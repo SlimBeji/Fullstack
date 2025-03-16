@@ -1,0 +1,62 @@
+services:
+    frontend:
+        build:
+            context: .
+            dockerfile: ./frontend/frontend.Dockerfile
+        container_name: frontend
+        ports:
+            - 5000:5173
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules
+        env_file:
+            - ./frontend/frontend.env
+        depends_on:
+            - backend
+        command: npm run dev
+        restart: on-failure
+
+    backend:
+        build:
+            context: .
+            dockerfile: ./backend/backend.Dockerfile
+        container_name: backend
+        ports:
+            - 3000:3000
+        volumes:
+            - ./backend:/app
+            - /app/node_modules
+        env_file:
+            - ./backend/backend.env
+        depends_on:
+            - mongo
+        command: npm start
+        restart: on-failure
+
+    mongo:
+        image: mongo:latest
+        container_name: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - ./mongo:/data/db
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
+        restart: on-failure
+
+    mongo-express:
+        image: mongo-express:latest
+        container_name: mongo-express
+        ports:
+            - 8000:8081
+        volumes:
+            - ./mongo-express:/app/config/
+        environment:
+            ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: example
+            ME_CONFIG_BASICAUTH: false
+        depends_on:
+            - mongo
+        restart: on-failure
