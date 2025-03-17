@@ -7,8 +7,8 @@
 todo.txt
 
 # Docker local images
-./mongo
-./mongo-express
+mongo
+mongo-express
 
 # Logs
 logs
