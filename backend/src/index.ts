@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cookieSession from "cookie-session";
 import "./controllers";
@@ -16,6 +17,13 @@ app.use("/api", router);
 app.use(wrongRoute);
 app.use(errorHandler);
 
-app.listen(3000, () => {
-    console.log("Listening on port 3000");
-});
+mongoose
+    .connect(process.env.MONGO_URL!)
+    .then(() => {
+        app.listen(3000, () => {
+            console.log("Listening on port 3000");
+        });
+    })
+    .catch(() => {
+        console.log("Could not stablish connection to database");
+    });
