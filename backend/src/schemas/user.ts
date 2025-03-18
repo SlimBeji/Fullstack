@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Schema } from "mongoose";
 
 export interface User {
     id: string;
@@ -7,7 +8,19 @@ export interface User {
     password: string;
     imageUrl?: string;
     isAdmin: boolean;
+    places: string;
 }
+
+export const UserDBSchema = new Schema<User>({
+    // Fields
+    name: { type: String, required: true, unique: true, min: 2 },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true, min: 8 },
+    imageUrl: { type: String, required: false },
+    isAdmin: { type: Boolean, required: true, default: false },
+    // Relations
+    places: { type: String, required: false },
+});
 
 export const UserPutSchema = z.object({
     name: z.string().min(2).optional(),
