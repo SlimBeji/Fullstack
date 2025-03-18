@@ -20,43 +20,43 @@ import {
 @controller("/places")
 export class PlacesController {
     @get("/")
-    public getPlaces(
+    public async getPlaces(
         req: ParsedRequest,
         resp: Response,
         next: NextFunction
-    ): void {
-        resp.status(200).json(crudPlace.placeLookup("*"));
+    ) {
+        resp.status(200).json(await crudPlace.search({}));
     }
 
     @bodyValidator(PlacePostSchema)
     @post("/")
-    public createPlace(
+    public async createPlace(
         req: ParsedRequest<PlacePost>,
         resp: Response,
         next: NextFunction
-    ): void {
-        const newPlace = crudPlace.createPlace(req.parsed);
+    ) {
+        const newPlace = await crudPlace.create(req.parsed);
         resp.status(200).json(newPlace);
     }
 
     @get("/:placeId")
-    public getPlace(
+    public async getPlace(
         req: ParsedRequest,
         res: Response,
         next: NextFunction
-    ): void {
-        const place = crudPlace.placeLookup(req.params.placeId)[0];
+    ) {
+        const place = await crudPlace.get(req.params.placeId);
         res.status(200).json(place);
     }
 
     @bodyValidator(PlacePutSchema)
     @put("/:placeId")
-    public editPlace(
+    public async editPlace(
         req: ParsedRequest<PlacePut>,
         res: Response,
         next: NextFunction
-    ): void {
-        const updatedPlace = crudPlace.updatePlace(
+    ) {
+        const updatedPlace = await crudPlace.update(
             req.params.placeId,
             req.parsed
         );
@@ -64,12 +64,12 @@ export class PlacesController {
     }
 
     @del("/:placeId")
-    public deletePlace(
+    public async deletePlace(
         req: ParsedRequest,
         res: Response,
         next: NextFunction
-    ): void {
-        crudPlace.deletePlace(req.params.placeId);
+    ) {
+        await crudPlace.delete(req.params.placeId);
         res.status(200).json({
             message: `Deleted place ${req.params.placeId}`,
         });

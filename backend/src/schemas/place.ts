@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Schema } from "mongoose";
 
 export interface Location {
     lat: number;
@@ -14,6 +15,20 @@ export interface Place {
     location: Location;
     creatorId: string;
 }
+
+export const PlaceDBSchema = new Schema<Place>({
+    // Fields
+    title: { type: String, required: true },
+    description: { type: String, required: true, min: 10 },
+    imageUrl: { type: String, required: false },
+    address: { type: String, required: true, min: 1 },
+    location: {
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true },
+    },
+    // Ids:
+    creatorId: { type: String, required: true },
+});
 
 export const PlacePostSchema = z.object({
     title: z.string().min(10),
