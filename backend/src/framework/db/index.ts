@@ -13,8 +13,13 @@ export abstract class Crud<
 > {
     constructor(public model: CrudModel<I, D>) {}
 
+    protected abstract secrets: { [K in keyof I]?: I[K] };
+
     public hideSecrets = (obj: I): I => {
-        return obj;
+        return {
+            ...obj,
+            ...this.secrets,
+        };
     };
 
     public toJson = (raws: D[]): I[] => {

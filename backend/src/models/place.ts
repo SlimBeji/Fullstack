@@ -7,6 +7,8 @@ const PlaceDB = model<Place>("Place", PlaceDBSchema);
 type PlaceDocument = InstanceType<typeof PlaceDB>;
 
 export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
+    protected secrets = {};
+
     constructor() {
         super(PlaceDB);
     }
