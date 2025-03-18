@@ -18,7 +18,7 @@ app.use(wrongRoute);
 app.use(errorHandler);
 
 mongoose
-    .connect(process.env.MONGO_URL!)
+    .connect(process.env.MONGO_URL!, { dbName: "myapp" })
     .then(() => {
         app.listen(3000, () => {
             console.log("Listening on port 3000");
