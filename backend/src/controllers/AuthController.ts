@@ -8,23 +8,23 @@ import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
 export class AuthController {
     @bodyValidator(SignupSchema)
     @post("/signup")
-    public signup(
+    public async signup(
         req: ParsedRequest<SignupForm>,
         res: Response,
         next: NextFunction
-    ): void {
-        const newUser = crudUser.createUser(req.parsed);
+    ) {
+        const newUser = await crudUser.create(req.parsed);
         res.status(200).json(newUser);
     }
 
     @bodyValidator(SigninSchema)
     @post("/signin")
-    public signin(
+    public async signin(
         req: ParsedRequest<SigninForm>,
         res: Response,
         next: NextFunction
-    ): void {
-        const user = crudUser.authenticate(req.parsed);
+    ) {
+        const user = await crudUser.authenticate(req.parsed);
         res.status(200).json(user);
     }
 }

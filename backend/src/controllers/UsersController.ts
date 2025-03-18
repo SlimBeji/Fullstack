@@ -14,54 +14,57 @@ import { UserPut, UserPutSchema } from "../schemas";
 @controller("/users")
 export class UsersController {
     @get("/")
-    public getUsers(
+    public async getUsers(
         req: ParsedRequest,
         res: Response,
         next: NextFunction
-    ): void {
-        res.status(200).json(crudUser.userLookup("*"));
+    ) {
+        res.status(200).json(await crudUser.search({}));
     }
 
     @get("/:userId")
-    public getUser(
+    public async getUser(
         req: ParsedRequest,
         res: Response,
         next: NextFunction
-    ): void {
-        const user = crudUser.userLookup(req.params.userId)[0];
+    ) {
+        const user = await crudUser.get(req.params.userId);
         res.status(200).json(user);
     }
 
     @bodyValidator(UserPutSchema)
     @put("/:userId")
-    public editUser(
+    public async editUser(
         req: ParsedRequest<UserPut>,
         res: Response,
         next: NextFunction
-    ): void {
-        const updatedUser = crudUser.updateUser(req.params.userId, req.parsed);
+    ) {
+        const updatedUser = await crudUser.update(
+            req.params.userId,
+            req.parsed
+        );
         res.status(200).json(updatedUser);
     }
 
     @del("/:userId")
-    public deleteUser(
+    public async deleteUser(
         req: ParsedRequest,
         res: Response,
         next: NextFunction
-    ): void {
-        crudUser.deleteUser(req.params.userId);
+    ) {
+        await crudUser.delete(req.params.userId);
         res.status(200).json({
             message: `Deleted user ${req.params.userId}`,
         });
     }
 
     @get("/:userId/places")
-    public getPlace(
+    public async getPlace(
         req: ParsedRequest,
         res: Response,
         next: NextFunction
-    ): void {
-        const places = crudPlace.placeLookup(req.params.userId, "creatorId");
+    ) {
+        const places = await crudPlace.search({ creatorId: req.params.userId });
         res.status(200).json(places);
     }
 }
