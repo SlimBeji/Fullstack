@@ -4,7 +4,9 @@ import { AppRouter } from "./AppRouter";
 import { getValidator } from "../decorators/bodyValidator";
 import { getPath } from "../decorators/routes";
 import { getMiddlewares } from "../decorators/use";
-import { RequestHandler } from "express";
+import { NextFunction, Response, RequestHandler } from "express";
+import { ParsedRequest } from "../types";
+import { ParsedRequestHandler } from "../types";
 
 const router = AppRouter.getInstance();
 
@@ -15,12 +17,27 @@ export function controller(prefix: string) {
             const { path, method } = getPath(target.prototype, key);
             const middlewares = getMiddlewares(target.prototype, key);
             const validator = getValidator(target.prototype, key);
-            const handlers: RequestHandler[] = [...middlewares];
-            if (validator) handlers.push(validator as RequestHandler);
-            handlers.push(rootHandler);
+            const handlers: ParsedRequestHandler[] = [...middlewares];
+            if (validator) handlers.push(validator);
+
+            const wrapper = async (
+                req: ParsedRequest,
+                res: Response,
+                next: NextFunction
+            ): Promise<any> => {
+                try {
+                    return await rootHandler(req, res, next);
+                } catch (err) {
+                    next(err);
+                }
+            };
+            handlers.push(wrapper);
 
             if (path) {
-                router[method](`${prefix}${path}`, handlers);
+                router[method](
+                    `${prefix}${path}`,
+                    handlers as RequestHandler[]
+                );
             }
         });
     };

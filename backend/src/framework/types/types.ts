@@ -12,8 +12,8 @@ export type ParsedRequestHandler<T = any> = (
     req: ParsedRequest<T>,
     res: Response,
     next: NextFunction
-) => void;
+) => Promise<any>;
 
 export type RequestHandlerDescriptor<T = any> = TypedPropertyDescriptor<
-    (req: ParsedRequest<T>, res: Response, next: NextFunction) => void
+    ParsedRequestHandler<T>
 >;
