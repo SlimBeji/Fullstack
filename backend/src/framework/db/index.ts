@@ -1,5 +1,4 @@
 import { FilterQuery, Model, Document } from "mongoose";
-import { v4 as uuid } from "uuid";
 import { HttpStatus } from "../types";
 import { ApiError } from "../models";
 
@@ -66,10 +65,20 @@ export abstract class Crud<
 
     public create = async (form: C): Promise<I> => {
         const newObj = new this.model({
-            creatorId: uuid(),
             ...form,
         });
-        await newObj.save();
+        try {
+            await newObj.save();
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new ApiError(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    `Could not create object: ${err.message}!`
+                );
+            }
+            throw err;
+        }
+
         return this.toJson([newObj])[0];
     };
 
