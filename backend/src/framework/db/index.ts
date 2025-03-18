@@ -58,7 +58,7 @@ export abstract class Crud<
         if (!raws.length) {
             throw new ApiError(
                 HttpStatus.NOT_FOUND,
-                `No places found with query ${query}!`
+                `No places found with query ${JSON.stringify(query)}!`
             );
         }
         return this.toJson(raws);
