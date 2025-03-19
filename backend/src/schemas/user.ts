@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { Schema } from "mongoose";
+import { Types, Schema } from "mongoose";
+import { CollectionEnum } from "./enums";
 
 export interface User {
     id: string;
@@ -8,7 +9,7 @@ export interface User {
     password: string;
     imageUrl?: string;
     isAdmin: boolean;
-    places: string;
+    places: Types.ObjectId[];
 }
 
 export const UserDBSchema = new Schema<User>({
@@ -19,7 +20,13 @@ export const UserDBSchema = new Schema<User>({
     imageUrl: { type: String, required: false },
     isAdmin: { type: Boolean, required: true, default: false },
     // Relations
-    places: { type: String, required: false },
+    places: [
+        {
+            type: Schema.ObjectId,
+            required: true,
+            ref: CollectionEnum.PLACE,
+        },
+    ],
 });
 
 export const UserPutSchema = z.object({
