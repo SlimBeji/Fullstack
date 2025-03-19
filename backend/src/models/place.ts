@@ -1,8 +1,14 @@
 import { model } from "mongoose";
 import { Crud } from "../framework";
-import { Place, PlaceDBSchema, PlacePost, PlacePut } from "../schemas";
+import {
+    CollectionEnum,
+    Place,
+    PlaceDBSchema,
+    PlacePost,
+    PlacePut,
+} from "../schemas";
 
-const PlaceDB = model<Place>("Place", PlaceDBSchema);
+const PlaceDB = model<Place>(CollectionEnum.PLACE, PlaceDBSchema);
 
 type PlaceDocument = InstanceType<typeof PlaceDB>;
 

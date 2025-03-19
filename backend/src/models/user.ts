@@ -2,6 +2,7 @@ import { model } from "mongoose";
 import { Crud, ApiError, HttpStatus } from "../framework";
 
 import {
+    CollectionEnum,
     User,
     UserDBSchema,
     UserPut,
@@ -9,7 +10,7 @@ import {
     SigninForm,
 } from "../schemas";
 
-const UserDB = model<User>("User", UserDBSchema);
+const UserDB = model<User>(CollectionEnum.USER, UserDBSchema);
 
 type UserDocument = InstanceType<typeof UserDB>;
 
