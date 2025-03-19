@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { Schema, Types } from "mongoose";
-import { CollectionEnum } from "./enums";
+import { Types } from "mongoose";
 
 export interface Location {
     lat: number;
@@ -16,24 +15,6 @@ export interface Place {
     location: Location;
     creatorId: Types.ObjectId;
 }
-
-export const PlaceDBSchema = new Schema<Place>({
-    // Fields
-    title: { type: String, required: true },
-    description: { type: String, required: true, min: 10 },
-    imageUrl: { type: String, required: false },
-    address: { type: String, required: true, min: 1 },
-    location: {
-        lat: { type: Number, required: true },
-        lng: { type: Number, required: true },
-    },
-    // Foreign Keys:
-    creatorId: {
-        type: Schema.ObjectId,
-        required: true,
-        ref: CollectionEnum.USER,
-    },
-});
 
 export const PlacePostSchema = z.object({
     title: z.string().min(10),
