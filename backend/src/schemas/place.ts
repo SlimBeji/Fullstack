@@ -46,6 +46,7 @@ export const PlacePostSchema = z.object({
             lng: z.number(),
         })
         .required(),
+    creatorId: z.string().min(24),
 });
 
 export type PlacePost = z.infer<typeof PlacePostSchema>;
