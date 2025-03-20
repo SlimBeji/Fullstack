@@ -26,7 +26,7 @@ const UserDBSchema = new Schema<User>({
     ],
 });
 
-const UserDB = model<User>(CollectionEnum.USER, UserDBSchema);
+export const UserDB = model<User>(CollectionEnum.USER, UserDBSchema);
 
 type UserDocument = InstanceType<typeof UserDB>;
 
