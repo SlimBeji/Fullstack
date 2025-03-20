@@ -1,7 +1,9 @@
 import { model, Schema } from "mongoose";
 import { Crud } from "../framework";
 import { CollectionEnum, Place, PlacePost, PlacePut } from "../schemas";
+import { UserDB } from "./user";
 
+// Schema creation
 export const PlaceDBSchema = new Schema<Place>({
     // Fields
     title: { type: String, required: true },
@@ -20,10 +22,26 @@ export const PlaceDBSchema = new Schema<Place>({
     },
 });
 
-const PlaceDB = model<Place>(CollectionEnum.PLACE, PlaceDBSchema);
+// Hooks
+PlaceDBSchema.pre("save", async function (next) {
+    const userExists = await UserDB.exists({ _id: this.creatorId });
+    if (!userExists) throw new Error("User does not exist");
+    next();
+});
+
+PlaceDBSchema.post("save", async function name(place, next) {
+    await UserDB.findByIdAndUpdate(place.creatorId, {
+        $push: { places: place._id },
+    });
+    next();
+});
+
+// Model Creation
+export const PlaceDB = model<Place>(CollectionEnum.PLACE, PlaceDBSchema);
 
 type PlaceDocument = InstanceType<typeof PlaceDB>;
 
+// Crud Class
 export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
     protected secrets = {};
 
