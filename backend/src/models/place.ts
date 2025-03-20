@@ -36,6 +36,14 @@ PlaceDBSchema.post("save", async function name(place, next) {
     next();
 });
 
+PlaceDBSchema.pre("deleteOne", async function (next) {
+    const place = await this.model.findOne(this.getFilter());
+    await UserDB.findByIdAndUpdate(place.creatorId, {
+        $pull: { places: place._id },
+    });
+    next();
+});
+
 // Model Creation
 export const PlaceDB = model<Place>(CollectionEnum.PLACE, PlaceDBSchema);
 
