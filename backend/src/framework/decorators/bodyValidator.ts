@@ -22,7 +22,7 @@ export function bodyValidator<T extends ZodType>(schema: T) {
 }
 
 function validateBody<T extends ZodType>(schema: T): ParsedRequestHandler {
-    return function (
+    return async function (
         req: ParsedRequest<z.infer<T>>,
         resp: Response,
         next: NextFunction
