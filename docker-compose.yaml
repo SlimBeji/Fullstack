@@ -29,21 +29,47 @@ services:
         env_file:
             - ./backend/backend.env
         depends_on:
-            - mongo
+            - mongo-setup
         command: npm start
         restart: on-failure
 
-    mongo:
+    mongo1:
         image: mongo:latest
-        container_name: mongo
+        container_name: mongo1
         ports:
             - 27017:27017
         volumes:
-            - ./mongo:/data/db
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
+            - ./mongo/1:/data/db
+        command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
         restart: on-failure
+
+    mongo2:
+        image: mongo:latest
+        container_name: mongo2
+        ports:
+            - 27018:27017
+        volumes:
+            - ./mongo/2:/data/db
+        command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+        restart: on-failure
+
+    mongo-setup:
+        image: mongo:latest
+        container_name: mongo-setup
+        depends_on:
+            - mongo1
+            - mongo2
+        entrypoint: >
+            bash -c "
+                sleep 5;
+                echo 'rs.initiate({
+                _id: \"rs0\",
+                members: [
+                    { _id: 0, host: \"mongo1:27017\" },
+                    { _id: 1, host: \"mongo2:27017\" }
+                ]
+                })' | mongosh --host mongo1:27017
+            "
 
     mongo-express:
         image: mongo-express:latest
@@ -53,10 +79,8 @@ services:
         volumes:
             - ./mongo-express:/app/config/
         environment:
-            ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: example
+            ME_CONFIG_MONGODB_URL: mongodb://mongo1:27017,mongo2:27017/?replicaSet=rs0
             ME_CONFIG_BASICAUTH: false
         depends_on:
-            - mongo
+            - mongo-setup
         restart: on-failure
