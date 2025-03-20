@@ -75,10 +75,13 @@ export abstract class Crud<
             return this.toJson([newObj])[0];
         } catch (err) {
             if (err instanceof Error) {
-                throw new ApiError(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    `Could not create object: ${err.message}!`
-                );
+                let status = HttpStatus.INTERNAL_SERVER_ERROR;
+                let message = `Could not create object: ${err.message}!`;
+                if (err.message.startsWith("E11000 duplicate key error")) {
+                    status = HttpStatus.UNPROCESSABLE_ENTITY;
+                    message = "Email or Username already exists";
+                }
+                throw new ApiError(status, message);
             }
             throw err;
         }
@@ -96,7 +99,7 @@ export abstract class Crud<
         } catch (err) {
             if (err instanceof Error) {
                 throw new ApiError(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    HttpStatus.INTERNAL_SERVER_ERROR,
                     `Could not update object: ${err.message}!`
                 );
             }
@@ -106,6 +109,19 @@ export abstract class Crud<
 
     public delete = async (id: string): Promise<void> => {
         const raw = await this.getById(id);
-        await raw.deleteOne();
+        try {
+            const session = await startSession();
+            session.startTransaction();
+            await raw.deleteOne({ session });
+            await session.commitTransaction();
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    `Could not delete object: ${err.message}!`
+                );
+            }
+            throw err;
+        }
     };
 }
