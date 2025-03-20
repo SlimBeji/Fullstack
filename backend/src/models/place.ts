@@ -29,7 +29,7 @@ PlaceDBSchema.pre("save", async function (next) {
     next();
 });
 
-PlaceDBSchema.post("save", async function name(place, next) {
+PlaceDBSchema.post("save", async function (place, next) {
     await UserDB.findByIdAndUpdate(place.creatorId, {
         $push: { places: place._id },
     });
