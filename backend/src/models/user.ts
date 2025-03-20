@@ -45,7 +45,7 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
         );
-        if (!users) throw error;
+        if (!users.length) throw error;
         const user = users[0];
         if (user.password !== form.password) throw error;
         return this.toJson([user])[0];
