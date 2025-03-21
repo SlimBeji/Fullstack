@@ -6,6 +6,7 @@ export enum ValidatorEnum {
     MIN = "MIN",
     MAX = "MAX",
     EMAIL = "EMAIL",
+    URL = "URL",
 }
 
 interface AnyValidatorType {
@@ -68,6 +69,14 @@ export const emailValidator = (): EmailValidatorType => {
     return { name: ValidatorEnum.EMAIL };
 };
 
+interface UrllValidatorType {
+    name: ValidatorEnum.URL;
+}
+
+export const urlValidator = (): UrllValidatorType => {
+    return { name: ValidatorEnum.URL };
+};
+
 export type ValidatorType =
     | AnyValidatorType
     | RequireValidatorType
@@ -75,7 +84,8 @@ export type ValidatorType =
     | MaxlengthValidatorType
     | MinValidatorType
     | MaxValidatorType
-    | EmailValidatorType;
+    | EmailValidatorType
+    | UrllValidatorType;
 
 export const validate = (
     value: string,
@@ -102,6 +112,14 @@ export const validate = (
                 break;
             case ValidatorEnum.EMAIL:
                 if (!/^\S+@\S+\.\S+$/.test(value)) return false;
+                break;
+            case ValidatorEnum.URL:
+                if (
+                    !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(
+                        value
+                    )
+                )
+                    return false;
                 break;
             default:
                 throw Error(`Unknow validator type ${validator}`);
