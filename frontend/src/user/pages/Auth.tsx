@@ -35,17 +35,17 @@ const Auth: React.FC = () => {
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [state, inputHandler, setData] = useForm<AuthFormTypes>(emptyState);
 
-    let verb: "Signing Up" | "Logging In";
+    let verb: "Authenticate" | "Register";
     let requiredText: "Login Required" | "Registration Required";
     let switchText: "Swith to login" | "Switch to signup";
     let usernameValidators: ValidatorType[];
     if (isLoginMode) {
-        verb = "Signing Up";
+        verb = "Authenticate";
         requiredText = "Login Required";
         switchText = "Switch to signup";
         usernameValidators = [anyValidator()];
     } else {
-        verb = "Logging In";
+        verb = "Register";
         requiredText = "Registration Required";
         switchText = "Swith to login";
         usernameValidators = [minLengthValidator(8)];
@@ -125,7 +125,7 @@ const Auth: React.FC = () => {
                     errorText="Please enter a password with at least 10 characters"
                 />
                 <Button type="submit" disabled={!state.isValid}>
-                    Authenticate
+                    {verb}
                 </Button>
             </form>
             <Button inverse onClick={onSwitchModeHandler}>
