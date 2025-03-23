@@ -5,86 +5,92 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../../shared/context";
 import { useForm, emptyStateBuilder } from "../../shared/hooks/form";
 import { Card } from "../../shared/components/ui";
-import { Input } from "../../shared/components/form";
-import { Button } from "../../shared/components/form";
+import { Input, Button } from "../../shared/components/form";
 
 import {
     emailValidator,
     minLengthValidator,
-    anyValidator,
-    ValidatorType,
+    urlValidator,
+    minValidator,
 } from "../../shared/util/validators";
+import { backendApi } from "../../shared/util/axios";
 
-enum AuthForm {
-    USERNAME = "username",
-    EMAIL = "email",
-    PASSWORD = "password",
-}
+const AuthForm = {
+    username: false,
+    email: true,
+    password: true,
+    imageUrl: false,
+};
 
-type AuthFormTypes = `${AuthForm}`;
+type AuthFormTypes = keyof typeof AuthForm;
 
 const emptyState = emptyStateBuilder<AuthFormTypes>(AuthForm);
-
-/* Initially username is hidden because we are in login
-mode so start from isValid=true, since it is not taken
-into account in the loginform */
-emptyState.inputs.username.isValid = true;
 
 const Auth: React.FC = () => {
     const auth = useContext(AuthContext);
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [state, inputHandler, setData] = useForm<AuthFormTypes>(emptyState);
+    const [state, inputHandlers, _, fieldsActivationHandler] =
+        useForm<AuthFormTypes>(emptyState);
 
     let verb: "Authenticate" | "Register";
     let requiredText: "Login Required" | "Registration Required";
     let switchText: "Swith to login" | "Switch to signup";
-    let usernameValidators: ValidatorType[];
     if (isLoginMode) {
         verb = "Authenticate";
         requiredText = "Login Required";
         switchText = "Switch to signup";
-        usernameValidators = [anyValidator()];
     } else {
         verb = "Register";
         requiredText = "Registration Required";
         switchText = "Swith to login";
-        usernameValidators = [minLengthValidator(8)];
     }
+
+    const onSignin = (): void => {
+        backendApi
+            .post("/signin", {
+                name: state.inputs.username.val,
+                password: state.inputs.password.val,
+            })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        auth.login();
+    };
+
+    const onSignup = (): void => {
+        backendApi
+            .post("/signup", {
+                name: state.inputs.username.val,
+                email: state.inputs.email.val,
+                password: state.inputs.password.val,
+            })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        auth.login();
+    };
 
     const onSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
         if (isLoginMode) {
-            console.log(
-                verb,
-                state.inputs.email.val,
-                state.inputs.password.val
-            );
+            onSignin();
         } else {
-            console.log(
-                verb,
-                state.inputs.username.val,
-                state.inputs.email.val,
-                state.inputs.password.val
-            );
+            onSignup();
         }
-        auth.login();
     };
 
     const onSwitchModeHandler = () => {
         setIsLoginMode((prev: boolean) => {
-            if (!prev) {
-                // Previous mode is Signup
-                // Next mode is login
-                // Set username validity to true
-                setData({
-                    inputs: {
-                        username: {
-                            isValid: true,
-                            val: state.inputs.username.val,
-                        },
-                    },
-                });
-            }
+            fieldsActivationHandler({
+                username: prev,
+                imageUrl: prev,
+            });
             return !prev;
         });
     };
@@ -96,18 +102,18 @@ const Auth: React.FC = () => {
             <form onSubmit={onSubmit}>
                 {!isLoginMode && (
                     <Input
-                        onInput={inputHandler}
+                        onInput={inputHandlers.username}
                         element="input"
                         id="username"
                         type="text"
                         label="Username"
-                        validators={usernameValidators}
+                        validators={[minValidator(8)]}
                         errorText="Please enter a valid username of at least 8 characters"
                         value={state.inputs.username.val || ""}
                     />
                 )}
                 <Input
-                    onInput={inputHandler}
+                    onInput={inputHandlers.email}
                     element="input"
                     id="email"
                     type="email"
@@ -116,7 +122,7 @@ const Auth: React.FC = () => {
                     errorText="Please enter a valid email"
                 />
                 <Input
-                    onInput={inputHandler}
+                    onInput={inputHandlers.password}
                     element="input"
                     id="password"
                     type="password"
@@ -124,6 +130,18 @@ const Auth: React.FC = () => {
                     validators={[minLengthValidator(10)]}
                     errorText="Please enter a password with at least 10 characters"
                 />
+                {!isLoginMode && (
+                    <Input
+                        onInput={inputHandlers.imageUrl}
+                        element="input"
+                        id="imageUrl"
+                        type="text"
+                        label="Avatar"
+                        validators={[urlValidator()]}
+                        errorText="Please enter a valid image url your avatar"
+                        value={state.inputs.imageUrl.val || ""}
+                    />
+                )}
                 <Button type="submit" disabled={!state.isValid}>
                     {verb}
                 </Button>
