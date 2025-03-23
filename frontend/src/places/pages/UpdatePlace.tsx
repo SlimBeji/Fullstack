@@ -13,20 +13,20 @@ import {
 
 import { DUMMY_PLACES } from "./data";
 
-enum FieldNames {
-    TITLE = "title",
-    DESCRIPTION = "description",
-}
+const Form = {
+    title: true,
+    description: true,
+};
 
-type FieldNamesType = `${FieldNames}`;
+type FormFields = keyof typeof Form;
 
-const initialState = emptyStateBuilder<FieldNamesType>(FieldNames);
+const initialState = emptyStateBuilder<FormFields>(Form);
 
 const UpdatePlace: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
 
-    const [state, inputHandler, setFormData] =
-        useForm<FieldNamesType>(initialState);
+    const [state, inputHandlers, setFormData] =
+        useForm<FormFields>(initialState);
 
     const placeId = Number(useParams().placeId!);
 
@@ -38,12 +38,10 @@ const UpdatePlace: React.FC = () => {
         if (!place) {
             return;
         }
-        setFormData({
-            inputs: {
-                title: { val: place.title, isValid: true },
-                description: { val: place.description, isValid: true },
-            },
-        });
+        setFormData([
+            { fieldName: "title", val: place.title, isValid: true },
+            { fieldName: "description", val: place.description, isValid: true },
+        ]);
         setIsLoaded(true);
     }, [place, setFormData, setIsLoaded]);
 
@@ -72,7 +70,7 @@ const UpdatePlace: React.FC = () => {
                 id="title"
                 element="input"
                 type="text"
-                onInput={inputHandler}
+                onInput={inputHandlers.title}
                 label="Title"
                 validators={[requireValidator()]}
                 errorText="Please enter a valid Title"
@@ -82,7 +80,7 @@ const UpdatePlace: React.FC = () => {
             <Input
                 id="description"
                 element="textarea"
-                onInput={inputHandler}
+                onInput={inputHandlers.description}
                 label="Description"
                 validators={[minLengthValidator(10)]}
                 errorText="Please enter a valid Description"
