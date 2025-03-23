@@ -6,53 +6,48 @@ import Input from "../../shared/components/form/Input";
 import { Button } from "../../shared/components/form";
 import { minLengthValidator } from "../../shared/util/validators";
 
-enum FieldNames {
-    TITLE = "title",
-    ADDRESS = "address",
-    DESCRIPTION = "description",
-}
+const Form = {
+    title: true,
+    address: true,
+    description: true,
+};
 
-type FieldNamesType = `${FieldNames}`;
+type FormFields = keyof typeof Form;
 
-const initialState = emptyStateBuilder<FieldNamesType>(FieldNames);
+const initialState = emptyStateBuilder<FormFields>(Form);
 
 const NewPlace: React.FC = () => {
-    const [state, inputHandler] = useForm<FieldNamesType>(initialState);
+    const [state, inputHandlers] = useForm<FormFields>(initialState);
 
     const submitHandler = (e: React.FormEvent): void => {
         e.preventDefault();
-        console.log(
-            "sending data to server",
-            state.inputs.title?.val,
-            state.inputs.address?.val,
-            state.inputs.description?.val
-        );
+        console.log("sending data to server", state.inputs);
     };
 
     return (
         <form className="place-form" onSubmit={submitHandler}>
             <Input
-                id={FieldNames.TITLE}
+                id="title"
                 element="input"
                 type="text"
-                onInput={inputHandler}
+                onInput={inputHandlers.title}
                 label="Title"
                 validators={[minLengthValidator(8)]}
                 errorText="Please enter a valid Title"
             />
             <Input
-                id={FieldNames.ADDRESS}
+                id="address"
                 element="input"
                 type="text"
-                onInput={inputHandler}
+                onInput={inputHandlers.address}
                 label="Address"
                 validators={[minLengthValidator(8)]}
                 errorText="Please enter a valid address"
             />
             <Input
-                id={FieldNames.DESCRIPTION}
+                id={"description"}
                 element="textarea"
-                onInput={inputHandler}
+                onInput={inputHandlers.description}
                 label="Description"
                 validators={[minLengthValidator(8)]}
                 errorText="Please enter a valid Description"
