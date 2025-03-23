@@ -10,7 +10,6 @@ import { Input, Button } from "../../shared/components/form";
 import {
     emailValidator,
     minLengthValidator,
-    urlValidator,
     minValidator,
 } from "../../shared/util/validators";
 import { backendApi } from "../../shared/util/axios";
@@ -19,7 +18,6 @@ const AuthForm = {
     username: false,
     email: true,
     password: true,
-    imageUrl: false,
 };
 
 type AuthFormTypes = keyof typeof AuthForm;
@@ -89,7 +87,6 @@ const Auth: React.FC = () => {
         setIsLoginMode((prev: boolean) => {
             fieldsActivationHandler({
                 username: prev,
-                imageUrl: prev,
             });
             return !prev;
         });
@@ -130,18 +127,6 @@ const Auth: React.FC = () => {
                     validators={[minLengthValidator(10)]}
                     errorText="Please enter a password with at least 10 characters"
                 />
-                {!isLoginMode && (
-                    <Input
-                        onInput={inputHandlers.imageUrl}
-                        element="input"
-                        id="imageUrl"
-                        type="text"
-                        label="Avatar"
-                        validators={[urlValidator()]}
-                        errorText="Please enter a valid image url your avatar"
-                        value={state.inputs.imageUrl.val || ""}
-                    />
-                )}
                 <Button type="submit" disabled={!state.isValid}>
                     {verb}
                 </Button>
