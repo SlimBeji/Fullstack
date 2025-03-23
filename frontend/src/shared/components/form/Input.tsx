@@ -50,7 +50,7 @@ interface InputProps {
     type?: HTMLInputElement["type"];
     id: string;
     label: string;
-    onInput: (id: string, value: string, isValid: boolean) => void;
+    onInput: (value: string, isValid: boolean) => void;
     rows?: number;
     placeholder?: string;
     validators?: ValidatorType[];
@@ -79,8 +79,12 @@ const Input: React.FC<InputProps> = ({
     });
 
     useEffect(() => {
-        onInput(id, state.value, state.isValid);
-    }, [onInput, id, state.value, state.isValid]);
+        let isValid = state.isValid;
+        if (validators) {
+            isValid = validate(state.value, validators);
+        }
+        onInput(state.value, isValid);
+    }, [onInput, state.value, state.isValid]);
 
     const changeHandler = (
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
