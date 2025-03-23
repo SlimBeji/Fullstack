@@ -47,7 +47,7 @@ const Auth: React.FC = () => {
 
     const onSignin = (): void => {
         backendApi
-            .post("/signin", {
+            .post("/auth/signin", {
                 name: state.inputs.username.val,
                 password: state.inputs.password.val,
             })
@@ -62,7 +62,7 @@ const Auth: React.FC = () => {
 
     const onSignup = (): void => {
         backendApi
-            .post("/signup", {
+            .post("/auth/signup", {
                 name: state.inputs.username.val,
                 email: state.inputs.email.val,
                 password: state.inputs.password.val,
