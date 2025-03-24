@@ -13,7 +13,7 @@ import {
     minValidator,
 } from "../../shared/util/validators";
 import { backendApi } from "../../shared/util/axios";
-import { AxiosError, HttpStatusCode } from "axios";
+import { AxiosError } from "axios";
 
 const AuthForm = {
     username: false,
