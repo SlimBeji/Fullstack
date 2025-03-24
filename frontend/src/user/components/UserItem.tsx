@@ -16,13 +16,16 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
             <Card className="user-item__content">
                 <Link to={`/${user.id}/places`}>
                     <div className="user-item__image">
-                        <Avatar imageUrl={user.imageUrl} alt={user.name} />
+                        <Avatar
+                            imageUrl={user.imageUrl || ""}
+                            alt={user.name}
+                        />
                     </div>
                     <div className="user-item__info">
                         <h2>{user.name}</h2>
                         <h3>
-                            {user.placesCount}{" "}
-                            {user.placesCount === 1 ? "Place" : "Places"}
+                            {user.places.length}{" "}
+                            {user.places.length === 1 ? "Place" : "Places"}
                         </h3>
                     </div>
                 </Link>

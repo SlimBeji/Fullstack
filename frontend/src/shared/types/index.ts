@@ -16,8 +16,8 @@ export interface Location {
 export interface User {
     id: number;
     name: string;
-    imageUrl: string;
-    placesCount: number;
+    imageUrl?: string;
+    places: string[];
 }
 
 export interface Place {
