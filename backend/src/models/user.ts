@@ -40,7 +40,7 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
     };
 
     public authenticate = async (form: SigninForm): Promise<User> => {
-        const users = await this.model.find({ name: form.name });
+        const users = await this.model.find({ email: form.email });
         const error = new ApiError(
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`

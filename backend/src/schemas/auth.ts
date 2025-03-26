@@ -10,7 +10,7 @@ export const SignupSchema = z.object({
 export type SignupForm = z.infer<typeof SignupSchema>;
 
 export const SigninSchema = z.object({
-    name: z.string(),
+    email: z.string().email(),
     password: z.string(),
 });
 
