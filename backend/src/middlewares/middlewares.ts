@@ -17,7 +17,7 @@ export const cors = (req: Request, res: Response, next: NextFunction): void => {
     // Handle preflight requests
     if (req.method === "OPTIONS") {
         res.sendStatus(204);
-        return next();
+        return;
     }
 
     next();
