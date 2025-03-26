@@ -4,6 +4,8 @@ export type RecursivePartial<T> = {
     [P in keyof T]?: T[P] extends object ? RecursivePartial<T[P]> : T[P];
 };
 
+export type HttpMethods = "get" | "post" | "put" | "delete";
+
 export type ButtonType = "button" | "submit" | "reset" | undefined;
 
 export type FormSubmitHandler = (e: FormEvent) => void;
