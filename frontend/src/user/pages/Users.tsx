@@ -1,19 +1,36 @@
-import UsersList from "../components/UsersList";
+import { useEffect } from "react";
 
+import UsersList from "../components/UsersList";
+import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
+import { useHttp } from "../../shared/hooks/http";
 import { User } from "../../shared/types";
 
-const USERS: User[] = [
-    {
-        id: 1,
-        name: "Slim",
-        imageUrl:
-            "https://img.delicious.com.au/DGZCHR1s/del/2018/12/paris-france-97370-2.jpg",
-        placesCount: 3,
-    },
-];
-
 const Users: React.FC = () => {
-    return <UsersList items={USERS} />;
+    const [data, sendRequest, clearError] = useHttp();
+
+    useEffect(() => {
+        sendRequest("/users", "get");
+    }, []);
+
+    return (
+        <>
+            {data.error?.message && (
+                <ErrorModal
+                    header="Could not fetch users!"
+                    error={data.error.message}
+                    onClear={() => clearError()}
+                />
+            )}
+            {data.loading && (
+                <div className="center">
+                    <LoadingSpinner asOverlay />
+                </div>
+            )}
+            {data.data?.parsed && (
+                <UsersList items={data.data.parsed as User[]} />
+            )}
+        </>
+    );
 };
 
 export default Users;
