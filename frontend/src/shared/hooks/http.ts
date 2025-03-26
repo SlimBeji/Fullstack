@@ -89,7 +89,6 @@ export const useHttp = (): [
         async (url: string, method: HttpMethods, data?: object) => {
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
-
             dispatch({ type: ActionType.SEND_REQUEST });
             await backendApi[method](url, data, {
                 signal: abortControllerRef.current.signal,
@@ -106,6 +105,7 @@ export const useHttp = (): [
                         payload: err,
                     });
                 });
+            abortControllerRef.current = null;
         },
         []
     );
