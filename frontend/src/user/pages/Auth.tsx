@@ -44,20 +44,24 @@ const Auth: React.FC = () => {
     }
 
     const onSignin = async (): Promise<void> => {
-        await sendRequest("/auth/signin", "post", {
+        const resp = await sendRequest("/auth/signin", "post", {
             email: state.inputs.email.val,
             password: state.inputs.password.val,
         });
-        auth.login();
+        if (resp.data?.id) {
+            auth.login(resp.data.id);
+        }
     };
 
     const onSignup = async (): Promise<void> => {
-        await sendRequest("/auth/signup", "post", {
+        const resp = await sendRequest("/auth/signup", "post", {
             name: state.inputs.username.val,
             email: state.inputs.email.val,
             password: state.inputs.password.val,
         });
-        auth.login();
+        if (resp.data?.id) {
+            auth.login(resp.data.id);
+        }
     };
 
     const onSubmit = (e: React.FormEvent): void => {

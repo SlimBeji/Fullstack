@@ -79,14 +79,18 @@ const reducer = (state: State, action: Action): State => {
 
 export const useHttp = (): [
     State,
-    (url: string, method: HttpMethods, data?: object) => Promise<void>,
+    (url: string, method: HttpMethods, data?: object) => Promise<AxiosResponse>,
     () => void
 ] => {
     const abortControllerRef = useRef<AbortController>(null);
     const [state, dispatch] = useReducer(reducer, emptyState);
 
     const sendRequest = useCallback(
-        async (url: string, method: HttpMethods, data?: object) => {
+        async (
+            url: string,
+            method: HttpMethods,
+            data?: object
+        ): Promise<AxiosResponse> => {
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
             dispatch({ type: ActionType.SEND_REQUEST });
@@ -98,6 +102,8 @@ export const useHttp = (): [
                     type: ActionType.PARSE_RESPONSE,
                     payload: resp,
                 });
+                abortControllerRef.current = null;
+                return resp;
             } catch (err) {
                 if (err instanceof AxiosError) {
                     dispatch({
@@ -105,9 +111,9 @@ export const useHttp = (): [
                         payload: err,
                     });
                 }
+                abortControllerRef.current = null;
                 throw err;
             }
-            abortControllerRef.current = null;
         },
         []
     );
