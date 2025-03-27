@@ -12,7 +12,7 @@ export interface Place {
     description: string;
     imageUrl?: string;
     address: string;
-    location: Location;
+    location?: Location;
     creatorId: Types.ObjectId;
 }
 
@@ -26,7 +26,7 @@ export const PlacePostSchema = z.object({
             lat: z.number(),
             lng: z.number(),
         })
-        .required(),
+        .optional(),
     creatorId: z.string().min(24),
 });
 

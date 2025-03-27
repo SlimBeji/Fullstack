@@ -11,8 +11,11 @@ export const PlaceDBSchema = new Schema<Place>({
     imageUrl: { type: String, required: false },
     address: { type: String, required: true, min: 1 },
     location: {
-        lat: { type: Number, required: true },
-        lng: { type: Number, required: true },
+        required: false,
+        type: {
+            lat: { type: Number, required: true },
+            lng: { type: Number, required: true },
+        },
     },
     // Foreign Keys:
     creatorId: {
