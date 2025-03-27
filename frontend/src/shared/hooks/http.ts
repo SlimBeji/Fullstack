@@ -90,21 +90,23 @@ export const useHttp = (): [
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
             dispatch({ type: ActionType.SEND_REQUEST });
-            await backendApi[method](url, data, {
-                signal: abortControllerRef.current.signal,
-            })
-                .then((res) => {
-                    dispatch({
-                        type: ActionType.PARSE_RESPONSE,
-                        payload: res,
-                    });
-                })
-                .catch((err) => {
+            try {
+                const resp = await backendApi[method](url, data, {
+                    signal: abortControllerRef.current.signal,
+                });
+                dispatch({
+                    type: ActionType.PARSE_RESPONSE,
+                    payload: resp,
+                });
+            } catch (err) {
+                if (err instanceof AxiosError) {
                     dispatch({
                         type: ActionType.PARSE_ERROR,
                         payload: err,
                     });
-                });
+                }
+                throw err;
+            }
             abortControllerRef.current = null;
         },
         []
