@@ -16,13 +16,16 @@ import { AuthContext } from "./shared/context";
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const login = useCallback(() => {
+    const [userId, setUserId] = useState("");
+    const login = useCallback((uid: string) => {
         setIsLoggedIn(true);
+        setUserId(uid);
     }, []);
     const logout = useCallback(() => {
         setIsLoggedIn(false);
+        setUserId("");
     }, []);
-    const context = { isLoggedIn, login, logout };
+    const context = { isLoggedIn, userId, login, logout };
 
     let routes: React.JSX.Element;
     if (isLoggedIn) {
