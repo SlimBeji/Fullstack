@@ -3,7 +3,7 @@ import "./Auth.css";
 import { useState, useContext } from "react";
 
 import { AuthContext } from "../../shared/context";
-import { useForm, emptyStateBuilder } from "../../shared/hooks/form";
+import { useForm, emptyStateBuilder, useHttp } from "../../shared/hooks";
 import { Card, ErrorModal, LoadingSpinner } from "../../shared/components/ui";
 import { Input, Button } from "../../shared/components/form";
 
@@ -12,8 +12,6 @@ import {
     minLengthValidator,
     minValidator,
 } from "../../shared/util/validators";
-import { backendApi } from "../../shared/util/axios";
-import { AxiosError } from "axios";
 
 const AuthForm = {
     username: false,
@@ -27,9 +25,8 @@ const emptyState = emptyStateBuilder<AuthFormTypes>(AuthForm);
 
 const Auth: React.FC = () => {
     const auth = useContext(AuthContext);
+    const [data, sendRequest, clearError] = useHttp();
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
     const [state, inputHandlers, _, fieldsActivationHandler] =
         useForm<AuthFormTypes>(emptyState);
 
@@ -46,55 +43,30 @@ const Auth: React.FC = () => {
         switchText = "Swith to login";
     }
 
-    const onSignin = (): void => {
-        backendApi
-            .post("/auth/signin", {
-                name: state.inputs.username.val,
-                password: state.inputs.password.val,
-            })
-            .then(() => {
-                auth.login();
-            })
-            .catch((err) => {
-                errorHandler(err);
-            });
+    const onSignin = async (): Promise<void> => {
+        await sendRequest("/auth/signin", "post", {
+            email: state.inputs.email.val,
+            password: state.inputs.password.val,
+        });
+        auth.login();
     };
 
-    const onSignup = (): void => {
-        backendApi
-            .post("/auth/signup", {
-                name: state.inputs.username.val,
-                email: state.inputs.email.val,
-                password: state.inputs.password.val,
-            })
-            .then(() => {
-                auth.login();
-            })
-            .catch((err) => {
-                errorHandler(err);
-            });
-    };
-
-    const errorHandler = (err: Error) => {
-        const defaultMessage = "Something went wrong!";
-        if (err instanceof AxiosError) {
-            const message = err.response?.data?.message;
-            setErrorMessage(message || defaultMessage);
-        } else {
-            setErrorMessage(err.message || defaultMessage);
-        }
+    const onSignup = async (): Promise<void> => {
+        await sendRequest("/auth/signup", "post", {
+            name: state.inputs.username.val,
+            email: state.inputs.email.val,
+            password: state.inputs.password.val,
+        });
+        auth.login();
     };
 
     const onSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
-        setIsLoading(true);
-        setErrorMessage("");
         if (isLoginMode) {
             onSignin();
         } else {
             onSignup();
         }
-        setIsLoading(false);
     };
 
     const onSwitchModeHandler = () => {
@@ -108,13 +80,15 @@ const Auth: React.FC = () => {
 
     return (
         <>
-            <ErrorModal
-                header="Credentials not valid!"
-                error={errorMessage}
-                onClear={() => setErrorMessage("")}
-            />
+            {data.error?.message && (
+                <ErrorModal
+                    header="Credentials not valid!"
+                    error={data.error?.message}
+                    onClear={() => clearError()}
+                />
+            )}
             <Card className="authentication">
-                {isLoading && <LoadingSpinner asOverlay />}
+                {data.loading && <LoadingSpinner asOverlay />}
                 <h2>{requiredText}</h2>
                 <hr />
                 <form onSubmit={onSubmit}>
