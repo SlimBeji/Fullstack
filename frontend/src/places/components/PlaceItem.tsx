@@ -8,6 +8,7 @@ import Modal from "../../shared/components/ui/Modal";
 import { Card } from "../../shared/components/ui";
 import { Button } from "../../shared/components/form";
 import { Map } from "../../shared/components/ui";
+import placeholder from "../../static/place_placeholder.jpg";
 
 interface PlaceItemProps {
     place: Place;
@@ -80,7 +81,10 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place }) => {
             <li className="place-item">
                 <Card className="place-item__content">
                     <div className="place-item__image">
-                        <img src={place.imageUrl} alt={place.title} />
+                        <img
+                            src={place.imageUrl || placeholder}
+                            alt={place.title}
+                        />
                     </div>
                     <div className="place-item__info">
                         <h2>{place.title}</h2>
