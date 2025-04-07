@@ -2,7 +2,7 @@ import React from "react";
 import "./LoadingSpinner.css";
 
 interface LoadingSpinner {
-    asOverlay: boolean;
+    asOverlay?: boolean;
 }
 
 const LoadingSpinner: React.FC<LoadingSpinner> = ({ asOverlay }) => {
