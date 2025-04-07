@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { Crud, ApiError, HttpStatus } from "../framework";
+import { Crud, ApiError, HttpStatus, ErrorHandler } from "../framework";
 
 import {
     CollectionEnum,
@@ -49,6 +49,19 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         const user = users[0];
         if (user.password !== form.password) throw error;
         return this.toJson([user])[0];
+    };
+
+    public create = async (form: SignupForm): Promise<User> => {
+        const errorHandler = (err: Error): [HttpStatus, string] => {
+            let status = HttpStatus.INTERNAL_SERVER_ERROR;
+            let message = `Could not create ${this.model.modelName} object: ${err.message}!`;
+            if (err.message.startsWith("E11000 duplicate key error")) {
+                status = HttpStatus.UNPROCESSABLE_ENTITY;
+                message = "Email or Username already exists";
+            }
+            return [status, message];
+        };
+        return super.create(form, errorHandler);
     };
 }
 
