@@ -1,5 +1,5 @@
 import { useCallback, useReducer, useRef, useEffect } from "react";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import { HttpMethods } from "../types";
 import { backendApi } from "../util/axios";
 
@@ -77,13 +77,33 @@ const reducer = (state: State, action: Action): State => {
     }
 };
 
-export const useHttp = (): [
+interface useHttpOptions {
+    ignoreNotFound?: boolean;
+}
+
+export const useHttp = (
+    options: useHttpOptions
+): [
     State,
     (url: string, method: HttpMethods, data?: object) => Promise<AxiosResponse>,
     () => void
 ] => {
     const abortControllerRef = useRef<AbortController>(null);
     const [state, dispatch] = useReducer(reducer, emptyState);
+
+    const dispatchOk = (resp: AxiosResponse): void => {
+        dispatch({
+            type: ActionType.PARSE_RESPONSE,
+            payload: resp,
+        });
+    };
+
+    const dispatchNotOk = (err: AxiosError): void => {
+        dispatch({
+            type: ActionType.PARSE_ERROR,
+            payload: err,
+        });
+    };
 
     const sendRequest = useCallback(
         async (
@@ -98,18 +118,20 @@ export const useHttp = (): [
                 const resp = await backendApi[method](url, data, {
                     signal: abortControllerRef.current.signal,
                 });
-                dispatch({
-                    type: ActionType.PARSE_RESPONSE,
-                    payload: resp,
-                });
+                dispatchOk(resp);
                 abortControllerRef.current = null;
                 return resp;
             } catch (err) {
                 if (err instanceof AxiosError) {
-                    dispatch({
-                        type: ActionType.PARSE_ERROR,
-                        payload: err,
-                    });
+                    if (
+                        err.response?.status === HttpStatusCode.NotFound &&
+                        options.ignoreNotFound
+                    ) {
+                        dispatchOk(err.response);
+                        return err.response;
+                    } else {
+                        dispatchNotOk(err);
+                    }
                 }
                 abortControllerRef.current = null;
                 throw err;
