@@ -82,7 +82,7 @@ interface useHttpOptions {
 }
 
 export const useHttp = (
-    options: useHttpOptions
+    options: useHttpOptions = {}
 ): [
     State,
     (url: string, method: HttpMethods, data?: object) => Promise<AxiosResponse>,
