@@ -1,20 +1,17 @@
 import "./PlaceForm.css";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { useForm, emptyStateBuilder } from "../../shared/hooks/form";
+import { useForm, emptyStateBuilder, useHttp } from "../../shared/hooks";
 import { Button, Input } from "../../shared/components/form";
-import { Card } from "../../shared/components/ui";
-import {
-    requireValidator,
-    minLengthValidator,
-} from "../../shared/util/validators";
-
-import { DUMMY_PLACES } from "./data";
+import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
+import { minLengthValidator } from "../../shared/util/validators";
+import { AxiosResponse } from "axios";
 
 const Form = {
     title: true,
+    address: true,
     description: true,
 };
 
@@ -23,81 +20,98 @@ type FormFields = keyof typeof Form;
 const initialState = emptyStateBuilder<FormFields>(Form);
 
 const UpdatePlace: React.FC = () => {
-    const [isLoaded, setIsLoaded] = useState(false);
-
     const [state, inputHandlers, setFormData] =
         useForm<FormFields>(initialState);
+    const [data, sendRequest, clearError] = useHttp();
 
-    const placeId = Number(useParams().placeId!);
-
-    const place = DUMMY_PLACES.find((place) => {
-        return place.id === placeId;
-    });
-
+    const placeId = useParams().placeId!;
     useEffect(() => {
-        if (!place) {
+        sendRequest(`/places/${placeId}`, "get").then((resp: AxiosResponse) => {
+            const { data } = resp;
+            setFormData([
+                { fieldName: "title", val: data.title, isValid: true },
+                { fieldName: "address", val: data.address, isValid: true },
+                {
+                    fieldName: "description",
+                    val: data.description,
+                    isValid: true,
+                },
+            ]);
+        });
+    }, [sendRequest, setFormData, placeId]);
+
+    const submitHandler = async (e: React.FormEvent): Promise<void> => {
+        e.preventDefault();
+        try {
+            await sendRequest(`/places/${placeId}`, "put", {
+                title: state.inputs.title?.val,
+                address: state.inputs.address?.val,
+                description: state.inputs.description?.val,
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const renderForm = (): React.JSX.Element | undefined => {
+        if (data.loading || !data.data?.parsed) {
             return;
         }
-        setFormData([
-            { fieldName: "title", val: place.title, isValid: true },
-            { fieldName: "description", val: place.description, isValid: true },
-        ]);
-        setIsLoaded(true);
-    }, [place, setFormData, setIsLoaded]);
 
-    if (!place) {
         return (
-            <div className="center">
-                <Card>
-                    <h2>Could not find place!</h2>
-                </Card>
-            </div>
-        );
-    }
-
-    const submitHandler = (e: React.FormEvent): void => {
-        e.preventDefault();
-        console.log(
-            "sending data to server",
-            state.inputs.title?.val,
-            state.inputs.description?.val
+            <form className="place-form" onSubmit={submitHandler}>
+                <Input
+                    id="title"
+                    element="input"
+                    type="text"
+                    onInput={inputHandlers.title}
+                    label="Title"
+                    validators={[minLengthValidator(10)]}
+                    errorText="Please enter a valid Title"
+                    value={state.inputs.title.val}
+                    isValid={state.inputs.title.isValid}
+                />
+                <Input
+                    id="address"
+                    element="input"
+                    type="text"
+                    onInput={inputHandlers.address}
+                    label="Address"
+                    validators={[minLengthValidator(1)]}
+                    errorText="Please enter a valid Address"
+                    value={state.inputs.address.val}
+                    isValid={state.inputs.address.isValid}
+                />
+                <Input
+                    id="description"
+                    element="textarea"
+                    onInput={inputHandlers.description}
+                    label="Description"
+                    validators={[minLengthValidator(10)]}
+                    errorText="Please enter a valid Description"
+                    value={state.inputs.description.val}
+                    isValid={state.inputs.description.isValid}
+                />
+                <Button type="submit" disabled={!state.isValid}>
+                    Edit Place
+                </Button>
+            </form>
         );
     };
 
-    const formContent = (
-        <form className="place-form" onSubmit={submitHandler}>
-            <Input
-                id="title"
-                element="input"
-                type="text"
-                onInput={inputHandlers.title}
-                label="Title"
-                validators={[requireValidator()]}
-                errorText="Please enter a valid Title"
-                value={state.inputs.title.val}
-                isValid={state.inputs.title.isValid}
-            />
-            <Input
-                id="description"
-                element="textarea"
-                onInput={inputHandlers.description}
-                label="Description"
-                validators={[minLengthValidator(10)]}
-                errorText="Please enter a valid Description"
-                value={state.inputs.description.val}
-                isValid={state.inputs.description.isValid}
-            />
-            <Button type="submit" disabled={!state.isValid}>
-                Edit Place
-            </Button>
-        </form>
+    return (
+        <>
+            {data.error && (
+                <ErrorModal error={data.error.message} onClear={clearError} />
+            )}
+            {data.loading && (
+                <div className="center">
+                    <LoadingSpinner asOverlay />
+                </div>
+            )}
+            {renderForm()}
+        </>
     );
-
-    if (isLoaded) {
-        return formContent;
-    } else {
-        return <div>LOADING...</div>;
-    }
 };
 
 export default UpdatePlace;
