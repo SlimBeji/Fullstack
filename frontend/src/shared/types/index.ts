@@ -23,7 +23,7 @@ export interface User {
 }
 
 export interface Place {
-    id: number;
+    id: string;
     title: string;
     description: string;
     imageUrl: string;

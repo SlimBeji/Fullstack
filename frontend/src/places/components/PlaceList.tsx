@@ -8,9 +8,10 @@ import { Button } from "../../shared/components/form";
 
 interface PlaceListProps {
     items: Place[];
+    onDelete: () => void;
 }
 
-const PlaceList: React.FC<PlaceListProps> = ({ items }) => {
+const PlaceList: React.FC<PlaceListProps> = ({ items, onDelete }) => {
     if (items.length === 0) {
         return (
             <div className="place-list center">
@@ -24,7 +25,7 @@ const PlaceList: React.FC<PlaceListProps> = ({ items }) => {
     return (
         <ul className="place-list">
             {items.map((p: Place) => {
-                return <PlaceItem key={p.id} place={p} />;
+                return <PlaceItem key={p.id} place={p} onDelete={onDelete} />;
             })}
         </ul>
     );

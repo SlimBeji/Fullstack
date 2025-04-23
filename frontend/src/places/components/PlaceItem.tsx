@@ -4,18 +4,25 @@ import "./PlaceItem.css";
 
 import { AuthContext } from "../../shared/context";
 import { Place } from "../../shared/types";
-import Modal from "../../shared/components/ui/Modal";
-import { Card } from "../../shared/components/ui";
+import {
+    Card,
+    Map,
+    Modal,
+    ErrorModal,
+    LoadingSpinner,
+} from "../../shared/components/ui";
 import { Button } from "../../shared/components/form";
-import { Map } from "../../shared/components/ui";
+import { useHttp } from "../../shared/hooks";
 import placeholder from "../../static/place_placeholder.jpg";
 
 interface PlaceItemProps {
     place: Place;
+    onDelete: () => void;
 }
 
-const PlaceItem: React.FC<PlaceItemProps> = ({ place }) => {
+const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
     const auth = useContext(AuthContext);
+    const [data, sendRequest, clearError] = useHttp();
     const [showMap, setShowMap] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -37,7 +44,9 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place }) => {
 
     const onDelteHandler = (): void => {
         setShowDeleteModal(false);
-        console.log("Deleting the place");
+        sendRequest(`/places/${place.id}`, "delete").then(() => {
+            onDelete();
+        });
     };
 
     const mapModalFooter = <Button onClick={closeMapHanlder}>CLOSE</Button>;
@@ -55,6 +64,14 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place }) => {
 
     return (
         <>
+            {data.error && (
+                <ErrorModal error={data.error.message} onClear={clearError} />
+            )}
+            {data.loading && (
+                <div className="center">
+                    <LoadingSpinner asOverlay />
+                </div>
+            )}
             <Modal
                 show={showMap}
                 onCancel={closeMapHanlder}
