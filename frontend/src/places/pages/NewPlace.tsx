@@ -51,7 +51,7 @@ const NewPlace: React.FC = () => {
                     type="text"
                     onInput={inputHandlers.title}
                     label="Title"
-                    validators={[minLengthValidator(8)]}
+                    validators={[minLengthValidator(10)]}
                     errorText="Please enter a valid Title"
                 />
                 <Input
@@ -60,7 +60,7 @@ const NewPlace: React.FC = () => {
                     type="text"
                     onInput={inputHandlers.address}
                     label="Address"
-                    validators={[minLengthValidator(8)]}
+                    validators={[minLengthValidator(10)]}
                     errorText="Please enter a valid address"
                 />
                 <Input
@@ -68,7 +68,7 @@ const NewPlace: React.FC = () => {
                     element="textarea"
                     onInput={inputHandlers.description}
                     label="Description"
-                    validators={[minLengthValidator(8)]}
+                    validators={[minLengthValidator(10)]}
                     errorText="Please enter a valid Description"
                 />
                 <Button type="submit" disabled={!state.isValid}>
