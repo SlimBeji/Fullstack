@@ -1,14 +1,13 @@
 import "./NavLinks.css";
 
 import { useContext } from "react";
-import { NavLink, useMatch, redirect } from "react-router-dom";
+import { NavLink, redirect } from "react-router-dom";
 
 import { AuthContext } from "../../context";
 
 const NavLinks: React.FC = () => {
     const auth = useContext(AuthContext);
-    const match = useMatch("/:userId/places");
-    const userId = match?.params?.userId;
+    const userId = auth.userId;
 
     const onLogout = () => {
         auth.logout();
@@ -20,14 +19,9 @@ const NavLinks: React.FC = () => {
             <li>
                 <NavLink to="/">All users</NavLink>
             </li>
-            {auth.isLoggedIn && (
+            {auth.isLoggedIn && userId && (
                 <li>
-                    <NavLink
-                        to={userId ? `/${userId}/places` : "/1/places"}
-                        className={userId ? "active" : ""}
-                    >
-                        My places
-                    </NavLink>
+                    <NavLink to={`/${userId}/places`}>My places</NavLink>
                 </li>
             )}
             {auth.isLoggedIn && (
