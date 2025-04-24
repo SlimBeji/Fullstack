@@ -112,10 +112,10 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                         <Button onClick={openMapHanlder} inverse>
                             VIEW ON MAP
                         </Button>
-                        {auth.isLoggedIn && (
+                        {auth.userId === place.creatorId && (
                             <Button to={`/places/${place.id}`}>EDIT</Button>
                         )}
-                        {auth.isLoggedIn && (
+                        {auth.userId === place.creatorId && (
                             <Button danger onClick={openDeleteModal}>
                                 DELETE
                             </Button>

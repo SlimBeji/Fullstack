@@ -29,5 +29,5 @@ export interface Place {
     imageUrl: string;
     address: string;
     location: Location;
-    creatorId: number;
+    creatorId: string;
 }
