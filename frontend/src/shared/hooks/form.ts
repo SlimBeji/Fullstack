@@ -2,7 +2,7 @@ import { useCallback, useReducer, useMemo } from "react";
 
 interface InputState<T extends string> {
     fieldName: T;
-    val: string;
+    val: any;
     isActive?: boolean;
     isValid: boolean;
 }
@@ -102,7 +102,7 @@ export const useForm = <T extends string>(
     initialState: FormState<T>
 ): [
     FormState<T>,
-    { [key in T]: (val: string, isValid: boolean) => void },
+    { [key in T]: (val: any, isValid: boolean) => void },
     (payload: InputState<T>[]) => void,
     (payload: { [key in T]?: boolean }) => void
 ] => {
@@ -110,10 +110,10 @@ export const useForm = <T extends string>(
 
     const inputHandlers = useMemo(() => {
         const handlers: {
-            [key in T]: (val: string, isValid: boolean) => void;
+            [key in T]: (val: any, isValid: boolean) => void;
         } = {} as any;
         for (let key in initialState.inputs) {
-            handlers[key] = (val: string, isValid: boolean) => {
+            handlers[key] = (val: any, isValid: boolean) => {
                 dispatch({
                     type: ActionType.UPDATE_FIELD,
                     payload: {
