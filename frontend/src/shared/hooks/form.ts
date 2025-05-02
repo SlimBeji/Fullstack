@@ -12,7 +12,7 @@ export interface FormState<T extends string> {
     isValid: boolean;
 }
 
-const recheckValidity = <T extends string>(data: FormState<T>): boolean => {
+const recheckFormValidity = <T extends string>(data: FormState<T>): boolean => {
     for (let key in data.inputs) {
         const { isActive, isValid } = data.inputs[key];
         if (isActive && !isValid) {
@@ -79,7 +79,7 @@ const formReducer = <T extends string>(
         default:
             return state;
     }
-    newState.isValid = recheckValidity(newState);
+    newState.isValid = recheckFormValidity(newState);
     return newState;
 };
 
