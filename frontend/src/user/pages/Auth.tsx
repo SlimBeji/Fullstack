@@ -5,7 +5,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../../shared/context";
 import { useForm, emptyStateBuilder, useHttp } from "../../shared/hooks";
 import { Card, ErrorModal, LoadingSpinner } from "../../shared/components/ui";
-import { Input, Button } from "../../shared/components/form";
+import { Input, Button, ImageUpload } from "../../shared/components/form";
 
 import {
     emailValidator,
@@ -15,6 +15,7 @@ import {
 
 const AuthForm = {
     username: false,
+    image: false,
     email: true,
     password: true,
 };
@@ -56,6 +57,7 @@ const Auth: React.FC = () => {
     const onSignup = async (): Promise<void> => {
         const resp = await sendRequest("/auth/signup", "post", {
             name: state.inputs.username.val,
+            image: state.inputs.image.val,
             email: state.inputs.email.val,
             password: state.inputs.password.val,
         });
@@ -106,6 +108,14 @@ const Auth: React.FC = () => {
                             validators={[minValidator(8)]}
                             errorText="Please enter a valid username of at least 8 characters"
                             value={state.inputs.username.val || ""}
+                        />
+                    )}
+                    {!isLoginMode && (
+                        <ImageUpload
+                            id="image"
+                            onInput={inputHandlers.image}
+                            url={state.inputs.image.val}
+                            required
                         />
                     )}
                     <Input
