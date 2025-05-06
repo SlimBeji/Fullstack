@@ -1,6 +1,5 @@
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import mongoose from "mongoose";
-import bodyParser from "body-parser";
 import cookieSession from "cookie-session";
 import "./controllers";
 
@@ -10,9 +9,9 @@ import { wrongRoute, cors } from "./middlewares";
 const SECRET_KEY = "NOT_VERY_SECRET";
 const app = express();
 const router = AppRouter.getInstance();
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors);
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
 app.use("/api", router);
 app.use(wrongRoute);
