@@ -20,3 +20,10 @@ export type ParsedRequestHandler<T = any> = (
 export type RequestHandlerDescriptor<T = any> = TypedPropertyDescriptor<
     ParsedRequestHandler<T>
 >;
+
+export interface MulterFileConfig {
+    name: string;
+    maxCount?: number;
+}
+
+export type MulterFilesConfig = MulterFileConfig[];

@@ -3,6 +3,7 @@ export enum MetadataKeys {
     path = "path",
     middlewares = "middlewares",
     validator = "validator",
+    multer = "multer",
 }
 
 export enum HttpMethods {
