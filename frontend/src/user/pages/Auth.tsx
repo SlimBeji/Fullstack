@@ -55,12 +55,12 @@ const Auth: React.FC = () => {
     };
 
     const onSignup = async (): Promise<void> => {
-        const resp = await sendRequest("/auth/signup", "post", {
-            name: state.inputs.username.val,
-            image: state.inputs.image.val,
-            email: state.inputs.email.val,
-            password: state.inputs.password.val,
-        });
+        const formData = new FormData();
+        formData.append("name", state.inputs.username.val);
+        formData.append("image", state.inputs.image.val.file);
+        formData.append("email", state.inputs.email.val);
+        formData.append("password", state.inputs.password.val);
+        const resp = await sendRequest("/auth/signup", "post", formData);
         if (resp.data?.id) {
             auth.login(resp.data.id);
         }
@@ -114,7 +114,7 @@ const Auth: React.FC = () => {
                         <ImageUpload
                             id="image"
                             onInput={inputHandlers.image}
-                            url={state.inputs.image.val}
+                            val={state.inputs.image.val}
                             required
                         />
                     )}

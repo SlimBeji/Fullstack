@@ -43,12 +43,17 @@ const inputReducer = (
     }
 };
 
+interface ImageUploadValue {
+    file: File | null;
+    url: string;
+}
+
 interface ImageUploadProps {
     id: string;
     center?: boolean;
-    onInput: (url: string, isValid: boolean) => void;
+    onInput: (val: ImageUploadValue, isValid: boolean) => void;
     errorText?: string;
-    url?: string;
+    val?: ImageUploadValue;
     required?: boolean;
 }
 
@@ -57,12 +62,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     center = true,
     onInput,
     errorText = "Could not read the file",
-    url = "",
+    val = undefined,
     required = false,
 }) => {
     const [state, dispatch] = useReducer(inputReducer, {
-        file: null,
-        url: url,
+        file: val?.file || null,
+        url: val?.url || "",
         isValid: false,
     });
     const filePickerRef = useRef<HTMLInputElement>(null);
@@ -72,7 +77,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         if (required) {
             isValid = state.url ? true : false;
         }
-        onInput(state.url, isValid);
+        onInput({ file: state.file, url: state.url }, isValid);
     }, [onInput, required, state.url, state.isValid]);
 
     const onClickHandler = (): void => {
