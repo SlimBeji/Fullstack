@@ -6,6 +6,8 @@ export type RecursivePartial<T> = {
 
 export type HttpMethods = "get" | "post" | "put" | "delete";
 
+export type HeaderContent = "application/json" | "multipart/form-data";
+
 export type ButtonType = "button" | "submit" | "reset" | undefined;
 
 export type FormSubmitHandler = (e: FormEvent) => void;

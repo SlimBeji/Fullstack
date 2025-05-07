@@ -1,7 +1,7 @@
 import { useCallback, useReducer, useRef, useEffect } from "react";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
-import { HttpMethods } from "../types";
-import { backendApi } from "../util/axios";
+import { HeaderContent, HttpMethods } from "../types";
+import { getClient } from "../util/axios";
 
 interface State {
     loading: boolean;
@@ -85,7 +85,12 @@ export const useHttp = (
     options: useHttpOptions = {}
 ): [
     State,
-    (url: string, method: HttpMethods, data?: object) => Promise<AxiosResponse>,
+    (
+        url: string,
+        method: HttpMethods,
+        data?: object,
+        contentType?: HeaderContent
+    ) => Promise<AxiosResponse>,
     () => void
 ] => {
     const abortControllerRef = useRef<AbortController>(null);
@@ -113,9 +118,14 @@ export const useHttp = (
         ): Promise<AxiosResponse> => {
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
+            let contentType: HeaderContent = "application/json";
+            if (data instanceof FormData) {
+                contentType = "multipart/form-data";
+            }
+            const webClient = getClient(contentType);
             dispatch({ type: ActionType.SEND_REQUEST });
             try {
-                const resp = await backendApi[method](url, data, {
+                const resp = await webClient[method](url, data, {
                     signal: abortControllerRef.current.signal,
                 });
                 dispatchOk(resp);
