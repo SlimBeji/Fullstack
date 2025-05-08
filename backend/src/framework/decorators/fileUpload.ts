@@ -5,6 +5,7 @@ import {
     ParsedRequestHandler,
     RequestHandlerDescriptor,
     MulterFilesConfig,
+    ParsedRequest,
 } from "../types";
 
 const filesUpload = multer({});
@@ -29,4 +30,16 @@ export function getFileUploader(
         key
     );
     return filesUpload.fields(uploadConfig) as ParsedRequestHandler;
+}
+
+export function extractFile(
+    req: ParsedRequest,
+    field: string
+): Express.Multer.File | null {
+    try {
+        const files = req.files as Record<string, Express.Multer.File[]>;
+        return files[field][0];
+    } catch {
+        return null;
+    }
 }
