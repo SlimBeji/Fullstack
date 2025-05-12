@@ -15,7 +15,6 @@ export const UserPutSchema = z.object({
     name: z.string().min(2).optional(),
     email: z.string().email().optional(),
     password: z.string().optional(),
-    imageUrl: z.string().url().optional(),
 });
 
 export type UserPut = z.infer<typeof UserPutSchema>;
