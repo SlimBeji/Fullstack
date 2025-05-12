@@ -1,4 +1,9 @@
-import { Storage, StorageOptions, SaveOptions } from "@google-cloud/storage";
+import {
+    Storage,
+    StorageOptions,
+    SaveOptions,
+    Bucket,
+} from "@google-cloud/storage";
 import { randomUUID } from "crypto";
 import path from "path";
 
@@ -13,6 +18,7 @@ export class CloudStorage {
     private readonly baseMediaUrl: string;
     private readonly accessExpiration: number;
     private readonly storage: Storage;
+    private readonly bucket: Bucket;
 
     constructor() {
         // Parsing env variables
@@ -35,6 +41,9 @@ export class CloudStorage {
                 console.error("Failed to initialize emulator:", err);
             });
         }
+
+        // Select the bucket
+        this.bucket = this.storage.bucket(this.bucketName);
     }
 
     get isEmulator(): boolean {
@@ -86,8 +95,7 @@ export class CloudStorage {
         }
 
         expiration = expiration || this.accessExpiration;
-        const bucket = this.storage.bucket(this.bucketName);
-        const file = bucket.file(filename);
+        const file = this.bucket.file(filename);
         const [url] = await file.getSignedUrl({
             version: "v4",
             action: "read",
@@ -96,7 +104,7 @@ export class CloudStorage {
         return url;
     }
 
-    async uploadFile(
+    public async uploadFile(
         file: Express.Multer.File,
         destination?: string
     ): Promise<string> {
@@ -106,14 +114,27 @@ export class CloudStorage {
             ext
         );
         const filename = `${baseFilename}_${randomUUID()}${ext}`.toLowerCase();
-        const bucket = this.storage.bucket(this.bucketName);
-        const blob = bucket.file(filename);
+        const blob = this.bucket.file(filename);
         const metadata: SaveOptions = {
             contentType: file.mimetype,
             metadata: { contentType: file.mimetype },
         };
         await blob.save(file.buffer, metadata);
         return blob.name;
+    }
+
+    public async deleteFile(filename: string): Promise<boolean> {
+        try {
+            const blob = this.bucket.file(filename);
+            await blob.delete();
+            return true;
+        } catch (error) {
+            // 404 error when the filename does not exists
+            if ((error as any).code !== 404) {
+                throw error;
+            }
+            return false;
+        }
     }
 }
 
