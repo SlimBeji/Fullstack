@@ -79,6 +79,7 @@ const Auth: React.FC = () => {
         setIsLoginMode((prev: boolean) => {
             fieldsActivationHandler({
                 username: prev,
+                image: prev,
             });
             return !prev;
         });
