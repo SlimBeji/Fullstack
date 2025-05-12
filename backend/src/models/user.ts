@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 import { Crud, ApiError, HttpStatus } from "../framework";
 import { storage } from "../utils";
 
@@ -100,6 +100,12 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         };
         return super.create(form, errorHandler);
     };
+
+    public async deleteCleanup(document: UserDocument): Promise<void> {
+        if (document.imageUrl) {
+            storage.deleteFile(document.imageUrl);
+        }
+    }
 }
 
 export const crudUser = new CrudUser();

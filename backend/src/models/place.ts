@@ -69,6 +69,12 @@ export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
         });
         return await Promise.all(placesPromises);
     }
+
+    public async deleteCleanup(document: PlaceDocument): Promise<void> {
+        if (document.imageUrl) {
+            storage.deleteFile(document.imageUrl);
+        }
+    }
 }
 
 export const crudPlace = new CrudPlace();

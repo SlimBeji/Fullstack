@@ -111,6 +111,8 @@ export abstract class Crud<
         }
     }
 
+    public async deleteCleanup(document: D): Promise<void> {}
+
     public async delete(id: string): Promise<void> {
         const raw = await this.getById(id);
         try {
@@ -127,5 +129,6 @@ export abstract class Crud<
             }
             throw err;
         }
+        await this.deleteCleanup(raw);
     }
 }
