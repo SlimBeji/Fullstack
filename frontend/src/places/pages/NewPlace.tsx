@@ -2,17 +2,17 @@ import "./PlaceForm.css";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Input from "../../shared/components/form/Input";
-import { Button } from "../../shared/components/form";
 import { minLengthValidator } from "../../shared/util/validators";
 import { useHttp, emptyStateBuilder, useForm } from "../../shared/hooks";
 import { AuthContext } from "../../shared/context";
 import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
+import { Button, Input, ImageUpload } from "../../shared/components/form";
 
 const Form = {
     title: true,
     address: true,
     description: true,
+    image: true,
 };
 
 type FormFields = keyof typeof Form;
@@ -20,20 +20,21 @@ type FormFields = keyof typeof Form;
 const initialState = emptyStateBuilder<FormFields>(Form);
 
 const NewPlace: React.FC = () => {
-    const auth = useContext(AuthContext);
     const navigate = useNavigate();
-    const [state, inputHandlers] = useForm<FormFields>(initialState);
+    const auth = useContext(AuthContext);
     const [data, sendRequest, clearError] = useHttp();
+    const [state, inputHandlers] = useForm<FormFields>(initialState);
 
-    const submitHandler = async (e: React.FormEvent): Promise<void> => {
+    const onSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append("title", state.inputs.title.val);
+        formData.append("image", state.inputs.image.val.file);
+        formData.append("description", state.inputs.description.val);
+        formData.append("address", state.inputs.address.val);
+        formData.append("creatorId", auth.userId || "");
         try {
-            await sendRequest("/places", "post", {
-                title: state.inputs.title.val,
-                description: state.inputs.description.val,
-                address: state.inputs.address.val,
-                creatorId: auth.userId,
-            });
+            await sendRequest("/places", "post", formData);
             navigate("/");
         } catch (err) {}
     };
@@ -43,7 +44,7 @@ const NewPlace: React.FC = () => {
             {data.error && (
                 <ErrorModal error={data.error.message} onClear={clearError} />
             )}
-            <form className="place-form" onSubmit={submitHandler}>
+            <form className="place-form" onSubmit={onSubmit}>
                 {data.loading && <LoadingSpinner asOverlay />}
                 <Input
                     id="title"
@@ -70,6 +71,12 @@ const NewPlace: React.FC = () => {
                     label="Description"
                     validators={[minLengthValidator(10)]}
                     errorText="Please enter a valid Description"
+                />
+                <ImageUpload
+                    id="image"
+                    onInput={inputHandlers.image}
+                    val={state.inputs.image.val}
+                    required
                 />
                 <Button type="submit" disabled={!state.isValid}>
                     Add Place
