@@ -21,7 +21,7 @@ export abstract class Crud<
         };
     }
 
-    public toJson(raws: D[]): I[] {
+    public async toJson(raws: D[]): Promise<I[]> {
         return raws.map((el) => {
             return this.hideSecrets(
                 el.toObject({
@@ -49,7 +49,7 @@ export abstract class Crud<
 
     public async get(id: string): Promise<I> {
         const raw = await this.getById(id);
-        return this.toJson([raw])[0];
+        return (await this.toJson([raw]))[0];
     }
 
     public async search(query: FilterQuery<D>): Promise<I[]> {
@@ -62,7 +62,7 @@ export abstract class Crud<
                 )}!`
             );
         }
-        return this.toJson(raws);
+        return await this.toJson(raws);
     }
 
     public async create(
@@ -77,7 +77,7 @@ export abstract class Crud<
             session.startTransaction();
             await newObj.save({ session });
             await session.commitTransaction();
-            return this.toJson([newObj])[0];
+            return (await this.toJson([newObj]))[0];
         } catch (err) {
             if (err instanceof Error) {
                 let status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -99,7 +99,7 @@ export abstract class Crud<
             session.startTransaction();
             await raw.save({ session });
             await session.commitTransaction();
-            return this.toJson([raw])[0];
+            return (await this.toJson([raw]))[0];
         } catch (err) {
             if (err instanceof Error) {
                 throw new ApiError(
