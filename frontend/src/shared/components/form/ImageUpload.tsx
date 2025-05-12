@@ -17,6 +17,7 @@ interface ImageUploadState {
     file: File | null;
     url: string;
     isValid: boolean;
+    uploadAttempt: boolean;
 }
 
 enum ImageUploadActionType {
@@ -37,6 +38,7 @@ const inputReducer = (
             return {
                 ...state,
                 ...action.payload,
+                uploadAttempt: true,
             };
         default:
             return state;
@@ -69,6 +71,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         file: val?.file || null,
         url: val?.url || "",
         isValid: false,
+        uploadAttempt: false,
     });
     const filePickerRef = useRef<HTMLInputElement>(null);
 
@@ -128,7 +131,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     PICK IMAGE
                 </Button>
             </div>
-            {!state.isValid && <p>{errorText}</p>}
+            {!state.isValid && state.uploadAttempt && <p>{errorText}</p>}
         </div>
     );
 };
