@@ -1,11 +1,22 @@
 import { Response, NextFunction } from "express";
 
-import { controller, post, bodyValidator, ParsedRequest } from "../framework";
+import {
+    controller,
+    post,
+    bodyValidator,
+    fileUploader,
+    ParsedRequest,
+    ApiError,
+    HttpStatus,
+    extractFile,
+} from "../framework";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
+import { storage } from "../utils";
 
 @controller("/auth")
 export class AuthController {
+    @fileUploader([{ name: "image" }])
     @bodyValidator(SignupSchema)
     @post("/signup")
     public async signup(
@@ -13,6 +24,20 @@ export class AuthController {
         res: Response,
         next: NextFunction
     ) {
+        const duplicateMsg = await crudUser.checkDuplicate(
+            req.parsed.email,
+            req.parsed.name
+        );
+        if (duplicateMsg) {
+            throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
+        }
+
+        const imageFile = extractFile(req, "image");
+        if (!imageFile) {
+            throw new ApiError(HttpStatus.BAD_REQUEST, "No Image was provided");
+        }
+
+        req.parsed.imageUrl = await storage.uploadFile(imageFile);
         const newUser = await crudUser.create(req.parsed);
         res.status(200).json(newUser);
     }
