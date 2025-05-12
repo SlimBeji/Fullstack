@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { hash, compare } from "bcryptjs";
 import { Crud, ApiError, HttpStatus } from "../framework";
 import { storage } from "../utils";
 
@@ -9,6 +10,8 @@ import {
     SignupForm,
     SigninForm,
 } from "../schemas";
+
+const DEFAULT_HASH_SALT = 12;
 
 const UserDBSchema = new Schema<User>({
     // Fields
@@ -83,12 +86,14 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             throw error;
         }
         const user = users[0];
-        if (user.password !== form.password) throw error;
+        const isValidPassword = await compare(form.password, user.password);
+        if (!isValidPassword) throw error;
 
         return (await crudUser.toJson([user]))[0];
     };
 
     public create = async (form: SignupForm): Promise<User> => {
+        form.password = await hash(form.password, DEFAULT_HASH_SALT);
         const errorHandler = (err: Error): [HttpStatus, string] => {
             let status = HttpStatus.INTERNAL_SERVER_ERROR;
             let message = `Could not create ${this.model.modelName} object: ${err.message}!`;
@@ -99,6 +104,13 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             return [status, message];
         };
         return super.create(form, errorHandler);
+    };
+
+    public update = async (id: string, form: UserPut): Promise<User> => {
+        if (form.password) {
+            form.password = await hash(form.password, DEFAULT_HASH_SALT);
+        }
+        return super.update(id, form);
     };
 
     public async deleteCleanup(document: UserDocument): Promise<void> {
