@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { Crud, ApiError, HttpStatus } from "../framework";
+import { storage } from "../utils";
 
 import {
     CollectionEnum,
@@ -39,16 +40,49 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         password: "***HIDDEN***",
     };
 
+    public async toJson(raws: UserDocument[]): Promise<User[]> {
+        const users = await super.toJson(raws);
+        const userPromises = users.map(async (u) => {
+            const imageUrl = await storage.getSignedUrl(u.imageUrl!);
+            return { ...u, imageUrl };
+        });
+        return await Promise.all(userPromises);
+    }
+
+    public checkDuplicate = async (
+        email: string,
+        name: string
+    ): Promise<string> => {
+        const user = await this.model.findOne({
+            $or: [{ email }, { name }],
+        });
+        if (!user) {
+            return "";
+        }
+        if (user.email === email) return `email ${email} is already used!`;
+        if (user.name === name) return `name ${name} is already used!`;
+        return "";
+    };
+
+    public getByEmail = async (email: string): Promise<User | null> => {
+        const users = await this.model.find({ email });
+        if (!users.length) {
+            return null;
+        }
+        const userDocument = users[0];
+        return (await this.toJson([userDocument]))[0];
+    };
+
     public authenticate = async (form: SigninForm): Promise<User> => {
-        const users = await this.model.find({ email: form.email });
         const error = new ApiError(
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
         );
-        if (!users.length) throw error;
-        const user = users[0];
+        const user = await this.getByEmail(form.email);
+        if (!user) throw error;
+
         if (user.password !== form.password) throw error;
-        return this.toJson([user])[0];
+        return user;
     };
 
     public create = async (form: SignupForm): Promise<User> => {
