@@ -8,6 +8,10 @@ import {
     del,
     bodyValidator,
     ParsedRequest,
+    fileUploader,
+    ApiError,
+    HttpStatus,
+    extractFile,
 } from "../framework";
 import { crudPlace } from "../models";
 import {
@@ -16,6 +20,7 @@ import {
     PlacePut,
     PlacePutSchema,
 } from "../schemas";
+import { storage } from "../utils";
 
 @controller("/places")
 export class PlacesController {
@@ -28,6 +33,7 @@ export class PlacesController {
         resp.status(200).json(await crudPlace.search({}));
     }
 
+    @fileUploader([{ name: "image" }])
     @bodyValidator(PlacePostSchema)
     @post("/")
     public async createPlace(
@@ -35,6 +41,12 @@ export class PlacesController {
         resp: Response,
         next: NextFunction
     ) {
+        const imageFile = extractFile(req, "image");
+        if (!imageFile) {
+            throw new ApiError(HttpStatus.BAD_REQUEST, "No Image was provided");
+        }
+
+        req.parsed.imageUrl = await storage.uploadFile(imageFile);
         const newPlace = await crudPlace.create(req.parsed);
         resp.status(200).json(newPlace);
     }

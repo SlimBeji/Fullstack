@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 import { Crud } from "../framework";
 import { CollectionEnum, Place, PlacePost, PlacePut } from "../schemas";
 import { UserDB } from "./user";
+import { storage } from "../utils";
 
 // Schema creation
 export const PlaceDBSchema = new Schema<Place>({
@@ -58,6 +59,15 @@ export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
 
     constructor() {
         super(PlaceDB);
+    }
+
+    public async toJson(raws: PlaceDocument[]): Promise<Place[]> {
+        const places = await super.toJson(raws);
+        const placesPromises = places.map(async (p) => {
+            const imageUrl = await storage.getSignedUrl(p.imageUrl!);
+            return { ...p, imageUrl };
+        });
+        return await Promise.all(placesPromises);
     }
 }
 
