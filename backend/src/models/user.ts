@@ -78,11 +78,14 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
         );
-        const user = await this.getByEmail(form.email);
-        if (!user) throw error;
-
+        const users = await this.model.find({ email: form.email });
+        if (!users.length) {
+            throw error;
+        }
+        const user = users[0];
         if (user.password !== form.password) throw error;
-        return user;
+
+        return (await crudUser.toJson([user]))[0];
     };
 
     public create = async (form: SignupForm): Promise<User> => {
