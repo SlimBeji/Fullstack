@@ -30,6 +30,7 @@ services:
             - ./backend/backend.env
         depends_on:
             - mongo-setup
+            - gcs
         command: npm start
         restart: on-failure
 
@@ -83,4 +84,26 @@ services:
             ME_CONFIG_BASICAUTH: false
         depends_on:
             - mongo-setup
+        restart: on-failure
+
+    gcs:
+        image: fsouza/fake-gcs-server
+        container_name: gcs
+        ports:
+            - 4443:4443
+        volumes:
+            - ./gcs:/storage
+        command:
+            [
+                "-scheme",
+                "http",
+                "-public-host",
+                "gcs:4443",
+                "-external-url",
+                "http://gcs:4443",
+                "-backend",
+                "filesystem",
+                "-filesystem-root",
+                "/storage",
+            ]
         restart: on-failure

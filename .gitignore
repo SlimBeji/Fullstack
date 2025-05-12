@@ -9,6 +9,7 @@ todo.txt
 # Docker local images
 mongo
 mongo-express
+gcs
 
 # Logs
 logs
