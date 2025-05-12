@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { Crud, ApiError, HttpStatus, ErrorHandler } from "../framework";
+import { Crud, ApiError, HttpStatus } from "../framework";
 
 import {
     CollectionEnum,
