@@ -29,7 +29,8 @@ services:
         env_file:
             - ./backend/backend.env
         depends_on:
-            - mongo-setup
+            - mongo1
+            - mongo2
             - gcs
         command: npm start
         restart: on-failure
