@@ -13,5 +13,7 @@ export const errorHandler = (
     }
     res.status(error.code || 500);
     const jsonResp = { message: error.message, details: error.details };
+    console.error(error.message);
+    console.error(error.details);
     res.json(jsonResp);
 };
