@@ -1,20 +1,25 @@
-import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
 import "./controllers";
 
+import {
+    PORT,
+    ENV,
+    SECRET_KEY,
+    JSON_MAX_SIZE,
+    MONGO_URL,
+    MONGO_DBNAME,
+} from "./config";
 import { AppRouter, errorHandler } from "./framework";
 import { wrongRoute, cors } from "./middlewares";
 
-dotenv.config();
-
-const SECRET_KEY = process.env.SECRET_KEY!;
 const app = express();
+app.env = ENV;
 const router = AppRouter.getInstance();
 
 app.use(cors);
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
 app.use("/api", router);
@@ -22,10 +27,10 @@ app.use(wrongRoute);
 app.use(errorHandler);
 
 mongoose
-    .connect(process.env.MONGO_URL!, { dbName: "myapp" })
+    .connect(MONGO_URL!, { dbName: MONGO_DBNAME })
     .then(() => {
-        app.listen(3000, () => {
-            console.log("Listening on port 3000");
+        app.listen(PORT, () => {
+            console.log(`Listening on port ${PORT}`);
         });
     })
     .catch(() => {
