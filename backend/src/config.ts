@@ -12,6 +12,7 @@ const parseVar = (varname: string, defaultValue?: string): string => {
 };
 
 // ENV config
+export const PORT = parseVar("PORT", "5000");
 export const SECRET_KEY = parseVar("SECRET_KEY");
 export const JSON_MAX_SIZE = parseVar("JSON_MAX_SIZE");
 export const ENV = parseVar("ENV");
