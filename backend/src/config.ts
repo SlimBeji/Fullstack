@@ -28,8 +28,19 @@ export const GOOGLE_APPLICATION_CREDENTIALS = parseVar(
 );
 export const GCP_PROJECT_ID = parseVar("GCP_PROJECT_ID");
 export const GCS_BUCKET_NAME = parseVar("GCS_BUCKET_NAME");
-export const GCS_STORAGE_EMULATOR_HOST = parseVar("GCS_STORAGE_EMULATOR_HOST");
-export const GCS_BASE_MEDIA_URL = parseVar("GCS_BASE_MEDIA_URL");
-export const GCS_BLOB_ACCESS_EXPIRATION = parseVar(
-    "GCS_BLOB_ACCESS_EXPIRATION"
+export const GCS_BLOB_ACCESS_EXPIRATION = Number(
+    parseVar("GCS_BLOB_ACCESS_EXPIRATION", "3600")
 );
+export const GCS_EMULATOR_PRIVATE_URL = parseVar("GCS_EMULATOR_PRIVATE_URL");
+export const GCS_EMULATOR_PUBLIC_URL = parseVar("GCS_EMULATOR_PUBLIC_URL");
+
+export const GCP_CONFIG = {
+    projectId: GCP_PROJECT_ID,
+    bucketName: GCS_BUCKET_NAME,
+    urlExpiration: GCS_BLOB_ACCESS_EXPIRATION,
+    emulator: {
+        privateUrl: GCS_EMULATOR_PRIVATE_URL,
+        publicUrl: GCS_EMULATOR_PUBLIC_URL,
+    },
+    credentialsFile: GOOGLE_APPLICATION_CREDENTIALS,
+};
