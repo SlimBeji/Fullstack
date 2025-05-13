@@ -5,10 +5,10 @@ dotenv.config();
 // Checker
 const parseVar = (varname: string, defaultValue?: string): string => {
     const value = process.env[varname] || defaultValue;
-    if (!value) {
+    if (!value && defaultValue === undefined) {
         throw new Error(`${varname} must be set as environment variable`);
     }
-    return value;
+    return value || "";
 };
 
 // ENV config
