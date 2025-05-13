@@ -6,30 +6,37 @@ import {
 } from "@google-cloud/storage";
 import { randomUUID } from "crypto";
 import path from "path";
-
 import { existsSync } from "fs";
 
+import { GCP_CONFIG } from "../config";
+
+interface GCSConfig {
+    projectId: string;
+    bucketName: string;
+    urlExpiration?: number;
+    emulator?: { privateUrl?: string; publicUrl?: string };
+    credentialsFile?: string;
+}
+
 export class CloudStorage {
-    private readonly envMode: string;
-    private readonly credentialsFile: string;
     private readonly projectId: string;
     private readonly bucketName: string;
-    private readonly emulatorHost: string;
-    private readonly baseMediaUrl: string;
-    private readonly accessExpiration: number;
+    private readonly urlExpiration: number;
+    private readonly emulatorPublicUrl?: string;
+    private readonly emulatorPrivateUrl?: string;
+    private readonly credentialsFile?: string;
+
     private readonly storage: Storage;
     private readonly bucket: Bucket;
 
-    constructor() {
-        // Parsing env variables
-        this.envMode = process.env.ENV || "dev";
-        this.credentialsFile = process.env.GOOGLE_APPLICATION_CREDENTIALS || "";
-        this.projectId = process.env.GCP_PROJECT_ID || "dev-project";
-        this.bucketName = process.env.GCS_BUCKET_NAME || "dev-bucket";
-        this.emulatorHost = process.env.GCS_STORAGE_EMULATOR_HOST || "";
-        this.baseMediaUrl = process.env.GCS_BASE_MEDIA_URL || "";
-        this.accessExpiration =
-            Number(process.env.GCS_BLOB_ACCESS_EXPIRATION) || 3600;
+    constructor(config: GCSConfig) {
+        // Setting base configuration
+        this.projectId = config.projectId;
+        this.bucketName = config.bucketName;
+        this.urlExpiration = config.urlExpiration || 3600;
+        this.emulatorPublicUrl = config.emulator?.publicUrl;
+        this.emulatorPrivateUrl = config.emulator?.privateUrl;
+        this.credentialsFile = config.credentialsFile;
 
         // Creating the storage object
         const options = this.getStorageOptions();
@@ -47,7 +54,7 @@ export class CloudStorage {
     }
 
     get isEmulator(): boolean {
-        return this.envMode === "dev" && !!this.emulatorHost;
+        return !!this.emulatorPrivateUrl && !!this.emulatorPublicUrl;
     }
 
     private getStorageOptions(): StorageOptions {
@@ -56,7 +63,7 @@ export class CloudStorage {
         if (this.isEmulator) {
             return {
                 ...baseConfig,
-                apiEndpoint: `${this.emulatorHost}`,
+                apiEndpoint: `${this.emulatorPrivateUrl}`,
             };
         }
 
@@ -80,8 +87,8 @@ export class CloudStorage {
         }
     }
 
-    private getEmulatorUrl(filename: string): string {
-        return `${this.baseMediaUrl}/download/storage/v1/b/${
+    private getEmulatorFileUrl(filename: string): string {
+        return `${this.emulatorPublicUrl}/download/storage/v1/b/${
             this.bucketName
         }/o/${encodeURIComponent(filename)}?alt=media`;
     }
@@ -91,10 +98,10 @@ export class CloudStorage {
         expiration?: number
     ): Promise<string> {
         if (this.isEmulator) {
-            return this.getEmulatorUrl(filename);
+            return this.getEmulatorFileUrl(filename);
         }
 
-        expiration = expiration || this.accessExpiration;
+        expiration = expiration || this.urlExpiration;
         const file = this.bucket.file(filename);
         const [url] = await file.getSignedUrl({
             version: "v4",
@@ -138,4 +145,4 @@ export class CloudStorage {
     }
 }
 
-export const storage = new CloudStorage();
+export const storage = new CloudStorage(GCP_CONFIG);
