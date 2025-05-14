@@ -8,20 +8,21 @@ export const errorHandler = (
     res: Response,
     next: NextFunction
 ) => {
+    // A response has been prepared
     if (res.headersSent) {
         return next(error);
     }
-    res.status(error.code || 500);
-    const jsonResp = { message: error.message, details: error.details };
-    console.error(error.message);
-    console.error(error.details);
-    res.json(jsonResp);
-};
 
-export const wrongRoute = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
+    // An error occured
+    if (error) {
+        res.status(error.code || 500);
+        const jsonResp = { message: error.message, details: error.details };
+        console.error(error.message);
+        console.error(error.details);
+        res.json(jsonResp);
+        return;
+    }
+
+    // No Route matched
     return next(new ApiError(HttpStatus.BAD_REQUEST, "Wrong endpoint"));
 };

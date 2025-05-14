@@ -12,7 +12,7 @@ import {
     MONGO_DBNAME,
 } from "./config";
 import { AppRouter } from "./framework";
-import { wrongRoute, errorHandler, cors } from "./middlewares";
+import { errorHandler, cors } from "./middlewares";
 
 const app = express();
 app.env = ENV;
@@ -23,7 +23,6 @@ app.use(express.json({ limit: JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
 app.use("/api", router);
-app.use(wrongRoute);
 app.use(errorHandler);
 
 mongoose
