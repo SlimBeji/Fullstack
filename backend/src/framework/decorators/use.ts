@@ -1,14 +1,15 @@
 import "reflect-metadata";
 
+import { RequestHandler } from "express";
 import { RequestHandlerDescriptor, ParsedRequestHandler } from "../types";
 
-export function use(middleware: ParsedRequestHandler) {
+export function use(middleware: ParsedRequestHandler | RequestHandler) {
     return function (
         target: Object,
         key: string,
         desc: RequestHandlerDescriptor
     ) {
-        const middlewares: ParsedRequestHandler[] =
+        const middlewares: (ParsedRequestHandler | RequestHandler)[] =
             Reflect.getMetadata("middlewares", target, key) || [];
 
         middlewares.push(middleware);
@@ -19,6 +20,6 @@ export function use(middleware: ParsedRequestHandler) {
 export function getMiddlewares(
     target: object,
     key: string
-): ParsedRequestHandler[] {
+): (ParsedRequestHandler | RequestHandler)[] {
     return Reflect.getMetadata("middlewares", target, key) || [];
 }
