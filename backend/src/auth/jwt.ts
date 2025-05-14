@@ -4,7 +4,7 @@ import { SECRET_KEY, JWT_EXPIRATION } from "../config";
 import { User } from "../schemas";
 import { crudUser } from "../models";
 import { HttpStatus } from "../enums";
-import { ApiError } from "../framework";
+import { ApiError } from "../types";
 
 export interface UserTokenInput {
     userId: string;

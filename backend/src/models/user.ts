@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import { hash, compare } from "bcryptjs";
 import { HttpStatus } from "../enums";
-import { ApiError } from "../framework";
+import { ApiError } from "../types";
 import { storage } from "../utils";
 import { createToken, EncodedUserToken } from "../auth";
 import { Crud } from "./base";

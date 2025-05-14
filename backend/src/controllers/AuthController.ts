@@ -6,13 +6,13 @@ import {
     bodyValidator,
     fileUploader,
     ParsedRequest,
-    ApiError,
     extractFile,
 } from "../framework";
 import { HttpStatus } from "../enums";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
 import { storage } from "../utils";
+import { ApiError } from "../types";
 
 @controller("/auth")
 export class AuthController {

@@ -9,7 +9,6 @@ import {
     bodyValidator,
     ParsedRequest,
     fileUploader,
-    ApiError,
     extractFile,
 } from "../framework";
 import { HttpStatus } from "../enums";
@@ -21,6 +20,7 @@ import {
     PlacePutSchema,
 } from "../schemas";
 import { storage } from "../utils";
+import { ApiError } from "../types";
 
 @controller("/places")
 export class PlacesController {
