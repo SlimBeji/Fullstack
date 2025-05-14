@@ -1,8 +1,8 @@
 import { model, Schema } from "mongoose";
-import { Crud } from "../framework";
 import { CollectionEnum, Place, PlacePost, PlacePut } from "../schemas";
 import { UserDB } from "./user";
 import { storage } from "../utils";
+import { Crud } from "./base";
 
 // Schema creation
 export const PlaceDBSchema = new Schema<Place>({
