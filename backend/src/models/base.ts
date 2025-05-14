@@ -1,7 +1,6 @@
 import { FilterQuery, Model, Document, startSession } from "mongoose";
 import { HttpStatus } from "../enums";
-import { ErrorHandler } from "../framework";
-import { ApiError } from "../types";
+import { ApiError, ErrorHandler } from "../types";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -81,11 +80,11 @@ export abstract class Crud<
             return (await this.toJson([newObj]))[0];
         } catch (err) {
             if (err instanceof Error) {
+                if (errorHandler) {
+                    throw errorHandler(err);
+                }
                 let status = HttpStatus.INTERNAL_SERVER_ERROR;
                 let message = `Could not create ${this.model.modelName} object: ${err.message}!`;
-                if (errorHandler) {
-                    [status, message] = errorHandler(err);
-                }
                 throw new ApiError(status, message);
             }
             throw err;
