@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 import { hash, compare } from "bcryptjs";
 import { Crud, ApiError, HttpStatus } from "../framework";
 import { storage } from "../utils";
+import { createToken, EncodedUserToken } from "../auth";
 
 import {
     CollectionEnum,
@@ -76,22 +77,6 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return (await this.toJson([userDocument]))[0];
     };
 
-    public authenticate = async (form: SigninForm): Promise<User> => {
-        const error = new ApiError(
-            HttpStatus.UNAUTHORIZED,
-            `Wrong name or password`
-        );
-        const users = await this.model.find({ email: form.email });
-        if (!users.length) {
-            throw error;
-        }
-        const user = users[0];
-        const isValidPassword = await compare(form.password, user.password);
-        if (!isValidPassword) throw error;
-
-        return (await crudUser.toJson([user]))[0];
-    };
-
     public create = async (form: SignupForm): Promise<User> => {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
         const errorHandler = (err: Error): [HttpStatus, string] => {
@@ -104,6 +89,26 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             return [status, message];
         };
         return super.create(form, errorHandler);
+    };
+
+    public signup = async (form: SignupForm): Promise<EncodedUserToken> => {
+        const user = await this.create(form);
+        return createToken(user);
+    };
+
+    public signin = async (form: SigninForm): Promise<EncodedUserToken> => {
+        const error = new ApiError(
+            HttpStatus.UNAUTHORIZED,
+            `Wrong name or password`
+        );
+        const users = await this.model.find({ email: form.email });
+        if (!users.length) {
+            throw error;
+        }
+        const user = users[0];
+        const isValidPassword = await compare(form.password, user.password);
+        if (!isValidPassword) throw error;
+        return createToken(user);
     };
 
     public update = async (id: string, form: UserPut): Promise<User> => {

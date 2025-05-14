@@ -38,8 +38,8 @@ export class AuthController {
         }
 
         req.parsed.imageUrl = await storage.uploadFile(imageFile);
-        const newUser = await crudUser.create(req.parsed);
-        res.status(200).json(newUser);
+        const tokenData = await crudUser.signup(req.parsed);
+        res.status(200).json(tokenData);
     }
 
     @bodyValidator(SigninSchema)
@@ -49,7 +49,7 @@ export class AuthController {
         res: Response,
         next: NextFunction
     ) {
-        const user = await crudUser.authenticate(req.parsed);
-        res.status(200).json(user);
+        const tokenData = await crudUser.signin(req.parsed);
+        res.status(200).json(tokenData);
     }
 }
