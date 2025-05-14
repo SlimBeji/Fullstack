@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { ApiError, HttpStatus } from "../framework";
+import { HttpStatus } from "../enums";
+import { ApiError } from "../framework";
 import { getUserFromToken } from "../auth";
 
 const getError = (message?: string): ApiError => {

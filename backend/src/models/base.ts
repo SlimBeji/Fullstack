@@ -1,5 +1,6 @@
 import { FilterQuery, Model, Document, startSession } from "mongoose";
-import { ApiError, HttpStatus, ErrorHandler } from "../framework";
+import { HttpStatus } from "../enums";
+import { ApiError, ErrorHandler } from "../framework";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 

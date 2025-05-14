@@ -3,7 +3,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { SECRET_KEY, JWT_EXPIRATION } from "../config";
 import { User } from "../schemas";
 import { crudUser } from "../models";
-import { ApiError, HttpStatus } from "../framework";
+import { HttpStatus } from "../enums";
+import { ApiError } from "../framework";
 
 export interface UserTokenInput {
     userId: string;

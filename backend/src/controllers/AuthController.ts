@@ -7,9 +7,9 @@ import {
     fileUploader,
     ParsedRequest,
     ApiError,
-    HttpStatus,
     extractFile,
 } from "../framework";
+import { HttpStatus } from "../enums";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
 import { storage } from "../utils";

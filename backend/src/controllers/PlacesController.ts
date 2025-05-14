@@ -10,9 +10,9 @@ import {
     ParsedRequest,
     fileUploader,
     ApiError,
-    HttpStatus,
     extractFile,
 } from "../framework";
+import { HttpStatus } from "../enums";
 import { crudPlace } from "../models";
 import {
     PlacePost,
