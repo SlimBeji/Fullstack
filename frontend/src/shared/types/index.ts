@@ -12,6 +12,12 @@ export type ButtonType = "button" | "submit" | "reset" | undefined;
 
 export type FormSubmitHandler = (e: FormEvent) => void;
 
+export interface EncodedUserToken {
+    userId: string;
+    email: string;
+    token: string;
+}
+
 export interface Location {
     lat: number;
     lng: number;
@@ -32,4 +38,8 @@ export interface Place {
     address: string;
     location: Location;
     creatorId: string;
+}
+
+export enum LocalStorageKeys {
+    userData = "userData",
 }
