@@ -7,7 +7,8 @@ import { AuthContext } from "../../context";
 
 const NavLinks: React.FC = () => {
     const auth = useContext(AuthContext);
-    const userId = auth.userId;
+    const isLoggedIn = !!auth.authData;
+    const userId = auth.authData?.userId;
 
     const onLogout = () => {
         auth.logout();
@@ -19,22 +20,22 @@ const NavLinks: React.FC = () => {
             <li>
                 <NavLink to="/">All users</NavLink>
             </li>
-            {auth.isLoggedIn && userId && (
+            {isLoggedIn && userId && (
                 <li>
                     <NavLink to={`/${userId}/places`}>My places</NavLink>
                 </li>
             )}
-            {auth.isLoggedIn && (
+            {isLoggedIn && (
                 <li>
                     <NavLink to="/places/new">Add place</NavLink>
                 </li>
             )}
-            {!auth.isLoggedIn && (
+            {!isLoggedIn && (
                 <li>
                     <NavLink to="/auth">Authenticate</NavLink>
                 </li>
             )}
-            {auth.isLoggedIn && (
+            {isLoggedIn && (
                 <li>
                     <button onClick={onLogout}>LOGOUT</button>
                 </li>

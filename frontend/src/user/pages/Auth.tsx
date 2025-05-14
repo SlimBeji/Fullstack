@@ -12,6 +12,7 @@ import {
     minLengthValidator,
     minValidator,
 } from "../../shared/util/validators";
+import { EncodedUserToken } from "../../shared/types";
 
 const AuthForm = {
     username: false,
@@ -49,9 +50,8 @@ const Auth: React.FC = () => {
             email: state.inputs.email.val,
             password: state.inputs.password.val,
         });
-        if (resp.data?.id) {
-            auth.login(resp.data.id);
-        }
+        const data = resp.data as EncodedUserToken;
+        auth.login(data);
     };
 
     const onSignup = async (): Promise<void> => {
@@ -61,9 +61,8 @@ const Auth: React.FC = () => {
         formData.append("email", state.inputs.email.val);
         formData.append("password", state.inputs.password.val);
         const resp = await sendRequest("/auth/signup", "post", formData);
-        if (resp.data?.id) {
-            auth.login(resp.data.id);
-        }
+        const data = resp.data as EncodedUserToken;
+        auth.login(data);
     };
 
     const onSubmit = (e: React.FormEvent): void => {
