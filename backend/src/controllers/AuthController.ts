@@ -4,10 +4,10 @@ import {
     controller,
     post,
     bodyValidator,
-    fileUploader,
     ParsedRequest,
-    extractFile,
+    use,
 } from "../framework";
+import { fileUpload, extractFile } from "../middlewares/fileupload";
 import { HttpStatus } from "../enums";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
@@ -16,7 +16,7 @@ import { ApiError } from "../types";
 
 @controller("/auth")
 export class AuthController {
-    @fileUploader([{ name: "image" }])
+    @use(fileUpload([{ name: "image" }]))
     @bodyValidator(SignupSchema)
     @post("/signup")
     public async signup(

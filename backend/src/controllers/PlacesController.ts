@@ -8,8 +8,7 @@ import {
     del,
     bodyValidator,
     ParsedRequest,
-    fileUploader,
-    extractFile,
+    use,
 } from "../framework";
 import { HttpStatus } from "../enums";
 import { crudPlace } from "../models";
@@ -19,6 +18,7 @@ import {
     PlacePut,
     PlacePutSchema,
 } from "../schemas";
+import { extractFile, fileUpload } from "../middlewares/fileupload";
 import { storage } from "../utils";
 import { ApiError } from "../types";
 
@@ -33,7 +33,7 @@ export class PlacesController {
         resp.status(200).json(await crudPlace.search({}));
     }
 
-    @fileUploader([{ name: "image" }])
+    @use(fileUpload([{ name: "image" }]))
     @bodyValidator(PlacePostSchema)
     @post("/")
     public async createPlace(
