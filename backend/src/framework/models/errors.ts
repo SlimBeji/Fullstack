@@ -1,4 +1,4 @@
-import { HttpStatus } from "../types";
+import { HttpStatus } from "../../enums";
 
 export class ApiError extends Error {
     constructor(
