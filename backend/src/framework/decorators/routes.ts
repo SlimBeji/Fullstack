@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { HttpMethods, MetadataKeys, RequestHandlerDescriptor } from "../types";
+import { HttpMethods, RequestHandlerDescriptor } from "../types";
 
 function routeBinder(method: string) {
     return function (path: string) {
@@ -9,8 +9,8 @@ function routeBinder(method: string) {
             key: string,
             desc: RequestHandlerDescriptor
         ) {
-            Reflect.defineMetadata(MetadataKeys.path, path, target, key);
-            Reflect.defineMetadata(MetadataKeys.method, method, target, key);
+            Reflect.defineMetadata("path", path, target, key);
+            Reflect.defineMetadata("method", method, target, key);
         };
     };
 }
@@ -19,8 +19,8 @@ export function getPath(
     target: object,
     key: string
 ): { method: HttpMethods; path: string } {
-    const path = Reflect.getMetadata(MetadataKeys.path, target, key) || "";
-    const method = Reflect.getMetadata(MetadataKeys.method, target, key) || "";
+    const path = Reflect.getMetadata("path", target, key) || "";
+    const method = Reflect.getMetadata("method", target, key) || "";
     return { path, method };
 }
 

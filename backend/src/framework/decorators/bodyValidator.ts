@@ -4,7 +4,6 @@ import { z, ZodType } from "zod";
 import { ApiError } from "../models";
 
 import {
-    MetadataKeys,
     HttpStatus,
     ParsedRequest,
     ParsedRequestHandler,
@@ -17,7 +16,7 @@ export function bodyValidator<T extends ZodType>(schema: T) {
         key: string,
         desc: RequestHandlerDescriptor<z.infer<typeof schema>>
     ) {
-        Reflect.defineMetadata(MetadataKeys.validator, schema, target, key);
+        Reflect.defineMetadata("validator", schema, target, key);
     };
 }
 
@@ -57,7 +56,7 @@ export function getValidator(
     key: string
 ): ParsedRequestHandler | undefined {
     const schema: ZodType | undefined = Reflect.getMetadata(
-        MetadataKeys.validator,
+        "validator",
         target,
         key
     );

@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import multer from "multer";
 import {
-    MetadataKeys,
     ParsedRequestHandler,
     RequestHandlerDescriptor,
     MulterFilesConfig,
@@ -16,7 +15,7 @@ export function fileUploader(config: MulterFilesConfig) {
         key: string,
         desc: RequestHandlerDescriptor
     ) {
-        Reflect.defineMetadata(MetadataKeys.multer, config, target, key);
+        Reflect.defineMetadata("multer", config, target, key);
     };
 }
 
@@ -25,7 +24,7 @@ export function getFileUploader(
     key: string
 ): ParsedRequestHandler {
     const uploadConfig: MulterFilesConfig = Reflect.getMetadata(
-        MetadataKeys.multer,
+        "multer",
         target,
         key
     );

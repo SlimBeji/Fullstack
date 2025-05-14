@@ -1,10 +1,6 @@
 import "reflect-metadata";
 
-import {
-    MetadataKeys,
-    RequestHandlerDescriptor,
-    ParsedRequestHandler,
-} from "../types";
+import { RequestHandlerDescriptor, ParsedRequestHandler } from "../types";
 
 export function use(middleware: ParsedRequestHandler) {
     return function (
@@ -13,15 +9,10 @@ export function use(middleware: ParsedRequestHandler) {
         desc: RequestHandlerDescriptor
     ) {
         const middlewares: ParsedRequestHandler[] =
-            Reflect.getMetadata(MetadataKeys.middlewares, target, key) || [];
+            Reflect.getMetadata("middlewares", target, key) || [];
 
         middlewares.push(middleware);
-        Reflect.defineMetadata(
-            MetadataKeys.middlewares,
-            middlewares,
-            target,
-            key
-        );
+        Reflect.defineMetadata("middlewares", middlewares, target, key);
     };
 }
 
@@ -29,5 +20,5 @@ export function getMiddlewares(
     target: object,
     key: string
 ): ParsedRequestHandler[] {
-    return Reflect.getMetadata(MetadataKeys.middlewares, target, key) || [];
+    return Reflect.getMetadata("middlewares", target, key) || [];
 }
