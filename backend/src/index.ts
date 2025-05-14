@@ -11,8 +11,8 @@ import {
     MONGO_URL,
     MONGO_DBNAME,
 } from "./config";
-import { AppRouter, errorHandler } from "./framework";
-import { wrongRoute, cors } from "./middlewares";
+import { AppRouter } from "./framework";
+import { wrongRoute, errorHandler, cors } from "./middlewares";
 
 const app = express();
 app.env = ENV;
