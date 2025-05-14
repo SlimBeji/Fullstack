@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { HttpMethods, RequestHandlerDescriptor } from "../types";
+import { RequestHandlerDescriptor } from "../types";
 
 function routeBinder(method: string) {
     return function (path: string) {
@@ -18,13 +18,13 @@ function routeBinder(method: string) {
 export function getPath(
     target: object,
     key: string
-): { method: HttpMethods; path: string } {
+): { method: "get" | "post" | "put" | "delete"; path: string } {
     const path = Reflect.getMetadata("path", target, key) || "";
     const method = Reflect.getMetadata("method", target, key) || "";
     return { path, method };
 }
 
-export const get = routeBinder(HttpMethods.get);
-export const post = routeBinder(HttpMethods.post);
-export const put = routeBinder(HttpMethods.put);
-export const del = routeBinder(HttpMethods.delete);
+export const get = routeBinder("get");
+export const post = routeBinder("post");
+export const put = routeBinder("put");
+export const del = routeBinder("delete");

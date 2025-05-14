@@ -1,10 +1,3 @@
-export enum HttpMethods {
-    get = "get",
-    post = "post",
-    put = "put",
-    delete = "delete",
-}
-
 export enum HttpStatus {
     OK = 200,
     BAD_REQUEST = 400,
