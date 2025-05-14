@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
     Route,
     Routes,
@@ -13,22 +13,34 @@ import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import { MainNavigation } from "./shared/components/navigation";
 import { AuthContext } from "./shared/context";
+import { EncodedUserToken, LocalStorageKeys } from "./shared/types";
+import { getAuthData } from "./shared/util/storage";
 
 function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userId, setUserId] = useState("");
-    const login = useCallback((uid: string) => {
-        setIsLoggedIn(true);
-        setUserId(uid);
+    const [authData, setAuthData] = useState<EncodedUserToken | null>(null);
+
+    const login = useCallback((data: EncodedUserToken) => {
+        if (data) {
+            setAuthData(data);
+            localStorage.setItem(
+                LocalStorageKeys.userData,
+                JSON.stringify(data)
+            );
+        }
     }, []);
     const logout = useCallback(() => {
-        setIsLoggedIn(false);
-        setUserId("");
+        setAuthData(null);
+        localStorage.removeItem(LocalStorageKeys.userData);
     }, []);
-    const context = { isLoggedIn, userId, login, logout };
+    const context = { authData, login, logout };
+
+    useEffect(() => {
+        const data = getAuthData();
+        if (data) setAuthData(data);
+    }, [setAuthData]);
 
     let routes: React.JSX.Element;
-    if (isLoggedIn) {
+    if (authData) {
         routes = (
             <>
                 <Route path="/" element={<Users />} />
