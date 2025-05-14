@@ -16,6 +16,10 @@ const checkAuthToken = async (
     req: Request,
     isAdmin: boolean
 ): Promise<ApiError | null> => {
+    if (req.method === "OPTIONS") {
+        return null;
+    }
+
     const rawToken = req.headers.authorization || "";
     const match = rawToken.match(/^Bearer\s+(.+)$/i);
     const token = match?.[1];
