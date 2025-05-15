@@ -1,11 +1,6 @@
 import "reflect-metadata";
 import { Response, NextFunction } from "express";
 import { z, ZodType } from "zod";
-import {
-    ParsedRequest,
-    ParsedRequestHandler,
-    RequestHandlerDescriptor,
-} from "../types";
 import { HttpStatus } from "../../enums";
 import { ApiError } from "../../types";
 

@@ -1,7 +1,5 @@
 import "reflect-metadata";
 
-import { RequestHandlerDescriptor } from "../types";
-
 function routeBinder(method: string) {
     return function (path: string) {
         return function (

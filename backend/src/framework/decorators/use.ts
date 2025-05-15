@@ -1,7 +1,6 @@
 import "reflect-metadata";
 
 import { RequestHandler } from "express";
-import { RequestHandlerDescriptor, ParsedRequestHandler } from "../types";
 
 export function use(middleware: ParsedRequestHandler | RequestHandler) {
     return function (

@@ -5,7 +5,6 @@ import { getValidator } from "../decorators/bodyValidator";
 import { getPath } from "../decorators/routes";
 import { getMiddlewares } from "../decorators/use";
 import { NextFunction, Response, RequestHandler } from "express";
-import { ParsedRequest } from "../types";
 
 const router = AppRouter.getInstance();
 
