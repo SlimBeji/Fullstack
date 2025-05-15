@@ -1,4 +1,4 @@
-import { HttpStatus } from "../enums";
+import { HttpStatus } from "./enums";
 
 export type ErrorHandler = (err: Error) => ApiError;
 

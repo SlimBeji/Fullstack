@@ -10,7 +10,6 @@ import {
     ParsedRequest,
     use,
 } from "../framework";
-import { HttpStatus } from "../enums";
 import { crudPlace } from "../models";
 import {
     PlacePost,
@@ -20,7 +19,7 @@ import {
 } from "../schemas";
 import { extractFile, fileUpload } from "../middlewares/fileupload";
 import { storage } from "../utils";
-import { ApiError } from "../types";
+import { ApiError, HttpStatus } from "../types";
 
 @controller("/places")
 export class PlacesController {

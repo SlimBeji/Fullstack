@@ -8,11 +8,10 @@ import {
     use,
 } from "../framework";
 import { fileUpload, extractFile } from "../middlewares/fileupload";
-import { HttpStatus } from "../enums";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
 import { storage } from "../utils";
-import { ApiError } from "../types";
+import { ApiError, HttpStatus } from "../types";
 
 @controller("/auth")
 export class AuthController {

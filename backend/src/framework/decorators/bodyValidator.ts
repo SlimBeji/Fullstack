@@ -1,8 +1,7 @@
 import "reflect-metadata";
 import { Response, NextFunction } from "express";
 import { z, ZodType } from "zod";
-import { HttpStatus } from "../../enums";
-import { ApiError } from "../../types";
+import { ApiError, HttpStatus } from "../../types";
 
 export function bodyValidator<T extends ZodType>(schema: T) {
     return function (
