@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
-import { CollectionEnum, Place, PlacePost, PlacePut } from "../schemas";
+import { Place, PlacePost, PlacePut } from "../schemas";
+import { CollectionEnum } from "../types";
 import { UserDB } from "./user";
 import { storage } from "../utils";
 import { Crud } from "./base";

@@ -6,3 +6,8 @@ export enum HttpStatus {
     UNPROCESSABLE_ENTITY = 422,
     INTERNAL_SERVER_ERROR = 500,
 }
+
+export enum CollectionEnum {
+    USER = "User",
+    PLACE = "Place",
+}

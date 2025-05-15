@@ -1,17 +1,11 @@
 import { model, Schema } from "mongoose";
 import { hash, compare } from "bcryptjs";
-import { ApiError, HttpStatus } from "../types";
+import { ApiError, HttpStatus, CollectionEnum } from "../types";
 import { storage } from "../utils";
 import { createToken, EncodedUserToken } from "../auth";
 import { Crud } from "./base";
 
-import {
-    CollectionEnum,
-    User,
-    UserPut,
-    SignupForm,
-    SigninForm,
-} from "../schemas";
+import { User, UserPut, SignupForm, SigninForm } from "../schemas";
 
 const DEFAULT_HASH_SALT = 12;
 
