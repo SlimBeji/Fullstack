@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
 import "./controllers";
-import { helloWorldRouter, authRouter } from "./controllers";
+import { helloWorldRouter, authRouter, userRouter } from "./controllers";
 
 import {
     PORT,
@@ -26,6 +26,7 @@ app.use(cookieSession({ keys: [SECRET_KEY] }));
 app.use("/api", router);
 app.use("/api/hello-world", helloWorldRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/users", userRouter);
 app.use(errorHandler);
 
 mongoose
