@@ -7,7 +7,6 @@ import {
     put,
     del,
     bodyValidator,
-    ParsedRequest,
     use,
 } from "../framework";
 import { crudPlace } from "../models";

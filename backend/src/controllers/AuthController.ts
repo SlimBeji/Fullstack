@@ -1,12 +1,6 @@
 import { Response, NextFunction } from "express";
 
-import {
-    controller,
-    post,
-    bodyValidator,
-    ParsedRequest,
-    use,
-} from "../framework";
+import { controller, post, bodyValidator, use } from "../framework";
 import { fileUpload, extractFile } from "../middlewares/fileupload";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";

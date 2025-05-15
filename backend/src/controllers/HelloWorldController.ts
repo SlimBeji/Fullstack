@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 
 import { Authenticated, Admin } from "../middlewares";
-import { controller, get, ParsedRequest, use } from "../framework";
+import { controller, get, use } from "../framework";
 
 @controller("/hello-world")
 export class HelloWorldController {

@@ -1,13 +1,6 @@
 import { Response, NextFunction } from "express";
 
-import {
-    controller,
-    get,
-    put,
-    del,
-    ParsedRequest,
-    bodyValidator,
-} from "../framework";
+import { controller, get, put, del, bodyValidator } from "../framework";
 import { crudUser, crudPlace } from "../models";
 import { UserPut, UserPutSchema } from "../schemas";
 
