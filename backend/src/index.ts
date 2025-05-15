@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
 import "./controllers";
+import { helloWorldRouter } from "./controllers";
 
 import {
     PORT,
@@ -23,6 +24,7 @@ app.use(express.json({ limit: JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
 app.use("/api", router);
+app.use("/api/hello-world", helloWorldRouter);
 app.use(errorHandler);
 
 mongoose
