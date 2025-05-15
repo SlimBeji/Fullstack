@@ -81,14 +81,14 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
 
     public create = async (form: SignupForm): Promise<User> => {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
-        const errorHandler = (err: Error): [HttpStatus, string] => {
+        const errorHandler = (err: Error): ApiError => {
             let status = HttpStatus.INTERNAL_SERVER_ERROR;
             let message = `Could not create ${this.model.modelName} object: ${err.message}!`;
             if (err.message.startsWith("E11000 duplicate key error")) {
                 status = HttpStatus.UNPROCESSABLE_ENTITY;
                 message = "Email or Username already exists";
             }
-            return [status, message];
+            return new ApiError(status, message);
         };
         return super.create(form, errorHandler);
     };
