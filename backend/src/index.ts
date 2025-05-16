@@ -3,7 +3,12 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
 import "./controllers";
-import { helloWorldRouter, authRouter, userRouter } from "./controllers";
+import {
+    helloWorldRouter,
+    authRouter,
+    userRouter,
+    placeRouter,
+} from "./controllers";
 
 import {
     PORT,
@@ -28,6 +33,7 @@ app.use("/api", router);
 app.use("/api/hello-world", helloWorldRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/places", placeRouter);
 app.use(errorHandler);
 
 mongoose
