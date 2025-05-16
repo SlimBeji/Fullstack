@@ -1,3 +1,4 @@
+import "express-async-errors";
 import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
