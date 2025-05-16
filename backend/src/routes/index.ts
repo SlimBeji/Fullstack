@@ -1,8 +1,8 @@
 import { Application } from "express";
-import { helloWorldRouter } from "./HelloWorldController";
-import { authRouter } from "./AuthController";
-import { userRouter } from "./UsersController";
-import { placeRouter } from "./PlacesController";
+import { helloWorldRouter } from "./helloWorld";
+import { authRouter } from "./auth";
+import { userRouter } from "./users";
+import { placeRouter } from "./places";
 
 export const registerRoutes = (app: Application): void => {
     app.use("/api/hello-world", helloWorldRouter);

@@ -12,7 +12,7 @@ import {
     MONGO_DBNAME,
 } from "./config";
 import { errorHandler, cors } from "./middlewares";
-import { registerRoutes } from "./controllers";
+import { registerRoutes } from "./routes";
 
 const app = express();
 app.env = ENV;
