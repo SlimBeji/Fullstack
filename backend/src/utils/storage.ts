@@ -8,14 +8,15 @@ import { randomUUID } from "crypto";
 import path from "path";
 import { existsSync } from "fs";
 
-import { GCP_CONFIG } from "../config";
+import config from "../config";
 
 interface GCSConfig {
-    projectId: string;
-    bucketName: string;
-    urlExpiration?: number;
-    emulator?: { privateUrl?: string; publicUrl?: string };
-    credentialsFile?: string;
+    GCP_PROJECT_ID: string;
+    GCS_BUCKET_NAME: string;
+    GCS_BLOB_ACCESS_EXPIRATION?: number;
+    GOOGLE_APPLICATION_CREDENTIALS?: string;
+    GCS_EMULATOR_PRIVATE_URL?: string;
+    GCS_EMULATOR_PUBLIC_URL?: string;
 }
 
 export class CloudStorage {
@@ -31,12 +32,12 @@ export class CloudStorage {
 
     constructor(config: GCSConfig) {
         // Setting base configuration
-        this.projectId = config.projectId;
-        this.bucketName = config.bucketName;
-        this.urlExpiration = config.urlExpiration || 3600;
-        this.emulatorPublicUrl = config.emulator?.publicUrl;
-        this.emulatorPrivateUrl = config.emulator?.privateUrl;
-        this.credentialsFile = config.credentialsFile;
+        this.projectId = config.GCP_PROJECT_ID;
+        this.bucketName = config.GCS_BUCKET_NAME;
+        this.urlExpiration = config.GCS_BLOB_ACCESS_EXPIRATION || 3600;
+        this.emulatorPublicUrl = config.GCS_EMULATOR_PUBLIC_URL;
+        this.emulatorPrivateUrl = config.GCS_EMULATOR_PRIVATE_URL;
+        this.credentialsFile = config.GOOGLE_APPLICATION_CREDENTIALS;
 
         // Creating the storage object
         const options = this.getStorageOptions();
@@ -145,4 +146,4 @@ export class CloudStorage {
     }
 }
 
-export const storage = new CloudStorage(GCP_CONFIG);
+export const storage = new CloudStorage(config);

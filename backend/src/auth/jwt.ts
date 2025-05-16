@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-import { SECRET_KEY, JWT_EXPIRATION } from "../config";
+import config from "../config";
 import { User } from "../schemas";
 import { crudUser } from "../models";
 import { ApiError, HttpStatus } from "../types";
@@ -23,12 +23,14 @@ export const createToken = (user: User): EncodedUserToken => {
         userId: user.id,
         email: user.email,
     };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: JWT_EXPIRATION });
+    const token = jwt.sign(payload, config.SECRET_KEY, {
+        expiresIn: config.JWT_EXPIRATION,
+    });
     return { token, email: user.email, userId: user.id };
 };
 
 export const verifyToken = (token: string): DecodedUserToken => {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, config.SECRET_KEY);
     if (typeof decoded === "string") {
         throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
     }
