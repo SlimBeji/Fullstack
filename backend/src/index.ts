@@ -2,13 +2,6 @@ import "express-async-errors";
 import express from "express";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
-import "./controllers";
-import {
-    helloWorldRouter,
-    authRouter,
-    userRouter,
-    placeRouter,
-} from "./controllers";
 
 import {
     PORT,
@@ -19,6 +12,7 @@ import {
     MONGO_DBNAME,
 } from "./config";
 import { errorHandler, cors } from "./middlewares";
+import { registerRoutes } from "./controllers";
 
 const app = express();
 app.env = ENV;
@@ -27,10 +21,7 @@ app.use(cors);
 app.use(express.json({ limit: JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
-app.use("/api/hello-world", helloWorldRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/users", userRouter);
-app.use("/api/places", placeRouter);
+registerRoutes(app);
 app.use(errorHandler);
 
 mongoose
