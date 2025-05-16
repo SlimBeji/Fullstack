@@ -32,7 +32,7 @@ const NewPlace: React.FC = () => {
         formData.append("image", state.inputs.image.val.file);
         formData.append("description", state.inputs.description.val);
         formData.append("address", state.inputs.address.val);
-        formData.append("creatorId", auth.userId || "");
+        formData.append("creatorId", auth.authData?.userId || "");
         try {
             await sendRequest("/places", "post", formData);
             navigate("/");
