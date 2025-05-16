@@ -18,18 +18,15 @@ import {
     MONGO_URL,
     MONGO_DBNAME,
 } from "./config";
-import { AppRouter } from "./framework";
 import { errorHandler, cors } from "./middlewares";
 
 const app = express();
 app.env = ENV;
-const router = AppRouter.getInstance();
 
 app.use(cors);
 app.use(express.json({ limit: JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
-app.use("/api", router);
 app.use("/api/hello-world", helloWorldRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
