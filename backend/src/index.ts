@@ -11,7 +11,7 @@ import {
     MONGO_URL,
     MONGO_DBNAME,
 } from "./config";
-import { errorHandler, cors } from "./middlewares";
+import { errorHandler, cors, noRouteMatchHandler } from "./middlewares";
 import { registerRoutes } from "./routes";
 
 const app = express();
@@ -22,6 +22,7 @@ app.use(express.json({ limit: JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [SECRET_KEY] }));
 registerRoutes(app);
+app.all("*", noRouteMatchHandler);
 app.use(errorHandler);
 
 mongoose

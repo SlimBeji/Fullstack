@@ -21,7 +21,12 @@ export const errorHandler = (
         res.json(jsonResp);
         return;
     }
+};
 
-    // No Route matched
-    return next(new ApiError(HttpStatus.BAD_REQUEST, "Wrong endpoint"));
+export const noRouteMatchHandler = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    next(new ApiError(HttpStatus.BAD_REQUEST, "Wrong endpoint"));
 };
