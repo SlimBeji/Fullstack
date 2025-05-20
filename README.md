@@ -19,3 +19,5 @@ Contrary to the course, this mini-project uses Typescript for both the express b
 2. Go/Gin
 
 The two replicated APIs will be added as micorservices. The goal is to have 3 interchangeable backends with identical functionalities and to explore the common patterns in building REST API with 3 different languages.
+
+This mini project will evolve into a fullstack boilerplate example that can combines multiple frontend technologies with different backend technologies.
