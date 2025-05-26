@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 
-import { crudPlace } from "../models";
+import { crudPlace } from "../crud";
 import {
     PlacePost,
     PlacePostSchema,

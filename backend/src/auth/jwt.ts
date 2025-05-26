@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 import config from "../config";
 import { User } from "../schemas";
-import { crudUser } from "../models";
+import { crudUser } from "../crud";
 import { ApiError, HttpStatus } from "../types";
 
 export interface UserTokenInput {

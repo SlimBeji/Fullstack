@@ -1,6 +1,6 @@
 import { Router, Response, Request, NextFunction } from "express";
 import { fileUpload, extractFile, validateBody } from "../middlewares";
-import { crudUser } from "../models";
+import { crudUser } from "../crud";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
 import { storage } from "../utils";
 import { ApiError, HttpStatus } from "../types";

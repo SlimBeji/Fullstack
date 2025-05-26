@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 
-import { crudUser, crudPlace } from "../models";
+import { crudUser, crudPlace } from "../crud";
 import { UserPut, UserPutSchema } from "../schemas";
 import { validateBody } from "../middlewares";
 
