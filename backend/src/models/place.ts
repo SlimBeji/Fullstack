@@ -1,9 +1,7 @@
 import { model, Schema } from "mongoose";
-import { Place, PlacePost, PlacePut } from "../schemas";
+import { Place } from "../schemas";
 import { CollectionEnum } from "../types";
 import { UserDB } from "./user";
-import { storage } from "../utils";
-import { Crud } from "./base";
 
 // Schema creation
 export const PlaceDBSchema = new Schema<Place>({
@@ -52,30 +50,4 @@ PlaceDBSchema.pre("deleteOne", async function (next) {
 // Model Creation
 export const PlaceDB = model<Place>(CollectionEnum.PLACE, PlaceDBSchema);
 
-type PlaceDocument = InstanceType<typeof PlaceDB>;
-
-// Crud Class
-export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
-    protected secrets = {};
-
-    constructor() {
-        super(PlaceDB);
-    }
-
-    public async toJson(raws: PlaceDocument[]): Promise<Place[]> {
-        const places = await super.toJson(raws);
-        const placesPromises = places.map(async (p) => {
-            const imageUrl = await storage.getSignedUrl(p.imageUrl!);
-            return { ...p, imageUrl };
-        });
-        return await Promise.all(placesPromises);
-    }
-
-    public async deleteCleanup(document: PlaceDocument): Promise<void> {
-        if (document.imageUrl) {
-            storage.deleteFile(document.imageUrl);
-        }
-    }
-}
-
-export const crudPlace = new CrudPlace();
+export type PlaceDocument = InstanceType<typeof PlaceDB>;
