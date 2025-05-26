@@ -1,15 +1,9 @@
-import { Response, NextFunction } from "express";
-import { z, ZodType } from "zod";
+import { Request, Response, NextFunction } from "express";
+import { ZodType } from "zod";
 import { ApiError, HttpStatus } from "../types";
 
-type InferSchemaType<T extends ZodType> = z.infer<T>;
-
 export const validateBody = <T extends ZodType>(schema: T) => {
-    return async function (
-        req: ParsedRequest<InferSchemaType<T>>,
-        resp: Response,
-        next: NextFunction
-    ) {
+    return async function (req: Request, resp: Response, next: NextFunction) {
         const body = req.body;
         if (!body || Object.keys(body).length === 0) {
             next(

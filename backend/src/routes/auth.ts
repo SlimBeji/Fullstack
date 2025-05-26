@@ -1,4 +1,4 @@
-import { Router, Response, NextFunction, RequestHandler } from "express";
+import { Router, Response, Request, NextFunction } from "express";
 import { fileUpload, extractFile, validateBody } from "../middlewares";
 import { crudUser } from "../models";
 import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
@@ -7,28 +7,18 @@ import { ApiError, HttpStatus } from "../types";
 
 export const authRouter = Router();
 
-async function signin(
-    req: ParsedRequest<SigninForm>,
-    res: Response,
-    next: NextFunction
-) {
-    const tokenData = await crudUser.signin(req.parsed);
+async function signin(req: Request, res: Response, next: NextFunction) {
+    const parsed = req.parsed as SigninForm;
+    const tokenData = await crudUser.signin(parsed);
     res.status(200).json(tokenData);
 }
-authRouter.post(
-    "/signin",
-    validateBody(SigninSchema) as RequestHandler,
-    signin as RequestHandler
-);
+authRouter.post("/signin", validateBody(SigninSchema), signin);
 
-async function signup(
-    req: ParsedRequest<SignupForm>,
-    res: Response,
-    next: NextFunction
-) {
+async function signup(req: Request, res: Response, next: NextFunction) {
+    const parsed = req.parsed as SignupForm;
     const duplicateMsg = await crudUser.checkDuplicate(
-        req.parsed.email,
-        req.parsed.name
+        parsed.email,
+        parsed.name
     );
     if (duplicateMsg) {
         throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
@@ -39,13 +29,13 @@ async function signup(
         throw new ApiError(HttpStatus.BAD_REQUEST, "No Image was provided");
     }
 
-    req.parsed.imageUrl = await storage.uploadFile(imageFile);
-    const tokenData = await crudUser.signup(req.parsed);
+    parsed.imageUrl = await storage.uploadFile(imageFile);
+    const tokenData = await crudUser.signup(parsed);
     res.status(200).json(tokenData);
 }
 authRouter.post(
     "/signup",
     fileUpload([{ name: "image" }]),
-    validateBody(SignupSchema) as RequestHandler,
-    signup as RequestHandler
+    validateBody(SignupSchema),
+    signup
 );
