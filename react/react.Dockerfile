@@ -5,10 +5,10 @@ FROM node:22
 WORKDIR /app
 
 # Copying requirements
-COPY ./backend/package.json /app/package.json
+COPY ./react/package.json /app/package.json
 
 # Installing dependencies
 RUN npm install
 
 # Copy Code
-COPY ./backend /app
+COPY ./react /app

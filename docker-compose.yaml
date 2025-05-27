@@ -1,33 +1,33 @@
 services:
-    frontend:
+    react:
         build:
             context: .
-            dockerfile: ./frontend/frontend.Dockerfile
-        container_name: frontend
+            dockerfile: ./react/react.Dockerfile
+        container_name: react
         ports:
             - 8000:5173
         volumes:
-            - ./frontend:/app
+            - ./react:/app
             - /app/node_modules
         env_file:
-            - ./frontend/frontend.env
+            - ./react/react.env
         depends_on:
-            - backend
+            - express
         command: npm run dev
         restart: on-failure
 
-    backend:
+    express:
         build:
             context: .
-            dockerfile: ./backend/backend.Dockerfile
-        container_name: backend
+            dockerfile: ./express/express.Dockerfile
+        container_name: express
         ports:
             - 5000:5000
         volumes:
-            - ./backend:/app
+            - ./express:/app
             - /app/node_modules
         env_file:
-            - ./backend/backend.env
+            - ./express/express.env
         depends_on:
             - mongo1
             - mongo2
