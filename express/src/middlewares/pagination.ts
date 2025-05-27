@@ -8,7 +8,7 @@ export class PaginationParams {
     }
 }
 
-export const pagination = (maxSize: number | null = null): RequestHandler => {
+export const paginate = (maxSize: number | null = null): RequestHandler => {
     maxSize = maxSize || config.MAX_ITEMS_PER_PAGE;
     return async function name(
         req: Request,
