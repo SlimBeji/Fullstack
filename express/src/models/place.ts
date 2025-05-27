@@ -4,26 +4,30 @@ import { CollectionEnum } from "../types";
 import { UserDB } from "./user";
 
 // Schema creation
-export const PlaceDBSchema = new Schema<Place>({
-    // Fields
-    title: { type: String, required: true },
-    description: { type: String, required: true, min: 10 },
-    imageUrl: { type: String, required: false },
-    address: { type: String, required: true, min: 1 },
-    location: {
-        required: false,
-        type: {
-            lat: { type: Number, required: true },
-            lng: { type: Number, required: true },
+export const PlaceDBSchema = new Schema<Place>(
+    {
+        // Fields
+        title: { type: String, required: true },
+        description: { type: String, required: true, min: 10 },
+        imageUrl: { type: String, required: false },
+        address: { type: String, required: true, min: 1 },
+        location: {
+            required: false,
+            type: {
+                lat: { type: Number, required: true },
+                lng: { type: Number, required: true },
+            },
+        },
+        // Foreign Keys:
+        creatorId: {
+            type: Schema.ObjectId,
+            required: true,
+            ref: CollectionEnum.USER,
         },
     },
-    // Foreign Keys:
-    creatorId: {
-        type: Schema.ObjectId,
-        required: true,
-        ref: CollectionEnum.USER,
-    },
-});
+    { timestamps: true }
+);
+PlaceDBSchema.index({ createdAt: 1 });
 
 // Hooks
 PlaceDBSchema.pre("save", async function (next) {
