@@ -14,7 +14,7 @@ app.use(express.json({ limit: config.JSON_MAX_SIZE }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({ keys: [config.SECRET_KEY] }));
 registerRoutes(app);
-app.all("*", noRouteMatchHandler);
+app.use(noRouteMatchHandler);
 app.use(errorHandler);
 
 export default app;
