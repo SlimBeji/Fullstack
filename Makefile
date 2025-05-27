@@ -29,3 +29,6 @@ test-express:
 
 check-express-ts:
 	docker exec -it express npx tsc --noEmit
+
+express-script/%:
+	docker exec -it express npx ts-node src/scripts/$*
