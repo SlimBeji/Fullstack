@@ -36,7 +36,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up
+	docker-compose up --attach backend --attach frontend
 
 build:
 	docker-compose build
@@ -58,3 +58,7 @@ bash-backend:
 # Run Backend tests
 test-backend:
 	docker exec -it backend npm test
+
+# Check ts errors
+check-ts:
+	tsc --noEmit ./backend
