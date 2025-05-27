@@ -16,6 +16,7 @@ export default {
     PORT: parseVar("PORT", "5000"),
     SECRET_KEY: parseVar("SECRET_KEY"),
     JSON_MAX_SIZE: parseVar("JSON_MAX_SIZE"),
+    MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),
     JWT_EXPIRATION: Number(parseVar("JWT_EXPIRATION", "3600")),
     ENV: parseVar("ENV"),
 
