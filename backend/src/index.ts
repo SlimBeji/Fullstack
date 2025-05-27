@@ -3,7 +3,6 @@ import config from "./config";
 import app from "./app";
 
 // Connect Mongoose than run the app
-
 mongoose
     .connect(config.MONGO_URL!, { dbName: config.MONGO_DBNAME })
     .then(() => {
