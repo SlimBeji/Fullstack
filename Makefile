@@ -54,3 +54,7 @@ bash-frontend:
 # Backend commands
 bash-backend:
 	docker exec -it backend bash
+
+# Run Backend tests
+test-backend:
+	docker exec -it backend npm test
