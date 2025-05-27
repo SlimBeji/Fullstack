@@ -26,3 +26,6 @@ bash-express:
 
 test-express:
 	docker exec -it express npm test
+
+check-express-ts:
+	docker exec -it express npx tsc --noEmit
