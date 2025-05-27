@@ -7,16 +7,23 @@ import {
     PlacePut,
     PlacePutSchema,
 } from "../schemas";
-import { extractFile, fileUpload, validateBody } from "../middlewares";
+import {
+    extractFile,
+    fileUpload,
+    PaginationParams,
+    paginate,
+    validateBody,
+} from "../middlewares";
 import { storage } from "../utils";
 import { ApiError, HttpStatus } from "../types";
 
 export const placeRouter = Router();
 
 async function getPlaces(req: Request, resp: Response, next: NextFunction) {
-    resp.status(200).json(await crudPlace.search({}));
+    const pagination = req.pagination as PaginationParams;
+    resp.status(200).json(await crudPlace.search({}, pagination));
 }
-placeRouter.get("/", getPlaces);
+placeRouter.get("/", paginate(), getPlaces);
 
 async function createPlace(req: Request, resp: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePost;

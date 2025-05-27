@@ -1,5 +1,6 @@
 import { FilterQuery, Model, Document, startSession } from "mongoose";
 import { ApiError, ErrorHandler, HttpStatus } from "../types";
+import { PaginationParams } from "../middlewares";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -51,8 +52,19 @@ export abstract class Crud<
         return (await this.toJson([raw]))[0];
     }
 
-    public async search(query: FilterQuery<D>): Promise<I[]> {
-        const raws = await this.model.find(query);
+    public async search(
+        query: FilterQuery<D>,
+        pagination: PaginationParams | null = null
+    ): Promise<I[]> {
+        let mongoQuery = this.model.find(query);
+        if (pagination) {
+            mongoQuery = mongoQuery
+                .sort({ createdAt: 1 })
+                .skip(pagination.skip)
+                .limit(pagination.size);
+        }
+
+        const raws = await mongoQuery.exec();
         if (!raws.length) {
             throw new ApiError(
                 HttpStatus.NOT_FOUND,
