@@ -6,13 +6,16 @@ export interface Location {
     lng: number;
 }
 
-export interface Place {
-    id: string;
+export interface NewPlace {
     title: string;
     description: string;
     imageUrl?: string;
     address: string;
     location?: Location;
+}
+
+export interface Place extends NewPlace {
+    id: string;
     creatorId: Types.ObjectId;
 }
 

@@ -1,13 +1,16 @@
 import { z } from "zod";
 import { Types } from "mongoose";
 
-export interface User {
-    id: string;
+export interface NewUser {
     name: string;
     email: string;
     password: string;
     imageUrl?: string;
     isAdmin: boolean;
+}
+
+export interface User extends NewUser {
+    id: string;
     places: Types.ObjectId[];
 }
 
