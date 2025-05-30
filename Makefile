@@ -32,3 +32,9 @@ check-express-ts:
 
 express-script/%:
 	docker exec -it express npx ts-node src/scripts/$*
+
+express-seed:
+	docker exec -it express npx ts-node src/scripts/seedDb.ts
+
+express-dump:
+	docker exec -it express npx ts-node src/scripts/dumpDb.ts
