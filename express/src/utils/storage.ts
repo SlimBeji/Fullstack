@@ -6,7 +6,8 @@ import {
 } from "@google-cloud/storage";
 import { randomUUID } from "crypto";
 import path from "path";
-import { existsSync } from "fs";
+import mime from "mime-types";
+import { existsSync, readFileSync } from "fs";
 
 import config from "../config";
 
@@ -17,6 +18,12 @@ interface GCSConfig {
     GOOGLE_APPLICATION_CREDENTIALS?: string;
     GCS_EMULATOR_PRIVATE_URL?: string;
     GCS_EMULATOR_PUBLIC_URL?: string;
+}
+
+export interface FileToUpload {
+    originalname: string;
+    mimetype: string;
+    buffer: Buffer<ArrayBufferLike>;
 }
 
 export class CloudStorage {
@@ -113,7 +120,7 @@ export class CloudStorage {
     }
 
     public async uploadFile(
-        file: Express.Multer.File,
+        file: FileToUpload,
         destination?: string
     ): Promise<string> {
         const ext = path.extname(file.originalname);
@@ -147,3 +154,12 @@ export class CloudStorage {
 }
 
 export const storage = new CloudStorage(config);
+
+export const uploadLocal = async (filePath: string): Promise<string> => {
+    const originalname = path.basename(filePath);
+    const mimetype = mime.lookup(filePath) || "application/octet-stream";
+    const buffer = readFileSync(filePath);
+    const fileToUpload = { originalname, mimetype, buffer };
+    const fileUrl = await storage.uploadFile(fileToUpload);
+    return fileUrl;
+};
