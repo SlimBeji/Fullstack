@@ -13,6 +13,7 @@ export const PlaceDBSchema = new Schema<Place>(
         address: { type: String, required: true, min: 1 },
         location: {
             required: false,
+            _id: false,
             type: {
                 lat: { type: Number, required: true },
                 lng: { type: Number, required: true },
