@@ -1,5 +1,14 @@
 import request from "supertest";
+import { memoryDb } from "../memoryDb";
 import app from "../../app";
+
+beforeAll(async () => {
+    await memoryDb.start();
+});
+
+afterAll(async () => {
+    await memoryDb.stop();
+});
 
 describe("GET /api/hello-world/", () => {
     it("responds with json", async () => {
