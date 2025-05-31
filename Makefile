@@ -17,17 +17,17 @@ dump-mongo: fix-permission
 	rm -rf db/
 
 # React commands
-bash-react:
+react-bash:
 	docker exec -it react bash
 
 # Express commands
-bash-express:
+express-bash:
 	docker exec -it express bash
 
-test-express:
+express-test:
 	docker exec -it express npm test
 
-check-express-ts:
+express-check:
 	docker exec -it express npx tsc --noEmit
 
 express-script/%:
