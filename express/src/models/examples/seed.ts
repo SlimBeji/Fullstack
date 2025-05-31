@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { NewUserIn, users } from "./users";
 import { NewPlaceIn, places } from "./places";
 import { crudUser, crudPlace } from "../crud";
@@ -33,4 +34,12 @@ const seedPlaces = async (raw: NewPlaceIn[]): Promise<void> => {
 export const seedDb = async (): Promise<void> => {
     await seedUsers(users);
     await seedPlaces(places);
+};
+
+export const dumpDb = async (): Promise<void> => {
+    const collections = await mongoose.connection.db!.collections();
+    for (const collection of collections) {
+        await collection.deleteMany({});
+        console.log(`✅ Collection ${collection.namespace} cleared!`);
+    }
 };
