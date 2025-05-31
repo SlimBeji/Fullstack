@@ -9,7 +9,7 @@ import path from "path";
 import mime from "mime-types";
 import { existsSync, readFileSync } from "fs";
 
-import config from "../config";
+import config from "../../config";
 
 interface GCSConfig {
     GCP_PROJECT_ID: string;

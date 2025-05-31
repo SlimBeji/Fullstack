@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import config from "../config";
+import config from "../../config";
 
 export class PaginationParams {
     constructor(public readonly page: number, public readonly size: number) {}

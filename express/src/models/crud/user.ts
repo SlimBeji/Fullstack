@@ -1,9 +1,9 @@
 import { hash, compare } from "bcryptjs";
-import { ApiError, HttpStatus } from "../types";
-import { storage } from "../utils";
-import { createToken, EncodedUserToken } from "../auth";
+import { ApiError, HttpStatus } from "../../types";
+import { storage } from "../../lib/utils";
+import { createToken, EncodedUserToken } from "../../api/auth";
 import { User, UserPut, SignupForm, SigninForm } from "../schemas";
-import { UserDocument, UserDB } from "../models";
+import { UserDocument, UserDB } from "../collections";
 import { Crud } from "./base";
 
 const DEFAULT_HASH_SALT = 12;

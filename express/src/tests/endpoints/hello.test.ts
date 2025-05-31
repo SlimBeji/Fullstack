@@ -1,6 +1,6 @@
 import request from "supertest";
 import { memoryDb } from "../memoryDb";
-import app from "../../app";
+import app from "../../api";
 
 beforeAll(async () => {
     await memoryDb.start();

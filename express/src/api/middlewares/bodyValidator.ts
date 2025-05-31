@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodType } from "zod";
-import { ApiError, HttpStatus } from "../types";
+import { ApiError, HttpStatus } from "../../types";
 
 export const validateBody = <T extends ZodType>(schema: T) => {
     return async function (req: Request, resp: Response, next: NextFunction) {

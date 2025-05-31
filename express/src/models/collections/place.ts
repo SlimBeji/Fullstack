@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { Place } from "../schemas";
-import { CollectionEnum } from "../types";
+import { CollectionEnum } from "../../types";
 import { UserDB } from "./user";
 
 // Schema creation

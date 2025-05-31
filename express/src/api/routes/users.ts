@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 
-import { crudUser, crudPlace } from "../crud";
-import { UserPut, UserPutSchema } from "../schemas";
+import { crudUser, crudPlace } from "../../models/crud";
+import { UserPut, UserPutSchema } from "../../models/schemas";
 import { PaginationParams, paginate, validateBody } from "../middlewares";
 
 export const userRouter = Router();

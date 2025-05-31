@@ -1,6 +1,6 @@
 import { Place, PlacePost, PlacePut } from "../schemas";
-import { PlaceDB, PlaceDocument } from "../models";
-import { storage } from "../utils";
+import { PlaceDB, PlaceDocument } from "../collections";
+import { storage } from "../../lib/utils";
 import { Crud } from "./base";
 
 export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {

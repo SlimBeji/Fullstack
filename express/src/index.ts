@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import config from "./config";
-import app from "./app";
+import app from "./api";
 
 // Connect Mongoose than run the app
 mongoose

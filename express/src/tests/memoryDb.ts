@@ -1,6 +1,6 @@
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import { seedDb } from "../scripts/seedDb";
+import { seedDb } from "../models/examples";
 import config from "../config";
 
 class MemoryDb {

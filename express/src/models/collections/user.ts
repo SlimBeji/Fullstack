@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { CollectionEnum } from "../types";
+import { CollectionEnum } from "../../types";
 
 import { User } from "../schemas";
 

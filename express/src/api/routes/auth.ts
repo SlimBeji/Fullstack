@@ -1,9 +1,14 @@
 import { Router, Response, Request, NextFunction } from "express";
 import { fileUpload, extractFile, validateBody } from "../middlewares";
-import { crudUser } from "../crud";
-import { SigninForm, SigninSchema, SignupForm, SignupSchema } from "../schemas";
-import { storage } from "../utils";
-import { ApiError, HttpStatus } from "../types";
+import { crudUser } from "../../models/crud";
+import {
+    SigninForm,
+    SigninSchema,
+    SignupForm,
+    SignupSchema,
+} from "../../models/schemas";
+import { storage } from "../../lib/utils";
+import { ApiError, HttpStatus } from "../../types";
 
 export const authRouter = Router();
 

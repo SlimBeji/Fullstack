@@ -1,12 +1,12 @@
 import { Router, Request, Response, NextFunction } from "express";
 
-import { crudPlace } from "../crud";
+import { crudPlace } from "../../models/crud";
 import {
     PlacePost,
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
-} from "../schemas";
+} from "../../models/schemas";
 import {
     extractFile,
     fileUpload,
@@ -14,8 +14,8 @@ import {
     paginate,
     validateBody,
 } from "../middlewares";
-import { storage } from "../utils";
-import { ApiError, HttpStatus } from "../types";
+import { storage } from "../../lib/utils";
+import { ApiError, HttpStatus } from "../../types";
 
 export const placeRouter = Router();
 

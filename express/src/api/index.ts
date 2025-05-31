@@ -2,7 +2,7 @@ import "express-async-errors";
 import express from "express";
 import cookieSession from "cookie-session";
 
-import config from "./config";
+import config from "../config";
 import { errorHandler, cors, noRouteMatchHandler } from "./middlewares";
 import { registerRoutes } from "./routes";
 
