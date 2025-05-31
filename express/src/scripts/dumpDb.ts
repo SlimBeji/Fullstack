@@ -9,8 +9,10 @@ const deleteCollections = async (): Promise<void> => {
     }
 };
 
-mongoose
-    .connect(config.MONGO_URL)
-    .then(() => deleteCollections())
-    .then(() => console.log("✅ All collections cleared successfully!"))
-    .finally(() => mongoose.disconnect());
+if (require.main === module) {
+    mongoose
+        .connect(config.MONGO_URL)
+        .then(() => deleteCollections())
+        .then(() => console.log("✅ All collections cleared successfully!"))
+        .finally(() => mongoose.disconnect());
+}
