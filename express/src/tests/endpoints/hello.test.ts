@@ -3,11 +3,11 @@ import { memoryDb } from "../memoryDb";
 import app from "../../api";
 
 beforeAll(async () => {
-    await memoryDb.start();
+    await memoryDb.session();
 });
 
 afterAll(async () => {
-    await memoryDb.stop();
+    await memoryDb.disconnect();
 });
 
 describe("GET /api/hello-world/", () => {
