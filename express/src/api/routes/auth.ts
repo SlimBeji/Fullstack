@@ -30,11 +30,10 @@ async function signup(req: Request, res: Response, next: NextFunction) {
     }
 
     const imageFile = extractFile(req, "image");
-    if (!imageFile) {
-        throw new ApiError(HttpStatus.BAD_REQUEST, "No Image was provided");
+    if (imageFile) {
+        parsed.imageUrl = await storage.uploadFile(imageFile);
     }
 
-    parsed.imageUrl = await storage.uploadFile(imageFile);
     const tokenData = await crudUser.signup(parsed);
     res.status(200).json(tokenData);
 }
