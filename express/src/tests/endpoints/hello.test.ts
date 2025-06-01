@@ -7,7 +7,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await memoryDb.disconnect();
+    await memoryDb.destroy();
 });
 
 describe("GET /api/hello-world/", () => {

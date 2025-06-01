@@ -1,6 +1,8 @@
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { seedDb } from "../models/examples";
+import { CollectionEnum } from "../types";
+import Config from "../config";
 
 export class MemoryDb {
     private replSet: MongoMemoryReplSet | null = null;
@@ -16,19 +18,16 @@ export class MemoryDb {
         }
     }
 
-    public async session(dbName: string = "main"): Promise<void> {
+    public async session(dbName: string = Config.MONGO_DBNAME): Promise<void> {
         await this.create();
         const conn = await mongoose.connect(this.uri, { dbName });
         const wasSeeded = await conn.connection
-            .db!.listCollections({ name: "users" })
+            .db!.listCollections({ name: CollectionEnum.USER })
             .hasNext();
+
         if (!wasSeeded) {
             await seedDb();
         }
-    }
-
-    public async disconnect(): Promise<void> {
-        await mongoose.disconnect();
     }
 
     public async destroy(): Promise<void> {
