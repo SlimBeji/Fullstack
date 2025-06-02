@@ -1,17 +1,23 @@
-import { z } from "zod";
+import { z } from "../../openapi";
 
+import { userNameField, userEmailField, userPasswordField } from "./user";
+
+// Zod Schemas
 export const SignupSchema = z.object({
-    name: z.string().min(2),
-    email: z.string().email(),
-    password: z.string().min(8),
-    imageUrl: z.string().url().optional(),
+    name: userNameField,
+    email: userEmailField,
+    password: userPasswordField,
 });
 
-export type SignupForm = z.infer<typeof SignupSchema>;
+export type SignupBodyForm = z.infer<typeof SignupSchema>;
+
+export type SignupForm = SignupBodyForm & {
+    imageUrl?: string;
+};
 
 export const SigninSchema = z.object({
-    email: z.string().email(),
-    password: z.string(),
+    email: userEmailField,
+    password: userPasswordField,
 });
 
 export type SigninForm = z.infer<typeof SigninSchema>;

@@ -1,6 +1,7 @@
-import { z } from "zod";
+import { z } from "../../openapi";
 import { Types } from "mongoose";
 
+// Interfaces
 export interface NewUser {
     name: string;
     email: string;
@@ -14,10 +15,27 @@ export interface User extends NewUser {
     places: Types.ObjectId[];
 }
 
+// Zod Fields
+export const userNameField = z.string().min(2).openapi({
+    description: "The user name, two characters at least",
+    example: "Slim Beji",
+});
+
+export const userEmailField = z.string().email().openapi({
+    description: "The user email",
+    example: "mslimbeji@gmail.com",
+});
+
+export const userPasswordField = z.string().min(8).openapi({
+    description: "The user password, 8 characters at least",
+    example: "my_secret_password",
+});
+
+// Zod Schemas
 export const UserPutSchema = z.object({
-    name: z.string().min(2).optional(),
-    email: z.string().email().optional(),
-    password: z.string().optional(),
+    name: userNameField.optional(),
+    email: userEmailField.optional(),
+    password: userPasswordField.optional(),
 });
 
 export type UserPut = z.infer<typeof UserPutSchema>;
