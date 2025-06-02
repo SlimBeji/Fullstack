@@ -26,10 +26,7 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return await Promise.all(userPromises);
     }
 
-    public checkDuplicate = async (
-        email: string,
-        name: string
-    ): Promise<string> => {
+    public async checkDuplicate(email: string, name: string): Promise<string> {
         const user = await this.model.findOne({
             $or: [{ email }, { name }],
         });
@@ -39,18 +36,18 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         if (user.email === email) return `email ${email} is already used!`;
         if (user.name === name) return `name ${name} is already used!`;
         return "";
-    };
+    }
 
-    public getByEmail = async (email: string): Promise<User | null> => {
+    public async getByEmail(email: string): Promise<User | null> {
         const users = await this.model.find({ email });
         if (!users.length) {
             return null;
         }
         const userDocument = users[0];
         return (await this.toJson([userDocument]))[0];
-    };
+    }
 
-    public create = async (form: SignupForm): Promise<User> => {
+    public async create(form: SignupForm): Promise<User> {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
         const errorHandler = (err: Error): ApiError => {
             let status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -62,14 +59,14 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             return new ApiError(status, message);
         };
         return super.create(form, errorHandler);
-    };
+    }
 
-    public signup = async (form: SignupForm): Promise<EncodedUserToken> => {
+    public async signup(form: SignupForm): Promise<EncodedUserToken> {
         const user = await this.create(form);
         return createToken(user);
-    };
+    }
 
-    public signin = async (form: SigninForm): Promise<EncodedUserToken> => {
+    public async signin(form: SigninForm): Promise<EncodedUserToken> {
         const error = new ApiError(
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
@@ -82,14 +79,14 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         const isValidPassword = await compare(form.password, user.password);
         if (!isValidPassword) throw error;
         return createToken(user);
-    };
+    }
 
-    public update = async (id: string, form: UserPut): Promise<User> => {
+    public async update(id: string, form: UserPut): Promise<User> {
         if (form.password) {
             form.password = await hash(form.password, DEFAULT_HASH_SALT);
         }
         return super.update(id, form);
-    };
+    }
 
     public async deleteCleanup(document: UserDocument): Promise<void> {
         if (document.imageUrl) {
