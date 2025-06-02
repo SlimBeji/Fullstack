@@ -3,6 +3,7 @@ import { fileUpload, extractFile, validateBody } from "../middlewares";
 import { crudUser } from "../../models/crud";
 import {
     SigninForm,
+    SignupBodyForm,
     SigninSchema,
     SignupForm,
     SignupSchema,
@@ -20,7 +21,7 @@ async function signin(req: Request, res: Response, next: NextFunction) {
 authRouter.post("/signin", validateBody(SigninSchema), signin);
 
 async function signup(req: Request, res: Response, next: NextFunction) {
-    const parsed = req.parsed as SignupForm;
+    const parsed = req.parsed as SignupBodyForm;
     const duplicateMsg = await crudUser.checkDuplicate(
         parsed.email,
         parsed.name
@@ -29,12 +30,12 @@ async function signup(req: Request, res: Response, next: NextFunction) {
         throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
     }
 
+    let imageUrl = "";
     const imageFile = extractFile(req, "image");
     if (imageFile) {
-        parsed.imageUrl = await storage.uploadFile(imageFile);
+        imageUrl = await storage.uploadFile(imageFile);
     }
-
-    const tokenData = await crudUser.signup(parsed);
+    const tokenData = await crudUser.signup({ ...parsed, imageUrl });
     res.status(200).json(tokenData);
 }
 authRouter.post(

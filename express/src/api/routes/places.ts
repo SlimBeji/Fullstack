@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 
 import { crudPlace } from "../../models/crud";
 import {
-    PlacePost,
+    PlacePostBody,
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
@@ -26,14 +26,13 @@ async function getPlaces(req: Request, resp: Response, next: NextFunction) {
 placeRouter.get("/", paginate(), getPlaces);
 
 async function createPlace(req: Request, resp: Response, next: NextFunction) {
-    const parsed = req.parsed as PlacePost;
+    const parsed = req.parsed as PlacePostBody;
     const imageFile = extractFile(req, "image");
     if (!imageFile) {
         throw new ApiError(HttpStatus.BAD_REQUEST, "No Image was provided");
     }
-
-    parsed.imageUrl = await storage.uploadFile(imageFile);
-    const newPlace = await crudPlace.create(parsed);
+    const imageUrl = await storage.uploadFile(imageFile);
+    const newPlace = await crudPlace.create({ ...parsed, imageUrl });
     resp.status(200).json(newPlace);
 }
 placeRouter.post(
