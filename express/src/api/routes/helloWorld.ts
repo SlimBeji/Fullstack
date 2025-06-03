@@ -74,3 +74,29 @@ async function helloAdmin(req: Request, res: Response, next: NextFunction) {
 }
 
 helloWorldRouter.get("/admin", Admin, helloAdmin);
+
+swaggerRegistery.registerPath({
+    method: "get",
+    path: "/hello-world/admin",
+    responses: {
+        200: {
+            description: "A simple response with message field",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string().openapi({
+                            example: "Hello Admin Slim",
+                        }),
+                    }),
+                },
+            },
+        },
+    },
+    tags: ["Hello World"],
+    summary: "Hello World Endpoint for admins only",
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
+});
