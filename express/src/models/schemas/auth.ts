@@ -15,11 +15,21 @@ export const tokenField = z.string().openapi({
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM",
 });
 
+export const imageField = z.string().openapi({
+    type: "string",
+    format: "binary",
+    description: "User's profile image (JPEG)",
+});
+
 // Signup Schemas
 export const SignupSchema = z.object({
     name: userNameField,
     email: userEmailField,
     password: userPasswordField,
+});
+
+export const SignupMultipartSchema = SignupSchema.extend({
+    image: imageField, // For openapi spec only
 });
 
 export type SignupBodyForm = z.infer<typeof SignupSchema>;

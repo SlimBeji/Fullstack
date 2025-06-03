@@ -7,6 +7,7 @@ import {
     SigninSchema,
     SignupSchema,
     EncodedTokenSchema,
+    SignupMultipartSchema,
 } from "../../models/schemas";
 import { storage } from "../../lib/utils";
 import { ApiError, HttpStatus } from "../../types";
@@ -40,6 +41,34 @@ authRouter.post(
     validateBody(SignupSchema),
     signup
 );
+
+swaggerRegistery.registerPath({
+    method: "post",
+    path: "/auth/signup",
+    request: {
+        body: {
+            content: {
+                "multipart/form-data": {
+                    schema: SignupMultipartSchema,
+                },
+            },
+            description: "user signup form",
+            required: true,
+        },
+    },
+    responses: {
+        200: {
+            description: "User registered and received his access token",
+            content: {
+                "application/json": {
+                    schema: EncodedTokenSchema,
+                },
+            },
+        },
+    },
+    tags: ["Auth"],
+    summary: "User registration",
+});
 
 // Signin in route
 async function signin(req: Request, res: Response, next: NextFunction) {
