@@ -1,6 +1,8 @@
-import request from "supertest";
+import supertest from "supertest";
 import { memoryDb } from "../memoryDb";
 import app from "../../api";
+
+const request = supertest(app);
 
 beforeAll(async () => {
     await memoryDb.session();
@@ -17,7 +19,7 @@ describe("POST /api/auth/signup", () => {
             email: "new_user@gmail.com",
             password: "very_secret",
         };
-        const response = await request(app)
+        const response = await request
             .post("/api/auth/signup")
             .send(data)
             .expect("Content-Type", /json/)
@@ -34,7 +36,7 @@ describe("POST /api/auth/signin", () => {
             email: "mslimbeji@gmail.com",
             password: "very_secret",
         };
-        const response = await request(app)
+        const response = await request
             .post("/api/auth/signin")
             .send(data)
             .expect("Content-Type", /json/)
