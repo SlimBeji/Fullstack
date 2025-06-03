@@ -14,6 +14,7 @@ const parseVar = (varname: string, defaultValue?: string): string => {
 export default {
     // ENV config
     PORT: parseVar("PORT", "5000"),
+    API_URL: parseVar("API_URL", "http://localhost:5000/api"),
     SECRET_KEY: parseVar("SECRET_KEY"),
     JSON_MAX_SIZE: parseVar("JSON_MAX_SIZE"),
     MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),

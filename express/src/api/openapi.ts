@@ -4,6 +4,7 @@ import {
 } from "@asteasolutions/zod-to-openapi";
 import swaggerUi from "swagger-ui-express";
 import { Application } from "express";
+import config from "../config";
 
 const swaggerRegistery = new OpenAPIRegistry();
 
@@ -19,7 +20,7 @@ const registerSwaggger = (app: Application, path: string): void => {
         },
         servers: [
             {
-                url: `http://localhost:5000/api`,
+                url: config.API_URL,
                 description: "Swagger documentation",
             },
         ],
