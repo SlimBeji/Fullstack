@@ -9,6 +9,13 @@ import config from "../config";
 const swaggerRegistery = new OpenAPIRegistry();
 
 const registerSwaggger = (app: Application, path: string): void => {
+    swaggerRegistery.registerComponent("securitySchemes", "BearerAuth", {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description:
+            "Enter your JWT Bearer token in the format: **Bearer <token>**",
+    });
     const generator = new OpenApiGeneratorV3(swaggerRegistery.definitions);
     const openApiDocument = generator.generateDocument({
         openapi: "3.0.0",
