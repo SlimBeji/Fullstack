@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import config from "../../config";
-import { User } from "../../models/schemas";
+import { User, EncodedToken } from "../../models/schemas";
 import { crudUser } from "../../models/crud";
 import { ApiError, HttpStatus } from "../../types";
 
@@ -10,15 +10,9 @@ export interface UserTokenInput {
     email: string;
 }
 
-export interface EncodedUserToken {
-    userId: string;
-    email: string;
-    token: string;
-}
-
 export interface DecodedUserToken extends UserTokenInput, JwtPayload {}
 
-export const createToken = (user: User): EncodedUserToken => {
+export const createToken = (user: User): EncodedToken => {
     const payload: UserTokenInput = {
         userId: user.id,
         email: user.email,

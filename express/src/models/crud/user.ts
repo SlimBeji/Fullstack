@@ -1,8 +1,14 @@
 import { hash, compare } from "bcryptjs";
 import { ApiError, HttpStatus } from "../../types";
 import { storage } from "../../lib/utils";
-import { createToken, EncodedUserToken } from "../../api/auth";
-import { User, UserPut, SignupForm, SigninForm } from "../schemas";
+import { createToken } from "../../api/auth";
+import {
+    User,
+    UserPut,
+    SignupForm,
+    SigninForm,
+    EncodedToken,
+} from "../schemas";
 import { UserDocument, UserDB } from "../collections";
 import { Crud } from "./base";
 
@@ -61,12 +67,12 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return super.create(form, errorHandler);
     }
 
-    public async signup(form: SignupForm): Promise<EncodedUserToken> {
+    public async signup(form: SignupForm): Promise<EncodedToken> {
         const user = await this.create(form);
         return createToken(user);
     }
 
-    public async signin(form: SigninForm): Promise<EncodedUserToken> {
+    public async signin(form: SigninForm): Promise<EncodedToken> {
         const error = new ApiError(
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
