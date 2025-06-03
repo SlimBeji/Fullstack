@@ -29,7 +29,7 @@ swaggerRegistery.registerPath({
             },
         },
     },
-    tags: ["Hello World!"],
+    tags: ["Hello World"],
     summary: "Hello World Endpoint",
 });
 
