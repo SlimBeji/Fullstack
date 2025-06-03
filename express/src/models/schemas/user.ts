@@ -16,6 +16,11 @@ export interface User extends NewUser {
 }
 
 // Zod Fields
+export const userIdField = z.string().min(24).openapi({
+    description: "The user ID, 24 characters",
+    example: "683b21134e2e5d46978daf1f",
+});
+
 export const userNameField = z.string().min(2).openapi({
     description: "The user name, two characters at least",
     example: "Slim Beji",
