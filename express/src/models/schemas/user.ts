@@ -33,7 +33,7 @@ export const userEmailField = z.string().email().openapi({
 
 export const userPasswordField = z.string().min(8).openapi({
     description: "The user password, 8 characters at least",
-    example: "my_secret_password",
+    example: "very_secret",
 });
 
 // Zod Schemas
