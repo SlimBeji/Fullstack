@@ -14,6 +14,33 @@ import { swaggerRegistery } from "../openapi";
 
 export const authRouter = Router();
 
+// Signup route
+async function signup(req: Request, res: Response, next: NextFunction) {
+    const parsed = req.parsed as SignupBodyForm;
+    const duplicateMsg = await crudUser.checkDuplicate(
+        parsed.email,
+        parsed.name
+    );
+    if (duplicateMsg) {
+        throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
+    }
+
+    let imageUrl = "";
+    const imageFile = extractFile(req, "image");
+    if (imageFile) {
+        imageUrl = await storage.uploadFile(imageFile);
+    }
+    const tokenData = await crudUser.signup({ ...parsed, imageUrl });
+    res.status(200).json(tokenData);
+}
+
+authRouter.post(
+    "/signup",
+    fileUpload([{ name: "image" }]),
+    validateBody(SignupSchema),
+    signup
+);
+
 // Signin in route
 async function signin(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as SigninForm;
@@ -50,29 +77,3 @@ swaggerRegistery.registerPath({
     tags: ["Auth"],
     summary: "User authentication",
 });
-
-// Signup route
-async function signup(req: Request, res: Response, next: NextFunction) {
-    const parsed = req.parsed as SignupBodyForm;
-    const duplicateMsg = await crudUser.checkDuplicate(
-        parsed.email,
-        parsed.name
-    );
-    if (duplicateMsg) {
-        throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
-    }
-
-    let imageUrl = "";
-    const imageFile = extractFile(req, "image");
-    if (imageFile) {
-        imageUrl = await storage.uploadFile(imageFile);
-    }
-    const tokenData = await crudUser.signup({ ...parsed, imageUrl });
-    res.status(200).json(tokenData);
-}
-authRouter.post(
-    "/signup",
-    fileUpload([{ name: "image" }]),
-    validateBody(SignupSchema),
-    signup
-);
