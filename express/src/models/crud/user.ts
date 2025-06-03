@@ -53,6 +53,15 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return (await this.toJson([userDocument]))[0];
     }
 
+    public async getBearer(email: string): Promise<string> {
+        const user = await this.getByEmail(email);
+        if (!user) {
+            throw new Error(`No user with email ${email} in the database`);
+        }
+        const { token } = createToken(user);
+        return `Bearer ${token}`;
+    }
+
     public async create(form: SignupForm): Promise<User> {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
         const errorHandler = (err: Error): ApiError => {
