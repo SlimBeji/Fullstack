@@ -1,4 +1,4 @@
-import { z } from "../../openapi";
+import { z } from "../../zod";
 import { Types } from "mongoose";
 
 // Interfaces
