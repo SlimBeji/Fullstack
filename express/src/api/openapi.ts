@@ -36,6 +36,10 @@ const registerSwaggger = (app: Application, path: string): void => {
                 name: "Auth",
                 description: "Registration and Authentication endpoints",
             },
+            {
+                name: "Hello World",
+                description: "Hello World endpoints",
+            },
         ],
     });
     app.use(path, swaggerUi.serve, swaggerUi.setup(openApiDocument));
