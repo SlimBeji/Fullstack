@@ -11,3 +11,18 @@ export enum CollectionEnum {
     USER = "User",
     PLACE = "Place",
 }
+
+export const MongoFilterOperationMapping = {
+    eq: "$eq",
+    ne: "$ne",
+    gt: "$gt",
+    gte: "$gte",
+    lt: "$lt",
+    lte: "$lte",
+    in: "$in",
+    nin: "$nin",
+    regex: "$regex",
+    text: "$text",
+};
+
+export type MongoFilterOperation = keyof typeof MongoFilterOperationMapping;
