@@ -1,7 +1,7 @@
 import supertest from "supertest";
-import { memoryDb } from "../memoryDb";
-import app from "../../api";
-import { crudUser } from "../../models/crud";
+import { memoryDb } from "../../memoryDb";
+import app from "../../../api";
+import { crudUser } from "../../../models/crud";
 
 const request = supertest(app);
 
