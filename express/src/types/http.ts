@@ -1,4 +1,4 @@
-import { MongoFilterOperation } from "./enums";
+import { MongoFilter } from "./enums";
 
 export interface PaginationData {
     page: number;
@@ -7,11 +7,4 @@ export interface PaginationData {
 
 export type SortData = { [key: string]: 1 | -1 };
 
-export interface Filter {
-    op: MongoFilterOperation;
-    value: any;
-}
-
-export type FilterNode = Filter | { [key: string]: FilterNode };
-
-export type FilterData = { [key: string]: FilterNode };
+export type FilterData = { [key: string]: MongoFilter };
