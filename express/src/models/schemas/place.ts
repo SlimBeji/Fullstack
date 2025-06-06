@@ -1,6 +1,6 @@
 import { z } from "../../zod";
 import { Types } from "mongoose";
-import { buildPaginatedSchema } from "./utils";
+import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
 export const placeIdField = z.string().min(24).openapi({
@@ -90,15 +90,20 @@ export const PlacePutSchema = z.object({
 export type PlacePut = z.infer<typeof PlacePutSchema>;
 
 // Search Schemas
-export const PlaceSearchSchema = PlacePutSchema.extend({});
-
-export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
-
 export const PlaceSortableFields = [
     "title",
     "description",
     "address",
     "location",
 ];
+
+export const PlaceSearchSchema = PlacePutSchema.extend({});
+
+export const PlaceSearchSwagger = buildPaginationSchema(
+    PlaceSearchSchema,
+    PlaceSortableFields
+);
+
+export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
 
 export const PlacePaginated = buildPaginatedSchema(PlaceSchema);

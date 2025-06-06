@@ -1,6 +1,6 @@
 import { z } from "../../zod";
 import { Types } from "mongoose";
-import { buildPaginatedSchema } from "./utils";
+import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
 export const userIdField = z.string().min(24).openapi({
@@ -71,10 +71,6 @@ export const UserPutSchema = z.object({
 export type UserPut = z.infer<typeof UserPutSchema>;
 
 // Search Schemas
-export const UserSearchSchema = UserPutSchema.extend({});
-
-export type UserSearch = z.infer<typeof UserSearchSchema>;
-
 export const UserSortableFields = [
     "name",
     "email",
@@ -82,5 +78,14 @@ export const UserSortableFields = [
     "imageUrl",
     "isAdmin",
 ];
+
+export const UserSearchSchema = UserPutSchema.extend({});
+
+export const UserSearchSwagger = buildPaginationSchema(
+    UserSearchSchema,
+    UserSortableFields
+);
+
+export type UserSearch = z.infer<typeof UserSearchSchema>;
 
 export const UserPaginated = buildPaginatedSchema(UserSchema);
