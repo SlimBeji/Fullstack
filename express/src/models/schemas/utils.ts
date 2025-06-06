@@ -6,6 +6,12 @@ export const buildPaginationSchema = (
     schema: AnyZodObject,
     sortableFields: string[]
 ): AnyZodObject => {
+    const fields: string[] = [];
+    sortableFields.forEach((item) => {
+        fields.push(item);
+        fields.push(`-${item}`);
+    });
+
     return schema.extend({
         page: z.number().default(1).openapi("The page number"),
         size: z
@@ -13,7 +19,7 @@ export const buildPaginationSchema = (
             .default(Config.MAX_ITEMS_PER_PAGE)
             .openapi("Items per page"),
         sort: z
-            .array(z.enum(sortableFields as [string, ...string[]]))
+            .array(z.enum(fields as [string, ...string[]]))
             .default([])
             .openapi(
                 "Fields to use for sorting. Use the '-' for descending sorting"
