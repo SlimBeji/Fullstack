@@ -91,6 +91,7 @@ export type PlacePut = z.infer<typeof PlacePutSchema>;
 
 // Search Schemas
 export const PlaceSortableFields = [
+    "createdAt",
     "title",
     "description",
     "address",

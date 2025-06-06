@@ -72,6 +72,7 @@ export type UserPut = z.infer<typeof UserPutSchema>;
 
 // Search Schemas
 export const UserSortableFields = [
+    "createdAt",
     "name",
     "email",
     "password",
