@@ -1,5 +1,6 @@
 import { z } from "../../zod";
 import { Types } from "mongoose";
+import { buildPaginatedSchema } from "./utils";
 
 // Zod Fields
 export const userIdField = z.string().min(24).openapi({
@@ -81,3 +82,5 @@ export const UserSortableFields = [
     "imageUrl",
     "isAdmin",
 ];
+
+export const UserPaginated = buildPaginatedSchema(UserSchema);

@@ -1,5 +1,6 @@
 import { z } from "../../zod";
 import { Types } from "mongoose";
+import { buildPaginatedSchema } from "./utils";
 
 // Zod Fields
 export const placeIdField = z.string().min(24).openapi({
@@ -99,3 +100,5 @@ export const PlaceSortableFields = [
     "address",
     "location",
 ];
+
+export const PlacePaginated = buildPaginatedSchema(PlaceSchema);
