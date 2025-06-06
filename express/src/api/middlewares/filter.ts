@@ -20,10 +20,13 @@ const parsePaginationFields = (
     const pageField = typeof req.query.page === "string" ? req.query.page : "1";
     const page = Math.max(1, parseInt(pageField) || 1);
 
-    const sizeField = typeof req.query.size === "string" ? req.query.size : "1";
+    const sizeField =
+        typeof req.query.size === "string" ? req.query.size : `${maxSize}`;
     const size = Math.min(Math.max(1, parseInt(sizeField) || 1), maxSize);
 
-    return { page, size };
+    const skip = (page - 1) * size;
+
+    return { page, size, skip };
 };
 
 const parseSortField = (req: Request, allowedFields: string[]): SortData => {
