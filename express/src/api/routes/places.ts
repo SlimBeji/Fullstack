@@ -6,24 +6,20 @@ import {
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
+    PlaceSearchSchema,
+    PlaceSortableFields,
 } from "../../models/schemas";
-import {
-    extractFile,
-    fileUpload,
-    PaginationParams,
-    paginate,
-    validateBody,
-} from "../middlewares";
+import { extractFile, fileUpload, validateBody, filter } from "../middlewares";
 import { storage } from "../../lib/utils";
 import { ApiError, HttpStatus } from "../../types";
 
 export const placeRouter = Router();
 
 async function getPlaces(req: Request, resp: Response, next: NextFunction) {
-    const pagination = req.pagination as PaginationParams;
-    resp.status(200).json(await crudPlace.search({}, pagination));
+    const query = req.mongoQuery!;
+    resp.status(200).json(await crudPlace.search(query));
 }
-placeRouter.get("/", paginate(), getPlaces);
+placeRouter.get("/", filter(PlaceSearchSchema, PlaceSortableFields), getPlaces);
 
 async function createPlace(req: Request, resp: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePostBody;
