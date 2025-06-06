@@ -1,6 +1,10 @@
 import { FilterQuery, Model, Document, startSession } from "mongoose";
-import { ApiError, ErrorHandler, HttpStatus } from "../../types";
-import { PaginationParams } from "../../api/middlewares";
+import {
+    ApiError,
+    ErrorHandler,
+    HttpStatus,
+    PaginationParams,
+} from "../../types";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
