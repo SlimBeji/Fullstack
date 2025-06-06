@@ -68,3 +68,16 @@ export const UserPutSchema = z.object({
 });
 
 export type UserPut = z.infer<typeof UserPutSchema>;
+
+// Search Schemas
+export const UserSearchSchema = UserPutSchema.extend({});
+
+export type UserSearch = z.infer<typeof UserSearchSchema>;
+
+export const UserSortableFields = [
+    "name",
+    "email",
+    "password",
+    "imageUrl",
+    "isAdmin",
+];
