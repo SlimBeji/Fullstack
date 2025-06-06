@@ -79,7 +79,7 @@ export const UserSortableFields = [
     "isAdmin",
 ];
 
-export const UserSearchSchema = UserPutSchema.extend({});
+export const UserSearchSchema = UserPutSchema.omit({ password: true });
 
 export const UserSearchSwagger = buildPaginationSchema(
     UserSearchSchema,
