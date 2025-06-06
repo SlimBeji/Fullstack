@@ -1,5 +1,12 @@
 import { Model, Document, startSession, RootFilterQuery } from "mongoose";
-import { ApiError, ErrorHandler, FilterQuery, HttpStatus } from "../../types";
+import {
+    ApiError,
+    ErrorHandler,
+    FilterQuery,
+    HttpStatus,
+    PaginatedData,
+} from "../../types";
+import { count } from "console";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -51,23 +58,21 @@ export abstract class Crud<
         return (await this.toJson([raw]))[0];
     }
 
-    public async search(filterQuery: FilterQuery): Promise<I[]> {
+    public async search(filterQuery: FilterQuery): Promise<PaginatedData<I>> {
         let { pagination, sort, filters } = filterQuery;
         if (Object.keys(sort).length === 0) {
             sort = { createdAt: 1 };
         }
-
-        let mongoQuery = this.model
-            .find(filters as RootFilterQuery<I>)
+        let parsedFilters = filters as RootFilterQuery<I>;
+        const total = await this.model.countDocuments(parsedFilters);
+        const raws = await this.model
+            .find(parsedFilters)
             .sort(sort)
-            .collation({ locale: "en", strength: 2 });
-        if (Object.keys(pagination).length !== 0) {
-            mongoQuery = mongoQuery
-                .skip(pagination.skip)
-                .limit(pagination.size);
-        }
+            .collation({ locale: "en", strength: 2 })
+            .skip(pagination.skip)
+            .limit(pagination.size)
+            .exec();
 
-        const raws = await mongoQuery.exec();
         if (!raws.length) {
             throw new ApiError(
                 HttpStatus.NOT_FOUND,
@@ -75,7 +80,13 @@ export abstract class Crud<
                 { query: filterQuery }
             );
         }
-        return await this.toJson(raws);
+        const data = await this.toJson(raws);
+        return {
+            page: pagination.page,
+            totalPages: Math.ceil(total / pagination.size),
+            totalCount: total,
+            data,
+        };
     }
 
     public async create(
