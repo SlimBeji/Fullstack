@@ -1,22 +1,16 @@
 import "express";
 import { User } from "../schemas";
-import { PaginationData, SortData, FilterData } from "./http";
+import { PaginationData, SortData, FilterData, FilterQuery } from "./http";
 
 declare module "express-serve-static-core" {
     interface Request {
         currentUser?: User;
         parsed?: unknown;
-        mongoQuery?: MongoQuery;
+        filterQuery?: FilterQuery;
     }
 
     interface Application {
         env?: string;
-    }
-
-    interface MongoQuery {
-        pagination: PaginationData;
-        sort: SortData;
-        filters: FilterData;
     }
 }
 

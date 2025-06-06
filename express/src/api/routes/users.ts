@@ -14,7 +14,7 @@ import { validateBody, filter } from "../middlewares";
 export const userRouter = Router();
 
 async function getUsers(req: Request, res: Response, next: NextFunction) {
-    const query = req.mongoQuery!;
+    const query = req.filterQuery!;
     res.status(200).json(await crudUser.search(query));
 }
 userRouter.get("/", filter(UserSearchSchema, UserSortableFields), getUsers);
@@ -41,7 +41,7 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
 userRouter.delete("/:userId", deleteUser);
 
 async function getPlace(req: Request, res: Response, next: NextFunction) {
-    const query = req.mongoQuery!;
+    const query = req.filterQuery!;
     query.filters["creatorId"] = { $eq: req.params.userId };
     const places = await crudPlace.search(query);
     res.status(200).json(places);

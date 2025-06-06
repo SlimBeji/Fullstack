@@ -160,7 +160,7 @@ export const filter = (
             const pagination = parsePaginationFields(req, maxSize);
             const sort = parseSortField(req, sortableFields);
             const filters = parseFilters(req, zodSchema);
-            req.mongoQuery = { pagination, sort, filters };
+            req.filterQuery = { pagination, sort, filters };
             next();
         } catch (err) {
             if (err instanceof Error) {

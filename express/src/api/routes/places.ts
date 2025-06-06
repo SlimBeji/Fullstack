@@ -16,7 +16,7 @@ import { ApiError, HttpStatus } from "../../types";
 export const placeRouter = Router();
 
 async function getPlaces(req: Request, resp: Response, next: NextFunction) {
-    const query = req.mongoQuery!;
+    const query = req.filterQuery!;
     resp.status(200).json(await crudPlace.search(query));
 }
 placeRouter.get("/", filter(PlaceSearchSchema, PlaceSortableFields), getPlaces);
