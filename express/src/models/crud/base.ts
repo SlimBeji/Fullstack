@@ -1,10 +1,5 @@
-import { FilterQuery, Model, Document, startSession } from "mongoose";
-import {
-    ApiError,
-    ErrorHandler,
-    HttpStatus,
-    PaginationParams,
-} from "../../types";
+import { Model, Document, startSession, RootFilterQuery } from "mongoose";
+import { ApiError, ErrorHandler, FilterQuery, HttpStatus } from "../../types";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -56,14 +51,18 @@ export abstract class Crud<
         return (await this.toJson([raw]))[0];
     }
 
-    public async search(
-        query: FilterQuery<D>,
-        pagination: PaginationParams | null = null
-    ): Promise<I[]> {
-        let mongoQuery = this.model.find(query);
-        if (pagination) {
+    public async search(filterQuery: FilterQuery): Promise<I[]> {
+        let { pagination, sort, filters } = filterQuery;
+        if (Object.keys(sort).length === 0) {
+            sort = { createdAt: 1 };
+        }
+
+        let mongoQuery = this.model
+            .find(filters as RootFilterQuery<I>)
+            .sort(sort)
+            .collation({ locale: "en", strength: 2 });
+        if (Object.keys(pagination).length !== 0) {
             mongoQuery = mongoQuery
-                .sort({ createdAt: 1 })
                 .skip(pagination.skip)
                 .limit(pagination.size);
         }
@@ -72,9 +71,8 @@ export abstract class Crud<
         if (!raws.length) {
             throw new ApiError(
                 HttpStatus.NOT_FOUND,
-                `No ${this.model.modelName} found with query ${JSON.stringify(
-                    query
-                )}!`
+                `No ${this.model.modelName} found`,
+                { query: filterQuery }
             );
         }
         return await this.toJson(raws);
