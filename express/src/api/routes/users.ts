@@ -6,18 +6,43 @@ import {
     UserPutSchema,
     UserSearchSchema,
     UserSortableFields,
+    UserPaginated,
     PlaceSearchSchema,
     PlaceSortableFields,
+    UserSearchSwagger,
 } from "../../models/schemas";
 import { validateBody, filter } from "../middlewares";
+import { swaggerRegistery } from "../openapi";
 
 export const userRouter = Router();
 
+// Get Users Endpoint
 async function getUsers(req: Request, res: Response, next: NextFunction) {
     const query = req.filterQuery!;
     res.status(200).json(await crudUser.search(query));
 }
+
 userRouter.get("/", filter(UserSearchSchema, UserSortableFields), getUsers);
+
+swaggerRegistery.registerPath({
+    method: "get",
+    path: "/users/",
+    request: {
+        query: UserSearchSwagger,
+    },
+    responses: {
+        200: {
+            description: "Search and Filter users",
+            content: {
+                "application/json": {
+                    schema: UserPaginated,
+                },
+            },
+        },
+    },
+    tags: ["User"],
+    summary: "Search and Retrieve users",
+});
 
 async function getUser(req: Request, res: Response, next: NextFunction) {
     const user = await crudUser.get(req.params.userId);
