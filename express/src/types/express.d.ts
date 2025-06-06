@@ -6,7 +6,6 @@ declare module "express-serve-static-core" {
     interface Request {
         currentUser?: User;
         parsed?: unknown;
-        pagination?: unknown;
         mongoQuery?: MongoQuery;
     }
 

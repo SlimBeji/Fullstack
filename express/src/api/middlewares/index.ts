@@ -3,5 +3,4 @@ export * from "./errors";
 export * from "./auth";
 export * from "./fileupload";
 export * from "./bodyValidator";
-export * from "./pagination";
 export * from "./filter";
