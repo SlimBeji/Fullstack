@@ -1,3 +1,4 @@
+import { z, zodObjectId } from "../../zod";
 import { Router, Request, Response, NextFunction } from "express";
 
 import { crudUser, crudPlace } from "../../models/crud";
@@ -10,6 +11,7 @@ import {
     PlaceSearchSchema,
     PlaceSortableFields,
     UserSearchSwagger,
+    UserSchema,
 } from "../../models/schemas";
 import { validateBody, filter } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
@@ -44,11 +46,38 @@ swaggerRegistery.registerPath({
     summary: "Search and Retrieve users",
 });
 
+// Get User Endpoint
 async function getUser(req: Request, res: Response, next: NextFunction) {
     const user = await crudUser.get(req.params.userId);
     res.status(200).json(user);
 }
+
 userRouter.get("/:userId", getUser);
+
+swaggerRegistery.registerPath({
+    method: "get",
+    path: "/users/{userId}",
+    request: {
+        params: z.object({
+            userId: zodObjectId().openapi({
+                example: "507f1f77bcf86cd799439011",
+                description: "MongoDB ObjectId",
+            }),
+        }),
+    },
+    responses: {
+        200: {
+            description: "User information",
+            content: {
+                "application/json": {
+                    schema: UserSchema,
+                },
+            },
+        },
+    },
+    tags: ["User"],
+    summary: "Search and Retrieve user by id",
+});
 
 async function editUser(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as UserPut;
