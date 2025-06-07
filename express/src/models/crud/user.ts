@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { hash, compare } from "bcryptjs";
 import { ApiError, HttpStatus } from "../../types";
 import { storage } from "../../lib/utils";
@@ -96,7 +97,10 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return createToken(user);
     }
 
-    public async update(id: string, form: UserPut): Promise<User> {
+    public async update(
+        id: string | Types.ObjectId,
+        form: UserPut
+    ): Promise<User> {
         if (form.password) {
             form.password = await hash(form.password, DEFAULT_HASH_SALT);
         }
