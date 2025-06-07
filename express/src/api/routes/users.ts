@@ -13,7 +13,7 @@ import {
     UserSearchSwagger,
     UserSchema,
 } from "../../models/schemas";
-import { validateBody, filter } from "../middlewares";
+import { validateBody, filter, fetchUser, Admin } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const userRouter = Router();
@@ -79,27 +79,35 @@ swaggerRegistery.registerPath({
     summary: "Search and Retrieve user by id",
 });
 
+// Put User Endpoint
 async function editUser(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as UserPut;
-    const updatedUser = await crudUser.update(req.params.userId, parsed);
-    res.status(200).json(updatedUser);
+    const fetchedUser = res.fetchedUser!;
+    const updatedUser = await crudUser.updateDocument(fetchedUser, parsed);
+    const result = await crudUser.jsonfify(updatedUser);
+    res.status(200).json(result);
 }
-userRouter.put("/:userId", validateBody(UserPutSchema), editUser);
 
+userRouter.put("/:userId", validateBody(UserPutSchema), fetchUser(), editUser);
+
+// Delete User Endpoint
 async function deleteUser(req: Request, res: Response, next: NextFunction) {
     await crudUser.delete(req.params.userId);
     res.status(200).json({
         message: `Deleted user ${req.params.userId}`,
     });
 }
-userRouter.delete("/:userId", deleteUser);
 
+userRouter.delete("/:userId", Admin, deleteUser);
+
+// Get User Places
 async function getPlace(req: Request, res: Response, next: NextFunction) {
     const query = req.filterQuery!;
     query.filters["creatorId"] = { $eq: req.params.userId };
     const places = await crudPlace.search(query);
     res.status(200).json(places);
 }
+
 userRouter.get(
     "/:userId/places",
     filter(PlaceSearchSchema, PlaceSortableFields),
