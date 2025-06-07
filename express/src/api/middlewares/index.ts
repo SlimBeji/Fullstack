@@ -4,3 +4,4 @@ export * from "./auth";
 export * from "./fileupload";
 export * from "./bodyValidator";
 export * from "./filter";
+export * from "./fetchData";

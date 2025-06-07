@@ -1,6 +1,7 @@
 import "express";
 import { PaginationData, SortData, FilterData, FilterQuery } from "./http";
-import { Place, User } from "../models/schemas";
+import { User } from "../models/schemas";
+import { PlaceDocument, UserDocument } from "../models/collections";
 
 declare module "express-serve-static-core" {
     interface Request {
@@ -10,7 +11,8 @@ declare module "express-serve-static-core" {
     }
 
     interface Response {
-        fetched: { user?: User; place?: Place };
+        fetchedUser?: UserDocument;
+        fetchedPlace?: PlaceDocument;
     }
 
     interface Application {
