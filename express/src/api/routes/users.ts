@@ -90,6 +90,45 @@ async function editUser(req: Request, res: Response, next: NextFunction) {
 
 userRouter.put("/:userId", validateBody(UserPutSchema), fetchUser(), editUser);
 
+swaggerRegistery.registerPath({
+    method: "put",
+    path: "/users/{userId}",
+    request: {
+        params: z.object({
+            userId: zodObjectId().openapi({
+                example: "507f1f77bcf86cd799439011",
+                description: "MongoDB ObjectId",
+            }),
+        }),
+        body: {
+            content: {
+                "application/json": {
+                    schema: UserPutSchema,
+                },
+            },
+            description: "User updated data",
+            required: true,
+        },
+    },
+    responses: {
+        200: {
+            description: "User information",
+            content: {
+                "application/json": {
+                    schema: UserSchema,
+                },
+            },
+        },
+    },
+    tags: ["User"],
+    summary: "Update users",
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
+});
+
 // Delete User Endpoint
 async function deleteUser(req: Request, res: Response, next: NextFunction) {
     await crudUser.delete(req.params.userId);
