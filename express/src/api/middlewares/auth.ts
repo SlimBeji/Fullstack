@@ -11,7 +11,7 @@ const getError = (message?: string): ApiError => {
     );
 };
 
-const checkAuthToken = async (
+export const checkAuthToken = async (
     req: Request,
     isAdmin: boolean
 ): Promise<ApiError | null> => {
