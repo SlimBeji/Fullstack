@@ -1,12 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { NewUserIn, users } from "./users";
 import { NewPlaceIn, places } from "./places";
 import { crudUser, crudPlace } from "../crud";
 import { uploadLocal } from "../../lib/utils";
 import { CollectionEnum } from "../../types";
 
-const userRefMapping: Map<number, string> = new Map();
-const placeRefMapping: Map<number, string> = new Map();
+const userRefMapping: Map<number, Types.ObjectId> = new Map();
+const placeRefMapping: Map<number, Types.ObjectId> = new Map();
 
 const createCollections = async (): Promise<void> => {
     await Promise.all(

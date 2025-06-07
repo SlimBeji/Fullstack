@@ -1,12 +1,12 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-
+import { Types } from "mongoose";
 import config from "../../config";
 import { User, EncodedToken } from "../../models/schemas";
 import { crudUser } from "../../models/crud";
 import { ApiError, HttpStatus } from "../../types";
 
 export interface UserTokenInput {
-    userId: string;
+    userId: Types.ObjectId;
     email: string;
 }
 

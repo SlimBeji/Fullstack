@@ -1,4 +1,10 @@
-import { Model, Document, startSession, RootFilterQuery } from "mongoose";
+import {
+    Model,
+    Document,
+    startSession,
+    RootFilterQuery,
+    Types,
+} from "mongoose";
 import {
     ApiError,
     ErrorHandler,
@@ -6,7 +12,6 @@ import {
     HttpStatus,
     PaginatedData,
 } from "../../types";
-import { count } from "console";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -42,7 +47,7 @@ export abstract class Crud<
         });
     }
 
-    private async getById(id: string): Promise<D> {
+    private async getById(id: string | Types.ObjectId): Promise<D> {
         const raw = await this.model.findById(id);
         if (!raw) {
             throw new ApiError(
@@ -53,7 +58,7 @@ export abstract class Crud<
         return raw;
     }
 
-    public async get(id: string): Promise<I> {
+    public async get(id: string | Types.ObjectId): Promise<I> {
         const raw = await this.getById(id);
         return (await this.toJson([raw]))[0];
     }
@@ -115,7 +120,7 @@ export abstract class Crud<
         }
     }
 
-    public async update(id: string, form: U): Promise<I> {
+    public async update(id: string | Types.ObjectId, form: U): Promise<I> {
         const raw = await this.getById(id);
         raw.set(form);
         try {
@@ -137,7 +142,7 @@ export abstract class Crud<
 
     public async deleteCleanup(document: D): Promise<void> {}
 
-    public async delete(id: string): Promise<void> {
+    public async delete(id: string | Types.ObjectId): Promise<void> {
         const raw = await this.getById(id);
         try {
             const session = await startSession();
