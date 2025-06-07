@@ -24,8 +24,8 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         password: "***HIDDEN***",
     };
 
-    public async toJson(raws: UserDocument[]): Promise<User[]> {
-        const users = await super.toJson(raws);
+    public async jsonifyBatch(raws: UserDocument[]): Promise<User[]> {
+        const users = await super.jsonifyBatch(raws);
         const userPromises = users.map(async (u) => {
             const imageUrl = await storage.getSignedUrl(u.imageUrl!);
             return { ...u, imageUrl };
@@ -51,7 +51,7 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
             return null;
         }
         const userDocument = users[0];
-        return (await this.toJson([userDocument]))[0];
+        return this.jsonfify(userDocument);
     }
 
     public async getBearer(email: string): Promise<string> {
@@ -97,11 +97,14 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return createToken(user);
     }
 
-    public async update(user: User, form: UserPut): Promise<User> {
+    public async updateDocument(
+        user: UserDocument,
+        form: UserPut
+    ): Promise<UserDocument> {
         if (form.password) {
             form.password = await hash(form.password, DEFAULT_HASH_SALT);
         }
-        return super.update(user, form);
+        return await super.updateDocument(user, form);
     }
 
     public async deleteCleanup(document: UserDocument): Promise<void> {

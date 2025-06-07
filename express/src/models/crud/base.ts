@@ -32,7 +32,7 @@ export abstract class Crud<
         };
     }
 
-    public async toJson(raws: D[]): Promise<I[]> {
+    public async jsonifyBatch(raws: D[]): Promise<I[]> {
         return raws.map((el) => {
             return this.hideSecrets(
                 el.toObject({
@@ -47,7 +47,11 @@ export abstract class Crud<
         });
     }
 
-    public async getById(id: string | Types.ObjectId): Promise<D> {
+    public async jsonfify(raw: D): Promise<I> {
+        return (await this.jsonifyBatch([raw]))[0];
+    }
+
+    public async getDocument(id: string | Types.ObjectId): Promise<D> {
         const raw = await this.model.findById(id);
         if (!raw) {
             throw new ApiError(
@@ -59,11 +63,13 @@ export abstract class Crud<
     }
 
     public async get(id: string | Types.ObjectId): Promise<I> {
-        const raw = await this.getById(id);
-        return (await this.toJson([raw]))[0];
+        const raw = await this.getDocument(id);
+        return await this.jsonfify(raw);
     }
 
-    public async search(filterQuery: FilterQuery): Promise<PaginatedData<I>> {
+    public async searchDocuments(
+        filterQuery: FilterQuery
+    ): Promise<PaginatedData<D>> {
         let { pagination, sort, filters } = filterQuery;
         if (Object.keys(sort).length === 0) {
             sort = { createdAt: 1 };
@@ -78,26 +84,24 @@ export abstract class Crud<
             .limit(pagination.size)
             .exec();
 
-        if (!raws.length) {
-            throw new ApiError(
-                HttpStatus.NOT_FOUND,
-                `No ${this.model.modelName} found`,
-                { query: filterQuery }
-            );
-        }
-        const data = await this.toJson(raws);
         return {
             page: pagination.page,
             totalPages: Math.ceil(total / pagination.size),
             totalCount: total,
-            data,
+            data: raws,
         };
     }
 
-    public async create(
+    public async search(filterQuery: FilterQuery): Promise<PaginatedData<I>> {
+        const raw = await this.searchDocuments(filterQuery);
+        const data = await this.jsonifyBatch(raw.data);
+        return { ...raw, data };
+    }
+
+    public async createDocument(
         form: C,
         errorHandler: ErrorHandler | null = null
-    ): Promise<I> {
+    ): Promise<D> {
         const newObj = new this.model({
             ...form,
         });
@@ -106,7 +110,7 @@ export abstract class Crud<
             session.startTransaction();
             await newObj.save({ session });
             await session.commitTransaction();
-            return (await this.toJson([newObj]))[0];
+            return newObj;
         } catch (err) {
             if (err instanceof Error) {
                 if (errorHandler) {
@@ -120,15 +124,22 @@ export abstract class Crud<
         }
     }
 
-    public async update(obj: I, form: U): Promise<I> {
-        const raw = new this.model({ ...obj });
-        raw.set(form);
+    public async create(
+        form: C,
+        errorHandler: ErrorHandler | null = null
+    ): Promise<I> {
+        const document = await this.createDocument(form, errorHandler);
+        return await this.jsonfify(document);
+    }
+
+    public async updateDocument(obj: D, form: U): Promise<D> {
+        obj.set(form);
         try {
             const session = await startSession();
             session.startTransaction();
-            await raw.save({ session });
+            await obj.save({ session });
             await session.commitTransaction();
-            return (await this.toJson([raw]))[0];
+            return obj;
         } catch (err) {
             if (err instanceof Error) {
                 throw new ApiError(
@@ -140,14 +151,19 @@ export abstract class Crud<
         }
     }
 
+    public async update(id: string | Types.ObjectId, form: U): Promise<I> {
+        const doc = await this.getDocument(id);
+        const updated = await this.updateDocument(doc, form);
+        return this.jsonfify(updated);
+    }
+
     public async deleteCleanup(document: D): Promise<void> {}
 
-    public async delete(obj: I): Promise<void> {
-        const raw = new this.model({ ...obj });
+    public async deleteDocument(obj: D): Promise<void> {
         try {
             const session = await startSession();
             session.startTransaction();
-            await raw.deleteOne({ session });
+            await obj.deleteOne({ session });
             await session.commitTransaction();
         } catch (err) {
             if (err instanceof Error) {
@@ -158,11 +174,11 @@ export abstract class Crud<
             }
             throw err;
         }
-        await this.deleteCleanup(raw);
+        await this.deleteCleanup(obj);
     }
 
-    public async deleteById(id: string | Types.ObjectId): Promise<void> {
-        const raw = await this.get(id);
-        return await this.delete(raw);
+    public async delete(id: string | Types.ObjectId): Promise<void> {
+        const raw = await this.getDocument(id);
+        return await this.deleteDocument(raw);
     }
 }

@@ -10,8 +10,8 @@ export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
         super(PlaceDB);
     }
 
-    public async toJson(raws: PlaceDocument[]): Promise<Place[]> {
-        const places = await super.toJson(raws);
+    public async jsonifyBatch(raws: PlaceDocument[]): Promise<Place[]> {
+        const places = await super.jsonifyBatch(raws);
         const placesPromises = places.map(async (p) => {
             const imageUrl = await storage.getSignedUrl(p.imageUrl!);
             return { ...p, imageUrl };
