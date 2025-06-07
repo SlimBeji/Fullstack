@@ -1,9 +1,8 @@
-import { z } from "../../zod";
-import { Types } from "mongoose";
+import { z, zodObjectId } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
-export const userIdField = z.string().min(24).openapi({
+export const userIdField = zodObjectId().openapi({
     description: "The user ID, 24 characters",
     example: "683b21134e2e5d46978daf1f",
 });
@@ -34,7 +33,7 @@ export const userIsAdminField = z.boolean().openapi({
 });
 
 export const userPlacesField = z.array(
-    z.string().min(24).openapi({
+    zodObjectId().openapi({
         description: "The id of places belonging to the user, 24 characters",
         example: "683b21134e2e5d46978daf1f",
     })
@@ -57,9 +56,7 @@ export const UserSchema = NewUserSchema.extend({
     places: userPlacesField,
 });
 
-export type User = z.infer<typeof UserSchema> & {
-    places: Types.ObjectId[]; //use mongo type instead of string
-};
+export type User = z.infer<typeof UserSchema>;
 
 // Put Schemas
 export const UserPutSchema = z.object({

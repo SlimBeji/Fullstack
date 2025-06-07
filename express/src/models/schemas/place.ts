@@ -1,9 +1,8 @@
-import { z } from "../../zod";
-import { Types } from "mongoose";
+import { z, zodObjectId } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
-export const placeIdField = z.string().min(24).openapi({
+export const placeIdField = zodObjectId().openapi({
     description: "The ID of the place 24 characters",
     example: "683b21134e2e5d46978daf1f",
 });
@@ -39,7 +38,7 @@ export const placeLocationField = z.object({
     }),
 });
 
-export const placeCreatorIdField = z.string().min(24).openapi({
+export const placeCreatorIdField = zodObjectId().openapi({
     description: "The ID of the place creator, 24 characters",
     example: "683b21134e2e5d46978daf1f",
 });
@@ -60,9 +59,7 @@ export const PlaceSchema = NewPlaceSchema.extend({
     creatorId: placeCreatorIdField,
 });
 
-export type Place = z.infer<typeof PlaceSchema> & {
-    creatorId: Types.ObjectId;
-};
+export type Place = z.infer<typeof PlaceSchema>;
 
 // Post Schemas
 export const PlacePostSchema = z.object({
