@@ -60,3 +60,18 @@ describe("PUT /api/users/id", () => {
         expect(response.body).toHaveProperty("name", "Slim El Beji");
     });
 });
+
+describe("DELETE /api/users/id", () => {
+    it("DELETE Users", async () => {
+        const user = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
+        const response = await request
+            .delete(`/api/users/${user.id}`)
+            .set("Authorization", adminToken)
+            .expect("Content-Type", /json/)
+            .expect(200);
+        expect(response.body).toHaveProperty(
+            "message",
+            `Deleted user ${user.id}`
+        );
+    });
+});
