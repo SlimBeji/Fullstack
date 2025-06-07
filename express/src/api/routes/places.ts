@@ -46,13 +46,14 @@ placeRouter.get("/:placeId", getPlace);
 
 async function editPlace(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePut;
-    const updatedPlace = await crudPlace.update(req.params.placeId, parsed);
+    const place = await crudPlace.get(req.params.placeId);
+    const updatedPlace = await crudPlace.update(place, parsed);
     res.status(200).json(updatedPlace);
 }
 placeRouter.put("/:placeId", validateBody(PlacePutSchema), editPlace);
 
 async function deletePlace(req: Request, res: Response, next: NextFunction) {
-    await crudPlace.delete(req.params.placeId);
+    await crudPlace.deleteById(req.params.placeId);
     res.status(200).json({
         message: `Deleted place ${req.params.placeId}`,
     });

@@ -47,7 +47,7 @@ export abstract class Crud<
         });
     }
 
-    private async getById(id: string | Types.ObjectId): Promise<D> {
+    public async getById(id: string | Types.ObjectId): Promise<D> {
         const raw = await this.model.findById(id);
         if (!raw) {
             throw new ApiError(
@@ -120,8 +120,8 @@ export abstract class Crud<
         }
     }
 
-    public async update(id: string | Types.ObjectId, form: U): Promise<I> {
-        const raw = await this.getById(id);
+    public async update(obj: I, form: U): Promise<I> {
+        const raw = new this.model({ ...obj });
         raw.set(form);
         try {
             const session = await startSession();
@@ -142,8 +142,8 @@ export abstract class Crud<
 
     public async deleteCleanup(document: D): Promise<void> {}
 
-    public async delete(id: string | Types.ObjectId): Promise<void> {
-        const raw = await this.getById(id);
+    public async delete(obj: I): Promise<void> {
+        const raw = new this.model({ ...obj });
         try {
             const session = await startSession();
             session.startTransaction();
@@ -159,5 +159,10 @@ export abstract class Crud<
             throw err;
         }
         await this.deleteCleanup(raw);
+    }
+
+    public async deleteById(id: string | Types.ObjectId): Promise<void> {
+        const raw = await this.get(id);
+        return await this.delete(raw);
     }
 }

@@ -97,14 +97,11 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return createToken(user);
     }
 
-    public async update(
-        id: string | Types.ObjectId,
-        form: UserPut
-    ): Promise<User> {
+    public async update(user: User, form: UserPut): Promise<User> {
         if (form.password) {
             form.password = await hash(form.password, DEFAULT_HASH_SALT);
         }
-        return super.update(id, form);
+        return super.update(user, form);
     }
 
     public async deleteCleanup(document: UserDocument): Promise<void> {
