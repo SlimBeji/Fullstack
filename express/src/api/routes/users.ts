@@ -139,6 +139,40 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
 
 userRouter.delete("/:userId", Admin, deleteUser);
 
+swaggerRegistery.registerPath({
+    method: "delete",
+    path: "/users/{userId}",
+    request: {
+        params: z.object({
+            userId: zodObjectId().openapi({
+                example: "507f1f77bcf86cd799439011",
+                description: "MongoDB ObjectId",
+            }),
+        }),
+    },
+    responses: {
+        200: {
+            description: "Deletion confirmation message",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string().openapi({
+                            example: "Deleted user 507f1f77bcf86cd799439011",
+                        }),
+                    }),
+                },
+            },
+        },
+    },
+    tags: ["User"],
+    summary: "Search and Retrieve user by id",
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
+});
+
 // Get User Places
 async function getPlace(req: Request, res: Response, next: NextFunction) {
     const query = req.filterQuery!;
