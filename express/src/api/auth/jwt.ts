@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 import config from "../../config";
-import { User, EncodedToken } from "../../models/schemas";
+import { UserRead, EncodedToken } from "../../models/schemas";
 import { crudUser } from "../../models/crud";
 import { ApiError, HttpStatus } from "../../types";
 
@@ -12,7 +12,7 @@ export interface UserTokenInput {
 
 export interface DecodedUserToken extends UserTokenInput, JwtPayload {}
 
-export const createToken = (user: User): EncodedToken => {
+export const createToken = (user: UserRead): EncodedToken => {
     const payload: UserTokenInput = {
         userId: user.id,
         email: user.email,
@@ -31,9 +31,9 @@ export const verifyToken = (token: string): DecodedUserToken => {
     return decoded as DecodedUserToken;
 };
 
-export const getUserFromToken = async (token: string): Promise<User> => {
+export const getUserFromToken = async (token: string): Promise<UserRead> => {
     const payload = verifyToken(token);
-    const user = await crudUser.get(payload.userId);
+    const user = await crudUser.getById(payload.userId);
     if (!user) {
         throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
     }
