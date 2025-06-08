@@ -4,31 +4,42 @@ import { ApiError, HttpStatus } from "../../types";
 import { storage } from "../../lib/utils";
 import { createToken } from "../../api/auth";
 import {
-    User,
+    UserDB,
+    UserCreate,
     UserPut,
-    SignupForm,
-    SigninForm,
+    UserRead,
+    UserPost,
+    UserUpdate,
+    Signin,
+    SignupMultipart,
     EncodedToken,
 } from "../schemas";
-import { UserDocument, UserDB } from "../collections";
+import { UserDocument, UserModel } from "../collections";
 import { Crud } from "./base";
 
 const DEFAULT_HASH_SALT = 12;
 
-export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
+export class CrudUser extends Crud<
+    UserDB,
+    UserDocument,
+    UserRead,
+    UserCreate,
+    UserPost,
+    UserUpdate,
+    UserPut
+> {
     constructor() {
-        super(UserDB);
+        super(UserModel);
     }
 
-    protected secrets: { [K in keyof User]?: User[K] } = {
-        password: "***HIDDEN***",
-    };
-
-    public async jsonifyBatch(raws: UserDocument[]): Promise<User[]> {
-        const users = await super.jsonifyBatch(raws);
-        const userPromises = users.map(async (u) => {
-            const imageUrl = await storage.getSignedUrl(u.imageUrl!);
-            return { ...u, imageUrl };
+    public async jsonifyBatch(docs: UserDocument[]): Promise<UserRead[]> {
+        const userPromises = docs.map(async (doc) => {
+            // Removing the password field
+            const { password, ...obj } = this.serializeDocument(doc);
+            let imageUrl = "";
+            if (obj.imageUrl)
+                imageUrl = await storage.getSignedUrl(obj.imageUrl);
+            return { ...obj, imageUrl };
         });
         return await Promise.all(userPromises);
     }
@@ -45,13 +56,13 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return "";
     }
 
-    public async getByEmail(email: string): Promise<User | null> {
+    public async getByEmail(email: string): Promise<UserRead | null> {
         const users = await this.model.find({ email });
         if (!users.length) {
             return null;
         }
         const userDocument = users[0];
-        return this.jsonfify(userDocument);
+        return await this.jsonfify(userDocument);
     }
 
     public async getBearer(email: string): Promise<string> {
@@ -63,26 +74,32 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return `Bearer ${token}`;
     }
 
-    public async create(form: SignupForm): Promise<User> {
+    public async create(form: UserPost): Promise<UserRead> {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
-        const errorHandler = (err: Error): ApiError => {
+        const imageUrl = await storage.uploadFile(form.image);
+        const { image, ...body } = form;
+        const data = { ...body, imageUrl };
+        try {
+            const doc = await this.createDocument(data);
+            return this.jsonfify(doc);
+        } catch (err) {
+            const e = err as Error;
             let status = HttpStatus.INTERNAL_SERVER_ERROR;
-            let message = `Could not create ${this.model.modelName} object: ${err.message}!`;
-            if (err.message.startsWith("E11000 duplicate key error")) {
+            let message = `Could not create ${this.model.modelName} object: ${e.message}!`;
+            if (e.message.startsWith("E11000 duplicate key error")) {
                 status = HttpStatus.UNPROCESSABLE_ENTITY;
                 message = "Email or Username already exists";
             }
-            return new ApiError(status, message);
-        };
-        return super.create(form, errorHandler);
+            throw new ApiError(status, message);
+        }
     }
 
-    public async signup(form: SignupForm): Promise<EncodedToken> {
-        const user = await this.create(form);
+    public async signup(form: SignupMultipart): Promise<EncodedToken> {
+        const user = await this.create({ ...form, isAdmin: false });
         return createToken(user);
     }
 
-    public async signin(form: SigninForm): Promise<EncodedToken> {
+    public async signin(form: Signin): Promise<EncodedToken> {
         const error = new ApiError(
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
@@ -97,14 +114,12 @@ export class CrudUser extends Crud<User, UserDocument, SignupForm, UserPut> {
         return createToken(user);
     }
 
-    public async updateDocument(
-        user: UserDocument,
-        form: UserPut
-    ): Promise<UserDocument> {
+    public async update(user: UserDocument, form: UserPut): Promise<UserRead> {
         if (form.password) {
             form.password = await hash(form.password, DEFAULT_HASH_SALT);
         }
-        return await super.updateDocument(user, form);
+        const doc = await super.updateDocument(user, form);
+        return this.jsonfify(doc);
     }
 
     public async deleteCleanup(document: UserDocument): Promise<void> {

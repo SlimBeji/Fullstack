@@ -1,22 +1,56 @@
-import { Place, PlacePost, PlacePut } from "../schemas";
-import { PlaceDB, PlaceDocument } from "../collections";
+import {
+    PlaceDB,
+    PlaceCreate,
+    PlacePut,
+    PlaceRead,
+    PlacePost,
+    PlaceUpdate,
+} from "../schemas";
+import { PlaceModel, PlaceDocument } from "../collections";
 import { storage } from "../../lib/utils";
 import { Crud } from "./base";
 
-export class CrudPlace extends Crud<Place, PlaceDocument, PlacePost, PlacePut> {
+export class CrudPlace extends Crud<
+    PlaceDB,
+    PlaceDocument,
+    PlaceRead,
+    PlaceCreate,
+    PlacePost,
+    PlaceUpdate,
+    PlacePut
+> {
     protected secrets = {};
 
     constructor() {
-        super(PlaceDB);
+        super(PlaceModel);
     }
 
-    public async jsonifyBatch(raws: PlaceDocument[]): Promise<Place[]> {
-        const places = await super.jsonifyBatch(raws);
-        const placesPromises = places.map(async (p) => {
-            const imageUrl = await storage.getSignedUrl(p.imageUrl!);
-            return { ...p, imageUrl };
+    public async jsonifyBatch(docs: PlaceDocument[]): Promise<PlaceRead[]> {
+        const placesPromises = docs.map(async (doc) => {
+            const obj = this.serializeDocument(doc);
+            let imageUrl = "";
+            if (obj.imageUrl) {
+                imageUrl = await storage.getSignedUrl(obj.imageUrl);
+            }
+            return { ...obj, imageUrl } as PlaceRead;
         });
         return await Promise.all(placesPromises);
+    }
+
+    public async create(form: PlacePost): Promise<PlaceRead> {
+        const imageUrl = await storage.uploadFile(form.image);
+        const { image, ...body } = form;
+        const data = { ...body, imageUrl };
+        const doc = await this.createDocument(data);
+        return this.jsonfify(doc);
+    }
+
+    public async update(
+        obj: PlaceDocument,
+        form: PlacePut
+    ): Promise<PlaceRead> {
+        const doc = await this.updateDocument(obj, form);
+        return await this.jsonfify(doc);
     }
 
     public async deleteCleanup(document: PlaceDocument): Promise<void> {
