@@ -3,7 +3,7 @@ import { CollectionEnum } from "../../types";
 
 import { User } from "../schemas";
 
-const UserDBSchema = new Schema<User>(
+const UserCollectionSchema = new Schema<User>(
     {
         // Fields
         name: { type: String, required: true, unique: true, min: 2 },
@@ -22,8 +22,8 @@ const UserDBSchema = new Schema<User>(
     },
     { timestamps: true }
 );
-UserDBSchema.index({ createdAt: 1 });
+UserCollectionSchema.index({ createdAt: 1 });
 
-export const UserDB = model<User>(CollectionEnum.USER, UserDBSchema);
+export const UserDB = model<User>(CollectionEnum.USER, UserCollectionSchema);
 
 export type UserDocument = InstanceType<typeof UserDB>;

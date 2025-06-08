@@ -4,7 +4,7 @@ import { CollectionEnum } from "../../types";
 import { UserDB } from "./user";
 
 // Schema creation
-export const PlaceDBSchema = new Schema<Place>(
+export const PlaceCollectionSchema = new Schema<Place>(
     {
         // Fields
         title: { type: String, required: true },
@@ -28,23 +28,23 @@ export const PlaceDBSchema = new Schema<Place>(
     },
     { timestamps: true }
 );
-PlaceDBSchema.index({ createdAt: 1 });
+PlaceCollectionSchema.index({ createdAt: 1 });
 
 // Hooks
-PlaceDBSchema.pre("save", async function (next) {
+PlaceCollectionSchema.pre("save", async function (next) {
     const userExists = await UserDB.exists({ _id: this.creatorId });
     if (!userExists) throw new Error("User does not exist");
     next();
 });
 
-PlaceDBSchema.post("save", async function (place, next) {
+PlaceCollectionSchema.post("save", async function (place, next) {
     await UserDB.findByIdAndUpdate(place.creatorId, {
         $push: { places: place._id },
     });
     next();
 });
 
-PlaceDBSchema.pre("deleteOne", async function (next) {
+PlaceCollectionSchema.pre("deleteOne", async function (next) {
     const place = await this.model.findOne(this.getFilter());
     await UserDB.findByIdAndUpdate(place.creatorId, {
         $pull: { places: place._id },
@@ -53,6 +53,9 @@ PlaceDBSchema.pre("deleteOne", async function (next) {
 });
 
 // Model Creation
-export const PlaceDB = model<Place>(CollectionEnum.PLACE, PlaceDBSchema);
+export const PlaceDB = model<Place>(
+    CollectionEnum.PLACE,
+    PlaceCollectionSchema
+);
 
 export type PlaceDocument = InstanceType<typeof PlaceDB>;
