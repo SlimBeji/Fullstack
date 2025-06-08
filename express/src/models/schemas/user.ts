@@ -1,3 +1,4 @@
+import { FileToUpload } from "../../types";
 import { z, zodObjectId } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
@@ -75,7 +76,9 @@ export const UserPostSchema = UserCreateSchema.omit({ imageUrl: true }).extend({
     image: userImageField,
 });
 
-export type UserPost = z.infer<typeof UserPostSchema>;
+export type UserPost = Omit<z.infer<typeof UserPostSchema>, "image"> & {
+    image: FileToUpload;
+};
 
 // Read Schemas
 
