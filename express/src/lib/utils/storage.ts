@@ -10,6 +10,7 @@ import mime from "mime-types";
 import { existsSync, readFileSync } from "fs";
 
 import config from "../../config";
+import { FileToUpload } from "../../types";
 
 interface GCSConfig {
     GCP_PROJECT_ID: string;
@@ -18,12 +19,6 @@ interface GCSConfig {
     GOOGLE_APPLICATION_CREDENTIALS?: string;
     GCS_EMULATOR_PRIVATE_URL?: string;
     GCS_EMULATOR_PUBLIC_URL?: string;
-}
-
-export interface FileToUpload {
-    originalname: string;
-    mimetype: string;
-    buffer: Buffer<ArrayBufferLike>;
 }
 
 export class CloudStorage {

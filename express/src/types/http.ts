@@ -22,3 +22,9 @@ export interface PaginatedData<T> {
     totalCount: number;
     data: T[];
 }
+
+export interface FileToUpload {
+    originalname: string;
+    mimetype: string;
+    buffer: Buffer<ArrayBufferLike>;
+}
