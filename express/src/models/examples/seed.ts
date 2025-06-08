@@ -1,9 +1,10 @@
 import mongoose, { Types } from "mongoose";
-import { NewUserIn, users } from "./users";
-import { NewPlaceIn, places } from "./places";
+import { users } from "./users";
+import { places } from "./places";
 import { crudUser, crudPlace } from "../crud";
 import { uploadLocal } from "../../lib/utils";
 import { CollectionEnum } from "../../types";
+import { UserSeed, PlaceSeed } from "../schemas";
 
 const userRefMapping: Map<number, Types.ObjectId> = new Map();
 const placeRefMapping: Map<number, Types.ObjectId> = new Map();
@@ -16,17 +17,17 @@ const createCollections = async (): Promise<void> => {
     );
 };
 
-const seedUsers = async (raw: NewUserIn[]): Promise<void> => {
+const seedUsers = async (raw: UserSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newUserIn) => {
             newUserIn.imageUrl = await uploadLocal(newUserIn.imageUrl!);
-            const user = await crudUser.create(newUserIn);
+            const user = await crudUser.createDocument(newUserIn);
             userRefMapping.set(newUserIn._ref, user.id);
         })
     );
 };
 
-const seedPlaces = async (raw: NewPlaceIn[]): Promise<void> => {
+const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newPlaceIn) => {
             newPlaceIn.imageUrl = await uploadLocal(newPlaceIn.imageUrl!);
@@ -34,7 +35,7 @@ const seedPlaces = async (raw: NewPlaceIn[]): Promise<void> => {
                 ...newPlaceIn,
                 creatorId: userRefMapping.get(newPlaceIn._createorRef)!,
             };
-            const place = await crudPlace.create(data);
+            const place = await crudPlace.createDocument(data);
             placeRefMapping.set(newPlaceIn._ref, place.id);
         })
     );
