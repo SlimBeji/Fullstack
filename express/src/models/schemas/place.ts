@@ -22,6 +22,12 @@ export const placeImageUrlField = z.string().openapi({
     description: "local url on the storage",
 });
 
+export const placeImageField = z.string().openapi({
+    type: "string",
+    format: "binary",
+    description: "Place image (JPEG)",
+});
+
 export const placeAddressField = z.string().min(1).openapi({
     description: "The place address",
     example: "Fulham road",
@@ -43,50 +49,49 @@ export const placeCreatorIdField = zodObjectId().openapi({
     example: "683b21134e2e5d46978daf1f",
 });
 
-// Place Schemas
-export const NewPlaceSchema = z.object({
+// DB Schemas
+export const PlaceDBSchema = z.object({
     title: placeTitleField,
     description: placeDescriptionField,
     imageUrl: placeImageUrlField.optional(),
     address: placeAddressField,
     location: placeLocationField.optional(),
-});
-
-export type NewPlace = z.infer<typeof NewPlaceSchema>;
-
-export const PlaceSchema = NewPlaceSchema.extend({
-    id: placeIdField,
     creatorId: placeCreatorIdField,
 });
 
-export type Place = z.infer<typeof PlaceSchema>;
+export type PlaceDB = z.infer<typeof PlaceDBSchema>;
+
+// Seed Schemas
+export const PlaceSeedSchema = PlaceDBSchema.omit({ creatorId: true });
+
+export type PlaceSeed = z.infer<typeof PlaceSeedSchema>;
+
+// Creation Schemas
+
+export const PlaceCreateSchema = PlaceDBSchema.extend({});
+
+export type PlaceCreate = z.infer<typeof PlaceCreateSchema>;
 
 // Post Schemas
-export const PlacePostSchema = z.object({
-    title: placeTitleField,
-    description: placeDescriptionField,
-    address: placeAddressField,
-    location: placeLocationField.optional(),
-    creatorId: placeCreatorIdField,
+export const PlacePostSchema = PlaceCreateSchema.omit({
+    imageUrl: true,
+}).extend({ image: placeImageField });
+
+export type PlacePost = z.infer<typeof PlacePostSchema>;
+
+// Read Schemas
+
+export const PlaceReadSchema = PlaceDBSchema.extend({
+    id: placeIdField,
 });
 
-export type PlacePostBody = z.infer<typeof PlacePostSchema>;
+export type PlaceRead = z.infer<typeof PlaceReadSchema>;
 
-export type PlacePost = PlacePostBody & {
-    imageUrl?: string;
-};
+export const PlacesPaginatedSchema = buildPaginatedSchema(PlaceReadSchema);
 
-// Put Schemas
-export const PlacePutSchema = z.object({
-    title: placeTitleField.optional(),
-    description: placeDescriptionField.optional(),
-    address: placeAddressField.optional(),
-    location: placeLocationField.optional(),
-});
+export type PlacesPaginated = z.infer<typeof PlacesPaginatedSchema>;
 
-export type PlacePut = z.infer<typeof PlacePutSchema>;
-
-// Search Schemas
+// Query Schemas
 export const PlaceSortableFields = [
     "createdAt",
     "title",
@@ -95,13 +100,21 @@ export const PlaceSortableFields = [
     "location",
 ];
 
-export const PlaceSearchSchema = PlacePutSchema.extend({});
+export const PlaceSearchSchema = z.object({
+    title: placeTitleField.optional(),
+    description: placeDescriptionField.optional(),
+    address: placeAddressField.optional(),
+    location: placeLocationField.optional(),
+});
+
+export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
 
 export const PlaceSearchSwagger = buildPaginationSchema(
     PlaceSearchSchema,
     PlaceSortableFields
 );
 
-export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
+// Put Schemas
+export const PlacePutSchema = PlaceSearchSchema.extend({});
 
-export const PlacePaginated = buildPaginatedSchema(PlaceSchema);
+export type PlacePut = z.infer<typeof PlacePutSchema>;

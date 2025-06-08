@@ -27,6 +27,12 @@ export const userImageUrlField = z.string().openapi({
     description: "local url on the storage",
 });
 
+export const userImageField = z.string().openapi({
+    type: "string",
+    format: "binary",
+    description: "User's profile image (JPEG)",
+});
+
 export const userIsAdminField = z.boolean().openapi({
     description: "Whether the user is an admin or not",
     example: false,
@@ -39,35 +45,51 @@ export const userPlacesField = z.array(
     })
 );
 
-// User Schemas
-
-export const NewUserSchema = z.object({
+// DB Schemas
+export const UserDBSchema = z.object({
     name: userNameField,
     email: userEmailField,
     password: userPasswordField,
     imageUrl: userImageUrlField.optional(),
     isAdmin: userIsAdminField,
-});
-
-export type NewUser = z.infer<typeof NewUserSchema>;
-
-export const UserSchema = NewUserSchema.extend({
-    id: userIdField,
     places: userPlacesField,
 });
 
-export type User = z.infer<typeof UserSchema>;
+export type UserDB = z.infer<typeof UserDBSchema>;
 
-// Put Schemas
-export const UserPutSchema = z.object({
-    name: userNameField.optional(),
-    email: userEmailField.optional(),
-    password: userPasswordField.optional(),
+// Seed Schemas
+
+export const UserSeedSchema = UserDBSchema.extend({});
+
+export type UserSeed = z.infer<typeof UserSeedSchema>;
+
+// Creation Schemas
+
+export const UserCreateSchema = UserDBSchema.extend({});
+
+export type UserCreate = z.infer<typeof UserCreateSchema>;
+
+// Post Schemas
+
+export const UserPostSchema = UserCreateSchema.omit({ imageUrl: true }).extend({
+    image: userImageField,
 });
 
-export type UserPut = z.infer<typeof UserPutSchema>;
+export type UserPost = z.infer<typeof UserPostSchema>;
 
-// Search Schemas
+// Read Schemas
+
+export const UserReadSchema = UserDBSchema.extend({
+    id: userIdField,
+}).omit({ password: true });
+
+export type UserRead = z.infer<typeof UserReadSchema>;
+
+export const UsersPaginatedSchema = buildPaginatedSchema(UserReadSchema);
+
+export type UsersPaginated = z.infer<typeof UsersPaginatedSchema>;
+
+// Quey Schemas
 export const UserSortableFields = [
     "createdAt",
     "name",
@@ -77,13 +99,21 @@ export const UserSortableFields = [
     "isAdmin",
 ];
 
-export const UserSearchSchema = UserPutSchema.omit({ password: true });
+export const UserSearchSchema = z.object({
+    name: userNameField.optional(),
+    email: userEmailField.optional(),
+});
+
+export type UserSearch = z.infer<typeof UserSearchSchema>;
 
 export const UserSearchSwagger = buildPaginationSchema(
     UserSearchSchema,
     UserSortableFields
 );
 
-export type UserSearch = z.infer<typeof UserSearchSchema>;
+// Put Schemas
+export const UserPutSchema = UserSearchSchema.extend({
+    password: userPasswordField.optional(),
+});
 
-export const UserPaginated = buildPaginatedSchema(UserSchema);
+export type UserPut = z.infer<typeof UserPutSchema>;
