@@ -67,7 +67,7 @@ export type UserSeed = z.infer<typeof UserSeedSchema>;
 
 // Creation Schemas
 
-export const UserCreateSchema = UserDBSchema.omit({ id: true });
+export const UserCreateSchema = UserDBSchema.omit({ id: true, places: true });
 
 export type UserCreate = z.infer<typeof UserCreateSchema>;
 

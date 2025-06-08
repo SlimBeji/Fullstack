@@ -1,3 +1,4 @@
+import { FileToUpload } from "../../types";
 import { z } from "../../zod";
 
 import {
@@ -29,7 +30,12 @@ export const SignupMultipartSchema = SignupBodySchema.extend({
     image: userImageField,
 });
 
-export type SignupMultipart = z.infer<typeof SignupMultipartSchema>;
+export type SignupMultipart = Omit<
+    z.infer<typeof SignupMultipartSchema>,
+    "image"
+> & {
+    image: FileToUpload;
+};
 
 // Signin Schemas
 export const SigninSchema = z.object({
