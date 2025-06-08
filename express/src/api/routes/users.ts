@@ -172,17 +172,3 @@ swaggerRegistery.registerPath({
         },
     ],
 });
-
-// Get User Places
-async function getPlace(req: Request, res: Response, next: NextFunction) {
-    const query = req.filterQuery!;
-    query.filters["creatorId"] = { $eq: req.params.userId };
-    const places = await crudPlace.search(query);
-    res.status(200).json(places);
-}
-
-userRouter.get(
-    "/:userId/places",
-    filter(PlaceSearchSchema, PlaceSortableFields),
-    getPlace
-);
