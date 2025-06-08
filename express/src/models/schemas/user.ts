@@ -48,6 +48,7 @@ export const userPlacesField = z.array(
 
 // DB Schemas
 export const UserDBSchema = z.object({
+    id: userIdField,
     name: userNameField,
     email: userEmailField,
     password: userPasswordField,
@@ -60,13 +61,13 @@ export type UserDB = z.infer<typeof UserDBSchema>;
 
 // Seed Schemas
 
-export const UserSeedSchema = UserDBSchema.extend({});
+export const UserSeedSchema = UserDBSchema.omit({ id: true });
 
 export type UserSeed = z.infer<typeof UserSeedSchema>;
 
 // Creation Schemas
 
-export const UserCreateSchema = UserDBSchema.extend({});
+export const UserCreateSchema = UserDBSchema.omit({ id: true });
 
 export type UserCreate = z.infer<typeof UserCreateSchema>;
 
@@ -82,9 +83,7 @@ export type UserPost = Omit<z.infer<typeof UserPostSchema>, "image"> & {
 
 // Read Schemas
 
-export const UserReadSchema = UserDBSchema.extend({
-    id: userIdField,
-}).omit({ password: true });
+export const UserReadSchema = UserDBSchema.omit({ password: true });
 
 export type UserRead = z.infer<typeof UserReadSchema>;
 

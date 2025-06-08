@@ -52,6 +52,7 @@ export const placeCreatorIdField = zodObjectId().openapi({
 
 // DB Schemas
 export const PlaceDBSchema = z.object({
+    id: placeIdField,
     title: placeTitleField,
     description: placeDescriptionField,
     imageUrl: placeImageUrlField.optional(),
@@ -63,13 +64,16 @@ export const PlaceDBSchema = z.object({
 export type PlaceDB = z.infer<typeof PlaceDBSchema>;
 
 // Seed Schemas
-export const PlaceSeedSchema = PlaceDBSchema.omit({ creatorId: true });
+export const PlaceSeedSchema = PlaceDBSchema.omit({
+    id: true,
+    creatorId: true,
+});
 
 export type PlaceSeed = z.infer<typeof PlaceSeedSchema>;
 
 // Creation Schemas
 
-export const PlaceCreateSchema = PlaceDBSchema.extend({});
+export const PlaceCreateSchema = PlaceDBSchema.omit({ id: true });
 
 export type PlaceCreate = z.infer<typeof PlaceCreateSchema>;
 
@@ -84,9 +88,7 @@ export type PlacePost = Omit<z.infer<typeof PlacePostSchema>, "image"> & {
 
 // Read Schemas
 
-export const PlaceReadSchema = PlaceDBSchema.extend({
-    id: placeIdField,
-});
+export const PlaceReadSchema = PlaceDBSchema.extend({});
 
 export type PlaceRead = z.infer<typeof PlaceReadSchema>;
 
