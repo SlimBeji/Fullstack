@@ -114,7 +114,13 @@ export const PlaceSearchSwagger = buildPaginationSchema(
     PlaceSortableFields
 );
 
+// Update Schemas
+
+export const PlaceUpdateSchema = PlaceSearchSchema.extend({});
+
+export type PlaceUpdate = z.infer<typeof PlaceUpdateSchema>;
+
 // Put Schemas
-export const PlacePutSchema = PlaceSearchSchema.extend({});
+export const PlacePutSchema = PlaceUpdateSchema.extend({});
 
 export type PlacePut = z.infer<typeof PlacePutSchema>;

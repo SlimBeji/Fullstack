@@ -111,9 +111,14 @@ export const UserSearchSwagger = buildPaginationSchema(
     UserSortableFields
 );
 
-// Put Schemas
-export const UserPutSchema = UserSearchSchema.extend({
+// Update Schemas
+export const UserUpdateSchema = UserSearchSchema.extend({
     password: userPasswordField.optional(),
 });
+
+export type UserUpdate = z.infer<typeof UserUpdateSchema>;
+
+// Put Schemas
+export const UserPutSchema = UserUpdateSchema.extend({});
 
 export type UserPut = z.infer<typeof UserPutSchema>;
