@@ -1,9 +1,9 @@
 import { model, Schema } from "mongoose";
 import { CollectionEnum } from "../../types";
 
-import { User } from "../schemas";
+import { UserDB } from "../schemas";
 
-const UserCollectionSchema = new Schema<User>(
+const UserCollectionSchema = new Schema<UserDB>(
     {
         // Fields
         name: { type: String, required: true, unique: true, min: 2 },
@@ -24,6 +24,9 @@ const UserCollectionSchema = new Schema<User>(
 );
 UserCollectionSchema.index({ createdAt: 1 });
 
-export const UserDB = model<User>(CollectionEnum.USER, UserCollectionSchema);
+export const UserModel = model<UserDB>(
+    CollectionEnum.USER,
+    UserCollectionSchema
+);
 
-export type UserDocument = InstanceType<typeof UserDB>;
+export type UserDocument = InstanceType<typeof UserModel>;

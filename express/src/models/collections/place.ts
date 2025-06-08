@@ -1,10 +1,10 @@
 import { model, Schema } from "mongoose";
-import { Place } from "../schemas";
+import { PlaceDB } from "../schemas";
 import { CollectionEnum } from "../../types";
-import { UserDB } from "./user";
+import { UserModel } from "./user";
 
 // Schema creation
-export const PlaceCollectionSchema = new Schema<Place>(
+export const PlaceCollectionSchema = new Schema<PlaceDB>(
     {
         // Fields
         title: { type: String, required: true },
@@ -32,13 +32,13 @@ PlaceCollectionSchema.index({ createdAt: 1 });
 
 // Hooks
 PlaceCollectionSchema.pre("save", async function (next) {
-    const userExists = await UserDB.exists({ _id: this.creatorId });
+    const userExists = await UserModel.exists({ _id: this.creatorId });
     if (!userExists) throw new Error("User does not exist");
     next();
 });
 
 PlaceCollectionSchema.post("save", async function (place, next) {
-    await UserDB.findByIdAndUpdate(place.creatorId, {
+    await UserModel.findByIdAndUpdate(place.creatorId, {
         $push: { places: place._id },
     });
     next();
@@ -46,16 +46,16 @@ PlaceCollectionSchema.post("save", async function (place, next) {
 
 PlaceCollectionSchema.pre("deleteOne", async function (next) {
     const place = await this.model.findOne(this.getFilter());
-    await UserDB.findByIdAndUpdate(place.creatorId, {
+    await UserModel.findByIdAndUpdate(place.creatorId, {
         $pull: { places: place._id },
     });
     next();
 });
 
 // Model Creation
-export const PlaceDB = model<Place>(
+export const PlaceModel = model<PlaceDB>(
     CollectionEnum.PLACE,
     PlaceCollectionSchema
 );
 
-export type PlaceDocument = InstanceType<typeof PlaceDB>;
+export type PlaceDocument = InstanceType<typeof PlaceModel>;
