@@ -63,13 +63,10 @@ export const PlaceDBSchema = z.object({
 
 export type PlaceDB = z.infer<typeof PlaceDBSchema>;
 
-// Seed Schemas
-export const PlaceSeedSchema = PlaceDBSchema.omit({
-    id: true,
-    creatorId: true,
-});
-
-export type PlaceSeed = z.infer<typeof PlaceSeedSchema>;
+export type PlaceSeed = Omit<PlaceDB, "id" | "creatorId"> & {
+    _ref: number;
+    _createorRef: number;
+};
 
 // Creation Schemas
 

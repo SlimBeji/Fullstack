@@ -1,12 +1,7 @@
-import { NewPlace } from "../schemas";
+import { PlaceSeed } from "../schemas";
 import { getImagePath } from "../../lib/utils";
 
-export interface NewPlaceIn extends NewPlace {
-    _ref: number;
-    _createorRef: number;
-}
-
-export const places: NewPlaceIn[] = [
+export const places: PlaceSeed[] = [
     {
         _ref: 1,
         _createorRef: 1,

@@ -59,11 +59,9 @@ export const UserDBSchema = z.object({
 
 export type UserDB = z.infer<typeof UserDBSchema>;
 
-// Seed Schemas
-
-export const UserSeedSchema = UserDBSchema.omit({ id: true });
-
-export type UserSeed = z.infer<typeof UserSeedSchema>;
+export type UserSeed = Omit<UserDB, "id" | "places"> & {
+    _ref: number;
+};
 
 // Creation Schemas
 

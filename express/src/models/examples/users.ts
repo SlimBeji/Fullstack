@@ -1,11 +1,7 @@
-import { NewUser } from "../schemas";
+import { UserSeed } from "../schemas";
 import { getImagePath } from "../../lib/utils";
 
-export interface NewUserIn extends NewUser {
-    _ref: number;
-}
-
-export const users: NewUserIn[] = [
+export const users: UserSeed[] = [
     {
         _ref: 1,
         name: "Slim Beji",
