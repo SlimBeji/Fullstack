@@ -12,6 +12,16 @@ export const fetchUser = (checkAuth: boolean = true): RequestHandler => {
             );
         }
         const user = await crudUser.getDocument(userId);
+        if (!user) {
+            next(
+                new ApiError(
+                    HttpStatus.NOT_FOUND,
+                    `User ${userId} was not provided`
+                )
+            );
+            return;
+        }
+
         res.fetchedUser = user;
         if (checkAuth) {
             await checkAuthToken(req, false);
