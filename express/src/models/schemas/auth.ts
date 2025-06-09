@@ -27,14 +27,14 @@ export const SignupBodySchema = z.object({
 export type SignupBody = z.infer<typeof SignupBodySchema>;
 
 export const SignupMultipartSchema = SignupBodySchema.extend({
-    image: userImageField,
+    image: userImageField.optional(),
 });
 
 export type SignupMultipart = Omit<
     z.infer<typeof SignupMultipartSchema>,
     "image"
 > & {
-    image: FileToUpload;
+    image?: FileToUpload;
 };
 
 // Signin Schemas

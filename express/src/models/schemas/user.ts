@@ -72,11 +72,11 @@ export type UserCreate = z.infer<typeof UserCreateSchema>;
 // Post Schemas
 
 export const UserPostSchema = UserCreateSchema.omit({ imageUrl: true }).extend({
-    image: userImageField,
+    image: userImageField.optional(),
 });
 
 export type UserPost = Omit<z.infer<typeof UserPostSchema>, "image"> & {
-    image: FileToUpload;
+    image?: FileToUpload;
 };
 
 // Read Schemas
