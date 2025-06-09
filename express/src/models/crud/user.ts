@@ -76,7 +76,7 @@ export class CrudUser extends Crud<
 
     public async create(form: UserPost): Promise<UserRead> {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
-        const imageUrl = await storage.uploadFile(form.image);
+        const imageUrl = await storage.uploadFile(form.image || null);
         const { image, ...body } = form;
         const data = { ...body, imageUrl };
         try {

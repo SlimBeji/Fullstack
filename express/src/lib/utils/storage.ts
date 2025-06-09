@@ -115,9 +115,13 @@ export class CloudStorage {
     }
 
     public async uploadFile(
-        file: FileToUpload,
+        file: FileToUpload | null,
         destination?: string
     ): Promise<string> {
+        if (!file) {
+            return "";
+        }
+
         const ext = path.extname(file.originalname);
         const baseFilename = path.basename(
             destination || file.originalname,
