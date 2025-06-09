@@ -73,8 +73,12 @@ export class CrudUser extends Crud<
         return `Bearer ${token}`;
     }
 
-    public async create(form: UserPost): Promise<UserRead> {
+    public async createDocument(form: UserCreate): Promise<UserDocument> {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
+        return await super.createDocument(form);
+    }
+
+    public async create(form: UserPost): Promise<UserRead> {
         const imageUrl = await storage.uploadFile(form.image || null);
         const { image, ...body } = form;
         const data = { ...body, imageUrl };
