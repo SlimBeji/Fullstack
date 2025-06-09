@@ -33,6 +33,26 @@ describe("GET /api/users", () => {
     });
 });
 
+describe("POST /api/users", () => {
+    it("Create Users", async () => {
+        const data = {
+            name: "Test Van Test",
+            password: "very_secret",
+            email: "test@test.com",
+            isAdmin: true,
+        };
+        const response = await request
+            .post("/api/users")
+            .send(data)
+            .set("Authorization", adminToken)
+            .expect("Content-Type", /json/)
+            .expect(200);
+        expect(response.body).toHaveProperty("email", "test@test.com");
+        expect(response.body).toHaveProperty("name", "Test Van Test");
+        expect(response.body).toHaveProperty("isAdmin", true);
+    });
+});
+
 describe("GET /api/users/id", () => {
     it("Fetches Users", async () => {
         const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
