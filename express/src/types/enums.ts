@@ -7,6 +7,11 @@ export enum HttpStatus {
     INTERNAL_SERVER_ERROR = 500,
 }
 
+export enum ContentType {
+    multipartFormData = "multipart/form-data",
+    applicationJson = "application/json",
+}
+
 export enum MimeType {
     JPEG = "image/jpeg",
     PNG = "image/png",
