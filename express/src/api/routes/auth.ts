@@ -9,8 +9,6 @@ import {
     SignupMultipartSchema,
     EncodedTokenSchema,
 } from "../../models/schemas";
-import { storage } from "../../lib/utils";
-import { ApiError, HttpStatus } from "../../types";
 import { swaggerRegistery } from "../openapi";
 
 export const authRouter = Router();
