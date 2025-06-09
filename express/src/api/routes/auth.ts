@@ -1,32 +1,25 @@
 import { Router, Response, Request, NextFunction } from "express";
-import { fileUpload, extractFile, validateBody } from "../middlewares";
 import { crudUser } from "../../models/crud";
 import {
     Signin,
     SigninSchema,
-    SignupBody,
-    SignupBodySchema,
-    SignupMultipartSchema,
+    Signup,
+    SignupSchema,
     EncodedTokenSchema,
 } from "../../models/schemas";
+import { validateBody } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const authRouter = Router();
 
 // Signup route
 async function signup(req: Request, res: Response, next: NextFunction) {
-    const parsed = req.parsed as SignupBody;
-    const image = extractFile(req, "image") || undefined;
-    const tokenData = await crudUser.signup({ ...parsed, image });
+    const parsed = req.parsed as Signup;
+    const tokenData = await crudUser.signup(parsed);
     res.status(200).json(tokenData);
 }
 
-authRouter.post(
-    "/signup",
-    fileUpload([{ name: "image" }]),
-    validateBody(SignupBodySchema),
-    signup
-);
+authRouter.post("/signup", validateBody(SignupSchema), signup);
 
 swaggerRegistery.registerPath({
     method: "post",
@@ -35,7 +28,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "multipart/form-data": {
-                    schema: SignupMultipartSchema,
+                    schema: SignupSchema,
                 },
             },
             description: "user signup form",

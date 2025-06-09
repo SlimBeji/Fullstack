@@ -1,4 +1,3 @@
-import { FileToUpload } from "../../types";
 import { z } from "../../zod";
 
 import {
@@ -18,24 +17,14 @@ export const tokenField = z.string().openapi({
 });
 
 // Signup Schemas
-export const SignupBodySchema = z.object({
+export const SignupSchema = z.object({
     name: userNameField,
     email: userEmailField,
     password: userPasswordField,
-});
-
-export type SignupBody = z.infer<typeof SignupBodySchema>;
-
-export const SignupMultipartSchema = SignupBodySchema.extend({
     image: userImageField.optional(),
 });
 
-export type SignupMultipart = Omit<
-    z.infer<typeof SignupMultipartSchema>,
-    "image"
-> & {
-    image?: FileToUpload;
-};
+export type Signup = z.infer<typeof SignupSchema>;
 
 // Signin Schemas
 export const SigninSchema = z.object({

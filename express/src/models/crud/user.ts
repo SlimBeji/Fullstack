@@ -10,7 +10,7 @@ import {
     UserPost,
     UserUpdate,
     Signin,
-    SignupMultipart,
+    Signup,
     EncodedToken,
 } from "../schemas";
 import { UserDocument, UserModel } from "../collections";
@@ -97,7 +97,7 @@ export class CrudUser extends Crud<
         }
     }
 
-    public async signup(form: SignupMultipart): Promise<EncodedToken> {
+    public async signup(form: Signup): Promise<EncodedToken> {
         const duplicateMsg = await this.checkDuplicate(form.email, form.name);
         if (duplicateMsg) {
             throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
