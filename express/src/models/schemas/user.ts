@@ -71,9 +71,7 @@ export const UserPostSchema = UserCreateSchema.omit({ imageUrl: true }).extend({
     image: userImageField.optional(),
 });
 
-export type UserPost = Omit<z.infer<typeof UserPostSchema>, "image"> & {
-    image?: FileToUpload;
-};
+export type UserPost = z.infer<typeof UserPostSchema>;
 
 // Read Schemas
 

@@ -13,13 +13,7 @@ import {
     UserPut,
     UserPutSchema,
 } from "../../models/schemas";
-import {
-    validateBody,
-    filter,
-    fetchUser,
-    Admin,
-    extractFile,
-} from "../middlewares";
+import { validateBody, filter, fetchUser, Admin } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const userRouter = Router();
@@ -55,8 +49,7 @@ swaggerRegistery.registerPath({
 // Post a User (admin only)
 async function createUser(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as UserPost;
-    const image = extractFile(req, "image") || undefined;
-    const newUser = await crudUser.create({ ...parsed, image });
+    const newUser = await crudUser.create(parsed);
     res.status(200).json(newUser);
 }
 
