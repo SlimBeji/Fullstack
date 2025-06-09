@@ -9,7 +9,7 @@ import {
     PlacePut,
     PlacePutSchema,
 } from "../../models/schemas";
-import { extractFile, fileUpload, validateBody, filter } from "../middlewares";
+import { validateBody, filter } from "../middlewares";
 
 export const placeRouter = Router();
 
@@ -24,17 +24,11 @@ placeRouter.get("/", filter(PlaceSearchSchema, PlaceSortableFields), getPlaces);
 // Post New Places
 async function createPlace(req: Request, resp: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePost;
-    const image = extractFile(req, "image") || undefined;
-    const newPlace = await crudPlace.create({ ...parsed, image });
+    const newPlace = await crudPlace.create(parsed);
     resp.status(200).json(newPlace);
 }
 
-placeRouter.post(
-    "/",
-    fileUpload([{ name: "image" }]),
-    validateBody(PlacePostSchema),
-    createPlace
-);
+placeRouter.post("/", validateBody(PlacePostSchema), createPlace);
 
 // Get a place by ID
 async function getPlace(req: Request, res: Response, next: NextFunction) {

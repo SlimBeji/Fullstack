@@ -75,9 +75,7 @@ export const PlacePostSchema = PlaceCreateSchema.omit({
     imageUrl: true,
 }).extend({ image: placeImageField.optional() });
 
-export type PlacePost = Omit<z.infer<typeof PlacePostSchema>, "image"> & {
-    image?: FileToUpload;
-};
+export type PlacePost = z.infer<typeof PlacePostSchema>;
 
 // Read Schemas
 
