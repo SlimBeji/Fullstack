@@ -1,30 +1,77 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodType } from "zod";
+import { AnyZodObject, ZodTypeAny } from "zod";
+import multer from "multer";
 import { ApiError, HttpStatus } from "../../types";
+import { isMultipartFormData } from "../../lib/utils";
 
-export const validateBody = <T extends ZodType>(schema: T) => {
+const isFileField = (field: ZodTypeAny | any): boolean => {
+    if (field._def?.openapi?.metadata?.format === "binary") {
+        return true;
+    }
+    return false;
+};
+
+const getFileFields = (schema: AnyZodObject): string[] => {
+    const fields: string[] = [];
+    for (const [key, fieldSchema] of Object.entries(schema.shape)) {
+        if (isFileField(fieldSchema)) {
+            fields.push(key);
+        }
+    }
+    return fields;
+};
+
+const checkBody = (req: Request, schema: AnyZodObject): ApiError | void => {
+    const body = req.body;
+    if (!body || Object.keys(body).length === 0) {
+        return new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            "Bad request. No Body attached!"
+        );
+    }
+    const result = schema.safeParse(body);
+    if (!result.success) {
+        return new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            "request not valid",
+            result.error
+        );
+    }
+    req.parsed = result.data;
+};
+
+export const validateBody = (schema: AnyZodObject) => {
     return async function (req: Request, resp: Response, next: NextFunction) {
-        const body = req.body;
-        if (!body || Object.keys(body).length === 0) {
-            next(
-                new ApiError(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Bad request. No Body attached!"
-                )
-            );
+        const fileFields = getFileFields(schema);
+        const isMultipart = isMultipartFormData(req);
+        if (isMultipart && fileFields.length > 0) {
+            // Multipart form
+            const multerObj = multer({});
+            const config = fileFields.map((item) => {
+                return { name: item };
+            });
+            const multerMiddleware = multerObj.fields(config);
+            multerMiddleware(req, resp, (mErr) => {
+                if (mErr) return next(mErr);
+                fileFields.forEach((key) => {
+                    if (!req.files) {
+                        return next(
+                            new ApiError(
+                                HttpStatus.INTERNAL_SERVER_ERROR,
+                                "something went wrong while parsing multipart form"
+                            )
+                        );
+                    }
+                    const files = req.files as any as {
+                        [fieldname: string]: File[];
+                    };
+                    req.body[key] = files[key][0];
+                });
+                return next(checkBody(req, schema));
+            });
+        } else {
+            // Simple json post
+            return next(checkBody(req, schema));
         }
-
-        const result = schema.safeParse(body);
-        if (!result.success) {
-            next(
-                new ApiError(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "request not valid",
-                    result.error
-                )
-            );
-        }
-        req.parsed = result.data;
-        next();
     };
 };
