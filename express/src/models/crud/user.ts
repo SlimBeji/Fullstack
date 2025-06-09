@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import { hash, compare } from "bcryptjs";
 import { ApiError, HttpStatus } from "../../types";
 import { storage } from "../../lib/utils";
@@ -95,6 +94,10 @@ export class CrudUser extends Crud<
     }
 
     public async signup(form: SignupMultipart): Promise<EncodedToken> {
+        const duplicateMsg = await this.checkDuplicate(form.email, form.name);
+        if (duplicateMsg) {
+            throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
+        }
         const user = await this.create({ ...form, isAdmin: false });
         return createToken(user);
     }
