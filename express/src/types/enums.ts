@@ -7,6 +7,11 @@ export enum HttpStatus {
     INTERNAL_SERVER_ERROR = 500,
 }
 
+export enum MimeType {
+    JPEG = "image/jpeg",
+    PNG = "image/png",
+}
+
 export enum CollectionEnum {
     USERS = "users",
     PLACES = "places",

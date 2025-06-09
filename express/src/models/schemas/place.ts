@@ -1,5 +1,5 @@
 import { FileToUpload } from "../../types";
-import { z, zodObjectId } from "../../zod";
+import { z, zodObjectId, zodFile } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
@@ -23,11 +23,7 @@ export const placeImageUrlField = z.string().openapi({
     description: "local url on the storage",
 });
 
-export const placeImageField = z.string().openapi({
-    type: "string",
-    format: "binary",
-    description: "Place image (JPEG)",
-});
+export const placeImageField = zodFile("User's profile image (JPEG)");
 
 export const placeAddressField = z.string().min(1).openapi({
     description: "The place address",

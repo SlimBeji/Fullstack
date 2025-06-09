@@ -1,5 +1,5 @@
 import { FileToUpload } from "../../types";
-import { z, zodObjectId } from "../../zod";
+import { z, zodObjectId, zodFile } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
@@ -28,11 +28,7 @@ export const userImageUrlField = z.string().openapi({
     description: "local url on the storage",
 });
 
-export const userImageField = z.string().openapi({
-    type: "string",
-    format: "binary",
-    description: "User's profile image (JPEG)",
-});
+export const userImageField = zodFile("User's profile image (JPEG)");
 
 export const userIsAdminField = z.boolean().openapi({
     description: "Whether the user is an admin or not",
