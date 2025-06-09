@@ -39,7 +39,7 @@ const zodFile = (
     maxSize: number = Config.FILEUPLOAD_MAX_SIZE
 ) => {
     return z
-        .string()
+        .any()
         .transform((val) => {
             const rs = fileRuntimeSchema(acceptedMimetypes, maxSize);
             const result = rs.safeParse(val);
