@@ -23,7 +23,7 @@ export const PlaceCollectionSchema = new Schema<PlaceDB>(
         creatorId: {
             type: Schema.ObjectId,
             required: true,
-            ref: CollectionEnum.USER,
+            ref: CollectionEnum.USERS,
         },
     },
     { timestamps: true }
@@ -54,7 +54,7 @@ PlaceCollectionSchema.pre("deleteOne", async function (next) {
 
 // Model Creation
 export const PlaceModel = model<PlaceDB>(
-    CollectionEnum.PLACE,
+    CollectionEnum.PLACES,
     PlaceCollectionSchema
 );
 

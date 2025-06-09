@@ -22,7 +22,7 @@ export class MemoryDb {
         await this.create();
         const conn = await mongoose.connect(this.uri, { dbName });
         const wasSeeded = await conn.connection
-            .db!.listCollections({ name: CollectionEnum.USER })
+            .db!.listCollections({ name: CollectionEnum.USERS })
             .hasNext();
 
         if (!wasSeeded) {

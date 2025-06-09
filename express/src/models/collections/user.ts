@@ -16,7 +16,7 @@ const UserCollectionSchema = new Schema<UserDB>(
             {
                 type: Schema.ObjectId,
                 required: true,
-                ref: CollectionEnum.PLACE,
+                ref: CollectionEnum.PLACES,
             },
         ],
     },
@@ -25,7 +25,7 @@ const UserCollectionSchema = new Schema<UserDB>(
 UserCollectionSchema.index({ createdAt: 1 });
 
 export const UserModel = model<UserDB>(
-    CollectionEnum.USER,
+    CollectionEnum.USERS,
     UserCollectionSchema
 );
 
