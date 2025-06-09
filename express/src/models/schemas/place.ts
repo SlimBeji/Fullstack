@@ -77,10 +77,10 @@ export type PlaceCreate = z.infer<typeof PlaceCreateSchema>;
 // Post Schemas
 export const PlacePostSchema = PlaceCreateSchema.omit({
     imageUrl: true,
-}).extend({ image: placeImageField });
+}).extend({ image: placeImageField.optional() });
 
 export type PlacePost = Omit<z.infer<typeof PlacePostSchema>, "image"> & {
-    image: FileToUpload;
+    image?: FileToUpload;
 };
 
 // Read Schemas
