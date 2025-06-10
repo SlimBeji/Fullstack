@@ -123,8 +123,8 @@ swaggerRegistery.registerPath({
 // Edit Places
 async function editPlace(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePut;
-    const place = await crudPlace.getDocument(req.params.placeId);
-    const updatedPlace = await crudPlace.updateDocument(place!, parsed);
+    const fetchedPlace = res.fetchedPlace!;
+    const updatedPlace = await crudPlace.update(fetchedPlace, parsed);
     res.status(200).json(updatedPlace);
 }
 
