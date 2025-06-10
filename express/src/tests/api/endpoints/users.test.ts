@@ -3,15 +3,18 @@ import { memoryDb } from "../../memoryDb";
 import app from "../../../api";
 import { crudUser } from "../../../models/crud";
 import { getImagePath } from "../../../lib/utils";
+import { UserRead } from "../../../models/schemas";
 
 let adminToken: string = "";
 let token: string = "";
+let example: UserRead;
 const request = supertest(app);
 
 beforeAll(async () => {
     await memoryDb.session();
     adminToken = await crudUser.getBearer("mslimbeji@gmail.com");
     token = await crudUser.getBearer("beji.slim@yahoo.fr");
+    example = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
 });
 
 afterAll(async () => {
@@ -54,23 +57,21 @@ describe("POST /api/users", () => {
 
 describe("GET /api/users/id", () => {
     it("Fetches Users", async () => {
-        const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
         const response = await request
-            .get(`/api/users/${user.id}`)
+            .get(`/api/users/${example.id}`)
             .set("Authorization", token)
             .expect("Content-Type", /json/)
             .expect(200);
-        expect(response.body).toHaveProperty("email", "mslimbeji@gmail.com");
-        expect(response.body).toHaveProperty("name", "Slim Beji");
+        expect(response.body).toHaveProperty("email", "beji.slim@yahoo.fr");
+        expect(response.body).toHaveProperty("name", "Mohamed Slim Beji");
     });
 });
 
 describe("PUT /api/users/id", () => {
     it("Update Users", async () => {
         const data = { name: "Slim El Beji" };
-        const user = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
         const response = await request
-            .put(`/api/users/${user.id}`)
+            .put(`/api/users/${example.id}`)
             .send(data)
             .set("Authorization", token)
             .expect("Content-Type", /json/)
@@ -82,15 +83,14 @@ describe("PUT /api/users/id", () => {
 
 describe("DELETE /api/users/id", () => {
     it("DELETE Users", async () => {
-        const user = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
         const response = await request
-            .delete(`/api/users/${user.id}`)
+            .delete(`/api/users/${example.id}`)
             .set("Authorization", adminToken)
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty(
             "message",
-            `Deleted user ${user.id}`
+            `Deleted user ${example.id}`
         );
     });
 });
