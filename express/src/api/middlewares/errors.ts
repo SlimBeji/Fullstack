@@ -14,10 +14,14 @@ export const errorHandler = (
 
     // An error occured
     if (error) {
-        res.status(error.code || 500);
+        const statusCode = error.code || 500;
+        res.status(statusCode);
         const jsonResp = { message: error.message, details: error.details };
-        console.error(error.message);
-        console.error(error.details);
+
+        if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
+            console.error(error.message);
+            console.error(error.details);
+        }
         res.json(jsonResp);
         return;
     }
