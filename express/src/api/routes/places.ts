@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-
+import { z, zodObjectId } from "../../zod";
 import { crudPlace } from "../../models/crud";
 import {
     PlaceSearchSchema,
@@ -95,6 +95,31 @@ async function getPlace(req: Request, res: Response, next: NextFunction) {
 
 placeRouter.get("/:placeId", getPlace);
 
+swaggerRegistery.registerPath({
+    method: "get",
+    path: "/places/{placeId}",
+    request: {
+        params: z.object({
+            placeId: zodObjectId().openapi({
+                example: "507f1f77bcf86cd799439011",
+                description: "Place Id",
+            }),
+        }),
+    },
+    responses: {
+        200: {
+            description: "Place data",
+            content: {
+                "application/json": {
+                    schema: PlaceReadSchema,
+                },
+            },
+        },
+    },
+    tags: ["Place"],
+    summary: "Search and Retrieve place by id",
+});
+
 // Edit Places
 async function editPlace(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePut;
@@ -105,6 +130,45 @@ async function editPlace(req: Request, res: Response, next: NextFunction) {
 
 placeRouter.put("/:placeId", validateBody(PlacePutSchema), editPlace);
 
+swaggerRegistery.registerPath({
+    method: "put",
+    path: "/places/{placeId}",
+    request: {
+        params: z.object({
+            placeId: zodObjectId().openapi({
+                example: "507f1f77bcf86cd799439011",
+                description: "Place id",
+            }),
+        }),
+        body: {
+            content: {
+                "application/json": {
+                    schema: PlacePutSchema,
+                },
+            },
+            description: "Place updated data",
+            required: true,
+        },
+    },
+    responses: {
+        200: {
+            description: "Place data",
+            content: {
+                "application/json": {
+                    schema: PlaceReadSchema,
+                },
+            },
+        },
+    },
+    tags: ["Place"],
+    summary: "Update places",
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
+});
+
 // Delete Places
 async function deletePlace(req: Request, res: Response, next: NextFunction) {
     await crudPlace.deleteById(req.params.placeId);
@@ -114,3 +178,37 @@ async function deletePlace(req: Request, res: Response, next: NextFunction) {
 }
 
 placeRouter.delete("/:placeId", deletePlace);
+
+swaggerRegistery.registerPath({
+    method: "delete",
+    path: "/places/{placeId}",
+    request: {
+        params: z.object({
+            placeId: zodObjectId().openapi({
+                example: "507f1f77bcf86cd799439011",
+                description: "Place Id",
+            }),
+        }),
+    },
+    responses: {
+        200: {
+            description: "Deletion confirmation message",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string().openapi({
+                            example: "Deleted place 507f1f77bcf86cd799439011",
+                        }),
+                    }),
+                },
+            },
+        },
+    },
+    tags: ["Place"],
+    summary: "Delete place by id",
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
+});
