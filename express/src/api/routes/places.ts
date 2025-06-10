@@ -19,6 +19,7 @@ export const placeRouter = Router();
 
 // Get Places Endpoint
 async function getPlaces(req: Request, resp: Response, next: NextFunction) {
+    // All places are public
     const query = req.filterQuery!;
     resp.status(200).json(await crudPlace.fetch(query));
 }
@@ -47,9 +48,10 @@ swaggerRegistery.registerPath({
 
 // Post New Places
 async function createPlace(req: Request, resp: Response, next: NextFunction) {
+    // Use safeCreate to avoid a user posting a place for another user
     const parsed = req.parsed as PlacePost;
-    const user = req.currentUser;
-    const newPlace = await crudPlace.safeCreate(user, parsed);
+    const currentUser = req.currentUser!;
+    const newPlace = await crudPlace.safeCreate(currentUser, parsed);
     resp.status(200).json(newPlace);
 }
 
@@ -95,7 +97,8 @@ swaggerRegistery.registerPath({
 
 // Get a place by ID
 async function getPlace(req: Request, res: Response, next: NextFunction) {
-    const place = await crudPlace.getById(req.params.placeId);
+    // All places are public
+    const place = await crudPlace.get(req.params.placeId);
     res.status(200).json(place);
 }
 
@@ -129,12 +132,21 @@ swaggerRegistery.registerPath({
 // Edit Places
 async function editPlace(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePut;
-    const fetchedPlace = res.fetchedPlace!;
-    const updatedPlace = await crudPlace.update(fetchedPlace, parsed);
+    const currentUser = req.currentUser!;
+    const updatedPlace = await crudPlace.safeUpdateById(
+        currentUser,
+        req.params.placeId,
+        parsed
+    );
     res.status(200).json(updatedPlace);
 }
 
-placeRouter.put("/:placeId", validateBody(PlacePutSchema), editPlace);
+placeRouter.put(
+    "/:placeId",
+    Authenticated,
+    validateBody(PlacePutSchema),
+    editPlace
+);
 
 swaggerRegistery.registerPath({
     method: "put",
@@ -177,13 +189,14 @@ swaggerRegistery.registerPath({
 
 // Delete Places
 async function deletePlace(req: Request, res: Response, next: NextFunction) {
-    await crudPlace.deleteById(req.params.placeId);
+    const currentUser = req.currentUser!;
+    await crudPlace.safeDelete(currentUser, req.params.placeId);
     res.status(200).json({
         message: `Deleted place ${req.params.placeId}`,
     });
 }
 
-placeRouter.delete("/:placeId", deletePlace);
+placeRouter.delete("/:placeId", Authenticated, deletePlace);
 
 swaggerRegistery.registerPath({
     method: "delete",
