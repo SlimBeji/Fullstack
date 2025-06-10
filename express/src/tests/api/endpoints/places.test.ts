@@ -88,7 +88,7 @@ describe("PUT /api/places/id", () => {
         const response = await request
             .put(`/api/places/${example.id}`)
             .send(data)
-            .set("Authorization", token)
+            .set("Authorization", adminToken)
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("address", "Fulham Road, London");
