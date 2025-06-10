@@ -1,4 +1,4 @@
-import { z, zodObjectId, zodFile } from "../../zod";
+import { z, zodObjectId, zodFile, zodObject } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
 // Zod Fields
@@ -39,9 +39,11 @@ export const locationLngField = z.number().openapi({
     example: -0.19090418688755467,
 });
 
-export const placeLocationField = z.object({
+export const placeLocationField = zodObject({
     lat: locationLatField,
     lng: locationLngField,
+}).openapi({
+    description: "Location object (can be sent as JSON string)",
 });
 
 export const placeCreatorIdField = zodObjectId().openapi({

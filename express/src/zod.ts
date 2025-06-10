@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { AnyZodObject, z, ZodAny, ZodTypeAny } from "zod";
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import Config from "./config";
@@ -55,4 +55,12 @@ const zodFile = (
         });
 };
 
-export { z, zodObjectId, zodFile };
+const zodObject = (config: { [fieldname: string]: ZodTypeAny }) => {
+    // Fix swagger UI error of stringifying objects
+    return z.preprocess(
+        (val) => (typeof val === "string" ? JSON.parse(val) : val),
+        z.object(config)
+    );
+};
+
+export { z, zodObjectId, zodFile, zodObject };

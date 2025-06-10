@@ -10,6 +10,7 @@ import {
     PlacePutSchema,
     PlaceSearchSwagger,
     PlacesPaginatedSchema,
+    PlaceReadSchema,
 } from "../../models/schemas";
 import { validateBody, filter } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
@@ -52,6 +53,39 @@ async function createPlace(req: Request, resp: Response, next: NextFunction) {
 }
 
 placeRouter.post("/", validateBody(PlacePostSchema), createPlace);
+
+swaggerRegistery.registerPath({
+    method: "post",
+    path: "/places/",
+    request: {
+        body: {
+            content: {
+                "multipart/form-data": {
+                    schema: PlacePostSchema,
+                },
+            },
+            description: "Place creation",
+            required: true,
+        },
+    },
+    responses: {
+        200: {
+            description: "Place creation",
+            content: {
+                "application/json": {
+                    schema: PlaceReadSchema,
+                },
+            },
+        },
+    },
+    tags: ["Place"],
+    summary: "Place Creation",
+    security: [
+        {
+            BearerAuth: [],
+        },
+    ],
+});
 
 // Get a place by ID
 async function getPlace(req: Request, res: Response, next: NextFunction) {
