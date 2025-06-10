@@ -19,7 +19,7 @@ const UserPlaces: React.FC = () => {
             }
 
             try {
-                await sendRequest(`/users/${userId}/places`, "get");
+                await sendRequest(`/places?creatorId=${userId}`, "get");
             } catch (err) {}
         },
         [sendRequest]
@@ -34,8 +34,8 @@ const UserPlaces: React.FC = () => {
     };
 
     const renderPlaces = (): React.JSX.Element | undefined => {
-        if (!data.loading && data.data?.parsed) {
-            let places = data.data.parsed as Place[];
+        if (!data.loading && data.data?.parsed?.data) {
+            let places = data.data.parsed.data as Place[];
             if (data.statusCode === HttpStatusCode.NotFound) {
                 places = [];
             }

@@ -7,7 +7,7 @@ interface State {
     loading: boolean;
     statusCode?: number;
     data?: {
-        parsed: object;
+        parsed: Record<string, any>;
         raw: AxiosResponse;
     };
     error?: {
@@ -88,7 +88,7 @@ export const useHttp = (
     (
         url: string,
         method: HttpMethods,
-        data?: object,
+        data?: Record<string, any>,
         contentType?: HeaderContent
     ) => Promise<AxiosResponse>,
     () => void

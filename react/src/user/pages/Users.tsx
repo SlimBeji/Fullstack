@@ -26,8 +26,8 @@ const Users: React.FC = () => {
                     <LoadingSpinner asOverlay />
                 </div>
             )}
-            {data.data?.parsed && (
-                <UsersList items={data.data.parsed as User[]} />
+            {data.data?.parsed?.data && (
+                <UsersList items={data.data.parsed.data as User[]} />
             )}
         </>
     );
