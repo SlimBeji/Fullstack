@@ -25,5 +25,5 @@ export const parseDotNotation = (data: any): any => {
 };
 
 export const getImagePath = (p: string) => {
-    return `src/static/images/${p}`;
+    return `/app/src/static/images/${p}`;
 };

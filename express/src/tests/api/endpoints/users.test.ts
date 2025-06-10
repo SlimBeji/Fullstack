@@ -2,6 +2,7 @@ import supertest from "supertest";
 import { memoryDb } from "../../memoryDb";
 import app from "../../../api";
 import { crudUser } from "../../../models/crud";
+import { getImagePath } from "../../../lib/utils";
 
 let adminToken: string = "";
 let token: string = "";
@@ -35,15 +36,13 @@ describe("GET /api/users", () => {
 
 describe("POST /api/users", () => {
     it("Create Users", async () => {
-        const data = {
-            name: "Test Van Test",
-            password: "very_secret",
-            email: "test@test.com",
-            isAdmin: true,
-        };
         const response = await request
             .post("/api/users")
-            .send(data)
+            .field("name", "Test Van Test")
+            .field("email", "test@test.com")
+            .field("password", "very_secret")
+            .field("isAdmin", true)
+            .attach("image", getImagePath("avatar1.jpg"))
             .set("Authorization", adminToken)
             .expect("Content-Type", /json/)
             .expect(200);

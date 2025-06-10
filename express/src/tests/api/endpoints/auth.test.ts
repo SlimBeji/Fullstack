@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import { memoryDb } from "../../memoryDb";
 import app from "../../../api";
+import { getImagePath } from "../../../lib/utils";
 
 const request = supertest(app);
 
@@ -14,14 +15,12 @@ afterAll(async () => {
 
 describe("POST /api/auth/signup", () => {
     it("responds with json", async () => {
-        const data = {
-            name: "Didier Drogba",
-            email: "new_user@gmail.com",
-            password: "very_secret",
-        };
         const response = await request
             .post("/api/auth/signup")
-            .send(data)
+            .field("name", "Didier Drogba")
+            .field("email", "new_user@gmail.com")
+            .field("password", "very_secret")
+            .attach("image", getImagePath("avatar1.jpg"))
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("email", "new_user@gmail.com");
