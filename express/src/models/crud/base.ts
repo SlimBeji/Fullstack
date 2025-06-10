@@ -13,6 +13,7 @@ import {
     HttpStatus,
     PaginatedData,
 } from "../../types";
+import config from "../../config";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -73,7 +74,10 @@ export abstract class Crud<
 
     public async fetchDocuments(filterQuery: FilterQuery): Promise<Doc[]> {
         let { pagination, sort, filters } = filterQuery;
-        if (Object.keys(sort).length === 0) {
+        const skip = pagination ? pagination.skip : 0;
+        const size = pagination ? pagination.size : config.MAX_ITEMS_PER_PAGE;
+
+        if (Object.keys(sort || []).length === 0) {
             sort = { createdAt: 1 };
         }
         let parsedFilters = filters as RootFilterQuery<DBInt>;
@@ -81,17 +85,19 @@ export abstract class Crud<
             .find(parsedFilters)
             .sort(sort)
             .collation({ locale: "en", strength: 2 })
-            .skip(pagination.skip)
-            .limit(pagination.size)
+            .skip(skip)
+            .limit(size)
             .exec();
         return documents;
     }
 
     public async fetch(filterQuery: FilterQuery): Promise<PaginatedData<Read>> {
         filterQuery = sanitizeFilter(filterQuery) as FilterQuery;
-        const page = filterQuery.pagination.page;
-        const totalCount = await this.countDocuments(filterQuery.filters);
-        const totalPages = Math.ceil(totalCount / filterQuery.pagination.size);
+        const { pagination, filters } = filterQuery;
+        const page = pagination ? pagination.page : 1;
+        const size = pagination ? pagination.size : config.MAX_ITEMS_PER_PAGE;
+        const totalCount = await this.countDocuments(filters || {});
+        const totalPages = Math.ceil(totalCount / size);
         const documents = await this.fetchDocuments(filterQuery);
         const data = await this.jsonifyBatch(documents);
         return { page, totalPages, totalCount, data };

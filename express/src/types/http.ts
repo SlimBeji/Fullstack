@@ -11,9 +11,9 @@ export type SortData = { [key: string]: 1 | -1 };
 export type FilterData = { [key: string]: MongoFilter };
 
 export interface FilterQuery {
-    pagination: PaginationData;
-    sort: SortData;
-    filters: FilterData;
+    pagination?: PaginationData;
+    sort?: SortData;
+    filters?: FilterData;
 }
 
 export interface PaginatedData<T> {
