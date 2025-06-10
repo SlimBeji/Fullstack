@@ -1,4 +1,3 @@
-import { FileToUpload } from "../../types";
 import { z, zodObjectId, zodFile } from "../../zod";
 import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
 
@@ -30,15 +29,19 @@ export const placeAddressField = z.string().min(1).openapi({
     example: "Fulham road",
 });
 
+export const locationLatField = z.number().openapi({
+    description: "The latitude of the place",
+    example: 51.48180425016331,
+});
+
+export const locationLngField = z.number().openapi({
+    description: "The longitude of the place",
+    example: -0.19090418688755467,
+});
+
 export const placeLocationField = z.object({
-    lat: z.number().openapi({
-        description: "The latitude of the place",
-        example: 51.48180425016331,
-    }),
-    lng: z.number().openapi({
-        description: "The longitude of the place",
-        example: -0.19090418688755467,
-    }),
+    lat: locationLatField,
+    lng: locationLngField,
 });
 
 export const placeCreatorIdField = zodObjectId().openapi({
@@ -106,10 +109,17 @@ export const PlaceSearchSchema = z.object({
 
 export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
 
-export const PlaceSearchSwagger = buildPaginationSchema(
+const PlaceSearchSwaggerPreBuilt = buildPaginationSchema(
     PlaceSearchSchema,
     PlaceSortableFields
 );
+
+export const PlaceSearchSwagger = PlaceSearchSwaggerPreBuilt.omit({
+    location: true,
+}).extend({
+    "location.lat": locationLatField,
+    "location.lng": locationLngField,
+});
 
 // Update Schemas
 

@@ -8,8 +8,11 @@ import {
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
+    PlaceSearchSwagger,
+    PlacesPaginatedSchema,
 } from "../../models/schemas";
 import { validateBody, filter } from "../middlewares";
+import { swaggerRegistery } from "../openapi";
 
 export const placeRouter = Router();
 
@@ -20,6 +23,26 @@ async function getPlaces(req: Request, resp: Response, next: NextFunction) {
 }
 
 placeRouter.get("/", filter(PlaceSearchSchema, PlaceSortableFields), getPlaces);
+
+swaggerRegistery.registerPath({
+    method: "get",
+    path: "/places/",
+    request: {
+        query: PlaceSearchSwagger,
+    },
+    responses: {
+        200: {
+            description: "Search and Filter places",
+            content: {
+                "application/json": {
+                    schema: PlacesPaginatedSchema,
+                },
+            },
+        },
+    },
+    tags: ["Place"],
+    summary: "Search and Retrieve places",
+});
 
 // Post New Places
 async function createPlace(req: Request, resp: Response, next: NextFunction) {

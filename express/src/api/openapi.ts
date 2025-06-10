@@ -44,6 +44,10 @@ const registerSwaggger = (app: Application, path: string): void => {
                 name: "User",
                 description: "User crud endpoints",
             },
+            {
+                name: "Place",
+                description: "Place crud endpoints",
+            },
         ],
     });
     app.use(path, swaggerUi.serve, swaggerUi.setup(openApiDocument));
