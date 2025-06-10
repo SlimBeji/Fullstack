@@ -10,7 +10,7 @@ import {
 import { PlaceModel, PlaceDocument } from "../collections";
 import { storage } from "../../lib/utils";
 import { Crud } from "./base";
-import { ApiError, HttpStatus } from "../../types";
+import { ApiError, HttpStatus, FilterQuery } from "../../types";
 
 export class CrudPlace extends Crud<
     PlaceDB,
@@ -21,10 +21,30 @@ export class CrudPlace extends Crud<
     PlaceUpdate,
     PlacePut
 > {
-    protected secrets = {};
-
     constructor() {
         super(PlaceModel);
+    }
+
+    public safeCheck(
+        user: UserRead,
+        data: PlaceDocument | PlacePost | PlaceCreate
+    ): void {
+        if (user.isAdmin) return;
+        const creatorId = "creatorId" in data ? data.creatorId : undefined;
+        if (creatorId && creatorId !== user.id) {
+            throw new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                `Cannot set creatorId to ${creatorId}. Access denied`
+            );
+        }
+    }
+
+    public safeFilter(user: UserRead, filterQuery: FilterQuery): FilterQuery {
+        const { sort, filters, pagination } = filterQuery;
+        if (filters) {
+            filters.creatorId = { $eq: user.id };
+        }
+        return { sort, filters, pagination };
     }
 
     public async jsonifyBatch(docs: PlaceDocument[]): Promise<PlaceRead[]> {

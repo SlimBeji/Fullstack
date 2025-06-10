@@ -1,5 +1,5 @@
 import { hash, compare } from "bcryptjs";
-import { ApiError, HttpStatus } from "../../types";
+import { ApiError, FilterQuery, HttpStatus } from "../../types";
 import { storage } from "../../lib/utils";
 import { createToken } from "../../api/auth";
 import {
@@ -29,6 +29,28 @@ export class CrudUser extends Crud<
 > {
     constructor() {
         super(UserModel);
+    }
+
+    public safeCheck(
+        user: UserRead,
+        data: UserDocument | UserPost | UserCreate
+    ): void {
+        if (user.isAdmin) return;
+        const dataUserId = "id" in data ? data.id : undefined;
+        if (dataUserId && dataUserId !== user.id) {
+            throw new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                `Access to user with id ${dataUserId} not granted`
+            );
+        }
+    }
+
+    public safeFilter(user: UserRead, filterQuery: FilterQuery): FilterQuery {
+        const { sort, filters, pagination } = filterQuery;
+        if (filters) {
+            filters.id = { $eq: user.id };
+        }
+        return { sort, filters, pagination };
     }
 
     public async jsonifyBatch(docs: UserDocument[]): Promise<UserRead[]> {

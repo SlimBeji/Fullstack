@@ -14,6 +14,7 @@ import {
     PaginatedData,
 } from "../../types";
 import config from "../../config";
+import { UserRead } from "../schemas";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
@@ -32,6 +33,22 @@ export abstract class Crud<
     public get modelName(): string {
         return this.model.modelName;
     }
+
+    public notFoundError(id: String | Types.ObjectId): ApiError {
+        return new ApiError(
+            HttpStatus.NOT_FOUND,
+            `No document with id ${id} found in ${this.modelName}s`
+        );
+    }
+
+    // Accessors
+
+    public abstract safeCheck(user: UserRead, doc: Doc | Post | Put): void;
+
+    public abstract safeFilter(
+        user: UserRead,
+        filterQuery: FilterQuery
+    ): FilterQuery;
 
     // Serialization
     public serializeDocument(document: Doc): DBInt {
@@ -56,11 +73,23 @@ export abstract class Crud<
         return await this.model.findById(id);
     }
 
-    public async getById(id: string | Types.ObjectId): Promise<Read | null> {
+    public async get(id: string | Types.ObjectId): Promise<Read | null> {
         const document = await this.getDocument(id);
         if (!document) {
             return null;
         }
+        return await this.jsonfify(document);
+    }
+
+    public async safeGet(
+        user: UserRead,
+        id: string | Types.ObjectId
+    ): Promise<Read> {
+        const document = await this.getDocument(id);
+        if (!document) {
+            throw this.notFoundError(id);
+        }
+        this.safeCheck(user, document);
         return await this.jsonfify(document);
     }
 
@@ -103,6 +132,14 @@ export abstract class Crud<
         return { page, totalPages, totalCount, data };
     }
 
+    public async safeFetch(
+        user: UserRead,
+        filterQuery: FilterQuery
+    ): Promise<PaginatedData<Read>> {
+        filterQuery = this.safeFilter(user, filterQuery);
+        return await this.fetch(filterQuery);
+    }
+
     // Create
 
     public async createDocument(form: Create): Promise<Doc> {
@@ -127,6 +164,11 @@ export abstract class Crud<
 
     public abstract create(post: Post): Promise<Read>;
 
+    public async safeCreate(user: UserRead, post: Post): Promise<Read> {
+        this.safeCheck(user, post);
+        return await this.create(post);
+    }
+
     // Update
 
     public async updateDocument(obj: Doc, form: Update): Promise<Doc> {
@@ -150,18 +192,26 @@ export abstract class Crud<
 
     public abstract update(obj: Doc, form: Put): Promise<Read>;
 
-    public async updateById(
+    public async safeUpdate(
+        user: UserRead,
+        doc: Doc,
+        form: Put
+    ): Promise<Read> {
+        this.safeCheck(user, doc);
+        this.safeCheck(user, form);
+        return await this.update(doc, form);
+    }
+
+    public async safeUpdateById(
+        user: UserRead,
         id: string | Types.ObjectId,
         form: Put
     ): Promise<Read> {
         const doc = await this.getDocument(id);
         if (!doc) {
-            throw new ApiError(
-                HttpStatus.BAD_REQUEST,
-                `Could not find object ${this.modelName} with id ${id}`
-            );
+            throw this.notFoundError(id);
         }
-        return await this.update(doc, form);
+        return await this.safeUpdate(user, doc, form);
     }
 
     // Delete
@@ -186,14 +236,15 @@ export abstract class Crud<
         await this.deleteCleanup(obj);
     }
 
-    public async deleteById(id: string | Types.ObjectId): Promise<void> {
-        const raw = await this.getDocument(id);
-        if (!raw) {
-            throw new ApiError(
-                HttpStatus.BAD_REQUEST,
-                `Could not find object ${this.modelName} with id ${id}`
-            );
+    public async safeDelete(
+        user: UserRead,
+        id: string | Types.ObjectId
+    ): Promise<void> {
+        const doc = await this.getDocument(id);
+        if (!doc) {
+            throw this.notFoundError(id);
         }
-        return await this.deleteDocument(raw);
+        this.safeCheck(user, doc);
+        return await this.deleteDocument(doc);
     }
 }
