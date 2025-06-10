@@ -101,6 +101,7 @@ export const PlaceSearchSchema = z.object({
     description: placeDescriptionField.optional(),
     address: placeAddressField.optional(),
     location: placeLocationField.optional(),
+    creatorId: placeCreatorIdField.optional(),
 });
 
 export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
