@@ -12,7 +12,7 @@ import {
     PlacesPaginatedSchema,
     PlaceReadSchema,
 } from "../../models/schemas";
-import { validateBody, filter } from "../middlewares";
+import { validateBody, filter, Authenticated } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const placeRouter = Router();
@@ -48,11 +48,17 @@ swaggerRegistery.registerPath({
 // Post New Places
 async function createPlace(req: Request, resp: Response, next: NextFunction) {
     const parsed = req.parsed as PlacePost;
-    const newPlace = await crudPlace.create(parsed);
+    const user = req.currentUser;
+    const newPlace = await crudPlace.safeCreate(user, parsed);
     resp.status(200).json(newPlace);
 }
 
-placeRouter.post("/", validateBody(PlacePostSchema), createPlace);
+placeRouter.post(
+    "/",
+    Authenticated,
+    validateBody(PlacePostSchema),
+    createPlace
+);
 
 swaggerRegistery.registerPath({
     method: "post",

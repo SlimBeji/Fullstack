@@ -5,10 +5,12 @@ import {
     PlaceRead,
     PlacePost,
     PlaceUpdate,
+    UserRead,
 } from "../schemas";
 import { PlaceModel, PlaceDocument } from "../collections";
 import { storage } from "../../lib/utils";
 import { Crud } from "./base";
+import { ApiError, HttpStatus } from "../../types";
 
 export class CrudPlace extends Crud<
     PlaceDB,
@@ -43,6 +45,26 @@ export class CrudPlace extends Crud<
         const data = { ...body, imageUrl };
         const doc = await this.createDocument(data);
         return this.jsonfify(doc);
+    }
+
+    public async safeCreate(
+        user: UserRead,
+        form: PlacePost
+    ): Promise<PlaceRead> {
+        if (!user) {
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "No authenticated user found"
+            );
+        }
+
+        if (user.id !== form.creatorId && !user.isAdmin) {
+            throw new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                `creatorId must be equal to ${user.id}`
+            );
+        }
+        return await this.create(form);
     }
 
     public async update(
