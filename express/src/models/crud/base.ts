@@ -4,10 +4,10 @@ import {
     startSession,
     RootFilterQuery,
     Types,
+    sanitizeFilter,
 } from "mongoose";
 import {
     ApiError,
-    ErrorHandler,
     FilterData,
     FilterQuery,
     HttpStatus,
@@ -88,6 +88,7 @@ export abstract class Crud<
     }
 
     public async fetch(filterQuery: FilterQuery): Promise<PaginatedData<Read>> {
+        filterQuery = sanitizeFilter(filterQuery) as FilterQuery;
         const page = filterQuery.pagination.page;
         const totalCount = await this.countDocuments(filterQuery.filters);
         const totalPages = Math.ceil(totalCount / filterQuery.pagination.size);
