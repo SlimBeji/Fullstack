@@ -65,7 +65,11 @@ export const validateBody = (schema: AnyZodObject) => {
                     const files = req.files as any as {
                         [fieldname: string]: File[];
                     };
-                    req.body[key] = files[key][0];
+                    if (files[key] && files[key].length > 0) {
+                        req.body[key] = files[key][0];
+                    } else {
+                        req.body[key] = undefined;
+                    }
                 });
                 return next(checkBody(req, schema));
             });
