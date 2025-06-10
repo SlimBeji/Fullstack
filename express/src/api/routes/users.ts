@@ -125,9 +125,8 @@ swaggerRegistery.registerPath({
 async function editUser(req: Request, res: Response, next: NextFunction) {
     const parsed = req.parsed as UserPut;
     const fetchedUser = res.fetchedUser!;
-    const updatedUser = await crudUser.updateDocument(fetchedUser, parsed);
-    const result = await crudUser.jsonfify(updatedUser);
-    res.status(200).json(result);
+    const updatedUser = await crudUser.update(fetchedUser, parsed);
+    res.status(200).json(updatedUser);
 }
 
 userRouter.put("/:userId", validateBody(UserPutSchema), fetchUser(), editUser);
