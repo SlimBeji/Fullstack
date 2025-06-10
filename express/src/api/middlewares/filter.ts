@@ -170,7 +170,7 @@ export const filter = (
                 next(
                     new ApiError(
                         HttpStatus.UNPROCESSABLE_ENTITY,
-                        "request not valid",
+                        `request not valid: ${err.message}`,
                         { message: err.message }
                     )
                 );
