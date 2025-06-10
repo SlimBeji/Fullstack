@@ -33,7 +33,7 @@ export const verifyToken = (token: string): DecodedUserToken => {
 
 export const getUserFromToken = async (token: string): Promise<UserRead> => {
     const payload = verifyToken(token);
-    const user = await crudUser.getById(payload.userId);
+    const user = await crudUser.get(payload.userId);
     if (!user) {
         throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
     }
