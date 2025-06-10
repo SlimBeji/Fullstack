@@ -119,8 +119,8 @@ const PlaceSearchSwaggerPreBuilt = buildPaginationSchema(
 export const PlaceSearchSwagger = PlaceSearchSwaggerPreBuilt.omit({
     location: true,
 }).extend({
-    "location.lat": locationLatField,
-    "location.lng": locationLngField,
+    "location.lat": locationLatField.optional(),
+    "location.lng": locationLngField.optional(),
 });
 
 // Update Schemas
