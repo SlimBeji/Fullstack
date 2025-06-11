@@ -44,7 +44,8 @@ const parseSortField = (req: Request, allowedFields: string[]): SortData => {
             field = field.substring(1);
         }
         if (allowedFields.indexOf(field) === -1) {
-            throw new Error(
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 `Cannot sort on field ${field}. Allowed fields are ${allowedFields}`
             );
         }
@@ -60,7 +61,8 @@ const parseFilterField = (
 ): MongoFilter => {
     let raw = req.query[key];
     if (raw == undefined) {
-        throw new Error(
+        throw new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
             `Something went wrong, param ${key} could not be extracted`
         );
     }
@@ -72,7 +74,8 @@ const parseFilterField = (
     const result: MongoFilter = {};
     raw.forEach((item) => {
         if (typeof item === "object") {
-            throw new Error(
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
             );
         }
@@ -83,14 +86,16 @@ const parseFilterField = (
             value = parts[0];
         } else if (parts.length === 2) {
             if (!(parts[0] in MongoOperationMapping)) {
-                throw new Error(
+                throw new ApiError(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
                     `Unknown operation ${parts[0]} for param ${key}`
                 );
             }
             op = parts[0] as FilterOperation;
             value = parts[1];
         } else {
-            throw new Error(
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
             );
         }
@@ -123,7 +128,8 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
 
         // Raise error if the field is unknown
         if (!allowedFilterFields.has(key)) {
-            throw new Error(
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 `Unknown filter field: '${key}'. Allowed fields are: ${Array.from(
                     allowedFilterFields
                 ).join(", ")}.`
@@ -166,14 +172,8 @@ export const filter = (
             req.filterQuery = { pagination, sort, filters };
             next();
         } catch (err) {
-            if (err instanceof Error) {
-                next(
-                    new ApiError(
-                        HttpStatus.UNPROCESSABLE_ENTITY,
-                        `request not valid: ${err.message}`,
-                        { message: err.message }
-                    )
-                );
+            if (err instanceof ApiError) {
+                next(err);
             }
             next(
                 new ApiError(
