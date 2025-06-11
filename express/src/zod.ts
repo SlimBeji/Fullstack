@@ -1,8 +1,8 @@
-import { AnyZodObject, z, ZodAny, ZodTypeAny } from "zod";
+import { z, ZodTypeAny } from "zod";
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import Config from "./config";
-import { MimeType } from "./types";
+import { HttpStatus, MimeType, ApiError } from "./types";
 
 extendZodWithOpenApi(z);
 
@@ -44,7 +44,10 @@ const zodFile = (
             const rs = fileRuntimeSchema(acceptedMimetypes, maxSize);
             const result = rs.safeParse(val);
             if (!result.success) {
-                throw new Error("Invalid file upload");
+                throw new ApiError(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid file upload"
+                );
             }
             return result.data;
         })

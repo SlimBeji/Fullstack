@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { PlaceDB } from "../schemas";
-import { CollectionEnum } from "../../types";
+import { CollectionEnum, HttpStatus, ApiError } from "../../types";
 import { UserModel } from "./user";
 
 // Schema creation
@@ -33,7 +33,8 @@ PlaceCollectionSchema.index({ createdAt: 1 });
 // Hooks
 PlaceCollectionSchema.pre("save", async function (next) {
     const userExists = await UserModel.exists({ _id: this.creatorId });
-    if (!userExists) throw new Error("User does not exist");
+    if (!userExists)
+        throw new ApiError(HttpStatus.BAD_REQUEST, "User does not exist");
     next();
 });
 
