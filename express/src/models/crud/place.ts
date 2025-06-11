@@ -29,6 +29,9 @@ export class CrudPlace extends Crud<
         user: UserRead,
         data: PlaceDocument | PlacePost | PlaceCreate
     ): void {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
         if (user.isAdmin) return;
         const creatorId = "creatorId" in data ? data.creatorId : undefined;
         if (creatorId && creatorId !== user.id) {
@@ -65,26 +68,6 @@ export class CrudPlace extends Crud<
         const data = { ...body, imageUrl };
         const doc = await this.createDocument(data);
         return this.jsonfify(doc);
-    }
-
-    public async safeCreate(
-        user: UserRead,
-        form: PlacePost
-    ): Promise<PlaceRead> {
-        if (!user) {
-            throw new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "No authenticated user found"
-            );
-        }
-
-        if (user.id !== form.creatorId && !user.isAdmin) {
-            throw new ApiError(
-                HttpStatus.UNAUTHORIZED,
-                `creatorId must be equal to ${user.id}`
-            );
-        }
-        return await this.create(form);
     }
 
     public async update(

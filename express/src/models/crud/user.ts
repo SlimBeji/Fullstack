@@ -35,6 +35,9 @@ export class CrudUser extends Crud<
         user: UserRead,
         data: UserDocument | UserPost | UserCreate
     ): void {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
         if (user.isAdmin) return;
         const dataUserId = "id" in data ? data.id : undefined;
         if (dataUserId && dataUserId !== user.id) {
@@ -89,7 +92,10 @@ export class CrudUser extends Crud<
     public async getBearer(email: string): Promise<string> {
         const user = await this.getByEmail(email);
         if (!user) {
-            throw new Error(`No user with email ${email} in the database`);
+            throw new ApiError(
+                HttpStatus.NOT_FOUND,
+                `No user with email ${email} in the database`
+            );
         }
         const { token } = createToken(user);
         return `Bearer ${token}`;
