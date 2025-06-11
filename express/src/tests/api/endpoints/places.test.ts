@@ -4,6 +4,7 @@ import app from "../../../api";
 import { crudPlace, crudUser } from "../../../models/crud";
 import { getImagePath } from "../../../lib/utils";
 import { PlaceRead } from "../../../models/schemas";
+import { HttpStatus } from "../../../types";
 
 let adminToken: string = "";
 let token: string = "";
@@ -64,6 +65,20 @@ describe("POST /api/places", () => {
             "Somewhere over the rainbow"
         );
     });
+
+    it("Someone cannot post on others behalf", async () => {
+        const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
+        const response = await request
+            .post("/api/places")
+            .field("creatorId", user.id.toString())
+            .field("description", "A brand new place")
+            .field("title", "Brand New Place")
+            .field("address", "Somewhere over the rainbow")
+            .attach("image", getImagePath("place1.jpg"))
+            .set("Authorization", token)
+            .expect("Content-Type", /json/)
+            .expect(HttpStatus.UNAUTHORIZED);
+    });
 });
 
 describe("GET /api/places/id", () => {
@@ -98,9 +113,27 @@ describe("PUT /api/places/id", () => {
             "Stamford Bridge - Home of the Blues"
         );
     });
+
+    it("User cannot update othe rplaces", async () => {
+        const data = { description: "Stamford Bridge - Home of the Blues" };
+        const response = await request
+            .put(`/api/places/${example.id}`)
+            .send(data)
+            .set("Authorization", token)
+            .expect("Content-Type", /json/)
+            .expect(HttpStatus.UNAUTHORIZED);
+    });
 });
 
 describe("DELETE /api/places/id", () => {
+    it("A user cannot delete someone else place", async () => {
+        const response = await request
+            .delete(`/api/places/${example.id}`)
+            .set("Authorization", token)
+            .expect("Content-Type", /json/)
+            .expect(HttpStatus.UNAUTHORIZED);
+    });
+
     it("DELETE a place", async () => {
         const response = await request
             .delete(`/api/places/${example.id}`)
