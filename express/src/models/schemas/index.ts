@@ -1,4 +1,4 @@
 export * from "./place";
 export * from "./user";
 export * from "./auth";
-export * from "./utils";
+export * from "./zod";

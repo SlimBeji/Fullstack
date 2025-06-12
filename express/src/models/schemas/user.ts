@@ -1,5 +1,10 @@
-import { z, zodObjectId, zodFile } from "../../zod";
-import { buildPaginatedSchema, buildPaginationSchema } from "./utils";
+import {
+    z,
+    zodObjectId,
+    zodFile,
+    buildPaginatedSchema,
+    buildPaginationSchema,
+} from "./zod";
 
 // Zod Fields
 export const userIdField = zodObjectId().openapi({

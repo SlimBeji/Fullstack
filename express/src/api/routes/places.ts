@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { z, zodObjectId } from "../../zod";
 import { crudPlace } from "../../models/crud";
 import {
+    z,
+    zodObjectId,
     PlaceSearchSchema,
     PlaceSortableFields,
     PlacePost,

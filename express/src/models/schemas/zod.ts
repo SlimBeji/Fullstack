@@ -1,12 +1,12 @@
-import { z, ZodTypeAny } from "zod";
+import { z, ZodTypeAny, AnyZodObject } from "zod";
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import { env } from "./config";
-import { HttpStatus, MimeType, ApiError } from "./types";
+import { env } from "../../config";
+import { HttpStatus, MimeType, ApiError } from "../../types";
 
 extendZodWithOpenApi(z);
 
-const zodObjectId = () => {
+export const zodObjectId = () => {
     return z
         .string()
         .min(24)
@@ -33,7 +33,7 @@ const fileRuntimeSchema = (
     });
 };
 
-const zodFile = (
+export const zodFile = (
     description: string,
     acceptedMimetypes: string[] | null = null,
     maxSize: number = env.FILEUPLOAD_MAX_SIZE
@@ -58,7 +58,7 @@ const zodFile = (
         });
 };
 
-const zodObject = (config: { [fieldname: string]: ZodTypeAny }) => {
+export const zodObject = (config: { [fieldname: string]: ZodTypeAny }) => {
     // Fix swagger UI error of stringifying objects
     return z.preprocess(
         (val) => (typeof val === "string" ? JSON.parse(val) : val),
@@ -66,4 +66,41 @@ const zodObject = (config: { [fieldname: string]: ZodTypeAny }) => {
     );
 };
 
-export { z, zodObjectId, zodFile, zodObject };
+export const buildPaginationSchema = (
+    schema: AnyZodObject,
+    sortableFields: string[]
+): AnyZodObject => {
+    const fields: string[] = [];
+    sortableFields.forEach((item) => {
+        fields.push(item);
+        fields.push(`-${item}`);
+    });
+
+    return schema.extend({
+        page: z.number().default(1).openapi("The page number"),
+        size: z
+            .number()
+            .default(env.MAX_ITEMS_PER_PAGE)
+            .openapi("Items per page"),
+        sort: z
+            .array(z.enum(fields as [string, ...string[]]))
+            .default([])
+            .openapi(
+                "Fields to use for sorting. Use the '-' for descending sorting"
+            ),
+    });
+};
+
+export const buildPaginatedSchema = (
+    schema: AnyZodObject,
+    description: string = "The page data"
+): AnyZodObject => {
+    return z.object({
+        page: z.number().openapi("The returned page number"),
+        totalPages: z.number().openapi("The total number of pages"),
+        totalCount: z.number().openapi("Total number of items in the database"),
+        data: z.array(schema).openapi(description),
+    });
+};
+
+export { z };

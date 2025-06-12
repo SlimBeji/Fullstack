@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { z } from "../../zod";
+import { z } from "../../models/schemas";
 import { Authenticated, Admin } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 

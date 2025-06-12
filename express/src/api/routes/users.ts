@@ -1,8 +1,9 @@
-import { z, zodObjectId } from "../../zod";
 import { Router, Request, Response, NextFunction } from "express";
 
 import { crudUser } from "../../models/crud";
 import {
+    z,
+    zodObjectId,
     UserSearchSchema,
     UserSortableFields,
     UserSearchSwagger,
