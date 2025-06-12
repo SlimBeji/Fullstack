@@ -4,6 +4,7 @@ import config from "../../config";
 import { UserRead, EncodedToken } from "../../models/schemas";
 import { crudUser } from "../../models/crud";
 import { ApiError, HttpStatus } from "../../types";
+import { redisClient } from "../../redisClient";
 
 export interface UserTokenInput {
     userId: Types.ObjectId;
@@ -12,7 +13,7 @@ export interface UserTokenInput {
 
 export interface DecodedUserToken extends UserTokenInput, JwtPayload {}
 
-export const createToken = (user: UserRead): EncodedToken => {
+const _createToken = (user: UserRead): EncodedToken => {
     const payload: UserTokenInput = {
         userId: user.id,
         email: user.email,
@@ -22,6 +23,16 @@ export const createToken = (user: UserRead): EncodedToken => {
     });
     return { token, email: user.email, userId: user.id };
 };
+
+const createTokenKeygen = (user: UserRead): string => {
+    return `create_token_${user.email}`;
+};
+
+export const createToken = redisClient.wrap<[UserRead], EncodedToken>(
+    _createToken,
+    createTokenKeygen,
+    config.JWT_EXPIRATION
+);
 
 export const verifyToken = (token: string): DecodedUserToken => {
     const decoded = jwt.verify(token, config.SECRET_KEY);
