@@ -1,16 +1,16 @@
 import supertest from "supertest";
-import { memoryDb } from "../../memoryDb";
 import app from "../../../api";
 import { getImagePath } from "../../../lib/utils";
+import { dropMemoryDb, prepareMemoryDb } from "../../helpers";
 
 const request = supertest(app);
 
 beforeAll(async () => {
-    await memoryDb.session();
+    await prepareMemoryDb();
 });
 
 afterAll(async () => {
-    await memoryDb.destroy();
+    await dropMemoryDb();
 });
 
 describe("POST /api/auth/signup", () => {

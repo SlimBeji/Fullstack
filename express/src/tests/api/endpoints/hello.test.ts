@@ -1,16 +1,16 @@
 import supertest from "supertest";
-import { memoryDb } from "../../memoryDb";
 import app from "../../../api";
 import { crudUser } from "../../../models/crud";
+import { dropMemoryDb, prepareMemoryDb } from "../../helpers";
 
 const request = supertest(app);
 
 beforeAll(async () => {
-    await memoryDb.session();
+    await prepareMemoryDb();
 });
 
 afterAll(async () => {
-    await memoryDb.destroy();
+    await dropMemoryDb();
 });
 
 describe("GET /api/hello-world/", () => {

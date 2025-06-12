@@ -1,10 +1,10 @@
 import supertest from "supertest";
-import { memoryDb } from "../../memoryDb";
 import app from "../../../api";
 import { crudPlace, crudUser } from "../../../models/crud";
 import { getImagePath } from "../../../lib/utils";
 import { PlaceRead } from "../../../models/schemas";
 import { HttpStatus } from "../../../types";
+import { dropMemoryDb, prepareMemoryDb } from "../../helpers";
 
 let adminToken: string = "";
 let token: string = "";
@@ -12,7 +12,7 @@ let example: PlaceRead;
 const request = supertest(app);
 
 beforeAll(async () => {
-    await memoryDb.session();
+    await prepareMemoryDb();
     adminToken = await crudUser.getBearer("mslimbeji@gmail.com");
     token = await crudUser.getBearer("beji.slim@yahoo.fr");
     const examples = await crudPlace.fetch({
@@ -24,7 +24,7 @@ beforeAll(async () => {
 afterAll(async () => {
     token = "";
     adminToken = "";
-    await memoryDb.destroy();
+    await dropMemoryDb();
 });
 
 describe("GET /api/places", () => {
