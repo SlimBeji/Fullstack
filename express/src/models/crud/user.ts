@@ -1,6 +1,6 @@
 import { hash, compare } from "bcryptjs";
 import { ApiError, FilterQuery, HttpStatus } from "../../types";
-import { storage } from "../../lib/utils";
+import { storage } from "../../lib/clients";
 import { createToken } from "../../api/auth";
 import {
     UserDB,

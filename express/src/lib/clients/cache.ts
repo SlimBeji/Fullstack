@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from "redis";
-import { env } from "./config";
-import { ApiError, HttpStatus } from "./types";
+import { env } from "../../config";
+import { ApiError, HttpStatus } from "../../types";
 
 export class RedisClient {
     private client: RedisClientType;

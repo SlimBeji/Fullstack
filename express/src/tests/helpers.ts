@@ -1,4 +1,4 @@
-import { redisClient } from "../redisClient";
+import { redisClient } from "../lib/clients";
 import { memoryDb } from "./memoryDb";
 
 export const prepareMemoryDb = async () => {

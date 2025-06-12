@@ -2,7 +2,7 @@ import mongoose, { Types } from "mongoose";
 import { users } from "./users";
 import { places } from "./places";
 import { crudUser, crudPlace } from "../crud";
-import { uploadLocal } from "../../lib/utils";
+import { uploadLocal } from "../../lib/clients";
 import { CollectionEnum } from "../../types";
 import { UserSeed, PlaceSeed } from "../schemas";
 

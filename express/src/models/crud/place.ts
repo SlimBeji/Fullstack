@@ -8,7 +8,7 @@ import {
     UserRead,
 } from "../schemas";
 import { PlaceModel, PlaceDocument } from "../collections";
-import { storage } from "../../lib/utils";
+import { storage } from "../../lib/clients";
 import { Crud } from "./base";
 import { ApiError, HttpStatus, FilterQuery } from "../../types";
 

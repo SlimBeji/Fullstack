@@ -4,7 +4,7 @@ import { env } from "../../config";
 import { UserRead, EncodedToken } from "../../models/schemas";
 import { crudUser } from "../../models/crud";
 import { ApiError, HttpStatus } from "../../types";
-import { redisClient } from "../../redisClient";
+import { redisClient } from "../../lib/clients";
 
 export interface UserTokenInput {
     userId: Types.ObjectId;

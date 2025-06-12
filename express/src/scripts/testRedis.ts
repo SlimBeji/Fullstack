@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { redisClient } from "../redisClient";
+import { redisClient } from "../lib/clients";
 import { createToken } from "../api/auth";
 import { crudUser } from "../models/crud";
 import { env } from "../config";
