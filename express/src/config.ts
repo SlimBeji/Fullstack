@@ -25,6 +25,10 @@ export default {
     // DATABASE config
     MONGO_URL: parseVar("MONGO_URL"),
     MONGO_DBNAME: parseVar("MONGO_DBNAME"),
+    REDIS_URL: parseVar("REDIS_URL"),
+    REDIS_DEFAULT_EXPIRATION: Number(
+        parseVar("REDIS_DEFAULT_EXPIRATION", "3600")
+    ),
 
     // GCP config
     GOOGLE_APPLICATION_CREDENTIALS: parseVar(

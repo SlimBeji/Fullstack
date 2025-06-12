@@ -11,6 +11,7 @@ todo.txt
 mongo
 mongo-express
 gcs
+redis
 
 # Logs
 logs
