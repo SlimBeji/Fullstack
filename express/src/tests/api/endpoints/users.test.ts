@@ -5,7 +5,7 @@ import { readImage } from "../../../lib/utils";
 import { UserRead } from "../../../models/schemas";
 import { HttpStatus } from "../../../types";
 import { createToken } from "../../../api/auth";
-import { dropMemoryDb, prepareMemoryDb } from "../../helpers";
+import { connectDbs, closeDbs } from "../../../lib/clients";
 
 let adminExample: UserRead;
 let adminToken: string = "";
@@ -14,7 +14,7 @@ let token: string = "";
 const request = supertest(app);
 
 beforeAll(async () => {
-    await prepareMemoryDb();
+    await connectDbs();
     adminExample = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
     adminToken = `Bearer ${(await createToken(adminExample)).token}`;
     example = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
@@ -24,7 +24,7 @@ beforeAll(async () => {
 afterAll(async () => {
     token = "";
     adminToken = "";
-    await dropMemoryDb();
+    await closeDbs();
 });
 
 describe("GET /api/users", () => {
