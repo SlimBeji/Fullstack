@@ -1,25 +1,32 @@
 import { createClient, RedisClientType } from "redis";
+import IORedisMock from "ioredis-mock";
 import { env } from "../../config";
 import { ApiError, HttpStatus } from "../../types";
 
 export class RedisClient {
-    private client: RedisClientType;
+    private client: RedisClientType | InstanceType<typeof IORedisMock>;
+
+    public get isTest(): boolean {
+        return !!process.env.JEST_WORKER_ID;
+    }
 
     private get isReady(): boolean {
-        return this.client.isReady;
+        if (this.isTest) return true;
+        return (this.client as RedisClientType).isReady;
     }
 
     constructor() {
-        this.client = createClient({
-            url: env.REDIS_URL,
-        });
-        this.client.on("error", (err) =>
-            console.error("Redis client error", err)
-        );
+        if (this.isTest) {
+            this.client = new IORedisMock();
+        } else {
+            this.client = createClient({
+                url: env.REDIS_URL,
+            });
+        }
     }
 
     public async connect(): Promise<void> {
-        if (!this.isReady) {
+        if (!this.isReady && !this.isTest) {
             try {
                 await this.client.connect();
             } catch (error) {
@@ -29,7 +36,7 @@ export class RedisClient {
     }
 
     public async close(): Promise<void> {
-        if (this.isReady) {
+        if (this.isReady && !this.isTest) {
             await this.client.quit();
         }
     }
@@ -59,13 +66,25 @@ export class RedisClient {
             );
         }
         await this.connect();
-        await this.client.setEx(key, expiration, stringified);
+        if (this.isTest) {
+            await (this.client as InstanceType<typeof IORedisMock>).set(
+                key,
+                stringified,
+                "EX",
+                expiration
+            );
+        } else {
+            await (this.client as RedisClientType).set(key, stringified, {
+                EX: expiration,
+            });
+        }
+
         return stringified;
     }
 
     public async delete(key: string): Promise<void> {
         await this.connect();
-        await this.client.del(key);
+        await this.client.del([key]);
     }
 
     public wrap<I extends any[], O>(
