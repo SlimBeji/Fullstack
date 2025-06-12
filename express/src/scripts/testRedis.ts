@@ -1,19 +1,14 @@
-import mongoose from "mongoose";
-import { redisClient } from "../lib/clients";
+import { redisClient, connectDbs, closeDbs } from "../lib/clients";
 import { createToken } from "../api/auth";
 import { crudUser } from "../models/crud";
-import { env } from "../config";
 
 async function test() {
     const user = await crudUser.getByEmail("mslimbeji@gmail.com");
     const encodedToken = await createToken(user!);
+    redisClient.set("Test", "Test");
     console.log(encodedToken);
 }
 
 if (require.main === module) {
-    mongoose
-        .connect(env.MONGO_URL)
-        .then(test)
-        .then(() => redisClient.close())
-        .finally(() => mongoose.disconnect());
+    connectDbs().then(test).finally(closeDbs);
 }
