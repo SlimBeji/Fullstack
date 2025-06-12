@@ -1,10 +1,9 @@
-import { redisClient } from "../lib/clients";
-import { memoryDb } from "./memoryDb";
+import { redisClient, db } from "../lib/clients";
 
 export const prepareMemoryDb = async () => {
-    await Promise.all([redisClient.connect(), memoryDb.session()]);
+    await Promise.all([redisClient.connect(), db.connect()]);
 };
 
 export const dropMemoryDb = async () => {
-    await Promise.all([redisClient.close(), memoryDb.destroy()]);
+    await Promise.all([redisClient.close(), db.close()]);
 };
