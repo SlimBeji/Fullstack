@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
-import config from "../../config";
+import { env } from "../../config";
 import { UserRead, EncodedToken } from "../../models/schemas";
 import { crudUser } from "../../models/crud";
 import { ApiError, HttpStatus } from "../../types";
@@ -18,8 +18,8 @@ const _createToken = (user: UserRead): EncodedToken => {
         userId: user.id,
         email: user.email,
     };
-    const token = jwt.sign(payload, config.SECRET_KEY, {
-        expiresIn: config.JWT_EXPIRATION,
+    const token = jwt.sign(payload, env.SECRET_KEY, {
+        expiresIn: env.JWT_EXPIRATION,
     });
     return { token, email: user.email, userId: user.id };
 };
@@ -31,11 +31,11 @@ const createTokenKeygen = (user: UserRead): string => {
 export const createToken = redisClient.wrap<[UserRead], EncodedToken>(
     _createToken,
     createTokenKeygen,
-    config.JWT_EXPIRATION
+    env.JWT_EXPIRATION
 );
 
 export const verifyToken = (token: string): DecodedUserToken => {
-    const decoded = jwt.verify(token, config.SECRET_KEY);
+    const decoded = jwt.verify(token, env.SECRET_KEY);
     if (typeof decoded === "string") {
         throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
     }

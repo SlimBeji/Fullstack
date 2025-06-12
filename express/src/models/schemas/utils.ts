@@ -1,6 +1,6 @@
 import { z } from "../../zod";
 import { AnyZodObject } from "zod";
-import Config from "../../config";
+import { env } from "../../config";
 
 export const buildPaginationSchema = (
     schema: AnyZodObject,
@@ -16,7 +16,7 @@ export const buildPaginationSchema = (
         page: z.number().default(1).openapi("The page number"),
         size: z
             .number()
-            .default(Config.MAX_ITEMS_PER_PAGE)
+            .default(env.MAX_ITEMS_PER_PAGE)
             .openapi("Items per page"),
         sort: z
             .array(z.enum(fields as [string, ...string[]]))

@@ -11,7 +11,7 @@ const parseVar = (varname: string, defaultValue?: string): string => {
     return value || "";
 };
 
-export default {
+export const env = {
     // ENV config
     PORT: parseVar("PORT", "5000"),
     API_URL: parseVar("API_URL", "http://localhost:5000/api"),

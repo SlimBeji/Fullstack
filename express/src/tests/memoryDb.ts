@@ -2,7 +2,7 @@ import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { seedDb } from "../models/examples";
 import { CollectionEnum } from "../types";
-import Config from "../config";
+import { env } from "../config";
 
 export class MemoryDb {
     private replSet: MongoMemoryReplSet | null = null;
@@ -18,7 +18,7 @@ export class MemoryDb {
         }
     }
 
-    public async session(dbName: string = Config.MONGO_DBNAME): Promise<void> {
+    public async session(dbName: string = env.MONGO_DBNAME): Promise<void> {
         await this.create();
         const conn = await mongoose.connect(this.uri, { dbName });
         const wasSeeded = await conn.connection

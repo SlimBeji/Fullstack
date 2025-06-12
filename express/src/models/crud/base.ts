@@ -13,7 +13,7 @@ import {
     HttpStatus,
     PaginatedData,
 } from "../../types";
-import config from "../../config";
+import { env } from "../../config";
 import { UserRead } from "../schemas";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
@@ -104,7 +104,7 @@ export abstract class Crud<
     public async fetchDocuments(filterQuery: FilterQuery): Promise<Doc[]> {
         let { pagination, sort, filters } = filterQuery;
         const skip = pagination ? pagination.skip : 0;
-        const size = pagination ? pagination.size : config.MAX_ITEMS_PER_PAGE;
+        const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
 
         if (Object.keys(sort || []).length === 0) {
             sort = { createdAt: 1 };
@@ -124,7 +124,7 @@ export abstract class Crud<
         filterQuery = sanitizeFilter(filterQuery) as FilterQuery;
         const { pagination, filters } = filterQuery;
         const page = pagination ? pagination.page : 1;
-        const size = pagination ? pagination.size : config.MAX_ITEMS_PER_PAGE;
+        const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
         const totalCount = await this.countDocuments(filters || {});
         const totalPages = Math.ceil(totalCount / size);
         const documents = await this.fetchDocuments(filterQuery);

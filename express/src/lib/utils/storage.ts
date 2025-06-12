@@ -9,7 +9,7 @@ import path from "path";
 import mime from "mime-types";
 import { existsSync, readFileSync } from "fs";
 
-import config from "../../config";
+import { env } from "../../config";
 import { FileToUpload } from "../../types";
 
 interface GCSConfig {
@@ -152,7 +152,7 @@ export class CloudStorage {
     }
 }
 
-export const storage = new CloudStorage(config);
+export const storage = new CloudStorage(env);
 
 export const uploadLocal = async (filePath: string): Promise<string> => {
     const originalname = path.basename(filePath);

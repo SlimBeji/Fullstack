@@ -1,7 +1,7 @@
 import { z, ZodTypeAny } from "zod";
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import Config from "./config";
+import { env } from "./config";
 import { HttpStatus, MimeType, ApiError } from "./types";
 
 extendZodWithOpenApi(z);
@@ -18,7 +18,7 @@ const zodObjectId = () => {
 
 const fileRuntimeSchema = (
     acceptedMimetypes: string[] | null = null,
-    maxSize: number = Config.FILEUPLOAD_MAX_SIZE
+    maxSize: number = env.FILEUPLOAD_MAX_SIZE
 ) => {
     acceptedMimetypes = acceptedMimetypes || [MimeType.JPEG, MimeType.PNG];
     return z.object({
@@ -36,7 +36,7 @@ const fileRuntimeSchema = (
 const zodFile = (
     description: string,
     acceptedMimetypes: string[] | null = null,
-    maxSize: number = Config.FILEUPLOAD_MAX_SIZE
+    maxSize: number = env.FILEUPLOAD_MAX_SIZE
 ) => {
     return z
         .any()

@@ -10,7 +10,7 @@ import {
     FilterData,
 } from "../../types";
 import { AnyZodObject, ZodTypeAny } from "zod";
-import config from "../../config";
+import { env } from "../../config";
 import { parseDotNotation } from "../../lib/utils";
 
 const parsePaginationFields = (
@@ -163,7 +163,7 @@ export const filter = (
     sortableFields: string[],
     maxSize: number | null = null
 ): RequestHandler => {
-    maxSize = maxSize || config.MAX_ITEMS_PER_PAGE;
+    maxSize = maxSize || env.MAX_ITEMS_PER_PAGE;
     return async (req: Request, resp: Response, next: NextFunction) => {
         try {
             const pagination = parsePaginationFields(req, maxSize);

@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from "redis";
-import config from "./config";
+import { env } from "./config";
 import { ApiError, HttpStatus } from "./types";
 
 export class RedisClient {
@@ -11,7 +11,7 @@ export class RedisClient {
 
     constructor() {
         this.client = createClient({
-            url: config.REDIS_URL,
+            url: env.REDIS_URL,
         });
         this.client.on("error", (err) =>
             console.error("Redis client error", err)
@@ -49,7 +49,7 @@ export class RedisClient {
         expiration: number | null = null
     ): Promise<any> {
         let stringified;
-        expiration = expiration || config.REDIS_DEFAULT_EXPIRATION;
+        expiration = expiration || env.REDIS_DEFAULT_EXPIRATION;
         try {
             stringified = JSON.stringify(val);
         } catch (err) {
