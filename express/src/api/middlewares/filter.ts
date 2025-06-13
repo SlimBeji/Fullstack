@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ParsedQs } from "qs";
 import {
     ApiError,
     MongoFilter,
@@ -10,6 +11,7 @@ import {
     FilterData,
 } from "../../types";
 import { AnyZodObject, ZodTypeAny } from "zod";
+import { flattenZodSchema } from "../../models/schemas";
 import { env } from "../../config";
 import { parseDotNotation } from "../../lib/utils";
 
@@ -54,6 +56,42 @@ const parseSortField = (req: Request, allowedFields: string[]): SortData => {
     return result;
 };
 
+const parseFilterValue = (
+    fieldValue: string | ParsedQs,
+    key: string
+): [FilterOperation, any] => {
+    // Checking the right format
+    if (typeof fieldValue === "object") {
+        throw new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
+        );
+    }
+
+    const parts = fieldValue.split(":");
+    let op: FilterOperation = "eq";
+    let value: any = "";
+    if (parts.length === 1) {
+        value = parts[0];
+    } else if (parts.length === 2) {
+        if (!(parts[0] in MongoOperationMapping)) {
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                `Unknown operation ${parts[0]} for param ${key}`
+            );
+        }
+        op = parts[0] as FilterOperation;
+        value = parts[1];
+    } else {
+        throw new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
+        );
+    }
+
+    return [op, value];
+};
+
 const parseFilterField = (
     req: Request,
     key: string,
@@ -73,35 +111,16 @@ const parseFilterField = (
 
     const result: MongoFilter = {};
     raw.forEach((item) => {
-        if (typeof item === "object") {
-            throw new ApiError(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
-            );
-        }
-        const parts = item.split(":");
-        let op: FilterOperation = "eq";
-        let value: any = "";
-        if (parts.length === 1) {
-            value = parts[0];
-        } else if (parts.length === 2) {
-            if (!(parts[0] in MongoOperationMapping)) {
-                throw new ApiError(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    `Unknown operation ${parts[0]} for param ${key}`
-                );
-            }
-            op = parts[0] as FilterOperation;
-            value = parts[1];
-        } else {
-            throw new ApiError(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
-            );
-        }
-
+        const [op, value] = parseFilterValue(item, key);
         const fieldSchema: ZodTypeAny = schema.shape[key];
-        fieldSchema.parse(value);
+        const parsing = fieldSchema.safeParse(value);
+        if (!parsing.success) {
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                `${key} parameter not valid`,
+                parsing.error
+            );
+        }
         result[`$${op}`] = value;
     });
 
@@ -109,12 +128,13 @@ const parseFilterField = (
 };
 
 const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
-    let data: any = {};
+    let flatData: any = {};
     let filterObject: FilterData = {};
 
-    // Ignore other parsed query fields and extract the possible filters
+    // Flatten the zod schema first and extract query fields
     const ignoredFields = new Set(["page", "size", "sort"]);
-    const allowedFilterFields = new Set(Object.keys(zodSchema.shape));
+    const flatSchema = flattenZodSchema(zodSchema);
+    const allowedFilterFields = new Set(Object.keys(flatSchema.shape));
 
     // Iterate over all keys
     for (const key in req.query) {
@@ -137,16 +157,16 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
         }
 
         // Extract the operation and value
-        const fieldFilter = parseFilterField(req, key, zodSchema);
+        const fieldFilter = parseFilterField(req, key, flatSchema);
         filterObject[key] = fieldFilter;
         if (MongoOperationMapping.eq in fieldFilter) {
-            data[key] = fieldFilter[MongoOperationMapping.eq];
+            flatData[key] = fieldFilter[MongoOperationMapping.eq];
         }
     }
 
     // Handle dot notation and validate the whole data with eq: operation
-    data = parseDotNotation(data);
-    const validationResult = zodSchema.safeParse(data);
+    const nestedData = parseDotNotation(flatData);
+    const validationResult = zodSchema.safeParse(nestedData);
     if (!validationResult.success) {
         throw new ApiError(
             HttpStatus.UNPROCESSABLE_ENTITY,
