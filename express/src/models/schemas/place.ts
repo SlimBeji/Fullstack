@@ -117,17 +117,10 @@ export const PlaceSearchSchema = z.object({
 
 export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
 
-const PlaceSearchSwaggerPreBuilt = buildPaginationSchema(
+export const PlaceSearchSwagger = buildPaginationSchema(
     PlaceSearchSchema,
     PlaceSortableFields
 );
-
-export const PlaceSearchSwagger = PlaceSearchSwaggerPreBuilt.omit({
-    location: true,
-}).extend({
-    "location.lat": locationLatField.optional(),
-    "location.lng": locationLngField.optional(),
-});
 
 // Update Schemas
 
