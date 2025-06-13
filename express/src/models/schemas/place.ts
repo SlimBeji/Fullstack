@@ -35,12 +35,12 @@ export const placeAddressField = z.string().min(1).openapi({
     example: "Fulham road",
 });
 
-export const locationLatField = z.number().openapi({
+export const locationLatField = z.coerce.number().openapi({
     description: "The latitude of the place",
     example: 51.48180425016331,
 });
 
-export const locationLngField = z.number().openapi({
+export const locationLngField = z.coerce.number().openapi({
     description: "The longitude of the place",
     example: -0.19090418688755467,
 });
