@@ -5,6 +5,7 @@ import {
     ZodObject,
     ZodOptional,
     ZodEffects,
+    ZodArray,
 } from "zod";
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
@@ -110,22 +111,33 @@ export const buildPaginatedSchema = (
     });
 };
 
-const unwrapSchema = (schema: ZodTypeAny): [ZodTypeAny, boolean, boolean] => {
-    let isNested = false;
+interface fieldDefinition {
+    field: ZodTypeAny;
+    isObject: boolean;
+    isOptional: boolean;
+    isArray: boolean;
+}
+
+const unwrapSchema = (schema: ZodTypeAny): fieldDefinition => {
+    let isObject = false;
     let isOptional = false;
-    let current = schema;
+    let isArray = false;
+    let field = schema;
     while (true) {
-        if (current instanceof ZodOptional) {
+        if (field instanceof ZodOptional) {
             isOptional = true;
-            current = current._def.innerType;
-        } else if (current instanceof ZodEffects) {
-            current = current._def.schema;
+            field = field._def.innerType;
+        } else if (field instanceof ZodEffects) {
+            field = field._def.schema;
+        } else if (field instanceof ZodArray) {
+            isArray = true;
+            field = field._def.type;
         } else {
             break;
         }
     }
-    if (current instanceof ZodObject) isNested = true;
-    return [current, isNested, isOptional];
+    if (field instanceof ZodObject) isObject = true;
+    return { field, isObject, isOptional, isArray };
 };
 
 export const flattenZodSchema = (
@@ -135,22 +147,30 @@ export const flattenZodSchema = (
     const result: Record<string, any> = {};
     for (const key in schema.shape) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
-        const [innerSchema, isNested, isOptional] = unwrapSchema(
+        const { field, isArray, isObject, isOptional } = unwrapSchema(
             schema.shape[key]
         );
-        if (isNested) {
+        if (isObject || isArray) {
             const flattened = flattenZodSchema(
-                innerSchema as AnyZodObject,
+                field as AnyZodObject,
                 fullKey
             ).shape;
             Object.entries(flattened).forEach(([k, v]) => {
                 result[k] = isOptional ? (v as any).optional() : v;
             });
         } else {
-            result[fullKey] = isOptional ? innerSchema.optional() : innerSchema;
+            result[fullKey] = isOptional ? field.optional() : field;
         }
     }
     return z.object(result);
+};
+
+export const getZodFields = (
+    schema: AnyZodObject,
+    flatten: boolean = false
+): Set<string> => {
+    const flat = flatten ? flattenZodSchema(schema) : schema;
+    return new Set(Object.keys(flat.shape));
 };
 
 export { z };
