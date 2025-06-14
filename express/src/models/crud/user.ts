@@ -31,6 +31,8 @@ export class CrudUser extends Crud<
         super(UserModel);
     }
 
+    protected defaultProjection = { password: 0, _v: 0 } as const;
+
     public safeCheck(
         user: UserRead,
         data: UserDocument | UserPost | UserCreate
@@ -59,7 +61,7 @@ export class CrudUser extends Crud<
     public async jsonifyBatch(docs: UserDocument[]): Promise<UserRead[]> {
         const userPromises = docs.map(async (doc) => {
             // Removing the password field
-            const { password, ...obj } = this.serializeDocument(doc);
+            const obj = this.serializeDocument(doc);
             let imageUrl = "";
             if (obj.imageUrl)
                 imageUrl = await storage.getSignedUrl(obj.imageUrl);

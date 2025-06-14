@@ -25,6 +25,8 @@ export class CrudPlace extends Crud<
         super(PlaceModel);
     }
 
+    protected defaultProjection = { __v: 0 } as const;
+
     public safeCheck(
         user: UserRead,
         data: PlaceDocument | PlacePost | PlaceCreate

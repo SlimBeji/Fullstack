@@ -18,6 +18,8 @@ import { UserRead } from "../schemas";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
+type Projection = { [key: string]: 0 | Projection };
+
 export abstract class Crud<
     DBInt, // DB Interface
     Doc extends Document, // Document Type
@@ -29,6 +31,8 @@ export abstract class Crud<
 > {
     // Constructor
     constructor(public model: CrudModel<DBInt, Doc>) {}
+
+    protected abstract defaultProjection: Projection;
 
     public get modelName(): string {
         return this.model.modelName;
@@ -111,7 +115,7 @@ export abstract class Crud<
         }
         let parsedFilters = filters as RootFilterQuery<DBInt>;
         const documents = await this.model
-            .find(parsedFilters)
+            .find(parsedFilters, this.defaultProjection)
             .sort(sort)
             .collation({ locale: "en", strength: 2 })
             .skip(skip)
