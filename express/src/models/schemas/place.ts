@@ -3,8 +3,9 @@ import {
     zodObjectId,
     zodFile,
     zodObject,
+    zodQueryParam,
     buildPaginatedSchema,
-    buildPaginationSchema,
+    buildSearchGetSchema,
 } from "./zod";
 
 // Zod Fields
@@ -104,27 +105,43 @@ export const PlaceSortableFields = [
     "title",
     "description",
     "address",
-    "location",
 ];
 
-export const PlaceSearchSchema = z.object({
+export const PlaceFiltersSchema = z.object({
+    title: zodQueryParam(placeTitleField, {
+        example: "eq:Some Place",
+    }).optional(),
+    description: zodQueryParam(placeDescriptionField, {
+        example: "regex:football",
+    }).optional(),
+    address: zodQueryParam(placeAddressField, {
+        example: "regex:d{1,2} Boulevard",
+    }).optional(),
+    location: zodObject({
+        lat: zodQueryParam(locationLatField, { example: "gt:3.5" }),
+        lng: zodQueryParam(locationLatField, { example: "lt:4.5" }),
+    }).optional(),
+    creatorId: zodQueryParam(placeCreatorIdField, {
+        example: "eq:683b21134e2e5d46978daf1f",
+    }).optional(),
+});
+
+export const PlaceSearchGetSchema = buildSearchGetSchema(
+    PlaceFiltersSchema,
+    PlaceSortableFields
+);
+
+export type PlaceSearchGet = z.infer<typeof PlaceSearchGetSchema>;
+
+// Update Schemas
+
+export const PlaceUpdateSchema = z.object({
     title: placeTitleField.optional(),
     description: placeDescriptionField.optional(),
     address: placeAddressField.optional(),
     location: placeLocationField.optional(),
     creatorId: placeCreatorIdField.optional(),
 });
-
-export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
-
-export const PlaceSearchSwagger = buildPaginationSchema(
-    PlaceSearchSchema,
-    PlaceSortableFields
-);
-
-// Update Schemas
-
-export const PlaceUpdateSchema = PlaceSearchSchema.extend({});
 
 export type PlaceUpdate = z.infer<typeof PlaceUpdateSchema>;
 

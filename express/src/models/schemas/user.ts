@@ -2,8 +2,9 @@ import {
     z,
     zodObjectId,
     zodFile,
+    zodQueryParam,
     buildPaginatedSchema,
-    buildPaginationSchema,
+    buildSearchGetSchema,
 } from "./zod";
 
 // Zod Fields
@@ -97,20 +98,26 @@ export const UserSortableFields = [
     "isAdmin",
 ];
 
-export const UserSearchSchema = z.object({
-    name: userNameField.optional(),
-    email: userEmailField.optional(),
+export const UserFilterSchema = z.object({
+    name: zodQueryParam(userNameField, {
+        example: "eq:Slim Beji",
+    }).optional(),
+    email: zodQueryParam(userNameField, {
+        example: "eq:mslimbeji@gmail.com",
+    }).optional(),
 });
 
-export type UserSearch = z.infer<typeof UserSearchSchema>;
-
-export const UserSearchSwagger = buildPaginationSchema(
-    UserSearchSchema,
+export const UserSearchGetSchema = buildSearchGetSchema(
+    UserFilterSchema,
     UserSortableFields
 );
 
+export type UserSearchGet = z.infer<typeof UserSearchGetSchema>;
+
 // Update Schemas
-export const UserUpdateSchema = UserSearchSchema.extend({
+export const UserUpdateSchema = z.object({
+    name: userNameField.optional(),
+    email: userEmailField.optional(),
     password: userPasswordField.optional(),
 });
 

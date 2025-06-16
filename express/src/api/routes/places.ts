@@ -3,13 +3,12 @@ import { crudPlace } from "../../models/crud";
 import {
     z,
     zodObjectId,
-    PlaceSearchSchema,
+    PlaceSearchGetSchema,
     PlaceSortableFields,
     PlacePost,
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
-    PlaceSearchSwagger,
     PlacesPaginatedSchema,
     PlaceReadSchema,
 } from "../../models/schemas";
@@ -25,13 +24,17 @@ async function getPlaces(req: Request, resp: Response, next: NextFunction) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.get("/", filter(PlaceSearchSchema, PlaceSortableFields), getPlaces);
+placeRouter.get(
+    "/",
+    filter(PlaceSearchGetSchema, PlaceSortableFields),
+    getPlaces
+);
 
 swaggerRegistery.registerPath({
     method: "get",
     path: "/places/",
     request: {
-        query: PlaceSearchSwagger,
+        query: PlaceSearchGetSchema,
     },
     responses: {
         200: {

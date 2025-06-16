@@ -4,9 +4,8 @@ import { crudUser } from "../../models/crud";
 import {
     z,
     zodObjectId,
-    UserSearchSchema,
+    UserSearchGetSchema,
     UserSortableFields,
-    UserSearchSwagger,
     UsersPaginatedSchema,
     UserPost,
     UserPostSchema,
@@ -16,7 +15,6 @@ import {
 } from "../../models/schemas";
 import { validateBody, filter, Admin, Authenticated } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
-import { UserDocument } from "../../models/collections";
 
 export const userRouter = Router();
 
@@ -27,13 +25,13 @@ async function getUsers(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.get("/", filter(UserSearchSchema, UserSortableFields), getUsers);
+userRouter.get("/", filter(UserSearchGetSchema, UserSortableFields), getUsers);
 
 swaggerRegistery.registerPath({
     method: "get",
     path: "/users/",
     request: {
-        query: UserSearchSwagger,
+        query: UserSearchGetSchema,
     },
     responses: {
         200: {
