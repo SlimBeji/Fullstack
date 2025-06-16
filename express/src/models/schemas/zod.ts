@@ -10,7 +10,7 @@ import {
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { env } from "../../config";
-import { HttpStatus, MimeType, ApiError } from "../../types";
+import { HttpStatus, MimeType, ApiError, FilterOperation } from "../../types";
 
 extendZodWithOpenApi(z);
 
@@ -96,7 +96,7 @@ const numericQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
     context: z.RefinementCtx
-): { op: string; val: number | number[] | boolean } | z.ZodNever => {
+): { op: FilterOperation; val: number | number[] | boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(Number(value)) };
@@ -162,7 +162,7 @@ const stringQueryParamTransform = (
     value: any,
     context: z.RefinementCtx,
     options?: TransformOption
-): { op: string; val: string | string[] | boolean } | z.ZodNever => {
+): { op: FilterOperation; val: string | string[] | boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(value) };
@@ -243,7 +243,7 @@ const booleanQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
     context: z.RefinementCtx
-): { op: string; val: boolean } | z.ZodNever => {
+): { op: FilterOperation; val: boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(value === "true") };
@@ -283,11 +283,11 @@ const dateQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
     context: z.RefinementCtx
-): { op: string; val: Date | Date[] | boolean } | z.ZodNever => {
+): { op: FilterOperation; val: Date | Date[] | boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             const date = new Date(value);
-            return { op: "$eq", val: field.parse(date) };
+            return { op: "eq", val: field.parse(date) };
         } catch (err) {
             return updateContextFromError(
                 context,
@@ -301,12 +301,12 @@ const dateQueryParamTransform = (
     const val = vals.join(":");
 
     switch (op) {
-        case "$eq":
-        case "$ne":
-        case "$gt":
-        case "$gte":
-        case "$lt":
-        case "$lte":
+        case "eq":
+        case "ne":
+        case "gt":
+        case "gte":
+        case "lt":
+        case "lte":
             try {
                 const date = new Date(val);
                 return { op, val: field.parse(date) };
@@ -318,8 +318,8 @@ const dateQueryParamTransform = (
                 );
             }
 
-        case "$in":
-        case "$nin":
+        case "in":
+        case "nin":
             try {
                 const dates = val.startsWith("[")
                     ? JSON.parse(val).map((d: string) => new Date(d))
@@ -333,21 +333,21 @@ const dateQueryParamTransform = (
                 );
             }
 
-        case "$exists":
+        case "exists":
             try {
                 return { op, val: z.coerce.boolean().parse(val) };
             } catch (err) {
                 return updateContextFromError(
                     context,
                     err,
-                    "Invalid boolean value for $exists operator"
+                    "Invalid boolean value for exists operator"
                 );
             }
 
         default:
             context.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: $eq,$ne,$gt,$gte,$lt,$lte,$in,$nin,$exists`,
+                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,exists`,
             });
             return z.NEVER;
     }
