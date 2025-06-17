@@ -102,7 +102,7 @@ export const UserFilterSchema = z.object({
     name: zodQueryParam(userNameField, {
         example: "eq:Slim Beji",
     }).optional(),
-    email: zodQueryParam(userNameField, {
+    email: zodQueryParam(userEmailField, {
         example: "eq:mslimbeji@gmail.com",
     }).optional(),
 });
