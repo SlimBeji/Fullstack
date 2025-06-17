@@ -85,10 +85,14 @@ const updateContextFromError = (
     err: any,
     message: string
 ): z.ZodNever => {
-    ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: err instanceof Error ? err.message : message,
-    });
+    let msg: any;
+    try {
+        msg = JSON.parse(err.message);
+    } catch {
+        msg = message;
+    }
+
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: msg });
     return z.NEVER;
 };
 
