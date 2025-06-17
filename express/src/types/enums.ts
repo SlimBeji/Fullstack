@@ -21,20 +21,3 @@ export enum CollectionEnum {
     USERS = "users",
     PLACES = "places",
 }
-
-export const MongoOperationMapping = {
-    eq: "$eq",
-    ne: "$ne",
-    gt: "$gt",
-    gte: "$gte",
-    lt: "$lt",
-    lte: "$lte",
-    in: "$in",
-    nin: "$nin",
-    regex: "$regex",
-    text: "$text",
-} as const;
-
-export type FilterOperation = keyof typeof MongoOperationMapping;
-
-export type MongoFilter = { [key in `$${FilterOperation}`]?: any };
