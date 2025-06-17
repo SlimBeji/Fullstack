@@ -12,13 +12,12 @@ import {
     FilterQuery,
     HttpStatus,
     PaginatedData,
+    ProjectionExcl,
 } from "../../types";
 import { env } from "../../config";
 import { UserRead } from "../schemas";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
-
-type Projection = { [key: string]: 0 | Projection };
 
 export abstract class Crud<
     DBInt, // DB Interface
@@ -32,7 +31,7 @@ export abstract class Crud<
     // Constructor
     constructor(public model: CrudModel<DBInt, Doc>) {}
 
-    protected abstract defaultProjection: Projection;
+    protected abstract defaultProjection: ProjectionExcl;
 
     public get modelName(): string {
         return this.model.modelName;

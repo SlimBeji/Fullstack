@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import {
     ApiError,
     MongoFilter,
-    FilterOperation,
+    MongoOperation,
     HttpStatus,
     PaginationData,
     SortData,
@@ -67,7 +67,7 @@ const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
 
 const parseMongoFilters = (
     filters: {
-        op: FilterOperation;
+        op: MongoOperation;
         val: any;
     }[]
 ): MongoFilter => {

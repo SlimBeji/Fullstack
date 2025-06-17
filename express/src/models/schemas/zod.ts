@@ -10,7 +10,7 @@ import {
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { env } from "../../config";
-import { HttpStatus, MimeType, ApiError, FilterOperation } from "../../types";
+import { HttpStatus, MimeType, ApiError, MongoOperation } from "../../types";
 
 extendZodWithOpenApi(z);
 
@@ -100,7 +100,7 @@ const numericQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
     context: z.RefinementCtx
-): { op: FilterOperation; val: number | number[] | boolean } | z.ZodNever => {
+): { op: MongoOperation; val: number | number[] | boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(Number(value)) };
@@ -166,7 +166,7 @@ const stringQueryParamTransform = (
     value: any,
     context: z.RefinementCtx,
     options?: TransformOption
-): { op: FilterOperation; val: string | string[] | boolean } | z.ZodNever => {
+): { op: MongoOperation; val: string | string[] | boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(value) };
@@ -247,7 +247,7 @@ const booleanQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
     context: z.RefinementCtx
-): { op: FilterOperation; val: boolean } | z.ZodNever => {
+): { op: MongoOperation; val: boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(value === "true") };
@@ -287,7 +287,7 @@ const dateQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
     context: z.RefinementCtx
-): { op: FilterOperation; val: Date | Date[] | boolean } | z.ZodNever => {
+): { op: MongoOperation; val: Date | Date[] | boolean } | z.ZodNever => {
     if (!value.includes(":")) {
         try {
             const date = new Date(value);
