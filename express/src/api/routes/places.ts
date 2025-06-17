@@ -4,7 +4,6 @@ import {
     z,
     zodObjectId,
     PlaceSearchGetSchema,
-    PlaceSortableFields,
     PlacePost,
     PlacePostSchema,
     PlacePut,
@@ -24,11 +23,7 @@ async function getPlaces(req: Request, resp: Response, next: NextFunction) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.get(
-    "/",
-    filter(PlaceSearchGetSchema, PlaceSortableFields),
-    getPlaces
-);
+placeRouter.get("/", filter(PlaceSearchGetSchema), getPlaces);
 
 swaggerRegistery.registerPath({
     method: "get",

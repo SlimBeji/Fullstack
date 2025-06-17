@@ -1,19 +1,16 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { ParsedQs } from "qs";
 import {
     ApiError,
     MongoFilter,
-    MongoOperationMapping,
     FilterOperation,
     HttpStatus,
     PaginationData,
     SortData,
     FilterData,
 } from "../../types";
-import { AnyZodObject, ZodTypeAny } from "zod";
-import { flattenZodSchema } from "../../models/schemas";
+import { z, AnyZodObject, ZodTypeAny } from "zod";
 import { env } from "../../config";
-import { parseDotNotation } from "../../lib/utils";
+import { getZodFields } from "../../models/schemas";
 
 const parsePaginationFields = (
     req: Request,
@@ -31,7 +28,7 @@ const parsePaginationFields = (
     return { page, size, skip };
 };
 
-const parseSortField = (req: Request, allowedFields: string[]): SortData => {
+const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
     const sortField = typeof req.query.sort === "string" ? req.query.sort : "";
 
     const fields = sortField
@@ -39,63 +36,55 @@ const parseSortField = (req: Request, allowedFields: string[]): SortData => {
         .map((f) => f.trim())
         .filter((f) => f.length > 0);
 
+    const sortValidator = zodSchema.shape.sort;
+    if (!sortValidator || !(sortValidator instanceof z.ZodType)) {
+        throw new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            `Something went wrong when parsing the request`
+        );
+    }
+
+    try {
+        sortValidator.parse(fields);
+    } catch (err) {
+        throw new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            `Sort parameter not valid`,
+            { details: (err as Error).message }
+        );
+    }
+
     const result: SortData = {};
     fields.forEach((field) => {
         const order = field.startsWith("-") ? -1 : 1;
         if (order === -1) {
             field = field.substring(1);
         }
-        if (allowedFields.indexOf(field) === -1) {
-            throw new ApiError(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                `Cannot sort on field ${field}. Allowed fields are ${allowedFields}`
-            );
-        }
         result[field] = order;
     });
     return result;
 };
 
-const parseFilterValue = (
-    fieldValue: string | ParsedQs,
-    key: string
-): [FilterOperation, any] => {
-    // Checking the right format
-    if (typeof fieldValue === "object") {
-        throw new ApiError(
-            HttpStatus.UNPROCESSABLE_ENTITY,
-            `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
-        );
-    }
-
-    const parts = fieldValue.split(":");
-    let op: FilterOperation = "eq";
-    let value: any = "";
-    if (parts.length === 1) {
-        value = parts[0];
-    } else if (parts.length === 2) {
-        if (!(parts[0] in MongoOperationMapping)) {
-            throw new ApiError(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                `Unknown operation ${parts[0]} for param ${key}`
-            );
+const parseMongoFilters = (
+    filters: {
+        op: FilterOperation;
+        val: any;
+    }[]
+): MongoFilter => {
+    const result: MongoFilter = {};
+    filters.forEach(({ op, val }) => {
+        if (op === "text") {
+            val = { $search: val };
         }
-        op = parts[0] as FilterOperation;
-        value = parts[1];
-    } else {
-        throw new ApiError(
-            HttpStatus.UNPROCESSABLE_ENTITY,
-            `param ${key} does not respect the format ${key}=op:val or ${key}=val (${key}=eq:5)`
-        );
-    }
-
-    return [op, value];
+        result[`$${op}`] = val;
+    });
+    return result;
 };
 
 const parseFilterField = (
     req: Request,
     key: string,
-    schema: AnyZodObject
+    field: ZodTypeAny
 ): MongoFilter => {
     let raw = req.query[key];
     if (raw == undefined) {
@@ -109,32 +98,24 @@ const parseFilterField = (
         raw = [raw];
     }
 
-    const result: MongoFilter = {};
-    raw.forEach((item) => {
-        const [op, value] = parseFilterValue(item, key);
-        const fieldSchema: ZodTypeAny = schema.shape[key];
-        const parsing = fieldSchema.safeParse(value);
-        if (!parsing.success) {
-            throw new ApiError(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                `${key} parameter not valid`,
-                parsing.error
-            );
-        }
-        result[`$${op}`] = value;
-    });
+    const parsingResult = field.safeParse(raw);
+    if (!parsingResult.success) {
+        throw new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            `${key} parameter not valid`,
+            parsingResult.error
+        );
+    }
 
-    return result;
+    return parseMongoFilters(parsingResult.data);
 };
 
 const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
-    let flatData: any = {};
     let filterObject: FilterData = {};
 
     // Flatten the zod schema first and extract query fields
     const ignoredFields = new Set(["page", "size", "sort"]);
-    const flatSchema = flattenZodSchema(zodSchema);
-    const allowedFilterFields = new Set(Object.keys(flatSchema.shape));
+    const allowedFilterFields = getZodFields(zodSchema);
 
     // Iterate over all keys
     for (const key in req.query) {
@@ -157,22 +138,15 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
         }
 
         // Extract the operation and value
-        const fieldFilter = parseFilterField(req, key, flatSchema);
-        filterObject[key] = fieldFilter;
-        if (MongoOperationMapping.eq in fieldFilter) {
-            flatData[key] = fieldFilter[MongoOperationMapping.eq];
+        const zodField = zodSchema.shape[key];
+        if (!zodField || !(zodField instanceof z.ZodType)) {
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                `Something went wrong when parsing the request`
+            );
         }
-    }
-
-    // Handle dot notation and validate the whole data with eq: operation
-    const nestedData = parseDotNotation(flatData);
-    const validationResult = zodSchema.safeParse(nestedData);
-    if (!validationResult.success) {
-        throw new ApiError(
-            HttpStatus.UNPROCESSABLE_ENTITY,
-            "request not valid",
-            validationResult.error
-        );
+        const fieldFilter = parseFilterField(req, key, zodField);
+        filterObject[key] = fieldFilter;
     }
 
     return filterObject;
@@ -180,14 +154,13 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
 
 export const filter = (
     zodSchema: AnyZodObject,
-    sortableFields: string[],
     maxSize: number | null = null
 ): RequestHandler => {
     maxSize = maxSize || env.MAX_ITEMS_PER_PAGE;
     return async (req: Request, resp: Response, next: NextFunction) => {
         try {
             const pagination = parsePaginationFields(req, maxSize);
-            const sort = parseSortField(req, sortableFields);
+            const sort = parseSortField(req, zodSchema);
             const filters = parseFilters(req, zodSchema);
             req.filterQuery = { pagination, sort, filters };
             next();

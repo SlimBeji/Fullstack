@@ -5,7 +5,6 @@ import {
     z,
     zodObjectId,
     UserSearchGetSchema,
-    UserSortableFields,
     UsersPaginatedSchema,
     UserPost,
     UserPostSchema,
@@ -25,7 +24,7 @@ async function getUsers(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.get("/", filter(UserSearchGetSchema, UserSortableFields), getUsers);
+userRouter.get("/", filter(UserSearchGetSchema), getUsers);
 
 swaggerRegistery.registerPath({
     method: "get",
