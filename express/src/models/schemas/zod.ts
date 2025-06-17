@@ -434,10 +434,7 @@ const unwrapSchema = (schema: ZodTypeAny): fieldDefinition => {
     return { field, isObject, isOptional, isArray };
 };
 
-export const flattenZodSchema = (
-    schema: AnyZodObject,
-    prefix = ""
-): AnyZodObject => {
+const flattenZodSchema = (schema: AnyZodObject, prefix = ""): AnyZodObject => {
     const result: Record<string, any> = {};
     for (const key in schema.shape) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
@@ -500,8 +497,7 @@ export const buildSearchGetSchema = (
     schema: AnyZodObject,
     sortableFields: string[]
 ): AnyZodObject => {
-    const flat = flattenZodSchema(schema);
-    return flat.extend({
+    return schema.extend({
         ...buildPagination(),
         sort: buildSort(sortableFields),
     });

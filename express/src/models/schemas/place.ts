@@ -117,9 +117,11 @@ export const PlaceFiltersSchema = z.object({
     address: zodQueryParam(placeAddressField, {
         example: "regex:d{1,2} Boulevard",
     }).optional(),
-    location: zodObject({
-        lat: zodQueryParam(locationLatField, { example: "gt:3.5" }),
-        lng: zodQueryParam(locationLatField, { example: "lt:4.5" }),
+    "location.lat": zodQueryParam(locationLatField, {
+        example: "gt:3.5",
+    }).optional(),
+    "location.lng": zodQueryParam(locationLatField, {
+        example: "lt:4.5",
     }).optional(),
     creatorId: zodQueryParam(placeCreatorIdField, {
         example: "eq:683b21134e2e5d46978daf1f",
