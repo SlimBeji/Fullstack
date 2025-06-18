@@ -113,8 +113,9 @@ export abstract class Crud<
             sort = { createdAt: 1 };
         }
         let parsedFilters = filters as RootFilterQuery<DBInt>;
+        const projection = filterQuery.projection || this.defaultProjection;
         const documents = await this.model
-            .find(parsedFilters, this.defaultProjection)
+            .find(parsedFilters, projection)
             .sort(sort)
             .collation({ locale: "en", strength: 2 })
             .skip(skip)

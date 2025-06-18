@@ -54,12 +54,11 @@ export class CrudPlace extends Crud<
 
     public async jsonifyBatch(docs: PlaceDocument[]): Promise<PlaceRead[]> {
         const placesPromises = docs.map(async (doc) => {
-            const obj = this.serializeDocument(doc);
-            let imageUrl = "";
+            let obj = this.serializeDocument(doc);
             if (obj.imageUrl) {
-                imageUrl = await storage.getSignedUrl(obj.imageUrl);
+                obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
             }
-            return { ...obj, imageUrl } as PlaceRead;
+            return obj;
         });
         return await Promise.all(placesPromises);
     }

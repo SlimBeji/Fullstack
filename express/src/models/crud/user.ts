@@ -61,11 +61,11 @@ export class CrudUser extends Crud<
     public async jsonifyBatch(docs: UserDocument[]): Promise<UserRead[]> {
         const userPromises = docs.map(async (doc) => {
             // Removing the password field
-            const obj = this.serializeDocument(doc);
-            let imageUrl = "";
-            if (obj.imageUrl)
-                imageUrl = await storage.getSignedUrl(obj.imageUrl);
-            return { ...obj, imageUrl };
+            let obj = this.serializeDocument(doc);
+            if (obj.imageUrl) {
+                obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
+            }
+            return obj;
         });
         return await Promise.all(userPromises);
     }
