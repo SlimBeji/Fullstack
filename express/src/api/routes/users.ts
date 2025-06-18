@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from "express";
-
 import { crudUser } from "../../models/crud";
 import {
     z,
     zodObjectId,
     UserSearchGetSchema,
+    UserSearchPostSchema,
     UsersPaginatedSchema,
     UserPost,
     UserPostSchema,
@@ -31,6 +31,36 @@ swaggerRegistery.registerPath({
     path: "/users/",
     request: {
         query: UserSearchGetSchema,
+    },
+    responses: {
+        200: {
+            description: "Search and Filter users",
+            content: {
+                "application/json": {
+                    schema: UsersPaginatedSchema,
+                },
+            },
+        },
+    },
+    tags: ["User"],
+    summary: "Search and Retrieve users",
+});
+
+// Post Search
+
+async function queryUsers(req: Request, res: Response, next: NextFunction) {
+    // All users are public
+    const query = req.filterQuery!;
+    res.status(200).json(await crudUser.fetch(query));
+}
+
+userRouter.post("/query", filter(UserSearchPostSchema), queryUsers);
+
+swaggerRegistery.registerPath({
+    method: "post",
+    path: "/users/query",
+    request: {
+        query: UserSearchPostSchema,
     },
     responses: {
         200: {

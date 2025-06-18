@@ -4,7 +4,7 @@ import {
     zodFile,
     zodQueryParam,
     buildPaginatedSchema,
-    buildSearchGetSchema,
+    buildSearchSchema,
 } from "./zod";
 
 // Zod Fields
@@ -107,12 +107,20 @@ export const UserFilterSchema = z.object({
     }).optional(),
 });
 
-export const UserSearchGetSchema = buildSearchGetSchema(
+export const UserSearchGetSchema = buildSearchSchema(
     UserFilterSchema,
     UserSortableFields
 );
 
 export type UserSearchGet = z.infer<typeof UserSearchGetSchema>;
+
+export const UserSearchPostSchema = buildSearchSchema(
+    UserFilterSchema,
+    UserSortableFields,
+    UserReadSchema
+);
+
+export type UserSearchPost = z.infer<typeof UserSearchPostSchema>;
 
 // Update Schemas
 export const UserUpdateSchema = z.object({

@@ -5,7 +5,7 @@ import {
     zodObject,
     zodQueryParam,
     buildPaginatedSchema,
-    buildSearchGetSchema,
+    buildSearchSchema,
 } from "./zod";
 
 // Zod Fields
@@ -128,12 +128,20 @@ export const PlaceFiltersSchema = z.object({
     }).optional(),
 });
 
-export const PlaceSearchGetSchema = buildSearchGetSchema(
+export const PlaceSearchGetSchema = buildSearchSchema(
     PlaceFiltersSchema,
     PlaceSortableFields
 );
 
 export type PlaceSearchGet = z.infer<typeof PlaceSearchGetSchema>;
+
+export const PlaceSearchPostSchema = buildSearchSchema(
+    PlaceFiltersSchema,
+    PlaceSortableFields,
+    PlaceReadSchema
+);
+
+export type PlaceSearchPost = z.infer<typeof PlaceSearchPostSchema>;
 
 // Update Schemas
 

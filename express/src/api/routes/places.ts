@@ -4,6 +4,7 @@ import {
     z,
     zodObjectId,
     PlaceSearchGetSchema,
+    PlaceSearchPostSchema,
     PlacePost,
     PlacePostSchema,
     PlacePut,
@@ -30,6 +31,35 @@ swaggerRegistery.registerPath({
     path: "/places/",
     request: {
         query: PlaceSearchGetSchema,
+    },
+    responses: {
+        200: {
+            description: "Search and Filter places",
+            content: {
+                "application/json": {
+                    schema: PlacesPaginatedSchema,
+                },
+            },
+        },
+    },
+    tags: ["Place"],
+    summary: "Search and Retrieve places",
+});
+
+// Post search
+async function queryPlaces(req: Request, resp: Response, next: NextFunction) {
+    // All places are public
+    const query = req.filterQuery!;
+    resp.status(200).json(await crudPlace.fetch(query));
+}
+
+placeRouter.post("/query", filter(PlaceSearchPostSchema), queryPlaces);
+
+swaggerRegistery.registerPath({
+    method: "post",
+    path: "/places/query",
+    request: {
+        query: PlaceSearchPostSchema,
     },
     responses: {
         200: {
