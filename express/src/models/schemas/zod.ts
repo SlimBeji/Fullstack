@@ -6,6 +6,7 @@ import {
     ZodOptional,
     ZodEffects,
     ZodArray,
+    ZodString,
 } from "zod";
 import { Types } from "mongoose";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
@@ -466,9 +467,9 @@ const flattenZodSchema = (schema: AnyZodObject, prefix = ""): AnyZodObject => {
 export const getZodFields = (
     schema: AnyZodObject,
     flatten: boolean = false
-): Set<string> => {
+): string[] => {
     const flat = flatten ? flattenZodSchema(schema) : schema;
-    return new Set(Object.keys(flat.shape));
+    return Object.keys(flat.shape);
 };
 
 const buildSort = (sortableFields: string[]): ZodTypeAny => {
@@ -497,14 +498,24 @@ const buildPagination = () => {
     };
 };
 
-export const buildSearchGetSchema = (
-    schema: AnyZodObject,
-    sortableFields: string[]
+const buildSelectableFields = (readSchema: AnyZodObject): ZodTypeAny => {
+    const fieldNames = getZodFields(readSchema, true);
+    return z.array(z.enum(fieldNames as [string, ...string[]])).optional();
+};
+
+export const buildSearchSchema = (
+    baseSchema: AnyZodObject,
+    sortableFields: string[],
+    readSchema?: AnyZodObject
 ): AnyZodObject => {
-    return schema.extend({
+    let config: Record<string, any> = {
         ...buildPagination(),
         sort: buildSort(sortableFields),
-    });
+    };
+    if (readSchema) {
+        config["fields"] = buildSelectableFields(readSchema);
+    }
+    return baseSchema.extend(config);
 };
 
 export const buildPaginatedSchema = (
