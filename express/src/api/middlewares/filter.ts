@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ParsedQs } from "qs";
 import {
     ApiError,
     MongoFilter,
@@ -7,10 +8,41 @@ import {
     PaginationData,
     SortData,
     FilterData,
+    ProjectionIncl,
 } from "../../types";
 import { z, AnyZodObject, ZodTypeAny } from "zod";
 import { env } from "../../config";
 import { getZodFields } from "../../models/schemas";
+import { parseDotNotation } from "../../lib/utils";
+
+const extract = (req: Request, key: string): string[] | undefined => {
+    const raw = req.query[key];
+    if (!raw) return undefined;
+
+    let values: (string | ParsedQs)[] = [];
+    if (!Array.isArray(raw)) {
+        values = [raw];
+    } else {
+        values = raw;
+    }
+
+    const result: string[] = [];
+    values.forEach((item) => {
+        if (typeof item === "string") {
+            const filtered = item
+                .split(",")
+                .map((f) => f.trim())
+                .filter((f) => f.length > 0);
+            result.push(...filtered);
+        } else {
+            throw new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                `Following format is not supported for query params: ${item}`
+            );
+        }
+    });
+    return result;
+};
 
 const parsePaginationFields = (
     req: Request,
@@ -29,12 +61,8 @@ const parsePaginationFields = (
 };
 
 const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
-    const sortField = typeof req.query.sort === "string" ? req.query.sort : "";
-
-    const fields = sortField
-        .split(",")
-        .map((f) => f.trim())
-        .filter((f) => f.length > 0);
+    const fields = extract(req, "sort");
+    if (!fields) return {};
 
     const sortValidator = zodSchema.shape.sort;
     if (!sortValidator || !(sortValidator instanceof z.ZodType)) {
@@ -44,18 +72,17 @@ const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
         );
     }
 
-    try {
-        sortValidator.parse(fields);
-    } catch (err) {
+    const parsing = sortValidator.safeParse(fields);
+    if (!parsing.success) {
         throw new ApiError(
             HttpStatus.UNPROCESSABLE_ENTITY,
             `Sort parameter not valid`,
-            { details: (err as Error).message }
+            { details: parsing.error }
         );
     }
 
     const result: SortData = {};
-    fields.forEach((field) => {
+    parsing.data.forEach((field: string) => {
         const order = field.startsWith("-") ? -1 : 1;
         if (order === -1) {
             field = field.substring(1);
@@ -63,6 +90,32 @@ const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
         result[field] = order;
     });
     return result;
+};
+
+const parseProjection = (
+    req: Request,
+    zodSchema: AnyZodObject
+): ProjectionIncl | undefined => {
+    const fields = extract(req, "fields");
+    if (!fields) return undefined;
+
+    const zodFields = zodSchema.shape.fields;
+    if (!zodFields || !(zodFields instanceof z.ZodType)) return undefined;
+
+    const parsing = zodFields.safeParse(fields);
+    if (!parsing.success) {
+        throw new ApiError(
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            "Could not parse the fields requested",
+            { details: parsing.error }
+        );
+    }
+
+    const flatProjection: Record<string, 1> = {};
+    (parsing.data as string[]).forEach((item) => {
+        flatProjection[item] = 1;
+    });
+    return parseDotNotation(flatProjection);
 };
 
 const parseMongoFilters = (
@@ -114,8 +167,8 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
     let filterObject: FilterData = {};
 
     // Flatten the zod schema first and extract query fields
-    const ignoredFields = new Set(["page", "size", "sort"]);
-    const allowedFilterFields = getZodFields(zodSchema);
+    const ignoredFields = new Set(["page", "size", "sort", "fields"]);
+    const allowedFilterFields = new Set(getZodFields(zodSchema));
 
     // Iterate over all keys
     for (const key in req.query) {
@@ -161,8 +214,9 @@ export const filter = (
         try {
             const pagination = parsePaginationFields(req, maxSize);
             const sort = parseSortField(req, zodSchema);
+            const projection = parseProjection(req, zodSchema);
             const filters = parseFilters(req, zodSchema);
-            req.filterQuery = { pagination, sort, filters };
+            req.filterQuery = { pagination, sort, projection, filters };
             next();
         } catch (err) {
             if (err instanceof ApiError) {
