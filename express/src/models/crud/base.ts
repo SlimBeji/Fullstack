@@ -65,9 +65,11 @@ export abstract class Crud<
         });
     }
 
-    public abstract jsonifyBatch(documents: Doc[]): Promise<Read[]>;
+    public abstract jsonifyBatch(
+        documents: Doc[]
+    ): Promise<Read[] | Partial<Read>[]>;
 
-    public async jsonfify(raw: Doc): Promise<Read> {
+    public async jsonfify(raw: Doc): Promise<Read | Partial<Read>> {
         return (await this.jsonifyBatch([raw]))[0];
     }
 
@@ -81,7 +83,8 @@ export abstract class Crud<
         if (!document) {
             return null;
         }
-        return await this.jsonfify(document);
+        const result = await this.jsonfify(document);
+        return result as Read;
     }
 
     public async safeGet(
@@ -93,7 +96,8 @@ export abstract class Crud<
             throw this.notFoundError(id);
         }
         this.safeCheck(user, document);
-        return await this.jsonfify(document);
+        const result = await this.jsonfify(document);
+        return result as Read;
     }
 
     // Fetch
@@ -124,7 +128,9 @@ export abstract class Crud<
         return documents;
     }
 
-    public async fetch(filterQuery: FilterQuery): Promise<PaginatedData<Read>> {
+    public async fetch(
+        filterQuery: FilterQuery
+    ): Promise<PaginatedData<Partial<Read>>> {
         filterQuery = sanitizeFilter(filterQuery) as FilterQuery;
         const { pagination, filters } = filterQuery;
         const page = pagination ? pagination.page : 1;
@@ -139,7 +145,7 @@ export abstract class Crud<
     public async safeFetch(
         user: UserRead,
         filterQuery: FilterQuery
-    ): Promise<PaginatedData<Read>> {
+    ): Promise<PaginatedData<Partial<Read>>> {
         filterQuery = this.safeFilter(user, filterQuery);
         return await this.fetch(filterQuery);
     }

@@ -18,7 +18,7 @@ beforeAll(async () => {
     const examples = await crudPlace.fetch({
         filters: { title: { $eq: "Stamford Bridge" } },
     });
-    example = examples.data[0]!;
+    example = examples.data[0] as PlaceRead;
 });
 
 afterAll(async () => {

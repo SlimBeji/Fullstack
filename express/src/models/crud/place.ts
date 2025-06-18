@@ -52,7 +52,9 @@ export class CrudPlace extends Crud<
         return { sort, filters, pagination };
     }
 
-    public async jsonifyBatch(docs: PlaceDocument[]): Promise<PlaceRead[]> {
+    public async jsonifyBatch(
+        docs: PlaceDocument[]
+    ): Promise<PlaceRead[] | Partial<PlaceRead>[]> {
         const placesPromises = docs.map(async (doc) => {
             let obj = this.serializeDocument(doc);
             if (obj.imageUrl) {
@@ -68,7 +70,8 @@ export class CrudPlace extends Crud<
         const { image, ...body } = form;
         const data = { ...body, imageUrl };
         const doc = await this.createDocument(data);
-        return this.jsonfify(doc);
+        const result = await this.jsonfify(doc);
+        return result as PlaceRead;
     }
 
     public async update(
@@ -76,7 +79,8 @@ export class CrudPlace extends Crud<
         form: PlacePut
     ): Promise<PlaceRead> {
         const doc = await this.updateDocument(obj, form);
-        return await this.jsonfify(doc);
+        const result = await this.jsonfify(doc);
+        return result as PlaceRead;
     }
 
     public async deleteCleanup(document: PlaceDocument): Promise<void> {

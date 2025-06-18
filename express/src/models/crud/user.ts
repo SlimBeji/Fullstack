@@ -58,7 +58,9 @@ export class CrudUser extends Crud<
         return { sort, filters, pagination };
     }
 
-    public async jsonifyBatch(docs: UserDocument[]): Promise<UserRead[]> {
+    public async jsonifyBatch(
+        docs: UserDocument[]
+    ): Promise<UserRead[] | Partial<UserRead>[]> {
         const userPromises = docs.map(async (doc) => {
             // Removing the password field
             let obj = this.serializeDocument(doc);
@@ -88,7 +90,8 @@ export class CrudUser extends Crud<
             return null;
         }
         const userDocument = users[0];
-        return await this.jsonfify(userDocument);
+        const result = await this.jsonfify(userDocument);
+        return result as UserRead;
     }
 
     public async getBearer(email: string): Promise<string> {
@@ -114,7 +117,8 @@ export class CrudUser extends Crud<
         const data = { ...body, imageUrl };
         try {
             const doc = await this.createDocument(data);
-            return this.jsonfify(doc);
+            const result = await this.jsonfify(doc);
+            return result as UserRead;
         } catch (err) {
             const e = err as Error;
             let status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -156,7 +160,8 @@ export class CrudUser extends Crud<
             form.password = await hash(form.password, DEFAULT_HASH_SALT);
         }
         const doc = await super.updateDocument(user, form);
-        return this.jsonfify(doc);
+        const result = await this.jsonfify(doc);
+        return result as UserRead;
     }
 
     public async deleteCleanup(document: UserDocument): Promise<void> {
