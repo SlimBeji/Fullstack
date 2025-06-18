@@ -1,5 +1,6 @@
 import "express";
-import { PaginationData, SortData, FilterData, FilterQuery } from "./http";
+
+import { FilterQuery } from "./mongo";
 import { UserRead } from "../models/schemas";
 import { PlaceDocument, UserDocument } from "../models/collections";
 
