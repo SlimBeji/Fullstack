@@ -41,6 +41,31 @@ describe("GET /api/places", () => {
     });
 });
 
+describe("POST /api/places/query", () => {
+    it("Fetches Places", async () => {
+        const data = {
+            title: ["Stamford Bridge"],
+            fields: ["location.lng", "location.lat"],
+        };
+        const response = await request
+            .post("/api/places/query")
+            .send(data)
+            .set("Authorization", token)
+            .expect("Content-Type", /json/)
+            .expect(200);
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("totalPages");
+        expect(response.body).toHaveProperty("totalCount", 1);
+        expect(response.body).toHaveProperty("data");
+
+        const fetchedData = response.body["data"][0];
+        delete fetchedData["id"];
+        expect(fetchedData).toEqual({
+            location: { lat: 51.48180425016331, lng: -0.19090418688755467 },
+        });
+    });
+});
+
 describe("POST /api/places", () => {
     it("Create Places", async () => {
         const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;

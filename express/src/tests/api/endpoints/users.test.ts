@@ -41,6 +41,32 @@ describe("GET /api/users", () => {
     });
 });
 
+describe("POST /api/users/query", () => {
+    it("Fetches users", async () => {
+        const data = {
+            email: ["regex:@gmail.com"],
+            fields: ["email", "name"],
+        };
+        const response = await request
+            .post("/api/users/query")
+            .send(data)
+            .set("Authorization", token)
+            .expect("Content-Type", /json/)
+            .expect(200);
+        expect(response.body).toHaveProperty("page", 1);
+        expect(response.body).toHaveProperty("totalPages");
+        expect(response.body).toHaveProperty("totalCount", 1);
+        expect(response.body).toHaveProperty("data");
+
+        const fetchedData = response.body["data"][0];
+        delete fetchedData["id"];
+        expect(fetchedData).toEqual({
+            name: "Slim Beji",
+            email: "mslimbeji@gmail.com",
+        });
+    });
+});
+
 describe("POST /api/users", () => {
     it("Create Users", async () => {
         const response = await request
