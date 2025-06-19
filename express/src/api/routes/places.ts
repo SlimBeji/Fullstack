@@ -12,7 +12,12 @@ import {
     PlacesPaginatedSchema,
     PlaceReadSchema,
 } from "../../models/schemas";
-import { validateBody, filter, Authenticated } from "../middlewares";
+import {
+    validateBody,
+    filterGet,
+    filterPost,
+    Authenticated,
+} from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const placeRouter = Router();
@@ -24,7 +29,7 @@ async function getPlaces(req: Request, resp: Response, next: NextFunction) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.get("/", filter(PlaceSearchGetSchema), getPlaces);
+placeRouter.get("/", filterGet(PlaceSearchGetSchema), getPlaces);
 
 swaggerRegistery.registerPath({
     method: "get",
@@ -53,13 +58,21 @@ async function queryPlaces(req: Request, resp: Response, next: NextFunction) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.post("/query", filter(PlaceSearchPostSchema), queryPlaces);
+placeRouter.post("/query", filterPost(PlaceSearchPostSchema), queryPlaces);
 
 swaggerRegistery.registerPath({
     method: "post",
     path: "/places/query",
     request: {
-        query: PlaceSearchPostSchema,
+        body: {
+            content: {
+                "application/json": {
+                    schema: PlaceSearchPostSchema,
+                },
+            },
+            description: "Place advanced query",
+            required: true,
+        },
     },
     responses: {
         200: {
