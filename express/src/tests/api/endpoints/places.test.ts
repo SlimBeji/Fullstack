@@ -59,7 +59,6 @@ describe("POST /api/places/query", () => {
         expect(response.body).toHaveProperty("data");
 
         const fetchedData = response.body["data"][0];
-        delete fetchedData["id"];
         expect(fetchedData).toEqual({
             location: { lat: 51.48180425016331, lng: -0.19090418688755467 },
         });

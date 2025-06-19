@@ -5,6 +5,7 @@ import {
     RootFilterQuery,
     Types,
     sanitizeFilter,
+    ProjectionType,
 } from "mongoose";
 import {
     ApiError,
@@ -13,6 +14,7 @@ import {
     HttpStatus,
     PaginatedData,
     ProjectionExcl,
+    ProjectionIncl,
 } from "../../types";
 import { env } from "../../config";
 import { UserRead } from "../schemas";
@@ -55,7 +57,7 @@ export abstract class Crud<
 
     // Serialization
     public serializeDocument(document: Doc): DBInt {
-        return document.toObject({
+        const obj = document.toObject({
             getters: true,
             transform: (doc, ret) => {
                 delete ret._id;
@@ -63,6 +65,11 @@ export abstract class Crud<
                 return ret;
             },
         });
+
+        if (!obj?.id) {
+            delete obj.id;
+        }
+        return obj;
     }
 
     public abstract jsonifyBatch(
@@ -102,6 +109,19 @@ export abstract class Crud<
 
     // Fetch
 
+    private parseProjection(
+        projection?: ProjectionIncl
+    ): ProjectionType<DBInt> {
+        if (!projection) {
+            return this.defaultProjection;
+        }
+
+        if (!("id" in projection)) {
+            return { ...projection, _id: 0 };
+        }
+        return projection;
+    }
+
     public async countDocuments(filterQuery: FilterData): Promise<number> {
         return await this.model.countDocuments(
             filterQuery as RootFilterQuery<DBInt>
@@ -117,7 +137,7 @@ export abstract class Crud<
             sort = { createdAt: 1 };
         }
         let parsedFilters = filters as RootFilterQuery<DBInt>;
-        const projection = filterQuery.projection || this.defaultProjection;
+        const projection = this.parseProjection(filterQuery.projection);
         const documents = await this.model
             .find(parsedFilters, projection)
             .sort(sort)

@@ -59,7 +59,6 @@ describe("POST /api/users/query", () => {
         expect(response.body).toHaveProperty("data");
 
         const fetchedData = response.body["data"][0];
-        delete fetchedData["id"];
         expect(fetchedData).toEqual({
             name: "Slim Beji",
             email: "mslimbeji@gmail.com",
