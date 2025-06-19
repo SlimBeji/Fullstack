@@ -12,13 +12,7 @@ import {
     UserPut,
     UserPutSchema,
 } from "../../models/schemas";
-import {
-    validateBody,
-    filterGet,
-    filterPost,
-    Admin,
-    Authenticated,
-} from "../middlewares";
+import { validateBody, filter, Admin, Authenticated } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const userRouter = Router();
@@ -30,7 +24,7 @@ async function getUsers(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.get("/", filterGet(UserSearchGetSchema), getUsers);
+userRouter.get("/", filter(UserSearchGetSchema, "query"), getUsers);
 
 swaggerRegistery.registerPath({
     method: "get",
@@ -60,7 +54,7 @@ async function queryUsers(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.post("/query", filterPost(UserSearchPostSchema), queryUsers);
+userRouter.post("/query", filter(UserSearchPostSchema, "body"), queryUsers);
 
 swaggerRegistery.registerPath({
     method: "post",
