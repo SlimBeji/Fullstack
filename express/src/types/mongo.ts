@@ -31,3 +31,5 @@ const MongoOperationMapping = {
 export type MongoOperation = keyof typeof MongoOperationMapping;
 
 export type MongoFilter = { [key in `$${MongoOperation}`]?: any };
+
+export type MongoBaseFilter = { op: MongoOperation; val: string[] };

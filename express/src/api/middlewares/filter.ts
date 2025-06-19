@@ -3,17 +3,19 @@ import { ParsedQs } from "qs";
 import {
     ApiError,
     MongoFilter,
-    MongoOperation,
     HttpStatus,
     PaginationData,
     SortData,
     FilterData,
     ProjectionIncl,
+    MongoBaseFilter,
 } from "../../types";
-import { z, AnyZodObject, ZodTypeAny } from "zod";
+import { z, AnyZodObject } from "zod";
 import { env } from "../../config";
 import { getZodFields } from "../../models/schemas";
 import { parseDotNotation } from "../../lib/utils";
+
+const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 
 const extract = (req: Request, key: string): string[] | undefined => {
     const raw = req.query[key];
@@ -44,20 +46,33 @@ const extract = (req: Request, key: string): string[] | undefined => {
     return result;
 };
 
+const toPaginationData = (page: number, size: number): PaginationData => {
+    const skip = (page - 1) * size;
+    return { page, size, skip };
+};
+
 const parsePaginationFields = (
     req: Request,
     maxSize: number
 ): PaginationData => {
     const pageField = typeof req.query.page === "string" ? req.query.page : "1";
     const page = Math.max(1, parseInt(pageField) || 1);
-
     const sizeField =
         typeof req.query.size === "string" ? req.query.size : `${maxSize}`;
     const size = Math.min(Math.max(1, parseInt(sizeField) || 1), maxSize);
+    return toPaginationData(page, size);
+};
 
-    const skip = (page - 1) * size;
-
-    return { page, size, skip };
+const toSortData = (fields: string[]): SortData => {
+    const result: SortData = {};
+    fields.forEach((field: string) => {
+        const order = field.startsWith("-") ? -1 : 1;
+        if (order === -1) {
+            field = field.substring(1);
+        }
+        result[field] = order;
+    });
+    return result;
 };
 
 const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
@@ -81,93 +96,14 @@ const parseSortField = (req: Request, zodSchema: AnyZodObject): SortData => {
         );
     }
 
-    const result: SortData = {};
-    parsing.data.forEach((field: string) => {
-        const order = field.startsWith("-") ? -1 : 1;
-        if (order === -1) {
-            field = field.substring(1);
-        }
-        result[field] = order;
-    });
-    return result;
+    return toSortData(parsing.data);
 };
 
-const parseProjection = (
+const extractParams = (
     req: Request,
     zodSchema: AnyZodObject
-): ProjectionIncl | undefined => {
-    const fields = extract(req, "fields");
-    if (!fields) return undefined;
-
-    const zodFields = zodSchema.shape.fields;
-    if (!zodFields || !(zodFields instanceof z.ZodType)) return undefined;
-
-    const parsing = zodFields.safeParse(fields);
-    if (!parsing.success) {
-        throw new ApiError(
-            HttpStatus.UNPROCESSABLE_ENTITY,
-            "Could not parse the fields requested",
-            { details: parsing.error }
-        );
-    }
-
-    const flatProjection: Record<string, 1> = {};
-    (parsing.data as string[]).forEach((item) => {
-        flatProjection[item] = 1;
-    });
-    return parseDotNotation(flatProjection);
-};
-
-const parseMongoFilters = (
-    filters: {
-        op: MongoOperation;
-        val: any;
-    }[]
-): MongoFilter => {
-    const result: MongoFilter = {};
-    filters.forEach(({ op, val }) => {
-        if (op === "text") {
-            val = { $search: val };
-        }
-        result[`$${op}`] = val;
-    });
-    return result;
-};
-
-const parseFilterField = (
-    req: Request,
-    key: string,
-    field: ZodTypeAny
-): MongoFilter => {
-    let raw = req.query[key];
-    if (raw == undefined) {
-        throw new ApiError(
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            `Something went wrong, param ${key} could not be extracted`
-        );
-    }
-
-    if (!Array.isArray(raw)) {
-        raw = [raw];
-    }
-
-    const parsingResult = field.safeParse(raw);
-    if (!parsingResult.success) {
-        throw new ApiError(
-            HttpStatus.UNPROCESSABLE_ENTITY,
-            `${key} parameter not valid`,
-            parsingResult.error
-        );
-    }
-
-    return parseMongoFilters(parsingResult.data);
-};
-
-const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
-    let filterObject: FilterData = {};
-
-    // Flatten the zod schema first and extract query fields
-    const ignoredFields = new Set(["page", "size", "sort", "fields"]);
+): Record<string, string[]> => {
+    const result: Record<string, string[]> = {};
     const allowedFilterFields = new Set(getZodFields(zodSchema));
 
     // Iterate over all keys
@@ -175,7 +111,7 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
         // Skip ignored fields and unset properties
         if (
             !Object.prototype.hasOwnProperty.call(req.query, key) ||
-            ignoredFields.has(key)
+            GLOBAL_PARAMS.has(key)
         ) {
             continue;
         }
@@ -190,22 +126,63 @@ const parseFilters = (req: Request, zodSchema: AnyZodObject): FilterData => {
             );
         }
 
-        // Extract the operation and value
-        const zodField = zodSchema.shape[key];
-        if (!zodField || !(zodField instanceof z.ZodType)) {
-            throw new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                `Something went wrong when parsing the request`
-            );
+        if (!!req.query[key]) {
+            const extracted = extract(req, key);
+            if (extracted) result[key] = extracted;
         }
-        const fieldFilter = parseFilterField(req, key, zodField);
-        filterObject[key] = fieldFilter;
     }
 
-    return filterObject;
+    return result;
 };
 
-export const filter = (
+const validateFilters = (
+    body: any,
+    schema: AnyZodObject
+): Record<string, MongoBaseFilter[]> => {
+    const newSchema = schema.omit({
+        page: true,
+        size: true,
+        sort: true,
+        fields: true,
+    });
+
+    const parsing = newSchema.safeParse(body);
+    if (!parsing.success) {
+        throw new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid request", {
+            details: parsing.error,
+        });
+    }
+
+    return parsing.data;
+};
+
+const toMongoFilters = (
+    filters: Record<string, MongoBaseFilter[]>
+): Record<string, MongoFilter> => {
+    const result: Record<string, MongoFilter> = {};
+    for (const [key, values] of Object.entries(filters)) {
+        if (GLOBAL_PARAMS.has(key)) continue;
+        const fieldFilters: MongoFilter = {};
+        values.forEach(({ op, val }) => {
+            if (op === "text") {
+                fieldFilters[`$${op}`] = { $search: val };
+            } else {
+                fieldFilters[`$${op}`] = val;
+            }
+        });
+        result[key] = fieldFilters;
+    }
+
+    return result;
+};
+
+const parseFilters = (req: Request, schema: AnyZodObject): FilterData => {
+    const paramsMap = extractParams(req, schema);
+    const filters = validateFilters(paramsMap, schema);
+    return toMongoFilters(filters);
+};
+
+export const filterGet = (
     zodSchema: AnyZodObject,
     maxSize: number | null = null
 ): RequestHandler => {
@@ -214,9 +191,60 @@ export const filter = (
         try {
             const pagination = parsePaginationFields(req, maxSize);
             const sort = parseSortField(req, zodSchema);
-            const projection = parseProjection(req, zodSchema);
             const filters = parseFilters(req, zodSchema);
-            req.filterQuery = { pagination, sort, projection, filters };
+            req.filterQuery = { pagination, sort, filters };
+            next();
+        } catch (err) {
+            if (err instanceof ApiError) {
+                next(err);
+            }
+            next(
+                new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Something went wrong while parsing request",
+                    { error: String(err) }
+                )
+            );
+        }
+    };
+};
+
+const toProjection = (
+    fields: string[] | undefined
+): ProjectionIncl | undefined => {
+    if (!fields || fields.length === 0) {
+        return undefined;
+    }
+
+    const flatProjection: Record<string, 1> = {};
+    fields.forEach((item) => {
+        flatProjection[item] = 1;
+    });
+    return parseDotNotation(flatProjection);
+};
+
+export const filterPost = (
+    zodSchema: AnyZodObject,
+    maxSize: number | null = null
+): RequestHandler => {
+    maxSize = maxSize || env.MAX_ITEMS_PER_PAGE;
+    return async (req: Request, resp: Response, next: NextFunction) => {
+        try {
+            const parsing = zodSchema.strict().safeParse(req.body);
+            if (!parsing.success) {
+                throw new ApiError(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Invalid query request",
+                    { details: parsing.error }
+                );
+            }
+
+            const data = parsing.data as z.infer<typeof zodSchema>;
+            const pagination = toPaginationData(data.page, data.size);
+            const sort = toSortData(data.sort);
+            const filters = toMongoFilters(data);
+            const projection = toProjection(data.fields);
+            req.filterQuery = { pagination, sort, filters, projection };
             next();
         } catch (err) {
             if (err instanceof ApiError) {
