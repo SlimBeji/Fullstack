@@ -24,8 +24,11 @@ export enum CollectionEnum {
 
 export enum Queues {
     EMAILS = "emails",
+    AI = "ai",
 }
 
 export enum Tasks {
     NEWSLETTER = "newsletter",
+    EMBEDDING = "embedding",
+    CAPTIONNING = "captionning",
 }
