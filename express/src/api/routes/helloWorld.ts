@@ -2,11 +2,13 @@ import { Router, Request, Response, NextFunction } from "express";
 import { z } from "../../models/schemas";
 import { Authenticated, Admin } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
+import { sendNewsletter } from "../../worker/tasks/email";
 
 export const helloWorldRouter = Router();
 
 // Hello World Endpoint
 async function hello(req: Request, res: Response, next: NextFunction) {
+    sendNewsletter("Slim", "mslimbeji@gmail.com");
     res.status(200).json({ message: "Hello World!" });
 }
 
