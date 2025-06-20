@@ -1,4 +1,5 @@
 import "express-async-errors";
+import "../worker/crons";
 import express from "express";
 import cookieSession from "cookie-session";
 
