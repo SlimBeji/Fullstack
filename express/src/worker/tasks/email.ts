@@ -23,14 +23,14 @@ export const sendNewsletter = (name: string, email: string) => {
     emailQueue.add(Tasks.NEWSLETTER, { name, email });
 };
 
-// Create
+// Worker
 type emailTaskData = NewsletterData;
 
 async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
     switch (job.name) {
         case Tasks.NEWSLETTER:
             await sendNewsletterTask(job as Job<NewsletterData>);
-            return;
+            break;
         default:
             throw new Error(`Unknown job name: ${job.name}`);
     }
