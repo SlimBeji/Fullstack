@@ -1,7 +1,11 @@
-import { Job, Worker } from "bullmq";
+import { Job, Worker, Queue } from "bullmq";
 import { Tasks, Queues } from "../../types";
-import { emailQueue, config } from "./config";
+import { config } from "./config";
 
+// Define Queue
+const emailQueue = new Queue(Queues.EMAILS, config);
+
+// Define Tasks, Types and Callers
 interface NewsletterData {
     name: string;
     email: string;
@@ -15,11 +19,24 @@ async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
     );
 }
 
-const emailWorker = new Worker(Queues.EMAILS, sendNewsletterTask, config);
-emailWorker.on("failed", (job, err) => {
-    console.error(`Job ${job?.id} failed with error ${err.message}`);
-});
-
 export const sendNewsletter = (name: string, email: string) => {
     emailQueue.add(Tasks.NEWSLETTER, { name, email });
 };
+
+// Create
+type emailTaskData = NewsletterData;
+
+async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
+    switch (job.name) {
+        case Tasks.NEWSLETTER:
+            await sendNewsletterTask(job as Job<NewsletterData>);
+            return;
+        default:
+            throw new Error(`Unknown job name: ${job.name}`);
+    }
+}
+
+const emailWorker = new Worker(Queues.EMAILS, emailTasksProcessor, config);
+emailWorker.on("failed", (job, err) => {
+    console.error(`Job ${job?.id} failed with error ${err.message}`);
+});
