@@ -30,6 +30,9 @@ export const env = {
         parseVar("REDIS_DEFAULT_EXPIRATION", "3600")
     ),
 
+    // HUGGING FACE config
+    HF_API_TOKEN: parseVar("HF_API_TOKEN"),
+
     // GCP config
     GOOGLE_APPLICATION_CREDENTIALS: parseVar(
         "GOOGLE_APPLICATION_CREDENTIALS",
