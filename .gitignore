@@ -7,6 +7,9 @@
 *.local
 todo.txt
 
+# Secret .env files
+express/express.env
+
 # Docker local images
 mongo
 mongo-express
