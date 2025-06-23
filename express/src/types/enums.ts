@@ -29,6 +29,5 @@ export enum Queues {
 
 export enum Tasks {
     NEWSLETTER = "newsletter",
-    EMBEDDING = "embedding",
-    CAPTIONNING = "captionning",
+    PLACE_EMBEDDING = "place_embedding",
 }

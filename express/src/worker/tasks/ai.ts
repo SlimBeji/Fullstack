@@ -1,48 +1,42 @@
 import { Job, Worker, Queue } from "bullmq";
 import { Tasks, Queues } from "../../types";
 import { config } from "./config";
+import { huggingFace } from "../../lib/clients/huggingFace";
+import { crudPlace } from "../../models/crud";
 
 // Define Queue
 const aiQueue = new Queue(Queues.AI, config);
 
-// Captionning Task
-interface CaptionningData {
-    file: File;
-}
-
-async function captionningTask(job: Job<CaptionningData>): Promise<void> {
-    const { file } = job.data;
-    console.log(`Generating caption for file ${file.name}`);
-}
-
-export const captionImage = (file: File) => {
-    aiQueue.add(Tasks.CAPTIONNING, { file });
-};
-
 // Embedding Text
-interface EmbeddingData {
-    text: string;
+interface PlaceEmbeddingData {
+    placeId: string;
 }
 
-async function embeddingTask(job: Job<EmbeddingData>): Promise<void> {
-    const { text } = job.data;
-    console.log(`Generating embedding for text: ${text}`);
+async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
+    const { placeId } = job.data;
+    const place = await crudPlace.get(placeId);
+    if (!place) {
+        console.log(`No place with id ${placeId} found in the database`);
+        return;
+    }
+    const text = `${place.title} - ${place.description}`;
+    const result = await huggingFace.embedText(text);
+
+    console.log("Finished embedding");
+    console.log(result);
 }
 
-export const embedding = (text: string) => {
-    aiQueue.add(Tasks.EMBEDDING, { text });
+export const placeEmbedding = (placeId: string) => {
+    aiQueue.add(Tasks.PLACE_EMBEDDING, { placeId });
 };
 
 // Worker
-type AiTasksData = CaptionningData | EmbeddingData;
+type AiTasksData = PlaceEmbeddingData;
 
 async function aiTasksProcessor(job: Job<AiTasksData>) {
     switch (job.name) {
-        case Tasks.CAPTIONNING:
-            await captionningTask(job as Job<CaptionningData>);
-            break;
-        case Tasks.EMBEDDING:
-            await embeddingTask(job as Job<EmbeddingData>);
+        case Tasks.PLACE_EMBEDDING:
+            await placeEmbeddingTask(job as Job<PlaceEmbeddingData>);
             break;
         default:
             throw new Error(`Unknown job name: ${job.name}`);
