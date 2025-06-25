@@ -25,6 +25,7 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
             userRefMapping.set(newUserIn._ref, user.id);
         })
     );
+    console.log("✅ Collection User seeded!");
 };
 
 const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
@@ -39,12 +40,14 @@ const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
             placeRefMapping.set(newPlaceIn._ref, place.id);
         })
     );
+    console.log("✅ Collection Place seeded!");
 };
 
 export const seedDb = async (): Promise<void> => {
     await createCollections();
     await seedUsers(users);
     await seedPlaces(places);
+    console.log("✅ Finished. You may exit");
 };
 
 export const dumpDb = async (): Promise<void> => {
@@ -53,4 +56,5 @@ export const dumpDb = async (): Promise<void> => {
         await collection.deleteMany({});
         console.log(`✅ Collection ${collection.namespace} cleared!`);
     }
+    console.log("✅ Finished. You may exit");
 };
