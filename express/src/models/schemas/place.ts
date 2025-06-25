@@ -24,6 +24,10 @@ export const placeDescriptionField = z.string().min(10).openapi({
     example: "Stadium of Chelsea football club",
 });
 
+export const placeEmbeddingField = z.array(z.number()).length(384).openapi({
+    description: "Title + Description embedding",
+});
+
 export const placeImageUrlField = z.string().openapi({
     type: "string",
     description: "local url on the storage",
@@ -63,6 +67,7 @@ export const PlaceDBSchema = z.object({
     id: placeIdField,
     title: placeTitleField,
     description: placeDescriptionField,
+    embedding: placeEmbeddingField.optional(),
     imageUrl: placeImageUrlField.optional(),
     address: placeAddressField,
     location: placeLocationField.optional(),

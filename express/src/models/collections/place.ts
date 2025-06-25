@@ -25,6 +25,15 @@ export const PlaceCollectionSchema = new Schema<PlaceDB>(
             required: true,
             ref: CollectionEnum.USERS,
         },
+        // AI
+        embedding: {
+            type: [Number],
+            required: false,
+            validate: [
+                (arr: number[]) => arr.length === 384,
+                "{PATH} must have exactly 384 elements",
+            ],
+        },
     },
     { timestamps: true }
 );
