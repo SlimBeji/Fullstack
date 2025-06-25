@@ -170,6 +170,15 @@ export abstract class Crud<
         return await this.fetch(filterQuery);
     }
 
+    // Save
+
+    public async saveDocument(doc: Doc): Promise<void> {
+        const session = await startSession();
+        session.startTransaction();
+        await doc.save({ session });
+        await session.commitTransaction();
+    }
+
     // Create
 
     public async createDocument(form: Create): Promise<Doc> {
@@ -177,10 +186,7 @@ export abstract class Crud<
             ...form,
         });
         try {
-            const session = await startSession();
-            session.startTransaction();
-            await newObj.save({ session });
-            await session.commitTransaction();
+            this.saveDocument(newObj);
             return newObj;
         } catch (err) {
             if (err instanceof Error) {
@@ -204,10 +210,7 @@ export abstract class Crud<
     public async updateDocument(obj: Doc, form: Update): Promise<Doc> {
         obj.set(form);
         try {
-            const session = await startSession();
-            session.startTransaction();
-            await obj.save({ session });
-            await session.commitTransaction();
+            this.saveDocument(obj);
             return obj;
         } catch (err) {
             if (err instanceof Error) {
