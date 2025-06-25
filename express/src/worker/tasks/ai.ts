@@ -14,15 +14,15 @@ interface PlaceEmbeddingData {
 
 async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
     const { placeId } = job.data;
-    const place = await crudPlace.get(placeId);
+    const place = await crudPlace.getDocument(placeId);
     if (!place) {
         console.log(`No place with id ${placeId} found in the database`);
         return;
     }
     const text = `${place.title} - ${place.description}`;
     const result = await huggingFace.embedText(text);
-
-    console.log("Finished embedding");
+    place.set({ embedding: result });
+    crudPlace.saveDocument(place);
     console.log(result);
 }
 

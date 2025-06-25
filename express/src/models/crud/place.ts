@@ -11,6 +11,7 @@ import { PlaceModel, PlaceDocument } from "../collections";
 import { storage } from "../../lib/clients";
 import { Crud } from "./base";
 import { ApiError, HttpStatus, FilterQuery } from "../../types";
+import { placeEmbedding } from "../../worker/tasks";
 
 export class CrudPlace extends Crud<
     PlaceDB,
@@ -70,6 +71,7 @@ export class CrudPlace extends Crud<
         const { image, ...body } = form;
         const data = { ...body, imageUrl };
         const doc = await this.createDocument(data);
+        placeEmbedding(doc.id);
         const result = await this.jsonfify(doc);
         return result as PlaceRead;
     }
@@ -79,6 +81,7 @@ export class CrudPlace extends Crud<
         form: PlacePut
     ): Promise<PlaceRead> {
         const doc = await this.updateDocument(obj, form);
+        placeEmbedding(doc.id);
         const result = await this.jsonfify(doc);
         return result as PlaceRead;
     }
