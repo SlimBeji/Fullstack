@@ -6,9 +6,7 @@ import {
     Navigate,
 } from "react-router-dom";
 
-import Users from "./user/pages/Users";
-import Auth from "./user/pages/Auth";
-import { NewPlace, UserPlaces, UpdatePlace } from "./pages";
+import { NewPlace, UserPlaces, UpdatePlace, Users, Auth } from "./pages";
 import { MainNavigation } from "./components/navigation";
 import { AuthContext } from "./stores";
 import { EncodedUserToken, LocalStorageKeys } from "./types";
