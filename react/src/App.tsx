@@ -12,7 +12,7 @@ import NewPlace from "./places/pages/NewPlace";
 import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import { MainNavigation } from "./components/navigation";
-import { AuthContext } from "./shared/context";
+import { AuthContext } from "./stores";
 import { EncodedUserToken, LocalStorageKeys } from "./types";
 import { getAuthData } from "./util";
 

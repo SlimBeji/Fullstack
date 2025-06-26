@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { EncodedUserToken } from "../../types";
+import { EncodedUserToken } from "../types";
 
 interface AuthContextType {
     authData: EncodedUserToken | null;

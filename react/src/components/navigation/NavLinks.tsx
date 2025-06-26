@@ -3,7 +3,7 @@ import "./NavLinks.css";
 import { useContext } from "react";
 import { NavLink, redirect } from "react-router-dom";
 
-import { AuthContext } from "../../context";
+import { AuthContext } from "../../stores";
 
 const NavLinks: React.FC = () => {
     const auth = useContext(AuthContext);

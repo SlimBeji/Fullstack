@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 
 import "./PlaceItem.css";
 
-import { AuthContext } from "../../shared/context";
+import { AuthContext } from "../../stores";
 import { Place } from "../../types";
 import {
     Card,
