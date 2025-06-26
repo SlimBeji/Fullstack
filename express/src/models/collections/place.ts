@@ -48,9 +48,11 @@ PlaceCollectionSchema.pre("save", async function (next) {
 });
 
 PlaceCollectionSchema.post("save", async function (place, next) {
-    await UserModel.findByIdAndUpdate(place.creatorId, {
-        $push: { places: place._id },
-    });
+    if (this.isNew) {
+        await UserModel.findByIdAndUpdate(place.creatorId, {
+            $addToSet: { places: place._id },
+        });
+    }
     next();
 });
 
