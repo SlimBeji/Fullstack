@@ -20,6 +20,9 @@ dump-mongo: fix-permission
 react-bash:
 	docker exec -it react bash
 
+react-check:
+	docker exec -it react npx tsc --noEmit
+
 # Express commands
 express-bash:
 	docker exec -it express bash
