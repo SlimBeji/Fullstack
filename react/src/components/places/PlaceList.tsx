@@ -1,10 +1,7 @@
 import "./PlaceList.css";
 
 import { Place } from "../../types";
-
 import PlaceItem from "./PlaceItem";
-import { Card } from "../../components/ui";
-import { Button } from "../../components/form";
 
 interface PlaceListProps {
     items: Place[];
@@ -12,16 +9,6 @@ interface PlaceListProps {
 }
 
 const PlaceList: React.FC<PlaceListProps> = ({ items, onDelete }) => {
-    if (items.length === 0) {
-        return (
-            <div className="place-list center">
-                <Card>
-                    <h2>No places found. Maybe create one?</h2>
-                    <Button to="/places/new">Share</Button>
-                </Card>
-            </div>
-        );
-    }
     return (
         <ul className="place-list">
             {items.map((p: Place) => {
