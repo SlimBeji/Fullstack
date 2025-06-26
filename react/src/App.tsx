@@ -14,7 +14,7 @@ import UpdatePlace from "./places/pages/UpdatePlace";
 import { MainNavigation } from "./components/navigation";
 import { AuthContext } from "./shared/context";
 import { EncodedUserToken, LocalStorageKeys } from "./types";
-import { getAuthData } from "./shared/util/storage";
+import { getAuthData } from "./util";
 
 function App() {
     const [authData, setAuthData] = useState<EncodedUserToken | null>(null);

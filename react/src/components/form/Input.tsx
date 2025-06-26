@@ -1,7 +1,7 @@
 import { ChangeEvent, useReducer, useEffect } from "react";
 import "./Input.css";
 
-import { validate, ValidatorType } from "../../util/validators";
+import { validate, ValidatorType } from "../../util";
 
 interface InputState {
     value: string;

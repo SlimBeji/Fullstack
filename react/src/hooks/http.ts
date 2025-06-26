@@ -1,7 +1,7 @@
 import { useCallback, useReducer, useRef, useEffect } from "react";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import { HeaderContent, HttpMethods } from "../types";
-import { getClient } from "../util/axios";
+import { getClient } from "../util";
 
 interface State {
     loading: boolean;

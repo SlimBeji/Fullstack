@@ -7,11 +7,7 @@ import { useForm, emptyStateBuilder, useHttp } from "../../hooks";
 import { Card, ErrorModal, LoadingSpinner } from "../../components/ui";
 import { Input, Button, ImageUpload } from "../../components/form";
 
-import {
-    emailValidator,
-    minLengthValidator,
-    minValidator,
-} from "../../shared/util/validators";
+import { emailValidator, minLengthValidator, minValidator } from "../../util";
 import { EncodedUserToken } from "../../types";
 
 const AuthForm = {

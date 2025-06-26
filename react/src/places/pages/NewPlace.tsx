@@ -2,7 +2,7 @@ import "./PlaceForm.css";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { minLengthValidator } from "../../shared/util/validators";
+import { minLengthValidator } from "../../util";
 import { useHttp, emptyStateBuilder, useForm } from "../../hooks";
 import { AuthContext } from "../../shared/context";
 import { ErrorModal, LoadingSpinner } from "../../components/ui";
