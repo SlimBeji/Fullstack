@@ -80,8 +80,13 @@ export class CrudPlace extends Crud<
         obj: PlaceDocument,
         form: PlacePut
     ): Promise<PlaceRead> {
+        const descriptionChanged =
+            !!form.description && form.description !== obj.description;
+        const titleChanged = !!form.title && form.title !== obj.title;
         const doc = await this.updateDocument(obj, form);
-        placeEmbedding(doc.id);
+        if (descriptionChanged || titleChanged) {
+            placeEmbedding(doc.id);
+        }
         const result = await this.jsonfify(doc);
         return result as PlaceRead;
     }
