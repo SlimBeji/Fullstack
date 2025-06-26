@@ -1,7 +1,7 @@
 import "./UsersList.css";
 
 import UserItem from "./UserItem";
-import { Card } from "../../shared/components/ui";
+import { Card } from "../../components/ui";
 
 import { User } from "../../shared/types";
 

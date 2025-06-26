@@ -3,7 +3,7 @@ import { useEffect, useCallback } from "react";
 
 import PlaceList from "../components/PlaceList";
 
-import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
+import { ErrorModal, LoadingSpinner } from "../../components/ui";
 import { Place } from "../../shared/types";
 import { useHttp } from "../../hooks";
 import { HttpStatusCode } from "axios";

@@ -3,8 +3,8 @@ import "./PlaceList.css";
 import { Place } from "../../shared/types";
 
 import PlaceItem from "./PlaceItem";
-import { Card } from "../../shared/components/ui";
-import { Button } from "../../shared/components/form";
+import { Card } from "../../components/ui";
+import { Button } from "../../components/form";
 
 interface PlaceListProps {
     items: Place[];

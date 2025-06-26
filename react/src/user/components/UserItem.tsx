@@ -4,7 +4,7 @@ import "./UserItem.css";
 
 import { User } from "../../shared/types";
 
-import { Avatar, Card } from "../../shared/components/ui";
+import { Avatar, Card } from "../../components/ui";
 
 interface UserItemProps {
     user: User;

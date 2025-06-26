@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import UsersList from "../components/UsersList";
-import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
+import { ErrorModal, LoadingSpinner } from "../../components/ui";
 import { useHttp } from "../../hooks";
 import { User } from "../../shared/types";
 

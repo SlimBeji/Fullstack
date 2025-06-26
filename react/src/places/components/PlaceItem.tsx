@@ -10,8 +10,8 @@ import {
     Modal,
     ErrorModal,
     LoadingSpinner,
-} from "../../shared/components/ui";
-import { Button } from "../../shared/components/form";
+} from "../../components/ui";
+import { Button } from "../../components/form";
 import { useHttp } from "../../hooks";
 import placeholder from "../../static/place_placeholder.jpg";
 

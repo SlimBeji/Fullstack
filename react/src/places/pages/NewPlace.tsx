@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { minLengthValidator } from "../../shared/util/validators";
 import { useHttp, emptyStateBuilder, useForm } from "../../hooks";
 import { AuthContext } from "../../shared/context";
-import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
-import { Button, Input, ImageUpload } from "../../shared/components/form";
+import { ErrorModal, LoadingSpinner } from "../../components/ui";
+import { Button, Input, ImageUpload } from "../../components/form";
 
 const Form = {
     title: true,

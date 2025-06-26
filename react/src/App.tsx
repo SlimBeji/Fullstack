@@ -11,7 +11,7 @@ import Auth from "./user/pages/Auth";
 import NewPlace from "./places/pages/NewPlace";
 import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
-import { MainNavigation } from "./shared/components/navigation";
+import { MainNavigation } from "./components/navigation";
 import { AuthContext } from "./shared/context";
 import { EncodedUserToken, LocalStorageKeys } from "./shared/types";
 import { getAuthData } from "./shared/util/storage";
