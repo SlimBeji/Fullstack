@@ -81,7 +81,7 @@ const Auth: React.FC = () => {
     };
 
     return (
-        <>
+        <div className="center">
             {data.error?.message && (
                 <ErrorModal
                     header="Credentials not valid!"
@@ -140,7 +140,7 @@ const Auth: React.FC = () => {
                     {switchText}
                 </Button>
             </Card>
-        </>
+        </div>
     );
 };
 
