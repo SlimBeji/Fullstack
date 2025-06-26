@@ -3,7 +3,7 @@ import "./PlaceForm.css";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { useForm, emptyStateBuilder, useHttp } from "../../shared/hooks";
+import { useForm, emptyStateBuilder, useHttp } from "../../hooks";
 import { Button, Input } from "../../shared/components/form";
 import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
 import { minLengthValidator } from "../../shared/util/validators";

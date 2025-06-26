@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import UsersList from "../components/UsersList";
 import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
-import { useHttp } from "../../shared/hooks/http";
+import { useHttp } from "../../hooks";
 import { User } from "../../shared/types";
 
 const Users: React.FC = () => {

@@ -12,7 +12,7 @@ import {
     LoadingSpinner,
 } from "../../shared/components/ui";
 import { Button } from "../../shared/components/form";
-import { useHttp } from "../../shared/hooks";
+import { useHttp } from "../../hooks";
 import placeholder from "../../static/place_placeholder.jpg";
 
 interface PlaceItemProps {

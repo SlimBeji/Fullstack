@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { minLengthValidator } from "../../shared/util/validators";
-import { useHttp, emptyStateBuilder, useForm } from "../../shared/hooks";
+import { useHttp, emptyStateBuilder, useForm } from "../../hooks";
 import { AuthContext } from "../../shared/context";
 import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
 import { Button, Input, ImageUpload } from "../../shared/components/form";

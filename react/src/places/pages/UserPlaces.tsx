@@ -5,7 +5,7 @@ import PlaceList from "../components/PlaceList";
 
 import { ErrorModal, LoadingSpinner } from "../../shared/components/ui";
 import { Place } from "../../shared/types";
-import { useHttp } from "../../shared/hooks";
+import { useHttp } from "../../hooks";
 import { HttpStatusCode } from "axios";
 
 const UserPlaces: React.FC = () => {

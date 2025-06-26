@@ -3,7 +3,7 @@ import "./Auth.css";
 import { useState, useContext } from "react";
 
 import { AuthContext } from "../../shared/context";
-import { useForm, emptyStateBuilder, useHttp } from "../../shared/hooks";
+import { useForm, emptyStateBuilder, useHttp } from "../../hooks";
 import { Card, ErrorModal, LoadingSpinner } from "../../shared/components/ui";
 import { Input, Button, ImageUpload } from "../../shared/components/form";
 
