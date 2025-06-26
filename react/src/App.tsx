@@ -8,9 +8,7 @@ import {
 
 import Users from "./user/pages/Users";
 import Auth from "./user/pages/Auth";
-import NewPlace from "./places/pages/NewPlace";
-import UserPlaces from "./places/pages/UserPlaces";
-import UpdatePlace from "./places/pages/UpdatePlace";
+import { NewPlace, UserPlaces, UpdatePlace } from "./pages";
 import { MainNavigation } from "./components/navigation";
 import { AuthContext } from "./stores";
 import { EncodedUserToken, LocalStorageKeys } from "./types";

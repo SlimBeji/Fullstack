@@ -3,10 +3,10 @@ import "./PlaceForm.css";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { useForm, emptyStateBuilder, useHttp } from "../../hooks";
-import { Button, Input } from "../../components/form";
-import { ErrorModal, LoadingSpinner } from "../../components/ui";
-import { minLengthValidator } from "../../util";
+import { useForm, emptyStateBuilder, useHttp } from "../hooks";
+import { Button, Input } from "../components/form";
+import { ErrorModal, LoadingSpinner } from "../components/ui";
+import { minLengthValidator } from "../util";
 import { AxiosResponse } from "axios";
 
 const Form = {

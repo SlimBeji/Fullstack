@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback } from "react";
 
-import PlaceList from "../components/PlaceList";
+import PlaceList from "../components/places/PlaceList";
 
-import { ErrorModal, LoadingSpinner } from "../../components/ui";
-import { Place } from "../../types";
-import { useHttp } from "../../hooks";
+import { ErrorModal, LoadingSpinner } from "../components/ui";
+import { Place } from "../types";
+import { useHttp } from "../hooks";
 import { HttpStatusCode } from "axios";
 
 const UserPlaces: React.FC = () => {
