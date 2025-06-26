@@ -1,9 +1,5 @@
 import { FormEvent } from "react";
 
-export type RecursivePartial<T> = {
-    [P in keyof T]?: T[P] extends object ? RecursivePartial<T[P]> : T[P];
-};
-
 export type HttpMethods = "get" | "post" | "put" | "delete";
 
 export type HeaderContent = "application/json" | "multipart/form-data";
