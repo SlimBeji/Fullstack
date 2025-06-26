@@ -5,6 +5,7 @@ import "./UserItem.css";
 import { User } from "../../types";
 
 import { Avatar, Card } from "../../components/ui";
+import placeholder from "../../static/avatar_placeholder.jpg";
 
 interface UserItemProps {
     user: User;
@@ -17,7 +18,7 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
                 <Link to={`/${user.id}/places`}>
                     <div className="user-item__image">
                         <Avatar
-                            imageUrl={user.imageUrl || ""}
+                            imageUrl={user.imageUrl || placeholder}
                             alt={user.name}
                         />
                     </div>
