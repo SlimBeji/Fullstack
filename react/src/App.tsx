@@ -13,7 +13,7 @@ import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import { MainNavigation } from "./components/navigation";
 import { AuthContext } from "./shared/context";
-import { EncodedUserToken, LocalStorageKeys } from "./shared/types";
+import { EncodedUserToken, LocalStorageKeys } from "./types";
 import { getAuthData } from "./shared/util/storage";
 
 function App() {

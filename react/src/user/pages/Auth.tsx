@@ -12,7 +12,7 @@ import {
     minLengthValidator,
     minValidator,
 } from "../../shared/util/validators";
-import { EncodedUserToken } from "../../shared/types";
+import { EncodedUserToken } from "../../types";
 
 const AuthForm = {
     username: false,

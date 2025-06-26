@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import "./UserItem.css";
 
-import { User } from "../../shared/types";
+import { User } from "../../types";
 
 import { Avatar, Card } from "../../components/ui";
 

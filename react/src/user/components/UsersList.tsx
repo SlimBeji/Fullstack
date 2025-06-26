@@ -3,7 +3,7 @@ import "./UsersList.css";
 import UserItem from "./UserItem";
 import { Card } from "../../components/ui";
 
-import { User } from "../../shared/types";
+import { User } from "../../types";
 
 interface UserListProps {
     items: User[];

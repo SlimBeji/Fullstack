@@ -1,6 +1,6 @@
 import "./PlaceList.css";
 
-import { Place } from "../../shared/types";
+import { Place } from "../../types";
 
 import PlaceItem from "./PlaceItem";
 import { Card } from "../../components/ui";

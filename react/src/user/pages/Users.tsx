@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import UsersList from "../components/UsersList";
 import { ErrorModal, LoadingSpinner } from "../../components/ui";
 import { useHttp } from "../../hooks";
-import { User } from "../../shared/types";
+import { User } from "../../types";
 
 const Users: React.FC = () => {
     const [data, sendRequest, clearError] = useHttp();
