@@ -76,7 +76,6 @@ const NewPlace: React.FC = () => {
                     id="image"
                     onInput={inputHandlers.image}
                     val={state.inputs.image.val}
-                    required
                 />
                 <Button type="submit" disabled={!state.isValid}>
                     Add Place

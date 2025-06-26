@@ -70,7 +70,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const [state, dispatch] = useReducer(inputReducer, {
         file: val?.file || null,
         url: val?.url || "",
-        isValid: false,
+        isValid: true,
         uploadAttempt: false,
     });
     const filePickerRef = useRef<HTMLInputElement>(null);

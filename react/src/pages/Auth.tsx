@@ -111,7 +111,6 @@ const Auth: React.FC = () => {
                             id="image"
                             onInput={inputHandlers.image}
                             val={state.inputs.image.val}
-                            required
                         />
                     )}
                     <Input
