@@ -1,11 +1,11 @@
 import "./Auth.css";
 
-import { useState, useContext } from "react";
+import { useState } from "react";
 
-import { AuthContext } from "../stores";
 import { useForm, emptyStateBuilder, useHttp } from "../hooks";
 import { Card, ErrorModal, LoadingSpinner } from "../components/ui";
 import { Input, Button, ImageUpload } from "../components/form";
+import { useAppDispatch, authSlice } from "../states";
 
 import { emailValidator, minLengthValidator, minValidator } from "../util";
 import { EncodedUserToken } from "../types";
@@ -22,7 +22,8 @@ type AuthFormTypes = keyof typeof AuthForm;
 const emptyState = emptyStateBuilder<AuthFormTypes>(AuthForm);
 
 const Auth: React.FC = () => {
-    const auth = useContext(AuthContext);
+    const dispatch = useAppDispatch();
+
     const [data, sendRequest, clearError] = useHttp();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [state, inputHandlers, _, fieldsActivationHandler] =
@@ -47,7 +48,7 @@ const Auth: React.FC = () => {
             password: state.inputs.password.val,
         });
         const data = resp.data as EncodedUserToken;
-        auth.login(data);
+        dispatch(authSlice.actions.login(data));
     };
 
     const onSignup = async (): Promise<void> => {
@@ -58,7 +59,7 @@ const Auth: React.FC = () => {
         formData.append("password", state.inputs.password.val);
         const resp = await sendRequest("/auth/signup", "post", formData);
         const data = resp.data as EncodedUserToken;
-        auth.login(data);
+        dispatch(authSlice.actions.login(data));
     };
 
     const onSubmit = (e: React.FormEvent): void => {

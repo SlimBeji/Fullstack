@@ -1,17 +1,18 @@
 import "./NavLinks.css";
 
-import { useContext } from "react";
 import { NavLink, redirect } from "react-router-dom";
 
-import { AuthContext } from "../../stores";
+import { useAppDispatch, useAppSelector, authSlice } from "../../states";
 
 const NavLinks: React.FC = () => {
-    const auth = useContext(AuthContext);
-    const isLoggedIn = !!auth.authData;
-    const userId = auth.authData?.userId;
+    const dispatch = useAppDispatch();
+    const authData = useAppSelector((state) => state.auth.data);
+
+    const isLoggedIn = !!authData;
+    const userId = authData?.userId;
 
     const onLogout = () => {
-        auth.logout();
+        dispatch(authSlice.actions.logout());
         return redirect("/auth");
     };
 

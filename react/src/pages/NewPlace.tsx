@@ -1,12 +1,11 @@
 import "./PlaceForm.css";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { minLengthValidator } from "../util";
 import { useHttp, emptyStateBuilder, useForm } from "../hooks";
-import { AuthContext } from "../stores";
 import { ErrorModal, LoadingSpinner } from "../components/ui";
 import { Button, Input, ImageUpload } from "../components/form";
+import { useAppSelector } from "../states";
 
 const Form = {
     title: true,
@@ -21,7 +20,7 @@ const initialState = emptyStateBuilder<FormFields>(Form);
 
 const NewPlace: React.FC = () => {
     const navigate = useNavigate();
-    const auth = useContext(AuthContext);
+    const authData = useAppSelector((state) => state.auth.data);
     const [data, sendRequest, clearError] = useHttp();
     const [state, inputHandlers] = useForm<FormFields>(initialState);
 
@@ -32,7 +31,7 @@ const NewPlace: React.FC = () => {
         formData.append("image", state.inputs.image.val.file);
         formData.append("description", state.inputs.description.val);
         formData.append("address", state.inputs.address.val);
-        formData.append("creatorId", auth.authData?.userId || "");
+        formData.append("creatorId", authData?.userId || "");
         try {
             await sendRequest("/places", "post", formData);
             navigate("/");

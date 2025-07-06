@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useCallback, useContext } from "react";
+import { useEffect, useCallback } from "react";
 
-import { AuthContext } from "../stores";
 import PlaceList from "../components/places/PlaceList";
 
+import { useAppSelector } from "../states";
 import { ErrorModal, LoadingSpinner, Card } from "../components/ui";
 import { Button } from "../components/form";
 import { Place } from "../types";
@@ -11,11 +11,11 @@ import { useHttp } from "../hooks";
 import { HttpStatusCode } from "axios";
 
 const UserPlaces: React.FC = () => {
-    const auth = useContext(AuthContext);
+    const authData = useAppSelector((state) => state.auth.data);
     const [data, sendRequest, clearError] = useHttp({ ignoreNotFound: true });
     const { userId } = useParams();
 
-    const isSameUser = userId === auth.authData?.userId ? true : false;
+    const isSameUser = userId === authData?.userId ? true : false;
 
     const fetchPlaces = useCallback(
         async (userId: string | undefined) => {

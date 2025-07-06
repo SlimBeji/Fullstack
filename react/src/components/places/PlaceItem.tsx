@@ -1,8 +1,8 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 
 import "./PlaceItem.css";
 
-import { AuthContext } from "../../stores";
+import { useAppSelector } from "../../states";
 import { Place } from "../../types";
 import {
     Card,
@@ -21,7 +21,7 @@ interface PlaceItemProps {
 }
 
 const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
-    const auth = useContext(AuthContext);
+    const authData = useAppSelector((state) => state.auth.data);
     const [data, sendRequest, clearError] = useHttp();
     const [showMap, setShowMap] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -112,10 +112,10 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                         <Button onClick={openMapHanlder} inverse>
                             VIEW ON MAP
                         </Button>
-                        {auth.authData?.userId === place.creatorId && (
+                        {authData?.userId === place.creatorId && (
                             <Button to={`/places/${place.id}`}>EDIT</Button>
                         )}
-                        {auth.authData?.userId === place.creatorId && (
+                        {authData?.userId === place.creatorId && (
                             <Button danger onClick={openDeleteModal}>
                                 DELETE
                             </Button>
