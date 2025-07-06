@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
     Route,
     Routes,
@@ -8,32 +8,17 @@ import {
 
 import { NewPlace, UserPlaces, UpdatePlace, Users, Auth } from "./pages";
 import { MainNavigation } from "./components/navigation";
-import { AuthContext } from "./stores";
-import { EncodedUserToken, LocalStorageKeys } from "./types";
 import { getAuthData } from "./util";
+import { authSlice, useAppDispatch, useAppSelector } from "./states";
 
 function App() {
-    const [authData, setAuthData] = useState<EncodedUserToken | null>(null);
-
-    const login = useCallback((data: EncodedUserToken) => {
-        if (data) {
-            setAuthData(data);
-            localStorage.setItem(
-                LocalStorageKeys.userData,
-                JSON.stringify(data)
-            );
-        }
-    }, []);
-    const logout = useCallback(() => {
-        setAuthData(null);
-        localStorage.removeItem(LocalStorageKeys.userData);
-    }, []);
-    const context = { authData, login, logout };
+    const dispatch = useAppDispatch();
+    const authData = useAppSelector((state) => state.auth.data);
 
     useEffect(() => {
         const data = getAuthData();
-        if (data) setAuthData(data);
-    }, [setAuthData]);
+        if (data) dispatch(authSlice.actions.login(data));
+    }, [dispatch, authSlice.actions.login]);
 
     let routes: React.JSX.Element;
     if (authData) {
@@ -58,14 +43,12 @@ function App() {
     }
 
     return (
-        <AuthContext.Provider value={context}>
-            <Router>
-                <MainNavigation />
-                <main>
-                    <Routes>{routes}</Routes>
-                </main>
-            </Router>
-        </AuthContext.Provider>
+        <Router>
+            <MainNavigation />
+            <main>
+                <Routes>{routes}</Routes>
+            </main>
+        </Router>
     );
 }
 

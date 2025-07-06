@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EncodedUserToken } from "../types";
+import { EncodedUserToken, LocalStorageKeys } from "../types";
 
 interface AuthState {
     data?: EncodedUserToken;
@@ -13,9 +13,14 @@ export const authSlice = createSlice({
     reducers: {
         login: (state: AuthState, action: PayloadAction<EncodedUserToken>) => {
             state.data = action.payload;
+            localStorage.setItem(
+                LocalStorageKeys.userData,
+                JSON.stringify(action.payload)
+            );
         },
         logout: (state: AuthState) => {
             state.data = undefined;
+            localStorage.removeItem(LocalStorageKeys.userData);
         },
     },
 });
