@@ -1,10 +1,11 @@
 import "./NavLinks.css";
 
-import { NavLink, redirect } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector, authSlice } from "../../states";
 
 const NavLinks: React.FC = () => {
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const authData = useAppSelector((state) => state.auth.data);
 
@@ -13,7 +14,7 @@ const NavLinks: React.FC = () => {
 
     const onLogout = () => {
         dispatch(authSlice.actions.logout());
-        return redirect("/auth");
+        return navigate("/auth");
     };
 
     return (
