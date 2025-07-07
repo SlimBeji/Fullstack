@@ -12,6 +12,7 @@ export interface EncodedUserToken {
     userId: string;
     email: string;
     token: string;
+    expiresAt: number;
 }
 
 export interface User {
