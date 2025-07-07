@@ -21,7 +21,13 @@ const _createToken = (user: UserRead): EncodedToken => {
     const token = jwt.sign(payload, env.SECRET_KEY, {
         expiresIn: env.JWT_EXPIRATION,
     });
-    return { token, email: user.email, userId: user.id };
+    const decoded = jwt.decode(token) as JwtPayload;
+    return {
+        token,
+        email: user.email,
+        userId: user.id,
+        expiresAt: Number(decoded.exp),
+    };
 };
 
 const createTokenKeygen = (user: UserRead): string => {
