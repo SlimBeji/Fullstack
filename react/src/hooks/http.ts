@@ -5,6 +5,7 @@ import { getClient } from "../util";
 
 interface State {
     loading: boolean;
+    tokenExpired: boolean;
     statusCode?: number;
     data?: {
         parsed: Record<string, any>;
@@ -21,6 +22,7 @@ enum ActionType {
     PARSE_RESPONSE,
     PARSE_ERROR,
     CLEAR_ERROR,
+    TOKEN_EXPIRED,
 }
 
 interface SendRequestAction {
@@ -37,6 +39,10 @@ interface ParseErrorAction {
     payload: AxiosError;
 }
 
+interface TokenExpiredAction {
+    type: ActionType.TOKEN_EXPIRED;
+}
+
 interface ClearErrorAction {
     type: ActionType.CLEAR_ERROR;
 }
@@ -45,17 +51,19 @@ type Action =
     | SendRequestAction
     | ParseResponseAction
     | ParseErrorAction
-    | ClearErrorAction;
+    | ClearErrorAction
+    | TokenExpiredAction;
 
-const emptyState: State = { loading: false };
+const emptyState: State = { loading: false, tokenExpired: false };
 
 const reducer = (state: State, action: Action): State => {
     switch (action.type) {
         case ActionType.SEND_REQUEST:
-            return { loading: true };
+            return { loading: true, tokenExpired: false };
         case ActionType.PARSE_RESPONSE:
             return {
                 loading: false,
+                tokenExpired: false,
                 statusCode: action.payload.status,
                 data: {
                     parsed: action.payload.data,
@@ -67,11 +75,14 @@ const reducer = (state: State, action: Action): State => {
             const message = data?.message || "Something went wrong!";
             return {
                 loading: false,
+                tokenExpired: false,
                 statusCode: action.payload.status,
                 error: { message, raw: action.payload },
             };
         case ActionType.CLEAR_ERROR:
-            return { loading: false };
+            return { loading: false, tokenExpired: false };
+        case ActionType.TOKEN_EXPIRED:
+            return { loading: false, tokenExpired: true };
         default:
             return state;
     }
@@ -116,24 +127,39 @@ export const useHttp = (
             method: HttpMethods,
             data?: object
         ): Promise<AxiosResponse> => {
+            // Create abort controller
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
+
+            // Prepare the web client
             let contentType: HeaderContent = "application/json";
             if (data instanceof FormData) {
                 contentType = "multipart/form-data";
             }
             const webClient = getClient(contentType);
-            dispatch({ type: ActionType.SEND_REQUEST });
+
             try {
+                // Send Request
+                dispatch({ type: ActionType.SEND_REQUEST });
                 const resp = await webClient[method](url, data, {
                     signal: abortControllerRef.current.signal,
                 });
+
+                // Handle good response
                 dispatchOk(resp);
-                abortControllerRef.current = null;
                 return resp;
             } catch (err) {
+                // Handle error
                 if (err instanceof AxiosError) {
+                    const errorDetail: string =
+                        err.response?.data?.details?.error || "";
+
                     if (
+                        err.response?.status === HttpStatusCode.Unauthorized &&
+                        errorDetail === "Token expired"
+                    ) {
+                        dispatch({ type: ActionType.TOKEN_EXPIRED });
+                    } else if (
                         err.response?.status === HttpStatusCode.NotFound &&
                         options.ignoreNotFound
                     ) {
@@ -143,8 +169,11 @@ export const useHttp = (
                         dispatchNotOk(err);
                     }
                 }
-                abortControllerRef.current = null;
+
+                // This should not be reached. Defensive programming
                 throw err;
+            } finally {
+                abortControllerRef.current = null;
             }
         },
         []
