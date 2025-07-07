@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiError, HttpStatus } from "../../types";
 import { getUserFromToken } from "../auth";
+import { TokenExpiredError } from "jsonwebtoken";
 
 const getError = (message?: string): ApiError => {
     const details = message ? { error: message } : {};
@@ -33,6 +34,9 @@ export const checkAuthToken = async (
         }
         req.currentUser = user;
     } catch (err) {
+        if (err instanceof TokenExpiredError) {
+            return getError("Token expired");
+        }
         return getError("Token not valid");
     }
     return null;
