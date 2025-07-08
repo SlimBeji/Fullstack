@@ -3,7 +3,7 @@ import "./Auth.css";
 import { useState } from "react";
 
 import { useForm, emptyStateBuilder, useHttp } from "../hooks";
-import { Card, ErrorModal, LoadingSpinner } from "../components/ui";
+import { Card, HttpError, LoadingSpinner } from "../components/ui";
 import { Input, Button, ImageUpload } from "../components/form";
 import { useAppDispatch, authSlice } from "../states";
 
@@ -84,9 +84,9 @@ const Auth: React.FC = () => {
     return (
         <div className="center">
             {data.error?.message && (
-                <ErrorModal
+                <HttpError
                     header="Credentials not valid!"
-                    error={data.error?.message}
+                    error={data.error}
                     onClear={() => clearError()}
                 />
             )}

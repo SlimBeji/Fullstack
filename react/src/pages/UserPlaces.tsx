@@ -4,7 +4,7 @@ import { useEffect, useCallback } from "react";
 import PlaceList from "../components/places/PlaceList";
 
 import { useAppSelector } from "../states";
-import { ErrorModal, LoadingSpinner, Card } from "../components/ui";
+import { HttpError, LoadingSpinner, Card } from "../components/ui";
 import { Button } from "../components/form";
 import { Place } from "../types";
 import { useHttp } from "../hooks";
@@ -39,8 +39,8 @@ const UserPlaces: React.FC = () => {
     };
 
     const renderPlaces = (): React.JSX.Element | undefined => {
-        if (!data.loading && data.data?.parsed?.data) {
-            let places = data.data.parsed.data as Place[];
+        if (!data.loading && data.json?.data) {
+            let places = data.json.data as Place[];
             if (data.statusCode === HttpStatusCode.NotFound) {
                 places = [];
             }
@@ -72,7 +72,7 @@ const UserPlaces: React.FC = () => {
     return (
         <>
             {data.error && (
-                <ErrorModal error={data.error.message} onClear={clearError} />
+                <HttpError error={data.error} onClear={clearError} />
             )}
             {data.loading && (
                 <div className="center">

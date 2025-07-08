@@ -8,7 +8,7 @@ import {
     Card,
     Map,
     Modal,
-    ErrorModal,
+    HttpError,
     LoadingSpinner,
 } from "../../components/ui";
 import { Button } from "../../components/form";
@@ -65,7 +65,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
     return (
         <>
             {data.error && (
-                <ErrorModal error={data.error.message} onClear={clearError} />
+                <HttpError error={data.error} onClear={clearError} />
             )}
             {data.loading && (
                 <div className="center">

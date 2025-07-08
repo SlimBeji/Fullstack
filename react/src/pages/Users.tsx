@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import UsersList from "../components/user/UsersList";
-import { ErrorModal, LoadingSpinner } from "../components/ui";
+import { HttpError, LoadingSpinner } from "../components/ui";
 import { useHttp } from "../hooks";
 import { User } from "../types";
 
@@ -15,9 +15,9 @@ const Users: React.FC = () => {
     return (
         <>
             {data.error?.message && (
-                <ErrorModal
+                <HttpError
                     header="Could not fetch users!"
-                    error={data.error.message}
+                    error={data.error}
                     onClear={() => clearError()}
                 />
             )}
@@ -26,9 +26,7 @@ const Users: React.FC = () => {
                     <LoadingSpinner asOverlay />
                 </div>
             )}
-            {data.data?.parsed?.data && (
-                <UsersList items={data.data.parsed.data as User[]} />
-            )}
+            {data.json?.data && <UsersList items={data.json.data as User[]} />}
         </>
     );
 };

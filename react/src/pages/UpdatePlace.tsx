@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useForm, emptyStateBuilder, useHttp } from "../hooks";
 import { Button, Input } from "../components/form";
-import { ErrorModal, LoadingSpinner } from "../components/ui";
+import { HttpError, LoadingSpinner } from "../components/ui";
 import { minLengthValidator } from "../util";
 import { AxiosResponse } from "axios";
 
@@ -54,7 +54,7 @@ const UpdatePlace: React.FC = () => {
     };
 
     const renderForm = (): React.JSX.Element | undefined => {
-        if (data.loading || !data.data?.parsed) {
+        if (data.loading || !data.json) {
             return;
         }
 
@@ -102,7 +102,7 @@ const UpdatePlace: React.FC = () => {
     return (
         <>
             {data.error && (
-                <ErrorModal error={data.error.message} onClear={clearError} />
+                <HttpError error={data.error} onClear={clearError} />
             )}
             {data.loading && (
                 <div className="center">

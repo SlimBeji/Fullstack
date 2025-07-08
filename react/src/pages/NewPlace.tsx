@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { minLengthValidator } from "../util";
 import { useHttp, emptyStateBuilder, useForm } from "../hooks";
-import { ErrorModal, LoadingSpinner } from "../components/ui";
+import { HttpError, LoadingSpinner } from "../components/ui";
 import { Button, Input, ImageUpload } from "../components/form";
 import { useAppSelector } from "../states";
 
@@ -41,7 +41,7 @@ const NewPlace: React.FC = () => {
     return (
         <>
             {data.error && (
-                <ErrorModal error={data.error.message} onClear={clearError} />
+                <HttpError error={data.error} onClear={clearError} />
             )}
             <form className="place-form" onSubmit={onSubmit}>
                 {data.loading && <LoadingSpinner asOverlay />}
