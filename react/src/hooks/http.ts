@@ -6,7 +6,7 @@ import { getClient } from "../util";
 interface State {
     loading: boolean;
     statusCode?: number;
-    data?: Record<string, any>;
+    json?: Record<string, any>;
     error?: {
         tokenExpired?: boolean;
         message: string;
@@ -56,7 +56,7 @@ const reducer = (state: State, action: Action): State => {
             return {
                 loading: false,
                 statusCode: action.payload.status,
-                data: action.payload.data,
+                json: action.payload.data,
             };
         case ActionType.PARSE_ERROR:
             const errResponse = action.payload.response;
