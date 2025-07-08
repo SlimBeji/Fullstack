@@ -5,15 +5,12 @@ import { getClient } from "../util";
 
 interface State {
     loading: boolean;
-    tokenExpired: boolean;
     statusCode?: number;
-    data?: {
-        parsed: Record<string, any>;
-        raw: AxiosResponse;
-    };
+    data?: Record<string, any>;
     error?: {
+        tokenExpired?: boolean;
         message: string;
-        raw: AxiosError;
+        response?: AxiosResponse;
     };
 }
 
@@ -39,10 +36,6 @@ interface ParseErrorAction {
     payload: AxiosError;
 }
 
-interface TokenExpiredAction {
-    type: ActionType.TOKEN_EXPIRED;
-}
-
 interface ClearErrorAction {
     type: ActionType.CLEAR_ERROR;
 }
@@ -51,38 +44,51 @@ type Action =
     | SendRequestAction
     | ParseResponseAction
     | ParseErrorAction
-    | ClearErrorAction
-    | TokenExpiredAction;
+    | ClearErrorAction;
 
-const emptyState: State = { loading: false, tokenExpired: false };
+const emptyState: State = { loading: false };
 
 const reducer = (state: State, action: Action): State => {
     switch (action.type) {
         case ActionType.SEND_REQUEST:
-            return { loading: true, tokenExpired: false };
+            return { loading: true };
         case ActionType.PARSE_RESPONSE:
             return {
                 loading: false,
-                tokenExpired: false,
                 statusCode: action.payload.status,
-                data: {
-                    parsed: action.payload.data,
-                    raw: action.payload,
-                },
+                data: action.payload.data,
             };
         case ActionType.PARSE_ERROR:
+            const errResponse = action.payload.response;
+            const status = errResponse?.status;
+            const errorData = errResponse?.data as any;
+            const errMessage: string = errorData?.details?.error || "";
+
+            if (errMessage === "Token expired") {
+                return {
+                    loading: false,
+                    statusCode: status,
+                    error: {
+                        tokenExpired: true,
+                        message: errMessage,
+                        response: errResponse,
+                    },
+                };
+            }
+
             const data = action.payload.response?.data as { message?: string };
             const message = data?.message || "Something went wrong!";
             return {
                 loading: false,
-                tokenExpired: false,
                 statusCode: action.payload.status,
-                error: { message, raw: action.payload },
+                error: {
+                    tokenExpired: false,
+                    message,
+                    response: action.payload.response,
+                },
             };
         case ActionType.CLEAR_ERROR:
-            return { loading: false, tokenExpired: false };
-        case ActionType.TOKEN_EXPIRED:
-            return { loading: false, tokenExpired: true };
+            return { loading: false };
         default:
             return state;
     }
@@ -151,15 +157,7 @@ export const useHttp = (
             } catch (err) {
                 // Handle error
                 if (err instanceof AxiosError) {
-                    const errorDetail: string =
-                        err.response?.data?.details?.error || "";
-
                     if (
-                        err.response?.status === HttpStatusCode.Unauthorized &&
-                        errorDetail === "Token expired"
-                    ) {
-                        dispatch({ type: ActionType.TOKEN_EXPIRED });
-                    } else if (
                         err.response?.status === HttpStatusCode.NotFound &&
                         options.ignoreNotFound
                     ) {
@@ -170,7 +168,6 @@ export const useHttp = (
                     }
                 }
 
-                // This should not be reached. Defensive programming
                 throw err;
             } finally {
                 abortControllerRef.current = null;
