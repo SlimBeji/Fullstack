@@ -24,7 +24,7 @@ const emptyState = emptyStateBuilder<AuthFormTypes>(AuthForm);
 const Auth: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const [data, sendRequest, clearError] = useHttp();
+    const [data, sendRequest, clearError] = useHttp({ noToken: true });
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [state, inputHandlers, _, fieldsActivationHandler] =
         useForm<AuthFormTypes>(emptyState);

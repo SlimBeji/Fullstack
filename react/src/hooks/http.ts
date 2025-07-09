@@ -3,6 +3,8 @@ import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import { HeaderContent, HttpMethods } from "../types";
 import { getClient } from "../util";
 
+const TOKEN_EXPIRED = "Token expired";
+
 interface State {
     loading: boolean;
     statusCode?: number;
@@ -59,18 +61,29 @@ const reducer = (state: State, action: Action): State => {
                 json: action.payload.data,
             };
         case ActionType.PARSE_ERROR:
+            if (action.payload.message === "Token expired") {
+                // Token stored was purged after expiring
+                return {
+                    loading: false,
+                    error: {
+                        tokenExpired: true,
+                        message: TOKEN_EXPIRED,
+                    },
+                };
+            }
+
+            // Sent expired token
             const errResponse = action.payload.response;
             const status = errResponse?.status;
             const errorData = errResponse?.data as any;
             const errMessage: string = errorData?.details?.error || "";
-
-            if (errMessage === "Token expired") {
+            if (errMessage === TOKEN_EXPIRED) {
                 return {
                     loading: false,
                     statusCode: status,
                     error: {
                         tokenExpired: true,
-                        message: errMessage,
+                        message: TOKEN_EXPIRED,
                         response: errResponse,
                     },
                 };
@@ -95,6 +108,7 @@ const reducer = (state: State, action: Action): State => {
 };
 
 interface useHttpOptions {
+    noToken?: boolean;
     ignoreNotFound?: boolean;
 }
 
@@ -143,6 +157,14 @@ export const useHttp = (
                 contentType = "multipart/form-data";
             }
             const webClient = getClient(contentType);
+            const token = webClient.defaults.headers.Authorization;
+
+            if (!token && !options.noToken) {
+                const err = new AxiosError(TOKEN_EXPIRED);
+                dispatchNotOk(err);
+                abortControllerRef.current = null;
+                throw err;
+            }
 
             try {
                 // Send Request
