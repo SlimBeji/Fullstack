@@ -24,7 +24,7 @@ const emptyState = emptyStateBuilder<AuthFormTypes>(AuthForm);
 const Auth: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const [data, sendRequest, clearError] = useHttp({ noToken: true });
+    const [data, sendRequest, clearError] = useHttp();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [state, inputHandlers, _, fieldsActivationHandler] =
         useForm<AuthFormTypes>(emptyState);
@@ -43,10 +43,15 @@ const Auth: React.FC = () => {
     }
 
     const onSignin = async (): Promise<void> => {
-        const resp = await sendRequest("/auth/signin", "post", {
-            email: state.inputs.email.val,
-            password: state.inputs.password.val,
-        });
+        const resp = await sendRequest(
+            "/auth/signin",
+            "post",
+            {
+                email: state.inputs.email.val,
+                password: state.inputs.password.val,
+            },
+            false
+        );
         const data = resp.data as EncodedUserToken;
         dispatch(authSlice.actions.login(data));
     };

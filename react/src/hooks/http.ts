@@ -108,7 +108,6 @@ const reducer = (state: State, action: Action): State => {
 };
 
 interface useHttpOptions {
-    noToken?: boolean;
     ignoreNotFound?: boolean;
 }
 
@@ -120,7 +119,7 @@ export const useHttp = (
         url: string,
         method: HttpMethods,
         data?: Record<string, any>,
-        contentType?: HeaderContent
+        tokenRequired?: boolean
     ) => Promise<AxiosResponse>,
     () => void
 ] => {
@@ -145,7 +144,8 @@ export const useHttp = (
         async (
             url: string,
             method: HttpMethods,
-            data?: object
+            data?: object,
+            tokenRequired: boolean = true
         ): Promise<AxiosResponse> => {
             // Create abort controller
             abortControllerRef.current?.abort();
@@ -159,7 +159,7 @@ export const useHttp = (
             const webClient = getClient(contentType);
             const token = webClient.defaults.headers.Authorization;
 
-            if (!token && !options.noToken) {
+            if (!token && tokenRequired) {
                 const err = new AxiosError(TOKEN_EXPIRED);
                 dispatchNotOk(err);
                 abortControllerRef.current = null;
