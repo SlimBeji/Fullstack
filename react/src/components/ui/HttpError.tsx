@@ -43,7 +43,7 @@ const HttpError: React.FC<HttpErrorProps> = ({ error, onClear, header }) => {
             show={!!error}
             footer={<Button onClick={tokenExpiredCleaner}>Authenticate</Button>}
         >
-            <p>Token expired! Please login again</p>
+            <p>Token expired! Please login again!</p>
         </Modal>
     );
 };
