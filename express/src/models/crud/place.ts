@@ -63,7 +63,7 @@ export class CrudPlace extends Crud<
             }
             return obj;
         });
-        return await Promise.all(placesPromises);
+        return Promise.all(placesPromises);
     }
 
     public async create(form: PlacePost): Promise<PlaceRead> {

@@ -82,7 +82,7 @@ export abstract class Crud<
 
     // Read
     public async getDocument(id: string | Types.ObjectId): Promise<Doc | null> {
-        return await this.model.findById(id);
+        return this.model.findById(id);
     }
 
     public async get(id: string | Types.ObjectId): Promise<Read | null> {
@@ -123,9 +123,7 @@ export abstract class Crud<
     }
 
     public async countDocuments(filterQuery: FilterData): Promise<number> {
-        return await this.model.countDocuments(
-            filterQuery as RootFilterQuery<DBInt>
-        );
+        return this.model.countDocuments(filterQuery as RootFilterQuery<DBInt>);
     }
 
     public async fetchDocuments(filterQuery: FilterQuery): Promise<Doc[]> {
@@ -167,7 +165,7 @@ export abstract class Crud<
         filterQuery: FilterQuery
     ): Promise<PaginatedData<Partial<Read>>> {
         filterQuery = this.safeFilter(user, filterQuery);
-        return await this.fetch(filterQuery);
+        return this.fetch(filterQuery);
     }
 
     // Save
@@ -202,7 +200,7 @@ export abstract class Crud<
 
     public async safeCreate(user: UserRead, post: Post): Promise<Read> {
         this.safeCheck(user, post);
-        return await this.create(post);
+        return this.create(post);
     }
 
     // Update
@@ -232,7 +230,7 @@ export abstract class Crud<
     ): Promise<Read> {
         this.safeCheck(user, doc);
         this.safeCheck(user, form);
-        return await this.update(doc, form);
+        return this.update(doc, form);
     }
 
     public async safeUpdateById(
@@ -244,7 +242,7 @@ export abstract class Crud<
         if (!doc) {
             throw this.notFoundError(id);
         }
-        return await this.safeUpdate(user, doc, form);
+        return this.safeUpdate(user, doc, form);
     }
 
     // Delete
@@ -278,6 +276,6 @@ export abstract class Crud<
             throw this.notFoundError(id);
         }
         this.safeCheck(user, doc);
-        return await this.deleteDocument(doc);
+        return this.deleteDocument(doc);
     }
 }

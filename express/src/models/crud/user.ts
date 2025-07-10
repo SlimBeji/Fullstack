@@ -69,7 +69,7 @@ export class CrudUser extends Crud<
             }
             return obj;
         });
-        return await Promise.all(userPromises);
+        return Promise.all(userPromises);
     }
 
     public async checkDuplicate(email: string, name: string): Promise<string> {
@@ -108,7 +108,7 @@ export class CrudUser extends Crud<
 
     public async createDocument(form: UserCreate): Promise<UserDocument> {
         form.password = await hash(form.password, DEFAULT_HASH_SALT);
-        return await super.createDocument(form);
+        return super.createDocument(form);
     }
 
     public async create(form: UserPost): Promise<UserRead> {
@@ -137,7 +137,7 @@ export class CrudUser extends Crud<
             throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
         }
         const user = await this.create({ ...form, isAdmin: false });
-        return await createToken(user);
+        return createToken(user);
     }
 
     public async signin(form: Signin): Promise<EncodedToken> {
@@ -152,7 +152,7 @@ export class CrudUser extends Crud<
         const user = users[0];
         const isValidPassword = await compare(form.password, user.password);
         if (!isValidPassword) throw error;
-        return await createToken(user);
+        return createToken(user);
     }
 
     public async update(user: UserDocument, form: UserPut): Promise<UserRead> {
