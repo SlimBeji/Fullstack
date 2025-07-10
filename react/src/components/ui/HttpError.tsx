@@ -2,7 +2,6 @@ import { AxiosResponse } from "axios";
 import ErrorModal from "./ErrorModal";
 import Modal from "./Modal";
 import { Button } from "../form";
-import { useNavigate } from "react-router-dom";
 import { authSlice, useAppDispatch } from "../../states";
 
 interface HttpErrorProps {
@@ -16,14 +15,11 @@ interface HttpErrorProps {
 }
 
 const HttpError: React.FC<HttpErrorProps> = ({ error, onClear, header }) => {
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const tokenExpiredCleaner = () => {
         onClear();
         dispatch(authSlice.actions.logout());
-        navigate("/auth");
-        console.log("I was executed");
     };
 
     if (!error.tokenExpired) {
