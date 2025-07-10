@@ -25,7 +25,6 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
             userRefMapping.set(newUserIn._ref, user.id);
         })
     );
-    console.log("✅ Collection User seeded!");
 };
 
 const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
@@ -40,21 +39,24 @@ const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
             placeRefMapping.set(newPlaceIn._ref, place.id);
         })
     );
-    console.log("✅ Collection Place seeded!");
 };
 
-export const seedDb = async (): Promise<void> => {
+export const seedDb = async (verbose: boolean = false): Promise<void> => {
     await createCollections();
     await seedUsers(users);
+    if (verbose) console.log("✅ Collection User seeded!");
     await seedPlaces(places);
-    console.log("✅ Finished. You may exit");
+    if (verbose) console.log("✅ Collection Place seeded!");
+    if (verbose) console.log("✅ Finished. You may exit");
 };
 
-export const dumpDb = async (): Promise<void> => {
+export const dumpDb = async (verbose: boolean = false): Promise<void> => {
     const collections = await mongoose.connection.db!.collections();
     for (const collection of collections) {
         await collection.deleteMany({});
-        console.log(`✅ Collection ${collection.namespace} cleared!`);
+        if (verbose) {
+            console.log(`✅ Collection ${collection.namespace} cleared!`);
+        }
     }
-    console.log("✅ Finished. You may exit");
+    if (verbose) console.log("✅ Finished. You may exit");
 };
