@@ -1,5 +1,9 @@
 import fs from "fs";
 
+export const sleep = (seconds: number) => {
+    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};
+
 export const parseDotNotation = (data: any): any => {
     const result: any = {};
 
