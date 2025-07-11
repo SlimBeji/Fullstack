@@ -47,3 +47,9 @@ const aiWorker = new Worker(Queues.AI, aiTasksProcessor, config);
 aiWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);
 });
+
+// Cleaner
+export const cleanEmailWorker = async () => {
+    await aiQueue.close();
+    await aiWorker.close();
+};

@@ -40,3 +40,9 @@ const emailWorker = new Worker(Queues.EMAILS, emailTasksProcessor, config);
 emailWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);
 });
+
+// Cleaner
+export const cleanAiWorker = async () => {
+    await emailQueue.close();
+    await emailWorker.close();
+};
