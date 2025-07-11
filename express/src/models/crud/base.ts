@@ -65,6 +65,11 @@ export abstract class Crud<
                 return result;
             },
         });
+
+        if (!obj?.id) {
+            delete obj.id;
+        }
+
         return obj;
     }
 
