@@ -59,16 +59,12 @@ export abstract class Crud<
     public serializeDocument(document: Doc): DBInt {
         const obj = document.toObject({
             getters: true,
+            versionKey: false,
             transform: (doc, ret) => {
-                delete ret._id;
-                delete ret.__v;
-                return ret;
+                const { _id, ...result } = { ...ret };
+                return result;
             },
         });
-
-        if (!obj?.id) {
-            delete obj.id;
-        }
         return obj;
     }
 
