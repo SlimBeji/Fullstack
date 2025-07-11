@@ -180,7 +180,7 @@ export abstract class Crud<
             ...form,
         });
         try {
-            this.saveDocument(newObj);
+            await this.saveDocument(newObj);
             return newObj;
         } catch (err) {
             if (err instanceof Error) {
@@ -204,7 +204,7 @@ export abstract class Crud<
     public async updateDocument(obj: Doc, form: Update): Promise<Doc> {
         obj.set(form);
         try {
-            this.saveDocument(obj);
+            await this.saveDocument(obj);
             return obj;
         } catch (err) {
             if (err instanceof Error) {
