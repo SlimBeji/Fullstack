@@ -5,7 +5,8 @@ import { readImage } from "../../../lib/utils";
 import { UserRead } from "../../../models/schemas";
 import { HttpStatus } from "../../../types";
 import { createToken } from "../../../api/auth";
-import { connectDbs, closeDbs } from "../../../lib/clients";
+import { connectDbs } from "../../../lib/clients";
+import { cleanAfterTest } from "../../helpers";
 
 let adminExample: UserRead;
 let adminToken: string = "";
@@ -24,7 +25,7 @@ beforeAll(async () => {
 afterAll(async () => {
     token = "";
     adminToken = "";
-    await closeDbs();
+    await cleanAfterTest();
 });
 
 describe("GET /api/users", () => {

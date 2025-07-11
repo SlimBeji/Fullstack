@@ -1,7 +1,8 @@
 import supertest from "supertest";
 import app from "../../../api";
 import { crudUser } from "../../../models/crud";
-import { connectDbs, closeDbs } from "../../../lib/clients";
+import { connectDbs } from "../../../lib/clients";
+import { cleanAfterTest } from "../../helpers";
 
 const request = supertest(app);
 
@@ -10,7 +11,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await closeDbs();
+    await cleanAfterTest();
 });
 
 describe("GET /api/hello-world/", () => {
