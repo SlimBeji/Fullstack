@@ -29,10 +29,6 @@ export const PlaceCollectionSchema = new Schema<PlaceDB>(
         embedding: {
             type: [Number],
             required: false,
-            validate: [
-                (arr: number[]) => arr.length === 384,
-                "{PATH} must have exactly 384 elements",
-            ],
         },
     },
     { timestamps: true }
