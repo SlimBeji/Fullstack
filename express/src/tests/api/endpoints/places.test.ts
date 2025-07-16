@@ -4,8 +4,7 @@ import { crudPlace, crudUser } from "../../../models/crud";
 import { getImagePath } from "../../../lib/utils";
 import { PlaceRead } from "../../../models/schemas";
 import { HttpStatus } from "../../../types";
-import { connectDbs } from "../../../lib/clients";
-import { cleanAfterTest } from "../../helpers";
+import { connectDbs, closeAll } from "../../../lib/clients";
 
 let adminToken: string = "";
 let token: string = "";
@@ -25,7 +24,7 @@ beforeAll(async () => {
 afterAll(async () => {
     token = "";
     adminToken = "";
-    await cleanAfterTest();
+    await closeAll();
 });
 
 describe("GET /api/places", () => {
