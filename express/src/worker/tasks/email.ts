@@ -42,7 +42,7 @@ emailWorker.on("failed", (job, err) => {
 });
 
 // Cleaner
-export const cleanAiWorker = async () => {
+export const closeAiWorker = async () => {
     await emailQueue.close();
     await emailWorker.close();
 };

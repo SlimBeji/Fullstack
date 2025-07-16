@@ -49,7 +49,7 @@ aiWorker.on("failed", (job, err) => {
 });
 
 // Cleaner
-export const cleanEmailWorker = async () => {
+export const closeEmailWorker = async () => {
     await aiQueue.close();
     await aiWorker.close();
 };

@@ -1,7 +1,7 @@
-import { cleanEmailWorker } from "./ai";
-import { cleanAiWorker } from "./email";
+import { closeEmailWorker } from "./ai";
+import { closeAiWorker } from "./email";
 
-export const cleanWorker = async () => {
-    await cleanEmailWorker();
-    await cleanAiWorker();
+export const closeWorkers = async () => {
+    await closeEmailWorker();
+    await closeAiWorker();
 };

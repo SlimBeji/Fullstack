@@ -1,5 +1,5 @@
 import { sendNewsletterCron } from "./emails";
 
-export const cleanCron = async () => {
+export const closeCrons = async () => {
     await sendNewsletterCron.stop();
 };
