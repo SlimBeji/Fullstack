@@ -27,6 +27,7 @@ async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
 }
 
 export const placeEmbedding = (placeId: string) => {
+    if (process.env.JEST_WORKER_ID) return;
     aiQueue.add(Tasks.PLACE_EMBEDDING, { placeId });
 };
 

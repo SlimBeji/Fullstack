@@ -20,6 +20,7 @@ async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
 }
 
 export const sendNewsletter = (name: string, email: string) => {
+    if (process.env.JEST_WORKER_ID) return;
     emailQueue.add(Tasks.NEWSLETTER, { name, email });
 };
 
