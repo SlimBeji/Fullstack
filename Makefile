@@ -28,7 +28,7 @@ express-bash:
 	docker exec -it express bash
 
 express-test:
-	docker exec -it express npm test
+	docker exec -it express npm test /src/tests/api/endpoints/users.test.ts
 
 express-check:
 	docker exec -it express npx tsc --noEmit

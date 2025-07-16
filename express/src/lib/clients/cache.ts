@@ -35,6 +35,14 @@ export class RedisClient {
         }
     }
 
+    public async flushAll(): Promise<void> {
+        if (this.isTest) {
+            await (this.client as InstanceType<typeof IORedisMock>).flushall();
+        } else {
+            await (this.client as RedisClientType).flushAll();
+        }
+    }
+
     public async close(): Promise<void> {
         if (this.isReady && !this.isTest) {
             await this.client.quit();

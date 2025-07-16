@@ -2,7 +2,7 @@ import mongoose, { Types } from "mongoose";
 import { users } from "./users";
 import { places } from "./places";
 import { crudUser, crudPlace } from "../crud";
-import { uploadLocal } from "../../lib/clients";
+import { redisClient, uploadLocal } from "../../lib/clients";
 import { CollectionEnum } from "../../types";
 import { UserSeed, PlaceSeed } from "../schemas";
 
@@ -58,5 +58,7 @@ export const dumpDb = async (verbose: boolean = false): Promise<void> => {
             console.log(`✅ Collection ${collection.namespace} cleared!`);
         }
     }
+    await redisClient.flushAll();
+    if (verbose) console.log("✅ Cache DB flushed");
     if (verbose) console.log("✅ Finished. You may exit");
 };
