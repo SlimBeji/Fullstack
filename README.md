@@ -1,23 +1,67 @@
-# MERN example project
+# 🔧 Multi-Stack Fullstack Project
 
-This home project was made for learning purposes. The starting point of this project is the following Udemy course: [React, NodeJS, Express & MongoDB - The MERN Fullstack Guide](https://www.udemy.com/course/react-nodejs-express-mongodb-the-mern-fullstack-guide/).
+This project is an exploration of modern fullstack development by building and comparing interchangeable backend APIs and frontend SPAs using different technologies.
 
-Contrary to the course, this mini-project uses Typescript for both the express backend and the React frontend. This project is also a containerized version with mongodb images and a Google Cloud Storage emulator contrary to the original course.
+## 💡 Project Overview
 
-# Docker Setup
+The core idea is to **replicate the same REST API and frontend application** across multiple tech stacks and make them **fully interchangeable**.
 
--   **Frontend**: React app created with Vite and using Typescript
--   **Backend**: Express api build with Typescript
--   **Mongo**: A mongodb replicaset with two nodes _mongo1_ and _mongo2_, a _mongo-setup_ container to configure the replicaset and a _mongo-express_ (Compass alternative) for UI
--   **GCS**: A Google cloud emulator using the following image: fsouza/fake-gcs-server
+All backends expose **identical endpoints**, and all frontends consume the same APIs, enabling any frontend to work with any backend without modification.
 
-# Next Steps
+This setup allows for:
 
--   The next steps of this home project is to replicate the Node/express backend with
+-   Comparing **code structure**, **developer experience**, and **performance**
+-   Experimenting with new technologies in a real-world scenario
+-   Understanding how to build scalable, interchangeable services
 
-1. Python/FastAPI
-2. Go/Gin
+## 🧱 Technology Stack
 
-The two replicated APIs will be added as micorservices. The goal is to have 3 interchangeable backends with identical functionalities and to explore the common patterns in building REST API with 3 different languages.
+### 🔙 Backends
 
-This mini project will evolve into a fullstack boilerplate example that can combines multiple frontend technologies with different backend technologies.
+Each backend implements the **same logic**, **routes**, and **data models**:
+
+-   **TypeScript** – using [Express](https://expressjs.com/)
+-   **Python** – using [FastAPI](https://fastapi.tiangolo.com/)
+-   **Go** – using [Gin](https://gin-gonic.com/)
+-   **Rust** – using [Axum](https://github.com/tokio-rs/axum)
+
+Each backend connects to a shared set of services (e.g., MongoDB, Redis).
+
+### 🔜 Frontends
+
+Each frontend is a modern **SPA** built with:
+
+-   **React**
+-   **Vue**
+-   **Angular**
+-   **Svelte**
+
+All frontends communicate with any backend through the same REST API, enabling **plug-and-play** architecture.
+
+## 🐳 Dockerized Setup
+
+Each app (frontend/backend) lives in its own folder (e.g., `/express`, `/react`, etc.) and is containerized using Docker.
+
+### 🔗 Shared Services (via `docker-compose.yaml`)
+
+-   **MongoDB**: A MongoDB replica set with `mongo1`, `mongo2`, and a `mongo-setup` container to initialize the replica configuration.
+-   **Mongo Express**: Web-based UI for browsing and managing MongoDB data.
+-   **Fake GCS Server**: A local emulator for Google Cloud Storage, using [`fsouza/fake-gcs-server`](https://github.com/fsouza/fake-gcs-server).
+-   **Redis**: In-memory database used for caching and as a message broker.
+-   **RedisInsight**: Web UI for inspecting and managing Redis data.
+
+## ⚠️ Disclaimer
+
+This project came to fruition after taking the following Udemy course:  
+[React, NodeJS, Express & MongoDB - The MERN Fullstack Guide](https://www.udemy.com/course/react-nodejs-express-mongodb-the-mern-fullstack-guide/)
+
+**Key differences:**
+
+-   Rewritten using **TypeScript** (course uses plain JavaScript)
+-   **Different folder structure** and **project architecture**
+-   Some **CSS/UI components** are reused
+
+## 🚀 Next Steps
+
+-   Add the **Python/FastAPI** backend
+-   Add the **Go/Gin** backend
