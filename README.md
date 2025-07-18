@@ -67,11 +67,15 @@ This project came to fruition after taking the following Udemy course:
 
 The first step in building a backend is to **design the data layer**—defining how data is structured, validated, and manipulated. A well-thought-out model setup is critical not only for development but also for testing, seeding, and consistency across different backend implementations.
 
-Each backend will include a `models/` folder containing several key subfolders to handle different schema use-cases.
+Each backend will include a `models/` folder containing several key subfolders:
 
 #### 📁 📁 Schemas
 
 We break down schema definitions based on their **specific purpose** in the application lifecycle: creation, seeding, reading, editing, querying...
+
+Each model or object will have its own schema file.
+
+The types of schemas defined are described below:
 
 ##### 📦 DB Schema
 
@@ -81,7 +85,7 @@ We break down schema definitions based on their **specific purpose** in the appl
 ##### 🌱 Seed Schema
 
 -   Used for generating dummy data when seeding a test database.
--   Can include reference fields to link documents across collections.
+-   Can include reference fields to link documents across collections since examples does not proper indexes yet.
 
 ##### ✍️ Creation Schema
 
@@ -179,3 +183,7 @@ Each example is structured using the [Seed Schema](#seed-schema) defined in the 
 
 -   Add the **Python/FastAPI** backend
 -   Add the **Go/Gin** backend
+-   Add the **Rust/Axium** backend
+-   Add a **Vue** SPA frontend
+-   Add an **Angular** SPA frontend
+-   Add a **Svelt** SPA frontend
