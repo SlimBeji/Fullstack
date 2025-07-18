@@ -135,7 +135,7 @@ For each collection, a corresponding **CRUD object** is created to encapsulate i
 
 To promote structure and security, CRUD operations are organized into **three layers**:
 
-1. **`*_Document` methods**: Direct interaction with the ORM/database layer.
+1. **`*Document` methods**: Direct interaction with the ORM/database layer.
 2. **Main methods**: High-level interface that uses schemas (e.g., converts `PostSchema` → `CreateSchema`).
 3. **`safe*` methods**: Add authorization and access control logic.
 
