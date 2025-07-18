@@ -177,6 +177,177 @@ This folder contains **example documents** for each model, along with utility me
 
 Each example is structured using the [Seed Schema](#seed-schema) defined in the `schemas/` folder.
 
+### 📁 API
+
+Next after defining the model layer, we take care of the api layer.
+
+The `/api` folder contains all the logic for handling **HTTP requests**, **authentication**, **middleware**, and **API documentation**. It acts as the main entry point for routing requests to the proper backend logic.
+
+It has the following subfolders:
+
+#### 📁📁 Auth
+
+Handles authentication logic.  
+Responsible for issuing **JWT tokens** used to authenticate and authorize users across the app.
+
+#### 📁 Middlewares
+
+Contains middleware functions that apply logic **before or after route handling**, including:
+
+-   **CORS policies**
+-   **Error handling**
+-   **Authentication & Authorization**
+-   **Data validation**
+
+> ⚠️ Some frameworks (like FastAPI) use dependency injection for middleware-like behavior. However, the **concept maps closely to route-level middleware** in frameworks like Express or Gin.
+
+#### 📁 Openapi
+
+This may be a single file to set up the **OpenAPI specification** for the backend.  
+It is used to **auto-generate Swagger UI documentation** from the defined routes and schemas.
+
+> ⚠️ Depending on the framework:
+>
+> -   **FastAPI**: Automatically generates Swagger UI from route and schema definitions.
+> -   **Express/Gin/Axum**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
+
+#### 📁 Routes
+
+Defines the actual **REST API endpoints** for each resource.
+
+Each model exposes a standardized set of **6 CRUD endpoints**, ensuring consistency across all backends:
+
+| Method | Path                | Purpose                                  | Input Schema   | Output Schema       | CRUD Function  |
+| ------ | ------------------- | ---------------------------------------- | -------------- | ------------------- | -------------- |
+| GET    | `/model-name/`      | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `safeFetch()`  |
+| POST   | `/model-name/query` | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `safeFetch()`  |
+| POST   | `/model-name/`      | Create a new record                      | PostSchema     | ReadSchema          | `safeCreate()` |
+| GET    | `/model-name/:uuid` | Retrieve a single record by ID           | –              | ReadSchema          | `safeGet()`    |
+| PUT    | `/model-name/:uuid` | Update an existing record                | PutSchema      | ReadSchema          | `safeUpdate()` |
+| DELETE | `/model-name/:uuid` | Delete a record by ID                    | –              | –                   | `safeDelete()` |
+
+Each route is tied to a corresponding method in the related CRUD module for consistent error handling and logic reuse.
+
+##### 🔍 Querying
+
+In the REST philosophy, the `GET` verb is used to retrieve data, while `POST` is typically used to create resources.
+
+A limitation of `GET` requests is that they **do not support a request body**, which restricts how advanced queries can be expressed. Instead, filtering must rely on **query parameters**:
+
+```
+/model-name?age=25&name=Slim
+```
+
+This simple syntax works for basic use cases, but it falls short when:
+
+-   Filtering by a **range** (e.g. age between 30 and 40)
+-   Matching **substrings** or patterns (e.g. names containing a keyword)
+-   Filtering on **nested fields** (e.g. `address.zipcode`)
+
+Using a JSON body in a `POST` request would solve this, but that would break REST principles. To address this, a more expressive **query parameter syntax** is used.
+
+Each query parameter follows the pattern: `field=operator:value`. If no operator is given, `eq` (equals) is assumed. The field may use dot notation to filter on nested properties.
+
+The different operations to be used are inspired by MongoDB’s query language:
+
+```
+operations = {
+    eq: "$eq",
+    ne: "$ne",
+    gt: "$gt",
+    gte: "$gte",
+    lt: "$lt",
+    lte: "$lte",
+    in: "$in",
+    nin: "$nin",
+    regex: "$regex",
+    text: "$text",
+}
+```
+
+For example, the following request:
+`/user?age=lte:40&age=gte:30&name=regex:Slim&address.zipcode=2040`
+
+Would return users
+
+-   whose age is between 30 and 40
+-   whose name contains `'Slim'`
+-   whose address has a `zipcode=2040`
+
+This will translate to the following mongoDB query
+
+```
+{
+  age: {
+    $lte: 40,
+    $gte: 30
+  },
+  name: {
+    $regex: "Slim"
+  },
+  "address.zipcode": {
+    $eq: 2040
+  }
+}
+
+```
+
+##### 🔁 REST vs GraphQL
+
+A common limitation of REST APIs is **over-fetching** — retrieving more data than needed. For example, you may only need a few fields, but the API returns the entire object. This increases the size of the HTTP response, leading to higher latency and unnecessary load on the backend server.
+
+Another issue arises with **GET request limitations**. Most browsers and servers enforce a maximum URL length (e.g. **2,083 characters in Internet Explorer**). For complex or deeply nested queries, this limit can be exceeded.
+
+**GraphQL** addresses both problems by allowing clients to:
+
+-   Specify exactly what data they want
+-   Use a JSON body for flexible and complex queries
+
+However, GraphQL comes with additional complexity, and in many cases, a well-designed REST API remains simpler and more approachable.
+
+To bring some of GraphQL's flexibility into REST, this project introduces a **`POST /model-name/query`** endpoint.
+
+It offers the same functionality as `GET /model-name`, but with more powerful querying capabilities, including:
+
+-   **Advanced filters**
+-   **Nested fields**
+-   **Field projection**
+
+The following json body
+
+```json
+{
+    "name": ["regex:Slim"],
+    "age": ["gte:30", "lte:40"],
+    "address.zipcode": [2040],
+    "page": 1,
+    "size": 100,
+    "sort": ["name"],
+    "fields": ["id", "name", "address.zipcode"]
+}
+```
+
+would generate this MongoDB query
+
+```js
+db.users
+    .find(
+        {
+            name: { $regex: "Slim" },
+            age: { $gte: 30, $lte: 40 },
+            "address.zipcode": { $eq: 2040 },
+        },
+        {
+            id: 1,
+            name: 1,
+            "address.zipcode": 1,
+        }
+    )
+    .sort({ name: 1 })
+    .skip(0)
+    .limit(100);
+```
+
 ## 📐 Frontend building
 
 ## 🚀 Next Steps
