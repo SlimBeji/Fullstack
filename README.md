@@ -389,8 +389,10 @@ Triggered by a **cron-like scheduler**.
 
 #### 📁📁 Tasks
 
-Asynchronous jobs triggered by the application (e.g., sending emails, processing images, syncing data).  
+Asynchronous jobs triggered by the application (e.g., sending emails, processing images, syncing data, AI model inference).  
 Usually dispatched via a **message queue** or **job broker** like Redis.
+
+> In this backend, a simple example task will be used: embedding the concatenation of two text fields (`title` + `description`) for a given model. This task is asynchronous because it may take some time to complete. The idea is to later on be able to perform smart queries using text query sent by the user and a cosine similarity lookup
 
 ### 📁 Tests
 
