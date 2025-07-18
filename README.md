@@ -404,8 +404,6 @@ Includes one-off or reusable scripts for **data migration**, **debugging**, or *
 
 Stores **static assets** like images or files that may be served by the backend or used for documentation/testing.
 
-## 📐 Frontend building
-
 ## 🚀 Next Steps
 
 -   Add the **Python/FastAPI** backend
