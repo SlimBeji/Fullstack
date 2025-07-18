@@ -348,6 +348,62 @@ db.users
     .limit(100);
 ```
 
+### 📁 Types
+
+Contains reusable and shared type definitions used across the project, including:
+
+-   **Enums**: Predefined sets of constant values
+-   **Interfaces / Types**: Common type definitions for data structures
+-   **Custom Errors**: Standardized error classes or types
+-   **Utility Types**: Generic helpers for type manipulation
+
+### 📁 Lib
+
+The `models/` and `api/` layers are responsible for **storing, retrieving, and updating data**.
+
+In a SaaS application, this stored data is used to **perform actions** and **deliver services** — that's where the `lib/` layer comes in.  
+It contains the **core business logic** that defines how the application uses the data to fulfill its purpose.
+
+Two common subfolders include:
+
+-   **/clients** – Wrappers around third-party APIs or service interfaces (e.g., MongoDB, Redis)
+-   **/utils** – Generic helper functions (e.g., date/string formatting, file and I/O operations)
+
+Other subfolders may be added depending on the domain-specific logic of the software.
+Corresponding endpoints can then be added to the `/api` layer — not just for data access, but also to trigger actions and expose services powered by this business logic.
+
+### 📁 Worker
+
+The `worker/` layer is responsible for **executing background jobs** — tasks that should run **outside the scope of an API request**.
+
+These jobs often apply the **business logic** defined in the `lib/` layer to perform asynchronous or scheduled operations.
+
+> This layer is essential for building scalable SaaS applications, as it offloads work that shouldn't block real-time user interactions.
+
+The `/worker` layer has two main subfolders:
+
+#### 📁📁 Cron
+
+Scheduled jobs (e.g., daily reports, cleanup tasks, notification dispatch).  
+Triggered by a **cron-like scheduler**.
+
+#### 📁📁 Tasks
+
+Asynchronous jobs triggered by the application (e.g., sending emails, processing images, syncing data).  
+Usually dispatched via a **message queue** or **job broker** like Redis.
+
+### 📁 Tests
+
+Contains **unit tests** and other automated tests to validate the application logic.
+
+### 📁 Scripts
+
+Includes one-off or reusable scripts for **data migration**, **debugging**, or **manual testing**.
+
+### 📁 Static
+
+Stores **static assets** like images or files that may be served by the backend or used for documentation/testing.
+
 ## 📐 Frontend building
 
 ## 🚀 Next Steps
