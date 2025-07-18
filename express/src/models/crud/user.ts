@@ -14,7 +14,7 @@ import {
     EncodedToken,
 } from "../schemas";
 import { UserDocument, UserModel } from "../collections";
-import { Crud } from "./base";
+import { Crud, CrudEvent } from "./base";
 
 const DEFAULT_HASH_SALT = 12;
 
@@ -35,7 +35,8 @@ export class CrudUser extends Crud<
 
     public safeCheck(
         user: UserRead,
-        data: UserDocument | UserPost | UserCreate
+        data: UserDocument | UserPost | UserCreate,
+        event: CrudEvent
     ): void {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");

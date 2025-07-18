@@ -9,7 +9,7 @@ import {
 } from "../schemas";
 import { PlaceModel, PlaceDocument } from "../collections";
 import { storage } from "../../lib/clients";
-import { Crud } from "./base";
+import { Crud, CrudEvent } from "./base";
 import { ApiError, HttpStatus, FilterQuery } from "../../types";
 import { placeEmbedding } from "../../worker/tasks";
 
@@ -30,7 +30,8 @@ export class CrudPlace extends Crud<
 
     public safeCheck(
         user: UserRead,
-        data: PlaceDocument | PlacePost | PlaceCreate
+        data: PlaceDocument | PlacePost | PlaceCreate,
+        event: CrudEvent
     ): void {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");

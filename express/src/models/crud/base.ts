@@ -19,6 +19,8 @@ import {
 import { env } from "../../config";
 import { UserRead } from "../schemas";
 
+export type CrudEvent = "create" | "read" | "update" | "delete";
+
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
 export abstract class Crud<
@@ -48,7 +50,11 @@ export abstract class Crud<
 
     // Accessors
 
-    public abstract safeCheck(user: UserRead, doc: Doc | Post | Put): void;
+    public abstract safeCheck(
+        user: UserRead,
+        doc: Doc | Post | Put,
+        event: CrudEvent
+    ): void;
 
     public abstract safeFilter(
         user: UserRead,
@@ -103,7 +109,7 @@ export abstract class Crud<
         if (!document) {
             throw this.notFoundError(id);
         }
-        this.safeCheck(user, document);
+        this.safeCheck(user, document, "read");
         const result = await this.jsonfify(document);
         return result as Read;
     }
@@ -200,7 +206,7 @@ export abstract class Crud<
     public abstract create(post: Post): Promise<Read>;
 
     public async safeCreate(user: UserRead, post: Post): Promise<Read> {
-        this.safeCheck(user, post);
+        this.safeCheck(user, post, "create");
         return this.create(post);
     }
 
@@ -229,8 +235,8 @@ export abstract class Crud<
         doc: Doc,
         form: Put
     ): Promise<Read> {
-        this.safeCheck(user, doc);
-        this.safeCheck(user, form);
+        this.safeCheck(user, doc, "read");
+        this.safeCheck(user, form, "update");
         return this.update(doc, form);
     }
 
@@ -276,7 +282,7 @@ export abstract class Crud<
         if (!doc) {
             throw this.notFoundError(id);
         }
-        this.safeCheck(user, doc);
+        this.safeCheck(user, doc, "delete");
         return this.deleteDocument(doc);
     }
 }
