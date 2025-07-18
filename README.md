@@ -190,7 +190,7 @@ It has the following subfolders:
 Handles authentication logic.  
 Responsible for issuing **JWT tokens** used to authenticate and authorize users across the app.
 
-#### 📁 Middlewares
+#### 📁📁 Middlewares
 
 Contains middleware functions that apply logic **before or after route handling**, including:
 
@@ -201,7 +201,7 @@ Contains middleware functions that apply logic **before or after route handling*
 
 > ⚠️ Some frameworks (like FastAPI) use dependency injection for middleware-like behavior. However, the **concept maps closely to route-level middleware** in frameworks like Express or Gin.
 
-#### 📁 Openapi
+#### 📁📁 Openapi
 
 This may be a single file to set up the **OpenAPI specification** for the backend.  
 It is used to **auto-generate Swagger UI documentation** from the defined routes and schemas.
@@ -211,7 +211,7 @@ It is used to **auto-generate Swagger UI documentation** from the defined routes
 > -   **FastAPI**: Automatically generates Swagger UI from route and schema definitions.
 > -   **Express/Gin/Axum**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
 
-#### 📁 Routes
+#### 📁📁 Routes
 
 Defines the actual **REST API endpoints** for each resource.
 
