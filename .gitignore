@@ -4,11 +4,15 @@
 **/dist
 **/dist-ssr
 **/coverage
+**/__pycache__
+*.pyc
+.cache
 *.local
 todo.txt
 
 # Secret .env files
 express/express.env
+fastapi/fastapi.env
 
 # Docker local images
 mongo
