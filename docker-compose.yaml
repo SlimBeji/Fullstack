@@ -35,6 +35,24 @@ services:
         command: npm start
         restart: on-failure
 
+    fastapi:
+        build:
+            context: .
+            dockerfile: ./fastapi/fastapi.Dockerfile
+        container_name: fastapi
+        ports:
+            - 5001:5001
+        volumes:
+            - ./fastapi:/app
+        env_file:
+            - ./fastapi/fastapi.env
+        depends_on:
+            - mongo1
+            - mongo2
+            - gcs
+        command: uvicorn api.app:create_app --host 0.0.0.0 --port 5001 --reload
+        restart: on-failure
+
     mongo1:
         image: mongo:latest
         container_name: mongo1
