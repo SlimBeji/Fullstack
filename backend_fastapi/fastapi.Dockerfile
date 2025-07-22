@@ -8,5 +8,5 @@ WORKDIR /app
 RUN pip install --upgrade pip
 
 # Copying  and installing requirements
-COPY ./fastapi /app
+COPY ./backend_fastapi /app
 RUN pip install -r requirements.txt

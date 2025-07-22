@@ -38,14 +38,14 @@ services:
     fastapi:
         build:
             context: .
-            dockerfile: ./fastapi/fastapi.Dockerfile
+            dockerfile: ./backend_fastapi/fastapi.Dockerfile
         container_name: fastapi
         ports:
             - 5001:5001
         volumes:
-            - ./fastapi:/app
+            - ./backend_fastapi:/app
         env_file:
-            - ./fastapi/fastapi.env
+            - ./backend_fastapi/fastapi.env
         depends_on:
             - mongo1
             - mongo2
