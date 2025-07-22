@@ -1,0 +1,11 @@
+# FastApi
+uvicorn
+fastapi
+
+# MongoDB
+beanie
+motor
+
+# Schemas
+pydantic[email]>=2.4
+pydantic-settings
