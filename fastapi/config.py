@@ -33,5 +33,9 @@ class Settings(BaseSettings):
     GCS_EMULATOR_PUBLIC_URL: str = ""
     GCS_BLOB_ACCESS_EXPIRATION: int = 3600
 
+    @property
+    def is_production(self) -> bool:
+        return self.ENV == "production"
+
 
 settings = Settings()
