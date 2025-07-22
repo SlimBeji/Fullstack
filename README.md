@@ -16,6 +16,26 @@ This setup allows for:
 
 ## 🧱 Technology Stack
 
+### 🗄️ Database: Why MongoDB over PostgreSQL?
+
+While PostgreSQL is a powerful and mature relational database, this project opts for **MongoDB** — a NoSQL, document-oriented database — for the following reasons:
+
+-   **Natural Data Modeling**: API responses and application data often involve deeply nested object structures. MongoDB’s document model aligns directly with this, reducing the need for complex relational mapping.
+-   **Simplified Queries**: In PostgreSQL, deeply related data requires multiple tables and joins (e.g., grandchild → child → parent). In MongoDB, such structures can often be embedded within a single collection, improving readability and performance.
+-   **JSON Support in PostgreSQL is Limited**: While PostgreSQL supports JSON columns, querying and manipulating nested JSON fields in SQL can become verbose and less intuitive. MongoDB was designed around JSON-style documents, making these operations more seamless.
+
+> For projects involving hierarchical data, flexible schemas, or nested documents, MongoDB provides a more natural and efficient approach.
+
+## 🧱 Technology Stack
+
+### Database (Postgresql vs MongoDB)
+
+This project will explore using MongoDB as a NoSQL database. In past projects, Postgresql was heavily used. It is a very capable database but some drawbacks were observed. The reasons for picking mongoDB as a dtabase is listed below
+
+-   In REST API, the responses may be JSON objects with nested objects. More generally, in programming, data is often represented with deeply nested objects and structures so working with a document oriented Database is more practical.
+-   In Postgresql, we model defined entities in tables and we join the tables with foreign keys. We may endup with more than 3 levels of tables requiring 2 joins to perform queries and lookups. In mongoDB because it is much more natural to have nested documents, the 3 distinct tables defined in Postrgesql can be compressed into one single collection making queries quite simple and fast.
+-   It is possible to use JSON columns in postgresql to avoid having to create distinct tables and join them by foreign keys but writing SQL queries manipulating those json queries may not always be straightformward. In terms of readability, having a grandchild represented as JSON inside a child which is also represented a JSON column my not be ideal. Using a Document oriented approach would be more natural
+
 ### 🔙 Backends
 
 Each backend implements the **same logic**, **routes**, and **data models**:
