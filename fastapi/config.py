@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     # APP
     PORT: int = 5001
     API_URL: str = "http://localhost:5001/api"
+    APP_URL: str
     SECRET_KEY: str
     FILEUPLOAD_MAX_SIZE: int = 100
     JSON_MAX_SIZE: str

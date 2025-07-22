@@ -15,6 +15,7 @@ export const env = {
     // ENV config
     PORT: parseVar("PORT", "5000"),
     API_URL: parseVar("API_URL", "http://localhost:5000/api"),
+    APP_URL: parseVar("APP_URL"),
     SECRET_KEY: parseVar("SECRET_KEY"),
     FILEUPLOAD_MAX_SIZE: Number(parseVar("FILEUPLOAD_MAX_SIZE", "100")),
     JSON_MAX_SIZE: parseVar("JSON_MAX_SIZE"),
