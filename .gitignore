@@ -11,8 +11,8 @@
 todo.txt
 
 # Secret .env files
-express/express.env
-fastapi/fastapi.env
+**/express.env
+**/fastapi.env
 
 # Docker local images
 mongo
