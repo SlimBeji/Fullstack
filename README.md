@@ -60,7 +60,9 @@ All frontends communicate with any backend through the same REST API, enabling *
 
 ## 🐳 Dockerized Setup
 
-Each app (frontend/backend) lives in its own folder (e.g., `/express`, `/react`, etc.) and is containerized using Docker.
+Each app (frontend/backend) lives in its own folder (e.g., `/backend_express`, `/backend_fastapi` `/frontend_react`, etc.) and is containerized using Docker.
+
+Prefixes `backend` and `frontend` are used so that the folders of the backend apps are next to each others and the folders of the frontend apps are next to each others.
 
 ### 🔗 Shared Services (via `docker-compose.yaml`)
 
