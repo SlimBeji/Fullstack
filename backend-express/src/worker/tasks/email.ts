@@ -1,5 +1,6 @@
-import { Job, Worker, Queue } from "bullmq";
-import { Tasks, Queues } from "../../types";
+import { Job, Queue, Worker } from "bullmq";
+
+import { Queues, Tasks } from "../../types";
 import { config } from "./config";
 
 // Define Queue
@@ -30,7 +31,7 @@ type emailTaskData = NewsletterData;
 async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
     switch (job.name) {
         case Tasks.NEWSLETTER:
-            await sendNewsletterTask(job as Job<NewsletterData>);
+            await sendNewsletterTask(job);
             break;
         default:
             throw new Error(`Unknown job name: ${job.name}`);

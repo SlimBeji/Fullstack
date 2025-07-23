@@ -1,9 +1,10 @@
 import {
-    OpenAPIRegistry,
     OpenApiGeneratorV3,
+    OpenAPIRegistry,
 } from "@asteasolutions/zod-to-openapi";
-import swaggerUi from "swagger-ui-express";
 import { Application } from "express";
+import swaggerUi from "swagger-ui-express";
+
 import { env } from "../config";
 
 const swaggerRegistery = new OpenAPIRegistry();
@@ -53,4 +54,4 @@ const registerSwaggger = (app: Application, path: string): void => {
     app.use(path, swaggerUi.serve, swaggerUi.setup(openApiDocument));
 };
 
-export { swaggerRegistery, registerSwaggger };
+export { registerSwaggger, swaggerRegistery };

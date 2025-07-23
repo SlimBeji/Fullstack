@@ -1,12 +1,14 @@
 import {
-    Model,
     Document,
-    startSession,
-    RootFilterQuery,
-    Types,
-    sanitizeFilter,
+    Model,
     ProjectionType,
+    RootFilterQuery,
+    sanitizeFilter,
+    startSession,
+    Types,
 } from "mongoose";
+
+import { env } from "../../config";
 import {
     ApiError,
     FilterData,
@@ -16,7 +18,6 @@ import {
     ProjectionExcl,
     ProjectionIncl,
 } from "../../types";
-import { env } from "../../config";
 import { UserRead } from "../schemas";
 
 export type CrudEvent = "create" | "read" | "update" | "delete";
@@ -41,7 +42,7 @@ export abstract class Crud<
         return this.model.modelName;
     }
 
-    public notFoundError(id: String | Types.ObjectId): ApiError {
+    public notFoundError(id: string | Types.ObjectId): ApiError {
         return new ApiError(
             HttpStatus.NOT_FOUND,
             `No document with id ${id} found in ${this.modelName}s`
@@ -141,7 +142,7 @@ export abstract class Crud<
         if (Object.keys(sort || []).length === 0) {
             sort = { createdAt: 1 };
         }
-        let parsedFilters = filters as RootFilterQuery<DBInt>;
+        const parsedFilters = filters as RootFilterQuery<DBInt>;
         const projection = this.parseProjection(filterQuery.projection);
         const documents = await this.model
             .find(parsedFilters, projection)
@@ -195,8 +196,8 @@ export abstract class Crud<
             return newObj;
         } catch (err) {
             if (err instanceof Error) {
-                let status = HttpStatus.INTERNAL_SERVER_ERROR;
-                let message = `Could not create ${this.modelName} object: ${err.message}!`;
+                const status = HttpStatus.INTERNAL_SERVER_ERROR;
+                const message = `Could not create ${this.modelName} object: ${err.message}!`;
                 throw new ApiError(status, message);
             }
             throw err;
@@ -254,7 +255,7 @@ export abstract class Crud<
 
     // Delete
 
-    public async deleteCleanup(document: Doc): Promise<void> {}
+    public async deleteCleanup(_document: Doc): Promise<void> {}
 
     public async deleteDocument(obj: Doc): Promise<void> {
         try {

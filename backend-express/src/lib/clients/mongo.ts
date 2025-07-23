@@ -1,5 +1,6 @@
-import mongoose, { Mongoose } from "mongoose";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
+import mongoose, { Mongoose } from "mongoose";
+
 import { env } from "../../config";
 import { seedDb } from "../../models/examples";
 import { CollectionEnum } from "../../types";

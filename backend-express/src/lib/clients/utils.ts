@@ -1,7 +1,7 @@
-import { db } from "./mongo";
-import { redisClient } from "./cache";
 import { closeCrons } from "../../worker/crons";
 import { closeWorkers } from "../../worker/tasks";
+import { redisClient } from "./cache";
+import { db } from "./mongo";
 
 export const connectDbs = async () => {
     await Promise.all([redisClient.connect(), db.connect()]);

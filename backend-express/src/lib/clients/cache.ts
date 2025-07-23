@@ -1,5 +1,6 @@
-import { createClient, RedisClientType } from "redis";
 import IORedisMock from "ioredis-mock";
+import { createClient, RedisClientType } from "redis";
+
 import { env } from "../../config";
 import { ApiError, HttpStatus } from "../../types";
 
@@ -67,7 +68,7 @@ export class RedisClient {
         expiration = expiration || env.REDIS_DEFAULT_EXPIRATION;
         try {
             stringified = JSON.stringify(val);
-        } catch (err) {
+        } catch {
             throw new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 `Could not store value ${val} in redis`

@@ -1,4 +1,5 @@
 import { Request } from "express";
+
 import { ContentType } from "../../types";
 
 export const isMultipartFormData = (req: Request): boolean => {

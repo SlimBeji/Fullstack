@@ -1,11 +1,12 @@
 import supertest from "supertest";
+
 import app from "../../../api";
-import { crudUser } from "../../../models/crud";
-import { readImage } from "../../../lib/utils";
-import { UserRead } from "../../../models/schemas";
-import { HttpStatus } from "../../../types";
 import { createToken } from "../../../api/auth";
 import { closeAll, connectDbs } from "../../../lib/clients";
+import { readImage } from "../../../lib/utils";
+import { crudUser } from "../../../models/crud";
+import { UserRead } from "../../../models/schemas";
+import { HttpStatus } from "../../../types";
 
 let adminExample: UserRead;
 let adminToken: string = "";
@@ -127,7 +128,7 @@ describe("PUT /api/users/id", () => {
 
     it("Users cannot update others profiles", async () => {
         const data = { name: "Slim El Beji" };
-        const response = await request
+        await request
             .put(`/api/users/${adminExample.id}`)
             .send(data)
             .set("Authorization", token)
@@ -150,7 +151,7 @@ describe("DELETE /api/users/id", () => {
     });
 
     it("Only admins can delete Users", async () => {
-        const response = await request
+        await request
             .delete(`/api/users/${example.id}`)
             .set("Authorization", token)
             .expect("Content-Type", /json/)

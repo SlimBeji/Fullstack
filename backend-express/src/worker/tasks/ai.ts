@@ -1,8 +1,9 @@
-import { Job, Worker, Queue } from "bullmq";
-import { Tasks, Queues } from "../../types";
-import { config } from "./config";
+import { Job, Queue, Worker } from "bullmq";
+
 import { huggingFace } from "../../lib/clients/huggingFace";
 import { crudPlace } from "../../models/crud";
+import { Queues, Tasks } from "../../types";
+import { config } from "./config";
 
 // Define Queue
 const aiQueue = new Queue(Queues.AI, config);
@@ -37,7 +38,7 @@ type AiTasksData = PlaceEmbeddingData;
 async function aiTasksProcessor(job: Job<AiTasksData>) {
     switch (job.name) {
         case Tasks.PLACE_EMBEDDING:
-            await placeEmbeddingTask(job as Job<PlaceEmbeddingData>);
+            await placeEmbeddingTask(job);
             break;
         default:
             throw new Error(`Unknown job name: ${job.name}`);

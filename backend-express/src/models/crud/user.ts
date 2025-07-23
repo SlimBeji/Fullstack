@@ -1,19 +1,20 @@
-import { hash, compare } from "bcryptjs";
-import { ApiError, FilterQuery, HttpStatus } from "../../types";
-import { storage } from "../../lib/clients";
+import { compare, hash } from "bcryptjs";
+
 import { createToken } from "../../api/auth";
+import { storage } from "../../lib/clients";
+import { ApiError, FilterQuery, HttpStatus } from "../../types";
+import { UserDocument, UserModel } from "../collections";
 import {
-    UserDB,
-    UserCreate,
-    UserPut,
-    UserRead,
-    UserPost,
-    UserUpdate,
+    EncodedToken,
     Signin,
     Signup,
-    EncodedToken,
+    UserCreate,
+    UserDB,
+    UserPost,
+    UserPut,
+    UserRead,
+    UserUpdate,
 } from "../schemas";
-import { UserDocument, UserModel } from "../collections";
 import { Crud, CrudEvent } from "./base";
 
 const DEFAULT_HASH_SALT = 12;
@@ -36,7 +37,7 @@ export class CrudUser extends Crud<
     public safeCheck(
         user: UserRead,
         data: UserDocument | UserPost | UserCreate,
-        event: CrudEvent
+        _event: CrudEvent
     ): void {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
@@ -64,7 +65,7 @@ export class CrudUser extends Crud<
     ): Promise<UserRead[] | Partial<UserRead>[]> {
         const userPromises = docs.map(async (doc) => {
             // Removing the password field
-            let obj = this.serializeDocument(doc);
+            const obj = this.serializeDocument(doc);
             if (obj.imageUrl) {
                 obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
             }
@@ -114,7 +115,7 @@ export class CrudUser extends Crud<
 
     public async create(form: UserPost): Promise<UserRead> {
         const imageUrl = await storage.uploadFile(form.image || null);
-        const { image, ...body } = form;
+        const { image: _image, ...body } = form;
         const data = { ...body, imageUrl };
         try {
             const doc = await this.createDocument(data);

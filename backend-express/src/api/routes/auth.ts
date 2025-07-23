@@ -1,11 +1,12 @@
-import { Router, Response, Request, NextFunction } from "express";
+import { Request, Response, Router } from "express";
+
 import { crudUser } from "../../models/crud";
 import {
+    EncodedTokenSchema,
     Signin,
     SigninSchema,
     Signup,
     SignupSchema,
-    EncodedTokenSchema,
 } from "../../models/schemas";
 import { validateBody } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
@@ -13,7 +14,7 @@ import { swaggerRegistery } from "../openapi";
 export const authRouter = Router();
 
 // Signup route
-async function signup(req: Request, res: Response, next: NextFunction) {
+async function signup(req: Request, res: Response) {
     const parsed = req.parsed as Signup;
     const tokenData = await crudUser.signup(parsed);
     res.status(200).json(tokenData);
@@ -50,7 +51,7 @@ swaggerRegistery.registerPath({
 });
 
 // Signin in route
-async function signin(req: Request, res: Response, next: NextFunction) {
+async function signin(req: Request, res: Response) {
     const parsed = req.parsed as Signin;
     const tokenData = await crudUser.signin(parsed);
     res.status(200).json(tokenData);

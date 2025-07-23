@@ -1,4 +1,4 @@
-import { connectDbs, closeAll } from "../lib/clients";
+import { closeAll, connectDbs } from "../lib/clients";
 import { seedDb } from "../models/examples";
 
 if (require.main === module) {

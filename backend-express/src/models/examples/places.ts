@@ -1,5 +1,5 @@
-import { PlaceSeed } from "../schemas";
 import { getImagePath } from "../../lib/utils";
+import { PlaceSeed } from "../schemas";
 
 const embedding1 = [
     0.0236833356320858, 0.027439933270215988, -0.0015803936403244734,

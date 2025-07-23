@@ -1,13 +1,14 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Request, Response, Router } from "express";
+
 import { z } from "../../models/schemas";
-import { Authenticated, Admin } from "../middlewares";
-import { swaggerRegistery } from "../openapi";
 import { sendNewsletter } from "../../worker/tasks/email";
+import { Admin, Authenticated } from "../middlewares";
+import { swaggerRegistery } from "../openapi";
 
 export const helloWorldRouter = Router();
 
 // Hello World Endpoint
-async function hello(req: Request, res: Response, next: NextFunction) {
+async function hello(req: Request, res: Response) {
     sendNewsletter("Slim", "mslimbeji@gmail.com");
     res.status(200).json({ message: "Hello World!" });
 }
@@ -36,7 +37,7 @@ swaggerRegistery.registerPath({
 });
 
 // Authenticated Hello World
-async function helloUser(req: Request, res: Response, next: NextFunction) {
+async function helloUser(req: Request, res: Response) {
     res.status(200).json({ message: `Hello ${req.currentUser?.name}!` });
 }
 
@@ -69,7 +70,7 @@ swaggerRegistery.registerPath({
 });
 
 // Hello World for admins
-async function helloAdmin(req: Request, res: Response, next: NextFunction) {
+async function helloAdmin(req: Request, res: Response) {
     res.status(200).json({
         message: `Hello Admin ${req.currentUser?.name}!`,
     });

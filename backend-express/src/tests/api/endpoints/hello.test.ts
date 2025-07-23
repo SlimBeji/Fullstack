@@ -1,7 +1,8 @@
 import supertest from "supertest";
+
 import app from "../../../api";
+import { closeAll, connectDbs } from "../../../lib/clients";
 import { crudUser } from "../../../models/crud";
-import { connectDbs, closeAll } from "../../../lib/clients";
 
 const request = supertest(app);
 

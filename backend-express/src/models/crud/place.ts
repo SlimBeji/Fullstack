@@ -1,17 +1,17 @@
+import { storage } from "../../lib/clients";
+import { ApiError, FilterQuery, HttpStatus } from "../../types";
+import { placeEmbedding } from "../../worker/tasks";
+import { PlaceDocument, PlaceModel } from "../collections";
 import {
-    PlaceDB,
     PlaceCreate,
+    PlaceDB,
+    PlacePost,
     PlacePut,
     PlaceRead,
-    PlacePost,
     PlaceUpdate,
     UserRead,
 } from "../schemas";
-import { PlaceModel, PlaceDocument } from "../collections";
-import { storage } from "../../lib/clients";
 import { Crud, CrudEvent } from "./base";
-import { ApiError, HttpStatus, FilterQuery } from "../../types";
-import { placeEmbedding } from "../../worker/tasks";
 
 export class CrudPlace extends Crud<
     PlaceDB,
@@ -31,7 +31,7 @@ export class CrudPlace extends Crud<
     public safeCheck(
         user: UserRead,
         data: PlaceDocument | PlacePost | PlaceCreate,
-        event: CrudEvent
+        _event: CrudEvent
     ): void {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
@@ -58,7 +58,7 @@ export class CrudPlace extends Crud<
         docs: PlaceDocument[]
     ): Promise<PlaceRead[] | Partial<PlaceRead>[]> {
         const placesPromises = docs.map(async (doc) => {
-            let obj = this.serializeDocument(doc);
+            const obj = this.serializeDocument(doc);
             if (obj.imageUrl) {
                 obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
             }
@@ -69,7 +69,7 @@ export class CrudPlace extends Crud<
 
     public async create(form: PlacePost): Promise<PlaceRead> {
         const imageUrl = await storage.uploadFile(form.image || null);
-        const { image, ...body } = form;
+        const { image: _image, ...body } = form;
         const data = { ...body, imageUrl };
         const doc = await this.createDocument(data);
         placeEmbedding(doc.id);

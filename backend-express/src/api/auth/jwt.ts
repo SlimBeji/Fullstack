@@ -1,10 +1,11 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
+
 import { env } from "../../config";
-import { UserRead, EncodedToken } from "../../models/schemas";
-import { crudUser } from "../../models/crud";
-import { ApiError, HttpStatus } from "../../types";
 import { redisClient } from "../../lib/clients";
+import { crudUser } from "../../models/crud";
+import { EncodedToken, UserRead } from "../../models/schemas";
+import { ApiError, HttpStatus } from "../../types";
 
 export interface UserTokenInput {
     userId: Types.ObjectId;

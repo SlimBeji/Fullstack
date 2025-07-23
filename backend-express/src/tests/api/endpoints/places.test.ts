@@ -1,10 +1,11 @@
 import supertest from "supertest";
+
 import app from "../../../api";
-import { crudPlace, crudUser } from "../../../models/crud";
+import { closeAll, connectDbs } from "../../../lib/clients";
 import { getImagePath } from "../../../lib/utils";
+import { crudPlace, crudUser } from "../../../models/crud";
 import { PlaceRead } from "../../../models/schemas";
 import { HttpStatus } from "../../../types";
-import { connectDbs, closeAll } from "../../../lib/clients";
 
 let adminToken: string = "";
 let token: string = "";
@@ -92,7 +93,7 @@ describe("POST /api/places", () => {
 
     it("Someone cannot post on others behalf", async () => {
         const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
-        const response = await request
+        await request
             .post("/api/places")
             .field("creatorId", user.id.toString())
             .field("description", "A brand new place")
@@ -140,7 +141,7 @@ describe("PUT /api/places/id", () => {
 
     it("User cannot update othe rplaces", async () => {
         const data = { description: "Stamford Bridge - Home of the Blues" };
-        const response = await request
+        await request
             .put(`/api/places/${example.id}`)
             .send(data)
             .set("Authorization", token)
@@ -151,7 +152,7 @@ describe("PUT /api/places/id", () => {
 
 describe("DELETE /api/places/id", () => {
     it("A user cannot delete someone else place", async () => {
-        const response = await request
+        await request
             .delete(`/api/places/${example.id}`)
             .set("Authorization", token)
             .expect("Content-Type", /json/)

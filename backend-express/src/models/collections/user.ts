@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
-import { CollectionEnum } from "../../types";
 
+import { CollectionEnum } from "../../types";
 import { UserDB } from "../schemas";
 
 const UserCollectionSchema = new Schema<UserDB>(

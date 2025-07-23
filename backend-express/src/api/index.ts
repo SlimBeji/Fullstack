@@ -1,12 +1,13 @@
 import "express-async-errors";
 import "../worker/crons";
-import express from "express";
+
 import cookieSession from "cookie-session";
+import express from "express";
 
 import { env } from "../config";
-import { errorHandler, cors, noRouteMatchHandler } from "./middlewares";
-import { registerRoutes } from "./routes";
+import { cors, errorHandler, noRouteMatchHandler } from "./middlewares";
 import { registerSwaggger } from "./openapi";
+import { registerRoutes } from "./routes";
 
 const app = express();
 app.env = env.ENV;

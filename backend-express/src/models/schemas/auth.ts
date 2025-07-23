@@ -1,12 +1,11 @@
-import { z } from "./zod";
-
 import {
-    userNameField,
     userEmailField,
-    userPasswordField,
     userIdField,
     userImageField,
+    userNameField,
+    userPasswordField,
 } from "./user";
+import { z } from "./zod";
 
 // Fields
 export const tokenField = z.string().openapi({

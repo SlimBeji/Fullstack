@@ -1,7 +1,8 @@
 import supertest from "supertest";
+
 import app from "../../../api";
+import { closeAll, connectDbs } from "../../../lib/clients";
 import { getImagePath } from "../../../lib/utils";
-import { connectDbs, closeAll } from "../../../lib/clients";
 
 const request = supertest(app);
 

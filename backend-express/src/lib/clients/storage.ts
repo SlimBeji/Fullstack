@@ -1,13 +1,13 @@
 import {
+    Bucket,
+    SaveOptions,
     Storage,
     StorageOptions,
-    SaveOptions,
-    Bucket,
 } from "@google-cloud/storage";
 import { randomUUID } from "crypto";
-import path from "path";
-import mime from "mime-types";
 import { existsSync, readFileSync } from "fs";
+import mime from "mime-types";
+import path from "path";
 
 import { env } from "../../config";
 import { FileToUpload } from "../../types";

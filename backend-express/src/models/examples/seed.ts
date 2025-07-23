@@ -1,10 +1,11 @@
 import mongoose, { Types } from "mongoose";
-import { users } from "./users";
-import { places } from "./places";
-import { crudUser, crudPlace } from "../crud";
+
 import { redisClient, uploadLocal } from "../../lib/clients";
 import { CollectionEnum } from "../../types";
-import { UserSeed, PlaceSeed } from "../schemas";
+import { crudPlace, crudUser } from "../crud";
+import { PlaceSeed, UserSeed } from "../schemas";
+import { places } from "./places";
+import { users } from "./users";
 
 const userRefMapping: Map<number, Types.ObjectId> = new Map();
 const placeRefMapping: Map<number, Types.ObjectId> = new Map();

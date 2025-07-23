@@ -1,24 +1,25 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Request, Response, Router } from "express";
+
 import { crudUser } from "../../models/crud";
 import {
-    z,
-    zodObjectId,
+    UserPost,
+    UserPostSchema,
+    UserPut,
+    UserPutSchema,
+    UserReadSchema,
     UserSearchGetSchema,
     UserSearchPostSchema,
     UsersPaginatedSchema,
-    UserPost,
-    UserPostSchema,
-    UserReadSchema,
-    UserPut,
-    UserPutSchema,
+    z,
+    zodObjectId,
 } from "../../models/schemas";
-import { validateBody, filter, Admin, Authenticated } from "../middlewares";
+import { Admin, Authenticated, filter, validateBody } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
 export const userRouter = Router();
 
 // Get Users Endpoint
-async function getUsers(req: Request, res: Response, next: NextFunction) {
+async function getUsers(req: Request, res: Response) {
     // All users are public
     const query = req.filterQuery!;
     res.status(200).json(await crudUser.fetch(query));
@@ -48,7 +49,7 @@ swaggerRegistery.registerPath({
 
 // Post Search
 
-async function queryUsers(req: Request, res: Response, next: NextFunction) {
+async function queryUsers(req: Request, res: Response) {
     // All users are public
     const query = req.filterQuery!;
     res.status(200).json(await crudUser.fetch(query));
@@ -85,7 +86,7 @@ swaggerRegistery.registerPath({
 });
 
 // Post a User (admin only)
-async function createUser(req: Request, res: Response, next: NextFunction) {
+async function createUser(req: Request, res: Response) {
     const currentUser = req.currentUser!;
     const parsed = req.parsed as UserPost;
     const newUser = await crudUser.safeCreate(currentUser, parsed);
@@ -128,7 +129,7 @@ swaggerRegistery.registerPath({
 });
 
 // Get User Endpoint
-async function getUser(req: Request, res: Response, next: NextFunction) {
+async function getUser(req: Request, res: Response) {
     // All users are public
     const user = await crudUser.get(req.params.userId);
     res.status(200).json(user);
@@ -162,7 +163,7 @@ swaggerRegistery.registerPath({
 });
 
 // Put User Endpoint
-async function editUser(req: Request, res: Response, next: NextFunction) {
+async function editUser(req: Request, res: Response) {
     const parsed = req.parsed as UserPut;
     const currentUser = req.currentUser!;
     const updatedUser = await crudUser.safeUpdateById(
@@ -220,7 +221,7 @@ swaggerRegistery.registerPath({
 });
 
 // Delete User Endpoint
-async function deleteUser(req: Request, res: Response, next: NextFunction) {
+async function deleteUser(req: Request, res: Response) {
     const currentUser = req.currentUser!;
     await crudUser.safeDelete(currentUser, req.params.userId);
     res.status(200).json({

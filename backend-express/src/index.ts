@@ -1,6 +1,6 @@
-import { connectDbs } from "./lib/clients";
-import { env } from "./config";
 import app from "./api";
+import { env } from "./config";
+import { connectDbs } from "./lib/clients";
 
 // Connect Mongoose than run the app
 if (require.main === module) {

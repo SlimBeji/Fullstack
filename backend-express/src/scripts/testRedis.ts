@@ -1,5 +1,5 @@
-import { redisClient, connectDbs, closeDbs } from "../lib/clients";
 import { createToken } from "../api/auth";
+import { closeDbs, connectDbs, redisClient } from "../lib/clients";
 import { crudUser } from "../models/crud";
 
 async function test() {

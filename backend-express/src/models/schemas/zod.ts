@@ -1,17 +1,17 @@
+import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import { Types } from "mongoose";
 import {
-    z,
-    ZodTypeAny,
     AnyZodObject,
+    z,
+    ZodArray,
+    ZodEffects,
     ZodObject,
     ZodOptional,
-    ZodEffects,
-    ZodArray,
-    ZodString,
+    ZodTypeAny,
 } from "zod";
-import { Types } from "mongoose";
-import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+
 import { env } from "../../config";
-import { HttpStatus, MimeType, ApiError, MongoOperation } from "../../types";
+import { ApiError, HttpStatus, MimeType, MongoOperation } from "../../types";
 
 extendZodWithOpenApi(z);
 
@@ -150,7 +150,7 @@ const numericQueryParamTransform = (
             }
 
         case "exists":
-            let boolValue = z.coerce.boolean().parse(val);
+            const boolValue = z.coerce.boolean().parse(val);
             return { op, val: boolValue };
 
         default:
@@ -210,7 +210,7 @@ const stringQueryParamTransform = (
             }
 
         case "exists":
-            let boolValue = z.coerce.boolean().parse(val);
+            const boolValue = z.coerce.boolean().parse(val);
             return { op, val: boolValue };
 
         case "regex":
@@ -268,7 +268,7 @@ const booleanQueryParamTransform = (
         case "ne":
         case "exists":
             try {
-                let boolValue = z.coerce.boolean().parse(val);
+                const boolValue = z.coerce.boolean().parse(val);
                 field.parse(boolValue);
                 return { op, val: boolValue };
             } catch (err) {
@@ -455,7 +455,7 @@ const flattenZodSchema = (schema: AnyZodObject, prefix = ""): AnyZodObject => {
                 result[k] = isOptional ? (v as any).optional() : v;
             });
         } else if (isArray) {
-            let arrayField = z.array(field);
+            const arrayField = z.array(field);
             result[fullKey] = isOptional ? arrayField.optional() : arrayField;
         } else {
             result[fullKey] = isOptional ? field.optional() : field;
@@ -508,7 +508,7 @@ export const buildSearchSchema = (
     sortableFields: string[],
     readSchema?: AnyZodObject
 ): AnyZodObject => {
-    let config: Record<string, any> = {
+    const config: Record<string, any> = {
         ...buildPagination(),
         sort: buildSort(sortableFields),
     };

@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+
 import { env } from "../../config";
 
 type EmbeddingResponse = number[][];

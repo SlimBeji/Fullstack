@@ -1,8 +1,7 @@
 import "express";
 
-import { FilterQuery } from "./mongo";
 import { UserRead } from "../models/schemas";
-import { PlaceDocument, UserDocument } from "../models/collections";
+import { FilterQuery } from "./mongo";
 
 declare module "express-serve-static-core" {
     interface Request {

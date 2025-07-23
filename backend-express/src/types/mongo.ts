@@ -15,7 +15,7 @@ export interface FilterQuery {
     projection?: ProjectionIncl;
 }
 
-const MongoOperationMapping = {
+export const MongoOperationMapping = {
     eq: "$eq",
     ne: "$ne",
     gt: "$gt",

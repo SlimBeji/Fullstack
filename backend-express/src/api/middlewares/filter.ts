@@ -1,18 +1,18 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParsedQs } from "qs";
+import { AnyZodObject } from "zod";
+
+import { parseDotNotation } from "../../lib/utils";
+import { getZodFields } from "../../models/schemas";
 import {
     ApiError,
-    MongoFilter,
     HttpStatus,
-    PaginationData,
-    SortData,
-    ProjectionIncl,
     MongoBaseFilter,
+    MongoFilter,
+    PaginationData,
+    ProjectionIncl,
+    SortData,
 } from "../../types";
-import { z, AnyZodObject } from "zod";
-import { env } from "../../config";
-import { getZodFields } from "../../models/schemas";
-import { parseDotNotation } from "../../lib/utils";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 
@@ -78,7 +78,7 @@ const extractQueryParams = (
             );
         }
 
-        if (!!req.query[key]) {
+        if (req.query[key]) {
             const extracted = extractQueryParam(req, key);
             if (extracted) result[key] = extracted;
         }
@@ -138,10 +138,8 @@ const toProjection = (
 
 export const filter = (
     zodSchema: AnyZodObject,
-    location: "query" | "body",
-    maxSize: number | null = null
+    location: "query" | "body"
 ): RequestHandler => {
-    maxSize = maxSize || env.MAX_ITEMS_PER_PAGE;
     return async (req: Request, resp: Response, next: NextFunction) => {
         const body =
             location === "body" ? req.body : extractQueryParams(req, zodSchema);
@@ -155,7 +153,7 @@ export const filter = (
             );
         }
 
-        const data = parsing.data as z.infer<typeof zodSchema>;
+        const data = parsing.data;
         const pagination = toPaginationData(data.page, data.size);
         const sort = toSortData(data.sort);
         const filters = toMongoFilters(data);

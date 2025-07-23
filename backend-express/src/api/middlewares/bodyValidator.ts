@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
-import { AnyZodObject, ZodTypeAny } from "zod";
+import { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import { ApiError, HttpStatus } from "../../types";
+import { AnyZodObject, ZodTypeAny } from "zod";
+
 import { isMultipartFormData } from "../../lib/utils";
+import { ApiError, HttpStatus } from "../../types";
 
 const isFileField = (field: ZodTypeAny | any): boolean => {
     if (field._def?.openapi?.metadata?.format === "binary") {
