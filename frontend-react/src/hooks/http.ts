@@ -121,7 +121,7 @@ export const useHttp = (
         data?: Record<string, any>,
         tokenRequired?: boolean
     ) => Promise<AxiosResponse>,
-    () => void
+    () => void,
 ] => {
     const abortControllerRef = useRef<AbortController>(null);
     const [state, dispatch] = useReducer(reducer, emptyState);

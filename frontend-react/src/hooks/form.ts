@@ -86,15 +86,18 @@ const formReducer = <T extends string>(
 export const emptyStateBuilder = <T extends string>(formConfig: {
     [key in T]: boolean;
 }): FormState<T> => {
-    const inputs = (Object.keys(formConfig) as T[]).reduce((result, name) => {
-        result[name] = {
-            fieldName: name,
-            val: "",
-            isActive: formConfig[name],
-            isValid: false,
-        };
-        return result;
-    }, {} as { [key in T]: InputState<T> });
+    const inputs = (Object.keys(formConfig) as T[]).reduce(
+        (result, name) => {
+            result[name] = {
+                fieldName: name,
+                val: "",
+                isActive: formConfig[name],
+                isValid: false,
+            };
+            return result;
+        },
+        {} as { [key in T]: InputState<T> }
+    );
     return { inputs, isValid: false };
 };
 
@@ -104,7 +107,7 @@ export const useForm = <T extends string>(
     FormState<T>,
     { [key in T]: (val: any, isValid: boolean) => void },
     (payload: InputState<T>[]) => void,
-    (payload: { [key in T]?: boolean }) => void
+    (payload: { [key in T]?: boolean }) => void,
 ] => {
     const [state, dispatch] = useReducer(formReducer<T>, initialState);
 

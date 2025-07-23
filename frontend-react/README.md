@@ -8,12 +8,12 @@ The app uses the official **Redux Toolkit** library for state management, connec
 
 ## 🗂️ Project Structure (`/src`)
 
--   **`main.tsx`** – Entry point that mounts the root React component and connects the Redux store.
--   **`App.tsx`** – Defines the app’s routing logic for the single-page application.
--   **`/pages/`** – Top-level route components rendered by `App`.
--   **`/components/`** – Reusable UI components and layout building blocks.
--   **`/states/`** – Redux store, slices, and related logic.
--   **`/hooks/`** – Custom hooks like `useHttp` (for sending requests) or `useForm` (for managing form state and validation).
--   **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
--   **`/static/`** – Static assets such as image placeholders or icons.
--   **`/util/`** – Utility functions and general-purpose helpers.
+- **`main.tsx`** – Entry point that mounts the root React component and connects the Redux store.
+- **`App.tsx`** – Defines the app’s routing logic for the single-page application.
+- **`/pages/`** – Top-level route components rendered by `App`.
+- **`/components/`** – Reusable UI components and layout building blocks.
+- **`/states/`** – Redux store, slices, and related logic.
+- **`/hooks/`** – Custom hooks like `useHttp` (for sending requests) or `useForm` (for managing form state and validation).
+- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
+- **`/static/`** – Static assets such as image placeholders or icons.
+- **`/util/`** – Utility functions and general-purpose helpers.
