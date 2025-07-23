@@ -5,10 +5,10 @@ FROM node:22
 WORKDIR /app
 
 # Copying requirements
-COPY ./express/package.json /app/package.json
+COPY ./backend-express/package.json /app/package.json
 
 # Installing dependencies
 RUN npm install
 
 # Copy Code
-COPY ./express /app
+COPY ./backend-express /app

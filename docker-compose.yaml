@@ -19,15 +19,15 @@ services:
     express:
         build:
             context: .
-            dockerfile: ./express/express.Dockerfile
+            dockerfile: ./backend-express/express.Dockerfile
         container_name: express
         ports:
             - 5000:5000
         volumes:
-            - ./express:/app
+            - ./backend-express:/app
             - /app/node_modules
         env_file:
-            - ./express/express.env
+            - ./backend-express/express.env
         depends_on:
             - mongo1
             - mongo2

@@ -10,7 +10,7 @@ run:
 build:
 	docker-compose build
 	cd react; npm install
-	cd express; npm install
+	cd backend-express; npm install
 
 # DB commands
 dump-mongo: fix-permission
@@ -30,7 +30,7 @@ react-check:
 # Express commands
 express-build:
 	docker-compose build express
-	cd express; npm install
+	cd backend-express; npm install
 
 express-bash:
 	docker exec -it express bash
