@@ -17,6 +17,8 @@ This backend is written in **Python** and follows the architecture and principle
 
 This backend uses the following tools to ensure clean and consistent Python code:
 
+-   **[mypy](https://mypy-lang.org/):** Static type checker for Python. It analyzes type hints and ensures functions, variables, and class attributes follow the expected types.  
+    This is especially useful in larger codebases and when using tools like **Pydantic** or **FastAPI** where typing is essential.
 -   **[autoflake](https://pypi.org/project/autoflake/):** Removes unused imports and variables.
 -   **[isort](https://pycqa.github.io/isort/):** Automatically sorts imports.  
     Configured to work with `black` formatting (see `.isort.cfg`).
