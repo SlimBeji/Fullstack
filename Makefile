@@ -42,7 +42,7 @@ express-check:
 	docker exec -it express npx tsc --noEmit
 
 express-lint:
-	docker exec -it express npx prettier --write .
+	docker exec -it express npx prettier --write . | grep -v "(unchanged)"
 
 express-script/%:
 	docker exec -it express npx ts-node src/scripts/$*
