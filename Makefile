@@ -59,3 +59,15 @@ fastapi-bash:
 
 fastapi-test:
 	docker exec -it fastapi pytest /app/tests
+
+fastapi-script/%:
+	docker exec -it fastapi python /app/scripts/$*
+
+fastapi-debug:
+	docker exec -it fastapi python /app/scripts/debug.py
+
+fastapi-seed:
+	docker exec -it fastapi python /app/scripts/seed_db.py
+
+fastapi-dump:
+	docker exec -it fastapi python /app/scripts/dump_db.py
