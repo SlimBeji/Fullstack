@@ -10,6 +10,3 @@ motor
 # Schemas
 pydantic[email]>=2.4
 pydantic-settings
-
-# Testing
-pytest

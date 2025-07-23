@@ -1,0 +1,8 @@
+# Linting Packages
+black
+isort
+autoflake
+
+# Testing
+pytest
+Faker
