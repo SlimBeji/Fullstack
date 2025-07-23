@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -19,8 +17,8 @@ def register_routers(
 def register_static_folder(
     app: FastAPI,
     static_files: StaticFiles,
-    name: Optional[str] = "static",
-    endpoint: Optional[str] = "/static",
+    name: str = "static",
+    endpoint: str = "/static",
 ):
     app.mount(endpoint, static_files, name)
 
