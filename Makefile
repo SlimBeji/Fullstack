@@ -57,4 +57,5 @@ fastapi-build:
 fastapi-bash:
 	docker exec -it fastapi bash
 
-
+fastapi-test:
+	docker exec -it fastapi pytest /app/tests
