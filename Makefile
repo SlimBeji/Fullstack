@@ -17,6 +17,10 @@ dump-mongo: fix-permission
 	rm -rf db/
 
 # React commands
+react-build:
+	docker-compose build react
+	cd react; npm install
+
 react-bash:
 	docker exec -it react bash
 
@@ -24,6 +28,10 @@ react-check:
 	docker exec -it react npx tsc --noEmit
 
 # Express commands
+express-build:
+	docker-compose build express
+	cd express; npm install
+
 express-bash:
 	docker exec -it express bash
 
@@ -41,3 +49,12 @@ express-seed:
 
 express-dump:
 	docker exec -it express npx ts-node src/scripts/dumpDb.ts
+
+# FastAPI commands
+fastapi-build:
+	docker-compose build fastapi
+
+fastapi-bash:
+	docker exec -it fastapi bash
+
+
