@@ -27,6 +27,9 @@ react-bash:
 react-check:
 	docker exec -it react npx tsc --noEmit
 
+react-lint:
+	docker exec -it react npx prettier --write . | grep -v "(unchanged)"
+
 # Express commands
 express-build:
 	docker-compose build express
