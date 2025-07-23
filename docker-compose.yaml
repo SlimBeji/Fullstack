@@ -2,15 +2,15 @@ services:
     react:
         build:
             context: .
-            dockerfile: ./react/react.Dockerfile
+            dockerfile: ./frontend-react/react.Dockerfile
         container_name: react
         ports:
             - 8000:5173
         volumes:
-            - ./react:/app
+            - ./frontend-react:/app
             - /app/node_modules
         env_file:
-            - ./react/react.env
+            - ./frontend-react/react.env
         depends_on:
             - express
         command: npm run dev

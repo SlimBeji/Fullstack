@@ -5,10 +5,10 @@ FROM node:22
 WORKDIR /app
 
 # Copying requirements
-COPY ./react/package.json /app/package.json
+COPY ./frontend-react/package.json /app/package.json
 
 # Installing dependencies
 RUN npm install
 
 # Copy Code
-COPY ./react /app
+COPY ./frontend-react /app

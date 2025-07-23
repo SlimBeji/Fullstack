@@ -9,7 +9,7 @@ run:
 
 build:
 	docker-compose build
-	cd react; npm install
+	cd frontend-react; npm install
 	cd backend-express; npm install
 
 # DB commands
@@ -19,7 +19,7 @@ dump-mongo: fix-permission
 # React commands
 react-build:
 	docker-compose build react
-	cd react; npm install
+	cd frontend-react; npm install
 
 react-bash:
 	docker exec -it react bash
