@@ -41,6 +41,9 @@ express-test:
 express-check:
 	docker exec -it express npx tsc --noEmit
 
+express-lint:
+	docker exec -it express npx prettier --write .
+
 express-script/%:
 	docker exec -it express npx ts-node src/scripts/$*
 
