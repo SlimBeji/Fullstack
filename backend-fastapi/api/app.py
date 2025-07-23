@@ -1,11 +1,12 @@
 from typing import Optional
 
-from api.openapi import OPENAPI_METADATA
-from api.routes import routers
-from config import settings
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from api.openapi import OPENAPI_METADATA
+from api.routes import routers
+from config import settings
 
 
 def register_routers(
