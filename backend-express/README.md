@@ -13,6 +13,19 @@ This backend is written in **TypeScript** and follows the architecture and princ
 | Background Jobs | [BullMQ](https://docs.bullmq.io/)                                                                                                          |
 | Task Scheduling | [node-cron](https://www.npmjs.com/package/node-cron)                                                                                       |
 
+## 🧹 Linting
+
+This project uses **[Prettier](https://prettier.io/)** for consistent code formatting.
+
+### Prettier Configuration
+
+```json
+{
+    "tabWidth": 4,
+    "trailingComma": "es5"
+}
+
+
 ## 📁 Key Directories
 
 - `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
@@ -29,3 +42,4 @@ This backend is written in **TypeScript** and follows the architecture and princ
 - Swagger documentation is auto-generated from Zod schemas using `zod-to-openapi` and served via `swagger-ui-express`.
 - Background jobs are processed via BullMQ with Redis as the broker.
 - Scheduled tasks (cron jobs) are powered by `node-cron`.
+```

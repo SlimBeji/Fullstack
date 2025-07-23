@@ -13,6 +13,15 @@ This backend is written in **Python** and follows the architecture and principle
 | Background Jobs | [Dramatiq](https://dramatiq.io/)                                                         |
 | Task Scheduling | [Dramatiq](https://dramatiq.io/)                                                         |
 
+## 🧹 Linting
+
+This backend uses the following tools to ensure clean and consistent Python code:
+
+-   **[autoflake](https://pypi.org/project/autoflake/):** Removes unused imports and variables.
+-   **[isort](https://pycqa.github.io/isort/):** Automatically sorts imports.  
+    Configured to work with `black` formatting (see `.isort.cfg`).
+-   **[black](https://black.readthedocs.io/):** Opinionated code formatter for Python.
+
 ## 📁 Key Directories
 
 -   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
