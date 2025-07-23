@@ -1,4 +1,5 @@
 # Linting Packages
+mypy
 black
 isort
 autoflake

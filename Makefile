@@ -69,9 +69,10 @@ fastapi-test:
 	docker exec -it fastapi pytest /app/tests
 
 fastapi-lint:
-	autoflake -r --in-place --remove-all-unused-imports --exclude=**/__init__.py  ./
-	isort . --settings-path ./backend-fastapi/.isort.cfg
-	python -m black .
+	docker exec -it fastapi autoflake -r --in-place --remove-all-unused-imports --exclude=**/__init__.py  ./
+	docker exec -it fastapi isort . --settings-path .isort.cfg
+	docker exec -it fastapi python -m black .
+	docker exec -it fastapi mypy .
 
 fastapi-script/%:
 	docker exec -it fastapi python /app/scripts/$*
