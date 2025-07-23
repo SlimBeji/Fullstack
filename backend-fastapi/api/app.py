@@ -1,8 +1,8 @@
 from typing import Optional
 
+from api.openapi import OPENAPI_METADATA
 from api.routes import routers
 from config import settings
-
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -41,7 +41,12 @@ def add_cors(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(
+        title="My FastAPI Pydantic API",
+        description="API documentation for my FastAPI application",
+        version="1.0.0",
+        openapi_tags=OPENAPI_METADATA,
+    )
 
     if settings.is_production:
         pass
