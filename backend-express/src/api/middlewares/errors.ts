@@ -33,6 +33,8 @@ export const noRouteMatchHandler = (
     next: NextFunction
 ) => {
     next(
-        new ApiError(HttpStatus.BAD_REQUEST, "Wrong endpoint", { url: req.url })
+        new ApiError(HttpStatus.BAD_REQUEST, "Wrong endpoint", {
+            url: req.url,
+        })
     );
 };

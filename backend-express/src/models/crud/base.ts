@@ -30,7 +30,7 @@ export abstract class Crud<
     Create extends object, // Creation Interface
     Post extends object, // HTTP Post Interface
     Update extends object, // Update Interface
-    Put extends object // HTTP Put Interface
+    Put extends object, // HTTP Put Interface
 > {
     // Constructor
     constructor(public model: CrudModel<DBInt, Doc>) {}
