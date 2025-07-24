@@ -15,16 +15,34 @@ This backend is written in **TypeScript** and follows the architecture and princ
 
 ## 🧹 Linting
 
-This project uses **[Prettier](https://prettier.io/)** for consistent code formatting.
+This project uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
 
-### Prettier Configuration
+### 🛠 ESLint
+
+The configuration uses the modern `eslint.config.js` format and includes the following plugins:
+
+- **[@typescript-eslint](https://typescript-eslint.io/):** TypeScript-specific linting rules.
+- **[eslint-plugin-unused-imports](https://www.npmjs.com/package/eslint-plugin-unused-imports):**  
+  Automatically detects and removes unused imports and variables.
+- **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**  
+  Enforces consistent ordering of imports and exports.
+
+#### 🔑 Key ESLint Rules
+
+- `no-unused-vars` and `no-undef`: **Disabled** (handled by TypeScript and `unused-imports`).
+- `unused-imports/no-unused-vars`: **Warn**, ignores variables/args starting with `_`.
+- `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
+
+### 🎨 Prettier
+
+Prettier is used for formatting with the following config:
 
 ```json
 {
     "tabWidth": 4,
     "trailingComma": "es5"
 }
-
+```
 
 ## 📁 Key Directories
 
@@ -42,4 +60,3 @@ This project uses **[Prettier](https://prettier.io/)** for consistent code forma
 - Swagger documentation is auto-generated from Zod schemas using `zod-to-openapi` and served via `swagger-ui-express`.
 - Background jobs are processed via BullMQ with Redis as the broker.
 - Scheduled tasks (cron jobs) are powered by `node-cron`.
-```
