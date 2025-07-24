@@ -8,12 +8,44 @@ The app uses the official **Redux Toolkit** library for state management, connec
 
 ## 🗂️ Project Structure (`/src`)
 
-- **`main.tsx`** – Entry point that mounts the root React component and connects the Redux store.
-- **`App.tsx`** – Defines the app’s routing logic for the single-page application.
-- **`/pages/`** – Top-level route components rendered by `App`.
-- **`/components/`** – Reusable UI components and layout building blocks.
-- **`/states/`** – Redux store, slices, and related logic.
-- **`/hooks/`** – Custom hooks like `useHttp` (for sending requests) or `useForm` (for managing form state and validation).
-- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
-- **`/static/`** – Static assets such as image placeholders or icons.
-- **`/util/`** – Utility functions and general-purpose helpers.
+-   **`main.tsx`** – Entry point that mounts the root React component and connects the Redux store.
+-   **`App.tsx`** – Defines the app’s routing logic for the single-page application.
+-   **`/pages/`** – Top-level route components rendered by `App`.
+-   **`/components/`** – Reusable UI components and layout building blocks.
+-   **`/states/`** – Redux store, slices, and related logic.
+-   **`/hooks/`** – Custom hooks like `useHttp` (for sending requests) or `useForm` (for managing form state and validation).
+-   **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
+-   **`/static/`** – Static assets such as image placeholders or icons.
+-   **`/util/`** – Utility functions and general-purpose helpers.
+
+## 🧹 Linting
+
+This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
+
+### 🛠 ESLint
+
+The configuration uses the modern `eslint.config.js` format and includes the following plugins:
+
+-   **[@typescript-eslint](https://typescript-eslint.io/):** TypeScript-specific linting rules.
+-   **[eslint-plugin-unused-imports](https://www.npmjs.com/package/eslint-plugin-unused-imports):**  
+    Automatically detects and removes unused imports and variables.
+-   **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**  
+    Enforces consistent ordering of imports and exports.
+
+#### 🔑 Key ESLint Rules
+
+-   `no-unused-vars` and `no-undef`: **Disabled** (handled by TypeScript and `unused-imports`).
+-   `unused-imports/no-unused-vars`: **Warn**, ignores variables/args starting with `_`.
+-   `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
+-   `no-useless-escape`: **Disabled** to avoid messing with regular expressions.
+
+### 🎨 Prettier
+
+Prettier is used for formatting with the following config:
+
+```json
+{
+    "tabWidth": 4,
+    "trailingComma": "es5"
+}
+```
