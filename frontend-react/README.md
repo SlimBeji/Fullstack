@@ -2,6 +2,14 @@
 
 This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
+## 🔐 Environment Variables
+
+The React client relies on a `.env` file for configuration.
+
+```
+VITE_BACKEND_URL=http://localhost:5000/api
+```
+
 ## 🧠 State Management
 
 The app uses the official **Redux Toolkit** library for state management, connecting the React components to a centralized Redux store.

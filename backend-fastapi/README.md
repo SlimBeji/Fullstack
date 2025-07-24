@@ -13,6 +13,40 @@ This backend is written in **Python** and follows the architecture and principle
 | Background Jobs | [Dramatiq](https://dramatiq.io/)                                                         |
 | Task Scheduling | [Dramatiq](https://dramatiq.io/)                                                         |
 
+## 🔐 Environment Variables
+
+The FastAPI backend relies on a `fastapi.env` file for configuration.
+
+```
+# ENV
+PORT=5001
+API_URL=http://localhost:5001/api
+APP_URL=http://localhost:8000
+SECRET_KEY=NOT_VERY_SECRET
+FILEUPLOAD_MAX_SIZE=100
+JSON_MAX_SIZE=10mb
+MAX_ITEMS_PER_PAGE=100
+JWT_EXPIRATION=3600
+ENV=dev
+
+# DATABASE
+MONGO_URL=mongodb://mongo1:27017,mongo2:27017/myapp?replicaSet=rs0
+MONGO_DBNAME=myapp
+REDIS_URL=redis://redis:6379/0
+REDIS_DEFAULT_EXPIRATION=3600
+
+# HUGGING FACE
+HF_API_TOKEN=<YOUR_API_TOKEN_HERE>
+
+# GCP
+GOOGLE_APPLICATION_CREDENTIALS=<LEAVE_EMULATOR_FIELDS_EMPTY_IF_USING_REAL_GCS>
+GCP_PROJECT_ID=dev-project
+GCS_BUCKET_NAME=dev-bucket
+GCS_EMULATOR_PRIVATE_URL=http://gcs:4443
+GCS_EMULATOR_PUBLIC_URL=http://localhost:4443
+GCS_BLOB_ACCESS_EXPIRATION=3600
+```
+
 ## 🧹 Linting
 
 This backend uses the following tools to ensure clean and consistent Python code:
