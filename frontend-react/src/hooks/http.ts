@@ -1,5 +1,6 @@
-import { useCallback, useReducer, useRef, useEffect } from "react";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
+import { useCallback, useEffect, useReducer, useRef } from "react";
+
 import { HeaderContent, HttpMethods } from "../types";
 import { getClient } from "../util";
 
@@ -60,7 +61,7 @@ const reducer = (state: State, action: Action): State => {
                 statusCode: action.payload.status,
                 json: action.payload.data,
             };
-        case ActionType.PARSE_ERROR:
+        case ActionType.PARSE_ERROR: {
             if (action.payload.message === "Token expired") {
                 // Token stored was purged after expiring
                 return {
@@ -100,6 +101,7 @@ const reducer = (state: State, action: Action): State => {
                     response: action.payload.response,
                 },
             };
+        }
         case ActionType.CLEAR_ERROR:
             return { loading: false };
         default:
@@ -195,7 +197,7 @@ export const useHttp = (
                 abortControllerRef.current = null;
             }
         },
-        []
+        [options.ignoreNotFound]
     );
 
     const clear = useCallback(() => {

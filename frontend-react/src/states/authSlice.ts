@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { EncodedUserToken, LocalStorageKeys } from "../types";
 
 interface AuthState {

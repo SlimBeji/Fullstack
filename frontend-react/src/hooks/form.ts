@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useMemo } from "react";
+import { useCallback, useMemo, useReducer } from "react";
 
 interface InputState<T extends string> {
     fieldName: T;
@@ -13,7 +13,7 @@ export interface FormState<T extends string> {
 }
 
 const recheckFormValidity = <T extends string>(data: FormState<T>): boolean => {
-    for (let key in data.inputs) {
+    for (const key in data.inputs) {
         const { isActive, isValid } = data.inputs[key];
         if (isActive && !isValid) {
             return false;
@@ -52,7 +52,7 @@ const formReducer = <T extends string>(
     state: FormState<T>,
     action: FormAction<T>
 ): FormState<T> => {
-    let newState = {
+    const newState = {
         ...state,
         inputs: { ...state.inputs },
     };
@@ -64,7 +64,7 @@ const formReducer = <T extends string>(
             };
             break;
         case ActionType.PREFILL:
-            for (let item of action.payload) {
+            for (const item of action.payload) {
                 newState.inputs[item.fieldName] = {
                     ...item,
                     isActive: item.isActive === false ? false : true,
@@ -72,7 +72,7 @@ const formReducer = <T extends string>(
             }
             break;
         case ActionType.FIELDS_ACTIVATION:
-            for (let fieldName in action.payload) {
+            for (const fieldName in action.payload) {
                 newState.inputs[fieldName].isActive = action.payload[fieldName];
             }
             break;
@@ -115,7 +115,7 @@ export const useForm = <T extends string>(
         const handlers: {
             [key in T]: (val: any, isValid: boolean) => void;
         } = {} as any;
-        for (let key in initialState.inputs) {
+        for (const key in initialState.inputs) {
             handlers[key] = (val: any, isValid: boolean) => {
                 dispatch({
                     type: ActionType.UPDATE_FIELD,
