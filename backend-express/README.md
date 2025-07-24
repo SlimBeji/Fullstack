@@ -15,7 +15,7 @@ This backend is written in **TypeScript** and follows the architecture and princ
 
 ## 🧹 Linting
 
-This project uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
+This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
 
 ### 🛠 ESLint
 
@@ -32,6 +32,7 @@ The configuration uses the modern `eslint.config.js` format and includes the fol
 - `no-unused-vars` and `no-undef`: **Disabled** (handled by TypeScript and `unused-imports`).
 - `unused-imports/no-unused-vars`: **Warn**, ignores variables/args starting with `_`.
 - `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
+- `no-useless-escape`: **Disabled** to avoid messing with regular expressions.
 
 ### 🎨 Prettier
 
