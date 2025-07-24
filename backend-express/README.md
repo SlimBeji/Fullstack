@@ -56,6 +56,21 @@ Prettier is used for formatting with the following config:
 - `scripts/` – One-off scripts (e.g., migrations, debugging utilities)
 - `static/` – Static assets (e.g., images, public files)
 
+## 🛠️ Makefile Commands
+
+The following shortcuts are available for managing the Express backend via `make`:
+
+| Command                             | Description                                                           |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| `make express-build`                | Build the Docker container for the Express app.                       |
+| `make express-bash`                 | Open an interactive shell inside the running Express container.       |
+| `make express-test`                 | Run the unit tests using the configured test runner.                  |
+| `make express-lint`                 | Lint and auto-format the codebase using ESLint, Prettier, and TSC.    |
+| `make express-script/⟨filename⟩.ts` | Execute a one-off script inside `src/scripts/`. Replace `⟨filename⟩`. |
+| `make express-debug`                | Run `debug.ts` for debugging or manual testing.                       |
+| `make express-seed`                 | Run `seedDb.ts` to populate the database with initial/sample data.    |
+| `make express-dump`                 | Run `dumpDb.ts` to export the current database state to a file.       |
+
 ## 📌 Notes
 
 - Swagger documentation is auto-generated from Zod schemas using `zod-to-openapi` and served via `swagger-ui-express`.

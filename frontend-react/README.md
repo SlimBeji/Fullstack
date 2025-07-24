@@ -49,3 +49,13 @@ Prettier is used for formatting with the following config:
     "trailingComma": "es5"
 }
 ```
+
+## 🛠️ Makefile Commands (React)
+
+The following `make` commands help manage the React frontend:
+
+| Command            | Description                                                               |
+| ------------------ | ------------------------------------------------------------------------- |
+| `make react-build` | Build the Docker container and install dependencies in `frontend-react/`. |
+| `make react-bash`  | Open an interactive shell inside the running React container.             |
+| `make react-lint`  | Run TypeScript type checks, ESLint fixes, and format files with Prettier. |

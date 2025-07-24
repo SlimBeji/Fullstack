@@ -35,6 +35,21 @@ This backend uses the following tools to ensure clean and consistent Python code
 -   `scripts/` – One-off scripts (e.g., migrations, debugging utilities)
 -   `static/` – Static assets (e.g., images, public files)
 
+## 🛠️ Makefile Commands
+
+The following `make` commands help manage the FastAPI backend:
+
+| Command                      | Description                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| `make fastapi-build`         | Build the Docker container for the FastAPI service.                             |
+| `make fastapi-bash`          | Open an interactive shell inside the running FastAPI container.                 |
+| `make fastapi-test`          | Run unit tests using `pytest`.                                                  |
+| `make fastapi-lint`          | Run all linting tools: `autoflake`, `isort`, `black`, and `mypy`.               |
+| `make fastapi-script/⟨name⟩` | Execute a script from `scripts/` directory (e.g. `make fastapi-script/foo.py`). |
+| `make fastapi-debug`         | Run `debug.py` for debugging or manual testing.                                 |
+| `make fastapi-seed`          | Run `seed_db.py` to populate the database with seed data.                       |
+| `make fastapi-dump`          | Run `dump_db.py` to export the database contents.                               |
+
 ## 📌 Notes
 
 All tools were selected to be **compatible with Python's async ecosystem**, taking full advantage of **FastAPI’s ASGI architecture**. This ensures better scalability and performance by allowing concurrent processing of I/O-bound operations like DB access, API calls, and background jobs.
