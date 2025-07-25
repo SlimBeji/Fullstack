@@ -30,10 +30,11 @@ export const placeEmbeddingField = z.array(z.number()).length(384).openapi({
 
 export const placeImageUrlField = z.string().openapi({
     type: "string",
+    example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
     description: "local url on the storage",
 });
 
-export const placeImageField = zodFile("User's profile image (JPEG)");
+export const placeImageField = zodFile("Place Image (JPEG)");
 
 export const placeAddressField = z.string().min(1).openapi({
     description: "The place address",
@@ -83,7 +84,10 @@ export type PlaceSeed = Omit<PlaceDB, "id" | "creatorId"> & {
 
 // Creation Schemas
 
-export const PlaceCreateSchema = PlaceDBSchema.omit({ id: true });
+export const PlaceCreateSchema = PlaceDBSchema.omit({
+    id: true,
+    embedding: true,
+});
 
 export type PlaceCreate = z.infer<typeof PlaceCreateSchema>;
 

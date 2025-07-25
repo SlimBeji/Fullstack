@@ -30,6 +30,7 @@ export const userPasswordField = z.string().min(8).openapi({
 
 export const userImageUrlField = z.string().openapi({
     type: "string",
+    example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
     description: "local url on the storage",
 });
 
