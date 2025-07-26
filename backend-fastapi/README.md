@@ -18,6 +18,9 @@ This backend is written in **Python** and follows the architecture and principle
 The FastAPI backend relies on a `fastapi.env` file for configuration.
 
 ```
+# PYTHON
+PYTHONPATH=/app
+
 # ENV
 PORT=5001
 API_URL=http://localhost:5001/api
