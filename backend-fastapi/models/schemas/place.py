@@ -120,7 +120,7 @@ class PlacePostSchema(PlaceBaseSchema):
 class PlaceReadSchema(PlaceDBSchema):
     id: place_id_field
     imageUrl: place_image_url_field | None = None
-    creator_id: place_creator_id_field
+    creatorId: place_creator_id_field
     embedding: place_embedding_field
 
 
@@ -132,7 +132,7 @@ class PlaceUpdateSchema(BaseModel):
     description: place_description_field | None = None
     address: place_address_field | None = None
     location: PlaceLocation | None = None
-    creator_id: place_creator_id_field | None = None
+    creatorId: place_creator_id_field | None = None
 
 
 class PlacePutSchema(PlaceUpdateSchema):

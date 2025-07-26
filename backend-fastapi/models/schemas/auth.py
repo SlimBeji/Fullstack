@@ -50,4 +50,4 @@ class EncodedTokenSchema(BaseModel):
     userId: user_id_field
     email: user_email_field
     token: token_field
-    expires_at: user_image_field
+    expiresAt: user_image_field
