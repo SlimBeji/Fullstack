@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Iterator
 
 
 def parse_dot_notation(data: dict[str, Any]) -> dict[str, Any]:
@@ -24,10 +24,9 @@ def flatten_json(
 ) -> dict[str, Any]:
     result: dict[str, Any] = {}
 
-    if isinstance(obj, dict):
-        enumerator = obj.items()
-    else:
-        enumerator = enumerate(obj)
+    enumerator: Iterator[tuple[Any, Any]] = iter(
+        obj.items() if isinstance(obj, dict) else enumerate(obj)
+    )
 
     for key, value in enumerator:
         new_key = f"{prefix}.{key}" if prefix else key
