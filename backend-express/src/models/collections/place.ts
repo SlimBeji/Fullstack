@@ -20,16 +20,13 @@ export const PlaceCollectionSchema = new Schema<PlaceDB>(
                 lng: { type: Number, required: true },
             },
         },
+        // AI
+        embedding: { type: [Number], required: false },
         // Foreign Keys:
         creatorId: {
             type: Schema.ObjectId,
             required: true,
             ref: CollectionEnum.USERS,
-        },
-        // AI
-        embedding: {
-            type: [Number],
-            required: false,
         },
     },
     { timestamps: true }
