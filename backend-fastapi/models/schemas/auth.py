@@ -2,13 +2,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from models.schemas.user import (
-    user_email_field,
-    user_id_field,
-    user_image_field,
-    user_name_field,
-    user_password_field,
-)
+from models.schemas.user import UserFields
 
 # --- Fields ----
 
@@ -29,25 +23,25 @@ expires_at_field = Annotated[
 
 
 class SignupSchema(BaseModel):
-    name: user_name_field
-    email: user_email_field
-    password: user_password_field
-    image: user_image_field | None = None
+    name: UserFields.name
+    email: UserFields.email
+    password: UserFields.password
+    image: UserFields.image | None = None
 
 
 # --- Signin Schemas ----
 
 
 class SigninSchema(BaseModel):
-    email: user_email_field
-    password: user_password_field
+    email: UserFields.email
+    password: UserFields.password
 
 
 # --- Response Schemas ----
 
 
 class EncodedTokenSchema(BaseModel):
-    userId: user_id_field
-    email: user_email_field
+    userId: UserFields.id
+    email: UserFields.email
     token: token_field
-    expiresAt: user_image_field
+    expiresAt: expires_at_field

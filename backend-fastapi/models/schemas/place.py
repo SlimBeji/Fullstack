@@ -7,132 +7,122 @@ from models.schemas.utils import id_metadata
 
 # --- Fields ----
 
-place_id_field = Annotated[
-    str,
-    Field(**id_metadata()),
-]
 
-place_title_field = Annotated[
-    str,
-    Field(
-        min_length=10,
-        description="The place title/name, 10 characters minimum",
-        example="Stamford Bridge",
-    ),
-]
+class PlaceFields:
+    id = Annotated[
+        str,
+        Field(**id_metadata()),
+    ]
+    title = Annotated[
+        str,
+        Field(
+            min_length=10,
+            description="The place title/name, 10 characters minimum",
+            example="Stamford Bridge",
+        ),
+    ]
+    description = Annotated[
+        str,
+        Field(
+            min_length=10,
+            description="The place description, 10 characters minimum",
+            example="Stadium of Chelsea football club",
+        ),
+    ]
+    embedding = Annotated[
+        list[float],
+        Field(
+            description="Title + Description embedding", min_length=384, max_length=384
+        ),
+    ]
+    image_url = Annotated[
+        str,
+        Field(
+            example="avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+            description="local url on the storage",
+        ),
+    ]
+    image = Annotated[
+        UploadFile,
+        File(description="Place Image (JPEG)"),
+    ]
+    address = Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="The place address",
+            example="Fulham road",
+        ),
+    ]
+    creator_id = Annotated[
+        str,
+        Field(**id_metadata(description="The ID of the place creator, 24 characters")),
+    ]
 
-place_description_field = Annotated[
-    str,
-    Field(
-        min_length=10,
-        description="The place description, 10 characters minimum",
-        example="Stadium of Chelsea football club",
-    ),
-]
+    # --- Nested Objects ----
 
-place_embedding_field = Annotated[
-    list[float],
-    Field(description="Title + Description embedding", min_length=384, max_length=384),
-]
-
-place_image_url_field = Annotated[
-    str,
-    Field(
-        example="avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-        description="local url on the storage",
-    ),
-]
-
-place_image_field = Annotated[
-    UploadFile,
-    File(description="Place Image (JPEG)"),
-]
-
-place_address_field = Annotated[
-    str,
-    Field(
-        min_length=1,
-        description="The place address",
-        example="Fulham road",
-    ),
-]
-
-location_lat_field = Annotated[
-    float, Field(description="The latitude of the place", example=51.48180425016331)
-]
-
-location_lng_field = Annotated[
-    float, Field(description="The longitude of the place", example=-0.19090418688755467)
-]
-
-place_creator_id_field = Annotated[
-    str, Field(**id_metadata(description="The ID of the place creator, 24 characters"))
-]
-
-# --- Nested Objects ----
-
-
-class PlaceLocation(BaseModel):
-    lat: location_lat_field
-    lng: location_lng_field
+    class Location(BaseModel):
+        lat: Annotated[
+            float,
+            Field(description="The latitude of the place", example=51.48180425016331),
+        ]
+        lng: Annotated[
+            float,
+            Field(
+                description="The longitude of the place", example=-0.19090418688755467
+            ),
+        ]
 
 
-# --- DB Schemas ----
+# --- Base Schemas ----
 
 
 class PlaceBaseSchema(BaseModel):
-    title: place_title_field
-    description: place_description_field
-    address: place_address_field
-    location: PlaceLocation | None = None
-
-
-class PlaceDBSchema(PlaceBaseSchema):
-    id: place_id_field
-    embedding: place_embedding_field | None = None
-    imageUrl: place_image_url_field | None = None
-    creatorId: place_creator_id_field
+    title: PlaceFields.title
+    description: PlaceFields.description
+    address: PlaceFields.address
+    location: PlaceFields.Location | None = None
 
 
 class PlaceSeedSchema(PlaceBaseSchema):
     _ref: int
     _creator_ref: int
-    embedding: place_embedding_field | None = None
-    imageUrl: place_image_url_field | None = None
+    embedding: PlaceFields.embedding | None = None
+    imageUrl: PlaceFields.image_url | None = None
 
 
 # --- Creation Schemas ---
 
 
 class PlaceCreateSchema(PlaceBaseSchema):
-    embedding: place_embedding_field | None = None
-    imageUrl: place_image_url_field | None = None
+    embedding: PlaceFields.embedding | None = None
+    imageUrl: PlaceFields.image_url | None = None
 
 
 class PlacePostSchema(PlaceBaseSchema):
-    embedding: place_embedding_field | None = None
-    image: place_image_field | None = None
+    embedding: PlaceFields.embedding | None = None
+    image: PlaceFields.image | None = None
 
 
 # --- Read Schemas ---
 
 
-class PlaceReadSchema(PlaceDBSchema):
-    id: place_id_field
-    imageUrl: place_image_url_field | None = None
-    creatorId: place_creator_id_field
-    embedding: place_embedding_field
+class PlaceReadSchema(PlaceBaseSchema):
+    id: PlaceFields.id
+    imageUrl: PlaceFields.image_url | None = None
+    creatorId: PlaceFields.creator_id
+    embedding: PlaceFields.embedding
 
 
 # --- Update Schemas ---
 
 
 class PlaceUpdateSchema(BaseModel):
-    title: place_title_field | None = None
-    description: place_description_field | None = None
-    address: place_address_field | None = None
-    location: PlaceLocation | None = None
-    creatorId: place_creator_id_field | None = None
+    title: PlaceFields.title | None = None
+    description: PlaceFields.description | None = None
+    address: PlaceFields.address | None = None
+    location: PlaceFields.Location | None = None
+    creatorId: PlaceFields.creator_id | None = None
 
 
 class PlacePutSchema(PlaceUpdateSchema):
