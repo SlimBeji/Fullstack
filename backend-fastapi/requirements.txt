@@ -3,6 +3,9 @@ uvicorn
 fastapi
 httpx
 
+# Mocks
+testcontainers
+
 # MongoDB
 beanie
 motor
