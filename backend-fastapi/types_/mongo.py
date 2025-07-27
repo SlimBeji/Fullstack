@@ -9,22 +9,24 @@ SaveEvent = [Insert, Replace, Update]
 
 ChangeEvent = [Replace, Update]
 
-MongoOp = Literal[
+type MongoOp = Literal[
     "$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$regex", "$text"
 ]
 
-FilterOp = Literal["eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text"]
+type FilterOp = Literal[
+    "eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text"
+]
 
 
-ProjectionIncl = dict[str, Literal[0] | "ProjectionIncl"]
+type ProjectionIncl = dict[str, Literal[1] | ProjectionIncl]
 
-ProjectionExcl = dict[str, Literal[0] | "ProjectionExcl"]
+type ProjectionExcl = dict[str, Literal[0] | ProjectionExcl]
 
-SortData = dict[str, Literal[-1, 1]]
+type SortData = dict[str, Literal[-1, 1]]
 
-MongoFilter = dict[MongoOp, Any]
+type MongoFilter = dict[MongoOp, Any]
 
-FilterData = dict[str, MongoFilter]
+type FilterData = dict[str, MongoFilter]
 
 
 class MongoBaseFilter(BaseModel):
