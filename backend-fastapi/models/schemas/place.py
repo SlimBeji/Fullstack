@@ -4,6 +4,7 @@ from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
 from models.schemas.utils import id_metadata
+from types_ import PaginatedData
 
 # --- Fields ----
 
@@ -113,6 +114,8 @@ class PlaceReadSchema(PlaceBaseSchema):
     creatorId: PlaceFields.creator_id
     embedding: PlaceFields.embedding
 
+
+PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 
 # --- Update Schemas ---
 

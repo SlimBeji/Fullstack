@@ -4,6 +4,7 @@ from fastapi import File, UploadFile
 from pydantic import BaseModel, EmailStr, Field
 
 from models.schemas.utils import id_metadata
+from types_ import PaginatedData
 
 # --- Fields ----
 
@@ -93,6 +94,8 @@ class UserReadSchema(UserBaseSchema):
     imageUrl: UserFields.image_url | None = None
     places: UserFields.places
 
+
+UsersPaginatedSchema = PaginatedData[UserReadSchema]
 
 # --- Update Schemas ---
 
