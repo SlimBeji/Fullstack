@@ -2,7 +2,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
-ReadSchema = TypeVar("ReadSchema", BaseModel)
+ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
 
 
 class PaginationData(BaseModel):
