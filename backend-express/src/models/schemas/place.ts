@@ -100,7 +100,7 @@ export type PlacePost = z.infer<typeof PlacePostSchema>;
 
 // Read Schemas
 
-export const PlaceReadSchema = PlaceDBSchema.extend({});
+export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true });
 
 export type PlaceRead = z.infer<typeof PlaceReadSchema>;
 

@@ -112,7 +112,6 @@ class PlaceReadSchema(PlaceBaseSchema):
     id: PlaceFields.id
     imageUrl: PlaceFields.image_url | None = None
     creatorId: PlaceFields.creator_id
-    embedding: PlaceFields.embedding
 
 
 PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
