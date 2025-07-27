@@ -32,7 +32,7 @@ export class CrudUser extends Crud<
         super(UserModel);
     }
 
-    protected defaultProjection = { password: 0, _v: 0 } as const;
+    protected defaultProjection = { password: 0, __v: 0 } as const;
 
     public safeCheck(
         user: UserRead,
