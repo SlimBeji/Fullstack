@@ -1,0 +1,100 @@
+from http import HTTPStatus
+from typing import Generic, Literal, Type, TypeVar, get_args
+
+from beanie import Document
+from bson import ObjectId
+from pydantic import BaseModel
+
+from models.schemas import UserReadSchema
+from types_ import ApiError, FilterQuery, ProjectionExcl
+
+ModelDocument = TypeVar("ModelDocument", bound=Document)
+ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
+CreateSchema = TypeVar("CreateSchema", bound=BaseModel)
+PostSchema = TypeVar("PostSchema", bound=BaseModel)
+UpdateSchema = TypeVar("UpdateSchema", bound=BaseModel)
+PutSchema = TypeVar("PutSchema", bound=BaseModel)
+
+CrudEvent = Literal["create", "read", "update", "delete"]
+
+
+class CrudBase(
+    Generic[
+        ModelDocument,  # Beanie Document
+        ReadSchema,  # Read Schema
+        CreateSchema,  # Creation Schema
+        PostSchema,  # HTTP Post Schema
+        UpdateSchema,  # Update Schema
+        PutSchema,  # HTTP Put Schema
+    ]
+):
+    # Constructor & Properties
+
+    DEFAULT_PROJECTION: ProjectionExcl = dict(_version=0)
+
+    def __init__(self) -> None:
+        orig_base = self.__class__.__orig_bases__[0]  # type: ignore[attr-defined]
+        types = get_args(orig_base)
+        self.model: Type[ModelDocument] = types[0]
+        self.read_schema: Type[ReadSchema] = types[1]
+        self.create_schema: Type[CreateSchema] = types[2]
+        self.post_schema: Type[PostSchema] = types[3]
+        self.update_schema: Type[UpdateSchema] = types[4]
+        self.put_schema: Type[PutSchema] = types[5]
+
+    @property
+    def model_name(self) -> str:
+        return self.model.get_collection_name()
+
+    # Helpers
+
+    def not_found(self, id: str | ObjectId) -> ApiError:
+        return ApiError(
+            HTTPStatus.NOT_FOUND,
+            f"No document with id {id} found in {self.model_name}s",
+        )
+
+    # Accessors
+
+    def safe_check(
+        self,
+        user: UserReadSchema,
+        document: ModelDocument | PostSchema | PutSchema,
+        event: CrudEvent,
+    ) -> None:
+        pass
+
+    def safe_filter(
+        self, user: UserReadSchema, filter_query: FilterQuery
+    ) -> FilterQuery:
+        return filter_query
+
+    # Serialization
+
+    async def serialize_batch(self, documents: list[ModelDocument]) -> list[ReadSchema]:
+        """Use the ReadSchema to hide sensitive data"""
+        return [self.read_schema.model_validate(d.model_dump()) for d in documents]
+
+    async def serialize(self, document: ModelDocument) -> ReadSchema:
+        result = await self.serialize_batch([document])
+        return result[0]
+
+    # Read
+
+    async def get_document(self, id: str | ObjectId) -> ModelDocument | None:
+        return await self.model.get(id)
+
+    async def get(self, id: str | ObjectId) -> ReadSchema | None:
+        doc = await self.get_document(id)
+        if not doc:
+            return None
+
+        return await self.serialize(doc)
+
+    async def safe_get(self, user: UserReadSchema, id: str | ObjectId) -> ReadSchema:
+        doc = await self.get_document(id)
+        if not doc:
+            raise self.not_found(id)
+
+        self.safe_check(user, doc, "read")
+        return await self.serialize(doc)
