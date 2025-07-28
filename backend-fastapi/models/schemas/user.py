@@ -1,16 +1,19 @@
 from typing import Annotated
 
+from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, EmailStr, Field
 
-from models.schemas.utils import id_metadata
 from types_ import PaginatedData
 
 # --- Fields ----
 
 
 class UserFields:
-    id = Annotated[str, Field(**id_metadata())]
+    id = Annotated[
+        PydanticObjectId,
+        Field(description="The User ID", example="683b21134e2e5d46978daf1f"),
+    ]
     name = Annotated[
         str,
         Field(
@@ -53,7 +56,12 @@ class UserFields:
         ),
     ]
     places = Annotated[
-        list[Annotated[str, Field(**id_metadata())]],
+        list[
+            Annotated[
+                PydanticObjectId,
+                Field(description="The Place ID", example="683b21134e2e5d46978daf1f"),
+            ]
+        ],
         Field(description="The id of places belonging to the user, 24 characters"),
     ]
 

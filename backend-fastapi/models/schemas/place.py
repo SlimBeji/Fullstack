@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
-from models.schemas.utils import id_metadata
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -12,7 +11,7 @@ from types_ import PaginatedData
 class PlaceFields:
     id = Annotated[
         str,
-        Field(**id_metadata()),
+        Field(description="The Place ID", example="683b21134e2e5d46978daf1f"),
     ]
     title = Annotated[
         str,
@@ -57,7 +56,7 @@ class PlaceFields:
     ]
     creator_id = Annotated[
         str,
-        Field(**id_metadata(description="The ID of the place creator, 24 characters")),
+        Field(description="The place creator ID", example="683b21134e2e5d46978daf1f"),
     ]
 
     # --- Nested Objects ----
