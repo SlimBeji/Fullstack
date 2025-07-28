@@ -8,18 +8,11 @@ import { CollectionEnum } from "../../types";
 export class MongoClient {
     private conn: Mongoose | null = null;
     private replSetMock: MongoMemoryReplSet | null = null;
-    public uri: string = "";
-    public dbName: string = "";
+    public uri: string = env.MONGO_URL;
+    public dbName: string = env.MONGO_DBNAME;
 
     public get isTest(): boolean {
         return !!process.env.JEST_WORKER_ID;
-    }
-
-    constructor() {
-        if (!this.isTest) {
-            this.uri = env.MONGO_URL;
-        }
-        this.dbName = env.MONGO_DBNAME;
     }
 
     private async prepareMock(): Promise<void> {
