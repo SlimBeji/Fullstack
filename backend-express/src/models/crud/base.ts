@@ -33,13 +33,23 @@ export abstract class Crud<
     Update extends object, // Update Interface
     Put extends object, // HTTP Put Interface
 > {
-    // Constructor
+    // Constructor & Properties
+
     constructor(public model: CrudModel<DBInt, Doc>) {}
 
     protected abstract defaultProjection: ProjectionExcl;
 
     public get modelName(): string {
         return this.model.modelName;
+    }
+
+    // Helpers
+
+    public async saveDocument(doc: Doc): Promise<void> {
+        const session = await startSession();
+        session.startTransaction();
+        await doc.save({ session });
+        await session.commitTransaction();
     }
 
     public notFoundError(id: string | Types.ObjectId): ApiError {
@@ -174,15 +184,6 @@ export abstract class Crud<
     ): Promise<PaginatedData<Partial<Read>>> {
         filterQuery = this.safeFilter(user, filterQuery);
         return this.fetch(filterQuery);
-    }
-
-    // Save
-
-    public async saveDocument(doc: Doc): Promise<void> {
-        const session = await startSession();
-        session.startTransaction();
-        await doc.save({ session });
-        await session.commitTransaction();
     }
 
     // Create
