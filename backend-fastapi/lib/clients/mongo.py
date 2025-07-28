@@ -1,7 +1,11 @@
-from typing import cast
+from typing import AsyncGenerator, cast
 
 from beanie import init_beanie
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import (
+    AsyncIOMotorClient,
+    AsyncIOMotorClientSession,
+    AsyncIOMotorDatabase,
+)
 from pymongo.asynchronous.database import AsyncDatabase
 from testcontainers.mongodb import MongoDbContainer
 
@@ -64,6 +68,21 @@ class MongoClient:
         if self._test_container:
             self._test_container.stop()
             self._test_container = None
+
+    async def session_transaction(
+        self,
+    ) -> AsyncGenerator[AsyncIOMotorClientSession, None]:
+        if self.client is None:
+            raise RuntimeError("MongoDB client not connected. Call db.connect() first.")
+
+        session: AsyncIOMotorClientSession | None = None
+        try:
+            session = await self.client.start_session()
+            async with session.start_transaction():
+                yield session
+        finally:
+            if session:
+                session.end_session()
 
 
 db = MongoClient()
