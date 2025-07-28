@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -18,7 +19,7 @@ class Settings(BaseSettings):
     JSON_MAX_SIZE: str
     MAX_ITEMS_PER_PAGE: int = 100
     JWT_EXPIRATION: int = 3600
-    ENV: str
+    ENV: Literal["dev", "test", "production"]
 
     # DATABASE
     MONGO_URL: str
@@ -40,6 +41,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.ENV == "production"
+
+    @property
+    def is_test(self) -> bool:
+        return self.ENV == "test"
 
 
 settings = Settings()  # type: ignore[call-arg]
