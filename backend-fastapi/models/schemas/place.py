@@ -1,8 +1,10 @@
 from typing import Annotated
 
+from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
+from models.schemas.utils import LinkedObjectId
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -10,7 +12,7 @@ from types_ import PaginatedData
 
 class PlaceFields:
     id = Annotated[
-        str,
+        PydanticObjectId,
         Field(description="The Place ID", example="683b21134e2e5d46978daf1f"),
     ]
     title = Annotated[
@@ -55,7 +57,7 @@ class PlaceFields:
         ),
     ]
     creator_id = Annotated[
-        str,
+        LinkedObjectId,
         Field(description="The place creator ID", example="683b21134e2e5d46978daf1f"),
     ]
 
