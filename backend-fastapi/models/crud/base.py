@@ -5,6 +5,7 @@ from beanie import Document
 from bson import ObjectId
 from pydantic import BaseModel
 
+from lib.clients import db
 from models.schemas import UserReadSchema
 from types_ import ApiError, FilterQuery, ProjectionExcl
 
@@ -47,6 +48,10 @@ class CrudBase(
         return self.model.get_collection_name()
 
     # Helpers
+
+    async def save_document(self, document: ModelDocument) -> None:
+        async with db.session_transaction() as session:
+            await document.save(session=session)
 
     def not_found(self, id: str | ObjectId) -> ApiError:
         return ApiError(
