@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any
 
-from lib.clients import close_dbs, connect_dbs, db
+from lib.clients import close_dbs, connect_dbs
 from models.crud import crud_place
 
 
