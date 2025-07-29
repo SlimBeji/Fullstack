@@ -90,11 +90,11 @@ class CrudBase(
         return await self.model.get(id)
 
     async def get(self, id: str | ObjectId) -> ReadSchema | None:
-        doc = await self.get_document(id)
-        if not doc:
+        document = await self.get_document(id)
+        if document is None:
             return None
 
-        return await self.serialize(doc)
+        return await self.serialize(document)
 
     async def safe_get(self, user: UserReadSchema, id: str | ObjectId) -> ReadSchema:
         doc = await self.get_document(id)
