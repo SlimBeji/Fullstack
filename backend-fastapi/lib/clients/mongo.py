@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator, cast
 
 from beanie import init_beanie
@@ -20,14 +21,21 @@ class MongoClient:
         self.db_name: str = settings.MONGO_DBNAME
         self.uri: str = settings.MONGO_URL
         self._test_container: MongoDbContainer | None = None
-        self.client: AsyncIOMotorClient | None = None
+        self._client: AsyncIOMotorClient | None = None
+
         self.db: AsyncIOMotorDatabase | None = None
 
     @property
     def is_test(self) -> bool:
         return settings.is_test
 
-    async def _configure_container(self) -> None:
+    @property
+    def client(self) -> AsyncIOMotorClient:
+        if self._client is None:
+            raise RuntimeError("Mongo client is not connected. Call connect() first.")
+        return self._client
+
+    def _configure_container(self) -> None:
         if self._test_container is not None:
             return
 
@@ -48,33 +56,31 @@ class MongoClient:
     async def connect(self) -> None:
         # Configure the test container if in test mode
         if self.is_test:
-            await self._configure_container()
+            self._configure_container()
 
         # Connect to the database
-        self.client = AsyncIOMotorClient(self.uri)
-        self.db = self.client[self.db_name]
+        self._client = AsyncIOMotorClient(self.uri)
+        self.db = self._client[self.db_name]
         await init_beanie(cast(AsyncDatabase, self.db), document_models=document_models)
 
         # Seed data for testing
         if self.is_test:
             await self._seed_test_data()
 
-    def close(self) -> None:
-        if self.client:
-            self.client.close()
-            self.client = None
+    async def close(self) -> None:
+        if self._client:
+            self._client.close()
+            self._client = None
             self.db = None
 
         if self._test_container:
             self._test_container.stop()
             self._test_container = None
 
+    @asynccontextmanager
     async def session_transaction(
         self,
     ) -> AsyncGenerator[AsyncIOMotorClientSession, None]:
-        if self.client is None:
-            raise RuntimeError("MongoDB client not connected. Call db.connect() first.")
-
         session: AsyncIOMotorClientSession | None = None
         try:
             session = await self.client.start_session()
@@ -82,7 +88,7 @@ class MongoClient:
                 yield session
         finally:
             if session:
-                session.end_session()
+                await session.end_session()
 
 
 db = MongoClient()
