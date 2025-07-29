@@ -11,6 +11,9 @@ beanie
 motor
 redis
 
+# GCP
+google-cloud-storage
+
 # Schemas
 pydantic[email]>=2.4
 pydantic-settings
