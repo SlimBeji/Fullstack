@@ -103,3 +103,34 @@ class CrudBase(
 
         self.safe_check(user, doc, "read")
         return await self.serialize(doc)
+
+    # Delete
+
+    async def delete_cleanup(self, document: ModelDocument) -> None:
+        pass
+
+    async def delete_document(self, document: ModelDocument) -> None:
+        try:
+            async with db.session_transaction() as session:
+                await document.delete(session=session)
+                await self.delete_cleanup(document)
+        except:
+            raise ApiError(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                f"Could not delete {self.model_name} object!",
+            )
+
+    async def delete(self, id: str | ObjectId) -> None:
+        document = await self.get_document(id)
+        if document is None:
+            return None
+
+        return await self.delete_document(document)
+
+    async def safe_delete(self, user: UserReadSchema, id: str | ObjectId) -> None:
+        document = await self.get_document(id)
+        if document is None:
+            raise self.not_found(id)
+
+        self.safe_check(user, document, "delete")
+        return await self.delete_document(document)
