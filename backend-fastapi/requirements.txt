@@ -6,9 +6,10 @@ httpx
 # Mocks
 testcontainers
 
-# MongoDB
+# MongoDB & Redis
 beanie
 motor
+redis
 
 # Schemas
 pydantic[email]>=2.4
