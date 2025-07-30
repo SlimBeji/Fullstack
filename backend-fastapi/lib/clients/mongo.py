@@ -8,6 +8,7 @@ from motor.motor_asyncio import (
     AsyncIOMotorDatabase,
 )
 from pymongo.asynchronous.database import AsyncDatabase
+from pymongo.errors import CollectionInvalid
 from testcontainers.mongodb import MongoDbContainer
 
 from config import settings
@@ -35,6 +36,20 @@ class MongoClient:
             raise RuntimeError("Mongo client is not connected. Call connect() first.")
         return self._client
 
+    async def create_collection(self, name: str) -> None:
+        try:
+            await self.db.create_collection(name)
+        except CollectionInvalid as e:
+            if e._message == f"collection {name} already exists":
+                return
+            raise e
+
+    async def list_collections(self) -> list[str]:
+        return await self.db.list_collection_names()
+
+    async def drop_collection(self, name: str) -> None:
+        return await self.db.drop_collection(name)
+
     def _configure_container(self) -> None:
         if self._test_container is not None:
             return
@@ -48,7 +63,7 @@ class MongoClient:
         if self.db is None:
             raise RuntimeError("Cannot seed while the connection is not established")
 
-        collections = await self.db.list_collection_names()
+        collections = await self.list_collections()
         was_seeded = Collections.USERS.value in collections
         if not was_seeded:
             await seed_db()
