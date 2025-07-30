@@ -104,6 +104,37 @@ class CrudBase(
         self.safe_check(user, doc, "read")
         return await self.serialize(doc)
 
+    # Update
+
+    async def update_document(
+        self, document: ModelDocument, form: UpdateSchema
+    ) -> ModelDocument:
+        for field, value in form.model_dump(exclude_unset=True).items():
+            setattr(document, field, value)
+
+        await self.save_document(document)
+        return document
+
+    async def update(self, document: ModelDocument, form: PutSchema) -> ModelDocument:
+        j = form.model_dump(exclude_none=True, exclude_unset=True)
+        update = self.update_schema.model_validate(j)
+        return await self.update_document(document, update)
+
+    async def safe_update(
+        self, user: UserReadSchema, document: ModelDocument, form: PutSchema
+    ) -> ModelDocument:
+        self.safe_check(user, document, "read")
+        self.safe_check(user, form, "update")
+        return await self.update(document, form)
+
+    async def safe_update_by_id(
+        self, user: UserReadSchema, id: str | ObjectId, form: PutSchema
+    ) -> ModelDocument:
+        document = await self.get_document(id)
+        if document is None:
+            raise self.not_found(id)
+        return await self.safe_update(user, document, form)
+
     # Delete
 
     async def delete_cleanup(self, document: ModelDocument) -> None:
