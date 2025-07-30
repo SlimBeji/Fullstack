@@ -30,20 +30,20 @@ class Place(BaseDocument):
     @before_event(ChangeEvent)
     async def validate_creator_exists(self) -> None:
         Users: Type["User"] = document_registry[Collections.USERS]
-        if not await Users.find_one(Users.id == self.creatorId):
+        if not await Users.find_one(Users.id == self.creatorId.ref.id):
             raise ValueError("Creator does not exist")
 
     @after_event([Insert])
     async def add_place_to_user(self) -> None:
         Users: Type["User"] = document_registry[Collections.USERS]
-        await Users.find_one(Users.id == self.creatorId).update(
+        await Users.find_one(Users.id == self.creatorId.ref.id).update(
             {"$addToSet": {"places": self.id}}
         )
 
-    @before_event(Delete)
+    @before_event([Delete])
     async def remove_place_from_user(self) -> None:
         Users: Type["User"] = document_registry[Collections.USERS]
-        await Users.find_one(Users.id == self.creatorId).update(
+        await Users.find_one(Users.id == self.creatorId.ref.id).update(
             {"$pull": {"places": self.id}}
         )
 
