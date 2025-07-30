@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any
 
-from lib.clients import close_dbs, connect_dbs, storage
+from lib.clients import close_dbs, cloud_storage, connect_dbs
 from lib.utils import get_image_path
 
 
@@ -13,8 +13,8 @@ def echo(output: Any):
 
 async def debug():
     path = get_image_path("avatar1.jpg")
-    destination = storage.upload_file(path)
-    url = storage.get_signed_url(destination)
+    destination = cloud_storage.upload_file(path)
+    url = cloud_storage.get_signed_url(destination)
     print(url)
 
 

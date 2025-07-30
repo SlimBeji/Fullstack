@@ -115,4 +115,4 @@ class CloudStorage:
             return False
 
 
-storage = CloudStorage()
+cloud_storage = CloudStorage()
