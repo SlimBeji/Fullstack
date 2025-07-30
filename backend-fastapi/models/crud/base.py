@@ -104,6 +104,22 @@ class CrudBase(
         self.safe_check(user, doc, "read")
         return await self.serialize(doc)
 
+    # Create
+
+    async def create_document(self, form: CreateSchema) -> ModelDocument:
+        document = self.model.model_validate(form.model_dump())
+        await self.save_document(document)
+        return document
+
+    async def create(self, form: PostSchema) -> ReadSchema:
+        create_form = self.create_schema.model_validate(form.model_dump())
+        document = await self.create_document(create_form)
+        return await self.serialize(document)
+
+    async def safe_create(self, user: UserReadSchema, form: PostSchema) -> ReadSchema:
+        self.safe_check(user, form, "create")
+        return await self.create(form)
+
     # Update
 
     async def update_document(
