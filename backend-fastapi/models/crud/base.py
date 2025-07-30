@@ -49,6 +49,10 @@ class CrudBase(
 
     # Helpers
 
+    async def insert_document(self, document: ModelDocument) -> None:
+        async with db.session_transaction() as session:
+            await document.insert(session=session)
+
     async def save_document(self, document: ModelDocument) -> None:
         async with db.session_transaction() as session:
             await document.save(session=session)
@@ -108,7 +112,7 @@ class CrudBase(
 
     async def create_document(self, form: CreateSchema) -> ModelDocument:
         document = self.model(**form.model_dump())
-        await self.save_document(document)
+        await self.insert_document(document)
         return document
 
     async def create(self, form: PostSchema) -> ReadSchema:
