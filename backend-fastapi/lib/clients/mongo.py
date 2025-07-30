@@ -22,8 +22,7 @@ class MongoClient:
         self.uri: str = settings.MONGO_URL
         self._test_container: MongoDbContainer | None = None
         self._client: AsyncIOMotorClient | None = None
-
-        self.db: AsyncIOMotorDatabase | None = None
+        self._db: AsyncIOMotorDatabase | None = None
 
     @property
     def is_test(self) -> bool:
@@ -34,6 +33,12 @@ class MongoClient:
         if self._client is None:
             raise RuntimeError("Mongo client is not connected. Call connect() first.")
         return self._client
+
+    @property
+    def db(self) -> AsyncIOMotorDatabase:
+        if self._db is None:
+            raise RuntimeError("Mongo client is not connected. Call connect() first.")
+        return self._db
 
     async def create_collection(self, name: str) -> None:
         try:
@@ -47,7 +52,7 @@ class MongoClient:
         return await self.db.list_collection_names()
 
     async def drop_collection(self, name: str) -> None:
-        return await self.db.drop_collection(name)
+        await self.db.drop_collection(name)
 
     def _configure_container(self) -> None:
         if self._test_container is not None:
@@ -59,9 +64,6 @@ class MongoClient:
         self.uri = self._test_container.get_connection_url()
 
     async def _seed_test_data(self) -> None:
-        if self.db is None:
-            raise RuntimeError("Cannot seed while the connection is not established")
-
         collections = await self.list_collections()
         was_seeded = Collections.USERS.value in collections
         if not was_seeded:
@@ -77,8 +79,10 @@ class MongoClient:
 
         # Connect to the database
         self._client = AsyncIOMotorClient(self.uri)
-        self.db = self._client[self.db_name]
-        await init_beanie(cast(AsyncDatabase, self.db), document_models=document_models)
+        self._db = self._client[self.db_name]
+        await init_beanie(
+            cast(AsyncDatabase, self._db), document_models=document_models
+        )
 
         # Seed data for testing
         if self.is_test:
@@ -88,7 +92,7 @@ class MongoClient:
         if self._client:
             self._client.close()
             self._client = None
-            self.db = None
+            self._db = None
 
         if self._test_container:
             self._test_container.stop()
