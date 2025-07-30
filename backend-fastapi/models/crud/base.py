@@ -131,21 +131,22 @@ class CrudBase(
         await self.save_document(document)
         return document
 
-    async def update(self, document: ModelDocument, form: PutSchema) -> ModelDocument:
+    async def update(self, document: ModelDocument, form: PutSchema) -> ReadSchema:
         j = form.model_dump(exclude_none=True, exclude_unset=True)
         update = self.update_schema.model_validate(j)
-        return await self.update_document(document, update)
+        document = await self.update_document(document, update)
+        return await self.serialize(document)
 
     async def safe_update(
         self, user: UserReadSchema, document: ModelDocument, form: PutSchema
-    ) -> ModelDocument:
+    ) -> ReadSchema:
         self.safe_check(user, document, "read")
         self.safe_check(user, form, "update")
         return await self.update(document, form)
 
     async def safe_update_by_id(
         self, user: UserReadSchema, id: str | ObjectId, form: PutSchema
-    ) -> ModelDocument:
+    ) -> ReadSchema:
         document = await self.get_document(id)
         if document is None:
             raise self.not_found(id)
