@@ -13,7 +13,6 @@ from testcontainers.mongodb import MongoDbContainer
 
 from config import settings
 from models.collections import document_models
-from models.examples import seed_db
 from types_ import Collections
 
 
@@ -66,6 +65,9 @@ class MongoClient:
         collections = await self.list_collections()
         was_seeded = Collections.USERS.value in collections
         if not was_seeded:
+            # Doing the import now, to avoid circular imports
+            from models.examples import seed_db
+
             await seed_db()
 
     async def connect(self) -> None:
