@@ -77,7 +77,7 @@ class UserBaseSchema(BaseModel):
 
 
 class UserSeedSchema(UserBaseSchema):
-    _ref: int
+    ref: int
     password: UserFields.password
     imageUrl: UserFields.image_url | None = None
 

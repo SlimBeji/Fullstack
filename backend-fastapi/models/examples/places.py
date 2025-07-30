@@ -778,8 +778,8 @@ EMBEDDING_2 = [
 
 PLACES: list[PlaceSeedSchema] = [
     PlaceSeedSchema(
-        _ref=1,
-        _creator_ref=1,
+        ref=1,
+        creator_ref=1,
         title="Stamford Bridge",
         description="Chelsea FC Stadium",
         embedding=EMBEDDING_1,
@@ -788,8 +788,8 @@ PLACES: list[PlaceSeedSchema] = [
         location=PlaceFields.Location(lat=51.48180425016331, lng=-0.19090418688755467),
     ),
     PlaceSeedSchema(
-        _ref=2,
-        _creator_ref=1,
+        ref=2,
+        creator_ref=1,
         title="Cobham Training Facility",
         description="Chelsea training facility",
         embedding=EMBEDDING_2,

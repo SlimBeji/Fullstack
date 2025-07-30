@@ -3,7 +3,7 @@ from models.schemas import UserSeedSchema
 
 USERS: list[UserSeedSchema] = [
     UserSeedSchema(
-        _ref=1,
+        ref=1,
         name="Slim Beji",
         email="mslimbeji@gmail.com",
         password="very_secret",
@@ -11,7 +11,7 @@ USERS: list[UserSeedSchema] = [
         isAdmin=True,
     ),
     UserSeedSchema(
-        _ref=2,
+        ref=2,
         name="Mohamed Slim Beji",
         email="beji.slim@yahoo.fr",
         password="very_secret",

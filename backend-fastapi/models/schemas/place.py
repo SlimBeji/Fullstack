@@ -87,8 +87,8 @@ class PlaceBaseSchema(BaseModel):
 
 
 class PlaceSeedSchema(PlaceBaseSchema):
-    _ref: int
-    _creator_ref: int
+    ref: int
+    creator_ref: int
     embedding: PlaceFields.embedding | None = None
     imageUrl: PlaceFields.image_url | None = None
 
@@ -99,11 +99,13 @@ class PlaceSeedSchema(PlaceBaseSchema):
 class PlaceCreateSchema(PlaceBaseSchema):
     embedding: PlaceFields.embedding | None = None
     imageUrl: PlaceFields.image_url | None = None
+    creatorId: PlaceFields.creator_id
 
 
 class PlacePostSchema(PlaceBaseSchema):
     embedding: PlaceFields.embedding | None = None
     image: PlaceFields.image | None = None
+    creatorId: PlaceFields.creator_id
 
 
 # --- Read Schemas ---
