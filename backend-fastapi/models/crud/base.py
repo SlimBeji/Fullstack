@@ -78,7 +78,7 @@ class CrudBase(
 
     async def serialize_batch(self, documents: list[ModelDocument]) -> list[ReadSchema]:
         """Use the ReadSchema to hide sensitive data"""
-        return [self.read_schema.model_validate(d.model_dump()) for d in documents]
+        return [self.read_schema(**d.model_dump()) for d in documents]
 
     async def serialize(self, document: ModelDocument) -> ReadSchema:
         result = await self.serialize_batch([document])
@@ -107,12 +107,12 @@ class CrudBase(
     # Create
 
     async def create_document(self, form: CreateSchema) -> ModelDocument:
-        document = self.model.model_validate(form.model_dump())
+        document = self.model(**form.model_dump())
         await self.save_document(document)
         return document
 
     async def create(self, form: PostSchema) -> ReadSchema:
-        create_form = self.create_schema.model_validate(form.model_dump())
+        create_form = self.create_schema(**form.model_dump())
         document = await self.create_document(create_form)
         return await self.serialize(document)
 
@@ -133,7 +133,7 @@ class CrudBase(
 
     async def update(self, document: ModelDocument, form: PutSchema) -> ReadSchema:
         j = form.model_dump(exclude_none=True, exclude_unset=True)
-        update = self.update_schema.model_validate(j)
+        update = self.update_schema(**j)
         document = await self.update_document(document, update)
         return await self.serialize(document)
 
