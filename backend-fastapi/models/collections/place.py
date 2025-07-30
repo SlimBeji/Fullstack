@@ -15,10 +15,10 @@ class Place(BaseDocument):
     # Fields
     title: PlaceFields.title
     description: PlaceFields.description
-    imageUrl: PlaceFields.image_url
+    imageUrl: PlaceFields.image_url | None = None
     address: PlaceFields.address
-    location: PlaceFields.Location | None
-    embedding: PlaceFields.embedding
+    location: PlaceFields.Location | None = None
+    embedding: PlaceFields.embedding = []
 
     # Relations
     creatorId: "Link[User]"

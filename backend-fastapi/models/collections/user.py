@@ -16,11 +16,11 @@ class User(BaseDocument):
     name: UserFields.name
     email: UserFields.email
     password: UserFields.password
-    imageUrl: UserFields.image_url
+    imageUrl: UserFields.image_url | None = None
     isAdmin: UserFields.is_admin
 
     # Relations
-    places: list["Link[Place]"]
+    places: list["Link[Place]"] = []
 
     class Settings:
         name = Collections.USERS
