@@ -276,6 +276,12 @@ export abstract class Crud<
         await this.deleteCleanup(obj);
     }
 
+    public async delete(id: string | Types.ObjectId): Promise<void> {
+        const doc = await this.getDocument(id);
+        if (!doc) return;
+        return this.deleteDocument(doc);
+    }
+
     public async safeDelete(
         user: UserRead,
         id: string | Types.ObjectId
