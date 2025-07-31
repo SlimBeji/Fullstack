@@ -1,3 +1,7 @@
+import { readFileSync } from "fs";
+import mime from "mime-types";
+import path from "path";
+
 export interface PaginationData {
     page: number;
     size: number;
@@ -11,8 +15,17 @@ export interface PaginatedData<T> {
     data: T[];
 }
 
-export interface FileToUpload {
-    originalname: string;
-    mimetype: string;
-    buffer: Buffer<ArrayBufferLike>;
+export class FileToUpload {
+    constructor(
+        public originalname: string,
+        public mimetype: string,
+        public buffer: Buffer<ArrayBufferLike>
+    ) {}
+
+    public static fromPath(filePath: string): FileToUpload {
+        const originalname = path.basename(filePath);
+        const mimetype = mime.lookup(filePath) || "application/octet-stream";
+        const buffer = readFileSync(filePath);
+        return new FileToUpload(originalname, mimetype, buffer);
+    }
 }
