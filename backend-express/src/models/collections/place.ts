@@ -2,7 +2,6 @@ import { model, Schema } from "mongoose";
 
 import { ApiError, CollectionEnum, HttpStatus } from "../../types";
 import { PlaceDB } from "../schemas";
-import { UserModel } from "./user";
 
 // Schema creation
 export const PlaceCollectionSchema = new Schema<PlaceDB>(
@@ -35,6 +34,8 @@ PlaceCollectionSchema.index({ createdAt: 1 });
 
 // Hooks
 PlaceCollectionSchema.pre("save", async function (next) {
+    // Lazy loading to avoid circular imports
+    const { UserModel } = await import("./user");
     const userExists = await UserModel.exists({ _id: this.creatorId });
     if (!userExists)
         throw new ApiError(HttpStatus.BAD_REQUEST, "User does not exist");
@@ -42,6 +43,8 @@ PlaceCollectionSchema.pre("save", async function (next) {
 });
 
 PlaceCollectionSchema.post("save", async function (place, next) {
+    // Lazy loading to avoid circular imports
+    const { UserModel } = await import("./user");
     await UserModel.findByIdAndUpdate(place.creatorId, {
         $addToSet: { places: place._id },
     });
@@ -49,6 +52,8 @@ PlaceCollectionSchema.post("save", async function (place, next) {
 });
 
 PlaceCollectionSchema.pre("deleteOne", async function (next) {
+    // Lazy loading to avoid circular imports
+    const { UserModel } = await import("./user");
     const place = await this.model.findOne(this.getFilter());
     await UserModel.findByIdAndUpdate(place.creatorId, {
         $pull: { places: place._id },
