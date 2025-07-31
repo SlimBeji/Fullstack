@@ -43,7 +43,7 @@ express-test:
 express-lint:
 	docker exec -it express npx tsc --noEmit
 	docker exec -it express npx eslint "src/**/*.ts" --fix
-	docker exec -it express npx prettier --write . | grep -v "(unchanged)"
+	docker exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
 
 express-script/%:
 	docker exec -it express npx ts-node src/scripts/$*
