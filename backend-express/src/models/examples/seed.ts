@@ -1,6 +1,6 @@
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 
-import { redisClient, storage } from "../../lib/clients";
+import { db, redisClient, storage } from "../../lib/clients";
 import { CollectionEnum } from "../../types";
 import { crudPlace, crudUser } from "../crud";
 import { PlaceSeed, UserSeed } from "../schemas";
@@ -13,7 +13,7 @@ const placeRefMapping: Map<number, Types.ObjectId> = new Map();
 const createCollections = async (): Promise<void> => {
     await Promise.all(
         Object.values(CollectionEnum).map(async (collectionName: string) => {
-            await mongoose.connection.db!.createCollection(collectionName);
+            await db.createCollection(collectionName);
         })
     );
 };
@@ -54,11 +54,11 @@ export const seedDb = async (verbose: boolean = false): Promise<void> => {
 };
 
 export const dumpDb = async (verbose: boolean = false): Promise<void> => {
-    const collections = await mongoose.connection.db!.collections();
+    const collections = await db.listCollections();
     for (const collection of collections) {
-        await collection.deleteMany({});
+        await db.dropCollection(collection.name);
         if (verbose) {
-            console.log(`✅ Collection ${collection.namespace} cleared!`);
+            console.log(`✅ Collection ${collection.name} cleared!`);
         }
     }
     await redisClient.flushAll();

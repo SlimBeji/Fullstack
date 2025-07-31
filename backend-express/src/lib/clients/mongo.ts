@@ -58,6 +58,18 @@ export class MongoClient {
             this.uri = "";
         }
     }
+
+    public async createCollection(name: string): Promise<void> {
+        await mongoose.connection.db!.createCollection(name);
+    }
+
+    public async listCollections(): Promise<mongoose.mongo.CollectionInfo[]> {
+        return await mongoose.connection.db!.listCollections().toArray();
+    }
+
+    public async dropCollection(name: string): Promise<void> {
+        await mongoose.connection.db!.dropCollection(name);
+    }
 }
 
 export const db = new MongoClient();
