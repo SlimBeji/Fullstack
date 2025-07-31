@@ -5,8 +5,7 @@ import {
     StorageOptions,
 } from "@google-cloud/storage";
 import { randomUUID } from "crypto";
-import { existsSync, readFileSync } from "fs";
-import mime from "mime-types";
+import { existsSync } from "fs";
 import path from "path";
 
 import { env } from "../../config";
@@ -115,11 +114,15 @@ export class CloudStorage {
     }
 
     public async uploadFile(
-        file: FileToUpload | null,
+        file: FileToUpload | string | null,
         destination?: string
     ): Promise<string> {
         if (!file) {
             return "";
+        }
+
+        if (typeof file === "string") {
+            file = FileToUpload.fromPath(file);
         }
 
         const ext = path.extname(file.originalname);
@@ -153,12 +156,3 @@ export class CloudStorage {
 }
 
 export const storage = new CloudStorage(env);
-
-export const uploadLocal = async (filePath: string): Promise<string> => {
-    const originalname = path.basename(filePath);
-    const mimetype = mime.lookup(filePath) || "application/octet-stream";
-    const buffer = readFileSync(filePath);
-    const fileToUpload = { originalname, mimetype, buffer };
-    const fileUrl = await storage.uploadFile(fileToUpload);
-    return fileUrl;
-};

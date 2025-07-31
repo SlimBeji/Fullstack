@@ -1,6 +1,6 @@
 import mongoose, { Types } from "mongoose";
 
-import { redisClient, uploadLocal } from "../../lib/clients";
+import { redisClient, storage } from "../../lib/clients";
 import { CollectionEnum } from "../../types";
 import { crudPlace, crudUser } from "../crud";
 import { PlaceSeed, UserSeed } from "../schemas";
@@ -21,7 +21,7 @@ const createCollections = async (): Promise<void> => {
 const seedUsers = async (raw: UserSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newUserIn) => {
-            newUserIn.imageUrl = await uploadLocal(newUserIn.imageUrl!);
+            newUserIn.imageUrl = await storage.uploadFile(newUserIn.imageUrl!);
             const user = await crudUser.createDocument(newUserIn);
             userRefMapping.set(newUserIn._ref, user.id);
         })
@@ -31,7 +31,9 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
 const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newPlaceIn) => {
-            newPlaceIn.imageUrl = await uploadLocal(newPlaceIn.imageUrl!);
+            newPlaceIn.imageUrl = await storage.uploadFile(
+                newPlaceIn.imageUrl!
+            );
             const data = {
                 ...newPlaceIn,
                 creatorId: userRefMapping.get(newPlaceIn._createorRef)!,
