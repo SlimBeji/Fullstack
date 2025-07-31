@@ -18,7 +18,7 @@ export const env = {
     APP_URL: parseVar("APP_URL"),
     SECRET_KEY: parseVar("SECRET_KEY"),
     FILEUPLOAD_MAX_SIZE: Number(parseVar("FILEUPLOAD_MAX_SIZE", "100")),
-    JSON_MAX_SIZE: parseVar("JSON_MAX_SIZE"),
+    JSON_MAX_SIZE: Number(parseVar("JSON_MAX_SIZE", "10240")),
     MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),
     JWT_EXPIRATION: Number(parseVar("JWT_EXPIRATION", "3600")),
     ENV: parseVar("ENV"),
