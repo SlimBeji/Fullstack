@@ -3,6 +3,7 @@ import { model, Schema } from "mongoose";
 import { CollectionEnum } from "../../types";
 import { UserDB } from "../schemas";
 
+// Schema creation
 const UserCollectionSchema = new Schema<UserDB>(
     {
         // Fields
@@ -24,6 +25,16 @@ const UserCollectionSchema = new Schema<UserDB>(
 );
 UserCollectionSchema.index({ createdAt: 1 });
 
+// Hooks
+UserCollectionSchema.pre("deleteOne", async function (next) {
+    // Lazy loading to avoid circular imports
+    const { PlaceModel } = await import("./place");
+    const user = await this.model.findOne(this.getFilter());
+    await PlaceModel.deleteMany({ creatorId: user.id });
+    next();
+});
+
+// Model Creation
 export const UserModel = model<UserDB>(
     CollectionEnum.USERS,
     UserCollectionSchema
