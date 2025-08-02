@@ -8,7 +8,8 @@ import {
     ApiError,
     FieldFilter,
     HttpStatus,
-    MongoFilterOperation,
+    MongoFieldFilters,
+    MongoFieldsFilters,
     PaginationData,
     SortData,
 } from "../../types";
@@ -103,13 +104,11 @@ const toSortData = (fields: string[]): SortData => {
     return result;
 };
 
-const toMongoFilters = (
-    body: FilterBody
-): Record<string, MongoFilterOperation> => {
-    const result: Record<string, MongoFilterOperation> = {};
+const toMongoFilters = (body: FilterBody): MongoFieldsFilters => {
+    const result: Record<string, MongoFieldFilters> = {};
     for (const [key, values] of Object.entries(body)) {
         if (GLOBAL_PARAMS.has(key)) continue;
-        const fieldFilters: MongoFilterOperation = {};
+        const fieldFilters: MongoFieldFilters = {};
         values.forEach(({ op, val }) => {
             if (op === "text") {
                 fieldFilters[`$${op}`] = { $search: val };

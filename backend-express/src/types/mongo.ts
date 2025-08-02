@@ -21,11 +21,9 @@ export type FilterOperation = keyof typeof MongoOperationsMapping;
 
 export type FieldFilter = { op: FilterOperation; val: string[] };
 
-export type MongoFilterOperation = { [key in `$${FilterOperation}`]?: any };
+export type MongoFieldFilters = { [key in `$${FilterOperation}`]?: any };
 
-export type MongoFieldsFilters<T extends string = string> = {
-    [key in T]?: MongoFilterOperation;
-};
+export type MongoFieldsFilters = { [key: string]: MongoFieldFilters };
 
 export interface MongoFindQuery<T> {
     pagination?: PaginationData;
