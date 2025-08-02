@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from lib.clients import db
 from models.schemas import UserReadSchema
-from types_ import ApiError, FilterQuery, ProjectionExcl
+from types_ import ApiError, MongoFindQuery, ProjectionExcl
 
 ModelDocument = TypeVar("ModelDocument", bound=Document)
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
@@ -74,8 +74,8 @@ class CrudBase(
         pass
 
     def safe_filter(
-        self, user: UserReadSchema, filter_query: FilterQuery
-    ) -> FilterQuery:
+        self, user: UserReadSchema, filter_query: MongoFindQuery
+    ) -> MongoFindQuery:
         return filter_query
 
     # Serialization

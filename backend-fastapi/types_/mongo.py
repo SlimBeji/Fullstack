@@ -24,9 +24,9 @@ type ProjectionExcl = dict[str, Literal[0] | ProjectionExcl]
 
 type SortData = dict[str, Literal[-1, 1]]
 
-type MongoFilter = dict[MongoOp, Any]
+type MongoFieldFilters = dict[MongoOp, Any]
 
-type FilterData = dict[str, MongoFilter]
+type MongoFieldsFilters = dict[str, MongoFieldFilters]
 
 
 class MongoBaseFilter(BaseModel):
@@ -34,8 +34,8 @@ class MongoBaseFilter(BaseModel):
     val: list[str]
 
 
-class FilterQuery(BaseModel):
+class MongoFindQuery(BaseModel):
     pagination: PaginationData | None
     sort: SortData | None
-    filters: FilterData | None
+    filters: MongoFieldsFilters | None
     projection: ProjectionIncl | None
