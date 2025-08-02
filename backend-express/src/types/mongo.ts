@@ -1,21 +1,10 @@
+import { FilterQuery, InclusionProjection } from "mongoose";
+
 import { PaginationData } from "./http";
 
 export type SortData = { [key: string]: 1 | -1 };
 
-export type FilterData = { [key: string]: MongoFilter };
-
-export type ProjectionIncl = { [key: string]: 1 | ProjectionIncl };
-
-export type ProjectionExcl = { [key: string]: 0 | ProjectionExcl };
-
-export interface FilterQuery {
-    pagination?: PaginationData;
-    sort?: SortData;
-    filters?: FilterData;
-    projection?: ProjectionIncl;
-}
-
-export const MongoOperationMapping = {
+export const MongoOperationsMapping = {
     eq: "$eq",
     ne: "$ne",
     gt: "$gt",
@@ -28,8 +17,19 @@ export const MongoOperationMapping = {
     text: "$text",
 } as const;
 
-export type MongoOperation = keyof typeof MongoOperationMapping;
+export type FilterOperation = keyof typeof MongoOperationsMapping;
 
-export type MongoFilter = { [key in `$${MongoOperation}`]?: any };
+export type FieldFilter = { op: FilterOperation; val: string[] };
 
-export type MongoBaseFilter = { op: MongoOperation; val: string[] };
+export type MongoFilterOperation = { [key in `$${FilterOperation}`]?: any };
+
+export type MongoFieldsFilters<T extends string = string> = {
+    [key in T]?: MongoFilterOperation;
+};
+
+export interface MongoFindQuery<T> {
+    pagination?: PaginationData;
+    sort?: SortData;
+    filters?: FilterQuery<T>;
+    projection?: InclusionProjection<T>;
+}

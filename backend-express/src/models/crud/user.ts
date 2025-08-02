@@ -2,7 +2,7 @@ import { compare, hash } from "bcryptjs";
 
 import { createToken } from "../../api/auth";
 import { storage } from "../../lib/clients";
-import { ApiError, FilterQuery, HttpStatus } from "../../types";
+import { ApiError, HttpStatus, MongoFindQuery } from "../../types";
 import { UserDocument, UserModel } from "../collections";
 import {
     EncodedToken,
@@ -52,10 +52,13 @@ export class CrudUser extends Crud<
         }
     }
 
-    public safeFilter(user: UserRead, filterQuery: FilterQuery): FilterQuery {
+    public safeFilter(
+        user: UserRead,
+        filterQuery: MongoFindQuery<UserDB>
+    ): MongoFindQuery<UserDB> {
         const { sort, filters, pagination } = filterQuery;
         if (filters) {
-            filters.id = { $eq: user.id };
+            filters._id = { $eq: user.id };
         }
         return { sort, filters, pagination };
     }

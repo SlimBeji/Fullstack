@@ -1,8 +1,10 @@
 import {
     Document,
+    ExclusionProjection,
+    FilterQuery,
+    InclusionProjection,
     Model,
     ProjectionType,
-    RootFilterQuery,
     sanitizeFilter,
     startSession,
     Types,
@@ -11,12 +13,9 @@ import {
 import { env } from "../../config";
 import {
     ApiError,
-    FilterData,
-    FilterQuery,
     HttpStatus,
+    MongoFindQuery,
     PaginatedData,
-    ProjectionExcl,
-    ProjectionIncl,
 } from "../../types";
 import { UserRead } from "../schemas";
 
@@ -24,7 +23,7 @@ export type CrudEvent = "create" | "read" | "update" | "delete";
 
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
-export abstract class Crud<
+export class Crud<
     DBInt, // DB Interface
     Doc extends Document, // Document Type
     Read extends object, // The Read interface
@@ -37,7 +36,7 @@ export abstract class Crud<
 
     constructor(public model: CrudModel<DBInt, Doc>) {}
 
-    protected abstract defaultProjection: ProjectionExcl;
+    protected defaultProjection: ExclusionProjection<DBInt> = { __v: 0 };
 
     public get modelName(): string {
         return this.model.modelName;
@@ -61,16 +60,18 @@ export abstract class Crud<
 
     // Accessors
 
-    public abstract safeCheck(
-        user: UserRead,
-        doc: Doc | Post | Put,
-        event: CrudEvent
-    ): void;
+    public safeCheck(
+        _user: UserRead,
+        _doc: Doc | Post | Put,
+        _event: CrudEvent
+    ): void {}
 
-    public abstract safeFilter(
-        user: UserRead,
-        filterQuery: FilterQuery
-    ): FilterQuery;
+    public safeFilter(
+        _user: UserRead,
+        query: MongoFindQuery<DBInt>
+    ): MongoFindQuery<DBInt> {
+        return query;
+    }
 
     // Serialization
     public serializeDocument(document: Doc): DBInt {
@@ -90,9 +91,13 @@ export abstract class Crud<
         return obj;
     }
 
-    public abstract jsonifyBatch(
+    public async jsonifyBatch(
         documents: Doc[]
-    ): Promise<Read[] | Partial<Read>[]>;
+    ): Promise<Read[] | Partial<Read>[]> {
+        return documents.map((doc) => this.serializeDocument(doc)) as
+            | Read[]
+            | Partial<Read>[];
+    }
 
     public async jsonfify(raw: Doc): Promise<Read | Partial<Read>> {
         return (await this.jsonifyBatch([raw]))[0];
@@ -128,7 +133,7 @@ export abstract class Crud<
     // Fetch
 
     private parseProjection(
-        projection?: ProjectionIncl
+        projection?: InclusionProjection<DBInt>
     ): ProjectionType<DBInt> {
         if (!projection) {
             return this.defaultProjection;
@@ -140,20 +145,20 @@ export abstract class Crud<
         return projection;
     }
 
-    public async countDocuments(filterQuery: FilterData): Promise<number> {
-        return this.model.countDocuments(filterQuery as RootFilterQuery<DBInt>);
+    public async countDocuments(filters: FilterQuery<DBInt>): Promise<number> {
+        return this.model.countDocuments(filters);
     }
 
-    public async fetchDocuments(filterQuery: FilterQuery): Promise<Doc[]> {
-        let { pagination, sort, filters } = filterQuery;
+    public async fetchDocuments(query: MongoFindQuery<DBInt>): Promise<Doc[]> {
+        let { pagination, sort, filters } = query;
         const skip = pagination ? pagination.skip : 0;
         const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
 
         if (Object.keys(sort || []).length === 0) {
             sort = { createdAt: 1 };
         }
-        const parsedFilters = filters as RootFilterQuery<DBInt>;
-        const projection = this.parseProjection(filterQuery.projection);
+        const parsedFilters = filters || {};
+        const projection = this.parseProjection(query.projection);
         const documents = await this.model
             .find(parsedFilters, projection)
             .sort(sort)
@@ -165,25 +170,25 @@ export abstract class Crud<
     }
 
     public async fetch(
-        filterQuery: FilterQuery
+        query: MongoFindQuery<DBInt>
     ): Promise<PaginatedData<Partial<Read>>> {
-        filterQuery = sanitizeFilter(filterQuery) as FilterQuery;
-        const { pagination, filters } = filterQuery;
+        query = sanitizeFilter(query) as MongoFindQuery<DBInt>;
+        const { pagination, filters } = query;
         const page = pagination ? pagination.page : 1;
         const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
         const totalCount = await this.countDocuments(filters || {});
         const totalPages = Math.ceil(totalCount / size);
-        const documents = await this.fetchDocuments(filterQuery);
+        const documents = await this.fetchDocuments(query);
         const data = await this.jsonifyBatch(documents);
         return { page, totalPages, totalCount, data };
     }
 
     public async safeFetch(
         user: UserRead,
-        filterQuery: FilterQuery
+        query: MongoFindQuery<DBInt>
     ): Promise<PaginatedData<Partial<Read>>> {
-        filterQuery = this.safeFilter(user, filterQuery);
-        return this.fetch(filterQuery);
+        query = this.safeFilter(user, query);
+        return this.fetch(query);
     }
 
     // Create
@@ -205,7 +210,11 @@ export abstract class Crud<
         }
     }
 
-    public abstract create(post: Post): Promise<Read>;
+    public async create(post: Post): Promise<Read> {
+        const doc = await this.createDocument(post as any as Create);
+        const result = await this.jsonfify(doc);
+        return result as Read;
+    }
 
     public async safeCreate(user: UserRead, post: Post): Promise<Read> {
         this.safeCheck(user, post, "create");
@@ -230,7 +239,11 @@ export abstract class Crud<
         }
     }
 
-    public abstract update(obj: Doc, form: Put): Promise<Read>;
+    public async update(obj: Doc, form: Put): Promise<Read> {
+        const doc = await this.updateDocument(obj, form as any as Update);
+        const result = await this.jsonfify(doc);
+        return result as Read;
+    }
 
     public async safeUpdate(
         user: UserRead,

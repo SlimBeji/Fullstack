@@ -1,5 +1,5 @@
 import { storage } from "../../lib/clients";
-import { ApiError, FilterQuery, HttpStatus } from "../../types";
+import { ApiError, HttpStatus, MongoFindQuery } from "../../types";
 import { placeEmbedding } from "../../worker/tasks";
 import { PlaceDocument, PlaceModel } from "../collections";
 import {
@@ -46,7 +46,10 @@ export class CrudPlace extends Crud<
         }
     }
 
-    public safeFilter(user: UserRead, filterQuery: FilterQuery): FilterQuery {
+    public safeFilter(
+        user: UserRead,
+        filterQuery: MongoFindQuery<PlaceDB>
+    ): MongoFindQuery<PlaceDB> {
         const { sort, filters, pagination } = filterQuery;
         if (filters) {
             filters.creatorId = { $eq: user.id };
