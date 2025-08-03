@@ -10,14 +10,22 @@ SaveEvent = [Insert, Replace, Update]
 ChangeEvent = [Replace, Update]
 
 type MongoOp = Literal[
-    "$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$regex", "$text"
+    "$eq",
+    "$ne",
+    "$gt",
+    "$gte",
+    "$lt",
+    "$lte",
+    "$in",
+    "$nin",
+    "$regex",
+    "$text",
+    "$exists",
 ]
 
 type FilterOp = Literal[
-    "eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text"
+    "eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text", "exists"
 ]
-
-
 type ProjectionIncl = dict[str, Literal[1] | ProjectionIncl]
 
 type ProjectionExcl = dict[str, Literal[0] | ProjectionExcl]
