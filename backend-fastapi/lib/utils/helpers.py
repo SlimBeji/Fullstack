@@ -1,6 +1,10 @@
 from typing import Any, Iterator
 
 
+def str_to_bool(val: str) -> bool:
+    return val.lower() in ("true", "1", "t", "y", "yes")
+
+
 def parse_dot_notation(data: dict[str, Any]) -> dict[str, Any]:
     result: dict[str, Any] = {}
 

@@ -6,6 +6,7 @@ import redis.asyncio as async_redis
 from testcontainers.redis import RedisContainer
 
 from config import settings
+from lib.utils.helpers import str_to_bool
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -77,7 +78,7 @@ class RedisClient:
         elif format == "float":
             return float(stored)
         elif format == "bool":
-            return str(stored).lower() in ("true", "1", "t", "y", "yes")
+            return str_to_bool(str(stored))
         return stored
 
     async def set(self, key: str, val: Any, expiration: int | None = None) -> None:
