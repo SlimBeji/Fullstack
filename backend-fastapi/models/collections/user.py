@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type, cast
 
-from beanie import Link
+from beanie import Delete, Link, after_event
+from beanie.odm.fields import ExpressionField
 
 from models.collections.base import BaseDocument, document_registry
 from models.schemas import UserFields
@@ -25,6 +26,12 @@ class User(BaseDocument):
     class Settings:
         name = Collections.USERS
         indexes = ["createdAt"]
+
+    @after_event([Delete])
+    async def remove_child_places(self) -> None:
+        Places: Type["Place"] = document_registry[Collections.PLACES]
+        creatorExpression = cast(ExpressionField, Places.creatorId)
+        await Places.find(creatorExpression.id == self.id).delete()
 
 
 document_registry[Collections.USERS] = User
