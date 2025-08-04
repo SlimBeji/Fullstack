@@ -1,10 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
-from models.schemas.utils import LinkedObjectId
+from models.schemas.utils import LinkedObjectId, QueryFilters
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -118,6 +118,17 @@ class PlaceReadSchema(PlaceBaseSchema):
 
 
 PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
+
+# --- Query Schemas ---
+
+PlaceSortableFields = Literal["createdAt", "title", "description", "address"]
+
+
+class PlaceFiltersSchema(BaseModel):
+    title: QueryFilters[PlaceFields.title]
+    description: QueryFilters[PlaceFields.description]
+    address: QueryFilters[PlaceFields.address]
+
 
 # --- Update Schemas ---
 

@@ -1,10 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, EmailStr, Field
 
-from models.schemas.utils import LinkedObjectId
+from models.schemas.utils import LinkedObjectId, QueryFilters
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -105,6 +105,19 @@ class UserReadSchema(UserBaseSchema):
 
 
 UsersPaginatedSchema = PaginatedData[UserReadSchema]
+
+
+# --- Query Schemas ---
+
+UserSortableFields = Literal[
+    "createdAt", "name", "email", "password", "imageUrl", "isAdmin"
+]
+
+
+class UserFiltersSchema(BaseModel):
+    name: QueryFilters[UserFields.name]
+    email: QueryFilters[UserFields.email]
+
 
 # --- Update Schemas ---
 
