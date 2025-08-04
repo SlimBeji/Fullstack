@@ -84,7 +84,7 @@ def _numeric_filter_validator(
 
 
 def _string_filter_validator(
-    op: FilterOp, raw: str, adapter: TypeAdapter
+    op: FilterOp, raw: str, adapter: TypeAdapter, is_indexed: bool = False
 ) -> FieldFilter:
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
@@ -110,6 +110,11 @@ def _string_filter_validator(
     elif op == "regex":
         return dict(op=op, val=raw)
     elif op == "text":
+        if is_indexed == False:
+            raise PydanticCustomError(
+                "invalid $text operation",
+                f"$text operation can only be performed of indexed string fields",
+            )
         return dict(op=op, val=raw)
     else:
         raise PydanticCustomError(
@@ -163,7 +168,8 @@ def _datetime_filter_validator(
 
 
 def make_filter_validator(real_type: Any):
-    base_class = get_args(real_type)[0]
+    base_class, annotations = get_args(real_type)
+    is_indexed: bool = annotations.json_schema_extra.get("is_indexed", False)
     adapter = TypeAdapter(real_type)
 
     if base_class not in [int, float, str, EmailStr, bool, datetime]:
@@ -185,7 +191,7 @@ def make_filter_validator(real_type: Any):
         if base_class in [int, float]:
             return _numeric_filter_validator(op, raw_val, adapter)
         elif base_class in [str, EmailStr]:
-            return _string_filter_validator(op, raw_val, adapter)
+            return _string_filter_validator(op, raw_val, adapter, is_indexed)
         elif base_class in [bool]:
             return _boolean_filter_validator(op, raw_val, adapter)
         elif base_class in [datetime]:
