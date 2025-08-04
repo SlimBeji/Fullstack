@@ -1,16 +1,38 @@
-import json
 from datetime import datetime
-from typing import Annotated, Any, Callable, Generic, TypedDict, TypeVar, cast, get_args
+from typing import (
+    Annotated,
+    Any,
+    Callable,
+    Generic,
+    Optional,
+    TypedDict,
+    TypeVar,
+    cast,
+    get_args,
+)
 
 from beanie import Link
 from beanie.odm.fields import PydanticObjectId
 from bson import ObjectId
-from pydantic import BeforeValidator, EmailStr, TypeAdapter
+from pydantic import BaseModel, BeforeValidator, EmailStr, Field, TypeAdapter
 from pydantic.networks import EmailStr
 from pydantic_core import PydanticCustomError
 
 from lib.utils import str_to_bool
 from types_ import FilterOp
+
+# Utility Methods
+
+
+def get_pydantic_flat_fields(obj: BaseModel, prefix: str = "") -> list[str]:
+    paths = []
+    for name, value in obj.__dict__.items():
+        if isinstance(value, BaseModel):
+            paths.extend(get_pydantic_flat_fields(value, f"{prefix}{name}."))
+        else:
+            paths.append(f"{prefix}{name}")
+    return paths
+
 
 # LinkedObjectId
 
@@ -59,20 +81,9 @@ def _numeric_filter_validator(
         val = adapter.validate_python(raw)
         return dict(op=op, val=val)
     elif op in ["in", "nin"]:
-        if raw.startswith("["):
-            try:
-                l: list[str] = json.loads(raw)
-            except json.JSONDecodeError:
-                raise PydanticCustomError(
-                    "invalid json list",
-                    f"{raw} is not a valid json list of numeric values",
-                )
-
-            val = [adapter.validate_python(item) for item in l]
-            return dict(op=op, val=val)
-        else:
-            val = adapter.validate_python(raw)
-            return dict(op=op, val=[val])
+        l = raw.split(",")
+        val = [adapter.validate_python(item) for item in l]
+        return dict(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
         return dict(op=op, val=val)
@@ -90,20 +101,9 @@ def _string_filter_validator(
         val = adapter.validate_python(raw)
         return dict(op=op, val=val)
     elif op in ["in", "nin"]:
-        if raw.startswith("["):
-            try:
-                l: list[str] = json.loads(raw)
-            except json.JSONDecodeError:
-                raise PydanticCustomError(
-                    "invalid json list",
-                    f"{raw} is not a valid json list of string values",
-                )
-
-            val = [adapter.validate_python(item) for item in l]
-            return dict(op=op, val=val)
-        else:
-            val = adapter.validate_python(raw)
-            return dict(op=op, val=[val])
+        l = raw.split(",")
+        val = [adapter.validate_python(item) for item in l]
+        return dict(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
         return dict(op=op, val=val)
@@ -143,20 +143,9 @@ def _datetime_filter_validator(
         val = adapter.validate_python(raw)
         return dict(op=op, val=val)
     elif op in ["in", "nin"]:
-        if raw.startswith("["):
-            try:
-                l: list[str] = json.loads(raw)
-            except json.JSONDecodeError:
-                raise PydanticCustomError(
-                    "invalid json list",
-                    f"{raw} is not a valid json list of datetime values",
-                )
-
-            val = [adapter.validate_python(item) for item in l]
-            return dict(op=op, val=val)
-        else:
-            val = adapter.validate_python(raw)
-            return dict(op=op, val=[val])
+        l = raw.split(",")
+        val = [adapter.validate_python(item) for item in l]
+        return dict(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
         return dict(op=op, val=val)
@@ -203,9 +192,21 @@ def make_filter_validator(real_type: Any):
     return validator
 
 
-class FilterParam(Generic[T]):
+class QueryFilter(Generic[T]):
     def __class_getitem__(cls, item):
+        _, field_info = get_args(item)
+        example = field_info.json_schema_extra.get("example")
         return Annotated[
-            FieldFilter,
+            str | FieldFilter,
             BeforeValidator(make_filter_validator(item)),
+            Field(example=example),
+        ]
+
+
+class QueryFilters(Generic[T]):
+    def __class_getitem__(cls, item):
+        _, field_info = get_args(item)
+        description = field_info.description
+        return Annotated[
+            Optional[list[QueryFilter[item]]], Field(None, description=description)
         ]
