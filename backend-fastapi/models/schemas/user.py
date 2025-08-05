@@ -4,7 +4,7 @@ from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, EmailStr, Field
 
-from models.schemas.utils import LinkedObjectId, QueryFilters
+from models.schemas.utils import LinkedObjectId, QueryFilters, build_search_schema
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -119,6 +119,25 @@ UserSortableFields = Literal[
 class UserFiltersSchema(BaseModel):
     name: QueryFilters[UserFields.name]
     email: QueryFilters[UserFields.email]
+
+
+class UserSearchGetSchema(
+    build_search_schema(  # type: ignore
+        "UserSearchGetSchema", UserFiltersSchema, UserSortableFields
+    )
+):
+    pass
+
+
+class UserSearchPostSchema(
+    build_search_schema(  # type: ignore
+        "UserSearchPostSchema",
+        UserFiltersSchema,
+        UserSortableFields,
+        UserReadSchema,
+    )
+):
+    pass
 
 
 # --- Update Schemas ---
