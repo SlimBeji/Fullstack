@@ -127,13 +127,14 @@ PlaceSortableFields = Literal["createdAt", "title", "description", "address"]
 
 
 class PlaceFiltersSchema(BaseFiltersSchema):
-    _projection = dict(location_lat="location.lat", location_lng="location.lng")
+    _projection = dict(locationLat="location.lat", locationLng="location.lng")
 
     title: QueryFilters[PlaceFields.title]
     description: QueryFilters[PlaceFields.description]
     address: QueryFilters[PlaceFields.address]
-    location_lat: QueryFilters[PlaceFields.location_lat]
-    location_lng: QueryFilters[PlaceFields.location_lat]
+    creatorId: QueryFilters[PlaceFields.creator_id]
+    locationLat: QueryFilters[PlaceFields.location_lat]
+    locationLng: QueryFilters[PlaceFields.location_lat]
 
 
 # --- Update Schemas ---
