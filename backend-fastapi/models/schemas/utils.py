@@ -1,4 +1,5 @@
 from datetime import datetime
+from types import UnionType
 from typing import (
     Annotated,
     Any,
@@ -38,9 +39,11 @@ def get_pydantic_flat_fields(model: type[BaseModel], prefix: str = "") -> list[s
     paths = []
     for name, field in model.model_fields.items():
         annotation = field.annotation
-
         if isinstance(annotation, type) and issubclass(annotation, BaseModel):
             paths.extend(get_pydantic_flat_fields(annotation, f"{prefix}{name}."))
+        elif isinstance(annotation, UnionType):
+            arg = get_args(annotation)[0]
+            paths.extend(get_pydantic_flat_fields(arg, f"{prefix}{name}."))
         else:
             paths.append(f"{prefix}{name}")
     return paths
