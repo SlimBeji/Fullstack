@@ -15,6 +15,7 @@ from beanie import Link
 from beanie.odm.fields import PydanticObjectId
 from bson import ObjectId
 from pydantic import BaseModel, BeforeValidator, EmailStr, Field, TypeAdapter
+from pydantic.fields import FieldInfo
 from pydantic.networks import EmailStr
 from pydantic_core import PydanticCustomError
 
@@ -32,6 +33,14 @@ def get_pydantic_flat_fields(obj: BaseModel, prefix: str = "") -> list[str]:
         else:
             paths.append(f"{prefix}{name}")
     return paths
+
+
+def get_field_info(field) -> FieldInfo | None:
+    extra = get_args(field)[1:]
+    for metadata in extra:
+        if isinstance(metadata, FieldInfo):
+            return metadata
+    return None
 
 
 # LinkedObjectId
@@ -156,12 +165,33 @@ def _datetime_filter_validator(
         )
 
 
+def _id_filter_validator(op: FilterOp, raw: str, adapter: TypeAdapter) -> FieldFilter:
+    if op in ["eq", "ne"]:
+        val = adapter.validate_python(raw)
+        return dict(op=op, val=val)
+    elif op in ["in", "nin"]:
+        l = raw.split(",")
+        val = [adapter.validate_python(item) for item in l]
+        return dict(op=op, val=val)
+    elif op == "exists":
+        val = str_to_bool(raw)
+        return dict(op=op, val=val)
+    else:
+        raise PydanticCustomError(
+            "invalid ObjectId operation",
+            f"{op} is not a valid operation for linked fields",
+        )
+
+
 def make_filter_validator(real_type: Any):
-    base_class, annotations = get_args(real_type)
-    is_indexed: bool = annotations.json_schema_extra.get("is_indexed", False)
+    base_class = get_args(real_type)[0]
+    annotations = get_field_info(real_type)
+    is_indexed: bool = getattr(annotations, "json_schema_extra", {}).get(
+        "is_indexed", False
+    )
     adapter = TypeAdapter(real_type)
 
-    if base_class not in [int, float, str, EmailStr, bool, datetime]:
+    if base_class not in [int, float, str, EmailStr, bool, datetime, PydanticObjectId]:
         raise RuntimeError(f"Unknow base type {base_class}")
 
     def validator(value: str | dict) -> FieldFilter:
@@ -185,6 +215,8 @@ def make_filter_validator(real_type: Any):
             return _boolean_filter_validator(op, raw_val, adapter)
         elif base_class in [datetime]:
             return _datetime_filter_validator(op, raw_val, adapter)
+        elif base_class in [PydanticObjectId]:
+            return _id_filter_validator(op, raw_val, adapter)
         else:
             # This should not be reached. Linting purposes
             raise RuntimeError(f"Unknow base type {base_class}")
@@ -194,8 +226,8 @@ def make_filter_validator(real_type: Any):
 
 class QueryFilter(Generic[T]):
     def __class_getitem__(cls, item):
-        _, field_info = get_args(item)
-        example = field_info.json_schema_extra.get("example")
+        field_info = get_field_info(item)
+        example = getattr(field_info, "json_schema_extra", {}).get("example")
         return Annotated[
             str | FieldFilter,
             BeforeValidator(make_filter_validator(item)),
@@ -205,8 +237,8 @@ class QueryFilter(Generic[T]):
 
 class QueryFilters(Generic[T]):
     def __class_getitem__(cls, item):
-        _, field_info = get_args(item)
-        description = field_info.description
+        field_info = get_field_info(item)
+        description = getattr(field_info, "description", "")
         return Annotated[
             Optional[list[QueryFilter[item]]], Field(None, description=description)
         ]
