@@ -45,6 +45,15 @@ def get_field_info(field) -> FieldInfo | None:
     return None
 
 
+def copy_fields(model: type[BaseModel]) -> dict[str, tuple[type[Any], Any]]:
+    new_fields: dict[str, tuple[type[Any], Any]] = {}
+    for k, v in model.model_fields.items():
+        annotation = cast(type[Any], v.annotation)
+        default = v.default
+        new_fields[k] = (annotation, default)
+    return new_fields
+
+
 # LinkedObjectId
 
 
