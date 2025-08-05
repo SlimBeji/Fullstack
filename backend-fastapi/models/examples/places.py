@@ -1,5 +1,5 @@
 from lib.utils import get_image_path
-from models.schemas import PlaceFields, PlaceSeedSchema
+from models.schemas import PlaceLocation, PlaceSeedSchema
 
 EMBEDDING_1 = [
     0.0236833356320858,
@@ -785,7 +785,7 @@ PLACES: list[PlaceSeedSchema] = [
         embedding=EMBEDDING_1,
         imageUrl=get_image_path("place1.jpg"),
         address="Fulham Road, London",
-        location=PlaceFields.Location(lat=51.48180425016331, lng=-0.19090418688755467),
+        location=PlaceLocation(lat=51.48180425016331, lng=-0.19090418688755467),
     ),
     PlaceSeedSchema(
         ref=2,
@@ -795,6 +795,6 @@ PLACES: list[PlaceSeedSchema] = [
         embedding=EMBEDDING_2,
         imageUrl=get_image_path("place2.jpg"),
         address="64 Stoke Rd, Stoke D'Abernon, Cobham KT11 3PT",
-        location=PlaceFields.Location(lat=51.31735558375386, lng=-0.38584590510204153),
+        location=PlaceLocation(lat=51.31735558375386, lng=-0.38584590510204153),
     ),
 ]

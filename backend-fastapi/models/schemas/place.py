@@ -60,20 +60,22 @@ class PlaceFields:
         LinkedObjectId,
         Field(description="The place creator ID", example="683b21134e2e5d46978daf1f"),
     ]
+    location_lat = Annotated[
+        float,
+        Field(description="The latitude of the place", example=51.48180425016331),
+    ]
+    location_lng = Annotated[
+        float,
+        Field(description="The longitude of the place", example=-0.19090418688755467),
+    ]
 
-    # --- Nested Objects ----
 
-    class Location(BaseModel):
-        lat: Annotated[
-            float,
-            Field(description="The latitude of the place", example=51.48180425016331),
-        ]
-        lng: Annotated[
-            float,
-            Field(
-                description="The longitude of the place", example=-0.19090418688755467
-            ),
-        ]
+# --- Nested Objects ----
+
+
+class PlaceLocation(BaseModel):
+    lat: PlaceFields.location_lat
+    lng: PlaceFields.location_lng
 
 
 # --- Base Schemas ----
@@ -83,7 +85,7 @@ class PlaceBaseSchema(BaseModel):
     title: PlaceFields.title
     description: PlaceFields.description
     address: PlaceFields.address
-    location: PlaceFields.Location | None = None
+    location: PlaceLocation | None = None
 
 
 class PlaceSeedSchema(PlaceBaseSchema):
@@ -137,7 +139,7 @@ class PlaceUpdateSchema(BaseModel):
     title: PlaceFields.title | None = None
     description: PlaceFields.description | None = None
     address: PlaceFields.address | None = None
-    location: PlaceFields.Location | None = None
+    location: PlaceLocation | None = None
     creatorId: PlaceFields.creator_id | None = None
 
 

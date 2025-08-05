@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Type
 from beanie import Delete, Insert, Link, after_event, before_event
 
 from models.collections.base import BaseDocument, document_registry
-from models.schemas.place import PlaceFields
+from models.schemas.place import PlaceFields, PlaceLocation
 from types_ import ChangeEvent, Collections
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ class Place(BaseDocument):
     description: PlaceFields.description
     imageUrl: PlaceFields.image_url | None = None
     address: PlaceFields.address
-    location: PlaceFields.Location | None = None
+    location: PlaceLocation | None = None
     embedding: PlaceFields.embedding = []
 
     # Relations
