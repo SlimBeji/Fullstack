@@ -186,9 +186,8 @@ def _id_filter_validator(op: FilterOp, raw: str, adapter: TypeAdapter) -> FieldF
 def make_filter_validator(real_type: Any):
     base_class = get_args(real_type)[0]
     annotations = get_field_info(real_type)
-    is_indexed: bool = getattr(annotations, "json_schema_extra", {}).get(
-        "is_indexed", False
-    )
+    json_schema_extra = getattr(annotations, "json_schema_extra") or {}
+    is_indexed: bool = json_schema_extra.get("is_indexed", False)
     adapter = TypeAdapter(real_type)
 
     if base_class not in [int, float, str, EmailStr, bool, datetime, PydanticObjectId]:
@@ -227,11 +226,10 @@ def make_filter_validator(real_type: Any):
 class QueryFilter(Generic[T]):
     def __class_getitem__(cls, item):
         field_info = get_field_info(item)
-        example = getattr(field_info, "json_schema_extra", {}).get("example")
         return Annotated[
             str | FieldFilter,
             BeforeValidator(make_filter_validator(item)),
-            Field(example=example),
+            Field(examples=field_info.examples),
         ]
 
 
