@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from functools import partial
-from typing import Type
 
 from beanie import Document, before_event
 from pydantic import Field
@@ -18,4 +17,4 @@ class BaseDocument(Document):
 
 
 # document_registery used to avoid circular imports
-document_registry: dict[str, Type[Document]] = {}
+document_registry: dict[str, type[Document]] = {}

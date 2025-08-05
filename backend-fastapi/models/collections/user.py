@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Type, cast
+from typing import TYPE_CHECKING, cast
 
 from beanie import Delete, Link, after_event
 from beanie.odm.fields import ExpressionField
@@ -29,7 +29,7 @@ class User(BaseDocument):
 
     @after_event([Delete])
     async def remove_child_places(self) -> None:
-        Places: Type["Place"] = document_registry[Collections.PLACES]
+        Places: type["Place"] = document_registry[Collections.PLACES]
         creatorExpression = cast(ExpressionField, Places.creatorId)
         await Places.find(creatorExpression.id == self.id).delete()
 

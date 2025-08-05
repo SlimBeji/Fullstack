@@ -5,7 +5,6 @@ from typing import (
     Callable,
     Generic,
     Optional,
-    Type,
     TypedDict,
     TypeVar,
     cast,
@@ -256,3 +255,16 @@ class BaseFiltersSchema(BaseModel):
         for name, target in self._projection.items():
             result[target] = result.pop(name, None)
         return result
+
+
+# Search Schema
+
+S = TypeVar("S", bound=str)
+
+
+def build_search_schema(
+    filter_model: type[BaseModel],
+    sortable_fields: type[S],
+    read_model: type[BaseModel] | None = None,
+) -> type[BaseModel]:
+    pass

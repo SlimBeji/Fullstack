@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Generic, Literal, Type, TypeVar, get_args
+from typing import Generic, Literal, TypeVar, get_args
 
 from beanie import Document
 from bson import ObjectId
@@ -36,12 +36,12 @@ class CrudBase(
     def __init__(self) -> None:
         orig_base = self.__class__.__orig_bases__[0]  # type: ignore[attr-defined]
         types = get_args(orig_base)
-        self.model: Type[ModelDocument] = types[0]
-        self.read_schema: Type[ReadSchema] = types[1]
-        self.create_schema: Type[CreateSchema] = types[2]
-        self.post_schema: Type[PostSchema] = types[3]
-        self.update_schema: Type[UpdateSchema] = types[4]
-        self.put_schema: Type[PutSchema] = types[5]
+        self.model: type[ModelDocument] = types[0]
+        self.read_schema: type[ReadSchema] = types[1]
+        self.create_schema: type[CreateSchema] = types[2]
+        self.post_schema: type[PostSchema] = types[3]
+        self.update_schema: type[UpdateSchema] = types[4]
+        self.put_schema: type[PutSchema] = types[5]
 
     @property
     def model_name(self) -> str:
