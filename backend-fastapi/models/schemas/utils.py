@@ -34,7 +34,7 @@ from types_ import FilterOp
 # Utility Methods
 
 
-def get_pydantic_flat_fields(model: Type[BaseModel], prefix: str = "") -> list[str]:
+def get_pydantic_flat_fields(model: type[BaseModel], prefix: str = "") -> list[str]:
     paths = []
     for name, field in model.model_fields.items():
         annotation = field.annotation
