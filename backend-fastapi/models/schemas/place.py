@@ -13,14 +13,14 @@ from types_ import PaginatedData
 class PlaceFields:
     id = Annotated[
         PydanticObjectId,
-        Field(description="The Place ID", example="683b21134e2e5d46978daf1f"),
+        Field(description="The Place ID", examples=["683b21134e2e5d46978daf1f"]),
     ]
     title = Annotated[
         str,
         Field(
             min_length=10,
             description="The place title/name, 10 characters minimum",
-            example="Stamford Bridge",
+            examples=["Stamford Bridge"],
         ),
     ]
     description = Annotated[
@@ -28,7 +28,7 @@ class PlaceFields:
         Field(
             min_length=10,
             description="The place description, 10 characters minimum",
-            example="Stadium of Chelsea football club",
+            examples=["Stadium of Chelsea football club"],
         ),
     ]
     embedding = Annotated[
@@ -40,7 +40,7 @@ class PlaceFields:
     image_url = Annotated[
         str,
         Field(
-            example="avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+            examples=["avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"],
             description="local url on the storage",
         ),
     ]
@@ -53,20 +53,24 @@ class PlaceFields:
         Field(
             min_length=1,
             description="The place address",
-            example="Fulham road",
+            examples=["Fulham road"],
         ),
     ]
     creator_id = Annotated[
         LinkedObjectId,
-        Field(description="The place creator ID", example="683b21134e2e5d46978daf1f"),
+        Field(
+            description="The place creator ID", examples=["683b21134e2e5d46978daf1f"]
+        ),
     ]
     location_lat = Annotated[
         float,
-        Field(description="The latitude of the place", example=51.48180425016331),
+        Field(description="The latitude of the place", examples=[51.48180425016331]),
     ]
     location_lng = Annotated[
         float,
-        Field(description="The longitude of the place", example=-0.19090418688755467),
+        Field(
+            description="The longitude of the place", examples=[-0.19090418688755467]
+        ),
     ]
 
 

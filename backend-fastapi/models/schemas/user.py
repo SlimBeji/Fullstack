@@ -13,21 +13,21 @@ from types_ import PaginatedData
 class UserFields:
     id = Annotated[
         PydanticObjectId,
-        Field(description="The User ID", example="683b21134e2e5d46978daf1f"),
+        Field(description="The User ID", examples=["683b21134e2e5d46978daf1f"]),
     ]
     name = Annotated[
         str,
         Field(
             min_length=2,
             description="The user name, two characters at least",
-            example="Slim Beji",
+            examples=["Slim Beji"],
         ),
     ]
     email = Annotated[
         EmailStr,
         Field(
             description="The user email",
-            example="mslimbeji@gmail.com",
+            examples=["mslimbeji@gmail.com"],
         ),
     ]
     password = Annotated[
@@ -35,13 +35,13 @@ class UserFields:
         Field(
             min_length=8,
             description="The user password, 8 characters at least",
-            example="very_secret",
+            examples=["very_secret"],
         ),
     ]
     image_url = Annotated[
         str,
         Field(
-            example="avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+            examples=["avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"],
             description="local url on the storage",
         ),
     ]
@@ -53,14 +53,16 @@ class UserFields:
         bool,
         Field(
             description="Whether the user is an admin or not",
-            example=False,
+            examples=[False],
         ),
     ]
     places = Annotated[
         list[
             Annotated[
                 LinkedObjectId,
-                Field(description="The Place ID", example="683b21134e2e5d46978daf1f"),
+                Field(
+                    description="The Place ID", examples=["683b21134e2e5d46978daf1f"]
+                ),
             ]
         ],
         Field(description="The id of places belonging to the user, 24 characters"),

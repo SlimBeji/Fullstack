@@ -10,13 +10,15 @@ token_field = Annotated[
     str,
     Field(
         description="A generated web token. The 'Bearer ' prefix needs to be added for authentication",
-        example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM",
+        examples=[
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"
+        ],
     ),
 ]
 
 expires_at_field = Annotated[
     int,
-    Field(description="The UNIX timestamp the token expires at", example=1751879562),
+    Field(description="The UNIX timestamp the token expires at", examples=[1751879562]),
 ]
 
 # --- Signup Schemas ----
