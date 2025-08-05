@@ -154,9 +154,9 @@ class PlaceSearchGetSchema(
     pass
 
 
-class PlaceSearchPostSchema(
+class PlaceSearchSchema(
     build_search_schema(  # type: ignore
-        "PlaceSearchPostSchema",
+        "PlaceSearchSchema",
         PlaceFiltersSchema,
         PlaceSortableFields,
         PlaceReadSchema,

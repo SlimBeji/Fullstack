@@ -129,9 +129,9 @@ class UserSearchGetSchema(
     pass
 
 
-class UserSearchPostSchema(
+class UserSearchSchema(
     build_search_schema(  # type: ignore
-        "UserSearchPostSchema",
+        "UserSearchSchema",
         UserFiltersSchema,
         UserSortableFields,
         UserReadSchema,
