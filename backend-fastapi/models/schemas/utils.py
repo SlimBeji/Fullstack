@@ -210,3 +210,16 @@ class QueryFilters(Generic[T]):
         return Annotated[
             Optional[list[QueryFilter[item]]], Field(None, description=description)
         ]
+
+
+# Base Filters Schema
+
+
+class BaseFiltersSchema(BaseModel):
+    _projection: dict[str, str] = {}
+
+    def model_dump(self, *args, **kwargs):
+        result = super().model_dump(*args, **kwargs)
+        for name, target in self._projection.items():
+            result[target] = result.pop(name, None)
+        return result

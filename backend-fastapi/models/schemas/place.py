@@ -4,7 +4,7 @@ from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
-from models.schemas.utils import LinkedObjectId, QueryFilters
+from models.schemas.utils import BaseFiltersSchema, LinkedObjectId, QueryFilters
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -126,10 +126,14 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 PlaceSortableFields = Literal["createdAt", "title", "description", "address"]
 
 
-class PlaceFiltersSchema(BaseModel):
+class PlaceFiltersSchema(BaseFiltersSchema):
+    _projection = dict(location_lat="location.lat", location_lng="location.lng")
+
     title: QueryFilters[PlaceFields.title]
     description: QueryFilters[PlaceFields.description]
     address: QueryFilters[PlaceFields.address]
+    location_lat: QueryFilters[PlaceFields.location_lat]
+    location_lng: QueryFilters[PlaceFields.location_lat]
 
 
 # --- Update Schemas ---
