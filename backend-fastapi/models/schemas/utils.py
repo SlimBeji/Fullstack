@@ -4,6 +4,7 @@ from typing import (
     Any,
     Callable,
     Generic,
+    Literal,
     Optional,
     TypedDict,
     TypeVar,
@@ -14,11 +15,19 @@ from typing import (
 from beanie import Link
 from beanie.odm.fields import PydanticObjectId
 from bson import ObjectId
-from pydantic import BaseModel, BeforeValidator, EmailStr, Field, TypeAdapter
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    EmailStr,
+    Field,
+    TypeAdapter,
+    create_model,
+)
 from pydantic.fields import FieldInfo
 from pydantic.networks import EmailStr
 from pydantic_core import PydanticCustomError
 
+from config import settings
 from lib.utils import str_to_bool
 from types_ import FilterOp
 
@@ -268,12 +277,80 @@ class BaseFiltersSchema(BaseModel):
 
 # Search Schema
 
-S = TypeVar("S", bound=str)
+
+def _build_pagination_fields() -> dict[str, tuple[type[Any], Any]]:
+    fields: dict[str, tuple[type[Any], Any]] = {}
+    fields["page"] = (
+        cast(type[Any], Annotated[int, Field(description="The page number")]),
+        1,
+    )
+    fields["size"] = (
+        cast(type[Any], Annotated[int, Field(description="Items per page")]),
+        settings.MAX_ITEMS_PER_PAGE,
+    )
+    return fields
+
+
+def _build_sort_fields(sortables: Any) -> dict[str, tuple[type[Any], Any]]:
+    fields: dict[str, tuple[type[Any], Any]] = {}
+    options = cast(list[str], get_args(sortables))
+    all_options: list[str] = []
+    for o in options:
+        all_options.extend([o, f"-{o}"])
+    fields["sort"] = (
+        cast(
+            type[Any],
+            Annotated[
+                list[Literal[tuple(all_options)]],  # type: ignore
+                Field(
+                    description="Fields to use for sorting. Use '-' for descending",
+                    examples=[["-createdAt"]],
+                ),
+            ],
+        ),
+        None,
+    )
+    return fields
+
+
+def _build_projection_fields(
+    model: type[BaseModel],
+) -> dict[str, tuple[type[Any], Any]]:
+    fields: dict[str, tuple[type[Any], Any]] = {}
+    fields["fields"] = (
+        cast(
+            type[Any],
+            Annotated[
+                list[Literal[tuple(get_pydantic_flat_fields(model))]],  # type: ignore
+                Field(
+                    description="Fields to include in the response; omit for full document",
+                    examples=[["id"]],
+                ),
+            ],
+        ),
+        None,
+    )
+    return fields
 
 
 def build_search_schema(
+    name: str,
     filter_model: type[BaseModel],
-    sortable_fields: type[S],
+    sortable_fields: Any,
     read_model: type[BaseModel] | None = None,
 ) -> type[BaseModel]:
-    pass
+    # Step 1: Copy Original Fields
+    new_fields = copy_fields(filter_model)
+
+    # Step 2: Add Pagination Fields
+    new_fields.update(_build_pagination_fields())
+
+    # Step 3: Add Sorting values
+    new_fields.update(_build_sort_fields(sortable_fields))
+
+    # Step 4: Add projection field if read_model is provided
+    if read_model:
+        new_fields.update(_build_projection_fields(read_model))
+
+    # Step 5: Return model
+    return create_model(name, **new_fields)  # type: ignore
