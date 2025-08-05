@@ -5,6 +5,7 @@ from typing import (
     Callable,
     Generic,
     Optional,
+    Type,
     TypedDict,
     TypeVar,
     cast,
@@ -25,11 +26,13 @@ from types_ import FilterOp
 # Utility Methods
 
 
-def get_pydantic_flat_fields(obj: BaseModel, prefix: str = "") -> list[str]:
+def get_pydantic_flat_fields(model: Type[BaseModel], prefix: str = "") -> list[str]:
     paths = []
-    for name, value in obj.__dict__.items():
-        if isinstance(value, BaseModel):
-            paths.extend(get_pydantic_flat_fields(value, f"{prefix}{name}."))
+    for name, field in model.model_fields.items():
+        annotation = field.annotation
+
+        if isinstance(annotation, type) and issubclass(annotation, BaseModel):
+            paths.extend(get_pydantic_flat_fields(annotation, f"{prefix}{name}."))
         else:
             paths.append(f"{prefix}{name}")
     return paths
