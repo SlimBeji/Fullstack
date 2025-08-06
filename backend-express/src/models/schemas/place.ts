@@ -141,6 +141,8 @@ export const PlaceFiltersSchema = z.object({
     ).optional(),
 });
 
+export type PlaceFilters = z.infer<typeof PlaceFiltersSchema>;
+
 export const PlaceSearchSchema = buildSearchSchema(
     PlaceFiltersSchema,
     PlaceSortableFields,

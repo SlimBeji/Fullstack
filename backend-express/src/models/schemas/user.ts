@@ -99,7 +99,7 @@ export const UserSortableFields = [
     "isAdmin",
 ];
 
-export const UserFilterSchema = z.object({
+export const UserFiltersSchema = z.object({
     name: zodQueryParam(userNameField, {
         example: "eq:Slim Beji",
     }).optional(),
@@ -108,8 +108,10 @@ export const UserFilterSchema = z.object({
     }).optional(),
 });
 
+export type UserFilters = z.infer<typeof UserFiltersSchema>;
+
 export const UserSearchSchema = buildSearchSchema(
-    UserFilterSchema,
+    UserFiltersSchema,
     UserSortableFields,
     UserReadSchema
 );
