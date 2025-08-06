@@ -126,10 +126,10 @@ export const PlaceFiltersSchema = z.object({
     address: zodQueryParam(placeAddressField, {
         example: "regex:d{1,2} Boulevard",
     }).optional(),
-    "location.lat": zodQueryParam(locationLatField, {
+    locationLat: zodQueryParam(locationLatField, {
         example: "gt:3.5",
     }).optional(),
-    "location.lng": zodQueryParam(locationLatField, {
+    locationLng: zodQueryParam(locationLatField, {
         example: "lt:4.5",
     }).optional(),
     creatorId: zodQueryParam(
