@@ -132,9 +132,13 @@ export const PlaceFiltersSchema = z.object({
     "location.lng": zodQueryParam(locationLatField, {
         example: "lt:4.5",
     }).optional(),
-    creatorId: zodQueryParam(placeCreatorIdField, {
-        example: "eq:683b21134e2e5d46978daf1f",
-    }).optional(),
+    creatorId: zodQueryParam(
+        placeCreatorIdField,
+        {
+            example: "eq:683b21134e2e5d46978daf1f",
+        },
+        { isObjectId: true }
+    ).optional(),
 });
 
 export const PlaceSearchGetSchema = buildSearchSchema(

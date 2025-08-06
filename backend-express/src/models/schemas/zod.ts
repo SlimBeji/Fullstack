@@ -77,7 +77,7 @@ export const zodObject = (config: { [fieldname: string]: ZodTypeAny }) => {
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
 
-type TransformOption = { isIndexed?: boolean };
+type TransformOption = { isIndexed?: boolean; isObjectId?: boolean };
 
 type OpenapiDoc = { description?: string; example?: any };
 
@@ -208,6 +208,13 @@ const stringQueryParamTransform = (
             return { op, val: boolValue };
 
         case "regex":
+            if (options?.isObjectId) {
+                context.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "regex search is not enabled objectId fields",
+                });
+                return z.NEVER;
+            }
             try {
                 new RegExp(val);
                 return { op, val };
