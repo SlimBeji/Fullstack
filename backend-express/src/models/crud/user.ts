@@ -13,6 +13,7 @@ import {
     UserPost,
     UserPut,
     UserRead,
+    UserSearch,
     UserUpdate,
 } from "../schemas";
 import { Crud, CrudEvent } from "./base";
@@ -23,6 +24,7 @@ export class CrudUser extends Crud<
     UserDB,
     UserDocument,
     UserRead,
+    UserSearch,
     UserCreate,
     UserPost,
     UserUpdate,

@@ -27,6 +27,7 @@ export class Crud<
     DBInt, // DB Interface
     Doc extends Document, // Document Type
     Read extends object, // The Read interface
+    Search extends object, // The Search interface
     Create extends object, // Creation Interface
     Post extends object, // HTTP Post Interface
     Update extends object, // Update Interface

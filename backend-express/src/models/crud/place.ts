@@ -8,6 +8,7 @@ import {
     PlacePost,
     PlacePut,
     PlaceRead,
+    PlaceSearch,
     PlaceUpdate,
     UserRead,
 } from "../schemas";
@@ -17,6 +18,7 @@ export class CrudPlace extends Crud<
     PlaceDB,
     PlaceDocument,
     PlaceRead,
+    PlaceSearch,
     PlaceCreate,
     PlacePost,
     PlaceUpdate,
