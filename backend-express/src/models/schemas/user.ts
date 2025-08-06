@@ -108,20 +108,17 @@ export const UserFilterSchema = z.object({
     }).optional(),
 });
 
-export const UserSearchGetSchema = buildSearchSchema(
-    UserFilterSchema,
-    UserSortableFields
-);
-
-export type UserSearchGet = z.infer<typeof UserSearchGetSchema>;
-
-export const UserSearchPostSchema = buildSearchSchema(
+export const UserSearchSchema = buildSearchSchema(
     UserFilterSchema,
     UserSortableFields,
     UserReadSchema
 );
 
-export type UserSearchPost = z.infer<typeof UserSearchPostSchema>;
+export type UserSearch = z.infer<typeof UserSearchSchema>;
+
+export const UserSearchGetSchema = UserSearchSchema.omit({ fields: true });
+
+export type UserSearchGet = z.infer<typeof UserSearchGetSchema>;
 
 // Update Schemas
 export const UserUpdateSchema = z.object({

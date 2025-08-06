@@ -8,7 +8,7 @@ import {
     UserPutSchema,
     UserReadSchema,
     UserSearchGetSchema,
-    UserSearchPostSchema,
+    UserSearchSchema,
     UsersPaginatedSchema,
     z,
     zodObjectId,
@@ -55,7 +55,7 @@ async function queryUsers(req: Request, res: Response) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.post("/query", filter(UserSearchPostSchema, "body"), queryUsers);
+userRouter.post("/query", filter(UserSearchSchema, "body"), queryUsers);
 
 swaggerRegistery.registerPath({
     method: "post",
@@ -64,7 +64,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: UserSearchPostSchema,
+                    schema: UserSearchSchema,
                 },
             },
             description: "user advanced Search",

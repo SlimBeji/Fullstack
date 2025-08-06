@@ -141,20 +141,17 @@ export const PlaceFiltersSchema = z.object({
     ).optional(),
 });
 
-export const PlaceSearchGetSchema = buildSearchSchema(
-    PlaceFiltersSchema,
-    PlaceSortableFields
-);
-
-export type PlaceSearchGet = z.infer<typeof PlaceSearchGetSchema>;
-
-export const PlaceSearchPostSchema = buildSearchSchema(
+export const PlaceSearchSchema = buildSearchSchema(
     PlaceFiltersSchema,
     PlaceSortableFields,
     PlaceReadSchema
 );
 
-export type PlaceSearchPost = z.infer<typeof PlaceSearchPostSchema>;
+export type PlaceSearch = z.infer<typeof PlaceSearchSchema>;
+
+export const PlaceSearchGetSchema = PlaceSearchSchema.omit({ fields: true });
+
+export type PlaceSearchGet = z.infer<typeof PlaceSearchGetSchema>;
 
 // Update Schemas
 

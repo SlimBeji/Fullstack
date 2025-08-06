@@ -8,7 +8,7 @@ import {
     PlacePutSchema,
     PlaceReadSchema,
     PlaceSearchGetSchema,
-    PlaceSearchPostSchema,
+    PlaceSearchSchema,
     PlacesPaginatedSchema,
     z,
     zodObjectId,
@@ -54,7 +54,7 @@ async function queryPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.post("/query", filter(PlaceSearchPostSchema, "body"), queryPlaces);
+placeRouter.post("/query", filter(PlaceSearchSchema, "body"), queryPlaces);
 
 swaggerRegistery.registerPath({
     method: "post",
@@ -63,7 +63,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: PlaceSearchPostSchema,
+                    schema: PlaceSearchSchema,
                 },
             },
             description: "Place advanced query",
