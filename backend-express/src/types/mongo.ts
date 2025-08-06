@@ -19,7 +19,24 @@ export const MongoOperationsMapping = {
 
 export type FilterOperation = keyof typeof MongoOperationsMapping;
 
-export type FieldFilter = { op: FilterOperation; val: string[] };
+export type QueryFilter = { op: FilterOperation; val: string[] };
+
+interface BaseFilterBody {
+    page?: number;
+    size?: number;
+    sort?: string[];
+    fields?: string[];
+}
+
+export type RawFindQuery = BaseFilterBody & Record<string, QueryFilter[]>;
+
+export interface FindQuery {
+    page?: number;
+    size?: number;
+    sort?: string[];
+    fields?: string[];
+    filters?: any;
+}
 
 export type MongoFieldFilters = { [key in `$${FilterOperation}`]?: any };
 

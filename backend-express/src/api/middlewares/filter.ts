@@ -6,24 +6,15 @@ import { parseDotNotation } from "../../lib/utils";
 import { getZodFields } from "../../models/schemas";
 import {
     ApiError,
-    FieldFilter,
     HttpStatus,
     MongoFieldFilters,
     MongoFieldsFilters,
     PaginationData,
+    RawFindQuery,
     SortData,
 } from "../../types";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
-
-interface BaseFilterBody {
-    page?: number;
-    size?: number;
-    sort?: string[];
-    fields?: string[];
-}
-
-type FilterBody = BaseFilterBody & Record<string, FieldFilter[]>;
 
 const extractQueryParam = (req: Request, key: string): string[] | undefined => {
     const raw = req.query[key];
@@ -99,7 +90,7 @@ const toSortData = (fields: string[]): SortData => {
     return result;
 };
 
-const toMongoFilters = (body: FilterBody): MongoFieldsFilters => {
+const toMongoFilters = (body: RawFindQuery): MongoFieldsFilters => {
     const result: Record<string, MongoFieldFilters> = {};
     for (const [key, values] of Object.entries(body)) {
         if (GLOBAL_PARAMS.has(key)) continue;
