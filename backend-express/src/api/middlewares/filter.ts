@@ -39,11 +39,7 @@ const extractQueryParam = (req: Request, key: string): string[] | undefined => {
     const result: string[] = [];
     values.forEach((item) => {
         if (typeof item === "string") {
-            const filtered = item
-                .split(",")
-                .map((f) => f.trim())
-                .filter((f) => f.length > 0);
-            result.push(...filtered);
+            result.push(item.trim());
         } else {
             throw new ApiError(
                 HttpStatus.UNPROCESSABLE_ENTITY,
@@ -83,7 +79,6 @@ const extractQueryParams = (
             if (extracted) result[key] = extracted;
         }
     }
-
     return result;
 };
 

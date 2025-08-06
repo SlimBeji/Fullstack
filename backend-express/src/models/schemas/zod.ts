@@ -113,9 +113,7 @@ const numericQueryParamTransform = (
             );
         }
     }
-
-    const [op, vals] = value.split(":");
-    const val = vals.join(":");
+    const [op, val] = value.split(":");
 
     switch (op) {
         case "eq":
@@ -137,15 +135,13 @@ const numericQueryParamTransform = (
         case "in":
         case "nin":
             try {
-                const arr = val.startsWith("[")
-                    ? JSON.parse(val)
-                    : [Number(val)];
-                return { op, val: z.array(field).parse(arr) };
+                const vals = val.split(",");
+                return { op, val: z.array(field).parse(vals) };
             } catch (err) {
                 return updateContextFromError(
                     context,
                     err,
-                    `Invalid array format for ${op} operator`
+                    `Invalid numeric options for ${op} operator`
                 );
             }
 
@@ -179,9 +175,7 @@ const stringQueryParamTransform = (
             );
         }
     }
-
-    const [op, ...vals] = value.split(":");
-    const val = vals.join(":");
+    const [op, val] = value.split(":");
 
     switch (op) {
         case "eq":
@@ -199,13 +193,13 @@ const stringQueryParamTransform = (
         case "in":
         case "nin":
             try {
-                const arr = val.startsWith("[") ? JSON.parse(val) : [val];
-                return { op, val: z.array(field).parse(arr) };
+                const vals = val.split(",");
+                return { op, val: z.array(field).parse(vals) };
             } catch (err) {
                 return updateContextFromError(
                     context,
                     err,
-                    `Invalid array format for ${op} operator`
+                    `Invalid string options for ${op} operator`
                 );
             }
 
@@ -260,7 +254,6 @@ const booleanQueryParamTransform = (
             );
         }
     }
-
     const [op, val] = value.split(":");
 
     switch (op) {
@@ -301,9 +294,7 @@ const dateQueryParamTransform = (
             );
         }
     }
-
-    const [op, ...vals] = value.split(":");
-    const val = vals.join(":");
+    const [op, val] = value.split(":");
 
     switch (op) {
         case "eq":
@@ -326,15 +317,13 @@ const dateQueryParamTransform = (
         case "in":
         case "nin":
             try {
-                const dates = val.startsWith("[")
-                    ? JSON.parse(val).map((d: string) => new Date(d))
-                    : [new Date(val)];
-                return { op, val: z.array(field).parse(dates) };
+                const vals = val.split(",");
+                return { op, val: z.array(field).parse(vals) };
             } catch (err) {
                 return updateContextFromError(
                     context,
                     err,
-                    `Invalid date array format for ${op} operator`
+                    `Invalid date options format for ${op} operator`
                 );
             }
 
