@@ -26,16 +26,6 @@ While PostgreSQL is a powerful and mature relational database, this project opts
 
 > For projects involving hierarchical data, flexible schemas, or nested documents, MongoDB provides a more natural and efficient approach.
 
-## 🧱 Technology Stack
-
-### Database (Postgresql vs MongoDB)
-
-This project will explore using MongoDB as a NoSQL database. In past projects, Postgresql was heavily used. It is a very capable database but some drawbacks were observed. The reasons for picking mongoDB as a dtabase is listed below
-
--   In REST API, the responses may be JSON objects with nested objects. More generally, in programming, data is often represented with deeply nested objects and structures so working with a document oriented Database is more practical.
--   In Postgresql, we model defined entities in tables and we join the tables with foreign keys. We may endup with more than 3 levels of tables requiring 2 joins to perform queries and lookups. In mongoDB because it is much more natural to have nested documents, the 3 distinct tables defined in Postrgesql can be compressed into one single collection making queries quite simple and fast.
--   It is possible to use JSON columns in postgresql to avoid having to create distinct tables and join them by foreign keys but writing SQL queries manipulating those json queries may not always be straightformward. In terms of readability, having a grandchild represented as JSON inside a child which is also represented a JSON column my not be ideal. Using a Document oriented approach would be more natural
-
 ### 🔙 Backends
 
 Each backend implements the **same logic**, **routes**, and **data models**:
@@ -102,12 +92,12 @@ The types of schemas defined are described below:
 ##### 📦 DB Schema
 
 -   Defines how the data is stored in the database.
--   Includes all internal fields, references, and indexing.
+-   Includes all internal fields and references.
 
 ##### 🌱 Seed Schema
 
 -   Used for generating dummy data when seeding a test database.
--   Can include reference fields to link documents across collections since examples does not proper indexes yet.
+-   Can include reference fields to link documents across collections since raw examples does not have proper indexes prior to DB injection.
 
 ##### ✍️ Creation Schema
 
@@ -166,13 +156,13 @@ Below the operations breakdown
 ##### 📄 get
 
 -   `getDocument`: Fetches a single raw ORM object by ID.
--   `get`: Returns the object in a `ReadSchema`.
+-   `get`: Returns the object in a `ReadSchema` format.
 -   `safeGet`: Ensures the requesting user has access to the document.
 
 ##### 📚 fetch
 
 -   `fetchDocuments`: Queries the DB with filters, projections, pagination, etc.
--   `fetch`: Returns results in a `PaginatedDataSchema`.
+-   `fetch`: Returns results in a `PaginatedDataSchema` format.
 -   `safeFetch`: Restricts results to data the user has access to.
 
 ##### ✏️ create
@@ -190,14 +180,15 @@ Below the operations breakdown
 ##### 🗑️ delete
 
 -   `deleteDocument`: Deletes a record using a Mongo transaction.
+-   `delete`: Delete a record by id.
 -   `safeDelete`: Ensures the user is authorized to delete the object.
 -   `deleteCleanup`: Optional cleanup logic after deletion (e.g., removing related files from cloud storage).
 
 #### 📁📁 Examples
 
-This folder contains **example documents** for each model, along with utility methods to **seed the database** and **dump data** for backup or testing.
+This folder contains **example documents** for each model, along with utility methods to **seed/dump the database** for testing.
 
-Each example is structured using the [Seed Schema](#seed-schema) defined in the `schemas/` folder.
+Each example is structured using the `SeedSchema` defined in the `schemas/` folder.
 
 ### 📁 API
 
@@ -239,14 +230,14 @@ Defines the actual **REST API endpoints** for each resource.
 
 Each model exposes a standardized set of **6 CRUD endpoints**, ensuring consistency across all backends:
 
-| Method | Path                | Purpose                                  | Input Schema   | Output Schema       | CRUD Function  |
-| ------ | ------------------- | ---------------------------------------- | -------------- | ------------------- | -------------- |
-| GET    | `/model-name/`      | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `safeFetch()`  |
-| POST   | `/model-name/query` | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `safeFetch()`  |
-| POST   | `/model-name/`      | Create a new record                      | PostSchema     | ReadSchema          | `safeCreate()` |
-| GET    | `/model-name/:uuid` | Retrieve a single record by ID           | –              | ReadSchema          | `safeGet()`    |
-| PUT    | `/model-name/:uuid` | Update an existing record                | PutSchema      | ReadSchema          | `safeUpdate()` |
-| DELETE | `/model-name/:uuid` | Delete a record by ID                    | –              | –                   | `safeDelete()` |
+| Method | Path                    | Purpose                                  | Input Schema   | Output Schema       | CRUD Function  |
+| ------ | ----------------------- | ---------------------------------------- | -------------- | ------------------- | -------------- |
+| GET    | `/model-name/`          | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `safeFetch()`  |
+| POST   | `/model-name/query`     | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `safeFetch()`  |
+| POST   | `/model-name/`          | Create a new record                      | PostSchema     | ReadSchema          | `safeCreate()` |
+| GET    | `/model-name/:objectId` | Retrieve a single record by ID           | –              | ReadSchema          | `safeGet()`    |
+| PUT    | `/model-name/:objectId` | Update an existing record                | PutSchema      | ReadSchema          | `safeUpdate()` |
+| DELETE | `/model-name/:objectId` | Delete a record by ID                    | –              | –                   | `safeDelete()` |
 
 Each route is tied to a corresponding method in the related CRUD module for consistent error handling and logic reuse.
 
