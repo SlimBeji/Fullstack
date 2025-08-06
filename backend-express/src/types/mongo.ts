@@ -21,6 +21,8 @@ export type FilterOperation = keyof typeof MongoOperationsMapping;
 
 export type QueryFilter = { op: FilterOperation; val: string[] };
 
+export type Filter = { op: FilterOperation; val: any };
+
 interface BaseFilterBody {
     page?: number;
     size?: number;
@@ -30,12 +32,14 @@ interface BaseFilterBody {
 
 export type RawFindQuery = BaseFilterBody & Record<string, QueryFilter[]>;
 
-export interface FindQuery {
+export interface FindQuery<S = unknown> {
     page?: number;
     size?: number;
     sort?: string[];
     fields?: string[];
-    filters?: any;
+    filters?: S extends object
+        ? Partial<Record<keyof S, Filter[]>>
+        : Record<string, Filter[]>;
 }
 
 export type MongoFieldFilters = { [key in `$${FilterOperation}`]?: any };

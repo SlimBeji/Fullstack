@@ -2,17 +2,9 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParsedQs } from "qs";
 import { AnyZodObject } from "zod";
 
-import { parseDotNotation } from "../../lib/utils";
+import { env } from "../../config";
 import { getZodFields } from "../../models/schemas";
-import {
-    ApiError,
-    HttpStatus,
-    MongoFieldFilters,
-    MongoFieldsFilters,
-    PaginationData,
-    RawFindQuery,
-    SortData,
-} from "../../types";
+import { ApiError, Filter, HttpStatus, RawFindQuery } from "../../types";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 
@@ -73,53 +65,17 @@ const extractQueryParams = (
     return result;
 };
 
-const toPaginationData = (page: number, size: number): PaginationData => {
-    const skip = (page - 1) * size;
-    return { page, size, skip };
-};
-
-const toSortData = (fields: string[]): SortData => {
-    const result: SortData = {};
-    fields.forEach((field: string) => {
-        const order = field.startsWith("-") ? -1 : 1;
-        if (order === -1) {
-            field = field.substring(1);
-        }
-        result[field] = order;
-    });
-    return result;
-};
-
-const toMongoFilters = (body: RawFindQuery): MongoFieldsFilters => {
-    const result: Record<string, MongoFieldFilters> = {};
+const extractFilters = (body: RawFindQuery): Record<string, Filter[]> => {
+    const result: Record<string, Filter[]> = {};
     for (const [key, values] of Object.entries(body)) {
         if (GLOBAL_PARAMS.has(key)) continue;
-        const fieldFilters: MongoFieldFilters = {};
+        const fieldFilters: Filter[] = [];
         values.forEach(({ op, val }) => {
-            if (op === "text") {
-                fieldFilters[`$${op}`] = { $search: val };
-            } else {
-                fieldFilters[`$${op}`] = val;
-            }
+            fieldFilters.push({ op, val });
         });
         result[key] = fieldFilters;
     }
-
     return result;
-};
-
-const toProjection = (
-    fields: string[] | undefined
-): Record<string, 1> | undefined => {
-    if (!fields || fields.length === 0) {
-        return undefined;
-    }
-
-    const flatProjection: Record<string, 1> = {};
-    fields.forEach((item) => {
-        flatProjection[item] = 1;
-    });
-    return parseDotNotation(flatProjection);
 };
 
 export const filter = (
@@ -138,13 +94,14 @@ export const filter = (
                 { details: parsing.error }
             );
         }
-
         const data = parsing.data;
-        const pagination = toPaginationData(data.page, data.size);
-        const sort = toSortData(data.sort);
-        const filters = toMongoFilters(data);
-        const projection = toProjection(data.fields);
-        req.filterQuery = { pagination, sort, filters, projection };
+        req.filterQuery = {
+            page: data.page || 1,
+            size: data.size || env.MAX_ITEMS_PER_PAGE,
+            sort: data.sort || [],
+            fields: data.fields || [],
+            filters: extractFilters(data),
+        };
         next();
     };
 };

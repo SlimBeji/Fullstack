@@ -1,13 +1,13 @@
 import "express";
 
 import { UserRead } from "../models/schemas";
-import { FilterQuery } from "./mongo";
+import { FindQuery } from "./mongo";
 
 declare module "express-serve-static-core" {
     interface Request {
         currentUser?: UserRead;
         parsed?: unknown;
-        filterQuery?: FilterQuery;
+        filterQuery?: FindQuery;
     }
 
     interface Application {
