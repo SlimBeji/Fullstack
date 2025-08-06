@@ -62,6 +62,7 @@ export class CrudPlace extends Crud<
     ): Promise<PlaceRead[] | Partial<PlaceRead>[]> {
         const placesPromises = docs.map(async (doc) => {
             const obj = this.serializeDocument(doc);
+            delete obj.embedding;
             if (obj.imageUrl) {
                 obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
             }
