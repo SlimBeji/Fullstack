@@ -30,7 +30,7 @@ from pydantic_core import PydanticCustomError
 
 from config import settings
 from lib.utils import str_to_bool
-from types_ import FilterOp
+from types_ import FilterOperation
 
 # Utility Methods
 
@@ -88,26 +88,26 @@ LinkedObjectId = Annotated[
 
 T = TypeVar("T")
 
-check_filter_op: Callable = TypeAdapter(FilterOp).validate_python
+check_filter_op: Callable = TypeAdapter(FilterOperation).validate_python
 
 
 class FieldFilter(TypedDict):
-    op: FilterOp
+    op: FilterOperation
     val: Any
 
 
-def _extract_raw_filter(value: str) -> tuple[FilterOp, Any]:
+def _extract_raw_filter(value: str) -> tuple[FilterOperation, Any]:
     if ":" in value:
         op, raw_val = value.split(":", 1)
     else:
         op, raw_val = "eq", value
 
     check_filter_op(op)
-    return cast(FilterOp, op), raw_val
+    return cast(FilterOperation, op), raw_val
 
 
 def _numeric_filter_validator(
-    op: FilterOp, raw: str, adapter: TypeAdapter
+    op: FilterOperation, raw: str, adapter: TypeAdapter
 ) -> FieldFilter:
     if op in ["eq", "ne", "gt", "gte", "lt", "lte"]:
         val = adapter.validate_python(raw)
@@ -127,7 +127,7 @@ def _numeric_filter_validator(
 
 
 def _string_filter_validator(
-    op: FilterOp, raw: str, adapter: TypeAdapter, is_indexed: bool = False
+    op: FilterOperation, raw: str, adapter: TypeAdapter, is_indexed: bool = False
 ) -> FieldFilter:
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
@@ -156,7 +156,7 @@ def _string_filter_validator(
 
 
 def _boolean_filter_validator(
-    op: FilterOp, raw: str, adapter: TypeAdapter
+    op: FilterOperation, raw: str, adapter: TypeAdapter
 ) -> FieldFilter:
     if op in ["eq", "ne", "exists"]:
         val = str_to_bool(raw)
@@ -169,7 +169,7 @@ def _boolean_filter_validator(
 
 
 def _datetime_filter_validator(
-    op: FilterOp, raw: str, adapter: TypeAdapter
+    op: FilterOperation, raw: str, adapter: TypeAdapter
 ) -> FieldFilter:
     if op in ["eq", "ne", "gt", "gte", "lt", "lte"]:
         val = adapter.validate_python(raw)
@@ -188,7 +188,9 @@ def _datetime_filter_validator(
         )
 
 
-def _id_filter_validator(op: FilterOp, raw: str, adapter: TypeAdapter) -> FieldFilter:
+def _id_filter_validator(
+    op: FilterOperation, raw: str, adapter: TypeAdapter
+) -> FieldFilter:
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
         return dict(op=op, val=val)
