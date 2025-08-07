@@ -259,7 +259,7 @@ This simple syntax works for basic use cases, but it falls short when:
 
 Using a JSON body in a `POST` request would solve this, but that would break REST principles. To address this, a more expressive **query parameter syntax** is used.
 
-Each query parameter follows the pattern: `field=operator:value`. If no operator is given, `eq` (equals) is assumed. The field may use dot notation to filter on nested properties.
+Each query parameter follows the pattern: `field=operator:value`. If no operator is given, `eq` (equals) is assumed. For nested fields, an alias may be used like `addressZipcode` or just `zipcode` to filter on the `address.zipcode` nested property.
 
 The different operations to be used are inspired by MongoDB’s query language:
 
@@ -279,7 +279,7 @@ operations = {
 ```
 
 For example, the following request:
-`/user?age=lte:40&age=gte:30&name=regex:Slim&address.zipcode=2040`
+`/user?age=lte:40&age=gte:30&name=regex:Slim&zipcode=2040`
 
 Would return users
 
@@ -304,6 +304,8 @@ This will translate to the following mongoDB query
 }
 
 ```
+
+> A post processing of the query parameters to convert nested fields filter names may be needed (e.g. from `zipcode` to `address.zipcode`)
 
 ##### 🔁 REST vs GraphQL
 
@@ -332,7 +334,7 @@ The following json body
 {
     "name": ["regex:Slim"],
     "age": ["gte:30", "lte:40"],
-    "address.zipcode": [2040],
+    "zipcode": [2040],
     "page": 1,
     "size": 100,
     "sort": ["name"],
