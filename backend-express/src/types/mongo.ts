@@ -1,4 +1,4 @@
-import { FilterQuery, InclusionProjection } from "mongoose";
+import { FilterQuery, ProjectionType } from "mongoose";
 
 import { PaginationData } from "./http";
 
@@ -32,14 +32,16 @@ interface BaseFilterBody {
 
 export type RawFindQuery = BaseFilterBody & Record<string, QueryFilter[]>;
 
+export type FindQueryFilters<S = unknown> = S extends object
+    ? Partial<Record<keyof S, Filter[]>>
+    : Record<string, Filter[]>;
+
 export interface FindQuery<S = unknown> {
     page?: number;
     size?: number;
     sort?: string[];
     fields?: string[];
-    filters?: S extends object
-        ? Partial<Record<keyof S, Filter[]>>
-        : Record<string, Filter[]>;
+    filters?: FindQueryFilters<S>;
 }
 
 export type MongoFieldFilters = { [key in `$${FilterOperation}`]?: any };
@@ -50,5 +52,5 @@ export interface MongoFindQuery<T> {
     pagination?: PaginationData;
     sort?: SortData;
     filters?: FilterQuery<T>;
-    projection?: InclusionProjection<T>;
+    projection?: ProjectionType<T>;
 }
