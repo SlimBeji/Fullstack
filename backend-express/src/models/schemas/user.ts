@@ -100,6 +100,9 @@ export const UserSortableFields = [
 ];
 
 export const UserFiltersSchema = z.object({
+    id: zodQueryParam(userIdField, {
+        example: "683b21134e2e5d46978daf1f",
+    }).optional(),
     name: zodQueryParam(userNameField, {
         example: "eq:Slim Beji",
     }).optional(),

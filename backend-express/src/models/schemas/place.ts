@@ -117,6 +117,9 @@ export const PlaceSortableFields = [
 ];
 
 export const PlaceFiltersSchema = z.object({
+    id: zodQueryParam(placeIdField, {
+        example: "683b21134e2e5d46978daf1f",
+    }).optional(),
     title: zodQueryParam(placeTitleField, {
         example: "eq:Some Place",
     }).optional(),
