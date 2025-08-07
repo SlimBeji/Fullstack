@@ -30,6 +30,11 @@ export class CrudPlace extends Crud<
 
     protected defaultProjection = { __v: 0 } as const;
 
+    protected filterFieldsMapping: Record<string, string> = {
+        locationLat: "location.lat",
+        locationLng: "location.lng",
+    };
+
     public safeCheck(
         user: UserRead,
         data: PlaceDocument | PlacePost | PlaceCreate,

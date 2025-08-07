@@ -42,6 +42,8 @@ export class Crud<
 
     protected defaultProjection: ExclusionProjection<DBInt> = { __v: 0 };
 
+    protected filterFieldsMapping: Record<string, string> = {};
+
     public get modelName(): string {
         return this.model.modelName;
     }
@@ -182,7 +184,10 @@ export class Crud<
             string,
             Filter[],
         ][]) {
-            const fieldName = key === "id" ? "_id" : key;
+            let fieldName = key === "id" ? "_id" : key;
+            if (fieldName in this.filterFieldsMapping) {
+                fieldName = this.filterFieldsMapping[fieldName];
+            }
 
             const fieldFilters: MongoFieldFilters = {};
             values.forEach(({ op, val }) => {
