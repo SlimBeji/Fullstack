@@ -17,7 +17,7 @@ beforeAll(async () => {
     adminToken = await crudUser.getBearer("mslimbeji@gmail.com");
     token = await crudUser.getBearer("beji.slim@yahoo.fr");
     const examples = await crudPlace.fetch({
-        filters: { title: { $eq: "Stamford Bridge" } },
+        filters: { title: [{ op: "eq", val: "Stamford Bridge" }] },
     });
     example = examples.data[0] as PlaceRead;
 });

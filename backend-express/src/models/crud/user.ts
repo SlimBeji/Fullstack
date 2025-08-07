@@ -2,7 +2,7 @@ import { compare, hash } from "bcryptjs";
 
 import { createToken } from "../../api/auth";
 import { storage } from "../../lib/clients";
-import { ApiError, HttpStatus, MongoFindQuery } from "../../types";
+import { ApiError, FindQuery, HttpStatus } from "../../types";
 import { UserDocument, UserModel } from "../collections";
 import {
     EncodedToken,
@@ -56,13 +56,12 @@ export class CrudUser extends Crud<
 
     public safeFilter(
         user: UserRead,
-        filterQuery: MongoFindQuery<UserDB>
-    ): MongoFindQuery<UserDB> {
-        const { sort, filters, pagination } = filterQuery;
-        if (filters) {
-            filters._id = { $eq: user.id };
+        query: FindQuery<UserFilters>
+    ): FindQuery<UserFilters> {
+        if (query.filters) {
+            query.filters.id = [{ op: "eq", val: user.id }];
         }
-        return { sort, filters, pagination };
+        return query;
     }
 
     public async jsonifyBatch(
