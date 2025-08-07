@@ -11,6 +11,7 @@ from types_ import ApiError, MongoFindQuery, ProjectionExcl
 
 ModelDocument = TypeVar("ModelDocument", bound=Document)
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
+FiltersSchema = TypeVar("FiltersSchema", bound=BaseModel)
 CreateSchema = TypeVar("CreateSchema", bound=BaseModel)
 PostSchema = TypeVar("PostSchema", bound=BaseModel)
 UpdateSchema = TypeVar("UpdateSchema", bound=BaseModel)
@@ -23,6 +24,7 @@ class CrudBase(
     Generic[
         ModelDocument,  # Beanie Document
         ReadSchema,  # Read Schema
+        FiltersSchema,  # Filters Schema
         CreateSchema,  # Creation Schema
         PostSchema,  # HTTP Post Schema
         UpdateSchema,  # Update Schema
@@ -38,10 +40,11 @@ class CrudBase(
         types = get_args(orig_base)
         self.model: type[ModelDocument] = types[0]
         self.read_schema: type[ReadSchema] = types[1]
-        self.create_schema: type[CreateSchema] = types[2]
-        self.post_schema: type[PostSchema] = types[3]
-        self.update_schema: type[UpdateSchema] = types[4]
-        self.put_schema: type[PutSchema] = types[5]
+        self.filters_schema: type[FiltersSchema] = types[2]
+        self.create_schema: type[CreateSchema] = types[3]
+        self.post_schema: type[PostSchema] = types[4]
+        self.update_schema: type[UpdateSchema] = types[5]
+        self.put_schema: type[PutSchema] = types[6]
 
     @property
     def model_name(self) -> str:
