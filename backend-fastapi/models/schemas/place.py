@@ -4,12 +4,7 @@ from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
-from models.schemas.utils import (
-    BaseFiltersSchema,
-    LinkedObjectId,
-    QueryFilters,
-    build_search_schema,
-)
+from models.schemas.utils import LinkedObjectId, QueryFilters, build_search_schema
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -135,9 +130,8 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 PlaceSortableFields = Literal["createdAt", "title", "description", "address"]
 
 
-class PlaceFiltersSchema(BaseFiltersSchema):
-    _projection = dict(locationLat="location.lat", locationLng="location.lng")
-
+class PlaceFiltersSchema(BaseModel):
+    id: QueryFilters[PlaceFields.id]
     title: QueryFilters[PlaceFields.title]
     description: QueryFilters[PlaceFields.description]
     address: QueryFilters[PlaceFields.address]
@@ -146,20 +140,20 @@ class PlaceFiltersSchema(BaseFiltersSchema):
     locationLng: QueryFilters[PlaceFields.location_lat]
 
 
-class PlaceSearchGetSchema(
-    build_search_schema(  # type: ignore
-        "PlaceSearchGetSchema", PlaceFiltersSchema, PlaceSortableFields
-    )
-):
-    pass
-
-
 class PlaceSearchSchema(
     build_search_schema(  # type: ignore
         "PlaceSearchSchema",
         PlaceFiltersSchema,
         PlaceSortableFields,
         PlaceReadSchema,
+    )
+):
+    pass
+
+
+class PlaceSearchGetSchema(
+    build_search_schema(  # type: ignore
+        "PlaceSearchGetSchema", PlaceFiltersSchema, PlaceSortableFields
     )
 ):
     pass

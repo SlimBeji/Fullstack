@@ -117,16 +117,9 @@ UserSortableFields = Literal[
 
 
 class UserFiltersSchema(BaseModel):
+    id: QueryFilters[UserFields.id]
     name: QueryFilters[UserFields.name]
     email: QueryFilters[UserFields.email]
-
-
-class UserSearchGetSchema(
-    build_search_schema(  # type: ignore
-        "UserSearchGetSchema", UserFiltersSchema, UserSortableFields
-    )
-):
-    pass
 
 
 class UserSearchSchema(
@@ -135,6 +128,14 @@ class UserSearchSchema(
         UserFiltersSchema,
         UserSortableFields,
         UserReadSchema,
+    )
+):
+    pass
+
+
+class UserSearchGetSchema(
+    build_search_schema(  # type: ignore
+        "UserSearchGetSchema", UserFiltersSchema, UserSortableFields
     )
 ):
     pass
