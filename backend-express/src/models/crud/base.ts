@@ -1,8 +1,7 @@
 import {
     Document,
     ExclusionProjection,
-    FilterQuery,
-    InclusionProjection,
+    FilterQuery as MongooseFilterQuery,
     Model,
     ProjectionType,
     sanitizeFilter,
@@ -12,11 +11,15 @@ import {
 
 import { env } from "../../config";
 import {
-    ApiError,
-    HttpStatus,
+    Filter,
+    FindQueryFilters,
+    MongoFieldFilters,
+    MongoFieldsFilters,
     MongoFindQuery,
-    PaginatedData,
+    PaginationData,
+    SortData,
 } from "../../types";
+import { ApiError, FindQuery, HttpStatus, PaginatedData } from "../../types";
 import { UserRead } from "../schemas";
 
 export type CrudEvent = "create" | "read" | "update" | "delete";
@@ -27,7 +30,7 @@ export class Crud<
     DBInt, // DB Interface
     Doc extends Document, // Document Type
     Read extends object, // The Read interface
-    Search extends object, // The Search interface
+    Filters extends object, // The Search Filters interface
     Create extends object, // Creation Interface
     Post extends object, // HTTP Post Interface
     Update extends object, // Update Interface
@@ -69,8 +72,8 @@ export class Crud<
 
     public safeFilter(
         _user: UserRead,
-        query: MongoFindQuery<DBInt>
-    ): MongoFindQuery<DBInt> {
+        query: FindQuery<Filters>
+    ): FindQuery<Filters> {
         return query;
     }
 
@@ -133,36 +136,82 @@ export class Crud<
 
     // Fetch
 
+    private parseSortData(fields: string[] | undefined): SortData {
+        if (!fields || fields.length === 0) {
+            return { createdAt: 1 };
+        }
+
+        const result: SortData = {};
+        fields.forEach((field: string) => {
+            const order = field.startsWith("-") ? -1 : 1;
+            if (order === -1) {
+                field = field.substring(1);
+            }
+            result[field] = order;
+        });
+        return result;
+    }
+
     private parseProjection(
-        projection?: InclusionProjection<DBInt>
+        fields: string[] | undefined
     ): ProjectionType<DBInt> {
-        if (!projection) {
+        if (!fields || fields.length === 0) {
             return this.defaultProjection;
         }
 
-        if (!("id" in projection)) {
-            return { ...projection, _id: 0 };
+        const result: ProjectionType<DBInt> = {};
+        fields.forEach((item) => {
+            result[item] = 1;
+        });
+
+        if (!("id" in result)) {
+            return { ...result, _id: 0 };
         }
-        return projection;
+        return result;
     }
 
-    public async countDocuments(filters: FilterQuery<DBInt>): Promise<number> {
+    private parseFilters(
+        filters: FindQueryFilters<Filters> | undefined
+    ): MongooseFilterQuery<DBInt> {
+        if (filters === undefined || Object.keys(filters).length === 0) {
+            return {};
+        }
+
+        const result: MongoFieldsFilters = {};
+        for (const [key, values] of Object.entries(sanitizeFilter(filters)) as [
+            string,
+            Filter[],
+        ][]) {
+            const fieldName = key === "id" ? "_id" : key;
+
+            const fieldFilters: MongoFieldFilters = {};
+            values.forEach(({ op, val }) => {
+                if (op === "text") {
+                    fieldFilters[`$${op}`] = { $search: val };
+                } else {
+                    fieldFilters[`$${op}`] = val;
+                }
+            });
+            result[fieldName] = fieldFilters;
+        }
+        return result as MongooseFilterQuery<DBInt>;
+    }
+
+    public async countDocuments(
+        filters: MongooseFilterQuery<DBInt>
+    ): Promise<number> {
         return this.model.countDocuments(filters);
     }
 
-    public async fetchDocuments(query: MongoFindQuery<DBInt>): Promise<Doc[]> {
-        let { pagination, sort, filters } = query;
+    public async fetchDocuments(
+        query: MongoFindQuery<Filters>
+    ): Promise<Doc[]> {
+        let { pagination, sort, filters, projection } = query;
         const skip = pagination ? pagination.skip : 0;
         const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
-
-        if (Object.keys(sort || []).length === 0) {
-            sort = { createdAt: 1 };
-        }
-        const parsedFilters = filters || {};
-        const projection = this.parseProjection(query.projection);
         const documents = await this.model
-            .find(parsedFilters, projection)
-            .sort(sort)
+            .find(filters || {}, projection || {})
+            .sort(sort || { createdAt: 1 })
             .collation({ locale: "en", strength: 2 })
             .skip(skip)
             .limit(size)
@@ -171,22 +220,28 @@ export class Crud<
     }
 
     public async fetch(
-        query: MongoFindQuery<DBInt>
+        query: FindQuery<Filters>
     ): Promise<PaginatedData<Partial<Read>>> {
-        query = sanitizeFilter(query) as MongoFindQuery<DBInt>;
-        const { pagination, filters } = query;
-        const page = pagination ? pagination.page : 1;
-        const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
+        // Parsing the FindQuery to Mongo language
+        const pagination = new PaginationData(query.page, query.size);
+        const projection = this.parseProjection(query.fields);
+        const sort = this.parseSortData(query.sort);
+        const filters = this.parseFilters(query.filters);
+        const parsed = { pagination, sort, filters, projection };
+
+        // Counting the output
         const totalCount = await this.countDocuments(filters || {});
-        const totalPages = Math.ceil(totalCount / size);
-        const documents = await this.fetchDocuments(query);
+        const totalPages = Math.ceil(totalCount / pagination.size);
+
+        // Fetching results and returning response
+        const documents = await this.fetchDocuments(parsed);
         const data = await this.jsonifyBatch(documents);
-        return { page, totalPages, totalCount, data };
+        return { page: pagination.page, totalPages, totalCount, data };
     }
 
     public async safeFetch(
         user: UserRead,
-        query: MongoFindQuery<DBInt>
+        query: FindQuery<Filters>
     ): Promise<PaginatedData<Partial<Read>>> {
         query = this.safeFilter(user, query);
         return this.fetch(query);
