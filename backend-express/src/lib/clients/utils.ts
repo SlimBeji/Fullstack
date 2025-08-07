@@ -12,7 +12,7 @@ export const closeDbs = async () => {
 };
 
 export const closeAll = async () => {
+    await closeDbs();
     await closeWorkers();
     await closeCrons();
-    await closeDbs();
 };
