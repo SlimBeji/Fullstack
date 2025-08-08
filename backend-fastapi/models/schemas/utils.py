@@ -13,9 +13,7 @@ from typing import (
     get_args,
 )
 
-from beanie import Link
 from beanie.odm.fields import PydanticObjectId
-from bson import ObjectId
 from pydantic import (
     BaseModel,
     BeforeValidator,
