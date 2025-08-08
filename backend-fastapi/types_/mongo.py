@@ -10,6 +10,8 @@ SaveEvent = [Insert, Replace, Update]
 
 ChangeEvent = [Replace, Update]
 
+type SortData = dict[str, Literal[-1, 1]]
+
 type Projection = dict[str, Literal[0, 1] | Projection]
 
 type MongoOperation = Literal[
@@ -61,6 +63,6 @@ class MongoFindQuery(BaseModel):
     pagination: PaginationData | None = PaginationData(
         page=1, size=settings.MAX_ITEMS_PER_PAGE
     )
-    sort: list[str] | None = []
+    sort: SortData = {}
     filters: MongoFieldsFilters | None = {}
     projection: Projection | None = {}
