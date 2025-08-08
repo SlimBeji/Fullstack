@@ -2,7 +2,7 @@ import mimetypes
 import os
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel
 
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
 
@@ -11,7 +11,7 @@ class PaginationData(BaseModel):
     page: int
     size: int
 
-    @computed_field
+    @property
     def skip(self) -> int:
         return (self.page - 1) * self.size
 
