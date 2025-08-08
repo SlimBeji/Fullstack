@@ -66,24 +66,6 @@ def copy_fields(model: type[BaseModel]) -> dict[str, tuple[type[Any], Any]]:
     return new_fields
 
 
-# LinkedObjectId
-
-
-def link_object_id_validator(value: Any) -> PydanticObjectId:
-    if isinstance(value, Link):
-        return PydanticObjectId(value.ref.id)
-    elif isinstance(value, ObjectId):
-        return PydanticObjectId(value)
-    elif isinstance(value, str) and ObjectId.is_valid(value):
-        return PydanticObjectId(value)
-    raise ValueError(f"Invalid value for LinkedObjectId: {value}")
-
-
-LinkedObjectId = Annotated[
-    PydanticObjectId,
-    BeforeValidator(link_object_id_validator),
-]
-
 # FieldFilter
 
 T = TypeVar("T")
