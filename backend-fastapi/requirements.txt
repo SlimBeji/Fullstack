@@ -3,13 +3,16 @@ uvicorn
 fastapi
 httpx
 
-# Mocks
-testcontainers
-
 # MongoDB & Redis
 beanie
 motor
 redis
+
+# DB Mocks
+testcontainers
+
+# Tasks
+dramatiq
 
 # GCP
 google-cloud-storage
