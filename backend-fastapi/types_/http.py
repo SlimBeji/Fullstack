@@ -20,7 +20,7 @@ class PaginatedData(BaseModel, Generic[ReadSchema]):
     page: int
     totalPages: int
     totalCount: int
-    data: list[ReadSchema]
+    data: list[dict] | list[ReadSchema]
 
 
 class FileToUpload:
