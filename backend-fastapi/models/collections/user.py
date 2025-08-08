@@ -1,7 +1,6 @@
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
-from beanie import Delete, Link, after_event
-from beanie.odm.fields import ExpressionField
+from beanie import Delete, PydanticObjectId, after_event
 
 from models.collections.base import BaseDocument, document_registry
 from models.schemas import UserFields
@@ -21,7 +20,7 @@ class User(BaseDocument):
     isAdmin: UserFields.is_admin
 
     # Relations
-    places: list["Link[Place]"] = []
+    places: list[PydanticObjectId] = []
 
     class Settings:
         name = Collections.USERS
@@ -30,8 +29,7 @@ class User(BaseDocument):
     @after_event([Delete])
     async def remove_child_places(self) -> None:
         Places: type["Place"] = document_registry[Collections.PLACES]
-        creatorExpression = cast(ExpressionField, Places.creatorId)
-        await Places.find(creatorExpression.id == self.id).delete()
+        await Places.find(Places.creatorId == self.id).delete()
 
 
 document_registry[Collections.USERS] = User
