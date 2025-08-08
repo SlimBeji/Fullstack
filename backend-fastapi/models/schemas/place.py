@@ -4,7 +4,7 @@ from beanie.odm.fields import PydanticObjectId
 from fastapi import File, UploadFile
 from pydantic import BaseModel, Field
 
-from models.schemas.utils import LinkedObjectId, QueryFilters, build_search_schema
+from models.schemas.utils import QueryFilters, build_search_schema
 from types_ import PaginatedData
 
 # --- Fields ----
@@ -57,7 +57,7 @@ class PlaceFields:
         ),
     ]
     creator_id = Annotated[
-        LinkedObjectId,
+        PydanticObjectId,
         Field(
             description="The place creator ID", examples=["683b21134e2e5d46978daf1f"]
         ),

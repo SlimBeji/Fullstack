@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from beanie import Delete, Insert, Link, after_event, before_event
+from beanie import Delete, Insert, PydanticObjectId, after_event, before_event
 
 from models.collections.base import BaseDocument, document_registry
 from models.schemas.place import PlaceFields, PlaceLocation
@@ -21,7 +21,7 @@ class Place(BaseDocument):
     embedding: PlaceFields.embedding = []
 
     # Relations
-    creatorId: "Link[User]"
+    creatorId: PydanticObjectId
 
     class Settings:
         name = Collections.PLACES
@@ -30,20 +30,20 @@ class Place(BaseDocument):
     @before_event(ChangeEvent)
     async def validate_creator_exists(self) -> None:
         Users: type["User"] = document_registry[Collections.USERS]
-        if not await Users.find_one(Users.id == self.creatorId.ref.id):
+        if not await Users.find_one(Users.id == self.creatorId):
             raise ValueError("Creator does not exist")
 
     @after_event([Insert])
     async def add_place_to_user(self) -> None:
         Users: type["User"] = document_registry[Collections.USERS]
-        await Users.find_one(Users.id == self.creatorId.ref.id).update(
+        await Users.find_one(Users.id == self.creatorId).update(
             {"$addToSet": {"places": self.id}}
         )
 
     @before_event([Delete])
     async def remove_place_from_user(self) -> None:
         Users: type["User"] = document_registry[Collections.USERS]
-        await Users.find_one(Users.id == self.creatorId.ref.id).update(
+        await Users.find_one(Users.id == self.creatorId).update(
             {"$pull": {"places": self.id}}
         )
 
