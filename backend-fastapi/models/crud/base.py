@@ -1,5 +1,6 @@
+import math
 from http import HTTPStatus
-from typing import Generic, Literal, TypeVar, get_args
+from typing import Generic, Literal, TypeVar, cast, get_args
 
 from beanie import Document
 from bson import ObjectId
@@ -7,7 +8,19 @@ from pydantic import BaseModel
 
 from lib.clients import db
 from models.schemas import UserReadSchema
-from types_ import ApiError, MongoFindQuery, ProjectionExcl
+from types_ import (
+    ApiError,
+    FindQuery,
+    FindQueryFilters,
+    MongoFieldFilters,
+    MongoFieldsFilters,
+    MongoFindQuery,
+    MongoOperation,
+    PaginatedData,
+    PaginationData,
+    Projection,
+    SortData,
+)
 
 ModelDocument = TypeVar("ModelDocument", bound=Document)
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
@@ -33,7 +46,9 @@ class CrudBase(
 ):
     # Constructor & Properties
 
-    DEFAULT_PROJECTION: ProjectionExcl = dict(_version=0)
+    DEFAULT_PROJECTION: Projection = dict(_version=0)
+
+    FILTER_FIELD_MAPPING: dict[str, str] = {}
 
     def __init__(self) -> None:
         orig_base = self.__class__.__orig_bases__[0]  # type: ignore[attr-defined]
@@ -76,20 +91,39 @@ class CrudBase(
     ) -> None:
         pass
 
-    def safe_filter(
-        self, user: UserReadSchema, filter_query: MongoFindQuery
-    ) -> MongoFindQuery:
+    def safe_query(self, user: UserReadSchema, filter_query: FindQuery) -> FindQuery:
         return filter_query
 
     # Serialization
 
-    async def serialize_batch(self, documents: list[ModelDocument]) -> list[ReadSchema]:
-        """Use the ReadSchema to hide sensitive data"""
-        return [self.read_schema(**d.model_dump()) for d in documents]
+    async def _post_process_dicts(self, data: list[dict]) -> list[dict]:
+        for item in data:
+            if "_id" in item:
+                item["id"] = item.pop("_id")
+        return data
 
-    async def serialize(self, document: ModelDocument) -> ReadSchema:
-        result = await self.serialize_batch([document])
-        return result[0]
+    async def post_process_results(
+        self, results: list[dict] | list[ModelDocument], to_dict: bool = False
+    ) -> list[dict] | list[ReadSchema]:
+        if not results:
+            return []
+
+        if not isinstance(results[0], dict):
+            data = [i.model_dump() for i in cast(list[ModelDocument], results)]
+        else:
+            data = cast(list[dict], results)
+
+        data = await self._post_process_dicts(data)
+        if to_dict:
+            return data
+
+        return [self.read_schema(**i) for i in data]
+
+    async def post_process(
+        self, result: ModelDocument | dict, to_dict: bool = False
+    ) -> ReadSchema | dict:
+        output = await self.post_process_results([result], to_dict=to_dict)
+        return output[0]
 
     # Read
 
@@ -101,7 +135,8 @@ class CrudBase(
         if document is None:
             return None
 
-        return await self.serialize(document)
+        result = await self.post_process(document)
+        return cast(ReadSchema, result)
 
     async def safe_get(self, user: UserReadSchema, id: str | ObjectId) -> ReadSchema:
         doc = await self.get_document(id)
@@ -109,7 +144,110 @@ class CrudBase(
             raise self.not_found(id)
 
         self.safe_check(user, doc, "read")
-        return await self.serialize(doc)
+        result = await self.post_process(doc)
+        return cast(ReadSchema, result)
+
+    # Fetch
+
+    def _parse_sort_data(self, fields: list[str] | None) -> SortData:
+        if not fields:
+            return dict(createdAt=1)
+
+        result: SortData = {}
+        for field in fields:
+            order: Literal[-1, 1] = 1
+            if field.startswith("-"):
+                order = -1
+                field = field[1:]
+            result[field] = order
+        return result
+
+    def _parse_projection(self, fields: list[str] | None) -> Projection:
+        if not fields:
+            return self.DEFAULT_PROJECTION
+
+        result: Projection = {}
+        for field in fields:
+            result[field] = 1
+
+        if "id" not in fields:
+            result["_id"] = 0
+
+        return result
+
+    def _parse_filters(
+        self, filters: FindQueryFilters | None = None
+    ) -> MongoFieldsFilters:
+        if not filters:
+            return {}
+
+        result: MongoFieldsFilters = {}
+        for name, values in filters.items():
+            if name == "id":
+                name = "_id"
+            if name in self.FILTER_FIELD_MAPPING:
+                name = self.FILTER_FIELD_MAPPING[name]
+
+            fieldFilters: MongoFieldFilters = {}
+            for value in values:
+                op = cast(MongoOperation, "$" + value.op)
+                if value.op == "text":
+                    fieldFilters[op] = {"$search": value.val}
+                else:
+                    fieldFilters[op] = value.val
+
+            result[name] = fieldFilters
+        return result
+
+    async def count_documents(self, filters: MongoFieldsFilters | None = None) -> int:
+        filters = filters or {}
+        return await self.model.find(filters).count()
+
+    async def fetch_documents(self, query: MongoFindQuery) -> list[dict]:
+        """Beanie has some bugs for fetching documents using projection.
+        Working with raw pymong to avoid them.
+        """
+        pagination = cast(PaginationData, query.pagination)
+        collection = self.model.get_pymongo_collection()
+        return (
+            await collection.find(query.filters, query.projection)
+            .sort({"email": 1})
+            .collation({"locale": "en", "strength": 2})
+            .skip(pagination.skip)
+            .limit(pagination.size)
+            .to_list()
+        )
+
+    async def fetch(self, query: FindQuery) -> PaginatedData[ReadSchema]:
+        # Parsing the FindQuery to Mongo language
+        pagination = PaginationData(page=query.page, size=query.size)
+        projection = self._parse_projection(query.fields)
+        sort = self._parse_sort_data(query.sort)
+        filters = self._parse_filters(query.filters)
+        parsed = MongoFindQuery(
+            pagination=pagination, projection=projection, sort=sort, filters=filters
+        )
+
+        # Counting the Output
+        total_count = await self.count_documents(filters)
+        total_pages = math.ceil(total_count / pagination.size)
+
+        # Fetching results and returning response
+        convrt_to_dict = bool(query.fields)
+        raw = await self.fetch_documents(parsed)
+        data = await self.post_process_results(raw, to_dict=convrt_to_dict)
+        return PaginatedData(
+            page=pagination.page,
+            totalPages=total_pages,
+            totalCount=total_count,
+            data=data,
+        )
+
+    async def safe_fetch(
+        self, user: UserReadSchema, query: FindQuery
+    ) -> PaginatedData[ReadSchema]:
+        query = self.safe_query(user, query)
+        return await self.fetch(query)
 
     # Create
 
@@ -121,7 +259,8 @@ class CrudBase(
     async def create(self, form: PostSchema) -> ReadSchema:
         create_form = self.create_schema(**form.model_dump())
         document = await self.create_document(create_form)
-        return await self.serialize(document)
+        result = await self.post_process(document)
+        return cast(ReadSchema, result)
 
     async def safe_create(self, user: UserReadSchema, form: PostSchema) -> ReadSchema:
         self.safe_check(user, form, "create")
@@ -142,7 +281,8 @@ class CrudBase(
         j = form.model_dump(exclude_none=True, exclude_unset=True)
         update = self.update_schema(**j)
         document = await self.update_document(document, update)
-        return await self.serialize(document)
+        result = await self.post_process(document)
+        return cast(ReadSchema, result)
 
     async def safe_update(
         self, user: UserReadSchema, document: ModelDocument, form: PutSchema
