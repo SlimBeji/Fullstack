@@ -12,8 +12,6 @@ ChangeEvent = [Replace, Update]
 
 type Projection = dict[str, Literal[0, 1] | Projection]
 
-type SortData = dict[str, Literal[-1, 1]]
-
 type MongoOperation = Literal[
     "$eq",
     "$ne",
@@ -60,7 +58,9 @@ type MongoFieldsFilters = dict[str, MongoFieldFilters]
 
 
 class MongoFindQuery(BaseModel):
-    pagination: PaginationData | None = None
-    sort: SortData | None = None
-    filters: MongoFieldsFilters | None
-    projection: Projection | None = None
+    pagination: PaginationData | None = PaginationData(
+        page=1, size=settings.MAX_ITEMS_PER_PAGE
+    )
+    sort: list[str] | None = []
+    filters: MongoFieldsFilters | None = {}
+    projection: Projection | None = {}
