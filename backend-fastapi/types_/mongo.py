@@ -10,10 +10,6 @@ SaveEvent = [Insert, Replace, Update]
 
 ChangeEvent = [Replace, Update]
 
-type ProjectionIncl = dict[str, Literal[1] | ProjectionIncl]
-
-type ProjectionExcl = dict[str, Literal[0] | ProjectionExcl]
-
 type Projection = dict[str, Literal[0, 1] | Projection]
 
 type SortData = dict[str, Literal[-1, 1]]
