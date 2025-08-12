@@ -72,17 +72,23 @@ class MongoClient:
 
             await seed_db()
 
+    async def init(self):
+        if self._client:
+            return
+
+        self._client = AsyncIOMotorClient(self.uri)
+        self._db = self._client[self.db_name]
+        await init_beanie(
+            cast(AsyncDatabase, self._db), document_models=document_models
+        )
+
     async def connect(self) -> None:
         # Configure the test container if in test mode
         if self.is_test:
             self._configure_container()
 
         # Connect to the database
-        self._client = AsyncIOMotorClient(self.uri)
-        self._db = self._client[self.db_name]
-        await init_beanie(
-            cast(AsyncDatabase, self._db), document_models=document_models
-        )
+        await self.init()
 
         # Seed data for testing
         if self.is_test:
