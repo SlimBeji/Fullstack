@@ -5,11 +5,9 @@ export const config = {
     defaultJobOptions: {
         removeOnComplete: {
             age: 7 * 24 * 60 * 60 * 1000,
-            count: 10000,
         },
         removeOnFail: {
-            age: 30 * 24 * 60 * 60 * 1000,
-            count: 5000,
+            age: 7 * 24 * 60 * 60 * 1000,
         },
     },
 };
