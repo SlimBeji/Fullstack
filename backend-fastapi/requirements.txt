@@ -1,6 +1,8 @@
 # FastApi
 uvicorn
 fastapi
+
+# Async
 httpx
 
 # MongoDB & Redis
@@ -12,7 +14,7 @@ redis
 testcontainers
 
 # Tasks
-dramatiq
+dramatiq[redis]
 
 # GCP
 google-cloud-storage
