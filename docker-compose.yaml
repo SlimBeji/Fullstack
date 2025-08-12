@@ -50,7 +50,7 @@ services:
             - mongo1
             - mongo2
             - gcs
-        command: uvicorn api.app:create_app --host 0.0.0.0 --port 5001 --reload
+        command: honcho start
         restart: on-failure
 
     mongo1:
