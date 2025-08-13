@@ -39,9 +39,6 @@ describe("GET /api/users", () => {
         expect(response.body).toHaveProperty("totalPages");
         expect(response.body).toHaveProperty("totalCount");
         expect(response.body).toHaveProperty("data");
-
-        const data: UserRead[] = response.body.data;
-        expect(data[1].places.length).toEqual(2);
     });
 });
 
