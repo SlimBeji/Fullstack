@@ -1,5 +1,6 @@
 import { createToken } from "../api/auth";
-import { closeAll, connectDbs, redisClient } from "../lib/clients";
+import { redisClient } from "../lib/clients";
+import { closeAll, startAll } from "../lib/sync";
 import { crudUser } from "../models/crud";
 
 async function test() {
@@ -10,5 +11,5 @@ async function test() {
 }
 
 if (require.main === module) {
-    connectDbs().then(test).finally(closeAll);
+    startAll().then(test).finally(closeAll);
 }

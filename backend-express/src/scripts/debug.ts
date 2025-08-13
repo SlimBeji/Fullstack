@@ -1,9 +1,9 @@
-import { closeAll, connectDbs } from "../lib/clients";
+import { closeAll, startAll } from "../lib/sync";
 
 async function debug() {
     console.log("I was executed");
 }
 
 if (require.main === module) {
-    connectDbs().then(debug).finally(closeAll);
+    startAll().then(debug).finally(closeAll);
 }

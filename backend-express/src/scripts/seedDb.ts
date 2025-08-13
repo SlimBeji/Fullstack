@@ -1,8 +1,8 @@
-import { closeAll, connectDbs } from "../lib/clients";
+import { closeAll, startAll } from "../lib/sync";
 import { seedDb } from "../models/examples";
 
 if (require.main === module) {
-    connectDbs()
+    startAll()
         .then(() => seedDb(true))
         .finally(closeAll);
 }

@@ -1,4 +1,5 @@
-import { closeAll, connectDbs, storage } from "../lib/clients";
+import { storage } from "../lib/clients";
+import { closeAll, startAll } from "../lib/sync";
 import { getImagePath } from "../lib/utils";
 
 async function test() {
@@ -9,5 +10,5 @@ async function test() {
 }
 
 if (require.main === module) {
-    connectDbs().then(test).finally(closeAll);
+    startAll().then(test).finally(closeAll);
 }
