@@ -379,10 +379,11 @@ The `models/` and `api/` layers are responsible for **storing, retrieving, and u
 In a SaaS application, this stored data is used to **perform actions** and **deliver services** — that's where the `lib/` layer comes in.  
 It contains the **core business logic** that defines how the application uses the data to fulfill its purpose.
 
-Two common subfolders include:
+Three common subfolders include:
 
 -   **/clients** – Wrappers around third-party APIs or service interfaces (e.g., MongoDB, Redis)
 -   **/utils** – Generic helper functions (e.g., date/string formatting, file and I/O operations)
+-   **/sync** – Syncing helper to connect various clients with workers and schedulers
 
 Other subfolders may be added depending on the domain-specific logic of the software.
 Corresponding endpoints can then be added to the `/api` layer — not just for data access, but also to trigger actions and expose services powered by this business logic.
