@@ -1,5 +1,10 @@
+from apscheduler.schedulers import SchedulerNotRunningError
+
 from worker.crons.scheduler import scheduler
 
 
 def close_crons() -> None:
-    scheduler.shutdown()
+    try:
+        scheduler.shutdown()
+    except SchedulerNotRunningError:
+        pass
