@@ -1,7 +1,8 @@
 import asyncio
 from typing import Any
 
-from lib.clients import close_dbs, connect_dbs, redis_client
+from lib.clients import redis_client
+from lib.sync import close_all, start_all
 
 
 def echo(output: Any):
@@ -18,9 +19,9 @@ async def debug():
 
 
 async def main():
-    await connect_dbs()
+    await start_all()
     await debug()
-    await close_dbs()
+    await close_all()
 
 
 if __name__ == "__main__":

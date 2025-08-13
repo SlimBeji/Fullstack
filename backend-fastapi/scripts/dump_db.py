@@ -1,13 +1,13 @@
 import asyncio
 
-from lib.clients import close_dbs, connect_dbs
+from lib.sync import close_all, start_all
 from models.examples import dump_db
 
 
 async def main() -> None:
-    await connect_dbs()
+    await start_all()
     await dump_db(True)
-    await close_dbs()
+    await close_all()
 
 
 if __name__ == "__main__":

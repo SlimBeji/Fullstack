@@ -1,7 +1,8 @@
 import asyncio
 from typing import Any
 
-from lib.clients import close_dbs, cloud_storage, connect_dbs
+from lib.clients import cloud_storage
+from lib.sync import close_all, start_all
 from lib.utils import get_image_path
 
 
@@ -19,9 +20,9 @@ async def debug():
 
 
 async def main():
-    await connect_dbs()
+    await start_all()
     await debug()
-    await close_dbs()
+    await close_all()
 
 
 if __name__ == "__main__":
