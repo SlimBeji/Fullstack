@@ -11,7 +11,7 @@ This backend is written in **Python** and follows the architecture and principle
 | Data Validation | [Pydantic](https://docs.pydantic.dev/)                                                   |
 | OpenAPI Docs    | \*Built-in via FastAPI                                                                   |
 | Background Jobs | [Dramatiq](https://dramatiq.io/)                                                         |
-| Task Scheduling | [Dramatiq](https://dramatiq.io/)                                                         |
+| Task Scheduling | [apscheduler](https://apscheduler.readthedocs.io/en/3.x/index.html)                      |
 
 ## 🔐 Environment Variables
 

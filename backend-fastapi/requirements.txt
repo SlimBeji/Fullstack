@@ -15,6 +15,7 @@ testcontainers
 
 # Tasks
 dramatiq[redis]
+apscheduler
 
 # GCP
 google-cloud-storage
