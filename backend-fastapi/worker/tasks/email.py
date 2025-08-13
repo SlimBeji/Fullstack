@@ -3,7 +3,7 @@ from typing import TypedDict
 
 from config import settings
 from types_ import Queues, Tasks
-from worker.tasks.base import dramatiq_task
+from worker.tasks.broker import dramatiq_task
 
 
 class NewsletterData(TypedDict):

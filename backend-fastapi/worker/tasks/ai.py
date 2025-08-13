@@ -7,7 +7,7 @@ from config import settings
 from lib.clients import hugging_face
 from models.crud import crud_place
 from types_ import Queues, Tasks
-from worker.tasks.base import dramatiq_task
+from worker.tasks.broker import dramatiq_task
 
 
 class PlaceEmbbeddingData(TypedDict):
