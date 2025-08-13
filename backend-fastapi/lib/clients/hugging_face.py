@@ -44,4 +44,4 @@ class HuggingFaceClient:
             )
 
 
-hugging_face = HuggingFaceClient(settings.HF_API_TOKEN)
+hf_client = HuggingFaceClient(settings.HF_API_TOKEN)

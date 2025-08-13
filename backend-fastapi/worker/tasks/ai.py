@@ -4,7 +4,7 @@ from typing import TypedDict
 from bson import ObjectId
 
 from config import settings
-from lib.clients import hugging_face
+from lib.clients import hf_client
 from models.crud import crud_place
 from types_ import Queues, Tasks
 from worker.tasks.broker import dramatiq_task
@@ -23,7 +23,7 @@ async def place_embedding_task(data: PlaceEmbbeddingData):
         return
 
     text = f"{place.title} - {place.description}"
-    result = await hugging_face.embed_text(text)
+    result = await hf_client.embed_text(text)
     place.embedding = result
     await crud_place.save_document(place)
     logging.info(result)
