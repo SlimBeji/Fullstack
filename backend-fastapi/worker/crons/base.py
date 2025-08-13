@@ -9,7 +9,7 @@ class ScheduledTask:
         self,
         fn: Callable,
         crontab: str,
-        args: tuple[Any] | None = None,
+        args: tuple | None = None,
         kwargs: dict[str, Any] | None = None,
     ) -> None:
         self.fn = fn
