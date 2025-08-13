@@ -1,2 +1,3 @@
 web: uvicorn api.app:create_app --host 0.0.0.0 --port 5001 --reload
 worker: watchmedo auto-restart --patterns="*.py" --recursive -- dramatiq worker.tasks.broker
+scheduler: watchmedo auto-restart --patterns="*.py" --recursive -- python -m worker.crons.scheduler
