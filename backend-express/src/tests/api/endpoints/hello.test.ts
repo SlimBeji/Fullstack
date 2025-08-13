@@ -1,13 +1,13 @@
 import supertest from "supertest";
 
 import app from "../../../api";
-import { closeAll, connectDbs } from "../../../lib/clients";
+import { closeAll, startAll } from "../../../lib/sync";
 import { crudUser } from "../../../models/crud";
 
 const request = supertest(app);
 
 beforeAll(async () => {
-    await connectDbs();
+    await startAll();
 });
 
 afterAll(async () => {

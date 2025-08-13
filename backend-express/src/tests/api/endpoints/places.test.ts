@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import app from "../../../api";
-import { closeAll, connectDbs } from "../../../lib/clients";
+import { closeAll, startAll } from "../../../lib/sync";
 import { getImagePath } from "../../../lib/utils";
 import { crudPlace, crudUser } from "../../../models/crud";
 import { PlaceRead } from "../../../models/schemas";
@@ -13,7 +13,7 @@ let example: PlaceRead;
 const request = supertest(app);
 
 beforeAll(async () => {
-    await connectDbs();
+    await startAll();
     adminToken = await crudUser.getBearer("mslimbeji@gmail.com");
     token = await crudUser.getBearer("beji.slim@yahoo.fr");
     const examples = await crudPlace.fetch({
