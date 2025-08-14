@@ -1,6 +1,7 @@
 import logging
 from typing import TypedDict
 
+from beanie import PydanticObjectId
 from bson import ObjectId
 
 from config import settings
@@ -29,7 +30,7 @@ async def place_embedding_task(data: PlaceEmbbeddingData):
     logging.info(result)
 
 
-def place_embeddding(place_id: str | ObjectId) -> None:
-    if settings.is_test:
+def place_embeddding(place_id: str | ObjectId | PydanticObjectId | None) -> None:
+    if settings.is_test or place_id is None:
         return
-    place_embedding_task.send(PlaceEmbbeddingData(place_id=place_id))
+    place_embedding_task.send(PlaceEmbbeddingData(place_id=str(place_id)))
