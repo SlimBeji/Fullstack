@@ -18,7 +18,7 @@ class Place(BaseDocument):
     imageUrl: PlaceFields.image_url | None = None
     address: PlaceFields.address
     location: PlaceLocation | None = None
-    embedding: PlaceFields.embedding = []
+    embedding: PlaceFields.embedding | None = None
 
     # Relations
     creatorId: PydanticObjectId

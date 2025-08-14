@@ -109,7 +109,6 @@ class PlaceCreateSchema(PlaceBaseSchema):
 
 
 class PlacePostSchema(PlaceBaseSchema):
-    embedding: PlaceFields.embedding | None = None
     image: PlaceFields.image | None = None
     creatorId: PlaceFields.creator_id
 
