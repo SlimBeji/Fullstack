@@ -288,6 +288,12 @@ class CrudBase(
         result = await self.post_process(document)
         return cast(ReadSchema, result)
 
+    async def update_by_id(self, id: str | ObjectId, form: PutSchema) -> ReadSchema:
+        document = await self.get_document(id)
+        if document is None:
+            raise self.not_found(id)
+        return await self.update(document, form)
+
     async def safe_update(
         self, user: UserReadSchema, document: ModelDocument, form: PutSchema
     ) -> ReadSchema:
