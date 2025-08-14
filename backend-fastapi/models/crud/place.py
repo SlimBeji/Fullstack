@@ -1,13 +1,22 @@
+from http import HTTPStatus
+from typing import cast
+
+from beanie import PydanticObjectId
+
+from lib.clients import cloud_storage
 from models.collections.place import Place
-from models.crud.base import CrudBase
-from models.schemas.place import (
+from models.crud.base import CrudBase, CrudEvent
+from models.schemas import (
     PlaceCreateSchema,
     PlaceFiltersSchema,
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
     PlaceUpdateSchema,
+    UserReadSchema,
 )
+from types_ import ApiError, Filter, FindQuery
+from worker.tasks import place_embeddding
 
 
 class CrudPlace(
@@ -21,7 +30,70 @@ class CrudPlace(
         PlacePutSchema,
     ]
 ):
-    pass
+    FILTER_FIELD_MAPPING: dict[str, str] = dict(
+        locationLat="location.lat", locationLng="location.lng"
+    )
+
+    def safe_check(
+        self,
+        user: UserReadSchema,
+        data: Place | PlacePostSchema | PlacePutSchema,
+        event: CrudEvent,
+    ) -> None:
+        if user is None:
+            raise ApiError(HTTPStatus.UNAUTHORIZED, "Not Authenticated")
+        if user.isAdmin:
+            return
+
+        creatorId: PydanticObjectId | None = getattr(data, "creatorId", None)
+        if creatorId and str(creatorId) != str(user.id):
+            raise ApiError(
+                HTTPStatus.UNAUTHORIZED,
+                f"Access denied to creator {creatorId}",
+            )
+
+    def safe_query(self, user: UserReadSchema, query: FindQuery) -> FindQuery:
+        if query.filters:
+            query.filters["creatorId"] = [Filter(op="eq", val=user.id)]
+        return query
+
+    async def _post_process_dict(self, item: dict) -> dict:
+        item = await super()._post_process_dict(item)
+        item.pop("embedding", None)
+        image_url: str | None = item.get("imageUrl", None)
+        if image_url is not None:
+            item["imageUrl"] = cloud_storage.get_signed_url(image_url)
+        return item
+
+    async def create(self, form: PlacePostSchema) -> PlaceReadSchema:
+        data = form.model_dump()
+        image = data.pop("image", None)
+        data["imageUrl"] = cloud_storage.upload_file(image)
+        create_form = PlaceCreateSchema(**data)
+        document = await self.create_document(create_form)
+        place_embeddding(document.id)
+        result = await self.post_process(document)
+        return cast(PlaceReadSchema, result)
+
+    async def update(self, document: Place, form: PlacePutSchema) -> PlaceReadSchema:
+        j = form.model_dump(exclude_none=True, exclude_unset=True)
+        update = self.update_schema(**j)
+        document = await self.update_document(document, update)
+
+        # Trigger new embedding if title or description changed
+        description_changed = (
+            form.description and form.description != document.description
+        )
+        title_changed = form.title and form.title != document.title
+        if description_changed or title_changed:
+            place_embeddding(document.id)
+
+        result = await self.post_process(document)
+        return cast(PlaceReadSchema, result)
+
+    async def delete_cleanup(self, document: Place):
+        if document.imageUrl:
+            cloud_storage.delete_file(document.imageUrl)
 
 
 crud_place = CrudPlace()
