@@ -28,8 +28,6 @@ export class CrudPlace extends Crud<
         super(PlaceModel);
     }
 
-    protected defaultProjection = { __v: 0 } as const;
-
     protected filterFieldsMapping: Record<string, string> = {
         locationLat: "location.lat",
         locationLng: "location.lng",
