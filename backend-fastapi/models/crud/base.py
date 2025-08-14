@@ -1,3 +1,4 @@
+import asyncio
 import math
 from http import HTTPStatus
 from typing import Generic, Literal, TypeVar, cast, get_args
@@ -96,11 +97,14 @@ class CrudBase(
 
     # Serialization
 
+    async def _post_process_dict(self, item: dict) -> dict:
+        if "_id" in item:
+            item["id"] = item.pop("_id")
+        return item
+
     async def _post_process_dicts(self, data: list[dict]) -> list[dict]:
-        for item in data:
-            if "_id" in item:
-                item["id"] = item.pop("_id")
-        return data
+        coroutines = [self._post_process_dict(i) for i in data]
+        return await asyncio.gather(*coroutines)
 
     async def post_process_results(
         self, results: list[dict] | list[ModelDocument], to_dict: bool = False
