@@ -147,7 +147,7 @@ class UserSearchGetSchema(
 class UserUpdateSchema(BaseModel):
     name: UserFields.name | None = None
     email: UserFields.email | None = None
-    isAdmin: UserFields.is_admin | None = None
+    password: UserFields.password | None = None
 
 
 class UserPutSchema(UserUpdateSchema):
