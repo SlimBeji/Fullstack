@@ -72,7 +72,7 @@ export class Crud<
         _event: CrudEvent
     ): void {}
 
-    public safeFilter(
+    public safeQuery(
         _user: UserRead,
         query: FindQuery<Filters>
     ): FindQuery<Filters> {
@@ -248,7 +248,7 @@ export class Crud<
         user: UserRead,
         query: FindQuery<Filters>
     ): Promise<PaginatedData<Partial<Read>>> {
-        query = this.safeFilter(user, query);
+        query = this.safeQuery(user, query);
         return this.fetch(query);
     }
 

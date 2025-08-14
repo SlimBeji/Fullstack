@@ -54,7 +54,7 @@ export class CrudUser extends Crud<
         }
     }
 
-    public safeFilter(
+    public safeQuery(
         user: UserRead,
         query: FindQuery<UserFilters>
     ): FindQuery<UserFilters> {

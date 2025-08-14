@@ -53,7 +53,7 @@ export class CrudPlace extends Crud<
         }
     }
 
-    public safeFilter(
+    public safeQuery(
         user: UserRead,
         query: FindQuery<PlaceFilters>
     ): FindQuery<PlaceFilters> {
