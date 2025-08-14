@@ -1,7 +1,6 @@
-import { compare, hash } from "bcryptjs";
-
 import { createToken } from "../../api/auth";
 import { storage } from "../../lib/clients";
+import { hashInput, verifyHash } from "../../lib/utils";
 import { ApiError, FindQuery, HttpStatus } from "../../types";
 import { UserDocument, UserModel } from "../collections";
 import {
@@ -17,8 +16,6 @@ import {
     UserUpdate,
 } from "../schemas";
 import { Crud, CrudEvent } from "./base";
-
-const DEFAULT_HASH_SALT = 12;
 
 export class CrudUser extends Crud<
     UserDB,
@@ -113,7 +110,7 @@ export class CrudUser extends Crud<
     }
 
     public async createDocument(form: UserCreate): Promise<UserDocument> {
-        form.password = await hash(form.password, DEFAULT_HASH_SALT);
+        form.password = await hashInput(form.password);
         return super.createDocument(form);
     }
 
@@ -156,14 +153,14 @@ export class CrudUser extends Crud<
             throw error;
         }
         const user = users[0];
-        const isValidPassword = await compare(form.password, user.password);
+        const isValidPassword = await verifyHash(form.password, user.password);
         if (!isValidPassword) throw error;
         return createToken(user);
     }
 
     public async update(user: UserDocument, form: UserPut): Promise<UserRead> {
         if (form.password) {
-            form.password = await hash(form.password, DEFAULT_HASH_SALT);
+            form.password = await hashInput(form.password);
         }
         const doc = await super.updateDocument(user, form);
         const result = await this.jsonfify(doc);
