@@ -97,16 +97,14 @@ export class Crud<
         return obj;
     }
 
-    public async jsonifyBatch(
-        documents: Doc[]
-    ): Promise<Read[] | Partial<Read>[]> {
-        return documents.map((doc) => this.serializeDocument(doc)) as
-            | Read[]
-            | Partial<Read>[];
+    public async post_process(raw: Doc): Promise<Read | Partial<Read>> {
+        return this.serializeDocument(raw) as Read | Partial<Read>;
     }
 
-    public async jsonfify(raw: Doc): Promise<Read | Partial<Read>> {
-        return (await this.jsonifyBatch([raw]))[0];
+    public async post_process_results(
+        raw: Doc[]
+    ): Promise<Read[] | Partial<Read>[]> {
+        return Promise.all(raw.map((i) => this.post_process(i)));
     }
 
     // Read
@@ -119,7 +117,7 @@ export class Crud<
         if (!document) {
             return null;
         }
-        const result = await this.jsonfify(document);
+        const result = await this.post_process(document);
         return result as Read;
     }
 
@@ -132,7 +130,7 @@ export class Crud<
             throw this.notFoundError(id);
         }
         this.safeCheck(user, document, "read");
-        const result = await this.jsonfify(document);
+        const result = await this.post_process(document);
         return result as Read;
     }
 
@@ -240,7 +238,7 @@ export class Crud<
 
         // Fetching results and returning response
         const documents = await this.fetchDocuments(parsed);
-        const data = await this.jsonifyBatch(documents);
+        const data = await this.post_process_results(documents);
         return { page: pagination.page, totalPages, totalCount, data };
     }
 
@@ -273,7 +271,7 @@ export class Crud<
 
     public async create(post: Post): Promise<Read> {
         const doc = await this.createDocument(post as any as Create);
-        const result = await this.jsonfify(doc);
+        const result = await this.post_process(doc);
         return result as Read;
     }
 
@@ -302,7 +300,7 @@ export class Crud<
 
     public async update(obj: Doc, form: Put): Promise<Read> {
         const doc = await this.updateDocument(obj, form as any as Update);
-        const result = await this.jsonfify(doc);
+        const result = await this.post_process(doc);
         return result as Read;
     }
 

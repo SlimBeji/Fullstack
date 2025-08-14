@@ -61,18 +61,15 @@ export class CrudPlace extends Crud<
         return query;
     }
 
-    public async jsonifyBatch(
-        docs: PlaceDocument[]
-    ): Promise<PlaceRead[] | Partial<PlaceRead>[]> {
-        const placesPromises = docs.map(async (doc) => {
-            const obj = this.serializeDocument(doc);
-            delete obj.embedding;
-            if (obj.imageUrl) {
-                obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
-            }
-            return obj;
-        });
-        return Promise.all(placesPromises);
+    public async post_process(
+        doc: PlaceDocument
+    ): Promise<PlaceRead | Partial<PlaceRead>> {
+        const obj = this.serializeDocument(doc);
+        delete obj.embedding;
+        if (obj.imageUrl) {
+            obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
+        }
+        return obj;
     }
 
     public async create(form: PlacePost): Promise<PlaceRead> {
@@ -81,7 +78,7 @@ export class CrudPlace extends Crud<
         const data = { ...body, imageUrl };
         const doc = await this.createDocument(data);
         placeEmbedding(doc.id);
-        const result = await this.jsonfify(doc);
+        const result = await this.post_process(doc);
         return result as PlaceRead;
     }
 
@@ -96,7 +93,7 @@ export class CrudPlace extends Crud<
         if (descriptionChanged || titleChanged) {
             placeEmbedding(doc.id);
         }
-        const result = await this.jsonfify(doc);
+        const result = await this.post_process(doc);
         return result as PlaceRead;
     }
 

@@ -61,18 +61,14 @@ export class CrudUser extends Crud<
         return query;
     }
 
-    public async jsonifyBatch(
-        docs: UserDocument[]
-    ): Promise<UserRead[] | Partial<UserRead>[]> {
-        const userPromises = docs.map(async (doc) => {
-            // Removing the password field
-            const obj = this.serializeDocument(doc);
-            if (obj.imageUrl) {
-                obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
-            }
-            return obj;
-        });
-        return Promise.all(userPromises);
+    public async post_process(
+        raw: UserDocument
+    ): Promise<UserRead | Partial<UserRead>> {
+        const obj = this.serializeDocument(raw);
+        if (obj.imageUrl) {
+            obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
+        }
+        return obj;
     }
 
     public async checkDuplicate(email: string, name: string): Promise<string> {
@@ -93,7 +89,7 @@ export class CrudUser extends Crud<
             return null;
         }
         const userDocument = users[0];
-        const result = await this.jsonfify(userDocument);
+        const result = await this.post_process(userDocument);
         return result as UserRead;
     }
 
@@ -120,7 +116,7 @@ export class CrudUser extends Crud<
         const data = { ...body, imageUrl };
         try {
             const doc = await this.createDocument(data);
-            const result = await this.jsonfify(doc);
+            const result = await this.post_process(doc);
             return result as UserRead;
         } catch (err) {
             const e = err as Error;
@@ -163,7 +159,7 @@ export class CrudUser extends Crud<
             form.password = await hashInput(form.password);
         }
         const doc = await super.updateDocument(user, form);
-        const result = await this.jsonfify(doc);
+        const result = await this.post_process(doc);
         return result as UserRead;
     }
 
