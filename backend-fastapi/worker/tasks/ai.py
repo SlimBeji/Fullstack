@@ -6,7 +6,6 @@ from bson import ObjectId
 
 from config import settings
 from lib.clients import hf_client
-from models.crud import crud_place
 from types_ import Queues, Tasks
 from worker.tasks.broker import dramatiq_task
 
@@ -17,6 +16,9 @@ class PlaceEmbbeddingData(TypedDict):
 
 @dramatiq_task(Tasks.PLACE_EMBEDDING, Queues.AI)
 async def place_embedding_task(data: PlaceEmbbeddingData):
+    # Lazy loading to avoid circular import issues
+    from models.crud import crud_place
+
     place_id = data["place_id"]
     place = await crud_place.get_document(place_id)
     if place is None:
