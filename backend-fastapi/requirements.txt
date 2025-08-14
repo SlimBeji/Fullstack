@@ -5,6 +5,9 @@ fastapi
 # Async
 httpx
 
+# Utilities
+bcrypt
+
 # MongoDB & Redis
 beanie
 motor
