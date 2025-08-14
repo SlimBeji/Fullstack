@@ -306,6 +306,17 @@ export class Crud<
         return result as Read;
     }
 
+    public async updateById(
+        id: string | Types.ObjectId,
+        form: Put
+    ): Promise<Read> {
+        const doc = await this.getDocument(id);
+        if (!doc) {
+            throw this.notFoundError(id);
+        }
+        return this.update(doc, form);
+    }
+
     public async safeUpdate(
         user: UserRead,
         doc: Doc,
