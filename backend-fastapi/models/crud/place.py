@@ -53,8 +53,11 @@ class CrudPlace(
             )
 
     def safe_query(self, user: UserReadSchema, query: FindQuery) -> FindQuery:
+        ownership_filters = [Filter(op="eq", val=user.id)]
         if query.filters:
-            query.filters["creatorId"] = [Filter(op="eq", val=user.id)]
+            query.filters["creatorId"] = ownership_filters
+        else:
+            query.filters = dict(id=ownership_filters)
         return query
 
     async def _post_process_dict(self, item: dict) -> dict:
