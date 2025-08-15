@@ -6,7 +6,8 @@ python-multipart
 # Async
 httpx
 
-# Utilities
+# Encryption
+python-jose[cryptography]
 bcrypt
 
 # MongoDB & Redis

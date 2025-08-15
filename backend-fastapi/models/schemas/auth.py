@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Form
 from pydantic import BaseModel, Field
@@ -7,7 +7,7 @@ from models.schemas.user import UserFields
 
 # --- Fields ----
 
-token_field = Annotated[
+access_token_field = Annotated[
     str,
     Field(
         description="A generated web token. The 'Bearer ' prefix needs to be added for authentication",
@@ -17,7 +17,7 @@ token_field = Annotated[
     ),
 ]
 
-expires_at_field = Annotated[
+expires_in_field = Annotated[
     int,
     Field(description="The UNIX timestamp the token expires at", examples=[1751879562]),
 ]
@@ -33,6 +33,11 @@ class SignupSchema(BaseModel):
 
 
 # --- Signin Schemas ----
+
+
+class TokenPayload(BaseModel):
+    userId: UserFields.id
+    email: UserFields.email
 
 
 class SigninForm:
@@ -58,7 +63,8 @@ class SigninForm:
 
 
 class EncodedTokenSchema(BaseModel):
+    access_token: access_token_field
+    token_type: Literal["bearer"]
     userId: UserFields.id
     email: UserFields.email
-    token: token_field
-    expiresAt: expires_at_field
+    expires_in: expires_in_field
