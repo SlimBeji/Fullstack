@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -5,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from api.openapi import OPENAPI_METADATA
 from api.routes import routers
 from config import settings
+from lib.sync import close_all, start_all
 
 
 def register_routers(
@@ -39,12 +42,20 @@ def add_cors(app: FastAPI):
     return app
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await start_all()
+    yield
+    await close_all()
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title="My FastAPI Pydantic API",
         description="API documentation for my FastAPI application",
         version="1.0.0",
         openapi_tags=OPENAPI_METADATA,
+        lifespan=lifespan,
     )
 
     if settings.is_production:
