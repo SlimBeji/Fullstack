@@ -4,10 +4,9 @@ from typing import cast
 from beanie import PydanticObjectId
 from pymongo.errors import DuplicateKeyError
 
-from api.auth import create_token
 from config import settings
 from lib.clients import cloud_storage
-from lib.utils import hash_input, verify_hash
+from lib.utils import create_token, hash_input, verify_hash
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent
 from models.schemas import (
