@@ -29,16 +29,22 @@ def register_static_folder(
 
 
 def add_cors(app: FastAPI):
-    origins = [settings.APP_URL]
-    if "https" in settings.APP_URL:
-        origins.append(settings.APP_URL.replace("https", "http"))
+    origins = ["*"]
+    methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    headers = [
+        "Origin",
+        "X-Requested-With",
+        "Content-Type",
+        "Accept",
+        "Authorization",
+    ]
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=methods,
+        allow_headers=headers,
     )
 
 
