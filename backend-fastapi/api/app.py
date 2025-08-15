@@ -4,10 +4,12 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from api.middlewares import all_middlewares
 from api.openapi import OPENAPI_METADATA
 from api.routes import routers
 from config import settings
 from lib.sync import close_all, start_all
+from types_ import Middleware
 
 
 def register_routers(
@@ -39,7 +41,14 @@ def add_cors(app: FastAPI):
         allow_headers=["*"],
     )
 
-    return app
+
+def register_middlewares(app: FastAPI, middlewares: list[Middleware]):
+    # Register the cors middleware first
+    add_cors(app)
+
+    # Register the middlewares define in api/middlewares
+    for middleware in middlewares:
+        app.middleware("http")(middleware)
 
 
 @asynccontextmanager
@@ -61,7 +70,7 @@ def create_app() -> FastAPI:
     if settings.is_production:
         pass
 
+    register_middlewares(app, all_middlewares)
     register_routers(app, routers)
-    add_cors(app)
 
     return app
