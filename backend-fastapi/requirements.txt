@@ -1,6 +1,7 @@
 # FastApi
 uvicorn
 fastapi
+python-multipart
 
 # Async
 httpx
