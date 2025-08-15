@@ -11,7 +11,7 @@ from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent
 from models.schemas import (
     EncodedTokenSchema,
-    SigninSchema,
+    SigninForm,
     SignupSchema,
     UserCreateSchema,
     UserFiltersSchema,
@@ -125,9 +125,9 @@ class CrudUser(
         user = await self.create(UserPostSchema(**data))
         return create_token(user)
 
-    async def signin(self, form: SigninSchema) -> EncodedTokenSchema:
+    async def signin(self, form: SigninForm) -> EncodedTokenSchema:
         error = ApiError(HTTPStatus.UNAUTHORIZED, "Wrong name or password")
-        user = await self.model.find_one(dict(email=form.email))
+        user = await self.model.find_one(dict(email=form.username))
         if user is None:
             raise error
 

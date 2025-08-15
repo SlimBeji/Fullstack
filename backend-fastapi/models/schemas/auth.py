@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from fastapi import Form
 from pydantic import BaseModel, Field
 
 from models.schemas.user import UserFields
@@ -34,9 +35,23 @@ class SignupSchema(BaseModel):
 # --- Signin Schemas ----
 
 
-class SigninSchema(BaseModel):
-    email: UserFields.email
-    password: UserFields.password
+class SigninForm:
+    def __init__(
+        self,
+        username: str = Form(
+            ...,
+            description="The user email",
+            examples=["mslimbeji@gmail.com"],
+        ),
+        password: str = Form(
+            ...,
+            min_length=8,
+            description="The user password, 8 characters at least",
+            examples=["very_secret"],
+        ),
+    ):
+        self.username = username
+        self.password = password
 
 
 # --- Response Schemas ----
