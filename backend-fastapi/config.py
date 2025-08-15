@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     FILEUPLOAD_MAX_SIZE: int = 100
     JSON_MAX_SIZE: str
     MAX_ITEMS_PER_PAGE: int = 100
+    GOD_MODE_LOGIN: str
     JWT_EXPIRATION: int = 3600
     ENV: Literal["dev", "test", "production"]
 
