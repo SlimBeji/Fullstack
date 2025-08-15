@@ -96,7 +96,7 @@ class CrudUser(
                 HTTPStatus.NOT_FOUND, f"No user with email {email} in the database"
             )
         token = create_token(user)
-        return f"Bearer {token.token}"
+        return f"Bearer {token.access_token}"
 
     async def create_document(self, form: UserCreateSchema) -> User:
         form.password = hash_input(form.password)

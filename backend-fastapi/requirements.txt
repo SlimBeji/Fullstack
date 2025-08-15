@@ -8,6 +8,7 @@ httpx
 
 # Encryption
 python-jose[cryptography]
+types-python-jose
 bcrypt
 
 # MongoDB & Redis
