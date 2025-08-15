@@ -9,10 +9,6 @@ declare module "express-serve-static-core" {
         parsed?: unknown;
         filterQuery?: FindQuery;
     }
-
-    interface Application {
-        env?: string;
-    }
 }
 
 export {};

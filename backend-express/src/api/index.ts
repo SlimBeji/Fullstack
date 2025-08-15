@@ -10,8 +10,6 @@ import { registerSwaggger } from "./openapi";
 import { registerRoutes } from "./routes";
 
 const app = express();
-app.env = env.ENV;
-
 app.use(cors);
 app.use(express.json({ limit: env.JSON_MAX_SIZE * 1024 }));
 app.use(express.urlencoded({ extended: true }));
