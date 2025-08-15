@@ -1,18 +1,40 @@
-import time
+from http import HTTPStatus
 
-from config import settings
-from lib.utils import sign_payload
-from models.schemas import EncodedTokenSchema, TokenPayload, UserReadSchema
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+
+from lib.utils import ExpiredToken, InvalidToken, decode_token
+from models.crud import crud_user
+from models.schemas import UserReadSchema
+from types_ import ApiError
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/signin")
 
 
-def create_token(user: UserReadSchema) -> EncodedTokenSchema:
-    payload = TokenPayload(userId=user.id, email=user.email)
-    access_token = sign_payload(payload)
-    expires_in = int(time.time()) + settings.JWT_EXPIRATION
-    return EncodedTokenSchema(
-        access_token=access_token,
-        token_type="bearer",
-        userId=user.id,
-        email=user.email,
-        expires_in=expires_in,
-    )
+async def get_user_from_token(token: str) -> UserReadSchema:
+    try:
+        payload = decode_token(token)
+    except ExpiredToken:
+        raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Expired")
+    except InvalidToken:
+        raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Not Valid")
+
+    user = await crud_user.get(payload.userId)
+    if user is None:
+        raise ApiError(HTTPStatus.NOT_FOUND, "User Not Found")
+
+    if user.email != payload.email:
+        raise ApiError(HTTPStatus.BAD_REQUEST, "Token Corrupt")
+
+    return user
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserReadSchema:
+    return await get_user_from_token(token)
+
+
+async def get_current_admin(token: str = Depends(oauth2_scheme)) -> UserReadSchema:
+    user = await get_user_from_token(token)
+    if not user.isAdmin:
+        raise ApiError(HTTPStatus.UNAUTHORIZED, f"Only admins are allowed")
+    return user
