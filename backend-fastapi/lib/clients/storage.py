@@ -7,6 +7,7 @@ from google.api_core.exceptions import Conflict, NotFound
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.storage import Client
 from google.oauth2 import service_account
+from starlette.datastructures import UploadFile
 
 from config import settings
 from types_ import FileToUpload
@@ -86,13 +87,15 @@ class CloudStorage:
         return url
 
     def upload_file(
-        self, param: FileToUpload | str | None, destination: str = ""
+        self, param: FileToUpload | UploadFile | str | None, destination: str = ""
     ) -> str:
         if not param:
             return ""
 
         if isinstance(param, str):
             file = FileToUpload.from_path(param)
+        elif isinstance(param, UploadFile):
+            file = FileToUpload.from_upload_file(param)
         else:
             file = param
 
