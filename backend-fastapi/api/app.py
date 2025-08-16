@@ -55,7 +55,7 @@ def register_middlewares(app: FastAPI, middlewares: list[Middleware]):
     # Register the middlewares define in api/middlewares
     for middleware in middlewares:
         if isinstance(middleware, type) and issubclass(middleware, AsgiMiddleware):
-            app.add_middleware(middleware)
+            app.add_middleware(middleware)  # type: ignore
         else:
             app.middleware("http")(middleware)
 
