@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     APP_URL: str
     SECRET_KEY: str
     FILEUPLOAD_MAX_SIZE: int = 100
-    JSON_MAX_SIZE: str
+    JSON_MAX_SIZE: int
     MAX_ITEMS_PER_PAGE: int = 100
     GOD_MODE_LOGIN: str
     JWT_EXPIRATION: int = 3600
