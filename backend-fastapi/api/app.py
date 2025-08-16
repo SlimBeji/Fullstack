@@ -9,7 +9,7 @@ from api.openapi import OPENAPI_METADATA
 from api.routes import routers
 from config import settings
 from lib.sync import close_all, start_all
-from types_ import Middleware
+from types_ import AsgiMiddleware, Middleware
 
 
 def register_routers(
@@ -54,7 +54,10 @@ def register_middlewares(app: FastAPI, middlewares: list[Middleware]):
 
     # Register the middlewares define in api/middlewares
     for middleware in middlewares:
-        app.middleware("http")(middleware)
+        if isinstance(middleware, type) and issubclass(middleware, AsgiMiddleware):
+            app.add_middleware(middleware)
+        else:
+            app.middleware("http")(middleware)
 
 
 @asynccontextmanager
