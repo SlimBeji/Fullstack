@@ -1,11 +1,11 @@
 from typing import Annotated, Literal
 
 from beanie.odm.fields import PydanticObjectId
-from fastapi import File, UploadFile
+from fastapi import File
 from pydantic import BaseModel, Field
 
 from models.schemas.utils import QueryFilters, build_search_schema
-from types_ import PaginatedData
+from types_ import FileToUpload, PaginatedData
 
 # --- Fields ----
 
@@ -45,7 +45,7 @@ class PlaceFields:
         ),
     ]
     image = Annotated[
-        UploadFile,
+        FileToUpload,
         File(description="Place Image (JPEG)"),
     ]
     address = Annotated[

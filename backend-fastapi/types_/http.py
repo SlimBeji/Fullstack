@@ -1,9 +1,12 @@
 import mimetypes
 import os
-from typing import Generic, TypeVar, cast
+from typing import Any, Generic, Self, TypeVar, cast
 
 from pydantic import BaseModel
+from pydantic_core import core_schema
 from starlette.datastructures import UploadFile
+
+from config import settings
 
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
 
@@ -25,13 +28,15 @@ class PaginatedData(BaseModel, Generic[ReadSchema]):
 
 
 class FileToUpload:
+    MAX_SIZE = settings.FILEUPLOAD_MAX_SIZE
+
     def __init__(self, filename: str, mimetype: str, buffer: bytes) -> None:
         self.name: str = filename
         self.mimetype = mimetype
         self.buffer: bytes = buffer
 
     @classmethod
-    def from_path(cls, path: str) -> "FileToUpload":
+    def from_path(cls, path: str) -> Self:
         filename = os.path.basename(path)
         mimetype = mimetypes.guess_type(path)[0] or "application/octet-stream"
         with open(path, "rb") as f:
@@ -39,7 +44,39 @@ class FileToUpload:
         return cls(filename, mimetype, buffer)
 
     @classmethod
-    def from_upload_file(cls, file: UploadFile) -> "FileToUpload":
+    def from_upload_file(cls, file: UploadFile) -> Self:
         name = cast(str, file.filename)
         content_type = cast(str, file.content_type)
         return cls(name, content_type, file.file.read())
+
+    @classmethod
+    def validate(cls, file: UploadFile | Self) -> Self:
+        if isinstance(file, cls):
+            if len(file.buffer) > cls.MAX_SIZE * 1024 * 1024:
+                raise ValueError(f"File too large (> {cls.MAX_SIZE} MB)")
+            return file
+
+        buffer = file.file.read()
+        if len(buffer) > cls.MAX_SIZE * 1024 * 1024:
+            raise ValueError(f"File too large (> {cls.MAX_SIZE} MB)")
+        return cls(cast(str, file.filename), cast(str, file.content_type), buffer)
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
+        return core_schema.no_info_after_validator_function(
+            cls.validate,
+            core_schema.union_schema(
+                [
+                    core_schema.is_instance_schema(UploadFile),
+                    core_schema.is_instance_schema(cls),
+                ]
+            ),
+        )
+
+    @classmethod
+    def __class_getitem__(cls, size_mb: int) -> type[Self]:
+        class FileWithCustomLimit(cls):
+            MAX_SIZE = size_mb
+
+        FileWithCustomLimit.__name__ = f"FileToUpload_{size_mb}MB"
+        return FileWithCustomLimit

@@ -1,9 +1,10 @@
 from typing import Annotated, Literal
 
-from fastapi import File, Form, UploadFile
+from fastapi import File, Form
 from pydantic import BaseModel, EmailStr, Field
 
 from models.schemas.user import UserFields
+from types_ import FileToUpload
 
 # --- Fields ----
 
@@ -45,7 +46,7 @@ class SignupForm:
             description="The user password, 8 characters at least",
             examples=["very_secret"],
         ),
-        image: UploadFile | None | Literal[""] = File(
+        image: FileToUpload | None | Literal[""] = File(
             None, description="The user profile image"
         ),
     ):
