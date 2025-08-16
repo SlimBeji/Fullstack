@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 import {
     userEmailField,
     userIdField,
@@ -19,6 +21,12 @@ export const expiresAtField = z.number().openapi({
     description: "The UNIX timestamp the token expires at",
     example: 1751879562,
 });
+
+// Token Data
+export interface UserTokenInput {
+    userId: Types.ObjectId;
+    email: string;
+}
 
 // Signup Schemas
 export const SignupSchema = z.object({
