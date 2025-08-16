@@ -374,19 +374,23 @@ Contains reusable and shared type definitions used across the project, including
 
 ### 📁 Lib
 
-The `models/` and `api/` layers are responsible for **storing, retrieving, and updating data**.
-
-In a SaaS application, this stored data is used to **perform actions** and **deliver services** — that's where the `lib/` layer comes in.  
-It contains the **core business logic** that defines how the application uses the data to fulfill its purpose.
-
-Three common subfolders include:
+Reusable modules including:
 
 -   **/clients** – Wrappers around third-party APIs or service interfaces (e.g., MongoDB, Redis)
+-   **/encryption** – Encryption and Authentication utilities
 -   **/utils** – Generic helper functions (e.g., date/string formatting, file and I/O operations)
 -   **/sync** – Syncing helper to connect various clients with workers and schedulers
 
-Other subfolders may be added depending on the domain-specific logic of the software.
+### 📁 Core
+
+The `models/`, `lib`, `api/` layers are responsible for **storing, retrieving, and updating data**.
+
+In a SaaS application, this stored data is used to **perform actions** and **deliver services** — that's where the `core/` layer comes in.  
+It contains the **core business logic** that defines how the application uses the data to fulfill its purpose.
+
 Corresponding endpoints can then be added to the `/api` layer — not just for data access, but also to trigger actions and expose services powered by this business logic.
+
+> This project does not include a `/core` folder since it is just a very basic CRUD API
 
 ### 📁 Worker
 
