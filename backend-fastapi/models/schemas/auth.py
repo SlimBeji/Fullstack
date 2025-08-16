@@ -23,6 +23,14 @@ expires_in_field = Annotated[
     Field(description="The UNIX timestamp the token expires at", examples=[1751879562]),
 ]
 
+# --- Token ----
+
+
+class TokenPayload(BaseModel):
+    userId: UserFields.id
+    email: UserFields.email
+
+
 # --- Signup Schemas ----
 
 
@@ -62,11 +70,6 @@ class SignupForm:
 
 
 # --- Signin Schemas ----
-
-
-class TokenPayload(BaseModel):
-    userId: UserFields.id
-    email: UserFields.email
 
 
 class SigninForm:
