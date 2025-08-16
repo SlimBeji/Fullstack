@@ -1,8 +1,9 @@
 import mimetypes
 import os
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, cast
 
 from pydantic import BaseModel
+from starlette.datastructures import UploadFile
 
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
 
@@ -36,3 +37,9 @@ class FileToUpload:
         with open(path, "rb") as f:
             buffer = f.read()
         return cls(filename, mimetype, buffer)
+
+    @classmethod
+    def from_upload_file(cls, file: UploadFile) -> "FileToUpload":
+        name = cast(str, file.filename)
+        content_type = cast(str, file.content_type)
+        return cls(name, content_type, file.file.read())
