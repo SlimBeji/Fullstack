@@ -3,6 +3,7 @@ import json
 from typing import Any, Awaitable, Callable, Literal, ParamSpec, TypeVar
 
 import redis.asyncio as async_redis
+from pydantic import BaseModel
 from testcontainers.redis import RedisContainer
 
 from config import settings
@@ -10,7 +11,7 @@ from lib.utils.helpers import str_to_bool
 
 P = ParamSpec("P")
 R = TypeVar("R")
-OutputFormat = Literal["json", "int", "float", "bool", ""]
+OutputFormat = Literal["json", "int", "float", "bool", ""] | type[BaseModel]
 
 
 class RedisClient:
@@ -71,7 +72,15 @@ class RedisClient:
             return None
 
         stored = raw.decode()
-        if format == "json":
+        if isinstance(format, type) and issubclass(format, BaseModel):
+            try:
+                return format(**json.loads(stored))
+            except:
+                # Value become not valid, purge it and return None
+                await self.delete(key)
+                return None
+
+        elif format == "json":
             return json.loads(stored)
         elif format == "int":
             return int(stored)
@@ -85,6 +94,8 @@ class RedisClient:
         expiration = expiration or self.default_expirartion
         if isinstance(val, dict) or isinstance(val, list):
             val = json.dumps(val)
+        elif isinstance(val, BaseModel):
+            val = json.dumps(val.model_dump(fallback=str))
         return await self.client.set(key, val, ex=expiration)
 
     async def delete(self, key: str) -> None:
