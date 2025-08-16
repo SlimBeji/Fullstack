@@ -12,7 +12,7 @@ from models.crud.base import CrudBase, CrudEvent
 from models.schemas import (
     EncodedTokenSchema,
     SigninForm,
-    SignupSchema,
+    SignupForm,
     UserCreateSchema,
     UserFiltersSchema,
     UserPostSchema,
@@ -115,7 +115,7 @@ class CrudUser(
                 HTTPStatus.UNPROCESSABLE_ENTITY, "Email or Username already exists"
             )
 
-    async def signup(self, form: SignupSchema) -> EncodedTokenSchema:
+    async def signup(self, form: SignupForm) -> EncodedTokenSchema:
         duplicate_msg = await self.check_duplicate(form.email, form.name)
         if duplicate_msg:
             raise ApiError(HTTPStatus.BAD_REQUEST, duplicate_msg)

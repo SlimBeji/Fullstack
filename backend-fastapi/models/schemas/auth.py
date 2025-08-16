@@ -1,7 +1,7 @@
 from typing import Annotated, Literal
 
-from fastapi import Form
-from pydantic import BaseModel, Field
+from fastapi import File, Form, UploadFile
+from pydantic import BaseModel, EmailStr, Field
 
 from models.schemas.user import UserFields
 
@@ -25,11 +25,39 @@ expires_in_field = Annotated[
 # --- Signup Schemas ----
 
 
-class SignupSchema(BaseModel):
-    name: UserFields.name
-    email: UserFields.email
-    password: UserFields.password
-    image: UserFields.image | None = None
+class SignupForm:
+    def __init__(
+        self,
+        name: str = Form(
+            ...,
+            min_length=2,
+            description="The user name, two characters at least",
+            examples=["Slim Beji"],
+        ),
+        email: EmailStr = Form(
+            ...,
+            description="The user email",
+            examples=["mslimbeji@gmail.com"],
+        ),
+        password: str = Form(
+            ...,
+            min_length=8,
+            description="The user password, 8 characters at least",
+            examples=["very_secret"],
+        ),
+        image: UploadFile | None | Literal[""] = File(
+            None, description="The user profile image"
+        ),
+    ):
+        self.name = name
+        self.email = email
+        self.password = password
+        self.image = image or None
+
+    def model_dump(self) -> dict:
+        return dict(
+            name=self.name, email=self.email, password=self.password, image=self.image
+        )
 
 
 # --- Signin Schemas ----
