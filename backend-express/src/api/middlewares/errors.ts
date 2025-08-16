@@ -17,7 +17,11 @@ export const errorHandler = (
     if (error) {
         const statusCode = error.code || 500;
         res.status(statusCode);
-        const jsonResp = { message: error.message, details: error.details };
+        const jsonResp = {
+            error: true,
+            message: error.message,
+            details: error.details,
+        };
         if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
             console.error(error);
         }
