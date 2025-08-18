@@ -1,5 +1,6 @@
-import { ReactNode } from "react";
 import "./MainHeader.css";
+
+import { ReactNode } from "react";
 
 interface MainHeaderProps {
     children?: ReactNode;

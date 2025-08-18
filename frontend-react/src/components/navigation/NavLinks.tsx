@@ -2,7 +2,7 @@ import "./NavLinks.css";
 
 import { NavLink, useNavigate } from "react-router-dom";
 
-import { useAppDispatch, useAppSelector, authSlice } from "../../states";
+import { authSlice, useAppDispatch, useAppSelector } from "../../states";
 
 const NavLinks: React.FC = () => {
     const navigate = useNavigate();

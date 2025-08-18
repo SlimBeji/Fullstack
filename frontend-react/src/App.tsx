@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import {
-    Route,
-    Routes,
     BrowserRouter as Router,
     Navigate,
+    Route,
+    Routes,
     useNavigate,
 } from "react-router-dom";
 
-import { NewPlace, UserPlaces, UpdatePlace, Users, Auth } from "./pages";
 import { MainNavigation } from "./components/navigation";
-import { getAuthData } from "./util";
+import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "./pages";
 import { authSlice, useAppDispatch, useAppSelector } from "./states";
+import { getAuthData } from "./util";
 
 const route = (
     path: string,
@@ -34,13 +34,13 @@ const AppRoutes: React.FC = () => {
     useEffect(() => {
         const data = getAuthData();
         if (data) dispatch(authSlice.actions.login(data));
-    }, [dispatch, authSlice.actions.login]);
+    }, [dispatch]);
 
     useEffect(() => {
         if (!authData) {
             navigate("/auth");
         }
-    }, [authData]);
+    }, [authData, navigate]);
 
     return (
         <main>

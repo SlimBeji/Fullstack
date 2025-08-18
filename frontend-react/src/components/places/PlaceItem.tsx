@@ -1,19 +1,19 @@
-import { useState } from "react";
-
 import "./PlaceItem.css";
 
-import { useAppSelector } from "../../states";
-import { Place } from "../../types";
+import { useState } from "react";
+
+import { Button } from "../../components/form";
 import {
     Card,
-    Map,
-    Modal,
     HttpError,
     LoadingSpinner,
+    Map,
+    Modal,
 } from "../../components/ui";
-import { Button } from "../../components/form";
 import { useHttp } from "../../hooks";
+import { useAppSelector } from "../../states";
 import placeholder from "../../static/place_placeholder.jpg";
+import { Place } from "../../types";
 
 interface PlaceItemProps {
     place: Place;

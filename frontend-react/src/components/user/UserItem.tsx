@@ -1,11 +1,10 @@
-import { Link } from "react-router-dom";
-
 import "./UserItem.css";
 
-import { User } from "../../types";
+import { Link } from "react-router-dom";
 
 import { Avatar, Card } from "../../components/ui";
 import placeholder from "../../static/avatar_placeholder.jpg";
+import { User } from "../../types";
 
 interface UserItemProps {
     user: User;

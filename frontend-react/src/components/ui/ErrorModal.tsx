@@ -1,7 +1,7 @@
 import React from "react";
 
-import Modal from "./Modal";
 import { Button } from "../form";
+import Modal from "./Modal";
 
 interface ErrorModelProps {
     error: string;

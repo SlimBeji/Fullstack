@@ -1,5 +1,6 @@
-import React from "react";
 import "./LoadingSpinner.css";
+
+import React from "react";
 
 interface LoadingSpinner {
     asOverlay?: boolean;

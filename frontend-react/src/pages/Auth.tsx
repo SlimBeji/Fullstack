@@ -2,13 +2,12 @@ import "./Auth.css";
 
 import { useState } from "react";
 
-import { useForm, emptyStateBuilder, useHttp } from "../hooks";
+import { Button, ImageUpload, Input } from "../components/form";
 import { Card, HttpError, LoadingSpinner } from "../components/ui";
-import { Input, Button, ImageUpload } from "../components/form";
-import { useAppDispatch, authSlice } from "../states";
-
-import { emailValidator, minLengthValidator, minValidator } from "../util";
+import { emptyStateBuilder, useForm, useHttp } from "../hooks";
+import { authSlice, useAppDispatch } from "../states";
 import { EncodedUserToken } from "../types";
+import { emailValidator, minLengthValidator, minValidator } from "../util";
 
 const AuthForm = {
     username: false,
@@ -26,7 +25,7 @@ const Auth: React.FC = () => {
 
     const [data, sendRequest, clearError] = useHttp();
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [state, inputHandlers, _, fieldsActivationHandler] =
+    const [state, inputHandlers, , fieldsActivationHandler] =
         useForm<AuthFormTypes>(emptyState);
 
     let verb: "Authenticate" | "Register";

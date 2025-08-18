@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-import UsersList from "../components/user/UsersList";
 import { HttpError, LoadingSpinner } from "../components/ui";
+import UsersList from "../components/user/UsersList";
 import { useHttp } from "../hooks";
 import { User } from "../types";
 
@@ -10,7 +10,7 @@ const Users: React.FC = () => {
 
     useEffect(() => {
         sendRequest("/users", "get", undefined, false);
-    }, []);
+    }, [sendRequest]);
 
     return (
         <>

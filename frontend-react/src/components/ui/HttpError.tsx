@@ -1,8 +1,9 @@
 import { AxiosResponse } from "axios";
+
+import { authSlice, useAppDispatch } from "../../states";
+import { Button } from "../form";
 import ErrorModal from "./ErrorModal";
 import Modal from "./Modal";
-import { Button } from "../form";
-import { authSlice, useAppDispatch } from "../../states";
 
 interface HttpErrorProps {
     error: {

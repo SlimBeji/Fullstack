@@ -1,7 +1,8 @@
+import "./Button.css";
+
+import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import "./Button.css";
-import { ReactNode } from "react";
 import { ButtonType } from "../../types";
 
 interface ButtonProps {

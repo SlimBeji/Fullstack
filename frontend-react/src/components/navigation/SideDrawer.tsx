@@ -1,8 +1,8 @@
+import "./SideDrawer.css";
+
 import { ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
 import { CSSTransition } from "react-transition-group";
-
-import "./SideDrawer.css";
 
 interface SideDrawerProps {
     show: boolean;

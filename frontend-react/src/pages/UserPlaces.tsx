@@ -1,14 +1,13 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useCallback } from "react";
-
-import PlaceList from "../components/places/PlaceList";
-
-import { useAppSelector } from "../states";
-import { HttpError, LoadingSpinner, Card } from "../components/ui";
-import { Button } from "../components/form";
-import { Place } from "../types";
-import { useHttp } from "../hooks";
 import { HttpStatusCode } from "axios";
+import { useCallback, useEffect } from "react";
+import { useParams } from "react-router-dom";
+
+import { Button } from "../components/form";
+import PlaceList from "../components/places/PlaceList";
+import { Card, HttpError, LoadingSpinner } from "../components/ui";
+import { useHttp } from "../hooks";
+import { useAppSelector } from "../states";
+import { Place } from "../types";
 
 const UserPlaces: React.FC = () => {
     const authData = useAppSelector((state) => state.auth.data);
@@ -30,7 +29,9 @@ const UserPlaces: React.FC = () => {
                     undefined,
                     false
                 );
-            } catch (err) {}
+            } catch (err) {
+                console.log(err);
+            }
         },
         [sendRequest]
     );

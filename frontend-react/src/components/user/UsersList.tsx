@@ -1,9 +1,8 @@
 import "./UsersList.css";
 
-import UserItem from "./UserItem";
 import { Card } from "../../components/ui";
-
 import { User } from "../../types";
+import UserItem from "./UserItem";
 
 interface UserListProps {
     items: User[];

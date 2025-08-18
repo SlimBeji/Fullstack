@@ -1,13 +1,12 @@
-import React, { useState } from "react";
-
-import { Link } from "react-router-dom";
-
 import "./MainNavigation.css";
 
-import MainHeader from "./MainHeader";
-import SideDrawer from "./SideDrawer";
-import NavLinks from "./NavLinks";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
 import Backdrop from "../ui/Backdrop";
+import MainHeader from "./MainHeader";
+import NavLinks from "./NavLinks";
+import SideDrawer from "./SideDrawer";
 
 const MainNavigation: React.FC = () => {
     const [drawerIsOpen, setDrawerIsOpen] = useState(false);

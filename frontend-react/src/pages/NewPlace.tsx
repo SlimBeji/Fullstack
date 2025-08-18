@@ -1,11 +1,12 @@
 import "./PlaceForm.css";
+
 import { useNavigate } from "react-router-dom";
 
-import { minLengthValidator } from "../util";
-import { useHttp, emptyStateBuilder, useForm } from "../hooks";
+import { Button, ImageUpload, Input } from "../components/form";
 import { HttpError, LoadingSpinner } from "../components/ui";
-import { Button, Input, ImageUpload } from "../components/form";
+import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { useAppSelector } from "../states";
+import { minLengthValidator } from "../util";
 
 const Form = {
     title: true,
@@ -35,7 +36,9 @@ const NewPlace: React.FC = () => {
         try {
             await sendRequest("/places", "post", formData);
             navigate("/");
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     return (

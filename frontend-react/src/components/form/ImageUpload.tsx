@@ -1,6 +1,6 @@
-import React, { useRef, useReducer, useEffect } from "react";
-
 import "./ImageUpload.css";
+
+import React, { useEffect, useReducer, useRef } from "react";
 
 import Button from "./Button";
 
@@ -81,7 +81,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             isValid = state.url ? true : false;
         }
         onInput({ file: state.file, url: state.url }, isValid);
-    }, [onInput, required, state.url, state.isValid]);
+    }, [onInput, required, state.url, state.file, state.isValid]);
 
     const onClickHandler = (): void => {
         if (filePickerRef.current) {

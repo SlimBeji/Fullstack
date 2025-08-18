@@ -1,9 +1,9 @@
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 
-import { useEffect, useState } from "react";
 import { Map as MapObject } from "leaflet";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect, useState } from "react";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
 import { Location } from "../../types";
 

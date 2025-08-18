@@ -1,5 +1,6 @@
-import { ChangeEvent, useReducer, useEffect } from "react";
 import "./Input.css";
+
+import { ChangeEvent, useEffect, useReducer } from "react";
 
 import { validate, ValidatorType } from "../../util";
 
@@ -29,11 +30,13 @@ const inputReducer = (
 ): InputState => {
     switch (action.type) {
         case InputActionType.CHANGE:
-            const { value, validators } = action.payload;
             return {
                 ...state,
-                value: value || "",
-                isValid: validate(value, validators),
+                value: action.payload.value || "",
+                isValid: validate(
+                    action.payload.value,
+                    action.payload.validators
+                ),
             };
         case InputActionType.TOUCH:
             return {
