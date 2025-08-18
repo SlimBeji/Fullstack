@@ -61,7 +61,7 @@ const Auth: React.FC = () => {
         formData.append("image", state.inputs.image.val.file);
         formData.append("email", state.inputs.email.val);
         formData.append("password", state.inputs.password.val);
-        const resp = await sendRequest("/auth/signup", "post", formData);
+        const resp = await sendRequest("/auth/signup", "post", formData, false);
         const data = resp.data as EncodedUserToken;
         dispatch(authSlice.actions.login(data));
     };
