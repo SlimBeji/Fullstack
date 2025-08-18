@@ -1,3 +1,4 @@
+import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 
 import {
@@ -27,6 +28,8 @@ export interface UserTokenInput {
     userId: Types.ObjectId;
     email: string;
 }
+
+export interface DecodedUserToken extends UserTokenInput, JwtPayload {}
 
 // Signup Schemas
 export const SignupSchema = z.object({
