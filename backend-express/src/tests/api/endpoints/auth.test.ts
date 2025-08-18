@@ -32,13 +32,10 @@ describe("POST /api/auth/signup", () => {
 
 describe("POST /api/auth/signin", () => {
     it("responds with json", async () => {
-        const data = {
-            email: "mslimbeji@gmail.com",
-            password: "very_secret",
-        };
         const response = await request
             .post("/api/auth/signin")
-            .send(data)
+            .set("Content-Type", "application/x-www-form-urlencoded")
+            .send("username=mslimbeji@gmail.com&password=very_secret")
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("email", "mslimbeji@gmail.com");

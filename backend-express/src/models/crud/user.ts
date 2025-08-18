@@ -143,7 +143,7 @@ export class CrudUser extends Crud<
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
         );
-        const users = await this.model.find({ email: form.email });
+        const users = await this.model.find({ email: form.username });
         if (!users.length) {
             throw error;
         }

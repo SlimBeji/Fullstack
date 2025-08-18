@@ -43,7 +43,7 @@ export type Signup = z.infer<typeof SignupSchema>;
 
 // Signin Schemas
 export const SigninSchema = z.object({
-    email: userEmailField,
+    username: userEmailField,
     password: userPasswordField,
 });
 
