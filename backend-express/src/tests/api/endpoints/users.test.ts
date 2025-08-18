@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import app from "../../../api";
-import { createToken } from "../../../api/auth";
+import { createToken } from "../../../lib/encryption";
 import { closeAll, startAll } from "../../../lib/sync";
 import { readImage } from "../../../lib/utils";
 import { crudUser } from "../../../models/crud";

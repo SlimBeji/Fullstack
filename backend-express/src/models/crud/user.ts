@@ -1,6 +1,5 @@
-import { createToken } from "../../api/auth";
 import { storage } from "../../lib/clients";
-import { hashInput, verifyHash } from "../../lib/utils";
+import { createToken, hashInput, verifyHash } from "../../lib/encryption";
 import { ApiError, FindQuery, HttpStatus } from "../../types";
 import { UserDocument, UserModel } from "../collections";
 import {

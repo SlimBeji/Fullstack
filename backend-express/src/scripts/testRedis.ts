@@ -1,5 +1,5 @@
-import { createToken } from "../api/auth";
 import { redisClient } from "../lib/clients";
+import { createToken } from "../lib/encryption";
 import { closeAll, startAll } from "../lib/sync";
 import { crudUser } from "../models/crud";
 
