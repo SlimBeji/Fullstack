@@ -47,7 +47,7 @@ const Auth: React.FC = () => {
             "/auth/signin",
             "post",
             {
-                email: state.inputs.email.val,
+                username: state.inputs.email.val,
                 password: state.inputs.password.val,
             },
             false
