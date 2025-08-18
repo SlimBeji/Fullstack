@@ -1,5 +1,6 @@
 import "./PlaceForm.css";
 
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button, ImageUpload, Input } from "../components/form";
@@ -41,6 +42,10 @@ const NewPlace: React.FC = () => {
         }
     };
 
+    const titleValidators = useMemo(() => [minLengthValidator(10)], []);
+    const addressValidators = useMemo(() => [minLengthValidator(1)], []);
+    const descriptionValidators = useMemo(() => [minLengthValidator(10)], []);
+
     return (
         <>
             {data.error && (
@@ -54,7 +59,7 @@ const NewPlace: React.FC = () => {
                     type="text"
                     onInput={inputHandlers.title}
                     label="Title"
-                    validators={[minLengthValidator(10)]}
+                    validators={titleValidators}
                     errorText="Please enter a valid Title"
                 />
                 <Input
@@ -63,7 +68,7 @@ const NewPlace: React.FC = () => {
                     type="text"
                     onInput={inputHandlers.address}
                     label="Address"
-                    validators={[minLengthValidator(10)]}
+                    validators={addressValidators}
                     errorText="Please enter a valid address"
                 />
                 <Input
@@ -71,7 +76,7 @@ const NewPlace: React.FC = () => {
                     element="textarea"
                     onInput={inputHandlers.description}
                     label="Description"
-                    validators={[minLengthValidator(10)]}
+                    validators={descriptionValidators}
                     errorText="Please enter a valid Description"
                 />
                 <ImageUpload

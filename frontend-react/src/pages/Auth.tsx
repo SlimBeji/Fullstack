@@ -1,13 +1,13 @@
 import "./Auth.css";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button, ImageUpload, Input } from "../components/form";
 import { Card, HttpError, LoadingSpinner } from "../components/ui";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { authSlice, useAppDispatch } from "../states";
 import { EncodedUserToken } from "../types";
-import { emailValidator, minLengthValidator, minValidator } from "../util";
+import { emailValidator, minLengthValidator } from "../util";
 
 const AuthForm = {
     username: false,
@@ -85,6 +85,10 @@ const Auth: React.FC = () => {
         });
     };
 
+    const usernameValidators = useMemo(() => [minLengthValidator(8)], []);
+    const emailValidators = useMemo(() => [emailValidator()], []);
+    const passwordValidators = useMemo(() => [minLengthValidator(10)], []);
+
     return (
         <div className="center">
             {data.error?.message && (
@@ -106,7 +110,7 @@ const Auth: React.FC = () => {
                             id="username"
                             type="text"
                             label="Username"
-                            validators={[minValidator(8)]}
+                            validators={usernameValidators}
                             errorText="Please enter a valid username of at least 8 characters"
                             value={state.inputs.username.val || ""}
                         />
@@ -124,7 +128,7 @@ const Auth: React.FC = () => {
                         id="email"
                         type="email"
                         label="E-Mail"
-                        validators={[emailValidator()]}
+                        validators={emailValidators}
                         errorText="Please enter a valid email"
                     />
                     <Input
@@ -133,7 +137,7 @@ const Auth: React.FC = () => {
                         id="password"
                         type="password"
                         label="Password"
-                        validators={[minLengthValidator(10)]}
+                        validators={passwordValidators}
                         errorText="Please enter a password with at least 10 characters"
                     />
                     <Button type="submit" disabled={!state.isValid}>

@@ -87,7 +87,7 @@ const Input: React.FC<InputProps> = ({
             isValid = validate(state.value, validators);
         }
         onInput(state.value, isValid);
-    }, [onInput, state.value, state.isValid]);
+    }, [onInput, state.value, state.isValid, validators]);
 
     const changeHandler = (
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

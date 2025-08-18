@@ -1,7 +1,7 @@
 import "./PlaceForm.css";
 
 import { AxiosResponse } from "axios";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, Input } from "../components/form";
@@ -53,6 +53,10 @@ const UpdatePlace: React.FC = () => {
         }
     };
 
+    const titleValidators = useMemo(() => [minLengthValidator(10)], []);
+    const addressValidators = useMemo(() => [minLengthValidator(1)], []);
+    const descriptionValidators = useMemo(() => [minLengthValidator(10)], []);
+
     const renderForm = (): React.JSX.Element | undefined => {
         if (data.loading || !data.json) {
             return;
@@ -66,7 +70,7 @@ const UpdatePlace: React.FC = () => {
                     type="text"
                     onInput={inputHandlers.title}
                     label="Title"
-                    validators={[minLengthValidator(10)]}
+                    validators={titleValidators}
                     errorText="Please enter a valid Title"
                     value={state.inputs.title.val}
                     isValid={state.inputs.title.isValid}
@@ -77,7 +81,7 @@ const UpdatePlace: React.FC = () => {
                     type="text"
                     onInput={inputHandlers.address}
                     label="Address"
-                    validators={[minLengthValidator(1)]}
+                    validators={addressValidators}
                     errorText="Please enter a valid Address"
                     value={state.inputs.address.val}
                     isValid={state.inputs.address.isValid}
@@ -87,7 +91,7 @@ const UpdatePlace: React.FC = () => {
                     element="textarea"
                     onInput={inputHandlers.description}
                     label="Description"
-                    validators={[minLengthValidator(10)]}
+                    validators={descriptionValidators}
                     errorText="Please enter a valid Description"
                     value={state.inputs.description.val}
                     isValid={state.inputs.description.isValid}
