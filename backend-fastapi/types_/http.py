@@ -2,7 +2,7 @@ import mimetypes
 import os
 from typing import Any, Generic, Self, TypeVar, cast
 
-from pydantic import BaseModel
+from pydantic import BaseModel, GetJsonSchemaHandler
 from pydantic_core import core_schema
 from starlette.datastructures import UploadFile
 
@@ -76,6 +76,12 @@ class FileToUpload:
                 ]
             ),
         )
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, _core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+    ) -> dict[str, Any]:
+        return dict(type="string", format="binary")
 
     @classmethod
     def __class_getitem__(cls, size_mb: int) -> type[Self]:
