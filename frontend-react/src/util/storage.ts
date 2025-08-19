@@ -10,7 +10,13 @@ export const getAuthData = (): EncodedUserToken | null => {
         localStorage.removeItem(LocalStorageKeys.userData);
         return null;
     }
-    if (!data.email || !data.userId || !data.token || !data.expiresAt) {
+    if (
+        !data.access_token ||
+        !(data.token_type === "bearer") ||
+        !data.userId ||
+        !data.email ||
+        !data.expiresAt
+    ) {
         localStorage.removeItem(LocalStorageKeys.userData);
         return null;
     }
@@ -25,5 +31,5 @@ export const getAuthData = (): EncodedUserToken | null => {
 export const getToken = (): string => {
     const authData = getAuthData();
     if (!authData) return "";
-    return `Bearer ${authData.token}`;
+    return `Bearer ${authData.access_token}`;
 };

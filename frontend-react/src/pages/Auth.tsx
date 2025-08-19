@@ -6,7 +6,7 @@ import { Button, ImageUpload, Input } from "../components/form";
 import { Card, HttpError, LoadingSpinner } from "../components/ui";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { authSlice, useAppDispatch } from "../states";
-import { EncodedUserToken } from "../types";
+import { SigninResponse } from "../types";
 import { emailValidator, minLengthValidator } from "../util";
 
 const AuthForm = {
@@ -51,7 +51,7 @@ const Auth: React.FC = () => {
             },
             false
         );
-        const data = resp.data as EncodedUserToken;
+        const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));
     };
 
@@ -62,7 +62,7 @@ const Auth: React.FC = () => {
         formData.append("email", state.inputs.email.val);
         formData.append("password", state.inputs.password.val);
         const resp = await sendRequest("/auth/signup", "post", formData, false);
-        const data = resp.data as EncodedUserToken;
+        const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));
     };
 

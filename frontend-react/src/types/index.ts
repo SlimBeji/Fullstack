@@ -8,10 +8,19 @@ export type ButtonType = "button" | "submit" | "reset" | undefined;
 
 export type FormSubmitHandler = (e: FormEvent) => void;
 
-export interface EncodedUserToken {
+export interface SigninResponse {
+    access_token: string;
+    token_type: "bearer";
     userId: string;
     email: string;
-    token: string;
+    expires_in: number;
+}
+
+export interface EncodedUserToken {
+    access_token: string;
+    token_type: "bearer";
+    userId: string;
+    email: string;
     expiresAt: number;
 }
 
