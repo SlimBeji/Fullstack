@@ -121,11 +121,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["User"],
     summary: "User Creation",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });
 
 // Get User Endpoint
@@ -213,11 +209,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["User"],
     summary: "Update users",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });
 
 // Delete User Endpoint
@@ -258,9 +250,5 @@ swaggerRegistery.registerPath({
     },
     tags: ["User"],
     summary: "Search and Retrieve user by id",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });

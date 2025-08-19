@@ -62,11 +62,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["Hello World"],
     summary: "Hello World Endpoint for authenticated users",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });
 
 // Hello World for admins
@@ -97,9 +93,5 @@ swaggerRegistery.registerPath({
     },
     tags: ["Hello World"],
     summary: "Hello World Endpoint for admins only",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });

@@ -126,11 +126,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["Place"],
     summary: "Place Creation",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });
 
 // Get a place by ID
@@ -218,11 +214,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["Place"],
     summary: "Update places",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });
 
 // Delete Places
@@ -263,9 +255,5 @@ swaggerRegistery.registerPath({
     },
     tags: ["Place"],
     summary: "Delete place by id",
-    security: [
-        {
-            BearerAuth: [],
-        },
-    ],
+    security: [{ OAuth2Password: [] }],
 });

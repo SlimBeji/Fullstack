@@ -10,12 +10,15 @@ import { env } from "../config";
 const swaggerRegistery = new OpenAPIRegistry();
 
 const registerSwaggger = (app: Application, path: string): void => {
-    swaggerRegistery.registerComponent("securitySchemes", "BearerAuth", {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
-        description:
-            "Enter your JWT Bearer token in the format: **Bearer <token>**",
+    swaggerRegistery.registerComponent("securitySchemes", "OAuth2Password", {
+        type: "oauth2",
+        flows: {
+            password: {
+                tokenUrl: `${env.API_URL}/auth/signin`,
+                scopes: {},
+            },
+        },
+        description: "Login with username/password to get a JWT",
     });
     const generator = new OpenApiGeneratorV3(swaggerRegistery.definitions);
     const openApiDocument = generator.generateDocument({
