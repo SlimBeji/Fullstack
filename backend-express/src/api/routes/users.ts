@@ -249,6 +249,6 @@ swaggerRegistery.registerPath({
         },
     },
     tags: ["User"],
-    summary: "Search and Retrieve user by id",
+    summary: "Delete user by id",
     security: [{ OAuth2Password: [] }],
 });
