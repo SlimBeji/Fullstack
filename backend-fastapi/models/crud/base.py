@@ -99,7 +99,7 @@ class CrudBase(
 
     async def _post_process_dict(self, item: dict) -> dict:
         if "_id" in item:
-            item["id"] = item.pop("_id")
+            item["id"] = str(item.pop("_id"))
         return item
 
     async def _post_process_dicts(self, data: list[dict]) -> list[dict]:
