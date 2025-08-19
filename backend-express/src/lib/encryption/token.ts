@@ -1,7 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
 
-import { env } from "../../config";
-import { redisClient } from "../../lib/clients";
 import {
     DecodedUserToken,
     EncodedToken,
@@ -19,7 +17,7 @@ export const decodeToken = (encoded: string): DecodedUserToken => {
     return decoded as DecodedUserToken;
 };
 
-const _createToken = (user: UserRead): EncodedToken => {
+export const createToken = (user: UserRead): EncodedToken => {
     const payload: UserTokenInput = {
         userId: user.id,
         email: user.email,
@@ -34,13 +32,3 @@ const _createToken = (user: UserRead): EncodedToken => {
         expires_in: Number(decoded.exp),
     };
 };
-
-const createTokenKeygen = (user: UserRead): string => {
-    return `create_token_${user.email}`;
-};
-
-export const createToken = redisClient.wrap<[UserRead], EncodedToken>(
-    _createToken,
-    createTokenKeygen,
-    env.JWT_EXPIRATION
-);

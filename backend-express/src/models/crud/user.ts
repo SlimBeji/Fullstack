@@ -101,8 +101,8 @@ export class CrudUser extends Crud<
                 `No user with email ${email} in the database`
             );
         }
-        const { token } = await createToken(user);
-        return `Bearer ${token}`;
+        const { access_token } = createToken(user);
+        return `Bearer ${access_token}`;
     }
 
     public async createDocument(form: UserCreate): Promise<UserDocument> {

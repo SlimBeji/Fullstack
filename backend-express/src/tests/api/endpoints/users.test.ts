@@ -17,9 +17,9 @@ const request = supertest(app);
 beforeAll(async () => {
     await startAll();
     adminExample = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
-    adminToken = `Bearer ${(await createToken(adminExample)).token}`;
+    adminToken = `Bearer ${createToken(adminExample).access_token}`;
     example = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
-    token = `Bearer ${(await createToken(example)).token}`;
+    token = `Bearer ${createToken(example).access_token}`;
 });
 
 afterAll(async () => {
