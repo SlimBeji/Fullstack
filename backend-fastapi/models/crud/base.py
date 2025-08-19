@@ -137,7 +137,7 @@ class CrudBase(
     async def get(self, id: str | ObjectId) -> ReadSchema | None:
         document = await self.get_document(id)
         if document is None:
-            return None
+            raise self.not_found(id)
 
         result = await self.post_process(document)
         return cast(ReadSchema, result)
