@@ -231,10 +231,17 @@ def make_filter_validator(real_type: Any):
 class QueryFilter(Generic[T]):
     def __class_getitem__(cls, item):
         field_info = get_field_info(item)
+        extra = getattr(field_info, "json_schema_extra", None) or {}
+        example = extra.get("filter_example", None)
+        if example:
+            examples = [example]
+        else:
+            examples = field_info.examples
+
         return Annotated[
             str | FieldFilter,
             BeforeValidator(make_filter_validator(item)),
-            Field(examples=field_info.examples),
+            Field(examples=examples),
         ]
 
 
@@ -242,8 +249,14 @@ class QueryFilters(Generic[T]):
     def __class_getitem__(cls, item):
         field_info = get_field_info(item)
         description = getattr(field_info, "description", "")
+        extra = getattr(field_info, "json_schema_extra", None) or {}
         return Annotated[
-            Optional[list[QueryFilter[item]]], Field(None, description=description)
+            Optional[list[QueryFilter[item]]],
+            Field(
+                None,
+                description=description,
+                json_schema_extra=extra,
+            ),
         ]
 
 
