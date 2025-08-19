@@ -1,5 +1,3 @@
-import time
-
 from jose import ExpiredSignatureError, JWTError
 
 from config import settings
@@ -27,8 +25,8 @@ def decode_token(encoded: str) -> TokenPayload:
 
 def create_token(user: UserReadSchema) -> EncodedTokenSchema:
     payload = TokenPayload(userId=user.id, email=user.email)
-    access_token = encode_payload(payload.model_dump(fallback=str))
     expires_in = settings.JWT_EXPIRATION
+    access_token = encode_payload(payload.model_dump(fallback=str), expires_in)
     return EncodedTokenSchema(
         access_token=access_token,
         token_type="bearer",

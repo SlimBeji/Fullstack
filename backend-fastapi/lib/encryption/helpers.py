@@ -1,3 +1,4 @@
+from datetime import UTC, datetime, timedelta
 from typing import Literal
 
 import bcrypt
@@ -21,7 +22,10 @@ def verify_hash(plain: str, hashed: str, encoding: AcceptedEncodings = "utf-8") 
     return bcrypt.checkpw(plain.encode(encoding), hashed.encode(encoding))
 
 
-def encode_payload(payload: dict) -> str:
+def encode_payload(payload: dict, expires_in: int = settings.JWT_EXPIRATION) -> str:
+    payload = payload.copy()
+    now = datetime.now(UTC)
+    payload.update(dict(iat=now, exp=now + timedelta(seconds=expires_in)))
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=SIGNING_ALGORITHM)
 
 
