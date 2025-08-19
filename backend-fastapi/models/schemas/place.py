@@ -147,7 +147,7 @@ class PlaceFiltersSchema(BaseModel):
     address: QueryFilters[PlaceFields.address]
     creatorId: QueryFilters[PlaceFields.creator_id]
     locationLat: QueryFilters[PlaceFields.location_lat]
-    locationLng: QueryFilters[PlaceFields.location_lat]
+    locationLng: QueryFilters[PlaceFields.location_lng]
 
 
 class PlaceSearchSchema(
