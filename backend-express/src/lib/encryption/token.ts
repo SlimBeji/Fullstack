@@ -1,5 +1,4 @@
-import { JwtPayload } from "jsonwebtoken";
-
+import { env } from "../../config";
 import {
     DecodedUserToken,
     EncodedToken,
@@ -23,12 +22,11 @@ export const createToken = (user: UserRead): EncodedToken => {
         email: user.email,
     };
     const access_token = encodePayload(payload);
-    const decoded = decodePayload(access_token) as JwtPayload;
     return {
         access_token,
         token_type: "bearer",
         email: user.email,
         userId: user.id,
-        expires_in: Number(decoded.exp),
+        expires_in: env.JWT_EXPIRATION,
     };
 };

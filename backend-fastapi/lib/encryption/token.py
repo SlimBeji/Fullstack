@@ -28,7 +28,7 @@ def decode_token(encoded: str) -> TokenPayload:
 def create_token(user: UserReadSchema) -> EncodedTokenSchema:
     payload = TokenPayload(userId=user.id, email=user.email)
     access_token = encode_payload(payload.model_dump(fallback=str))
-    expires_in = int(time.time()) + settings.JWT_EXPIRATION
+    expires_in = settings.JWT_EXPIRATION
     return EncodedTokenSchema(
         access_token=access_token,
         token_type="bearer",
