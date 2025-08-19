@@ -153,6 +153,17 @@ class CrudBase(
 
     # Fetch
 
+    def _to_find_query(self, schema: FindQuery | BaseModel) -> FindQuery:
+        if isinstance(schema, FindQuery):
+            return schema
+
+        data = schema.model_dump(exclude_unset=True, exclude_none=True)
+        page = data.pop("page", None)
+        size = data.pop("size", None)
+        sort = data.pop("sort", None)
+        fields = data.pop("fields", None)
+        return FindQuery(page=page, size=size, sort=sort, fields=fields, filters=data)
+
     def _parse_sort_data(self, fields: list[str] | None) -> SortData:
         if not fields:
             return dict(createdAt=1)
@@ -222,8 +233,9 @@ class CrudBase(
             .to_list()
         )
 
-    async def fetch(self, query: FindQuery) -> PaginatedData[ReadSchema]:
+    async def fetch(self, query: FindQuery | BaseModel) -> PaginatedData[ReadSchema]:
         # Parsing the FindQuery to Mongo language
+        query = self._to_find_query(query)
         pagination = PaginationData(page=query.page, size=query.size)
         projection = self._parse_projection(query.fields)
         sort = self._parse_sort_data(query.sort)
