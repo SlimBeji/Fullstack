@@ -94,7 +94,7 @@ class CrudUser(
             raise ApiError(
                 HTTPStatus.NOT_FOUND, f"No user with email {email} in the database"
             )
-        token = await create_token(user)
+        token = create_token(user)
         return f"Bearer {token.access_token}"
 
     async def create_document(self, form: UserCreateSchema) -> User:
@@ -123,7 +123,7 @@ class CrudUser(
         data = form.model_dump()
         data["isAdmin"] = False
         user = await self.create(UserPostSchema(**data))
-        return await create_token(user)
+        return create_token(user)
 
     async def signin(self, form: SigninForm) -> EncodedTokenSchema:
         error = ApiError(HTTPStatus.UNAUTHORIZED, "Wrong name or password")
@@ -137,7 +137,7 @@ class CrudUser(
         ):
             raise error
 
-        return await create_token(user)
+        return create_token(user)
 
     async def update(self, user: User, form: UserPutSchema) -> UserReadSchema:
         if form.password:
