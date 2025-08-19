@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from fastapi import File, Form
+from fastapi import Form
 from pydantic import BaseModel, EmailStr, Field
 
 from models.schemas.user import UserFields, UserMultipartFields
