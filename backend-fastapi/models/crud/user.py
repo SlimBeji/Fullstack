@@ -66,7 +66,7 @@ class CrudUser(
         item = await super()._post_process_dict(item)
         item.pop("password", None)
         image_url: str | None = item.get("imageUrl", None)
-        if image_url is not None:
+        if image_url:
             item["imageUrl"] = cloud_storage.get_signed_url(image_url)
         return item
 
