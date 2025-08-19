@@ -1,7 +1,7 @@
 from typing import Annotated, Literal
 
 from beanie.odm.fields import PydanticObjectId
-from fastapi import File
+from fastapi import File, Form
 from pydantic import BaseModel, EmailStr, Field
 
 from models.schemas.utils import QueryFilters, build_search_schema
@@ -69,6 +69,32 @@ class UserFields:
     ]
 
 
+class UserMultipartFields:
+    name: str = Form(
+        ...,
+        min_length=2,
+        description="The user name, two characters at least",
+        examples=["Slim Beji"],
+    )
+    email: EmailStr = Form(
+        ...,
+        description="The user email",
+        examples=["mslimbeji@gmail.com"],
+    )
+    isAdmin: bool = Form(
+        ...,
+        description="Whether the user is an admin or not",
+        examples=[False],
+    )
+    password: str = Form(
+        ...,
+        min_length=8,
+        description="The user password, 8 characters at least",
+        examples=["very_secret"],
+    )
+    image: FileToUpload = File(None, description="The user profile image")
+
+
 # --- Base Schemas ----
 
 
@@ -95,6 +121,31 @@ class UserCreateSchema(UserBaseSchema):
 class UserPostSchema(UserBaseSchema):
     password: UserFields.password
     image: UserFields.image | None = None
+
+
+class UserMultipartPost:
+    def __init__(
+        self,
+        name: str = UserMultipartFields.name,
+        email: EmailStr = UserMultipartFields.email,
+        isAdmin: bool = UserMultipartFields.isAdmin,
+        password: str = UserMultipartFields.password,
+        image: FileToUpload | None = UserMultipartFields.image,
+    ):
+        self.name = name
+        self.email = email
+        self.isAdmin = isAdmin
+        self.password = password
+        self.image = image or None
+
+    def to_post_schema(self) -> UserPostSchema:
+        return UserPostSchema(
+            name=self.name,
+            email=self.email,
+            isAdmin=self.isAdmin,
+            password=self.password,
+            image=self.image,
+        )
 
 
 # --- Read Schemas ---

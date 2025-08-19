@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 from fastapi import File, Form
 from pydantic import BaseModel, EmailStr, Field
 
-from models.schemas.user import UserFields
+from models.schemas.user import UserFields, UserMultipartFields
 from types_ import FileToUpload
 
 # --- Fields ----
@@ -37,26 +37,10 @@ class TokenPayload(BaseModel):
 class SignupForm:
     def __init__(
         self,
-        name: str = Form(
-            ...,
-            min_length=2,
-            description="The user name, two characters at least",
-            examples=["Slim Beji"],
-        ),
-        email: EmailStr = Form(
-            ...,
-            description="The user email",
-            examples=["mslimbeji@gmail.com"],
-        ),
-        password: str = Form(
-            ...,
-            min_length=8,
-            description="The user password, 8 characters at least",
-            examples=["very_secret"],
-        ),
-        image: FileToUpload | None | Literal[""] = File(
-            None, description="The user profile image"
-        ),
+        name: str = UserMultipartFields.name,
+        email: EmailStr = UserMultipartFields.email,
+        password: str = UserMultipartFields.password,
+        image: FileToUpload | None = UserMultipartFields.image,
     ):
         self.name = name
         self.email = email
