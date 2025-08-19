@@ -21,6 +21,7 @@ class PlaceFields:
             min_length=10,
             description="The place title/name, 10 characters minimum",
             examples=["Stamford Bridge"],
+            json_schema_extra=dict(filter_example="eq:Some Place"),
         ),
     ]
     description = Annotated[
@@ -29,6 +30,7 @@ class PlaceFields:
             min_length=10,
             description="The place description, 10 characters minimum",
             examples=["Stadium of Chelsea football club"],
+            json_schema_extra=dict(filter_example="regex:football"),
         ),
     ]
     embedding = Annotated[
@@ -54,22 +56,31 @@ class PlaceFields:
             min_length=1,
             description="The place address",
             examples=["Fulham road"],
+            json_schema_extra=dict(filter_example="regex:d{1,2} Boulevard"),
         ),
     ]
     creator_id = Annotated[
         PydanticObjectId,
         Field(
-            description="The place creator ID", examples=["683b21134e2e5d46978daf1f"]
+            description="The place creator ID",
+            examples=["683b21134e2e5d46978daf1f"],
+            json_schema_extra=dict(filter_example="eq:683b21134e2e5d46978daf1f"),
         ),
     ]
     location_lat = Annotated[
         float,
-        Field(description="The latitude of the place", examples=[51.48180425016331]),
+        Field(
+            description="The latitude of the place",
+            examples=[51.48180425016331],
+            json_schema_extra=dict(filter_example="gt:3.5"),
+        ),
     ]
     location_lng = Annotated[
         float,
         Field(
-            description="The longitude of the place", examples=[-0.19090418688755467]
+            description="The longitude of the place",
+            examples=[-0.19090418688755467],
+            json_schema_extra=dict(filter_example="lt:4.5"),
         ),
     ]
 

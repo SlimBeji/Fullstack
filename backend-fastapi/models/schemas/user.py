@@ -13,7 +13,10 @@ from types_ import FileToUpload, PaginatedData
 class UserFields:
     id = Annotated[
         PydanticObjectId,
-        Field(description="The User ID", examples=["683b21134e2e5d46978daf1f"]),
+        Field(
+            description="The User ID",
+            examples=["683b21134e2e5d46978daf1f"],
+        ),
     ]
     name = Annotated[
         str,
@@ -21,6 +24,7 @@ class UserFields:
             min_length=2,
             description="The user name, two characters at least",
             examples=["Slim Beji"],
+            json_schema_extra=dict(filter_example="eq:Slim Beji"),
         ),
     ]
     email = Annotated[
@@ -28,6 +32,7 @@ class UserFields:
         Field(
             description="The user email",
             examples=["mslimbeji@gmail.com"],
+            json_schema_extra=dict(filter_example="eq:mslimbeji@gmail.com"),
         ),
     ]
     password = Annotated[
