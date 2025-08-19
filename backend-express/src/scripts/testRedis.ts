@@ -2,7 +2,10 @@ import { redisClient } from "../lib/clients";
 import { closeAll, startAll } from "../lib/sync";
 
 async function test() {
-    redisClient.set("Test", "Test");
+    await redisClient.set("secret_number", 158);
+    console.log(await redisClient.get("secret_number"));
+    await redisClient.delete("secret_number");
+    console.log(await redisClient.get("secret_number"));
 }
 
 if (require.main === module) {
