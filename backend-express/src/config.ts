@@ -20,6 +20,7 @@ export const env = {
     FILEUPLOAD_MAX_SIZE: Number(parseVar("FILEUPLOAD_MAX_SIZE", "100")),
     JSON_MAX_SIZE: Number(parseVar("JSON_MAX_SIZE", "10240")),
     MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),
+    GOD_MODE_LOGIN: parseVar("GOD_MODE_LOGIN"),
     JWT_EXPIRATION: Number(parseVar("JWT_EXPIRATION", "3600")),
     ENV: parseVar("ENV"),
 
