@@ -24,13 +24,14 @@ const _createToken = (user: UserRead): EncodedToken => {
         userId: user.id,
         email: user.email,
     };
-    const token = encodePayload(payload);
-    const decoded = decodePayload(token) as JwtPayload;
+    const access_token = encodePayload(payload);
+    const decoded = decodePayload(access_token) as JwtPayload;
     return {
-        token,
+        access_token,
+        token_type: "bearer",
         email: user.email,
         userId: user.id,
-        expiresAt: Number(decoded.exp),
+        expires_in: Number(decoded.exp),
     };
 };
 

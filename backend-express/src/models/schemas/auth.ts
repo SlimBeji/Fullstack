@@ -11,14 +11,19 @@ import {
 import { z } from "./zod";
 
 // Fields
-export const tokenField = z.string().openapi({
+export const accessTokenField = z.string().openapi({
     description:
         "A generated web token. The 'Bearer ' prefix needs to be added for authentication",
     example:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM",
 });
 
-export const expiresAtField = z.number().openapi({
+export const tokenTypeField = z.literal("bearer").openapi({
+    description: "The type of token. Only 'bearer' is supported.",
+    example: "bearer",
+});
+
+export const expiresInField = z.number().openapi({
     description: "The UNIX timestamp the token expires at",
     example: 1751879562,
 });
@@ -52,10 +57,11 @@ export type Signin = z.infer<typeof SigninSchema>;
 // Response Schemas
 
 export const EncodedTokenSchema = z.object({
+    access_token: accessTokenField,
+    token_type: tokenTypeField,
     userId: userIdField,
     email: userEmailField,
-    token: tokenField,
-    expiresAt: expiresAtField,
+    expires_in: expiresInField,
 });
 
 export type EncodedToken = z.infer<typeof EncodedTokenSchema>;
