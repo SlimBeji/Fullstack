@@ -33,9 +33,16 @@ from types_ import FilterOperation
 # Utility Methods
 
 
+def _get_fields(model: BaseModel | type[BaseModel]):
+    if isinstance(model, type) and issubclass(model, BaseModel):
+        return model.model_fields.items()
+    else:
+        return model.__class__.model_fields.items()
+
+
 def get_pydantic_flat_fields(model: type[BaseModel], prefix: str = "") -> list[str]:
     paths = []
-    for name, field in model.model_fields.items():
+    for name, field in _get_fields(model):
         annotation = field.annotation
         if isinstance(annotation, type) and issubclass(annotation, BaseModel):
             paths.extend(get_pydantic_flat_fields(annotation, f"{prefix}{name}."))
@@ -57,7 +64,7 @@ def get_field_info(field) -> FieldInfo | None:
 
 def copy_fields(model: type[BaseModel]) -> dict[str, tuple[type[Any], Any]]:
     new_fields: dict[str, tuple[type[Any], Any]] = {}
-    for k, v in model.model_fields.items():
+    for k, v in _get_fields(model):
         annotation = cast(type[Any], v.annotation)
         default = v.default
         new_fields[k] = (annotation, default)
