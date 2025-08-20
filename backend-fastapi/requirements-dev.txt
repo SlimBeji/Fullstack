@@ -10,4 +10,5 @@ autoflake
 
 # Testing
 pytest
+pytest-asyncio
 Faker

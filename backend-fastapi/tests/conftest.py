@@ -1,10 +1,12 @@
 import os
 
 import pytest
-from fastapi.testclient import TestClient
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
 
 from api.app import create_app
 from config import settings
+from lib.sync import close_all, start_all
 
 
 @pytest.fixture(autouse=True)
@@ -13,8 +15,11 @@ def set_env_test():
     settings.ENV = "test"
 
 
-@pytest.fixture
-def client():
+@pytest_asyncio.fixture(scope="module")
+async def client():
     app = create_app()
-    with TestClient(app) as client:
-        yield client
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        await start_all()
+        yield ac
+        await close_all()
