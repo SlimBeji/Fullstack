@@ -18,7 +18,7 @@ from models.schemas import (
 place_router = APIRouter(prefix="/api/places", tags=["Place"])
 
 place_id_param = Path(
-    ..., example="507f1f77bcf86cd799439011", description="The ID of the place"
+    ..., examples=["507f1f77bcf86cd799439011"], description="The ID of the place"
 )
 
 

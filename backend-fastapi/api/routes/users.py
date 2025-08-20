@@ -16,7 +16,7 @@ from models.schemas import (
 user_router = APIRouter(prefix="/api/users", tags=["User"])
 
 user_id_param = Path(
-    ..., example="507f1f77bcf86cd799439011", description="The ID of the user"
+    ..., examples=["507f1f77bcf86cd799439011"], description="The ID of the user"
 )
 
 
