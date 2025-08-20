@@ -7,7 +7,7 @@ from worker.tasks import send_newsletter
 hello_world_router = APIRouter(prefix="/api/hello-world", tags=["Hello World"])
 
 
-@hello_world_router.get("/", summary="Hello World Endpoint")
+@hello_world_router.get("", summary="Hello World Endpoint")
 async def hello():
     send_newsletter("Slim", "mslimbeji@gmail.com")
     return dict(message="Hello World!")
