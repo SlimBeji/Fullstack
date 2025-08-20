@@ -28,10 +28,14 @@ async def create_collections() -> None:
 
 async def _seed_user(user: UserSeedSchema) -> None:
     if user.imageUrl:
-        user.imageUrl = cloud_storage.upload_file(user.imageUrl)
-        form = UserCreateSchema(**user.model_dump())
-        document = await crud_user.create_document(form)
-        USER_REF_MAPPING[user.ref] = str(document.id)
+        imageUrl = cloud_storage.upload_file(user.imageUrl)
+    else:
+        imageUrl = ""
+
+    data = user.model_dump()
+    data["imageUrl"] = imageUrl
+    document = await crud_user.create_document(UserCreateSchema(**data))
+    USER_REF_MAPPING[user.ref] = str(document.id)
 
 
 async def seed_users(users: list[UserSeedSchema]) -> None:
@@ -41,11 +45,16 @@ async def seed_users(users: list[UserSeedSchema]) -> None:
 
 async def _seed_place(place: PlaceSeedSchema) -> None:
     if place.imageUrl:
-        place.imageUrl = cloud_storage.upload_file(place.imageUrl)
-        creatorId = PydanticObjectId(USER_REF_MAPPING[place.creator_ref])
-        form = PlaceCreateSchema(**place.model_dump(), creatorId=creatorId)
-        document = await crud_place.create_document(form)
-        PLACE_REF_MAPPING[place.ref] = str(document.id)
+        imageUrl = cloud_storage.upload_file(place.imageUrl)
+    else:
+        imageUrl = ""
+
+    creatorId = PydanticObjectId(USER_REF_MAPPING[place.creator_ref])
+    data = place.model_dump()
+    data["imageUrl"] = imageUrl
+    data["creatorId"] = creatorId
+    document = await crud_place.create_document(PlaceCreateSchema(**data))
+    PLACE_REF_MAPPING[place.ref] = str(document.id)
 
 
 async def seed_places(places: list[PlaceSeedSchema]) -> None:
