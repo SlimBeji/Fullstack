@@ -64,13 +64,18 @@ async def lifespan(app: FastAPI):
     await close_all()
 
 
-def create_app() -> FastAPI:
+def create_app(test: bool = False) -> FastAPI:
+    if test:
+        lifespan_param = None
+    else:
+        lifespan_param = lifespan
+
     app = FastAPI(
         title="My FastAPI Pydantic API",
         description="API documentation for my FastAPI application",
         version="1.0.0",
         openapi_tags=OPENAPI_METADATA,
-        lifespan=lifespan,
+        lifespan=lifespan_param,
     )
 
     if settings.is_production:
