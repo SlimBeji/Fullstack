@@ -9,7 +9,6 @@ from motor.motor_asyncio import (
 )
 from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.errors import CollectionInvalid
-from testcontainers.mongodb import MongoDbContainer
 
 from config import settings
 from models.collections import document_models
@@ -20,7 +19,6 @@ class MongoClient:
     def __init__(self) -> None:
         self.db_name: str = settings.MONGO_DBNAME
         self.uri: str = settings.MONGO_URL
-        self._test_container: MongoDbContainer | None = None
         self._client: AsyncIOMotorClient | None = None
         self._db: AsyncIOMotorDatabase | None = None
 
@@ -54,15 +52,6 @@ class MongoClient:
     async def drop_collection(self, name: str) -> None:
         await self.db.drop_collection(name)
 
-    def _configure_container(self) -> None:
-        if self._test_container is not None:
-            return
-
-        self._test_container = MongoDbContainer("mongo:latest")
-        self._test_container.with_command("mongod", "--replSet", "rs0", "--bind_ip_all")
-        self._test_container.start()
-        self.uri = self._test_container.get_connection_url()
-
     async def _seed_test_data(self) -> None:
         collections = await self.list_collections()
         was_seeded = Collections.USERS.value in collections
@@ -83,26 +72,14 @@ class MongoClient:
         )
 
     async def connect(self) -> None:
-        # Configure the test container if in test mode
-        if self.is_test:
-            self._configure_container()
-
         # Connect to the database
         await self.init()
-
-        # Seed data for testing
-        if self.is_test:
-            await self._seed_test_data()
 
     async def close(self) -> None:
         if self._client:
             self._client.close()
             self._client = None
             self._db = None
-
-        if self._test_container:
-            self._test_container.stop()
-            self._test_container = None
 
     @asynccontextmanager
     async def session_transaction(
