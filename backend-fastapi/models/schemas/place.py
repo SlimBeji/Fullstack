@@ -1,8 +1,8 @@
 from typing import Annotated, Literal
 
 from beanie.odm.fields import PydanticObjectId
-from fastapi import File
-from pydantic import BaseModel, Field
+from fastapi import File, Form
+from pydantic import BaseModel, Field, Json
 
 from models.schemas.utils import QueryFilters, build_search_schema
 from types_ import FileToUpload, PaginatedData
@@ -85,12 +85,40 @@ class PlaceFields:
     ]
 
 
-# --- Nested Objects ----
-
-
 class PlaceLocation(BaseModel):
     lat: PlaceFields.location_lat
     lng: PlaceFields.location_lng
+
+
+class PlaceMultipartFields:
+    title: str = Form(
+        ...,
+        min_length=10,
+        description="The place title/name, 10 characters minimum",
+        examples=["Stamford Bridge"],
+    )
+    description: str = Form(
+        ...,
+        min_length=10,
+        description="The place description, 10 characters minimum",
+        examples=["Stadium of Chelsea football club"],
+    )
+    address: str = Form(
+        ...,
+        min_length=1,
+        description="The place address",
+        examples=["Fulham road"],
+    )
+    location: Json[PlaceLocation] = Form(None, description="The place creator ID")
+    creatorId: PydanticObjectId = Form(
+        ...,
+        description="The place creator ID",
+        examples=["683b21134e2e5d46978daf1f"],
+    )
+    image: FileToUpload = File(
+        None,
+        description="Place Image (JPEG)",
+    )
 
 
 # --- Base Schemas ----
@@ -122,6 +150,34 @@ class PlaceCreateSchema(PlaceBaseSchema):
 class PlacePostSchema(PlaceBaseSchema):
     image: PlaceFields.image | None = None
     creatorId: PlaceFields.creator_id
+
+
+class PlaceMultipartPost:
+    def __init__(
+        self,
+        title: str = PlaceMultipartFields.title,
+        description: str = PlaceMultipartFields.description,
+        address: str = PlaceMultipartFields.address,
+        location: PlaceLocation | None = PlaceMultipartFields.location,
+        creatorId: PydanticObjectId = PlaceMultipartFields.creatorId,
+        image: FileToUpload | None = PlaceMultipartFields.image,
+    ):
+        self.title = title
+        self.description = description
+        self.address = address
+        self.location = location or None
+        self.creatorId = creatorId
+        self.image = image or None
+
+    def to_post_schema(self) -> PlacePostSchema:
+        return PlacePostSchema(
+            title=self.title,
+            description=self.description,
+            address=self.address,
+            location=self.location,
+            creatorId=self.creatorId,
+            image=self.image,
+        )
 
 
 # --- Read Schemas ---
