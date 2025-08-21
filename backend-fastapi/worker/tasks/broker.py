@@ -8,6 +8,7 @@ from dramatiq.brokers.stub import StubBroker
 from dramatiq.middleware import AsyncIO
 from dramatiq.results import Results
 from dramatiq.results.backends.redis import RedisBackend
+from dramatiq.results.backends.stub import StubBackend
 
 from config import settings
 from lib.clients import connect_dbs
@@ -28,6 +29,7 @@ class AsyncIOWithBeanie(AsyncIO):
 broker: Broker  # Create the broker
 if settings.is_test:
     broker = StubBroker()
+    backend = StubBackend()
     broker.emit_after("process_boot")
 else:
     broker = RedisBroker(url=settings.REDIS_URL)
