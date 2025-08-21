@@ -4,7 +4,6 @@ from typing import Any, Awaitable, Callable, Literal, ParamSpec, TypeVar
 
 import redis.asyncio as async_redis
 from pydantic import BaseModel
-from testcontainers.redis import RedisContainer
 
 from config import settings
 from lib.utils.helpers import str_to_bool
@@ -16,10 +15,13 @@ OutputFormat = Literal["json", "int", "float", "bool", ""] | type[BaseModel]
 
 class RedisClient:
     def __init__(self) -> None:
-        self.uri: str = settings.REDIS_URL
         self.default_expirartion: int = settings.REDIS_DEFAULT_EXPIRATION
-        self._test_container: RedisContainer | None = None
         self._client: async_redis.Redis | None = None
+
+        if self.is_test:
+            self.uri: str = settings.REDIS_TEST_URL
+        else:
+            self.uri: str = settings.REDIS_URL
 
     @property
     def is_test(self) -> bool:
@@ -31,24 +33,7 @@ class RedisClient:
             raise RuntimeError("Redis client is not connected. Call connect() first.")
         return self._client
 
-    def _configure_container(self) -> None:
-        if self._test_container is not None:
-            return
-
-        self._test_container = RedisContainer("redis:6.2-alpine")
-        self._test_container.with_command(
-            "redis-server", "--save ", "20", "1", "--loglevel ", "warning"
-        )
-        self._test_container.start()
-        host = self._test_container.get_container_host_ip()
-        port = self._test_container.get_exposed_port(6379)
-        self.uri = f"redis://{host}:{port}/0"
-
     async def connect(self) -> None:
-        # Configure the test container if in test mode
-        if self.is_test:
-            self._configure_container()
-
         # Connect to the database
         if self._client is None:
             self._client = async_redis.Redis.from_url(self.uri)
@@ -58,10 +43,6 @@ class RedisClient:
         if self._client:
             await self._client.aclose()
             self._client = None
-
-        if self._test_container:
-            self._test_container.stop()
-            self._test_container = None
 
     async def flushall(self) -> None:
         await self.client.flushall()

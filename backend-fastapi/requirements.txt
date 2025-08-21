@@ -16,9 +16,6 @@ beanie
 motor
 redis
 
-# DB Mocks
-testcontainers
-
 # Tasks
 dramatiq[redis]
 apscheduler
