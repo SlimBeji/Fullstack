@@ -1,13 +1,13 @@
 import supertest from "supertest";
 
 import app from "../../../api";
-import { closeAll, startAll } from "../../../lib/sync";
+import { closeAll, seedTestData } from "../../../lib/sync";
 import { crudUser } from "../../../models/crud";
 
 const request = supertest(app);
 
 beforeAll(async () => {
-    await startAll();
+    await seedTestData();
 });
 
 afterAll(async () => {

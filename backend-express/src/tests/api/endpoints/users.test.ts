@@ -2,7 +2,7 @@ import supertest from "supertest";
 
 import app from "../../../api";
 import { createToken } from "../../../lib/encryption";
-import { closeAll, startAll } from "../../../lib/sync";
+import { closeAll, seedTestData } from "../../../lib/sync";
 import { readImage } from "../../../lib/utils";
 import { crudUser } from "../../../models/crud";
 import { UserRead } from "../../../models/schemas";
@@ -15,7 +15,7 @@ let token: string = "";
 const request = supertest(app);
 
 beforeAll(async () => {
-    await startAll();
+    await seedTestData();
     adminExample = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
     adminToken = `Bearer ${createToken(adminExample).access_token}`;
     example = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
