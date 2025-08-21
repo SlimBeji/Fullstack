@@ -33,7 +33,9 @@ ENV=dev
 # DATABASE
 MONGO_URL=mongodb://mongo1:27017,mongo2:27017/myapp?replicaSet=rs0
 MONGO_DBNAME=myapp
+MONGO_TEST_DBNAME=tests
 REDIS_URL=redis://redis:6379/0
+REDIS_TEST_URL=redis://redis:6379/1
 REDIS_DEFAULT_EXPIRATION=3600
 
 # HUGGING FACE
