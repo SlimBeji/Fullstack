@@ -12,15 +12,18 @@ from pymongo.errors import CollectionInvalid
 
 from config import settings
 from models.collections import document_models
-from types_ import Collections
 
 
 class MongoClient:
     def __init__(self) -> None:
-        self.db_name: str = settings.MONGO_DBNAME
         self.uri: str = settings.MONGO_URL
         self._client: AsyncIOMotorClient | None = None
         self._db: AsyncIOMotorDatabase | None = None
+
+        if self.is_test:
+            self.db_name: str = "test"
+        else:
+            self.db_name: str = settings.MONGO_DBNAME
 
     @property
     def is_test(self) -> bool:
@@ -51,15 +54,6 @@ class MongoClient:
 
     async def drop_collection(self, name: str) -> None:
         await self.db.drop_collection(name)
-
-    async def _seed_test_data(self) -> None:
-        collections = await self.list_collections()
-        was_seeded = Collections.USERS.value in collections
-        if not was_seeded:
-            # Doing the import now, to avoid circular imports
-            from models.examples import seed_db
-
-            await seed_db()
 
     async def init(self):
         if self._client:
