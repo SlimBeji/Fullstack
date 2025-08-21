@@ -42,15 +42,10 @@ const Auth: React.FC = () => {
     }
 
     const onSignin = async (): Promise<void> => {
-        const resp = await sendRequest(
-            "/auth/signin",
-            "post",
-            {
-                username: state.inputs.email.val,
-                password: state.inputs.password.val,
-            },
-            false
-        );
+        const formData = new FormData();
+        formData.append("username", state.inputs.email.val);
+        formData.append("password", state.inputs.password.val);
+        const resp = await sendRequest("/auth/signin", "post", formData, false);
         const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));
     };
