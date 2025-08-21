@@ -30,23 +30,43 @@ While PostgreSQL is a powerful and mature relational database, this project opts
 
 Each backend implements the **same logic**, **routes**, and **data models**:
 
--   **TypeScript** – using [Express](https://expressjs.com/)
--   **Python** – using [FastAPI](https://fastapi.tiangolo.com/)
--   **Go** – using [Gin](https://gin-gonic.com/)
--   **Rust** – using [Axum](https://github.com/tokio-rs/axum)
+| Language   | Web Framework                            | API Address               |
+| ---------- | ---------------------------------------- | ------------------------- |
+| TypeScript | [Express](https://expressjs.com/)        | http://localhost:5000/api |
+| Python     | [FastAPI](https://fastapi.tiangolo.com/) | http://localhost:5001/api |
+| Go         | [Gin](https://gin-gonic.com/)            | _Not Implemented Yet_     |
+| Rust       | [Axum](https://github.com/tokio-rs/axum) | _Not Implemented Yet_     |
 
 Each backend connects to a shared set of services (e.g., MongoDB, Redis).
 
 ### 🔜 Frontends
 
-Each frontend is a modern **SPA** built with:
+Each frontend is a modern **Single Page Application (SPA)** built using popular frameworks:
 
--   **React**
--   **Vue**
--   **Angular**
--   **Svelte**
+| Framework | Dev Server URL        | Env File Example |
+| --------- | --------------------- | ---------------- |
+| React     | http://localhost:8000 | `react.env`      |
+| Vue       | _Not Implemented Yet_ | `vue.env`        |
+| Angular   | _Not Implemented Yet_ | `angular.env`    |
+| Svelte    | _Not Implemented Yet_ | `svelte.env`     |
 
-All frontends communicate with any backend through the same REST API, enabling **plug-and-play** architecture.
+All frontends communicate with any backend through the **same REST API**, enabling a **plug-and-play architecture**.
+
+#### ✅ Switching Backend for a Frontend
+
+To connect a frontend to a specific backend, update the corresponding `.env` file with the correct API URL.
+
+For example, for **React**, update the `VITE_BACKEND_URL` in `react.env` like so:
+
+```env
+VITE_BACKEND_URL=http://localhost:5000/api   # Express API
+```
+
+or
+
+```env
+VITE_BACKEND_URL=http://localhost:5001/api   # FastAPI
+```
 
 ## 🐳 Dockerized Setup
 
@@ -428,9 +448,8 @@ Stores **static assets** like images or files that may be served by the backend 
 
 ## 🚀 Next Steps
 
--   Add the **Python/FastAPI** backend
--   Add the **Go/Gin** backend
--   Add the **Rust/Axium** backend
 -   Add a **Vue** SPA frontend
--   Add an **Angular** SPA frontend
+-   Add the **Go/Gin** backend
 -   Add a **Svelt** SPA frontend
+-   Add the **Rust/Axium** backend
+-   Add an **Angular** SPA frontend
