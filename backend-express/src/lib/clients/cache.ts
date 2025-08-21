@@ -1,33 +1,32 @@
-import IORedisMock from "ioredis-mock";
 import { createClient, RedisClientType } from "redis";
 
 import { env } from "../../config";
 import { ApiError, HttpStatus } from "../../types";
 
 export class RedisClient {
-    private client: RedisClientType | InstanceType<typeof IORedisMock>;
+    private client: RedisClientType;
 
     public get isTest(): boolean {
         return !!process.env.JEST_WORKER_ID;
     }
 
+    public get url(): string {
+        if (this.isTest) {
+            return env.REDIS_TEST_URL;
+        }
+        return env.REDIS_URL;
+    }
+
     private get isReady(): boolean {
-        if (this.isTest) return true;
-        return (this.client as RedisClientType).isReady;
+        return this.client.isReady;
     }
 
     constructor() {
-        if (this.isTest) {
-            this.client = new IORedisMock();
-        } else {
-            this.client = createClient({
-                url: env.REDIS_URL,
-            });
-        }
+        this.client = createClient({ url: this.url });
     }
 
     public async connect(): Promise<void> {
-        if (!this.isReady && !this.isTest) {
+        if (!this.isReady) {
             try {
                 await this.client.connect();
             } catch (error) {
@@ -37,15 +36,11 @@ export class RedisClient {
     }
 
     public async flushAll(): Promise<void> {
-        if (this.isTest) {
-            await (this.client as InstanceType<typeof IORedisMock>).flushall();
-        } else {
-            await (this.client as RedisClientType).flushAll();
-        }
+        await this.client.flushAll();
     }
 
     public async close(): Promise<void> {
-        if (this.isReady && !this.isTest) {
+        if (this.isReady) {
             await this.client.quit();
         }
     }
@@ -75,19 +70,9 @@ export class RedisClient {
             );
         }
         await this.connect();
-        if (this.isTest) {
-            await (this.client as InstanceType<typeof IORedisMock>).set(
-                key,
-                stringified,
-                "EX",
-                expiration
-            );
-        } else {
-            await (this.client as RedisClientType).set(key, stringified, {
-                EX: expiration,
-            });
-        }
-
+        await this.client.set(key, stringified, {
+            EX: expiration,
+        });
         return stringified;
     }
 
