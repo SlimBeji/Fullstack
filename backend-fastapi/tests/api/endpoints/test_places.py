@@ -1,17 +1,21 @@
 from http import HTTPStatus
+from typing import cast
 
 import pytest
+from conftest import Helpers
 
 from lib.utils import get_image_path
 from models.crud import crud_place
-from tests.conftest import Helpers
-from types_ import FindQuery
+from models.schemas import PlaceReadSchema
+from types_ import Filter, FindQuery
 
 
 async def _get_place_id() -> str:
-    query = FindQuery(filters=dict(title=[dict(op="eq", val="Stamford Bridge")]))
-    place = await crud_place.fetch(query)
-    return str(place.data[0].id)
+    query = FindQuery(filters=dict(title=[Filter(op="eq", val="Stamford Bridge")]))
+    result = await crud_place.fetch(query)
+    data = result.data
+    place = cast(PlaceReadSchema, data[0])
+    return str(place.id)
 
 
 @pytest.mark.asyncio

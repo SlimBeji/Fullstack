@@ -17,11 +17,9 @@ class RedisClient:
     def __init__(self) -> None:
         self.default_expirartion: int = settings.REDIS_DEFAULT_EXPIRATION
         self._client: async_redis.Redis | None = None
-
+        self.uri: str = settings.REDIS_URL
         if self.is_test:
-            self.uri: str = settings.REDIS_TEST_URL
-        else:
-            self.uri: str = settings.REDIS_URL
+            self.uri = settings.REDIS_TEST_URL
 
     @property
     def is_test(self) -> bool:

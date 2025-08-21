@@ -19,11 +19,9 @@ class MongoClient:
         self.uri: str = settings.MONGO_URL
         self._client: AsyncIOMotorClient | None = None
         self._db: AsyncIOMotorDatabase | None = None
-
+        self.db_name: str = settings.MONGO_DBNAME
         if self.is_test:
-            self.db_name: str = "test"
-        else:
-            self.db_name: str = settings.MONGO_DBNAME
+            self.db_name = settings.MONGO_TEST_DBNAME
 
     @property
     def is_test(self) -> bool:
