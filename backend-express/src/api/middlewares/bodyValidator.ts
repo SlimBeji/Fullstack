@@ -45,7 +45,7 @@ export const validateBody = (schema: AnyZodObject) => {
     return async function (req: Request, resp: Response, next: NextFunction) {
         const fileFields = getFileFields(schema);
         const isMultipart = isMultipartFormData(req);
-        if (isMultipart && fileFields.length > 0) {
+        if (isMultipart) {
             // Multipart form
             const multerObj = multer({});
             const config = fileFields.map((item) => {
