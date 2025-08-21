@@ -26,7 +26,7 @@ describe("POST /api/auth/signup", () => {
             .expect(200);
         expect(response.body).toHaveProperty("email", "new_user@gmail.com");
         expect(response.body).toHaveProperty("userId");
-        expect(response.body).toHaveProperty("token");
+        expect(response.body).toHaveProperty("access_token");
     });
 });
 
@@ -40,6 +40,6 @@ describe("POST /api/auth/signin", () => {
             .expect(200);
         expect(response.body).toHaveProperty("email", "mslimbeji@gmail.com");
         expect(response.body).toHaveProperty("userId");
-        expect(response.body).toHaveProperty("token");
+        expect(response.body).toHaveProperty("access_token");
     });
 });
