@@ -109,7 +109,7 @@ class PlaceMultipartFields:
         description="The place address",
         examples=["Fulham road"],
     )
-    location: Json[PlaceLocation] = Form(None, description="The place creator ID")
+    location: Json[PlaceLocation] = Form(None, description="The place coordiantes")
     creatorId: PydanticObjectId = Form(
         ...,
         description="The place creator ID",
