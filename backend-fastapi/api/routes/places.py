@@ -1,4 +1,3 @@
-import json
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
@@ -41,9 +40,6 @@ async def create_place(
     multipart_form: PlaceMultipartPost = Depends(),
     user: UserReadSchema = Depends(get_current_user),
 ):
-    data = multipart_form.to_post_schema()
-    if multipart_form.location:
-        data["location"] = json.loads(data["location"])
     return await crud_place.safe_create(user, multipart_form.to_post_schema())
 
 

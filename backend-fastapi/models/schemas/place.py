@@ -1,3 +1,4 @@
+import json
 from typing import Annotated, Literal
 
 from beanie.odm.fields import PydanticObjectId
@@ -158,10 +159,13 @@ class PlaceMultipartPost:
         title: str = PlaceMultipartFields.title,
         description: str = PlaceMultipartFields.description,
         address: str = PlaceMultipartFields.address,
-        location: PlaceLocation | None = PlaceMultipartFields.location,
+        location: PlaceLocation | str | None = PlaceMultipartFields.location,
         creatorId: PydanticObjectId = PlaceMultipartFields.creatorId,
         image: FileToUpload | None = PlaceMultipartFields.image,
     ):
+        if isinstance(location, str):
+            location = PlaceLocation(**json.loads(location))
+
         self.title = title
         self.description = description
         self.address = address
