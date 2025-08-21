@@ -7,6 +7,7 @@ from beanie import Document
 from bson import ObjectId
 from pydantic import BaseModel
 
+from config import settings
 from lib.clients import db
 from models.schemas import UserReadSchema
 from types_ import (
@@ -158,8 +159,8 @@ class CrudBase(
             return schema
 
         data = schema.model_dump(exclude_unset=True, exclude_none=True)
-        page = data.pop("page", None)
-        size = data.pop("size", None)
+        page = data.pop("page", 1)
+        size = data.pop("size", settings.MAX_ITEMS_PER_PAGE)
         sort = data.pop("sort", None)
         fields = data.pop("fields", None)
         return FindQuery(page=page, size=size, sort=sort, fields=fields, filters=data)
