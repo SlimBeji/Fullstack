@@ -7,7 +7,7 @@
         "start:build": "tsc -w",
         "start:run": "nodemon build/index.js",
         "start": "concurrently npm:start:*",
-        "test": "npx jest --config src/tests/jest.config.ts"
+        "test": "npx jest --config src/tests/jest.config.ts --runInBand"
     },
     "author": "",
     "license": "ISC",
