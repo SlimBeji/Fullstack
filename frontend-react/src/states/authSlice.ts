@@ -12,6 +12,12 @@ export const authSlice = createSlice({
     name: "auth",
     initialState: initialState,
     reducers: {
+        setAuthData: (
+            state: AuthState,
+            action: PayloadAction<EncodedUserToken>
+        ) => {
+            state.data = action.payload;
+        },
         login: (state: AuthState, action: PayloadAction<SigninResponse>) => {
             const { expires_in, ...rest } = action.payload;
             const expiresAt = Math.floor(Date.now() / 1000) + expires_in;

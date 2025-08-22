@@ -33,7 +33,7 @@ const AppRoutes: React.FC = () => {
 
     useEffect(() => {
         const data = getAuthData();
-        if (data) dispatch(authSlice.actions.login(data));
+        if (data) dispatch(authSlice.actions.setAuthData(data));
     }, [dispatch]);
 
     useEffect(() => {
