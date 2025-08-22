@@ -1,14 +1,12 @@
-import "./PlaceForm.css";
-
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button, ImageUpload, Input } from "../components/form";
+import PlaceForm from "../components/places/PlaceForm";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { useAppSelector } from "../states";
 import { minLengthValidator } from "../util";
-
 const Form = {
     title: true,
     address: true,
@@ -51,7 +49,7 @@ const NewPlace: React.FC = () => {
             {data.error && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
-            <form className="place-form" onSubmit={onSubmit}>
+            <PlaceForm onSubmit={onSubmit}>
                 {data.loading && <LoadingSpinner asOverlay />}
                 <Input
                     id="title"
@@ -87,7 +85,7 @@ const NewPlace: React.FC = () => {
                 <Button type="submit" disabled={!state.isValid}>
                     Add Place
                 </Button>
-            </form>
+            </PlaceForm>
         </>
     );
 };

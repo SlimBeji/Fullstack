@@ -1,10 +1,9 @@
-import "./PlaceForm.css";
-
 import { AxiosResponse } from "axios";
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, Input } from "../components/form";
+import PlaceForm from "../components/places/PlaceForm";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { minLengthValidator } from "../util";
@@ -63,7 +62,7 @@ const UpdatePlace: React.FC = () => {
         }
 
         return (
-            <form className="place-form" onSubmit={submitHandler}>
+            <PlaceForm onSubmit={submitHandler}>
                 <Input
                     id="title"
                     element="input"
@@ -99,7 +98,7 @@ const UpdatePlace: React.FC = () => {
                 <Button type="submit" disabled={!state.isValid}>
                     Edit Place
                 </Button>
-            </form>
+            </PlaceForm>
         );
     };
 
