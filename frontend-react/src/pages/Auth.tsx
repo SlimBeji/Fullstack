@@ -27,6 +27,7 @@ const Auth: React.FC = () => {
     const [state, inputHandlers, , fieldsActivationHandler] =
         useForm<AuthFormTypes>(emptyState);
 
+    // Text to display depending if Signin form or Signup form
     let verb: "Authenticate" | "Register";
     let requiredText: "Login Required" | "Registration Required";
     let switchText: "Swith to login" | "Switch to signup";
@@ -71,6 +72,11 @@ const Auth: React.FC = () => {
 
     const onSwitchModeHandler = () => {
         setIsLoginMode((prev: boolean) => {
+            // if prev === true ==> We were in Login Mode
+            // username and image were disabled (false)
+            // Switching to Signup Mode, we want to
+            // enable them so we send prev (true)
+            // Same reasoning if we were in Signup Mode
             fieldsActivationHandler({
                 username: prev,
                 image: prev,
