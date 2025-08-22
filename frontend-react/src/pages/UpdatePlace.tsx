@@ -3,7 +3,7 @@ import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button, Input } from "../components/form";
-import PlaceForm from "../components/places/PlaceForm";
+import { PlaceForm } from "../components/places";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { minLengthValidator } from "../util";

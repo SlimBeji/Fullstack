@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button, ImageUpload, Input } from "../components/form";
-import PlaceForm from "../components/places/PlaceForm";
+import { PlaceForm } from "../components/places";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { useAppSelector } from "../states";

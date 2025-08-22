@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Button } from "../components/form";
-import PlaceList from "../components/places/PlaceList";
+import { PlaceList } from "../components/places";
 import { Card, HttpError, LoadingSpinner } from "../components/ui";
 import { useHttp } from "../hooks";
 import { useAppSelector } from "../states";
