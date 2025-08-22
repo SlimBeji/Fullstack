@@ -18,11 +18,15 @@ interface State {
 }
 
 enum ActionType {
+    STORED_TOKEN_EXPIRED,
     SEND_REQUEST,
     PARSE_RESPONSE,
     PARSE_ERROR,
     CLEAR_ERROR,
-    TOKEN_EXPIRED,
+}
+
+interface StoredTokenExpiredAction {
+    type: ActionType.STORED_TOKEN_EXPIRED;
 }
 
 interface SendRequestAction {
@@ -44,6 +48,7 @@ interface ClearErrorAction {
 }
 
 type Action =
+    | StoredTokenExpiredAction
     | SendRequestAction
     | ParseResponseAction
     | ParseErrorAction
@@ -53,6 +58,14 @@ const emptyState: State = { loading: false };
 
 const reducer = (state: State, action: Action): State => {
     switch (action.type) {
+        case ActionType.STORED_TOKEN_EXPIRED:
+            return {
+                loading: false,
+                error: {
+                    tokenExpired: true,
+                    message: TOKEN_EXPIRED,
+                },
+            };
         case ActionType.SEND_REQUEST:
             return { loading: true };
         case ActionType.PARSE_RESPONSE:
@@ -62,18 +75,9 @@ const reducer = (state: State, action: Action): State => {
                 json: action.payload.data,
             };
         case ActionType.PARSE_ERROR: {
-            if (action.payload.message === "Token expired") {
-                // Token stored was purged after expiring
-                return {
-                    loading: false,
-                    error: {
-                        tokenExpired: true,
-                        message: TOKEN_EXPIRED,
-                    },
-                };
-            }
-
-            // Sent expired token
+            // We should catch an expired token before sending a request and handle
+            // it in the STORED_TOKEN_EXPIRED action. It is possible though to have
+            // the token expired while being sent or the frontend app did not detect it
             const errResponse = action.payload.response;
             const status = errResponse?.status;
             const errorData = errResponse?.data as any;
@@ -90,6 +94,7 @@ const reducer = (state: State, action: Action): State => {
                 };
             }
 
+            // Not a token related problem
             const data = action.payload.response?.data as { message?: string };
             const message = data?.message || "Something went wrong!";
             return {
@@ -113,18 +118,18 @@ interface useHttpOptions {
     ignoreNotFound?: boolean;
 }
 
+type SendRequestType = (
+    url: string,
+    method: HttpMethods,
+    data?: Record<string, any>,
+    tokenRequired?: boolean
+) => Promise<AxiosResponse>;
+
+type ClearErrorType = () => void;
+
 export const useHttp = (
     options: useHttpOptions = {}
-): [
-    State,
-    (
-        url: string,
-        method: HttpMethods,
-        data?: Record<string, any>,
-        tokenRequired?: boolean
-    ) => Promise<AxiosResponse>,
-    () => void,
-] => {
+): [State, SendRequestType, ClearErrorType] => {
     const abortControllerRef = useRef<AbortController>(null);
     const [state, dispatch] = useReducer(reducer, emptyState);
 
@@ -162,10 +167,11 @@ export const useHttp = (
             const token = webClient.defaults.headers.Authorization;
 
             if (!token && tokenRequired) {
-                const err = new AxiosError(TOKEN_EXPIRED);
-                dispatchNotOk(err);
+                dispatch({ type: ActionType.STORED_TOKEN_EXPIRED });
                 abortControllerRef.current = null;
-                throw err;
+                // We raise the same error as if we actually send
+                // a request and got a token expired response
+                throw new AxiosError(TOKEN_EXPIRED);
             }
 
             try {
