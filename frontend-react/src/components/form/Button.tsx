@@ -1,5 +1,3 @@
-import "./Button.css";
-
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,7 +7,7 @@ interface ButtonProps {
     children: ReactNode;
     to?: string;
     href?: string;
-    size?: string;
+    size?: "small" | "default" | "big";
     inverse?: boolean;
     danger?: boolean;
     type?: ButtonType;
@@ -18,35 +16,67 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = (props) => {
+    const size = props.size ?? "default";
+
+    const baseClasses =
+        "rounded-md font-medium transition-colors duration-200 focus:outline-none inline-block";
+
+    const sizeClasses = {
+        small: "px-3 py-1 text-sm",
+        default: "px-6 py-2 text-base",
+        big: "px-8 py-3 text-lg",
+    };
+
+    let colorClasses;
+
+    if (props.danger) {
+        if (props.disabled) {
+            colorClasses =
+                "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed";
+        } else {
+            colorClasses =
+                "bg-red-800 hover:bg-red-600 text-white border-red-800";
+        }
+    } else if (props.inverse) {
+        if (props.disabled) {
+            colorClasses =
+                "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed";
+        } else {
+            colorClasses =
+                "bg-transparent hover:bg-pink-500 text-pink-600 hover:text-white border border-pink-600";
+        }
+    } else {
+        if (props.disabled) {
+            colorClasses =
+                "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed";
+        } else {
+            colorClasses =
+                "bg-pink-600 hover:bg-pink-500 text-white border border-pink-600";
+        }
+    }
+
+    const classes = `${baseClasses} ${sizeClasses[size]} ${colorClasses}`;
+
     if (props.href) {
-        return (
-            <a
-                className={`button button--${props.size || "default"} ${
-                    props.inverse && "button--inverse"
-                } ${props.danger && "button--danger"}`}
-                href={props.href}
-            >
-                {props.children}
-            </a>
-        );
+        if (props.href) {
+            return (
+                <a className={classes} href={props.href}>
+                    {props.children}
+                </a>
+            );
+        }
     }
     if (props.to) {
         return (
-            <Link
-                to={props.to}
-                className={`button button--${props.size || "default"} ${
-                    props.inverse && "button--inverse"
-                } ${props.danger && "button--danger"}`}
-            >
+            <Link to={props.to} className={classes}>
                 {props.children}
             </Link>
         );
     }
+
     return (
         <button
-            className={`button button--${props.size || "default"} ${
-                props.inverse && "button--inverse"
-            } ${props.danger && "button--danger"}`}
+            className={classes}
             type={props.type}
             onClick={props.onClick}
             disabled={props.disabled}
