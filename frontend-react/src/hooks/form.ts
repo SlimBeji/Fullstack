@@ -9,7 +9,7 @@ interface InputState<T extends string> {
 
 export interface FormState<T extends string> {
     inputs: { [key in T]: InputState<T> };
-    isValid: boolean;
+    isValid: boolean; // Is the whole form valid
 }
 
 const recheckFormValidity = <T extends string>(data: FormState<T>): boolean => {
@@ -48,14 +48,25 @@ type FormAction<T extends string> =
     | PrefillAction<T>
     | FieldsActivationAction<T>;
 
+const deepStateCopy = <T extends string>(state: FormState<T>): FormState<T> => {
+    return {
+        ...state,
+        inputs: Object.keys(state.inputs).reduce(
+            (accumultaed, key) => {
+                const typedKey = key as T;
+                accumultaed[typedKey] = { ...state.inputs[typedKey] };
+                return accumultaed;
+            },
+            {} as { [key in T]: InputState<T> }
+        ),
+    };
+};
+
 const formReducer = <T extends string>(
     state: FormState<T>,
     action: FormAction<T>
 ): FormState<T> => {
-    const newState = {
-        ...state,
-        inputs: { ...state.inputs },
-    };
+    const newState = deepStateCopy(state);
     switch (action.type) {
         case ActionType.UPDATE_FIELD:
             newState.inputs[action.payload.fieldName] = {
@@ -101,20 +112,25 @@ export const emptyStateBuilder = <T extends string>(formConfig: {
     return { inputs, isValid: false };
 };
 
+type InputHandler = (val: any, isValid: boolean) => void;
+type InputHandlers<T extends string> = { [key in T]: InputHandler };
+type SetFormData<T extends string> = (payload: InputState<T>[]) => void;
+type FieldsActivationHandler<T extends string> = (payload: {
+    [key in T]?: boolean;
+}) => void;
+
 export const useForm = <T extends string>(
     initialState: FormState<T>
 ): [
     FormState<T>,
-    { [key in T]: (val: any, isValid: boolean) => void },
-    (payload: InputState<T>[]) => void,
-    (payload: { [key in T]?: boolean }) => void,
+    InputHandlers<T>,
+    SetFormData<T>,
+    FieldsActivationHandler<T>,
 ] => {
     const [state, dispatch] = useReducer(formReducer<T>, initialState);
 
     const inputHandlers = useMemo(() => {
-        const handlers: {
-            [key in T]: (val: any, isValid: boolean) => void;
-        } = {} as any;
+        const handlers: InputHandlers<T> = {} as any;
         for (const key in initialState.inputs) {
             handlers[key] = (val: any, isValid: boolean) => {
                 dispatch({
