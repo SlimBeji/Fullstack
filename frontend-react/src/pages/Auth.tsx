@@ -1,24 +1,23 @@
-import "./Auth.css";
-
 import { useMemo, useState } from "react";
 
 import { Button, ImageUpload, Input } from "../components/form";
-import { Card, HttpError, LoadingSpinner } from "../components/ui";
+import { HttpError, LoadingSpinner } from "../components/ui";
+import AuthForm from "../components/user/AuthForm";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { authSlice, useAppDispatch } from "../states";
 import { SigninResponse } from "../types";
 import { emailValidator, minLengthValidator } from "../util";
 
-const AuthForm = {
+const AuthFormData = {
     username: false,
     image: false,
     email: true,
     password: true,
 };
 
-type AuthFormTypes = keyof typeof AuthForm;
+type AuthFormTypes = keyof typeof AuthFormData;
 
-const emptyState = emptyStateBuilder<AuthFormTypes>(AuthForm);
+const emptyState = emptyStateBuilder<AuthFormTypes>(AuthFormData);
 
 const Auth: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -93,7 +92,7 @@ const Auth: React.FC = () => {
                     onClear={() => clearError()}
                 />
             )}
-            <Card className="authentication">
+            <AuthForm>
                 {data.loading && <LoadingSpinner asOverlay />}
                 <h2>{requiredText}</h2>
                 <hr />
@@ -142,7 +141,7 @@ const Auth: React.FC = () => {
                 <Button inverse onClick={onSwitchModeHandler}>
                     {switchText}
                 </Button>
-            </Card>
+            </AuthForm>
         </div>
     );
 };
