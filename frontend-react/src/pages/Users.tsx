@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { HttpError, LoadingSpinner } from "../components/ui";
-import UsersList from "../components/user/UsersList";
+import { UsersList } from "../components/user";
 import { useHttp } from "../hooks";
 import { User } from "../types";
 

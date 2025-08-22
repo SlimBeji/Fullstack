@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { Button, ImageUpload, Input } from "../components/form";
 import { HttpError, LoadingSpinner } from "../components/ui";
-import AuthForm from "../components/user/AuthForm";
+import { AuthForm } from "../components/user";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { authSlice, useAppDispatch } from "../states";
 import { SigninResponse } from "../types";
