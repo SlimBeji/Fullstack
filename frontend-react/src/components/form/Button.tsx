@@ -5,6 +5,7 @@ import { ButtonType } from "../../types";
 
 interface ButtonProps {
     children: ReactNode;
+    className?: string;
     to?: string;
     href?: string;
     size?: "small" | "default" | "big";
@@ -55,7 +56,7 @@ const Button: React.FC<ButtonProps> = (props) => {
         }
     }
 
-    const classes = `${baseClasses} ${sizeClasses[size]} ${colorClasses}`;
+    const classes = `${props.className || ""} ${baseClasses} ${sizeClasses[size]} ${colorClasses}`;
 
     if (props.href) {
         if (props.href) {
