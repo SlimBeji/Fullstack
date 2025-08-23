@@ -1,5 +1,3 @@
-import "./Card.css";
-
 import React from "react";
 
 interface CardProps {
@@ -9,8 +7,10 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = (props) => {
+    const cardStyle =
+        "relative m-0 shadow-md rounded-lg overflow-hidden p-4 bg-white";
     return (
-        <div className={`card ${props.className}`} style={props.style}>
+        <div className={cardStyle} style={props.style}>
             {props.children}
         </div>
     );
