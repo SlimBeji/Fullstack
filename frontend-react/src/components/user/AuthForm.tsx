@@ -1,5 +1,3 @@
-import "./AuthForm.css";
-
 import { Card } from "../ui";
 
 interface AuthFormProps {
@@ -7,7 +5,10 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = (props) => {
-    return <Card className="authentication">{props.children}</Card>;
+    const style =
+        "w-[90%] max-w-md mx-auto mt-28 text-center p-6 shadow-lg rounded-xl bg-white";
+
+    return <Card className={style}>{props.children}</Card>;
 };
 
 export default AuthForm;
