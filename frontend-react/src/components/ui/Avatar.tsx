@@ -1,22 +1,16 @@
-import "./Avatar.css";
-
 interface AvatarProps {
     className?: string;
     imageUrl: string;
     alt: string;
-    width?: string;
-    height?: string;
-    style?: React.CSSProperties;
 }
 
 const Avatar: React.FC<AvatarProps> = (props) => {
+    const conatainerClasses = `${props.className || ""} flex justify-center items-center rounded-full overflow-hidden w-16 h-16`;
+    const imgClasses = "w-full h-full object-cover";
+
     return (
-        <div className={`avatar ${props.className}`} style={props.style}>
-            <img
-                src={props.imageUrl}
-                alt={props.alt}
-                style={{ width: props.width, height: props.width }}
-            />
+        <div className={conatainerClasses}>
+            <img src={props.imageUrl} alt={props.alt} className={imgClasses} />
         </div>
     );
 };
