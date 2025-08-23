@@ -1,5 +1,3 @@
-import "./ImageUpload.css";
-
 import React, { useEffect, useReducer, useRef } from "react";
 
 import Button from "./Button";
@@ -112,26 +110,42 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         });
     };
 
+    // Styling section
+    const innerContainerStyle = `flex ${center ? "flex-col items-center justify-center" : ""}`;
+    const previewContainerStyle =
+        "w-52 h-52 border border-gray-300 flex items-center justify-center text-center mb-4 rounded-md bg-gray-50 overflow-hidden";
+
+    // JSX section
     return (
-        <div className="form-control">
+        <div className="mb-4">
             <input
                 id={id}
                 ref={filePickerRef}
-                style={{ display: "none" }}
+                className="hidden"
                 type="file"
                 accept=".jpg,.png,.jpeg"
                 onChange={changeHandler}
             />
-            <div className={`image-upload ${center && "center"}`}>
-                <div className="image-upload__preview">
-                    {state.url && <img src={state.url} alt="Preview" />}
-                    {!state.url && <p>Please pick an image.</p>}
+            <div className={innerContainerStyle}>
+                <div className={previewContainerStyle}>
+                    {state.url && (
+                        <img
+                            src={state.url}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                        />
+                    )}
+                    {!state.url && (
+                        <p className="text-gray-500">Please pick an image.</p>
+                    )}
                 </div>
                 <Button type="button" onClick={onClickHandler}>
                     PICK IMAGE
                 </Button>
             </div>
-            {!state.isValid && state.uploadAttempt && <p>{errorText}</p>}
+            {!state.isValid && state.uploadAttempt && (
+                <p className="mt-1 text-sm text-red-500">{errorText}</p>
+            )}
         </div>
     );
 };
