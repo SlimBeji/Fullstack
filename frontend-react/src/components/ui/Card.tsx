@@ -7,8 +7,7 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = (props) => {
-    const cardStyle =
-        "relative m-0 shadow-md rounded-lg overflow-hidden p-4 bg-white";
+    const cardStyle = `relative m-0 shadow-lg hover:translate-x-1 hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden bg-white ${props.className}`;
     return (
         <div className={cardStyle} style={props.style}>
             {props.children}
