@@ -1,5 +1,3 @@
-import "./Input.css";
-
 import { ChangeEvent, useEffect, useReducer } from "react";
 
 import { validate, ValidatorType } from "../../util";
@@ -105,12 +103,25 @@ const Input: React.FC<InputProps> = ({
         dispatch({ type: InputActionType.TOUCH });
     };
 
+    // Styling section
+    const isError = !state.isValid && state.isTouched;
+
+    const labelTextStyle = isError ? "text-red-500" : "text-gray-700";
+    const labelClasses = `block font-semibold mb-2 ${labelTextStyle}`;
+
+    const inputBorderStyle = isError
+        ? "border-red-500 bg-red-50"
+        : "border-gray-300 bg-gray-50 focus:border-pink-500";
+    const inputClasses = `w-full rounded-md border px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-500 ${inputBorderStyle}`;
+
+    // JSX section
     let inputElement: React.JSX.Element;
     switch (element) {
         case "textarea":
             inputElement = (
                 <textarea
                     value={state.value}
+                    className={inputClasses}
                     id={id}
                     onChange={changeHandler}
                     rows={rows || 3}
@@ -123,6 +134,7 @@ const Input: React.FC<InputProps> = ({
             inputElement = (
                 <input
                     value={state.value}
+                    className={inputClasses}
                     id={id}
                     onChange={changeHandler}
                     type={type}
@@ -133,15 +145,15 @@ const Input: React.FC<InputProps> = ({
     }
 
     return (
-        <div
-            className={`form-control ${
-                !state.isValid && state.isTouched && "form-control--invalid"
-            }`}
-        >
-            <label htmlFor={id}>{label}</label>
+        <div className="mb-4">
+            <label className={labelClasses} htmlFor={id}>
+                {label}
+            </label>
             {inputElement}
-            {!state.isValid && state.isTouched && (
-                <p>{errorText || "The input is not valid"}</p>
+            {isError && (
+                <p className="mt-1 text-sm text-red-500">
+                    {errorText || "The input is not valid"}
+                </p>
             )}
         </div>
     );
