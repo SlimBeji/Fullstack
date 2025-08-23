@@ -100,8 +100,10 @@ const Auth: React.FC = () => {
             )}
             <AuthForm>
                 {data.loading && <LoadingSpinner asOverlay />}
-                <h2>{requiredText}</h2>
-                <hr />
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    {requiredText}
+                </h2>
+                <hr className="border-t-2 border-pink-500 w-[100%] mb-6" />
                 <form onSubmit={onSubmit}>
                     {!isLoginMode && (
                         <Input
@@ -140,13 +142,19 @@ const Auth: React.FC = () => {
                         validators={passwordValidators}
                         errorText="Please enter a password with at least 10 characters"
                     />
-                    <Button type="submit" disabled={!state.isValid}>
-                        {verb}
-                    </Button>
+                    <div className="flex justify-center space-x-4">
+                        <Button type="submit" disabled={!state.isValid}>
+                            {verb}
+                        </Button>
+                        <Button
+                            type="button"
+                            inverse
+                            onClick={onSwitchModeHandler}
+                        >
+                            {switchText}
+                        </Button>
+                    </div>
                 </form>
-                <Button inverse onClick={onSwitchModeHandler}>
-                    {switchText}
-                </Button>
             </AuthForm>
         </div>
     );
