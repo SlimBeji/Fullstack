@@ -1,6 +1,6 @@
-import { ReactNode, useRef } from "react";
+import { Transition } from "@headlessui/react";
+import { Fragment, ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
-import { CSSTransition } from "react-transition-group";
 
 import { FormSubmitHandler } from "../../types";
 import Backdrop from "./Backdrop";
@@ -62,23 +62,18 @@ const Modal: React.FC<ModalProps> = ({ show, onCancel, ...overlayProps }) => {
     return (
         <>
             {show && <Backdrop onClick={onCancel} />}
-            <CSSTransition
-                in={show}
-                timeout={300}
-                classNames={{
-                    enter: "opacity-0 -translate-y-20",
-                    enterActive:
-                        "opacity-100 translate-y-0 transition-all duration-300 ease-out",
-                    exit: "opacity-100 -translate-y-0",
-                    exitActive:
-                        "opacity-0 -translate-y-[100vh] transition-all duration-500 ease-in",
-                }}
-                nodeRef={nodeRef}
-                mountOnEnter
-                unmountOnExit
+            <Transition
+                as={Fragment}
+                show={show}
+                enter="transition-all duration-300 ease-out transform"
+                enterFrom="opacity-0 -translate-y-20"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition-all transform"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 -translate-y-[100vh] duration-500 ease-in"
             >
                 <ModalOverlay ref={nodeRef} {...overlayProps}></ModalOverlay>
-            </CSSTransition>
+            </Transition>
         </>
     );
 };
