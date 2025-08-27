@@ -82,18 +82,15 @@ Prefixes `backend-` and `frontend-` are used so that the folders of the backend 
 -   **Redis**: In-memory database used for caching and as a message broker.
 -   **RedisInsight**: Web UI for inspecting and managing Redis data.
 
-## ⚠️ Disclaimer
+## 📐 Frontend Building
 
-This project came to fruition after taking the following Udemy course:  
-[React, NodeJS, Express & MongoDB - The MERN Fullstack Guide](https://www.udemy.com/course/react-nodejs-express-mongodb-the-mern-fullstack-guide/)
-
-**Key differences:**
-
--   Rewritten using **TypeScript** (course uses plain JavaScript)
--   **Different folder structure** and **project architecture**
--   Some **CSS/UI components** are reused
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
 ## 📐 Backend Building
+
+### 💡 Demo App Concept
+
+This demo project features two models: **Users** and **Places**. Users can create accounts and add their favorite places to their profiles. Other users can browse and view these favorite places.
 
 ### 📁 Models
 
