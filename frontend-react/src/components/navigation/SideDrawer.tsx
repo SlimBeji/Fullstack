@@ -1,5 +1,3 @@
-import "./SideDrawer.css";
-
 import { ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
 import { CSSTransition } from "react-transition-group";
@@ -22,7 +20,10 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ show, children, onClick }) => {
             unmountOnExit
         >
             <div ref={nodeRef}>
-                <aside className="side-drawer" onClick={onClick}>
+                <aside
+                    className="fixed top-0 left-0 z-[100] h-screen w-[70%] bg-white shadow-md"
+                    onClick={onClick}
+                >
                     {children}
                 </aside>
             </div>
