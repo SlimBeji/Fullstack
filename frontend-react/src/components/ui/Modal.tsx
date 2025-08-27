@@ -1,5 +1,3 @@
-import "./Modal.css";
-
 import { ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
 import { CSSTransition } from "react-transition-group";
@@ -32,18 +30,22 @@ const ModalOverlay: React.FC<ModalOverlayProps> = ({
     footerClass,
     ref,
 }) => {
+    const wrapperClasses =
+        "fixed top-[22vh] left-[10%] w-[80%] bg-white rounded-lg shadow-lg z-50 md:left-1/2 md:w-[40rem] md:-translate-x-1/2";
+    const headerClasses = "w-full p-4 bg-indigo-900 text-white";
+
     const content = (
-        <div ref={ref} className={`modal ${className}`} style={style}>
-            <header className={`modal__header ${headerClass}`}>
-                <h2>{header}</h2>
+        <div
+            ref={ref}
+            className={`${wrapperClasses} ${className}`}
+            style={style}
+        >
+            <header className={`${headerClasses} ${headerClass}`}>
+                <h2 className="m-2 text-xl font-semibold">{header}</h2>
             </header>
             <form onSubmit={onSubmit ? onSubmit : (e) => e.preventDefault()}>
-                <div className={`modal__content ${contentClass}`}>
-                    {children}
-                </div>
-                <footer className={`modal__footer ${footerClass}`}>
-                    {footer}
-                </footer>
+                <div className={`p-4 ${contentClass}`}>{children}</div>
+                <footer className={`p-4 ${footerClass}`}>{footer}</footer>
             </form>
         </div>
     );
@@ -62,8 +64,15 @@ const Modal: React.FC<ModalProps> = ({ show, onCancel, ...overlayProps }) => {
             {show && <Backdrop onClick={onCancel} />}
             <CSSTransition
                 in={show}
-                timeout={200}
-                classNames="modal"
+                timeout={300}
+                classNames={{
+                    enter: "opacity-0 -translate-y-20",
+                    enterActive:
+                        "opacity-100 translate-y-0 transition-all duration-300 ease-out",
+                    exit: "opacity-100 -translate-y-0",
+                    exitActive:
+                        "opacity-0 -translate-y-[100vh] transition-all duration-500 ease-in",
+                }}
                 nodeRef={nodeRef}
                 mountOnEnter
                 unmountOnExit
