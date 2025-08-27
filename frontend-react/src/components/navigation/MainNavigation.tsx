@@ -1,5 +1,3 @@
-import "./MainNavigation.css";
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -23,23 +21,23 @@ const MainNavigation: React.FC = () => {
         <React.Fragment>
             {drawerIsOpen && <Backdrop onClick={closeDrwaer} />}
             <SideDrawer show={drawerIsOpen} onClick={closeDrwaer}>
-                <nav className="main-navigation__drawer-nav">
+                <nav className="h-full">
                     <NavLinks />
                 </nav>
             </SideDrawer>
             <MainHeader>
                 <button
-                    className="main-navigation__menu-btn"
+                    className="w-12 h-12 bg-transparent border-none flex flex-col justify-around mr-8 cursor-pointer md:hidden"
                     onClick={openDrawer}
                 >
-                    <span />
-                    <span />
-                    <span />
+                    <span className="block w-12 h-[2.5px] bg-white" />
+                    <span className="block w-12 h-[2.5px] bg-white" />
+                    <span className="block w-12 h-[2.5px] bg-white" />
                 </button>
-                <h1 className="main-navigation__title">
+                <h1 className="text-white">
                     <Link to="/">YourPlaces</Link>
                 </h1>
-                <nav className="main-navigation__header-nav">
+                <nav className="hidden md:block">
                     <NavLinks />
                 </nav>
             </MainHeader>
