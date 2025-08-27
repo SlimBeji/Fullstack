@@ -1,5 +1,3 @@
-import "./PlaceForm.css";
-
 import { FormSubmitHandler } from "../../types";
 
 interface PlaceFormProps {
@@ -9,7 +7,10 @@ interface PlaceFormProps {
 
 const PlaceForm: React.FC<PlaceFormProps> = (props) => {
     return (
-        <form className="place-form" onSubmit={props.onSubmit}>
+        <form
+            className="relative list-none m-0 mx-auto p-4 w-[90%] max-w-[40rem] shadow-md rounded-md bg-white"
+            onSubmit={props.onSubmit}
+        >
             {props.children}
         </form>
     );
