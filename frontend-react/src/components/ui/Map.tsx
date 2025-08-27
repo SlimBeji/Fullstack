@@ -1,5 +1,4 @@
 import "leaflet/dist/leaflet.css";
-import "./Map.css";
 
 import { Map as MapObject } from "leaflet";
 import { useEffect, useState } from "react";
@@ -24,12 +23,12 @@ const Map: React.FC<MapProps> = ({ position, zoom, className, markerText }) => {
     }, [map]);
 
     return (
-        <div className="map-wrapper">
+        <div className="w-full h-[200px]">
             <MapContainer
                 center={position}
                 zoom={zoom}
                 scrollWheelZoom={false}
-                className={`leaflet-map ${className}`}
+                className={`w-full h-full ${className}`}
                 whenReady={() => setMap}
             >
                 <TileLayer
