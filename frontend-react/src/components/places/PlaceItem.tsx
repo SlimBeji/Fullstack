@@ -1,5 +1,3 @@
-import "./PlaceItem.css";
-
 import { useState } from "react";
 
 import { Button } from "../../components/form";
@@ -76,8 +74,8 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 show={showMap}
                 onCancel={closeMapHanlder}
                 header={place.address}
-                contentClass="place-item__modal-content"
-                footerClass="place-item__modal-action"
+                contentClass="p-0"
+                footerClass="flex justify-end"
                 footer={mapModalFooter}
             >
                 <Map
@@ -90,33 +88,46 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 show={showDeleteModal}
                 onCancel={closeDeleteModal}
                 header="Are you sure?"
-                footerClass="place-item__modal-actions"
+                contentClass="p-4"
+                footerClass="flex justify-end space-x-2"
                 footer={deleteModalFooter}
             >
                 <p>Do you want to proceed and delete this place?</p>
             </Modal>
-            <li className="place-item">
-                <Card className="place-item__content">
-                    <div className="place-item__image">
+
+            <li className="my-4">
+                <Card className="p-0">
+                    <div className="w-full h-52 md:h-80 mr-6">
                         <img
                             src={place.imageUrl || placeholder}
                             alt={place.title}
+                            className="w-full h-full object-cover"
                         />
                     </div>
-                    <div className="place-item__info">
-                        <h2>{place.title}</h2>
-                        <h2>{place.address}</h2>
-                        <p>{place.description}</p>
+                    <div className="p-4 text-center">
+                        <h2 className="mb-2">{place.title}</h2>
+                        <h2 className="mb-2">{place.address}</h2>
+                        <p className="mb-2">{place.description}</p>
                     </div>
-                    <div className="place-item__actions">
-                        <Button onClick={openMapHanlder} inverse>
+                    <div className="p-4 text-center border-t border-gray-300">
+                        <Button
+                            className="mx-1"
+                            onClick={openMapHanlder}
+                            inverse
+                        >
                             VIEW ON MAP
                         </Button>
                         {authData?.userId === place.creatorId && (
-                            <Button to={`/places/${place.id}`}>EDIT</Button>
+                            <Button className="mx-1" to={`/places/${place.id}`}>
+                                EDIT
+                            </Button>
                         )}
                         {authData?.userId === place.creatorId && (
-                            <Button danger onClick={openDeleteModal}>
+                            <Button
+                                className="mx-1"
+                                danger
+                                onClick={openDeleteModal}
+                            >
                                 DELETE
                             </Button>
                         )}
