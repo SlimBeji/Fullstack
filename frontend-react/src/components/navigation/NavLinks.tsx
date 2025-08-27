@@ -1,5 +1,3 @@
-import "./NavLinks.css";
-
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { authSlice, useAppDispatch, useAppSelector } from "../../states";
@@ -14,32 +12,57 @@ const NavLinks: React.FC = () => {
 
     const onLogout = () => {
         dispatch(authSlice.actions.logout());
-        return navigate("/auth");
+        navigate("/auth");
     };
 
+    // Styling section
+    const navLinkBase =
+        "border no-underline px-2 py-1 font-inherit hover:bg-[#f8df00] hover:border-[#292929] hover:text-[#292929]";
+    const navLinkInactive = "text-black md:text-white border-transparent";
+    const navLinkActive = "bg-[#f8df00] border-[#292929] text-[#292929]";
+    const navLinkClasses = (props: { isActive: boolean }) => {
+        return `${navLinkBase} ${props.isActive ? navLinkActive : navLinkInactive}`;
+    };
+    const buttonClasses =
+        "cursor-pointer border border-[#292929] text-[#292929] bg-transparent px-2 py-1 font-inherit hover:bg-[#f8df00] hover:text-[#292929] md:border-white md:text-white md:hover:bg-[#f8df00] md:hover:text-[#292929]";
+
+    // JSX section
     return (
-        <ul className="nav-links">
-            <li>
-                <NavLink to="/">All users</NavLink>
+        <ul className="list-none m-0 p-0 w-full h-full flex flex-col justify-center items-center md:flex-row">
+            <li className="m-4 md:mx-2 md:my-0">
+                <NavLink to="/" className={navLinkClasses}>
+                    All users
+                </NavLink>
             </li>
             {isLoggedIn && userId && (
-                <li>
-                    <NavLink to={`/${userId}/places`}>My places</NavLink>
+                <li className="m-4 md:mx-2 md:my-0">
+                    <NavLink
+                        to={`/${userId}/places`}
+                        className={navLinkClasses}
+                    >
+                        My places
+                    </NavLink>
                 </li>
             )}
             {isLoggedIn && (
-                <li>
-                    <NavLink to="/places/new">Add place</NavLink>
+                <li className="m-4 md:mx-2 md:my-0">
+                    <NavLink to="/places/new" className={navLinkClasses}>
+                        Add place
+                    </NavLink>
                 </li>
             )}
             {!isLoggedIn && (
-                <li>
-                    <NavLink to="/auth">Authenticate</NavLink>
+                <li className="m-4 md:mx-2 md:my-0">
+                    <NavLink to="/auth" className={navLinkClasses}>
+                        Authenticate
+                    </NavLink>
                 </li>
             )}
             {isLoggedIn && (
-                <li>
-                    <button onClick={onLogout}>LOGOUT</button>
+                <li className="m-4 md:mx-2 md:my-0">
+                    <button onClick={onLogout} className={buttonClasses}>
+                        LOGOUT
+                    </button>
                 </li>
             )}
         </ul>
