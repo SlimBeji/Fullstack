@@ -1,6 +1,6 @@
+import { Transition } from "@headlessui/react";
 import { ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
-import { CSSTransition } from "react-transition-group";
 
 interface SideDrawerProps {
     show: boolean;
@@ -11,13 +11,16 @@ interface SideDrawerProps {
 const SideDrawer: React.FC<SideDrawerProps> = ({ show, children, onClick }) => {
     const nodeRef = useRef(null);
     const content = (
-        <CSSTransition
-            in={show}
-            timeout={200}
-            classNames="slide-in-left"
-            nodeRef={nodeRef}
-            mountOnEnter
-            unmountOnExit
+        <Transition
+            show={show}
+            enter="transform transition duration-200"
+            enterFrom="-translate-x-full opacity-0"
+            enterTo="translate-x-0 opacity-100"
+            leave="transform transition duration-200"
+            leaveFrom="translate-x-0 opacity-100"
+            leaveTo="-translate-x-full opacity-0"
+            as="div"
+            ref={nodeRef}
         >
             <div ref={nodeRef}>
                 <aside
@@ -27,7 +30,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ show, children, onClick }) => {
                     {children}
                 </aside>
             </div>
-        </CSSTransition>
+        </Transition>
     );
     return createPortal(content, document.getElementById("drawer-hook")!);
 };
