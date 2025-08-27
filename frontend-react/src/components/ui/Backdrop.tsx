@@ -1,5 +1,3 @@
-import "./Backdrop.css";
-
 import { createPortal } from "react-dom";
 
 interface BackdropProps {
@@ -8,7 +6,10 @@ interface BackdropProps {
 
 const Backdrop: React.FC<BackdropProps> = ({ onClick }) => {
     return createPortal(
-        <div className="backdrop" onClick={onClick}></div>,
+        <div
+            className="fixed top-0 left-0 w-full h-screen bg-stone-300 opacity-70 z-10"
+            onClick={onClick}
+        ></div>,
         document.getElementById("backdrop-hook")!
     );
 };
