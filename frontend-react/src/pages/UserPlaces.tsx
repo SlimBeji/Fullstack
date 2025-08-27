@@ -56,9 +56,11 @@ const UserPlaces: React.FC = () => {
 
             if (isSameUser) {
                 return (
-                    <div className="place-list center">
-                        <Card>
-                            <h2>No places found. Maybe create one?</h2>
+                    <div className="center">
+                        <Card className="p-5">
+                            <h2 className="my-5">
+                                No places found. Maybe create one?
+                            </h2>
                             <Button to="/places/new">Share</Button>
                         </Card>
                     </div>
@@ -66,9 +68,11 @@ const UserPlaces: React.FC = () => {
             }
 
             return (
-                <div className="place-list center">
-                    <Card>
-                        <h2>This user has not created places yet.</h2>
+                <div className="center">
+                    <Card className="p-5">
+                        <h2 className="my-5">
+                            This user has not created places yet
+                        </h2>
                     </Card>
                 </div>
             );
