@@ -30,17 +30,15 @@ const ModalOverlay: React.FC<ModalOverlayProps> = ({
     footerClass,
     ref,
 }) => {
-    const wrapperClasses =
-        "fixed top-[22vh] left-[10%] w-[80%] bg-white rounded-lg shadow-lg z-50 md:left-1/2 md:w-[40rem] md:-translate-x-1/2";
-    const headerClasses = "w-full p-4 bg-indigo-900 text-white";
-
     const content = (
         <div
             ref={ref}
-            className={`${wrapperClasses} ${className}`}
+            className={`fixed top-[22vh] left-[10%] w-[80%] bg-white rounded-lg shadow-lg z-50 md:left-1/2 md:w-[40rem] md:-translate-x-1/2 ${className}`}
             style={style}
         >
-            <header className={`${headerClasses} ${headerClass}`}>
+            <header
+                className={`w-full p-4 bg-indigo-900 text-white ${headerClass}`}
+            >
                 <h2 className="m-2 text-xl font-semibold">{header}</h2>
             </header>
             <form onSubmit={onSubmit ? onSubmit : (e) => e.preventDefault()}>

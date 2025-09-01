@@ -110,12 +110,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         });
     };
 
-    // Styling section
-    const innerContainerStyle = `flex ${center ? "flex-col items-center justify-center" : ""}`;
-    const previewContainerStyle =
-        "w-52 h-52 border border-gray-300 flex items-center justify-center text-center mb-4 rounded-md bg-gray-50 overflow-hidden";
-
-    // JSX section
     return (
         <div className="mb-4">
             <input
@@ -126,8 +120,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 accept=".jpg,.png,.jpeg"
                 onChange={changeHandler}
             />
-            <div className={innerContainerStyle}>
-                <div className={previewContainerStyle}>
+            <div
+                className={`flex ${center ? "flex-col items-center justify-center" : ""}`}
+            >
+                <div className="w-52 h-52 border border-gray-300 flex items-center justify-center text-center mb-4 rounded-md bg-gray-50 overflow-hidden">
                     {state.url && (
                         <img
                             src={state.url}

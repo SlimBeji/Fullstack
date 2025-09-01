@@ -9,16 +9,13 @@ interface UserItemProps {
 }
 
 const UserItem: React.FC<UserItemProps> = ({ user }) => {
-    const cardStyle =
-        "p-0 border border-gray-200 hover:shadow-lg transition-shadow duration-300 rounded-xl";
-
-    const linkStyle =
-        "flex items-center w-full h-full px-4 py-4 bg-white hover:bg-gray-50 transition-colors duration-200 rounded-xl";
-
     return (
         <li className="m-4 w-[45%] min-w-[17.5rem]">
-            <Card className={cardStyle}>
-                <Link to={`/${user.id}/places`} className={linkStyle}>
+            <Card className="p-0 border border-gray-200 rounded-xl hover:shadow-lg transition-shadow duration-300">
+                <Link
+                    to={`/${user.id}/places`}
+                    className="flex items-center size-full p-4 bg-white rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                >
                     <div className="w-16 h-16 mr-4">
                         <Avatar
                             imageUrl={user.imageUrl || placeholder}

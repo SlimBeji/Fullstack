@@ -5,12 +5,15 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = (props) => {
-    const conatainerClasses = `${props.className || ""} flex justify-center items-center rounded-full overflow-hidden w-16 h-16`;
-    const imgClasses = "w-full h-full object-cover";
-
     return (
-        <div className={conatainerClasses}>
-            <img src={props.imageUrl} alt={props.alt} className={imgClasses} />
+        <div
+            className={`flex justify-center items-center rounded-full overflow-hidden w-16 h-16 ${props.className || ""}`}
+        >
+            <img
+                src={props.imageUrl}
+                alt={props.alt}
+                className="w-full h-full object-cover"
+            />
         </div>
     );
 };
