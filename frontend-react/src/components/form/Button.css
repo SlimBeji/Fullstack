@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 @layer components {
     .btn {
         @apply inline-block px-6 py-2 rounded-md text-base font-medium;
@@ -10,7 +12,7 @@
     }
 
     .btn.inverse {
-        @apply bg-transparent text-pink-600 border-pink-600
+        @apply bg-transparent text-pink-600 border-pink-600;
         @apply hover:bg-pink-500 hover:text-white border;
     }
 
