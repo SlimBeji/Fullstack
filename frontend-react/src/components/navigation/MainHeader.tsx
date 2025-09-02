@@ -5,11 +5,7 @@ interface MainHeaderProps {
 }
 
 const MainHeader: React.FC<MainHeaderProps> = ({ children }) => {
-    return (
-        <header className="w-full h-16 flex items-center fixed top-0 left-0 bg-[#ff0055] shadow-md px-4 z-50 md:justify-between">
-            {children}
-        </header>
-    );
+    return <header className="main-header">{children}</header>;
 };
 
 export default MainHeader;
