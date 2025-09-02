@@ -16,38 +16,31 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = (props) => {
-    const baseClasses =
-        "px-6 py-2 text-base rounded-md font-medium transition-colors duration-200 focus:outline-none inline-block";
-
     let colorClasses;
 
     if (props.danger) {
         if (props.disabled) {
-            colorClasses =
-                "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed";
+            colorClasses = "btn-danger-disabled";
         } else {
-            colorClasses =
-                "bg-red-800 hover:bg-red-600 text-white border-red-800";
+            colorClasses = "btn-danger";
         }
     } else if (props.inverse) {
         if (props.disabled) {
-            colorClasses =
-                "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed";
+            colorClasses = "btn-inverse-disabled";
         } else {
-            colorClasses =
-                "bg-transparent hover:bg-pink-500 text-pink-600 hover:text-white border border-pink-600";
+            colorClasses = "btn-inverse";
         }
     } else {
         if (props.disabled) {
-            colorClasses =
-                "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed";
+            colorClasses = "btn-disabled";
         } else {
-            colorClasses =
-                "bg-pink-600 hover:bg-pink-500 text-white border border-pink-600";
+            colorClasses = "btn";
         }
     }
 
-    const classes = `${props.className || ""} ${baseClasses} ${colorClasses}`;
+    const className = `${props.className || ""}`;
+
+    const classes = `${className} btn-default ${colorClasses}`;
 
     if (props.href) {
         if (props.href) {
