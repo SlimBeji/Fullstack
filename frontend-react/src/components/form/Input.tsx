@@ -103,25 +103,15 @@ const Input: React.FC<InputProps> = ({
         dispatch({ type: InputActionType.TOUCH });
     };
 
-    // Styling section
     const isError = !state.isValid && state.isTouched;
 
-    const labelTextStyle = isError ? "text-red-500" : "text-gray-700";
-    const labelClasses = `block font-semibold mb-2 ${labelTextStyle}`;
-
-    const inputBorderStyle = isError
-        ? "border-red-500 bg-red-50"
-        : "border-gray-300 bg-gray-50 focus:border-pink-500";
-    const inputClasses = `w-full rounded-md border px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-500 ${inputBorderStyle}`;
-
-    // JSX section
     let inputElement: React.JSX.Element;
     switch (element) {
         case "textarea":
             inputElement = (
                 <textarea
                     value={state.value}
-                    className={inputClasses}
+                    className="w-full rounded-md border px-3 py-2 text-gray-800 border-gray-300 bg-gray-50 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 error:bg-red-50 error:border-red-500"
                     id={id}
                     onChange={changeHandler}
                     rows={rows || 3}
@@ -134,7 +124,7 @@ const Input: React.FC<InputProps> = ({
             inputElement = (
                 <input
                     value={state.value}
-                    className={inputClasses}
+                    className="w-full rounded-md border px-3 py-2 text-gray-800 border-gray-300 bg-gray-50 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 error:bg-red-50 error:border-red-500"
                     id={id}
                     onChange={changeHandler}
                     type={type}
@@ -145,8 +135,11 @@ const Input: React.FC<InputProps> = ({
     }
 
     return (
-        <div className="mb-4">
-            <label className={labelClasses} htmlFor={id}>
+        <div className={`mb-4 ${isError ? "error" : ""}`}>
+            <label
+                className="block font-semibold mb-2 text-gray-700 error:text-red-500"
+                htmlFor={id}
+            >
                 {label}
             </label>
             {inputElement}

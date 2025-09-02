@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 
+@custom-variant error (&:where(.error *));
+
 * {
     box-sizing: border-box;
 }
