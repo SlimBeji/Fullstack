@@ -1,5 +1,3 @@
-import "./Button.css";
-
 import { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 

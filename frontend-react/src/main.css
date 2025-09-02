@@ -20,3 +20,6 @@ main {
 }
 
 @custom-variant error (&:where(.error *));
+
+@import "./components/form/Button.css";
+@import "./components/form/Input.css";

@@ -1,5 +1,3 @@
-@reference "tailwindcss";
-
 @layer components {
     .btn {
         @apply inline-block px-6 py-2 rounded-md text-base font-medium;
