@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useReducer } from "react";
+import { ChangeEvent, ElementType, useEffect, useReducer } from "react";
 
 import { validate, ValidatorType } from "../../util";
 
@@ -105,46 +105,32 @@ const Input: React.FC<InputProps> = ({
 
     const isError = !state.isValid && state.isTouched;
 
-    let inputElement: React.JSX.Element;
+    let Tag: ElementType = "input";
+    const tagProps: Record<string, any> = {
+        value: state.value,
+        id,
+        onChange: changeHandler,
+        onBlur: touchHandler,
+    };
+
     switch (element) {
         case "textarea":
-            inputElement = (
-                <textarea
-                    value={state.value}
-                    className="w-full rounded-md border px-3 py-2 text-gray-800 border-gray-300 bg-gray-50 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 error:bg-red-50 error:border-red-500"
-                    id={id}
-                    onChange={changeHandler}
-                    rows={rows || 3}
-                    onBlur={touchHandler}
-                />
-            );
+            Tag = "textarea";
+            tagProps.rows = rows || 3;
             break;
         case "input":
         default:
-            inputElement = (
-                <input
-                    value={state.value}
-                    className="w-full rounded-md border px-3 py-2 text-gray-800 border-gray-300 bg-gray-50 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500 error:bg-red-50 error:border-red-500"
-                    id={id}
-                    onChange={changeHandler}
-                    type={type}
-                    placeholder={placeholder}
-                    onBlur={touchHandler}
-                />
-            );
+            tagProps.type = type;
+            tagProps.placeholder = placeholder;
+            break;
     }
 
     return (
-        <div className={`mb-4 ${isError ? "error" : ""}`}>
-            <label
-                className="block font-semibold mb-2 text-gray-700 error:text-red-500"
-                htmlFor={id}
-            >
-                {label}
-            </label>
-            {inputElement}
+        <div className={`input-container ${isError ? "error" : ""}`}>
+            <label htmlFor={id}>{label}</label>
+            <Tag {...tagProps} />
             {isError && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="error-text">
                     {errorText || "The input is not valid"}
                 </p>
             )}
