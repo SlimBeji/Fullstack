@@ -1,7 +1,8 @@
 @layer components {
     .btn {
-        @apply inline-block px-6 py-2 text-base rounded-md font-medium transition-colors duration-200 focus:outline-none;
+        @apply inline-block px-6 py-2 rounded-md text-base font-medium;
         @apply bg-pink-600 hover:bg-pink-500 text-white border border-pink-600;
+        @apply transition-colors duration-200 focus:outline-none;
     }
 
     .btn.disabled {
@@ -9,10 +10,12 @@
     }
 
     .btn.inverse {
-        @apply bg-transparent hover:bg-pink-500 text-pink-600 hover:text-white border border-pink-600;
+        @apply bg-transparent text-pink-600 border-pink-600
+        @apply hover:bg-pink-500 hover:text-white border;
     }
 
     .btn.danger {
-        @apply bg-red-800 hover:bg-red-600 text-white border-red-800;
+        @apply bg-red-800 text-white border-red-800;
+        @apply hover:bg-red-600;
     }
 }
