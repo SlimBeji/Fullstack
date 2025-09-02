@@ -23,3 +23,4 @@ main {
 
 @import "./components/form/Button.css";
 @import "./components/form/Input.css";
+@import "./components/form/ImageUpload.css";

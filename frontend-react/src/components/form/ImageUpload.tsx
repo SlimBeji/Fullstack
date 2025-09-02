@@ -59,7 +59,6 @@ interface ImageUploadProps {
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
     id,
-    center = true,
     onInput,
     errorText = "Could not read the file",
     val = undefined,
@@ -111,7 +110,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     };
 
     return (
-        <div className="mb-4">
+        <div className="image-upload">
             <input
                 id={id}
                 ref={filePickerRef}
@@ -120,19 +119,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 accept=".jpg,.png,.jpeg"
                 onChange={changeHandler}
             />
-            <div
-                className={`flex ${center ? "flex-col items-center justify-center" : ""}`}
-            >
-                <div className="w-52 h-52 border border-gray-300 flex items-center justify-center text-center mb-4 rounded-md bg-gray-50 overflow-hidden">
-                    {state.url && (
-                        <img
-                            src={state.url}
-                            alt="Preview"
-                            className="w-full h-full object-cover"
-                        />
-                    )}
+            <div>
+                <div>
+                    {state.url && <img src={state.url} alt="Preview" />}
                     {!state.url && (
-                        <p className="text-gray-500">Please pick an image.</p>
+                        <p className="placeholder">Please pick an image.</p>
                     )}
                 </div>
                 <Button type="button" onClick={onClickHandler}>
@@ -140,7 +131,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 </Button>
             </div>
             {!state.isValid && state.uploadAttempt && (
-                <p className="mt-1 text-sm text-red-500">{errorText}</p>
+                <p className="error-text">{errorText}</p>
             )}
         </div>
     );

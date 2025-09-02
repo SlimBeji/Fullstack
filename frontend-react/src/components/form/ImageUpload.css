@@ -1,0 +1,27 @@
+@layer components {
+    .image-upload {
+        @apply mb-4;
+    }
+
+    .image-upload > div {
+        @apply flex flex-col items-center justify-center;
+    }
+
+    .image-upload > div > div {
+        @apply flex items-center justify-center text-center overflow-hidden;
+        @apply w-52 h-52 mb-4 border rounded-md;
+        @apply border-gray-300 bg-gray-50;
+    }
+
+    .image-upload .placeholder {
+        @apply text-gray-500;
+    }
+
+    .image-upload img {
+        @apply w-full h-full object-cover;
+    }
+
+    .image-upload .error-text {
+        @apply mt-1 text-sm text-red-500;
+    }
+}
