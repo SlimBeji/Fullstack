@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = (props) => {
     const classes = ` btn ${props.className || ""}`;
     const isDisabled = classes.includes("disabled");
 
-    let Tag: string | ElementType = "";
+    let Tag: ElementType = "button";
     const tagProps: any = {};
     if (props.href) {
         Tag = "a";
@@ -27,7 +27,6 @@ const Button: React.FC<ButtonProps> = (props) => {
         Tag = Link;
         tagProps.to = props.to;
     } else {
-        Tag = "button";
         tagProps.type = props.type || "button";
         tagProps.onClick = props.onClick;
         if (isDisabled) tagProps.disabled = true;
