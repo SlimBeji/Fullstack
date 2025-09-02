@@ -144,14 +144,14 @@ const Auth: React.FC = () => {
                     />
                     <div className="flex justify-center space-x-4">
                         <Button
-                            className={`min-w-40 ${state.isValid ? "" : "btn-disabled"}`}
+                            className={`min-w-40 ${state.isValid ? "" : "disabled"}`}
                             type="submit"
                         >
                             {verb}
                         </Button>
                         <Button
                             type="button"
-                            className="min-w-40 btn-inverse"
+                            className="min-w-40 inverse"
                             onClick={onSwitchModeHandler}
                         >
                             {switchText}

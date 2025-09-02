@@ -13,7 +13,7 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = (props) => {
-    const classes = `${props.className || ""} btn`;
+    const classes = ` btn ${props.className || ""}`;
     const isDisabled = classes.includes("disabled");
 
     if (props.href) {

@@ -84,7 +84,7 @@ const NewPlace: React.FC = () => {
                 />
                 <Button
                     type="submit"
-                    className={`${state.isValid ? "" : "btn-disabled"}`}
+                    className={`${state.isValid ? "" : "disabled"}`}
                 >
                     Add Place
                 </Button>

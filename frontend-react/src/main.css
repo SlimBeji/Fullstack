@@ -21,29 +21,22 @@ main {
 
 @custom-variant error (&:where(.error *));
 
+/* Button Style */
 @layer components {
     .btn {
         @apply inline-block px-6 py-2 text-base rounded-md font-medium transition-colors duration-200 focus:outline-none;
         @apply bg-pink-600 hover:bg-pink-500 text-white border border-pink-600;
     }
 
-    .btn-disabled {
+    .btn.disabled {
         @apply bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed;
     }
 
-    .btn-inverse {
+    .btn.inverse {
         @apply bg-transparent hover:bg-pink-500 text-pink-600 hover:text-white border border-pink-600;
     }
 
-    .btn-inverse-disabled {
-        @apply bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed;
-    }
-
-    .btn-danger {
+    .btn.danger {
         @apply bg-red-800 hover:bg-red-600 text-white border-red-800;
-    }
-
-    .btn-danger-disabled {
-        @apply bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed;
     }
 }
