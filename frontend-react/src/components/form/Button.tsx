@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { ButtonType } from "../../types";
@@ -16,32 +16,25 @@ const Button: React.FC<ButtonProps> = (props) => {
     const classes = ` btn ${props.className || ""}`;
     const isDisabled = classes.includes("disabled");
 
+    let Tag: string | ElementType = "";
+    const tagProps: any = {};
     if (props.href) {
-        if (props.href) {
-            return (
-                <a className={classes} href={props.href}>
-                    {props.children}
-                </a>
-            );
-        }
-    }
-    if (props.to) {
-        return (
-            <Link to={props.to} className={classes}>
-                {props.children}
-            </Link>
-        );
+        Tag = "a";
+        tagProps.href = props.href;
+    } else if (props.to) {
+        Tag = Link;
+        tagProps.to = props.to;
+    } else {
+        Tag = "button";
+        tagProps.type = props.type || "button";
+        tagProps.onClick = props.onClick;
+        if (isDisabled) tagProps.disabled = true;
     }
 
     return (
-        <button
-            className={classes}
-            type={props.type}
-            onClick={props.onClick}
-            disabled={isDisabled}
-        >
+        <Tag className={classes} {...tagProps}>
             {props.children}
-        </button>
+        </Tag>
     );
 };
 
