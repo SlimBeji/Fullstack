@@ -18,30 +18,27 @@ const MainNavigation: React.FC = () => {
     };
 
     return (
-        <React.Fragment>
+        <>
             {drawerIsOpen && <Backdrop onClick={closeDrwaer} />}
             <SideDrawer show={drawerIsOpen} onClick={closeDrwaer}>
-                <nav className="h-full">
+                <nav className="sidedrawer">
                     <NavLinks />
                 </nav>
             </SideDrawer>
             <MainHeader>
-                <button
-                    className="w-12 h-12 bg-transparent border-none flex flex-col justify-around mr-8 cursor-pointer md:hidden"
-                    onClick={openDrawer}
-                >
-                    <span className="block w-12 h-[2.5px] bg-white" />
-                    <span className="block w-12 h-[2.5px] bg-white" />
-                    <span className="block w-12 h-[2.5px] bg-white" />
+                <button className="hamburger" onClick={openDrawer}>
+                    <span />
+                    <span />
+                    <span />
                 </button>
-                <h1 className="text-white">
+                <h1 className="app-header">
                     <Link to="/">YourPlaces</Link>
                 </h1>
-                <nav className="hidden md:block">
+                <nav className="main">
                     <NavLinks />
                 </nav>
             </MainHeader>
-        </React.Fragment>
+        </>
     );
 };
 

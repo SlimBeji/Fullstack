@@ -1,0 +1,22 @@
+@layer components {
+    nav.main {
+        @apply hidden md:block;
+    }
+
+    nav.sidedrawer {
+        @apply h-full;
+    }
+
+    h1.app-header {
+        @apply text-2xl text-white;
+    }
+
+    button.hamburger {
+        @apply flex flex-col justify-around md:hidden;
+        @apply w-12 h-12 mr-8 border-none bg-transparent cursor-pointer;
+    }
+
+    button.hamburger span {
+        @apply block w-12 h-[2.5px] bg-white;
+    }
+}
