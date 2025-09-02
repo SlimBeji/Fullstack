@@ -8,7 +8,6 @@ interface ButtonProps {
     className?: string;
     to?: string;
     href?: string;
-    size?: "small" | "default" | "big";
     inverse?: boolean;
     danger?: boolean;
     type?: ButtonType;
@@ -17,16 +16,8 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = (props) => {
-    const size = props.size ?? "default";
-
     const baseClasses =
-        "rounded-md font-medium transition-colors duration-200 focus:outline-none inline-block";
-
-    const sizeClasses = {
-        small: "px-3 py-1 text-sm",
-        default: "px-6 py-2 text-base",
-        big: "px-8 py-3 text-lg",
-    };
+        "px-6 py-2 text-base rounded-md font-medium transition-colors duration-200 focus:outline-none inline-block";
 
     let colorClasses;
 
@@ -56,7 +47,7 @@ const Button: React.FC<ButtonProps> = (props) => {
         }
     }
 
-    const classes = `${props.className || ""} ${baseClasses} ${sizeClasses[size]} ${colorClasses}`;
+    const classes = `${props.className || ""} ${baseClasses} ${colorClasses}`;
 
     if (props.href) {
         if (props.href) {
