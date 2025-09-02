@@ -82,7 +82,10 @@ const NewPlace: React.FC = () => {
                     onInput={inputHandlers.image}
                     val={state.inputs.image.val}
                 />
-                <Button type="submit" disabled={!state.isValid}>
+                <Button
+                    type="submit"
+                    className={`${state.isValid ? "" : "btn-disabled"}`}
+                >
                     Add Place
                 </Button>
             </PlaceForm>

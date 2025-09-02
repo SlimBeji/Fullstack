@@ -51,10 +51,10 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
 
     const deleteModalFooter = (
         <>
-            <Button inverse onClick={closeDeleteModal}>
+            <Button className="btn-inverse" onClick={closeDeleteModal}>
                 CANCEL
             </Button>
-            <Button danger onClick={onDelteHandler}>
+            <Button className="btn-danger" onClick={onDelteHandler}>
                 DELETE
             </Button>
         </>
@@ -111,9 +111,8 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                     </div>
                     <div className="p-4 text-center border-t border-gray-300">
                         <Button
-                            className="mx-1"
+                            className="mx-1 btn-inverse"
                             onClick={openMapHanlder}
-                            inverse
                         >
                             VIEW ON MAP
                         </Button>
@@ -124,8 +123,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                         )}
                         {authData?.userId === place.creatorId && (
                             <Button
-                                className="mx-1"
-                                danger
+                                className="mx-1 btn-danger"
                                 onClick={openDeleteModal}
                             >
                                 DELETE
