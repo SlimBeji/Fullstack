@@ -6,10 +6,7 @@ interface BackdropProps {
 
 const Backdrop: React.FC<BackdropProps> = ({ onClick }) => {
     return createPortal(
-        <div
-            className="fixed top-0 left-0 w-full h-screen bg-stone-300 opacity-70 z-10"
-            onClick={onClick}
-        ></div>,
+        <div className="modal-backdrop" onClick={onClick}></div>,
         document.getElementById("backdrop-hook")!
     );
 };

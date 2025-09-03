@@ -30,4 +30,5 @@ main {
 @import "./components/navigation/Navlinks.css";
 @import "./components/navigation/SideDrawer.css";
 
-@import "./components//ui/Avatar.css";
+@import "./components/ui/Avatar.css";
+@import "./components/ui/Backdrop.css";
