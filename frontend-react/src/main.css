@@ -29,3 +29,5 @@ main {
 @import "./components/navigation/MainNavigation.css";
 @import "./components/navigation/Navlinks.css";
 @import "./components/navigation/SideDrawer.css";
+
+@import "./components//ui/Avatar.css";
