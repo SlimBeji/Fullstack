@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import Backdrop from "../ui/Backdrop";
-import MainHeader from "./MainHeader";
 import NavLinks from "./NavLinks";
 import SideDrawer from "./SideDrawer";
 
@@ -25,7 +24,7 @@ const MainNavigation: React.FC = () => {
                     <NavLinks />
                 </nav>
             </SideDrawer>
-            <MainHeader>
+            <header className="main-header">
                 <button className="hamburger" onClick={openDrawer}>
                     <span />
                     <span />
@@ -37,7 +36,7 @@ const MainNavigation: React.FC = () => {
                 <nav className="main">
                     <NavLinks />
                 </nav>
-            </MainHeader>
+            </header>
         </>
     );
 };
