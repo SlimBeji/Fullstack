@@ -1,0 +1,5 @@
+@layer components {
+    .places-list {
+        @apply w-[90%] max-w-[40rem] my-4 mx-auto p-0 list-none;
+    }
+}

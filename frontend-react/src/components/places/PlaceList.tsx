@@ -8,7 +8,7 @@ interface PlaceListProps {
 
 const PlaceList: React.FC<PlaceListProps> = ({ items, onDelete }) => {
     return (
-        <ul className="list-none m-4 mx-auto p-0 w-[90%] max-w-[40rem]">
+        <ul className="places-list">
             {items.map((p: Place) => {
                 return <PlaceItem key={p.id} place={p} onDelete={onDelete} />;
             })}

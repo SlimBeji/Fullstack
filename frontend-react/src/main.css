@@ -43,3 +43,4 @@ main {
 
 @import "./components/places/PlaceForm.css";
 @import "./components/places/PlaceItem.css";
+@import "./components/places/PlaceList.css";
