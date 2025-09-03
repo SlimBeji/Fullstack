@@ -3,11 +3,7 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = (props) => {
-    return (
-        <div className="w-[90%] max-w-md mx-auto mt-10 text-center p-6 shadow-lg rounded-xl bg-white">
-            {props.children}
-        </div>
-    );
+    return <div className="auth-form">{props.children}</div>;
 };
 
 export default AuthForm;
