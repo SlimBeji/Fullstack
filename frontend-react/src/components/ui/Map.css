@@ -1,0 +1,5 @@
+@layer components {
+    .map-container {
+        @apply w-full h-50;
+    }
+}

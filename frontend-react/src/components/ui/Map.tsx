@@ -23,7 +23,7 @@ const Map: React.FC<MapProps> = ({ position, zoom, className, markerText }) => {
     }, [map]);
 
     return (
-        <div className="w-full h-[200px]">
+        <div className="map-container">
             <MapContainer
                 center={position}
                 zoom={zoom}
