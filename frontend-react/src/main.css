@@ -21,6 +21,16 @@ main {
 
 @custom-variant error (&:where(.error *));
 
+/* Global Styles */
+@layer components {
+    .card {
+        @apply relative m-0 shadow-lg rounded-lg;
+        @apply bg-white overflow-hidden;
+        @apply hover:translate-x-1 hover:shadow-xl transition-all duration-300;
+    }
+}
+
+/* Components CSS */
 @import "./components/form/Button.css";
 @import "./components/form/Input.css";
 @import "./components/form/ImageUpload.css";
@@ -31,7 +41,6 @@ main {
 
 @import "./components/ui/Avatar.css";
 @import "./components/ui/Backdrop.css";
-@import "./components/ui/Card.css";
 @import "./components/ui/LoadingSpinner.css";
 @import "./components/ui/Map.css";
 @import "./components/ui/Modal.css";
