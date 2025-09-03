@@ -1,0 +1,31 @@
+@layer components {
+    ul.links-container {
+        @apply flex flex-col justify-center items-center md:flex-row;
+        @apply w-full h-full m-0 p-0 list-none;
+    }
+
+    ul.links-container li {
+        @apply m-4 md:mx-2 md:my-0;
+    }
+
+    ul.links-container li a,
+    ul.links-container li button {
+        @apply px-2 py-1 border cursor-pointer;
+        @apply text-gray-800 border-transparent;
+        @apply md:text-white md:border-transparent;
+
+        @apply hover:bg-yellow-300 hover:text-gray-800 hover:border-gray-800;
+    }
+
+    ul.links-container li .active {
+        @apply bg-yellow-300 text-gray-800 border-gray-800;
+    }
+
+    ul.links-container li a {
+        @apply no-underline;
+    }
+
+    ul.links-container li button {
+        @apply border border-gray-800 md:border-white;
+    }
+}

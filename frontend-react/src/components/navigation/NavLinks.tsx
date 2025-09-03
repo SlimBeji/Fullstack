@@ -10,16 +10,7 @@ interface NavLinkWrapperProps {
 const NavLinkWrapper: React.FC<NavLinkWrapperProps> = ({ to, children }) => (
     <NavLink
         to={to}
-        className={({ isActive }) =>
-            `
-                border no-underline px-2 py-1 font-inherit hover:bg-[#f8df00] hover:border-[#292929] hover:text-[#292929] 
-            ${
-                isActive
-                    ? "bg-[#f8df00] border-[#292929] text-[#292929]"
-                    : "text-black md:text-white border-transparent"
-            }
-            `
-        }
+        className={({ isActive }) => `${isActive ? "active" : ""}`}
     >
         {children}
     </NavLink>
@@ -39,35 +30,30 @@ const NavLinks: React.FC = () => {
     };
 
     return (
-        <ul className="list-none m-0 p-0 w-full h-full flex flex-col justify-center items-center md:flex-row">
-            <li className="m-4 md:mx-2 md:my-0">
+        <ul className="links-container">
+            <li>
                 <NavLinkWrapper to="/">All users</NavLinkWrapper>
             </li>
             {isLoggedIn && userId && (
-                <li className="m-4 md:mx-2 md:my-0">
+                <li>
                     <NavLinkWrapper to={`/${userId}/places`}>
                         My places
                     </NavLinkWrapper>
                 </li>
             )}
             {isLoggedIn && (
-                <li className="m-4 md:mx-2 md:my-0">
+                <li>
                     <NavLinkWrapper to="/places/new">Add place</NavLinkWrapper>
                 </li>
             )}
             {!isLoggedIn && (
-                <li className="m-4 md:mx-2 md:my-0">
+                <li>
                     <NavLinkWrapper to="/auth">Authenticate</NavLinkWrapper>
                 </li>
             )}
             {isLoggedIn && (
-                <li className="m-4 md:mx-2 md:my-0">
-                    <button
-                        onClick={onLogout}
-                        className="cursor-pointer border border-[#292929] text-[#292929] bg-transparent px-2 py-1 font-inherit hover:bg-[#f8df00] hover:text-[#292929] md:border-white md:text-white md:hover:bg-[#f8df00] md:hover:text-[#292929]"
-                    >
-                        LOGOUT
-                    </button>
+                <li>
+                    <button onClick={onLogout}>LOGOUT</button>
                 </li>
             )}
         </ul>
