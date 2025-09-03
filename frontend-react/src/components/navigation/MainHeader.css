@@ -1,7 +1,0 @@
-@layer components {
-    .main-header {
-        @apply flex items-center fixed z-50 top-0 left-0 md:justify-between;
-        @apply w-full h-16 px-4 shadow-md;
-        @apply bg-[#ff0055];
-    }
-}

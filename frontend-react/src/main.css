@@ -25,7 +25,6 @@ main {
 @import "./components/form/Input.css";
 @import "./components/form/ImageUpload.css";
 
-@import "./components/navigation/MainHeader.css";
 @import "./components/navigation/MainNavigation.css";
 @import "./components/navigation/Navlinks.css";
 @import "./components/navigation/SideDrawer.css";
