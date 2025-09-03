@@ -9,17 +9,15 @@ interface UserListProps {
 const UsersList: React.FC<UserListProps> = ({ items }) => {
     if (items.length === 0) {
         return (
-            <div className="flex justify-center items-center">
+            <div className="no-users">
                 <Card>
-                    <h2 className="text-xl font-semibold text-gray-700">
-                        No Users found!
-                    </h2>
+                    <h2>No Users found!</h2>
                 </Card>
             </div>
         );
     }
     return (
-        <ul className="w-[90%] max-w-4xl mx-auto flex justify-center flex-wrap gap-6">
+        <ul className="users-list">
             {items.map((item: User) => {
                 return <UserItem key={item.id} user={item} />;
             })}
