@@ -1,0 +1,7 @@
+@layer components {
+    .card {
+        @apply relative m-0 shadow-lg rounded-lg;
+        @apply bg-white overflow-hidden;
+        @apply hover:translate-x-1 hover:shadow-xl transition-all duration-300;
+    }
+}
