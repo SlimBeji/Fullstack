@@ -13,20 +13,17 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ show, children, onClick }) => {
     const content = (
         <Transition
             show={show}
-            enter="transform transition duration-200"
-            enterFrom="-translate-x-full opacity-0"
-            enterTo="translate-x-0 opacity-100"
-            leave="transform transition duration-200"
-            leaveFrom="translate-x-0 opacity-100"
-            leaveTo="-translate-x-full opacity-0"
+            enter="sidedrawer effect"
+            enterFrom="sidedrawer a"
+            enterTo="sidedrawer b"
+            leave="sidedrawer effect"
+            leaveFrom="sidedrawer b"
+            leaveTo="sidedrawer a"
             as="div"
             ref={nodeRef}
         >
             <div ref={nodeRef}>
-                <aside
-                    className="fixed top-0 left-0 z-[100] h-screen w-[70%] bg-white shadow-md"
-                    onClick={onClick}
-                >
+                <aside className="sidedrawer" onClick={onClick}>
                     {children}
                 </aside>
             </div>

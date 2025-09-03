@@ -28,3 +28,4 @@ main {
 @import "./components/navigation/MainHeader.css";
 @import "./components/navigation/MainNavigation.css";
 @import "./components/navigation/Navlinks.css";
+@import "./components/navigation/SideDrawer.css";
