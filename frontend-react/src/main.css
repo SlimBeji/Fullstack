@@ -35,3 +35,4 @@ main {
 @import "./components/ui/Card.css";
 @import "./components/ui/LoadingSpinner.css";
 @import "./components/ui/Map.css";
+@import "./components/ui/Modal.css";
