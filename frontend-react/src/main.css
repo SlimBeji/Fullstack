@@ -38,3 +38,4 @@ main {
 @import "./components/ui/Modal.css";
 
 @import "./components/user/AuthForm.css";
+@import "./components/user/UserItem.css";
