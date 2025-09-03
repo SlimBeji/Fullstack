@@ -40,3 +40,5 @@ main {
 @import "./components/user/AuthForm.css";
 @import "./components/user/UserItem.css";
 @import "./components/user/UsersList.css";
+
+@import "./components/places/PlaceForm.css";
