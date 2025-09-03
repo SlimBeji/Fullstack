@@ -47,19 +47,22 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
         });
     };
 
-    const mapModalFooter = <Button onClick={closeMapHanlder}>CLOSE</Button>;
+    const mapModalFooter = (
+        <footer className="place-item-map-modal-footer">
+            <Button onClick={closeMapHanlder}>CLOSE</Button>
+        </footer>
+    );
 
     const deleteModalFooter = (
-        <>
-            <Button className="inverse" onClick={closeDeleteModal}>
-                CANCEL
-            </Button>
+        <footer className="place-item-delete-modal-footer">
             <Button className="danger" onClick={onDelteHandler}>
                 DELETE
             </Button>
-        </>
+            <Button className="inverse" onClick={closeDeleteModal}>
+                CANCEL
+            </Button>
+        </footer>
     );
-
     return (
         <>
             {data.error && (
@@ -74,8 +77,6 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 show={showMap}
                 onCancel={closeMapHanlder}
                 header={place.address}
-                contentClass="p-0"
-                footerClass="flex justify-end"
                 footer={mapModalFooter}
             >
                 <Map
@@ -88,42 +89,36 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 show={showDeleteModal}
                 onCancel={closeDeleteModal}
                 header="Are you sure?"
-                contentClass="p-4"
-                footerClass="flex justify-end space-x-2"
                 footer={deleteModalFooter}
             >
-                <p>Do you want to proceed and delete this place?</p>
+                <div className="place-item-delete-modal-content">
+                    <p>Do you want to proceed and delete this place?</p>
+                </div>
             </Modal>
 
-            <li className="my-4">
-                <Card className="p-0">
-                    <div className="w-full h-52 md:h-80 mr-6">
+            <li className="place-item">
+                <Card className="place-item-card">
+                    <div className="image-container">
                         <img
                             src={place.imageUrl || placeholder}
                             alt={place.title}
-                            className="w-full h-full object-cover"
                         />
                     </div>
-                    <div className="p-4 text-center">
-                        <h2 className="mb-2">{place.title}</h2>
-                        <h2 className="mb-2">{place.address}</h2>
-                        <p className="mb-2">{place.description}</p>
+                    <div className="place-info">
+                        <h2>{place.title}</h2>
+                        <h2>{place.address}</h2>
+                        <p>{place.description}</p>
                     </div>
-                    <div className="p-4 text-center border-t border-gray-300">
-                        <Button
-                            className="mx-1 inverse"
-                            onClick={openMapHanlder}
-                        >
+                    <div className="place-actions">
+                        <Button className="inverse" onClick={openMapHanlder}>
                             VIEW ON MAP
                         </Button>
                         {authData?.userId === place.creatorId && (
-                            <Button className="mx-1" to={`/places/${place.id}`}>
-                                EDIT
-                            </Button>
+                            <Button to={`/places/${place.id}`}>EDIT</Button>
                         )}
                         {authData?.userId === place.creatorId && (
                             <Button
-                                className="mx-1 danger"
+                                className="danger"
                                 onClick={openDeleteModal}
                             >
                                 DELETE
