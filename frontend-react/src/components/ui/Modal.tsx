@@ -32,8 +32,8 @@ const ModalOverlay: React.FC<ModalOverlayProps> = ({
                 <h2>{header}</h2>
             </header>
             <form onSubmit={onSubmit ? onSubmit : (e) => e.preventDefault()}>
-                <div>{children}</div>
-                <footer>{footer}</footer>
+                {children}
+                {footer}
             </form>
         </div>
     );
