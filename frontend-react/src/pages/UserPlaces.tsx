@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { Button } from "../components/form";
 import { PlaceList } from "../components/places";
-import { Card, HttpError, LoadingSpinner } from "../components/ui";
+import { HttpError, LoadingSpinner } from "../components/ui";
 import { useHttp } from "../hooks";
 import { useAppSelector } from "../states";
 import { Place } from "../types";
@@ -57,23 +57,23 @@ const UserPlaces: React.FC = () => {
             if (isSameUser) {
                 return (
                     <div className="center">
-                        <Card className="p-5">
+                        <div className="card p-5">
                             <h2 className="my-5">
                                 No places found. Maybe create one?
                             </h2>
                             <Button to="/places/new">Share</Button>
-                        </Card>
+                        </div>
                     </div>
                 );
             }
 
             return (
                 <div className="center">
-                    <Card className="p-5">
+                    <div className="card p-5">
                         <h2 className="my-5">
                             This user has not created places yet
                         </h2>
-                    </Card>
+                    </div>
                 </div>
             );
         }

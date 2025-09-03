@@ -1,4 +1,3 @@
-import { Card } from "../../components/ui";
 import { User } from "../../types";
 import UserItem from "./UserItem";
 
@@ -10,9 +9,9 @@ const UsersList: React.FC<UserListProps> = ({ items }) => {
     if (items.length === 0) {
         return (
             <div className="no-users">
-                <Card>
+                <div className="card">
                     <h2>No Users found!</h2>
-                </Card>
+                </div>
             </div>
         );
     }

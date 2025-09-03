@@ -1,13 +1,7 @@
 import { useState } from "react";
 
 import { Button } from "../../components/form";
-import {
-    Card,
-    HttpError,
-    LoadingSpinner,
-    Map,
-    Modal,
-} from "../../components/ui";
+import { HttpError, LoadingSpinner, Map, Modal } from "../../components/ui";
 import { useHttp } from "../../hooks";
 import { useAppSelector } from "../../states";
 import placeholder from "../../static/place_placeholder.jpg";
@@ -97,7 +91,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
             </Modal>
 
             <li className="place-item">
-                <Card className="place-item-card">
+                <div className="card place-item-card">
                     <div className="image-container">
                         <img
                             src={place.imageUrl || placeholder}
@@ -125,7 +119,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                             </Button>
                         )}
                     </div>
-                </Card>
+                </div>
             </li>
         </>
     );
