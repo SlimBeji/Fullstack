@@ -11,7 +11,7 @@ interface UserItemProps {
 const UserItem: React.FC<UserItemProps> = ({ user }) => {
     return (
         <li className="user-item">
-            <div className="card user-item-card">
+            <div className="card">
                 <Link to={`/${user.id}/places`} className="user-item-link">
                     <div className="user-avatar">
                         <Avatar

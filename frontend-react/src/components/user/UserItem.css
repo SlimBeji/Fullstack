@@ -3,7 +3,7 @@
         @apply w-[45%] min-w-[17.5rem] m-4;
     }
 
-    .user-item-card {
+    .user-item .card {
         @apply p-0 border border-gray-200 rounded-xl hover:shadow-lg transition-shadow duration-300;
     }
 
