@@ -25,17 +25,19 @@ const MainNavigation: React.FC = () => {
                 </nav>
             </SideDrawer>
             <header className="main-header">
-                <button className="hamburger" onClick={openDrawer}>
-                    <span />
-                    <span />
-                    <span />
-                </button>
-                <h1 className="app-header">
-                    <Link to="/">YourPlaces</Link>
-                </h1>
-                <nav className="main">
-                    <NavLinks />
-                </nav>
+                <div>
+                    <button className="hamburger" onClick={openDrawer}>
+                        <span />
+                        <span />
+                        <span />
+                    </button>
+                    <h1 className="app-header">
+                        <Link to="/">Your Places</Link>
+                    </h1>
+                    <nav className="main">
+                        <NavLinks />
+                    </nav>
+                </div>
             </header>
         </>
     );
