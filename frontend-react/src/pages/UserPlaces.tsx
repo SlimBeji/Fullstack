@@ -2,7 +2,7 @@ import { HttpStatusCode } from "axios";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { PlaceList } from "../components/places";
+import { PlacesList } from "../components/places";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { useHttp } from "../hooks";
 import { useAppSelector } from "../states";
@@ -50,7 +50,7 @@ const UserPlaces: React.FC = () => {
                 places = [];
             }
             return (
-                <PlaceList
+                <PlacesList
                     sameAuthenticatedUser={isSameUser}
                     items={places}
                     onDelete={onDelete}
