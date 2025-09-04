@@ -6,7 +6,7 @@
     }
 
     .btn.disabled {
-        @apply bg-disabled text-disabled-2 border-disabled cursor-not-allowed;
+        @apply bg-disabled-bg text-disabled-text border-disabled-border cursor-not-allowed;
     }
 
     .btn.inverse {

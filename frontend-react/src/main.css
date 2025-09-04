@@ -4,11 +4,15 @@
 
 /* UI Colors */
 @theme {
+    --color-backdrop: var(--color-stone-300);
+
+    --color-disabled-bg: var(--color-gray-300);
+    --color-disabled-text: var(--color-gray-500);
+    --color-disabled-border: var(--color-gray-300);
+
     --color-background: var(--color-white);
     --color-background-2: var(--color-stone-50);
     --color-background-3: var(--color-stone-100);
-
-    --color-backdrop: var(--color-stone-300);
 
     --color-txt: var(--color-stone-50);
     --color-txt-d0: var(--color-stone-300);
@@ -30,9 +34,6 @@
     --color-danger: var(--color-red-600);
     --color-danger-2: var(--color-red-50);
     --color-danger-3: var(--color-red-700);
-
-    --color-disabled: var(--color-gray-300);
-    --color-disabled-2: var(--color-gray-500);
 }
 
 /* Variants */
