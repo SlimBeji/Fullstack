@@ -1,5 +1,5 @@
 @layer components {
     .modal-backdrop {
-        @apply fixed top-0 left-0 w-full h-screen bg-stone-300 opacity-70 z-10;
+        @apply fixed top-0 left-0 w-full h-screen bg-backdrop opacity-70 z-10;
     }
 }

@@ -1,13 +1,13 @@
 @layer components {
     .modal-container {
         @apply fixed z-50 top-[22vh] left-[10%];
-        @apply w-[80%] rounded-lg shadow-lg bg-white;
+        @apply w-[80%] rounded-lg shadow-lg bg-background;
         @apply md:left-1/2 md:w-160 md:-translate-x-1/2;
         @apply lg:w-200;
     }
 
     .modal-container header {
-        @apply w-full rounded-t-lg p-4 bg-pink-500 text-white;
+        @apply w-full rounded-t-lg p-4 bg-secondary text-txt;
     }
 
     .modal-container header h2 {

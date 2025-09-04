@@ -1,10 +1,10 @@
 @layer components {
     .spinner-container.overlay {
-        @apply absolute inset-0 bg-white/90 flex justify-center items-center;
+        @apply absolute inset-0 bg-background/90 flex justify-center items-center;
     }
 
     .spinner-container > div {
         @apply w-12 h-12 rounded-full animate-spin;
-        @apply border-4 border-pink-600 border-t-transparent;
+        @apply border-4 border-secondary border-t-transparent;
     }
 }
