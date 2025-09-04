@@ -41,21 +41,15 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
         });
     };
 
-    const mapModalFooter = (
-        <footer className="place-item-map-modal-footer">
-            <Button onClick={closeMapHanlder}>CLOSE</Button>
-        </footer>
-    );
-
     const deleteModalFooter = (
-        <footer className="place-item-delete-modal-footer">
+        <>
             <Button className="danger" onClick={onDelteHandler}>
                 DELETE
             </Button>
             <Button className="inverse" onClick={closeDeleteModal}>
                 CANCEL
             </Button>
-        </footer>
+        </>
     );
     return (
         <>
@@ -71,7 +65,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 show={showMap}
                 onCancel={closeMapHanlder}
                 header={place.address}
-                footer={mapModalFooter}
+                footer={<Button onClick={closeMapHanlder}>CLOSE</Button>}
             >
                 <Map
                     position={place.location}
@@ -85,9 +79,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 header="Are you sure?"
                 footer={deleteModalFooter}
             >
-                <div className="place-item-delete-modal-content">
-                    <p>Do you want to proceed and delete this place?</p>
-                </div>
+                <p>Do you want to proceed and delete this place?</p>
             </Modal>
 
             <li className="place-item">

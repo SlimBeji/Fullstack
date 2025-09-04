@@ -1,16 +1,4 @@
 @layer components {
-    .place-item-map-modal-footer {
-        @apply flex justify-end;
-    }
-
-    .place-item-delete-modal-content {
-        @apply p-4;
-    }
-
-    .place-item-delete-modal-footer {
-        @apply flex justify-end space-x-2;
-    }
-
     li.place-item {
         @apply my-4;
     }

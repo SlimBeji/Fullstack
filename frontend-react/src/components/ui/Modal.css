@@ -7,16 +7,19 @@
     }
 
     .modal-container header {
-        @apply w-full p-4 bg-sky-500 text-white;
+        @apply w-full rounded-t-lg p-4 bg-pink-500 text-white;
     }
 
     .modal-container header h2 {
         @apply m-2 text-xl font-semibold;
     }
 
-    .modal-container form > div,
+    .modal-container form > div {
+        @apply p-4 min-h-30;
+    }
+
     .modal-container form > footer {
-        @apply p-4;
+        @apply flex justify-end space-x-2 p-4;
     }
 
     .modal.effect {
