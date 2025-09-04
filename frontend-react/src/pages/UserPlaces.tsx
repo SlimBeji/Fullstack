@@ -2,7 +2,6 @@ import { HttpStatusCode } from "axios";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button } from "../components/form";
 import { PlaceList } from "../components/places";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { useHttp } from "../hooks";
@@ -50,31 +49,12 @@ const UserPlaces: React.FC = () => {
             if (data.statusCode === HttpStatusCode.NotFound) {
                 places = [];
             }
-            if (places.length > 0) {
-                return <PlaceList items={places} onDelete={onDelete} />;
-            }
-
-            if (isSameUser) {
-                return (
-                    <div className="center">
-                        <div className="card p-5">
-                            <h2 className="my-5">
-                                No places found. Maybe create one?
-                            </h2>
-                            <Button to="/places/new">Share</Button>
-                        </div>
-                    </div>
-                );
-            }
-
             return (
-                <div className="center">
-                    <div className="card p-5">
-                        <h2 className="my-5">
-                            This user has not created places yet
-                        </h2>
-                    </div>
-                </div>
+                <PlaceList
+                    sameAuthenticatedUser={isSameUser}
+                    items={places}
+                    onDelete={onDelete}
+                />
             );
         }
     };
