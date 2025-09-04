@@ -10,7 +10,7 @@
     .image-upload > div > div {
         @apply flex items-center justify-center text-center overflow-hidden;
         @apply w-52 h-52 mb-4 border rounded-md;
-        @apply border-txt-d0 bg-background-2;
+        @apply border-txt-d0 bg-background-highlight;
     }
 
     .image-upload .placeholder {
