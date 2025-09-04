@@ -47,10 +47,12 @@
 @import "./components/ui/Map.css";
 @import "./components/ui/Modal.css";
 
-@import "./components/user/AuthForm.css";
 @import "./components/user/UserItem.css";
 @import "./components/user/UsersList.css";
 
 @import "./components/places/PlaceForm.css";
 @import "./components/places/PlaceItem.css";
 @import "./components/places/PlaceList.css";
+
+/* Pages CSS */
+@import "./pages/Auth.css";

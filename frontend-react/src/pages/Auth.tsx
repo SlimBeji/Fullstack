@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 
 import { Button, ImageUpload, Input } from "../components/form";
 import { HttpError, LoadingSpinner } from "../components/ui";
-import { AuthForm } from "../components/user";
 import { emptyStateBuilder, useForm, useHttp } from "../hooks";
 import { authSlice, useAppDispatch } from "../states";
 import { SigninResponse } from "../types";
@@ -98,7 +97,7 @@ const Auth: React.FC = () => {
                     onClear={() => clearError()}
                 />
             )}
-            <AuthForm>
+            <div className="auth-form">
                 {data.loading && <LoadingSpinner asOverlay />}
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">
                     {requiredText}
@@ -158,7 +157,7 @@ const Auth: React.FC = () => {
                         </Button>
                     </div>
                 </form>
-            </AuthForm>
+            </div>
         </div>
     );
 };
