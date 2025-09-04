@@ -64,11 +64,7 @@ const UserPlaces: React.FC = () => {
             {data.error && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
-            {data.loading && (
-                <div className="center">
-                    <LoadingSpinner asOverlay />
-                </div>
-            )}
+            {data.loading && <LoadingSpinner asOverlay />}
             {renderPlaces()}
         </>
     );
