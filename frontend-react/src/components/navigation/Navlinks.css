@@ -10,7 +10,7 @@
 
     ul.links-container li a,
     ul.links-container li button {
-        @apply w-26 px-2 py-1;
+        @apply w-30 px-2 py-1;
         @apply text-center border rounded-sm text-lg cursor-pointer;
         @apply text-stone-50 bg-sky-400 border-transparent;
         @apply md:text-stone-50 md:border-transparent;
