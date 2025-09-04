@@ -9,6 +9,6 @@
     }
 
     .no-users h2 {
-        @apply text-xl font-semibold text-gray-700;
+        @apply text-xl font-semibold text-txt-d2;
     }
 }

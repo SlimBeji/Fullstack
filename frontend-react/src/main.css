@@ -5,6 +5,9 @@
 /* UI Colors */
 @theme {
     --color-background: var(--color-white);
+    --color-background-2: var(--color-stone-50);
+    --color-background-3: var(--color-stone-100);
+
     --color-backdrop: var(--color-stone-300);
 
     --color-txt: var(--color-stone-50);
