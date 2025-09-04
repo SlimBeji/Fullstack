@@ -21,11 +21,7 @@ const Users: React.FC = () => {
                     onClear={() => clearError()}
                 />
             )}
-            {data.loading && (
-                <div className="center">
-                    <LoadingSpinner asOverlay />
-                </div>
-            )}
+            {data.loading && <LoadingSpinner asOverlay />}
             {data.json?.data && <UsersList items={data.json.data as User[]} />}
         </>
     );
