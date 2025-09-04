@@ -15,7 +15,7 @@
     }
 
     .btn.danger {
-        @apply bg-red-800 text-white border-red-800;
-        @apply hover:bg-red-600;
+        @apply bg-red-600 text-white border-red-600;
+        @apply hover:bg-red-700;
     }
 }
