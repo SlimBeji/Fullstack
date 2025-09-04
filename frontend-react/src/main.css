@@ -53,6 +53,7 @@
 @import "./components/places/PlaceForm.css";
 @import "./components/places/PlaceItem.css";
 @import "./components/places/PlacesList.css";
+@import "./components/places/PlaceUpdateForm.css";
 
 /* Pages CSS */
 @import "./pages/Auth.css";
