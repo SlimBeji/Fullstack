@@ -5,6 +5,16 @@
 /* UI Colors */
 @theme {
     --color-background: var(--color-white);
+
+    --color-primary: var(--color-sky-400);
+    --color-primary-d1: var(--color-sky-600);
+    --color-primary-d2: var(--color-sky-800);
+    --color-primary-l1: var(--color-sky-300);
+    --color-primary-l2: var(--color-sky-50);
+
+    --color-txt: var(--color-stone-50);
+    --color-txt-d1: var(--color-stone-500);
+    --color-txt-d2: var(--color-stone-700);
 }
 
 /* Variants */

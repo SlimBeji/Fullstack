@@ -1,8 +1,8 @@
 @layer components {
     .main-header {
-        @apply flex items-center fixed z-50 top-0 left-0 md:justify-between;
+        @apply flex fixed z-50 top-0 left-0;
         @apply w-full h-16 px-4 shadow-md;
-        @apply bg-sky-400;
+        @apply bg-primary;
     }
 
     .main-header > div {
@@ -19,7 +19,7 @@
     }
 
     h1.app-header {
-        @apply text-2xl font-bold text-white;
+        @apply text-2xl font-bold text-txt;
     }
 
     button.hamburger {
@@ -28,6 +28,6 @@
     }
 
     button.hamburger span {
-        @apply block w-12 h-1 bg-white;
+        @apply block w-12 h-1 bg-background;
     }
 }

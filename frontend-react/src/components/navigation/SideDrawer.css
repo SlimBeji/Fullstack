@@ -13,6 +13,6 @@
 
     aside.sidedrawer {
         @apply fixed z-40 top-0 left-0 h-screen w-[70%];
-        @apply bg-white shadow-md;
+        @apply bg-background shadow-md;
     }
 }

@@ -10,17 +10,16 @@
 
     ul.links-container li a,
     ul.links-container li button {
-        @apply w-30 px-2 py-1;
+        @apply w-32 px-2 py-1;
         @apply text-center border rounded-sm text-lg cursor-pointer;
-        @apply text-stone-50 bg-sky-400 border-transparent;
-        @apply md:text-stone-50 md:border-transparent;
-
-        @apply hover:bg-sky-50 hover:text-stone-700 hover:border-transparent;
+        @apply text-txt bg-primary border-transparent;
+        @apply md:border-transparent;
+        @apply hover:bg-primary-l2 hover:text-txt-d2 hover:border-transparent;
     }
 
     ul.links-container li .active {
-        @apply bg-sky-600 border-transparent;
-        @apply md:bg-sky-50 md:text-stone-700;
+        @apply bg-primary-d1 border-transparent;
+        @apply md:bg-primary-l2 md:text-txt-d2;
     }
 
     ul.links-container li a {
@@ -28,6 +27,6 @@
     }
 
     ul.links-container li button {
-        @apply border border-transparent md:border-stone-50;
+        @apply border border-transparent md:border-txt;
     }
 }
