@@ -50,9 +50,9 @@
 @import "./components/user/UserItem.css";
 @import "./components/user/UsersList.css";
 
-@import "./components/places/PlaceForm.css";
 @import "./components/places/PlaceItem.css";
 @import "./components/places/PlacesList.css";
+@import "./components/places/PlaceCreateForm.css";
 @import "./components/places/PlaceUpdateForm.css";
 
 /* Pages CSS */
