@@ -2,26 +2,28 @@
 
 @import "tailwindcss";
 
-* {
-    box-sizing: border-box;
-}
-
-html {
-    font-family: "Open Sans", sans-serif;
-}
-
-body {
-    margin: 0;
-    background: white;
-}
-
-main {
-    margin-top: 5rem;
-}
-
+/* Variants */
 @custom-variant error (&:where(.error *));
 
 /* Global Styles */
+@layer base {
+    * {
+        @apply box-border;
+    }
+
+    html {
+        @apply font-sans;
+    }
+
+    body {
+        @apply m-0 bg-white;
+    }
+
+    main {
+        @apply mt-20;
+    }
+}
+
 @layer components {
     .card {
         @apply relative m-0 shadow-lg rounded-lg;
