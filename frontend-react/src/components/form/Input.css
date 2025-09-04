@@ -4,18 +4,18 @@
     }
 
     .input-container label {
-        @apply block mb-2 font-semibold text-gray-700 error:text-red-500;
+        @apply block mb-2 font-semibold text-txt-d2 error:text-danger;
     }
 
     .input-container textarea,
     .input-container input {
         @apply w-full rounded-md border px-3 py-2;
-        @apply text-gray-800 border-gray-300 bg-gray-50;
-        @apply focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500;
-        @apply error:bg-red-50 error:border-red-500;
+        @apply text-txt-d2 border-txt-d0 bg-txt;
+        @apply focus:border-secondary focus:outline-none;
+        @apply error:bg-danger-2 error:border-danger;
     }
 
     .input-container .error-text {
-        @apply mt-1 text-sm text-red-500;
+        @apply mt-1 text-sm text-danger;
     }
 }

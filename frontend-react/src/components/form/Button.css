@@ -1,21 +1,21 @@
 @layer components {
     .btn {
         @apply inline-block px-6 py-2 rounded-md text-base font-medium;
-        @apply bg-pink-600 hover:bg-pink-500 text-white border border-pink-600;
+        @apply bg-secondary-d1 hover:bg-secondary text-white border border-secondary-d1;
         @apply transition-colors duration-200 focus:outline-none;
     }
 
     .btn.disabled {
-        @apply bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed;
+        @apply bg-disabled text-disabled-2 border-disabled cursor-not-allowed;
     }
 
     .btn.inverse {
-        @apply bg-transparent text-pink-600 border-pink-600;
-        @apply hover:bg-pink-500 hover:text-white border;
+        @apply bg-transparent text-secondary-d1 border-secondary-d1;
+        @apply hover:bg-secondary hover:text-txt border;
     }
 
     .btn.danger {
-        @apply bg-red-600 text-white border-red-600;
-        @apply hover:bg-red-700;
+        @apply bg-danger text-background border-danger;
+        @apply hover:bg-danger-3;
     }
 }
