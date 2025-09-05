@@ -16,6 +16,14 @@
     --color-secondary-highlight: var(--color-pink-600);
     --color-secondary-background: var(--color-pink-50);
 
+    --color-success: var(--color-teal-500);
+    --color-success-highlight: var(--color-teal-600);
+    --color-success-background: var(--color-teal-50);
+
+    --color-warning: var(--color-orange-500);
+    --color-warning-highlight: var(--color-orange-600);
+    --color-warning-background: var(--color-orange-50);
+
     --color-danger: var(--color-red-500);
     --color-danger-highlight: var(--color-red-600);
     --color-danger-background: var(--color-red-50);
