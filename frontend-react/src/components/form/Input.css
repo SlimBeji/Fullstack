@@ -12,7 +12,7 @@
         @apply w-full rounded-md border px-3 py-2;
         @apply text-txt-d2 border-txt-d0 bg-txt;
         @apply focus:border-secondary focus:outline-none;
-        @apply error:bg-danger-2 error:border-danger;
+        @apply error:bg-danger-background error:border-danger;
     }
 
     .input-container .error-text {

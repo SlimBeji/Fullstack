@@ -16,6 +16,6 @@
 
     .btn.danger {
         @apply bg-danger text-background border-danger;
-        @apply hover:bg-danger-3;
+        @apply hover:bg-danger-highlight;
     }
 }
