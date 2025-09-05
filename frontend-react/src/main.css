@@ -8,6 +8,11 @@
     --color-background-contrast: var(--color-stone-50);
     --color-background-highlight: var(--color-stone-100);
 
+    --color-pen: var(--color-stone-700);
+    --color-pen-muted: var(--color-stone-500);
+    --color-pen-rule: var(--color-stone-300);
+    --color-pen-inverse: var(--color-stone-50);
+
     --color-primary: var(--color-sky-400);
     --color-primary-highlight: var(--color-sky-600);
     --color-primary-background: var(--color-sky-50);
@@ -33,11 +38,6 @@
     --color-disabled-border: var(--color-gray-300);
 
     --color-backdrop: var(--color-stone-300);
-
-    --color-txt: var(--color-stone-50);
-    --color-txt-d0: var(--color-stone-300);
-    --color-txt-d1: var(--color-stone-500);
-    --color-txt-d2: var(--color-stone-700);
 }
 
 /* Variants */

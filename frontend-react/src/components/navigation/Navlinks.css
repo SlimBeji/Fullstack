@@ -12,14 +12,14 @@
     ul.links-container li button {
         @apply w-32 px-2 py-1;
         @apply text-center border rounded-sm text-lg cursor-pointer;
-        @apply text-txt bg-primary border-transparent;
+        @apply text-pen-inverse bg-primary border-transparent;
         @apply md:border-transparent;
-        @apply hover:bg-primary-background hover:text-txt-d2 hover:border-transparent;
+        @apply hover:bg-primary-background hover:text-pen hover:border-transparent;
     }
 
     ul.links-container li .active {
         @apply bg-primary-highlight border-transparent;
-        @apply md:bg-primary-background md:text-txt-d2;
+        @apply md:bg-primary-background md:text-pen;
     }
 
     ul.links-container li a {
@@ -27,6 +27,6 @@
     }
 
     ul.links-container li button {
-        @apply border border-transparent md:border-txt;
+        @apply border border-transparent md:border-pen-inverse;
     }
 }

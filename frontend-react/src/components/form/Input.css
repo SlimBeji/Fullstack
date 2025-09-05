@@ -4,13 +4,13 @@
     }
 
     .input-container label {
-        @apply block mb-2 font-semibold text-txt-d2 error:text-danger;
+        @apply block mb-2 font-semibold text-pen error:text-danger;
     }
 
     .input-container textarea,
     .input-container input {
         @apply w-full rounded-md border px-3 py-2;
-        @apply text-txt-d2 border-txt-d0 bg-txt;
+        @apply text-pen border-pen-rule bg-background-contrast;
         @apply focus:border-secondary focus:outline-none;
         @apply error:bg-danger-background error:border-danger;
     }

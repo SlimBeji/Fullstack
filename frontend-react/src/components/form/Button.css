@@ -1,7 +1,7 @@
 @layer components {
     .btn {
         @apply inline-block px-6 py-2 rounded-md text-base font-medium;
-        @apply bg-secondary text-white border border-secondary;
+        @apply bg-secondary text-pen-inverse border border-secondary;
         @apply hover:bg-secondary-highlight;
         @apply transition-colors duration-200 focus:outline-none;
     }
@@ -12,7 +12,7 @@
 
     .btn.inverse {
         @apply bg-transparent text-secondary border-secondary;
-        @apply hover:bg-secondary-highlight hover:text-txt border;
+        @apply hover:bg-secondary-highlight hover:text-pen-inverse border;
     }
 
     .btn.danger {

@@ -10,11 +10,11 @@
     .image-upload > div > div {
         @apply flex items-center justify-center text-center overflow-hidden;
         @apply w-52 h-52 mb-4 border rounded-md;
-        @apply border-txt-d0 bg-background-highlight;
+        @apply border-pen-rule bg-background-highlight;
     }
 
     .image-upload .placeholder {
-        @apply text-txt-d1;
+        @apply text-pen-muted;
     }
 
     .image-upload img {

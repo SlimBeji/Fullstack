@@ -19,7 +19,7 @@
     }
 
     h1.app-header {
-        @apply text-2xl font-bold text-txt;
+        @apply text-2xl font-bold text-pen-inverse;
     }
 
     button.hamburger {

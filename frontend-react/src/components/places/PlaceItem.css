@@ -25,7 +25,7 @@
     }
 
     .place-item .place-actions {
-        @apply p-4 text-center border-t border-txt-d0;
+        @apply p-4 text-center border-t border-pen-rule;
     }
 
     .place-item .place-actions button,

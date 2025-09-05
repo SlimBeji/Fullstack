@@ -5,7 +5,7 @@
     }
 
     .auth-form > h2 {
-        @apply text-2xl font-bold text-txt-d2 mb-2;
+        @apply text-2xl font-bold text-pen mb-2;
     }
 
     .auth-form > hr {
