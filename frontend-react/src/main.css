@@ -8,8 +8,12 @@
     --color-background-contrast: var(--color-stone-50);
     --color-background-highlight: var(--color-stone-100);
 
-    --color-danger: var(--color-red-600);
-    --color-danger-highlight: var(--color-red-700);
+    --color-secondary: var(--color-pink-500);
+    --color-secondary-highlight: var(--color-pink-600);
+    --color-secondary-background: var(--color-pink-50);
+
+    --color-danger: var(--color-red-500);
+    --color-danger-highlight: var(--color-red-600);
     --color-danger-background: var(--color-red-50);
 
     --color-disabled-bg: var(--color-gray-300);
@@ -28,12 +32,6 @@
     --color-primary-d2: var(--color-sky-800);
     --color-primary-l1: var(--color-sky-300);
     --color-primary-l2: var(--color-sky-50);
-
-    --color-secondary: var(--color-pink-500);
-    --color-secondary-d1: var(--color-pink-600);
-    --color-secondary-d2: var(--color-pink-800);
-    --color-secondary-l1: var(--color-pink-300);
-    --color-secondary-l2: var(--color-pink-50);
 }
 
 /* Variants */
