@@ -8,6 +8,10 @@
     --color-background-contrast: var(--color-stone-50);
     --color-background-highlight: var(--color-stone-100);
 
+    --color-primary: var(--color-sky-400);
+    --color-primary-highlight: var(--color-sky-600);
+    --color-primary-background: var(--color-sky-50);
+
     --color-secondary: var(--color-pink-500);
     --color-secondary-highlight: var(--color-pink-600);
     --color-secondary-background: var(--color-pink-50);
@@ -26,12 +30,6 @@
     --color-txt-d0: var(--color-stone-300);
     --color-txt-d1: var(--color-stone-500);
     --color-txt-d2: var(--color-stone-700);
-
-    --color-primary: var(--color-sky-400);
-    --color-primary-d1: var(--color-sky-600);
-    --color-primary-d2: var(--color-sky-800);
-    --color-primary-l1: var(--color-sky-300);
-    --color-primary-l2: var(--color-sky-50);
 }
 
 /* Variants */
