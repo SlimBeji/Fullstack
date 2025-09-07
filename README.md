@@ -148,7 +148,7 @@ Variations:
 These groups follow a similar convention to **Bootstrap’s contextual colors**.  
 They serve both **theming** (primary/secondary) and **functional roles** (success/warning/danger).
 
--   `primary-*` and `secondary-*` → define the main theme colors of the dashboard.
+-   `primary-*` and `secondary-*` → define the main theme colors of the dashboard along with `surface-*` and `panel-*`.
 -   `success-*`, `warning-*`, `danger-*` → used for conveying functional meaning (feedback, alerts, validation).
 -   Each group provides consistent variations:
     -   `-on` → used for hover, focus, or active states
