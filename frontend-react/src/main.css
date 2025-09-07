@@ -34,8 +34,8 @@
     --color-danger-surface: var(--color-red-50);
 
     --color-disabled-surface: var(--color-gray-300);
-    --color-disabled-text: var(--color-gray-500);
-    --color-disabled-border: var(--color-gray-300);
+    --color-disabled-pen: var(--color-gray-500);
+    --color-disabled-rule: var(--color-gray-300);
 
     --color-backdrop: var(--color-stone-300);
 }
