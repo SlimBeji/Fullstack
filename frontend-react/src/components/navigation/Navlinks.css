@@ -14,12 +14,12 @@
         @apply text-center border rounded-sm text-lg cursor-pointer;
         @apply text-pen-inverse bg-primary border-transparent;
         @apply md:border-transparent;
-        @apply hover:bg-primary-background hover:text-pen hover:border-transparent;
+        @apply hover:bg-primary-surface hover:text-pen hover:border-transparent;
     }
 
     ul.links-container li .active {
         @apply bg-primary-highlight border-transparent;
-        @apply md:bg-primary-background md:text-pen;
+        @apply md:bg-primary-surface md:text-pen;
     }
 
     ul.links-container li a {

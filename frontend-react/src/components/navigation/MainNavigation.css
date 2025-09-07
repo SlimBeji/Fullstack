@@ -28,6 +28,6 @@
     }
 
     button.hamburger span {
-        @apply block w-12 h-1 bg-background;
+        @apply block w-12 h-1 bg-surface;
     }
 }

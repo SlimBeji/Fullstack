@@ -10,8 +10,8 @@
 
     .user-item-link {
         @apply flex items-center;
-        @apply size-full p-4 rounded-xl bg-background-contrast;
-        @apply hover:bg-background-highlight transition-colors duration-200;
+        @apply size-full p-4 rounded-xl bg-surface-alt;
+        @apply hover:bg-surface-on transition-colors duration-200;
     }
 
     .user-item .user-avatar {

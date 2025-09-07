@@ -1,7 +1,7 @@
 @layer components {
     .auth-form {
         @apply w-[90%] max-w-md mx-auto mt-10 p-6;
-        @apply text-center shadow-lg rounded-xl bg-background;
+        @apply text-center shadow-lg rounded-xl bg-surface;
     }
 
     .auth-form > h2 {

@@ -7,7 +7,7 @@
     }
 
     .btn.disabled {
-        @apply bg-disabled-bg text-disabled-text border-disabled-border cursor-not-allowed;
+        @apply bg-disabled-surface text-disabled-text border-disabled-border cursor-not-allowed;
     }
 
     .btn.inverse {
@@ -16,7 +16,7 @@
     }
 
     .btn.danger {
-        @apply bg-danger text-background border-danger;
+        @apply bg-danger text-pen-inverse border-danger;
         @apply hover:bg-danger-highlight;
     }
 }
