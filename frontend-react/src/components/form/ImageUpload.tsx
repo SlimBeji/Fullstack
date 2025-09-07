@@ -109,6 +109,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         });
     };
 
+    const isError = !state.isValid && state.uploadAttempt;
+
     return (
         <div className="image-upload">
             <input
@@ -130,9 +132,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     PICK IMAGE
                 </Button>
             </div>
-            {!state.isValid && state.uploadAttempt && (
-                <p className="error-text">{errorText}</p>
-            )}
+            <p className={`error-text ${isError ? "" : "invisible"}`}>
+                {errorText}
+            </p>
         </div>
     );
 };

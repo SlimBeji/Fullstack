@@ -129,11 +129,9 @@ const Input: React.FC<InputProps> = ({
         <div className={`input-container ${isError ? "error" : ""}`}>
             <label htmlFor={id}>{label}</label>
             <Tag {...tagProps} />
-            {isError && (
-                <p className="error-text">
-                    {errorText || "The input is not valid"}
-                </p>
-            )}
+            <p className={`error-text ${isError ? "" : "invisible"}`}>
+                {errorText || "The input is not valid"}
+            </p>
         </div>
     );
 };
