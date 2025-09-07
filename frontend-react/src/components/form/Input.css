@@ -10,7 +10,7 @@
     .input-container textarea,
     .input-container input {
         @apply w-full rounded-md border px-3 py-2;
-        @apply text-pen border-pen-rule bg-surface-alt;
+        @apply text-pen border-pen-ruler bg-surface-alt;
         @apply focus:border-secondary focus:outline-none;
         @apply error:bg-danger-surface error:border-danger;
     }

@@ -14,7 +14,7 @@
 
     --color-pen: var(--color-stone-700);
     --color-pen-muted: var(--color-stone-500);
-    --color-pen-rule: var(--color-stone-300);
+    --color-pen-ruler: var(--color-stone-300);
     --color-pen-inverse: var(--color-stone-50);
 
     --color-primary: var(--color-sky-400);
@@ -39,7 +39,7 @@
 
     --color-disabled-surface: var(--color-gray-300);
     --color-disabled-pen: var(--color-gray-500);
-    --color-disabled-rule: var(--color-gray-300);
+    --color-disabled-ruler: var(--color-gray-300);
 
     --color-backdrop: var(--color-stone-300);
 }

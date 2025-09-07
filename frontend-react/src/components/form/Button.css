@@ -7,7 +7,7 @@
     }
 
     .btn.disabled {
-        @apply bg-disabled-surface text-disabled-pen border-disabled-rule cursor-not-allowed;
+        @apply bg-disabled-surface text-disabled-pen border-disabled-ruler cursor-not-allowed;
     }
 
     .btn.inverse {
