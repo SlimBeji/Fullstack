@@ -2,7 +2,7 @@
     .btn {
         @apply inline-block px-6 py-2 rounded-md text-base font-medium;
         @apply bg-secondary text-pen-inverse border border-secondary;
-        @apply hover:bg-secondary-highlight;
+        @apply hover:bg-secondary-on;
         @apply transition-colors duration-200 focus:outline-none;
     }
 
@@ -12,11 +12,11 @@
 
     .btn.inverse {
         @apply bg-transparent text-secondary border-secondary;
-        @apply hover:bg-secondary-highlight hover:text-pen-inverse border;
+        @apply hover:bg-secondary-on hover:text-pen-inverse border;
     }
 
     .btn.danger {
         @apply bg-danger text-pen-inverse border-danger;
-        @apply hover:bg-danger-highlight;
+        @apply hover:bg-danger-on;
     }
 }

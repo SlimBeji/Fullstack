@@ -14,23 +14,23 @@
     --color-pen-inverse: var(--color-stone-50);
 
     --color-primary: var(--color-sky-400);
-    --color-primary-highlight: var(--color-sky-600);
+    --color-primary-on: var(--color-sky-600);
     --color-primary-surface: var(--color-sky-50);
 
     --color-secondary: var(--color-pink-500);
-    --color-secondary-highlight: var(--color-pink-600);
+    --color-secondary-on: var(--color-pink-600);
     --color-secondary-surface: var(--color-pink-50);
 
     --color-success: var(--color-teal-500);
-    --color-success-highlight: var(--color-teal-600);
+    --color-success-on: var(--color-teal-600);
     --color-success-surface: var(--color-teal-50);
 
     --color-warning: var(--color-orange-500);
-    --color-warning-highlight: var(--color-orange-600);
+    --color-warning-on: var(--color-orange-600);
     --color-warning-surface: var(--color-orange-50);
 
     --color-danger: var(--color-red-500);
-    --color-danger-highlight: var(--color-red-600);
+    --color-danger-on: var(--color-red-600);
     --color-danger-surface: var(--color-red-50);
 
     --color-disabled-surface: var(--color-gray-300);

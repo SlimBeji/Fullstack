@@ -18,7 +18,7 @@
     }
 
     ul.links-container li .active {
-        @apply bg-primary-highlight border-transparent;
+        @apply bg-primary-on border-transparent;
         @apply md:bg-primary-surface md:text-pen;
     }
 
