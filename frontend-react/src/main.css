@@ -8,6 +8,10 @@
     --color-surface-alt: var(--color-stone-50);
     --color-surface-on: var(--color-stone-100);
 
+    --color-panel: var(--color-stone-700);
+    --color-panel-alt: var(--color-stone-600);
+    --color-panel-on: var(--color-stone-500);
+
     --color-pen: var(--color-stone-700);
     --color-pen-muted: var(--color-stone-500);
     --color-pen-rule: var(--color-stone-300);
