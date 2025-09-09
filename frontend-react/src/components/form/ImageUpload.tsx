@@ -50,35 +50,37 @@ interface ImageUploadValue {
 
 interface ImageUploadProps {
     id: string;
-    center?: boolean;
+    disabled?: boolean;
+    inverse?: boolean;
+    color?: "primary" | "secondary" | "success" | "warning" | "danger";
     onInput: (val: ImageUploadValue, isValid: boolean) => void;
     errorText?: string;
     val?: ImageUploadValue;
     required?: boolean;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({
-    id,
-    onInput,
-    errorText = "Could not read the file",
-    val = undefined,
-    required = false,
-}) => {
+const ImageUpload: React.FC<ImageUploadProps> = (props) => {
+    const disabled = props.disabled ?? false;
+    const inverse = props.inverse && !disabled ? "inverse" : "";
+    const color = disabled ? "disabled" : props.color || "primary";
+    const className = `btn ${color} ${inverse}`;
+
     const [state, dispatch] = useReducer(inputReducer, {
-        file: val?.file || null,
-        url: val?.url || "",
+        file: props.val?.file || null,
+        url: props.val?.url || "",
         isValid: true,
         uploadAttempt: false,
     });
     const filePickerRef = useRef<HTMLInputElement>(null);
 
+    const { required, onInput } = props;
     useEffect(() => {
         let isValid = state.isValid;
         if (required) {
             isValid = state.url ? true : false;
         }
         onInput({ file: state.file, url: state.url }, isValid);
-    }, [onInput, required, state.url, state.file, state.isValid]);
+    }, [required, onInput, state.url, state.file, state.isValid]);
 
     const onClickHandler = (): void => {
         if (filePickerRef.current) {
@@ -114,7 +116,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     return (
         <div className="image-upload">
             <input
-                id={id}
+                id={props.id}
                 ref={filePickerRef}
                 className="hidden"
                 type="file"
@@ -128,12 +130,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         <p className="placeholder">Please pick an image.</p>
                     )}
                 </div>
-                <Button type="button" onClick={onClickHandler}>
+                <Button
+                    className={className}
+                    type="button"
+                    onClick={onClickHandler}
+                >
                     PICK IMAGE
                 </Button>
             </div>
             <p className={`error-text ${isError ? "" : "invisible"}`}>
-                {errorText}
+                {props.errorText}
             </p>
         </div>
     );

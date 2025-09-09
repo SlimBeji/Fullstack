@@ -78,6 +78,7 @@ const NewPlace: React.FC = () => {
                 />
                 <ImageUpload
                     id="image"
+                    color="secondary"
                     onInput={inputHandlers.image}
                     val={state.inputs.image.val}
                 />

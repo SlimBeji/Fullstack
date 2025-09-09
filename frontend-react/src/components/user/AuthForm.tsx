@@ -117,6 +117,7 @@ const Auth: React.FC = () => {
                     {!isLoginMode && (
                         <ImageUpload
                             id="image"
+                            color="secondary"
                             onInput={inputHandlers.image}
                             val={state.inputs.image.val}
                         />
