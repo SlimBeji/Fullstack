@@ -21,10 +21,9 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`/views/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
 - **`/stores/`** – Redux store, slices, and related logic.
-- **`/lib/`** – Contains reusable React logic including custom hooks.
+- **`/lib/`** – Contains reusable React logic including custom hooks and general-purpose TypeScript utilities.
 - **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
 - **`/assets/`** – Static assets such as image placeholders or icons.
-- **`/util/`** – Utility functions and general-purpose helpers.
 
 > In React, the more common convention is `/pages`, but `/views` is used here to align with the Vue project structure.
 
