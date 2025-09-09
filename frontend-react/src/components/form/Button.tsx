@@ -5,6 +5,9 @@ import { ButtonType } from "../../types";
 
 interface ButtonProps {
     children: ReactNode;
+    disabled?: boolean;
+    inverse?: boolean;
+    color?: "primary" | "secondary" | "success" | "warning" | "danger";
     className?: string;
     to?: string;
     href?: string;
@@ -13,8 +16,12 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = (props) => {
-    const classes = ` btn ${props.className || ""}`;
-    const isDisabled = classes.includes("disabled");
+    const customClasses = props.className || "";
+    const disabled = props.disabled ?? false;
+    const inverse = props.inverse && !disabled ? "inverse" : "";
+    const color = disabled ? "disabled" : props.color || "primary";
+
+    const className = ` btn ${color} ${inverse} ${customClasses}`;
 
     let Tag: ElementType = "button";
     const tagProps: any = {};
@@ -27,11 +34,11 @@ const Button: React.FC<ButtonProps> = (props) => {
     } else {
         tagProps.type = props.type || "button";
         tagProps.onClick = props.onClick;
-        if (isDisabled) tagProps.disabled = true;
+        if (disabled) tagProps.disabled = true;
     }
 
     return (
-        <Tag className={classes} {...tagProps}>
+        <Tag className={className} {...tagProps}>
             {props.children}
         </Tag>
     );
