@@ -46,9 +46,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
             <Button color="danger" onClick={onDelteHandler}>
                 DELETE
             </Button>
-            <Button inverse onClick={closeDeleteModal}>
-                CANCEL
-            </Button>
+            <Button onClick={closeDeleteModal}>CANCEL</Button>
         </>
     );
     return (
@@ -65,7 +63,11 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 show={showMap}
                 onCancel={closeMapHanlder}
                 header={place.address}
-                footer={<Button onClick={closeMapHanlder}>CLOSE</Button>}
+                footer={
+                    <Button inverse onClick={closeMapHanlder}>
+                        CLOSE
+                    </Button>
+                }
             >
                 <Map
                     position={place.location}
@@ -96,7 +98,11 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                         <p>{place.description}</p>
                     </div>
                     <div className="place-actions">
-                        <Button inverse onClick={openMapHanlder}>
+                        <Button
+                            color="secondary"
+                            inverse
+                            onClick={openMapHanlder}
+                        >
                             VIEW ON MAP
                         </Button>
                         {authData?.userId === place.creatorId && (

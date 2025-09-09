@@ -140,11 +140,16 @@ const Auth: React.FC = () => {
                         errorText="Please enter a password with at least 10 characters"
                     />
                     <div className="buttons">
-                        <Button disabled={!state.isValid} type="submit">
+                        <Button
+                            color="secondary"
+                            disabled={!state.isValid}
+                            type="submit"
+                        >
                             {verb}
                         </Button>
                         <Button
                             type="button"
+                            color="secondary"
                             inverse
                             onClick={onSwitchModeHandler}
                         >

@@ -30,7 +30,9 @@ const PlaceList: React.FC<PlaceListProps> = ({
             <div className="no-places">
                 <div className="card">
                     <h2>No places found. Maybe create one?</h2>
-                    <Button to="/places/new">Share</Button>
+                    <Button color="secondary" to="/places/new">
+                        Share
+                    </Button>
                 </div>
             </div>
         );
