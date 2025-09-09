@@ -16,16 +16,15 @@ The app uses the official **Redux Toolkit** library for state management, connec
 
 ## 🗂️ Project Structure (`/src`)
 
-- **`main.tsx`** – Entry point that mounts the root React component and connects the Redux store.
-- **`App.tsx`** – Defines the app’s routing logic for the single-page application.
+- **`main.tsx`** – Application entry point; renders the root <App /> component and sets up the Redux store provider.
+- **`App.tsx`** – Root component defining the global layout and routing.
+- **`/router/`** – Centralized application routing configuration.
 - **`/pages/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
 - **`/store/`** – Redux store, slices, and related logic and hooks.
 - **`/lib/`** – Contains reusable React logic including custom hooks and general-purpose TypeScript utilities.
 - **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
 - **`/assets/`** – Static assets such as image placeholders or icons.
-
-> In React, the more common convention is `/pages`, but `/views` is used here to align with the Vue project structure.
 
 ## 🧹 Linting
 
