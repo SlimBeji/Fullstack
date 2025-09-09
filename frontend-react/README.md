@@ -18,7 +18,7 @@ The app uses the official **Redux Toolkit** library for state management, connec
 
 - **`main.tsx`** – Entry point that mounts the root React component and connects the Redux store.
 - **`App.tsx`** – Defines the app’s routing logic for the single-page application.
-- **`/views/`** – Top-level route components rendered by `App`.
+- **`/pages/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
 - **`/store/`** – Redux store, slices, and related logic and hooks.
 - **`/lib/`** – Contains reusable React logic including custom hooks and general-purpose TypeScript utilities.

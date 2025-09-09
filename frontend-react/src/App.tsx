@@ -9,8 +9,8 @@ import {
 
 import { MainNavigation } from "./components/navigation";
 import { getAuthData } from "./lib";
+import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "./pages";
 import { authSlice, useAppDispatch, useAppSelector } from "./store";
-import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "./views";
 
 const route = (
     path: string,
