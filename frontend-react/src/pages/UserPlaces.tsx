@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { PlacesList } from "../components/places";
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { useHttp } from "../lib";
-import { useAppSelector } from "../stores";
+import { useAppSelector } from "../store";
 import { Place } from "../types";
 
 const UserPlaces: React.FC = () => {
