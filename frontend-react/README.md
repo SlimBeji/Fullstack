@@ -23,7 +23,7 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`/states/`** – Redux store, slices, and related logic.
 - **`/hooks/`** – Custom hooks like `useHttp` (for sending requests) or `useForm` (for managing form state and validation).
 - **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
-- **`/static/`** – Static assets such as image placeholders or icons.
+- **`/assets/`** – Static assets such as image placeholders or icons.
 - **`/util/`** – Utility functions and general-purpose helpers.
 
 ## 🧹 Linting

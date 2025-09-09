@@ -1,10 +1,10 @@
 import { useState } from "react";
 
+import placeholder from "../../assets/place_placeholder.jpg";
 import { Button } from "../../components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "../../components/ui";
 import { useHttp } from "../../hooks";
 import { useAppSelector } from "../../states";
-import placeholder from "../../static/place_placeholder.jpg";
 import { Place } from "../../types";
 
 interface PlaceItemProps {

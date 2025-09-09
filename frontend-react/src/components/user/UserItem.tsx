@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
+import placeholder from "../../assets/avatar_placeholder.jpg";
 import { Avatar } from "../../components/ui";
-import placeholder from "../../static/avatar_placeholder.jpg";
 import { User } from "../../types";
 
 interface UserItemProps {
