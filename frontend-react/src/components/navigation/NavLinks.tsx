@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 
-import { authSlice, useAppDispatch, useAppSelector } from "../../stores";
+import { authSlice, useAppDispatch, useAppSelector } from "../../store";
 
 interface NavLinkWrapperProps {
     to: string;

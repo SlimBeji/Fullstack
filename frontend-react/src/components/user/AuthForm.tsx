@@ -7,7 +7,7 @@ import {
     useForm,
     useHttp,
 } from "../../lib";
-import { authSlice, useAppDispatch } from "../../stores";
+import { authSlice, useAppDispatch } from "../../store";
 import { SigninResponse } from "../../types";
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";

@@ -20,14 +20,12 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`App.tsx`** – Defines the app’s routing logic for the single-page application.
 - **`/views/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
-- **`/stores/`** – Redux store, slices, and related logic.
+- **`/store/`** – Redux store, slices, and related logic and hooks.
 - **`/lib/`** – Contains reusable React logic including custom hooks and general-purpose TypeScript utilities.
 - **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
 - **`/assets/`** – Static assets such as image placeholders or icons.
 
 > In React, the more common convention is `/pages`, but `/views` is used here to align with the Vue project structure.
-
-> With Redux Toolkit, the app has a single store that combines multiple slices. The folder is named /stores (plural) to match the Vue convention, even though it contains only one Redux store.
 
 ## 🧹 Linting
 

@@ -7,7 +7,7 @@ import {
     useForm,
     useHttp,
 } from "../../lib";
-import { useAppSelector } from "../../stores";
+import { useAppSelector } from "../../store";
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
 const Form = {
