@@ -96,10 +96,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                     value={state.inputs.description.val}
                     isValid={state.inputs.description.isValid}
                 />
-                <Button
-                    type="submit"
-                    className={`${state.isValid ? "" : "disabled"}`}
-                >
+                <Button type="submit" disabled={!state.isValid}>
                     Edit Place
                 </Button>
             </form>
