@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-import { HeaderContent } from "../types";
+import { HeaderContent } from "../../types";
 import { getToken } from "./storage";
 
 export const getClient = (
