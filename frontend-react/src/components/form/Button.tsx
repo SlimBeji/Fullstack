@@ -20,8 +20,7 @@ const Button: React.FC<ButtonProps> = (props) => {
     const disabled = props.disabled ?? false;
     const inverse = props.inverse && !disabled ? "inverse" : "";
     const color = disabled ? "disabled" : props.color || "primary";
-
-    const className = ` btn ${color} ${inverse} ${customClasses}`;
+    const className = `btn ${color} ${inverse} ${customClasses}`;
 
     let Tag: ElementType = "button";
     const tagProps: any = {};
