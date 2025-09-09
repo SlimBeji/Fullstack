@@ -8,9 +8,9 @@ import {
 } from "react-router-dom";
 
 import { MainNavigation } from "./components/navigation";
-import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "./pages";
 import { authSlice, useAppDispatch, useAppSelector } from "./states";
 import { getAuthData } from "./util";
+import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "./views";
 
 const route = (
     path: string,
