@@ -1,22 +1,6 @@
 @layer components {
     .btn {
         @apply inline-block px-6 py-2 rounded-md text-base font-medium;
-        @apply bg-secondary text-pen-inverse border border-secondary;
-        @apply hover:bg-secondary-on;
         @apply transition-colors duration-200 focus:outline-none;
-    }
-
-    .btn.disabled {
-        @apply bg-disabled-surface text-disabled-pen border-disabled-ruler cursor-not-allowed;
-    }
-
-    .btn.inverse {
-        @apply bg-transparent text-secondary border-secondary;
-        @apply hover:bg-secondary-on hover:text-pen-inverse border;
-    }
-
-    .btn.danger {
-        @apply bg-danger text-pen-inverse border-danger;
-        @apply hover:bg-danger-on;
     }
 }

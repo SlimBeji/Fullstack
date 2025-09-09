@@ -72,6 +72,60 @@
         @apply bg-white overflow-hidden;
         @apply hover:translate-x-1 hover:shadow-xl transition-all duration-300;
     }
+
+    .primary {
+        @apply bg-primary text-pen-inverse border border-primary;
+        @apply hover:bg-primary-on;
+    }
+
+    .primary.inverse {
+        @apply bg-transparent text-primary border-primary;
+        @apply hover:bg-primary-on hover:text-pen-inverse border;
+    }
+
+    .secondary {
+        @apply bg-secondary text-pen-inverse border border-secondary;
+        @apply hover:bg-secondary-on;
+    }
+
+    .secondary.inverse {
+        @apply bg-transparent text-secondary border-secondary;
+        @apply hover:bg-secondary-on hover:text-pen-inverse border;
+    }
+
+    .success {
+        @apply bg-success text-pen-inverse border border-success;
+        @apply hover:bg-success-on;
+    }
+
+    .success.inverse {
+        @apply bg-transparent text-success border-success;
+        @apply hover:bg-success-on hover:text-pen-inverse border;
+    }
+
+    .warning {
+        @apply bg-warning text-pen-inverse border border-warning;
+        @apply hover:bg-warning-on;
+    }
+
+    .warning.inverse {
+        @apply bg-transparent text-warning border-warning;
+        @apply hover:bg-warning-on hover:text-pen-inverse border;
+    }
+
+    .danger {
+        @apply bg-danger text-pen-inverse border-danger;
+        @apply hover:bg-danger-on;
+    }
+
+    .danger.inverse {
+        @apply bg-transparent text-danger border-danger;
+        @apply hover:bg-danger-on hover:text-pen-inverse border;
+    }
+
+    .disabled {
+        @apply bg-disabled-surface text-disabled-pen border-disabled-ruler cursor-not-allowed;
+    }
 }
 
 /* Components CSS */
