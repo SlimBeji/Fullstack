@@ -18,8 +18,11 @@ console.log(import.meta.env.VITE_BACKEND_URL);
             <HelloWorld msg="You did it!" />
 
             <nav>
-                <RouterLink to="/">Home</RouterLink>
-                <RouterLink to="/about">About</RouterLink>
+                <RouterLink to="/auth">Auth</RouterLink>
+                <RouterLink to="/">Users</RouterLink>
+                <RouterLink to="/places/new">New Place</RouterLink>
+                <RouterLink to="/places/p123">Edit Place</RouterLink>
+                <RouterLink to="/u123/places">User Places</RouterLink>
             </nav>
         </div>
     </header>
