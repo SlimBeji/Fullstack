@@ -1,8 +1,8 @@
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import { useCallback, useEffect, useReducer, useRef } from "react";
 
-import { HeaderContent, HttpMethods } from "../types";
-import { getClient } from "../util";
+import { HeaderContent, HttpMethods } from "../../types";
+import { getClient } from "../../util";
 
 const TOKEN_EXPIRED = "Token expired";
 

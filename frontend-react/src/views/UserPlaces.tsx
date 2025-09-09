@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { PlacesList } from "../components/places";
 import { HttpError, LoadingSpinner } from "../components/ui";
-import { useHttp } from "../hooks";
+import { useHttp } from "../lib";
 import { useAppSelector } from "../stores";
 import { Place } from "../types";
 

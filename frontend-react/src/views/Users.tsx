@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { HttpError, LoadingSpinner } from "../components/ui";
 import { UsersList } from "../components/user";
-import { useHttp } from "../hooks";
+import { useHttp } from "../lib";
 import { User } from "../types";
 
 const Users: React.FC = () => {

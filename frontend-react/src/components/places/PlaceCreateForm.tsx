@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { emptyStateBuilder, useForm, useHttp } from "../../hooks";
+import { emptyStateBuilder, useForm, useHttp } from "../../lib";
 import { useAppSelector } from "../../stores";
 import { minLengthValidator } from "../../util";
 import { Button, ImageUpload, Input } from "../form";

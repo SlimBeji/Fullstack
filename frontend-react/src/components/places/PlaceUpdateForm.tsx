@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import { useEffect, useMemo } from "react";
 
-import { emptyStateBuilder, useForm, useHttp } from "../../hooks";
+import { emptyStateBuilder, useForm, useHttp } from "../../lib";
 import { minLengthValidator } from "../../util";
 import { Button, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
