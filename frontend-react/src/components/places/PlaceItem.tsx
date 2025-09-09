@@ -4,7 +4,7 @@ import placeholder from "../../assets/place_placeholder.jpg";
 import { Button } from "../../components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "../../components/ui";
 import { useHttp } from "../../hooks";
-import { useAppSelector } from "../../states";
+import { useAppSelector } from "../../stores";
 import { Place } from "../../types";
 
 interface PlaceItemProps {

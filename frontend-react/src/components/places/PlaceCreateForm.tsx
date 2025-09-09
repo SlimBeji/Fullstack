@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { emptyStateBuilder, useForm, useHttp } from "../../hooks";
-import { useAppSelector } from "../../states";
+import { useAppSelector } from "../../stores";
 import { minLengthValidator } from "../../util";
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";

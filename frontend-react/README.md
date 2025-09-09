@@ -20,7 +20,7 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`App.tsx`** – Defines the app’s routing logic for the single-page application.
 - **`/views/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
-- **`/states/`** – Redux store, slices, and related logic.
+- **`/stores/`** – Redux store, slices, and related logic.
 - **`/hooks/`** – Custom hooks like `useHttp` (for sending requests) or `useForm` (for managing form state and validation).
 - **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
 - **`/assets/`** – Static assets such as image placeholders or icons.

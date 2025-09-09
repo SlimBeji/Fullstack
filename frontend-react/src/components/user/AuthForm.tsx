@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { emptyStateBuilder, useForm, useHttp } from "../../hooks";
-import { authSlice, useAppDispatch } from "../../states";
+import { authSlice, useAppDispatch } from "../../stores";
 import { SigninResponse } from "../../types";
 import { emailValidator, minLengthValidator } from "../../util";
 import { Button, ImageUpload, Input } from "../form";
