@@ -82,7 +82,54 @@ Prefixes `backend-` and `frontend-` are used so that the folders of the backend 
 -   **Redis**: In-memory database used for caching and as a message broker.
 -   **RedisInsight**: Web UI for inspecting and managing Redis data.
 
-## 📐 Frontend Building
+## 📐 Frontend Strcuture
+
+### 📁 `/src` Folder
+
+Each framework has its own specifics and terminology, but a common structure can be identified.
+
+#### 📁📁 Entrypoints
+
+Entry files that initialize the application (`main`) and define the root component (`App`):
+
+-   **React** → `main.tsx` + `App.tsx`
+-   **Vue** → `main.ts` + `App.vue`
+-   **Svelte** → `main.ts` + `App.svelte`
+-   **Angular** → `main.ts` + `app.component.ts` (via `AppModule`)
+
+#### 📁📁 Pages / Views / Routes
+
+Top-level components that represent whole pages. Terminology varies:
+
+-   **React** → `/pages`
+-   **Vue** → `/views`
+-   **SvelteKit** → `/routes`
+-   **Angular** → `/pages` or feature modules
+
+#### 📁📁 Components
+
+Reusable UI components and layout building blocks. This convention is shared across all frameworks.
+
+#### 📁📁 Store / Stores
+
+Holds application state management logic.
+
+-   **React** → with Redux Toolkit, a single `/store` is common since multiple slices are combined into one store.
+-   **Vue** → with Pinia, `/stores` (plural) is common since you work with multiple independent stores.
+-   **Svelte** → `/stores` is used for reactive Svelte stores.
+-   **Angular** → `/store` when using NgRx
+
+#### 📁📁 Lib
+
+Contains general-purpose TypeScript utilities and framework specific logic such as **hooks** for React and **composables** for Vue.
+
+#### 📁📁 Types
+
+Shared type definitions such as `Enums`, `Interfaces`, and reusable `Types`. Centralizes consumed data models and contracts.
+
+#### 📁📁 Assets
+
+Static files such as images, icons, and fonts.
 
 ### 🎨 Theme Colors
 
