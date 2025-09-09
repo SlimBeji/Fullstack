@@ -26,6 +26,10 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`/assets/`** – Static assets such as image placeholders or icons.
 - **`/util/`** – Utility functions and general-purpose helpers.
 
+> In React, the more common convention is `/pages`, but `/views` is used here to align with the Vue project structure.
+
+> With Redux Toolkit, the app has a single store that combines multiple slices. The folder is named /stores (plural) to match the Vue convention, even though it contains only one Redux store.
+
 ## 🧹 Linting
 
 This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
