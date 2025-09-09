@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach fastapi --attach react 
+	docker-compose up --attach fastapi --attach vue 
 
 build:
 	docker-compose build
@@ -29,6 +29,14 @@ react-lint:
 	docker exec -it react npx eslint "src/**/*.ts" --fix
 	docker exec -it react npx eslint "src/**/*.tsx" --fix
 	docker exec -it react npx prettier --write . | grep -v "(unchanged)"
+
+# Vue commands
+vue-build:
+	docker-compose build vue
+	cd frontend-vue; npm install
+
+vue-bash:
+	docker exec -it vue bash
 
 # Express commands
 express-build:

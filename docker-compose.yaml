@@ -11,8 +11,21 @@ services:
             - /app/node_modules
         env_file:
             - ./frontend-react/react.env
-        depends_on:
-            - express
+        command: npm run dev
+        restart: on-failure
+
+    vue:
+        build:
+            context: .
+            dockerfile: ./frontend-vue/vue.Dockerfile
+        container_name: vue
+        ports:
+            - 8001:5173
+        volumes:
+            - ./frontend-vue:/app
+            - /app/node_modules
+        env_file:
+            - ./frontend-vue/vue.env
         command: npm run dev
         restart: on-failure
 
