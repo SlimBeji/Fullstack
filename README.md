@@ -34,8 +34,8 @@ Each backend implements the **same logic**, **routes**, and **data models**:
 | ---------- | ---------------------------------------- | ------------------------- |
 | TypeScript | [Express](https://expressjs.com/)        | http://localhost:5000/api |
 | Python     | [FastAPI](https://fastapi.tiangolo.com/) | http://localhost:5001/api |
+| Rust       | [Axum](https://actix.rs/)                | _Not Implemented Yet_     |
 | Go         | [Gin](https://gin-gonic.com/)            | _Not Implemented Yet_     |
-| Rust       | [Axum](https://github.com/tokio-rs/axum) | _Not Implemented Yet_     |
 
 Each backend connects to a shared set of services (e.g., MongoDB, Redis).
 
@@ -47,8 +47,8 @@ Each frontend is a modern **Single Page Application (SPA)** built using popular 
 | --------- | --------------------- | ---------------- |
 | React     | http://localhost:8000 | `react.env`      |
 | Vue       | _Not Implemented Yet_ | `vue.env`        |
-| Angular   | _Not Implemented Yet_ | `angular.env`    |
 | Svelte    | _Not Implemented Yet_ | `svelte.env`     |
+| Angular   | _Not Implemented Yet_ | `angular.env`    |
 
 All frontends communicate with any backend through the **same REST API**, enabling a **plug-and-play architecture**.
 
@@ -355,7 +355,7 @@ It is used to **auto-generate Swagger UI documentation** from the defined routes
 > ⚠️ Depending on the framework:
 >
 > -   **FastAPI**: Automatically generates Swagger UI from route and schema definitions.
-> -   **Express/Gin/Axum**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
+> -   **Express/Gin/Actix**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
 
 #### 📁📁 Routes
 
@@ -562,7 +562,7 @@ Stores **static assets** like images or files that may be served by the backend 
 ## 🚀 Next Steps
 
 -   Add a **Vue** SPA frontend
--   Add the **Go/Gin** backend
+-   Add the **Rust/Actix** backend
 -   Add a **Svelt** SPA frontend
--   Add the **Rust/Axium** backend
+-   Add the **Go/Gin** backend
 -   Add an **Angular** SPA frontend
