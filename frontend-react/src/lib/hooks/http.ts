@@ -75,36 +75,18 @@ const reducer = (state: State, action: Action): State => {
                 json: action.payload.data,
             };
         case ActionType.PARSE_ERROR: {
-            // We should catch an expired token before sending a request and handle
-            // it in the STORED_TOKEN_EXPIRED action. It is possible though to have
-            // the token expired while being sent or the frontend app did not detect it
-            const errResponse = action.payload.response;
-            const status = errResponse?.status;
-            const errorData = errResponse?.data as any;
-            const errMessage: string = errorData?.details?.error || "";
-            if (errMessage === TOKEN_EXPIRED) {
-                return {
-                    loading: false,
-                    statusCode: status,
-                    error: {
-                        tokenExpired: true,
-                        message: TOKEN_EXPIRED,
-                        response: errResponse,
-                    },
-                };
-            }
-
-            // Not a token related problem
-            const data = action.payload.response?.data as { message?: string };
-            const message = data?.message || "Something went wrong!";
+            const statusCode = action.payload.status;
+            const response = action.payload.response;
+            const data = response?.data as {
+                message?: string;
+                details?: { error: any };
+            };
+            const message = data.message || "Something went wrong!";
+            const tokenExpired = message === TOKEN_EXPIRED;
             return {
                 loading: false,
-                statusCode: action.payload.status,
-                error: {
-                    tokenExpired: false,
-                    message,
-                    response: action.payload.response,
-                },
+                statusCode,
+                error: { tokenExpired, message, response },
             };
         }
         case ActionType.CLEAR_ERROR:
@@ -133,20 +115,6 @@ export const useHttp = (
     const abortControllerRef = useRef<AbortController>(null);
     const [state, dispatch] = useReducer(reducer, emptyState);
 
-    const dispatchOk = (resp: AxiosResponse): void => {
-        dispatch({
-            type: ActionType.PARSE_RESPONSE,
-            payload: resp,
-        });
-    };
-
-    const dispatchNotOk = (err: AxiosError): void => {
-        dispatch({
-            type: ActionType.PARSE_ERROR,
-            payload: err,
-        });
-    };
-
     const sendRequest = useCallback(
         async (
             url: string,
@@ -164,8 +132,9 @@ export const useHttp = (
                 contentType = "multipart/form-data";
             }
             const webClient = getClient(contentType);
-            const token = webClient.defaults.headers.Authorization;
 
+            // Check the Token
+            const token = webClient.defaults.headers.Authorization;
             if (!token && tokenRequired) {
                 dispatch({ type: ActionType.STORED_TOKEN_EXPIRED });
                 abortControllerRef.current = null;
@@ -182,7 +151,10 @@ export const useHttp = (
                 });
 
                 // Handle good response
-                dispatchOk(resp);
+                dispatch({
+                    type: ActionType.PARSE_RESPONSE,
+                    payload: resp,
+                });
                 return resp;
             } catch (err) {
                 // Handle error
@@ -191,13 +163,19 @@ export const useHttp = (
                         err.response?.status === HttpStatusCode.NotFound &&
                         options.ignoreNotFound
                     ) {
-                        dispatchOk(err.response);
+                        dispatch({
+                            type: ActionType.PARSE_RESPONSE,
+                            payload: err.response,
+                        });
                         return err.response;
                     } else {
-                        dispatchNotOk(err);
+                        dispatch({
+                            type: ActionType.PARSE_ERROR,
+                            payload: err,
+                        });
+                        throw err;
                     }
                 }
-
                 throw err;
             } finally {
                 abortControllerRef.current = null;
