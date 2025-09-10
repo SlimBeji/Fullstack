@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import { useAuthStore } from "@/stores";
 import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/views";
 
 const router = createRouter({
@@ -35,6 +36,14 @@ const router = createRouter({
             redirect: "/",
         },
     ],
+});
+
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+    if (to.path !== "/auth" && !authStore.isLoggedIn) {
+        return next("/auth");
+    }
+    next();
 });
 
 export default router;
