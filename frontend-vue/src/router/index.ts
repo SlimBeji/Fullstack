@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+
 import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/views";
 
 const router = createRouter({
