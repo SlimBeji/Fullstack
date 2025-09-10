@@ -38,6 +38,10 @@ vue-build:
 vue-bash:
 	docker exec -it vue bash
 
+vue-lint:
+	docker exec -it vue npm run lint
+	docker exec -it vue npm run format | grep -v "(unchanged)"
+
 # Express commands
 express-build:
 	docker-compose build express
