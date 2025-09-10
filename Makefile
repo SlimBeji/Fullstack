@@ -25,7 +25,7 @@ react-bash:
 	docker exec -it react bash
 
 react-lint:
-	docker exec -it react npx tsc --noEmit
+	docker exec -it react npx tsc -b --noEmit
 	docker exec -it react npx eslint "src/**/*.ts" --fix
 	docker exec -it react npx eslint "src/**/*.tsx" --fix
 	docker exec -it react npx prettier --write . | grep -v "(unchanged)"
