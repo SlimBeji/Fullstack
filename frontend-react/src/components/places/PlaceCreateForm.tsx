@@ -36,7 +36,7 @@ const NewPlace: React.FC = () => {
         formData.append("address", state.inputs.address.val);
         formData.append("creatorId", authData?.userId || "");
         try {
-            await sendRequest("/places", "post", formData);
+            await sendRequest("/places/", "post", formData);
             navigate("/");
         } catch (err) {
             console.log(err);

@@ -23,7 +23,7 @@ const UserPlaces: React.FC = () => {
 
             try {
                 await sendRequest(
-                    `/places?creatorId=${userId}`,
+                    `/places/?creatorId=${userId}`,
                     "get",
                     undefined,
                     false
