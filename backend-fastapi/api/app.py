@@ -29,7 +29,7 @@ def register_static_folder(
 
 
 def add_cors(app: FastAPI):
-    origins = ["*"]
+    origins = [settings.APP_URL]
     methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     headers = [
         "Origin",
