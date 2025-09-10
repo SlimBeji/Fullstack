@@ -24,6 +24,7 @@ export default defineConfigWithVueTs(
             "simple-import-sort": pluginImportSort,
         },
         rules: {
+            "@typescript-eslint/no-explicit-any": "off",
             "vue/multi-word-component-names": "off",
             "simple-import-sort/imports": "warn",
             "simple-import-sort/exports": "warn",

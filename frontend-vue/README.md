@@ -34,6 +34,7 @@ This project was created with npm create vue@latest, with ESLint (error checking
 
 - Added eslint-plugin-simple-import-sort to keep imports consistently ordered.
 - Disabled vue/multi-word-component-names to allow single-word component names.
+- Enable usage of `any` keyword.
 
 ```js
 {
