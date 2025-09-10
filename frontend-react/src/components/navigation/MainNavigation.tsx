@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { useAppSelector } from "../../store";
 import Backdrop from "../ui/Backdrop";
 import NavLinks from "./NavLinks";
 import SideDrawer from "./SideDrawer";
 
 const MainNavigation: React.FC = () => {
     const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+
+    const authData = useAppSelector((state) => state.auth.data);
+    const isLoggedIn = !!authData;
 
     const openDrawer = (): void => {
         setDrawerIsOpen(true);
@@ -26,17 +30,21 @@ const MainNavigation: React.FC = () => {
             </SideDrawer>
             <header className="main-header">
                 <div>
-                    <button className="hamburger" onClick={openDrawer}>
-                        <span />
-                        <span />
-                        <span />
-                    </button>
+                    {isLoggedIn && (
+                        <button className="hamburger" onClick={openDrawer}>
+                            <span />
+                            <span />
+                            <span />
+                        </button>
+                    )}
                     <h1 className="app-header">
                         <Link to="/">Your Places</Link>
                     </h1>
-                    <nav className="main">
-                        <NavLinks />
-                    </nav>
+                    {isLoggedIn && (
+                        <nav className="main">
+                            <NavLinks />
+                        </nav>
+                    )}
                 </div>
             </header>
         </>

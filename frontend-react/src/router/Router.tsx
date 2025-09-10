@@ -42,6 +42,8 @@ const Router: React.FC = () => {
                 {route("/auth", <Auth />, !authData, "/")}
 
                 {/* Auth required Routes */}
+                {route("/", <Users />)}
+                {route("/:userId/places", <UserPlaces />)}
                 {route("/places/new", <NewPlace />, !!authData, "/auth")}
                 {route(
                     "/places/:placeId",
@@ -49,10 +51,6 @@ const Router: React.FC = () => {
                     !!authData,
                     "/auth"
                 )}
-
-                {/* Public Routes */}
-                {route("/:userId/places", <UserPlaces />)}
-                {route("/", <Users />)}
 
                 {/* Default Route */}
                 {route("*", <Navigate to="/" replace />)}
