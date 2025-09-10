@@ -16,36 +16,37 @@ The app uses **Pinia** as the official state management library for Vue 3, conne
 
 ## 🗂️ Project Structure (`/src`)
 
--   **`main.ts`** – Application entry point; creates the Vue app, configures plugins, and mounts the root component.
--   **`App.vue`** – Root Vue component defining the global layout and routing.
--   **`/router/`** – Centralized application routing configuration (Vue Router).
--   **`/views/`** – Top-level route components rendered by `App`.
--   **`/components/`** – Reusable UI components and layout building blocks.
--   **`/stores/`** – Pinia stores containing application state and related logic.
--   **`/lib/`** – Contains reusable Vue logic including composables and general-purpose TypeScript utilities.
--   **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
--   **`/assets/`** – Static assets such as image placeholders or icons.
+- **`main.ts`** – Application entry point; creates the Vue app, configures plugins, and mounts the root component.
+- **`App.vue`** – Root Vue component defining the global layout and routing.
+- **`/router/`** – Centralized application routing configuration (Vue Router).
+- **`/views/`** – Top-level route components rendered by `App`.
+- **`/components/`** – Reusable UI components and layout building blocks.
+- **`/stores/`** – Pinia stores containing application state and related logic.
+- **`/lib/`** – Contains reusable Vue logic including composables and general-purpose TypeScript utilities.
+- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
+- **`/assets/`** – Static assets such as image placeholders or icons.
 
 ## 🧹 Linting
 
-This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
+This project was created with npm create vue@latest, with ESLint (error checking) and Prettier (code formatting) enabled from the start.
 
-### 🛠 ESLint
+### 🔑 ESLint Customization
 
-The configuration uses the modern `eslint.config.js` format and includes the following plugins:
+- Added eslint-plugin-simple-import-sort to keep imports consistently ordered.
+- Disabled vue/multi-word-component-names to allow single-word component names.
 
--   **[@typescript-eslint](https://typescript-eslint.io/):** TypeScript-specific linting rules.
--   **[eslint-plugin-unused-imports](https://www.npmjs.com/package/eslint-plugin-unused-imports):**  
-    Automatically detects and removes unused imports and variables.
--   **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**  
-    Enforces consistent ordering of imports and exports.
-
-#### 🔑 Key ESLint Rules
-
--   `no-unused-vars` and `no-undef`: **Disabled** (handled by TypeScript and `unused-imports`).
--   `unused-imports/no-unused-vars`: **Warn**, ignores variables/args starting with `_`.
--   `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
--   `no-useless-escape`: **Disabled** to avoid messing with regular expressions.
+```js
+{
+    plugins: {
+        "simple-import-sort": pluginImportSort,
+    },
+    rules: {
+        "vue/multi-word-component-names": "off",
+        "simple-import-sort/imports": "warn",
+        "simple-import-sort/exports": "warn",
+    },
+}
+```
 
 ### 🎨 Prettier
 
