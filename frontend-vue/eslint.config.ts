@@ -1,10 +1,11 @@
-import { globalIgnores } from "eslint/config";
+import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
 import {
     defineConfigWithVueTs,
     vueTsConfigs,
 } from "@vue/eslint-config-typescript";
+import { globalIgnores } from "eslint/config";
+import pluginImportSort from "eslint-plugin-simple-import-sort";
 import pluginVue from "eslint-plugin-vue";
-import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
 
 export default defineConfigWithVueTs(
     {
@@ -19,8 +20,13 @@ export default defineConfigWithVueTs(
     skipFormatting,
 
     {
+        plugins: {
+            "simple-import-sort": pluginImportSort,
+        },
         rules: {
             "vue/multi-word-component-names": "off",
+            "simple-import-sort/imports": "error",
+            "simple-import-sort/exports": "error",
         },
     }
 );

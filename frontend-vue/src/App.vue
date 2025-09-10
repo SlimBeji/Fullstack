@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+
 import HelloWorld from "./components/HelloWorld.vue";
 console.log(import.meta.env.VITE_BACKEND_URL);
 </script>
