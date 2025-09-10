@@ -14,7 +14,9 @@
         "type-check": "vue-tsc --build"
     },
     "dependencies": {
+        "@tailwindcss/vite": "^4.1.13",
         "pinia": "^3.0.3",
+        "tailwindcss": "^4.1.13",
         "vue": "^3.5.18",
         "vue-router": "^4.5.1"
     },
