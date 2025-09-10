@@ -28,7 +28,7 @@ export const useHttp = (options: useHttpOptions = {}) => {
     const abortControllerRef = ref<AbortController | null>(null);
     const httpData = ref<State>(emptyState);
 
-    const resetState = () => {
+    const clear = () => {
         httpData.value = { loading: false };
     };
 
@@ -48,7 +48,6 @@ export const useHttp = (options: useHttpOptions = {}) => {
         };
         const message = data.message || "Something went wrong!";
         const tokenExpired = message === TOKEN_EXPIRED;
-
         httpData.value = {
             loading: false,
             statusCode,
@@ -119,6 +118,6 @@ export const useHttp = (options: useHttpOptions = {}) => {
     return {
         httpData,
         sendRequest,
-        resetState,
+        clear,
     };
 };
