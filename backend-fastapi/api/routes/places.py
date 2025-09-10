@@ -24,15 +24,21 @@ place_id_param = Path(
 @place_router.get(
     "/", summary="Search and Filter places", response_model=PlacesPaginatedSchema
 )
-async def get_places(query: Annotated[PlaceSearchGetSchema, Query()]):
-    return await crud_place.fetch(query)
+async def get_places(
+    query: Annotated[PlaceSearchGetSchema, Query()],
+    user: UserReadSchema = Depends(get_current_user),
+):
+    return await crud_place.safe_fetch(user, query)
 
 
 @place_router.post(
     "/query", summary="Search and Retrieve places", response_model=PlacesPaginatedSchema
 )
-async def get_places_from_post(query: PlaceSearchSchema):
-    return await crud_place.fetch(query)
+async def get_places_from_post(
+    query: PlaceSearchSchema,
+    user: UserReadSchema = Depends(get_current_user),
+):
+    return await crud_place.safe_fetch(user, query)
 
 
 @place_router.post("/", summary="Place creation", response_model=PlaceReadSchema)
@@ -48,8 +54,11 @@ async def create_place(
     summary="Search and Retrieve place by id",
     response_model=PlaceReadSchema,
 )
-async def get_place(place_id: str = place_id_param):
-    return await crud_place.get(place_id)
+async def get_place(
+    place_id: str = place_id_param,
+    user: UserReadSchema = Depends(get_current_user),
+):
+    return await crud_place.safe_get(user, place_id)
 
 
 @place_router.put(
