@@ -9,7 +9,6 @@ from api.openapi import OPENAPI_METADATA
 from api.routes import routers
 from config import settings
 from lib.sync import close_all, start_all
-from types_ import HttpMiddleware
 
 
 def register_routers(
