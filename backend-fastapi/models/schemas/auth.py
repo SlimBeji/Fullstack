@@ -1,34 +1,16 @@
-from typing import Annotated, Literal
+from typing import Literal
 
-from fastapi import Form
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 
-from models.schemas.user import UserFields, UserMultipartFields
+from models.fields import AuthAnnotations, UserAnnotations, UserFields
 from types_ import FileToUpload
-
-# --- Fields ----
-
-access_token_field = Annotated[
-    str,
-    Field(
-        description="A generated web token. The 'Bearer ' prefix needs to be added for authentication",
-        examples=[
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"
-        ],
-    ),
-]
-
-expires_in_field = Annotated[
-    int,
-    Field(description="The UNIX timestamp the token expires at", examples=[1751879562]),
-]
 
 # --- Token ----
 
 
 class TokenPayload(BaseModel):
-    userId: UserFields.id
-    email: UserFields.email
+    userId: UserAnnotations.id
+    email: UserAnnotations.email
 
 
 # --- Signup Schemas ----
@@ -37,10 +19,10 @@ class TokenPayload(BaseModel):
 class SignupForm:
     def __init__(
         self,
-        name: str = UserMultipartFields.name,
-        email: EmailStr = UserMultipartFields.email,
-        password: str = UserMultipartFields.password,
-        image: FileToUpload | None = UserMultipartFields.image,
+        name: str = UserFields.name.multipart,
+        email: EmailStr = UserFields.email.multipart,
+        password: str = UserFields.password.multipart,
+        image: FileToUpload | None = UserFields.image.multipart,
     ):
         self.name = name
         self.email = email
@@ -59,17 +41,8 @@ class SignupForm:
 class SigninForm:
     def __init__(
         self,
-        username: str = Form(
-            ...,
-            description="The user email",
-            examples=["mslimbeji@gmail.com"],
-        ),
-        password: str = Form(
-            ...,
-            min_length=8,
-            description="The user password, 8 characters at least",
-            examples=["very_secret"],
-        ),
+        username: str = UserFields.email.multipart,
+        password: str = UserFields.password.multipart,
     ):
         self.username = username
         self.password = password
@@ -79,8 +52,8 @@ class SigninForm:
 
 
 class EncodedTokenSchema(BaseModel):
-    access_token: access_token_field
+    access_token: AuthAnnotations.access_token
     token_type: Literal["bearer"]
-    userId: UserFields.id
-    email: UserFields.email
-    expires_in: expires_in_field
+    userId: UserAnnotations.id
+    email: UserAnnotations.email
+    expires_in: AuthAnnotations.expires_in
