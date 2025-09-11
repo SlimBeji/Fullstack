@@ -5,6 +5,7 @@ from beanie.odm.fields import PydanticObjectId
 from fastapi import File, Form
 from pydantic import BaseModel, Field, Json
 
+from config import settings
 from models.schemas.utils import QueryFilters, build_search_schema
 from types_ import FileToUpload, PaginatedData
 
@@ -208,6 +209,12 @@ class PlaceFiltersSchema(BaseModel):
     creatorId: QueryFilters[PlaceFields.creator_id]
     locationLat: QueryFilters[PlaceFields.location_lat]
     locationLng: QueryFilters[PlaceFields.location_lng]
+
+    # Defauult fields
+    page: Annotated[int, Field(1, description="The page number")]
+    size: Annotated[
+        int, Field(settings.MAX_ITEMS_PER_PAGE, description="Items per page")
+    ]
 
 
 class PlaceSearchSchema(

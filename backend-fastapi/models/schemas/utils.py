@@ -270,19 +270,6 @@ class QueryFilters(Generic[T]):
 # Search Schema
 
 
-def _build_pagination_fields() -> dict[str, tuple[type[Any], Any]]:
-    fields: dict[str, tuple[type[Any], Any]] = {}
-    fields["page"] = (
-        cast(type[Any], Annotated[int, Field(description="The page number")]),
-        1,
-    )
-    fields["size"] = (
-        cast(type[Any], Annotated[int, Field(description="Items per page")]),
-        settings.MAX_ITEMS_PER_PAGE,
-    )
-    return fields
-
-
 def _build_sort_fields(sortables: Any) -> dict[str, tuple[type[Any], Any]]:
     fields: dict[str, tuple[type[Any], Any]] = {}
     options = cast(list[str], get_args(sortables))
@@ -334,15 +321,12 @@ def build_search_schema(
     # Step 1: Copy Original Fields
     new_fields = copy_fields(filter_model)
 
-    # Step 2: Add Pagination Fields
-    new_fields.update(_build_pagination_fields())
-
-    # Step 3: Add Sorting values
+    # Step 2: Add Sorting values
     new_fields.update(_build_sort_fields(sortable_fields))
 
-    # Step 4: Add projection field if read_model is provided
+    # Step 3: Add projection field if read_model is provided
     if read_model:
         new_fields.update(_build_projection_fields(read_model))
 
-    # Step 5: Return model
+    # Step 4: Return model
     return create_model(name, **new_fields)  # type: ignore

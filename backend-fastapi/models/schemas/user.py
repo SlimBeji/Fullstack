@@ -4,6 +4,7 @@ from beanie.odm.fields import PydanticObjectId
 from fastapi import File, Form
 from pydantic import BaseModel, EmailStr, Field
 
+from config import settings
 from models.schemas.utils import QueryFilters, build_search_schema
 from types_ import FileToUpload, PaginatedData
 
@@ -176,6 +177,12 @@ class UserFiltersSchema(BaseModel):
     id: QueryFilters[UserFields.id]
     name: QueryFilters[UserFields.name]
     email: QueryFilters[UserFields.email]
+
+    # Defauult fields
+    page: Annotated[int, Field(1, description="The page number")]
+    size: Annotated[
+        int, Field(settings.MAX_ITEMS_PER_PAGE, description="Items per page")
+    ]
 
 
 class UserSearchSchema(
