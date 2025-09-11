@@ -5,7 +5,7 @@ from fastapi import File, Form
 from pydantic import BaseModel, EmailStr, Field
 
 from config import settings
-from models.schemas.utils import QueryFilters, build_search_schema
+from models.schemas.utils import QueryFilters
 from types_ import FileToUpload, PaginatedData
 
 # --- Fields ----
@@ -183,6 +183,8 @@ UserSortableFields = Literal[
     "-isAdmin",
 ]
 
+UserSelectableFields = Literal["id", "name", "email", "isAdmin", "imageUrl", "places"]
+
 
 class UserFiltersSchema(BaseModel):
     id: QueryFilters[UserFields.id]
@@ -201,18 +203,13 @@ class UserFiltersSchema(BaseModel):
             examples=[["-createdAt"]],
         ),
     ] = None
-
-
-class UserSearchSchema(
-    UserFiltersSchema,
-    build_search_schema(  # type: ignore
-        "UserSearchSchema",
-        UserFiltersSchema,
-        UserSortableFields,
-        UserReadSchema,
-    ),
-):
-    pass
+    fields: Annotated[
+        list[UserSelectableFields] | None,
+        Field(
+            description="Fields to include in the response; omit for full document",
+            examples=[["-id"]],
+        ),
+    ] = None
 
 
 # --- Update Schemas ---

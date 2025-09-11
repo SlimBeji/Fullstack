@@ -6,7 +6,7 @@ from fastapi import File, Form
 from pydantic import BaseModel, Field, Json
 
 from config import settings
-from models.schemas.utils import QueryFilters, build_search_schema
+from models.schemas.utils import QueryFilters
 from types_ import FileToUpload, PaginatedData
 
 # --- Fields ----
@@ -209,6 +209,17 @@ PlaceSortableFields = Literal[
     "-address",
 ]
 
+PlaceSelectableFields = Literal[
+    "id",
+    "title",
+    "description",
+    "address",
+    "location.lat",
+    "location.lng",
+    "imageUrl",
+    "creatorId",
+]
+
 
 class PlaceFiltersSchema(BaseModel):
     id: QueryFilters[PlaceFields.id]
@@ -231,18 +242,13 @@ class PlaceFiltersSchema(BaseModel):
             examples=[["-createdAt"]],
         ),
     ] = None
-
-
-class PlaceSearchSchema(
-    PlaceFiltersSchema,
-    build_search_schema(  # type: ignore
-        "PlaceSearchSchema",
-        PlaceFiltersSchema,
-        PlaceSortableFields,
-        PlaceReadSchema,
-    ),
-):
-    pass
+    fields: Annotated[
+        list[PlaceSelectableFields] | None,
+        Field(
+            description="Fields to include in the response; omit for full document",
+            examples=[["-id"]],
+        ),
+    ] = None
 
 
 # --- Update Schemas ---
