@@ -222,17 +222,6 @@ class PlaceSearchSchema(
     pass
 
 
-class PlaceSearchGetSchema(
-    PlaceFiltersSchema,
-    build_search_schema(  # type: ignore
-        "PlaceSearchGetSchema", PlaceFiltersSchema, PlaceSortableFields
-    ),
-):
-    pass
-
-
-type PlaceSearchType = PlaceSearchSchema | PlaceSearchGetSchema
-
 # --- Update Schemas ---
 
 

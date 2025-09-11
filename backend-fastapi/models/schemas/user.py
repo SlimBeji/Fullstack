@@ -190,17 +190,6 @@ class UserSearchSchema(
     pass
 
 
-class UserSearchGetSchema(
-    UserFiltersSchema,
-    build_search_schema(  # type: ignore
-        "UserSearchGetSchema", UserFiltersSchema, UserSortableFields
-    ),
-):
-    pass
-
-
-type UserSearchType = UserSearchSchema | UserSearchGetSchema
-
 # --- Update Schemas ---
 
 

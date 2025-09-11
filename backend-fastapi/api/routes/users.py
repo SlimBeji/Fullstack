@@ -8,7 +8,6 @@ from models.schemas import (
     UserMultipartPost,
     UserPutSchema,
     UserReadSchema,
-    UserSearchGetSchema,
     UserSearchSchema,
     UsersPaginatedSchema,
 )
@@ -24,7 +23,7 @@ user_id_param = Path(
     "/", summary="Search and Filter users", response_model=UsersPaginatedSchema
 )
 async def get_users(
-    query: Annotated[UserSearchGetSchema, Query()],
+    query: Annotated[UserSearchSchema, Query()],
     current_user: UserReadSchema = Depends(get_current_user),
 ):
     return await crud_user.user_fetch(current_user, query)

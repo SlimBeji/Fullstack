@@ -8,7 +8,6 @@ from models.schemas import (
     PlaceMultipartPost,
     PlacePutSchema,
     PlaceReadSchema,
-    PlaceSearchGetSchema,
     PlaceSearchSchema,
     PlacesPaginatedSchema,
     UserReadSchema,
@@ -25,7 +24,7 @@ place_id_param = Path(
     "/", summary="Search and Filter places", response_model=PlacesPaginatedSchema
 )
 async def get_places(
-    query: Annotated[PlaceSearchGetSchema, Query()],
+    query: Annotated[PlaceSearchSchema, Query()],
     user: UserReadSchema = Depends(get_current_user),
 ):
     return await crud_place.user_fetch(user, query)
