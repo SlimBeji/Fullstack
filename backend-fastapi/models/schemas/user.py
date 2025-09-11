@@ -179,23 +179,27 @@ class UserFiltersSchema(BaseModel):
 
 
 class UserSearchSchema(
+    UserFiltersSchema,
     build_search_schema(  # type: ignore
         "UserSearchSchema",
         UserFiltersSchema,
         UserSortableFields,
         UserReadSchema,
-    )
+    ),
 ):
     pass
 
 
 class UserSearchGetSchema(
+    UserFiltersSchema,
     build_search_schema(  # type: ignore
         "UserSearchGetSchema", UserFiltersSchema, UserSortableFields
-    )
+    ),
 ):
     pass
 
+
+type UserSearchType = UserSearchSchema | UserSearchGetSchema
 
 # --- Update Schemas ---
 

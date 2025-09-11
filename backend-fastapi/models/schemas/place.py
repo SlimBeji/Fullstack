@@ -211,23 +211,27 @@ class PlaceFiltersSchema(BaseModel):
 
 
 class PlaceSearchSchema(
+    PlaceFiltersSchema,
     build_search_schema(  # type: ignore
         "PlaceSearchSchema",
         PlaceFiltersSchema,
         PlaceSortableFields,
         PlaceReadSchema,
-    )
+    ),
 ):
     pass
 
 
 class PlaceSearchGetSchema(
+    PlaceFiltersSchema,
     build_search_schema(  # type: ignore
         "PlaceSearchGetSchema", PlaceFiltersSchema, PlaceSortableFields
-    )
+    ),
 ):
     pass
 
+
+type PlaceSearchType = PlaceSearchSchema | PlaceSearchGetSchema
 
 # --- Update Schemas ---
 

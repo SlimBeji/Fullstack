@@ -14,20 +14,20 @@ from models.schemas import (
     SigninForm,
     SignupForm,
     UserCreateSchema,
-    UserFiltersSchema,
     UserPostSchema,
     UserPutSchema,
     UserReadSchema,
+    UserSearchType,
     UserUpdateSchema,
 )
-from types_ import ApiError, Filter, FindQuery, Projection
+from types_ import ApiError, Filter, Projection
 
 
 class CrudUser(
     CrudBase[
         User,
         UserReadSchema,
-        UserFiltersSchema,
+        UserSearchType,
         UserCreateSchema,
         UserPostSchema,
         UserUpdateSchema,

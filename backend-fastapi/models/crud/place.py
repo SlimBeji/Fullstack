@@ -8,14 +8,14 @@ from models.collections.place import Place
 from models.crud.base import CrudBase, CrudEvent
 from models.schemas import (
     PlaceCreateSchema,
-    PlaceFiltersSchema,
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
+    PlaceSearchType,
     PlaceUpdateSchema,
     UserReadSchema,
 )
-from types_ import ApiError, Filter, FindQuery
+from types_ import ApiError, Filter
 from worker.tasks import place_embeddding
 
 
@@ -23,7 +23,7 @@ class CrudPlace(
     CrudBase[
         Place,
         PlaceReadSchema,
-        PlaceFiltersSchema,
+        PlaceSearchType,
         PlaceCreateSchema,
         PlacePostSchema,
         PlaceUpdateSchema,
