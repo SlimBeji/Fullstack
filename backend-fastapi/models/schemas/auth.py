@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr
 
-from models.fields import AuthAnnotations, UserAnnotations, UserFields
+from models.fields import AuthAnnotations, AuthFields, UserAnnotations, UserFields
 from types_ import FileToUpload
 
 # --- Token ----
@@ -41,7 +41,7 @@ class SignupForm:
 class SigninForm:
     def __init__(
         self,
-        username: str = UserFields.email.multipart,
+        username: str = AuthFields.username.multipart,
         password: str = UserFields.password.multipart,
     ):
         self.username = username

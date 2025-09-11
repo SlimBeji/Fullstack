@@ -4,6 +4,10 @@ from models.fields.base import FieldMeta
 
 
 class AuthFields:
+    username = FieldMeta(
+        description="The user email (We use username here because of OAuth spec)",
+        examples=["mslimbeji@gmail.com"],
+    )
     access_token = FieldMeta(
         description="A generated web token. The 'Bearer ' prefix needs to be added for authentication",
         examples=[
@@ -16,5 +20,6 @@ class AuthFields:
 
 
 class AuthAnnotations:
+    username = Annotated[str, AuthFields.username.info]
     access_token = Annotated[str, AuthFields.access_token.info]
     expires_in = Annotated[int, AuthFields.expires_in.info]
