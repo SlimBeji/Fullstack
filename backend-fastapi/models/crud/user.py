@@ -14,10 +14,10 @@ from models.schemas import (
     SigninForm,
     SignupForm,
     UserCreateSchema,
+    UserFiltersSchema,
     UserPostSchema,
     UserPutSchema,
     UserReadSchema,
-    UserSearchType,
     UserUpdateSchema,
 )
 from types_ import ApiError, Filter, Projection
@@ -27,7 +27,7 @@ class CrudUser(
     CrudBase[
         User,
         UserReadSchema,
-        UserSearchType,
+        UserFiltersSchema,
         UserCreateSchema,
         UserPostSchema,
         UserUpdateSchema,
@@ -55,8 +55,8 @@ class CrudUser(
             )
 
     def add_ownership_filters(
-        self, user: UserReadSchema, query: UserSearchType
-    ) -> UserSearchType:
+        self, user: UserReadSchema, query: UserFiltersSchema
+    ) -> UserFiltersSchema:
         query.id = [Filter(op="eq", val=user.id)]
         return query
 

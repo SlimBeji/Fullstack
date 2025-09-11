@@ -8,10 +8,10 @@ from models.collections.place import Place
 from models.crud.base import CrudBase, CrudEvent
 from models.schemas import (
     PlaceCreateSchema,
+    PlaceFiltersSchema,
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
-    PlaceSearchType,
     PlaceUpdateSchema,
     UserReadSchema,
 )
@@ -23,7 +23,7 @@ class CrudPlace(
     CrudBase[
         Place,
         PlaceReadSchema,
-        PlaceSearchType,
+        PlaceFiltersSchema,
         PlaceCreateSchema,
         PlacePostSchema,
         PlaceUpdateSchema,
@@ -53,8 +53,8 @@ class CrudPlace(
             )
 
     def add_ownership_filters(
-        self, user: UserReadSchema, query: PlaceSearchType
-    ) -> PlaceSearchType:
+        self, user: UserReadSchema, query: PlaceFiltersSchema
+    ) -> PlaceFiltersSchema:
         query.creatorId = [Filter(op="eq", val=user.id)]
         return query
 
