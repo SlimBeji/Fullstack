@@ -26,12 +26,12 @@ class UserFields:
         min_length=2,
         description="The user name, two characters at least",
         examples=["Slim Beji"],
-        json_schema_extra=dict(filter_example="eq:Slim Beji"),
+        filter_examples=["eq:Slim Beji"],
     )
     email = FieldMeta(
         description="The user email",
         examples=["mslimbeji@gmail.com"],
-        json_schema_extra=dict(filter_example="eq:mslimbeji@gmail.com"),
+        filter_examples=["eq:mslimbeji@gmail.com"],
     )
     password = FieldMeta(
         min_length=8,
