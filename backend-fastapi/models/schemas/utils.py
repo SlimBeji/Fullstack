@@ -1,11 +1,9 @@
 from datetime import datetime
-from types import UnionType
 from typing import (
     Annotated,
     Any,
     Callable,
     Generic,
-    Literal,
     Optional,
     TypedDict,
     TypeVar,
@@ -15,61 +13,17 @@ from typing import (
 
 from beanie.odm.fields import PydanticObjectId
 from pydantic import (
-    BaseModel,
     BeforeValidator,
     EmailStr,
     Field,
     TypeAdapter,
-    create_model,
 )
 from pydantic.fields import FieldInfo
 from pydantic.networks import EmailStr
 from pydantic_core import PydanticCustomError
 
-from config import settings
 from lib.utils import str_to_bool
 from types_ import FilterOperation
-
-# Utility Methods
-
-
-def _get_fields(model: BaseModel | type[BaseModel]):
-    if isinstance(model, type) and issubclass(model, BaseModel):
-        return model.model_fields.items()
-    else:
-        return model.__class__.model_fields.items()
-
-
-def get_pydantic_flat_fields(model: type[BaseModel], prefix: str = "") -> list[str]:
-    paths = []
-    for name, field in _get_fields(model):
-        annotation = field.annotation
-        if isinstance(annotation, type) and issubclass(annotation, BaseModel):
-            paths.extend(get_pydantic_flat_fields(annotation, f"{prefix}{name}."))
-        elif isinstance(annotation, UnionType):
-            arg = get_args(annotation)[0]
-            paths.extend(get_pydantic_flat_fields(arg, f"{prefix}{name}."))
-        else:
-            paths.append(f"{prefix}{name}")
-    return paths
-
-
-def get_field_info(field) -> FieldInfo | None:
-    extra = get_args(field)[1:]
-    for metadata in extra:
-        if isinstance(metadata, FieldInfo):
-            return metadata
-    return None
-
-
-def copy_fields(model: type[BaseModel]) -> dict[str, tuple[type[Any], Any]]:
-    new_fields: dict[str, tuple[type[Any], Any]] = {}
-    for k, v in _get_fields(model):
-        annotation = cast(type[Any], v.annotation)
-        default = v.default
-        new_fields[k] = (annotation, default)
-    return new_fields
-
 
 # FieldFilter
 
@@ -81,6 +35,14 @@ check_filter_op: Callable = TypeAdapter(FilterOperation).validate_python
 class FieldFilter(TypedDict):
     op: FilterOperation
     val: Any
+
+
+def get_field_info(field) -> FieldInfo | None:
+    extra = get_args(field)[1:]
+    for metadata in extra:
+        if isinstance(metadata, FieldInfo):
+            return metadata
+    return None
 
 
 def _extract_raw_filter(value: str) -> tuple[FilterOperation, Any]:
@@ -265,43 +227,3 @@ class QueryFilters(Generic[T]):
                 json_schema_extra=extra,
             ),
         ]
-
-
-# Search Schema
-
-
-def _build_projection_fields(
-    model: type[BaseModel],
-) -> dict[str, tuple[type[Any], Any]]:
-    fields: dict[str, tuple[type[Any], Any]] = {}
-    fields["fields"] = (
-        cast(
-            type[Any],
-            Annotated[
-                list[Literal[tuple(get_pydantic_flat_fields(model))]],  # type: ignore
-                Field(
-                    description="Fields to include in the response; omit for full document",
-                    examples=[["id"]],
-                ),
-            ],
-        ),
-        None,
-    )
-    return fields
-
-
-def build_search_schema(
-    name: str,
-    filter_model: type[BaseModel],
-    sortable_fields: Any,
-    read_model: type[BaseModel] | None = None,
-) -> type[BaseModel]:
-    # Step 1: Copy Original Fields
-    new_fields = copy_fields(filter_model)
-
-    # Step 2: Add projection field if read_model is provided
-    if read_model:
-        new_fields.update(_build_projection_fields(read_model))
-
-    # Step 3: Return model
-    return create_model(name, **new_fields)  # type: ignore
