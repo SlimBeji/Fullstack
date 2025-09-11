@@ -309,7 +309,7 @@ The types of schemas defined are described below:
 -   Used when returning search results in pages.
 -   Handles metadata like `totalCount`, `page`, `pageSize`, and `data`.
 
-##### 🔍 Search Schema
+##### 🔍 Filters Schema
 
 -   Defines the format for complex queries with filters, sorting, paginating etc...
 
