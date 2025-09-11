@@ -85,7 +85,7 @@ class CrudBase(
 
     # Accessors
 
-    def safe_check(
+    def auth_check(
         self,
         user: UserReadSchema,
         document: ModelDocument | PostSchema | PutSchema,
@@ -93,7 +93,9 @@ class CrudBase(
     ) -> None:
         pass
 
-    def safe_query(self, user: UserReadSchema, filter_query: FindQuery) -> FindQuery:
+    def add_ownership_filters(
+        self, user: UserReadSchema, filter_query: FindQuery
+    ) -> FindQuery:
         return filter_query
 
     # Serialization
@@ -143,12 +145,12 @@ class CrudBase(
         result = await self.post_process(document)
         return cast(ReadSchema, result)
 
-    async def safe_get(self, user: UserReadSchema, id: str | ObjectId) -> ReadSchema:
+    async def user_get(self, user: UserReadSchema, id: str | ObjectId) -> ReadSchema:
         doc = await self.get_document(id)
         if not doc:
             raise self.not_found(id)
 
-        self.safe_check(user, doc, "read")
+        self.auth_check(user, doc, "read")
         result = await self.post_process(doc)
         return cast(ReadSchema, result)
 
@@ -260,10 +262,10 @@ class CrudBase(
             data=data,
         )
 
-    async def safe_fetch(
+    async def user_fetch(
         self, user: UserReadSchema, query: FindQuery
     ) -> PaginatedData[ReadSchema]:
-        query = self.safe_query(user, query)
+        query = self.add_ownership_filters(user, query)
         return await self.fetch(query)
 
     # Create
@@ -279,8 +281,8 @@ class CrudBase(
         result = await self.post_process(document)
         return cast(ReadSchema, result)
 
-    async def safe_create(self, user: UserReadSchema, form: PostSchema) -> ReadSchema:
-        self.safe_check(user, form, "create")
+    async def user_create(self, user: UserReadSchema, form: PostSchema) -> ReadSchema:
+        self.auth_check(user, form, "create")
         return await self.create(form)
 
     # Update
@@ -307,20 +309,20 @@ class CrudBase(
             raise self.not_found(id)
         return await self.update(document, form)
 
-    async def safe_update(
+    async def user_update(
         self, user: UserReadSchema, document: ModelDocument, form: PutSchema
     ) -> ReadSchema:
-        self.safe_check(user, document, "read")
-        self.safe_check(user, form, "update")
+        self.auth_check(user, document, "read")
+        self.auth_check(user, form, "update")
         return await self.update(document, form)
 
-    async def safe_update_by_id(
+    async def user_update_by_id(
         self, user: UserReadSchema, id: str | ObjectId, form: PutSchema
     ) -> ReadSchema:
         document = await self.get_document(id)
         if document is None:
             raise self.not_found(id)
-        return await self.safe_update(user, document, form)
+        return await self.user_update(user, document, form)
 
     # Delete
 
@@ -345,10 +347,10 @@ class CrudBase(
 
         return await self.delete_document(document)
 
-    async def safe_delete(self, user: UserReadSchema, id: str | ObjectId) -> None:
+    async def user_delete(self, user: UserReadSchema, id: str | ObjectId) -> None:
         document = await self.get_document(id)
         if document is None:
             raise self.not_found(id)
 
-        self.safe_check(user, document, "delete")
+        self.auth_check(user, document, "delete")
         return await self.delete_document(document)

@@ -36,7 +36,7 @@ class CrudUser(
 ):
     DEFAULT_PROJECTION: Projection = dict(_version=0, password=0)
 
-    def safe_check(
+    def auth_check(
         self,
         user: UserReadSchema,
         data: User | UserPostSchema | UserPutSchema,
@@ -54,7 +54,9 @@ class CrudUser(
                 f"Access denied to user {date_user_id}",
             )
 
-    def safe_query(self, user: UserReadSchema, query: FindQuery) -> FindQuery:
+    def add_ownership_filters(
+        self, user: UserReadSchema, query: UserSearchType
+    ) -> UserSearchType:
         query.id = [Filter(op="eq", val=user.id)]
         return query
 

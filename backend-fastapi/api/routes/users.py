@@ -27,7 +27,7 @@ async def get_users(
     query: Annotated[UserSearchGetSchema, Query()],
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.safe_fetch(current_user, query)
+    return await crud_user.user_fetch(current_user, query)
 
 
 @user_router.post(
@@ -37,7 +37,7 @@ async def get_users_from_post(
     query: UserSearchSchema,
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.safe_fetch(current_user, query)
+    return await crud_user.user_fetch(current_user, query)
 
 
 @user_router.post("/", summary="User creation", response_model=UserReadSchema)
@@ -45,7 +45,7 @@ async def create_user(
     multipart_form: UserMultipartPost = Depends(),
     admin: UserReadSchema = Depends(get_current_admin),
 ):
-    return await crud_user.safe_create(admin, multipart_form.to_post_schema())
+    return await crud_user.user_create(admin, multipart_form.to_post_schema())
 
 
 @user_router.get(
@@ -57,7 +57,7 @@ async def get_user(
     user_id: str = user_id_param,
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.safe_get(current_user, user_id)
+    return await crud_user.user_get(current_user, user_id)
 
 
 @user_router.put("/{user_id}", summary="Update users", response_model=UserReadSchema)
@@ -66,7 +66,7 @@ async def update_user(
     user_id: str = user_id_param,
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.safe_update_by_id(current_user, user_id, form)
+    return await crud_user.user_update_by_id(current_user, user_id, form)
 
 
 @user_router.delete(
@@ -86,5 +86,5 @@ async def update_user(
 async def delete_user(
     user: UserReadSchema = Depends(get_current_admin), user_id: str = user_id_param
 ):
-    await crud_user.safe_delete(user, user_id)
+    await crud_user.user_delete(user, user_id)
     return dict(message=f"Deleted user {user_id}")

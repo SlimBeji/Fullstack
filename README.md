@@ -329,7 +329,7 @@ To promote structure and security, CRUD operations are organized into **three la
 
 1. **`*Document` methods**: Direct interaction with the ORM/database layer.
 2. **Main methods**: High-level interface that uses schemas (e.g., converts `PostSchema` → `CreateSchema`).
-3. **`safe*` methods**: Add authorization and access control logic.
+3. **`user*` methods**: Add authorization and access control logic. A user needs to be passed as parameter to check if allowed to perform the crud operation.
 
 Below the operations breakdown
 
@@ -337,31 +337,31 @@ Below the operations breakdown
 
 -   `getDocument`: Fetches a single raw ORM object by ID.
 -   `get`: Returns the object in a `ReadSchema` format.
--   `safeGet`: Ensures the requesting user has access to the document.
+-   `userGet`: Ensures the requesting user has access to the document.
 
 ##### 📚 fetch
 
 -   `fetchDocuments`: Queries the DB with filters, projections, pagination, etc.
 -   `fetch`: Returns results in a `PaginatedDataSchema` format.
--   `safeFetch`: Restricts results to data the user has access to.
+-   `userFetch`: Restricts results to data the user has access to.
 
 ##### ✏️ create
 
 -   `createDocument`: Creates a new record using a `CreateSchema`, inside a transaction.
 -   `create`: Converts a `PostSchema` to a `CreateSchema`, then calls `createDocument`.
--   `safeCreate`: Prevents unauthorized field assignment or object relations (e.g., assigning ownership improperly).
+-   `userCreate`: Prevents unauthorized field assignment or object relations (e.g., assigning ownership improperly).
 
 ##### 🛠️ update
 
 -   `updateDocument`: Updates an existing record using an `UpdateSchema`, inside a transaction.
 -   `update`: Converts a `PutSchema` to an `UpdateSchema`, then calls `updateDocument`.
--   `safeUpdate`: Prevents illegal changes to relationships or protected fields.
+-   `userUpdate`: Prevents illegal changes to relationships or protected fields.
 
 ##### 🗑️ delete
 
 -   `deleteDocument`: Deletes a record using a Mongo transaction.
 -   `delete`: Delete a record by id.
--   `safeDelete`: Ensures the user is authorized to delete the object.
+-   `userDelete`: Ensures the user is authorized to delete the object.
 -   `deleteCleanup`: Optional cleanup logic after deletion (e.g., removing related files from cloud storage).
 
 #### 📁📁 Examples
@@ -412,12 +412,12 @@ Each model exposes a standardized set of **6 CRUD endpoints**, ensuring consiste
 
 | Method | Path                    | Purpose                                  | Input Schema   | Output Schema       | CRUD Function  |
 | ------ | ----------------------- | ---------------------------------------- | -------------- | ------------------- | -------------- |
-| GET    | `/model-name/`          | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `safeFetch()`  |
-| POST   | `/model-name/query`     | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `safeFetch()`  |
-| POST   | `/model-name/`          | Create a new record                      | PostSchema     | ReadSchema          | `safeCreate()` |
-| GET    | `/model-name/:objectId` | Retrieve a single record by ID           | –              | ReadSchema          | `safeGet()`    |
-| PUT    | `/model-name/:objectId` | Update an existing record                | PutSchema      | ReadSchema          | `safeUpdate()` |
-| DELETE | `/model-name/:objectId` | Delete a record by ID                    | –              | –                   | `safeDelete()` |
+| GET    | `/model-name/`          | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `userFetch()`  |
+| POST   | `/model-name/query`     | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `userFetch()`  |
+| POST   | `/model-name/`          | Create a new record                      | PostSchema     | ReadSchema          | `userCreate()` |
+| GET    | `/model-name/:objectId` | Retrieve a single record by ID           | –              | ReadSchema          | `userGet()`    |
+| PUT    | `/model-name/:objectId` | Update an existing record                | PutSchema      | ReadSchema          | `userUpdate()` |
+| DELETE | `/model-name/:objectId` | Delete a record by ID                    | –              | –                   | `userDelete()` |
 
 Each route is tied to a corresponding method in the related CRUD module for consistent error handling and logic reuse.
 

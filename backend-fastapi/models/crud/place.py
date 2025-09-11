@@ -34,7 +34,7 @@ class CrudPlace(
         locationLat="location.lat", locationLng="location.lng"
     )
 
-    def safe_check(
+    def auth_check(
         self,
         user: UserReadSchema,
         data: Place | PlacePostSchema | PlacePutSchema,
@@ -52,7 +52,9 @@ class CrudPlace(
                 f"Access denied to creator {creatorId}",
             )
 
-    def safe_query(self, user: UserReadSchema, query: FindQuery) -> FindQuery:
+    def add_ownership_filters(
+        self, user: UserReadSchema, query: PlaceSearchType
+    ) -> PlaceSearchType:
         query.creatorId = [Filter(op="eq", val=user.id)]
         return query
 

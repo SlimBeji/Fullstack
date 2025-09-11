@@ -28,7 +28,7 @@ async def get_places(
     query: Annotated[PlaceSearchGetSchema, Query()],
     user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.safe_fetch(user, query)
+    return await crud_place.user_fetch(user, query)
 
 
 @place_router.post(
@@ -38,7 +38,7 @@ async def get_places_from_post(
     query: PlaceSearchSchema,
     user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.safe_fetch(user, query)
+    return await crud_place.user_fetch(user, query)
 
 
 @place_router.post("/", summary="Place creation", response_model=PlaceReadSchema)
@@ -46,7 +46,7 @@ async def create_place(
     multipart_form: PlaceMultipartPost = Depends(),
     user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.safe_create(user, multipart_form.to_post_schema())
+    return await crud_place.user_create(user, multipart_form.to_post_schema())
 
 
 @place_router.get(
@@ -58,7 +58,7 @@ async def get_place(
     place_id: str = place_id_param,
     user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.safe_get(user, place_id)
+    return await crud_place.user_get(user, place_id)
 
 
 @place_router.put(
@@ -69,7 +69,7 @@ async def update_place(
     place_id: str = place_id_param,
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.safe_update_by_id(current_user, place_id, form)
+    return await crud_place.user_update_by_id(current_user, place_id, form)
 
 
 @place_router.delete(
@@ -89,5 +89,5 @@ async def update_place(
 async def delete_place(
     user: UserReadSchema = Depends(get_current_user), place_id: str = place_id_param
 ):
-    await crud_place.safe_delete(user, place_id)
+    await crud_place.user_delete(user, place_id)
     return dict(message=f"Deleted place {place_id}")
