@@ -1,142 +1,54 @@
-from typing import Annotated, Literal
+from pydantic import BaseModel, EmailStr
 
-from beanie.odm.fields import PydanticObjectId
-from fastapi import File, Form
-from pydantic import BaseModel, EmailStr, Field
-
-from config import settings
-from models.schemas.utils import QueryFilters
+from models.fields import (
+    HttpFilters,
+    UserAnnotations,
+    UserFields,
+    UserSelectableFields,
+    UserSortableFields,
+)
+from models.schemas.utils import BaseFiltersSchema
 from types_ import FileToUpload, PaginatedData
-
-# --- Fields ----
-
-
-class UserFields:
-    id = Annotated[
-        PydanticObjectId,
-        Field(
-            description="The User ID",
-            examples=["683b21134e2e5d46978daf1f"],
-        ),
-    ]
-    name = Annotated[
-        str,
-        Field(
-            min_length=2,
-            description="The user name, two characters at least",
-            examples=["Slim Beji"],
-            json_schema_extra=dict(filter_example="eq:Slim Beji"),
-        ),
-    ]
-    email = Annotated[
-        EmailStr,
-        Field(
-            description="The user email",
-            examples=["mslimbeji@gmail.com"],
-            json_schema_extra=dict(filter_example="eq:mslimbeji@gmail.com"),
-        ),
-    ]
-    password = Annotated[
-        str,
-        Field(
-            min_length=8,
-            description="The user password, 8 characters at least",
-            examples=["very_secret"],
-        ),
-    ]
-    image_url = Annotated[
-        str,
-        Field(
-            examples=["avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"],
-            description="local url on the storage",
-        ),
-    ]
-    image = Annotated[
-        FileToUpload,
-        File(description="The user profile image"),
-    ]
-    is_admin = Annotated[
-        bool,
-        Field(
-            description="Whether the user is an admin or not",
-            examples=[False],
-        ),
-    ]
-    places = Annotated[
-        list[
-            Annotated[
-                PydanticObjectId,
-                Field(
-                    description="The Place ID", examples=["683b21134e2e5d46978daf1f"]
-                ),
-            ]
-        ],
-        Field(description="The id of places belonging to the user, 24 characters"),
-    ]
-
-
-class UserMultipartFields:
-    name: str = Form(
-        ...,
-        min_length=2,
-        description="The user name, two characters at least",
-        examples=["Slim Beji"],
-    )
-    email: EmailStr = Form(
-        ...,
-        description="The user email",
-        examples=["mslimbeji@gmail.com"],
-    )
-    isAdmin: bool = Form(
-        ...,
-        description="Whether the user is an admin or not",
-        examples=[False],
-    )
-    password: str = Form(
-        ...,
-        min_length=8,
-        description="The user password, 8 characters at least",
-        examples=["very_secret"],
-    )
-    image: FileToUpload = File(None, description="The user profile image")
-
 
 # --- Base Schemas ----
 
 
 class UserBaseSchema(BaseModel):
-    name: UserFields.name
-    email: UserFields.email
-    isAdmin: UserFields.is_admin
+    name: UserAnnotations.name
+    email: UserAnnotations.email
+    isAdmin: UserAnnotations.isAdmin
 
 
 class UserSeedSchema(UserBaseSchema):
     ref: int
-    password: UserFields.password
-    imageUrl: UserFields.image_url | None = None
+    password: UserAnnotations.password
+    imageUrl: UserAnnotations.imageUrl | None = None
 
 
 # --- Creation Schemas ---
 
 
 class UserCreateSchema(UserBaseSchema):
-    password: UserFields.password
-    imageUrl: UserFields.image_url | None = None
+    password: UserAnnotations.password
+    imageUrl: UserAnnotations.imageUrl | None = None
 
 
 class UserPostSchema(UserBaseSchema):
-    password: UserFields.password
-    image: UserFields.image | None = None
+    password: UserAnnotations.password
+    image: UserAnnotations.image | None = None
+
+
+# --- Multipart Post ----
 
 
 class UserMultipartPost:
     def __init__(
         self,
-        name: str = UserMultipartFields.name,
-        email: EmailStr = UserMultipartFields.email,
-        isAdmin: bool = UserMultipartFields.isAdmin,
-        password: str = UserMultipartFields.password,
-        image: FileToUpload | None = UserMultipartFields.image,
+        name: str = UserFields.name.multipart,
+        email: EmailStr = UserFields.email.multipart,
+        isAdmin: bool = UserFields.isAdmin.multipart,
+        password: str = UserFields.password.multipart,
+        image: FileToUpload | None = UserFields.password.multipart,
     ):
         self.name = name
         self.email = email
@@ -158,9 +70,9 @@ class UserMultipartPost:
 
 
 class UserReadSchema(UserBaseSchema):
-    id: UserFields.id
-    imageUrl: UserFields.image_url | None = None
-    places: UserFields.places
+    id: UserAnnotations.id
+    imageUrl: UserAnnotations.imageUrl | None = None
+    places: UserAnnotations.places
 
 
 UsersPaginatedSchema = PaginatedData[UserReadSchema]
@@ -168,57 +80,20 @@ UsersPaginatedSchema = PaginatedData[UserReadSchema]
 
 # --- Query Schemas ---
 
-UserSortableFields = Literal[
-    "createdAt",
-    "-createdAt",
-    "name",
-    "-name",
-    "email",
-    "-email",
-    "password",
-    "-password",
-    "imageUrl",
-    "-imageUrl",
-    "isAdmin",
-    "-isAdmin",
-]
 
-UserSelectableFields = Literal["id", "name", "email", "isAdmin", "imageUrl", "places"]
-
-
-class UserFiltersSchema(BaseModel):
-    id: QueryFilters[UserFields.id]
-    name: QueryFilters[UserFields.name]
-    email: QueryFilters[UserFields.email]
-
-    # Defauult fields
-    page: Annotated[int, Field(1, description="The page number")]
-    size: Annotated[
-        int, Field(settings.MAX_ITEMS_PER_PAGE, description="Items per page")
-    ]
-    sort: Annotated[
-        list[UserSortableFields] | None,
-        Field(
-            description="Fields to use for sorting. Use '-' for descending",
-            examples=[["-createdAt"]],
-        ),
-    ] = None
-    fields: Annotated[
-        list[UserSelectableFields] | None,
-        Field(
-            description="Fields to include in the response; omit for full document",
-            examples=[["-id"]],
-        ),
-    ] = None
+class UserFiltersSchema(BaseFiltersSchema[UserSelectableFields, UserSortableFields]):
+    id: HttpFilters[UserAnnotations.id]
+    name: HttpFilters[UserAnnotations.name]
+    email: HttpFilters[UserAnnotations.email]
 
 
 # --- Update Schemas ---
 
 
 class UserUpdateSchema(BaseModel):
-    name: UserFields.name | None = None
-    email: UserFields.email | None = None
-    password: UserFields.password | None = None
+    name: UserAnnotations.name | None = None
+    email: UserAnnotations.email | None = None
+    password: UserAnnotations.password | None = None
 
 
 class UserPutSchema(UserUpdateSchema):
