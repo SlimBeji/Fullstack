@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING
 from beanie import Delete, Insert, PydanticObjectId, after_event, before_event
 
 from models.collections.base import BaseDocument, document_registry
-from models.schemas.place import PlaceFields, PlaceLocation
+from models.fields import PlaceAnnotations
+from models.schemas.place import PlaceLocation
 from types_ import ChangeEvent, Collections
 
 if TYPE_CHECKING:
@@ -13,12 +14,12 @@ if TYPE_CHECKING:
 
 class Place(BaseDocument):
     # Fields
-    title: PlaceFields.title
-    description: PlaceFields.description
-    imageUrl: PlaceFields.image_url | None = None
-    address: PlaceFields.address
+    title: PlaceAnnotations.title
+    description: PlaceAnnotations.description
+    imageUrl: PlaceAnnotations.imageUrl | None = None
+    address: PlaceAnnotations.address
     location: PlaceLocation | None = None
-    embedding: PlaceFields.embedding | None = None
+    embedding: PlaceAnnotations.embedding | None = None
 
     # Relations
     creatorId: PydanticObjectId
