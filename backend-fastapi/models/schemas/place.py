@@ -198,7 +198,16 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 
 # --- Query Schemas ---
 
-PlaceSortableFields = Literal["createdAt", "title", "description", "address"]
+PlaceSortableFields = Literal[
+    "createdAt",
+    "-createdAt",
+    "title",
+    "-title",
+    "description",
+    "-description",
+    "address",
+    "-address",
+]
 
 
 class PlaceFiltersSchema(BaseModel):
@@ -215,6 +224,13 @@ class PlaceFiltersSchema(BaseModel):
     size: Annotated[
         int, Field(settings.MAX_ITEMS_PER_PAGE, description="Items per page")
     ]
+    sort: Annotated[
+        list[PlaceSortableFields] | None,
+        Field(
+            description="Fields to use for sorting. Use '-' for descending",
+            examples=[["-createdAt"]],
+        ),
+    ] = None
 
 
 class PlaceSearchSchema(

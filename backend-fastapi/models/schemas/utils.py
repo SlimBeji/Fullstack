@@ -270,28 +270,6 @@ class QueryFilters(Generic[T]):
 # Search Schema
 
 
-def _build_sort_fields(sortables: Any) -> dict[str, tuple[type[Any], Any]]:
-    fields: dict[str, tuple[type[Any], Any]] = {}
-    options = cast(list[str], get_args(sortables))
-    all_options: list[str] = []
-    for o in options:
-        all_options.extend([o, f"-{o}"])
-    fields["sort"] = (
-        cast(
-            type[Any],
-            Annotated[
-                list[Literal[tuple(all_options)]],  # type: ignore
-                Field(
-                    description="Fields to use for sorting. Use '-' for descending",
-                    examples=[["-createdAt"]],
-                ),
-            ],
-        ),
-        None,
-    )
-    return fields
-
-
 def _build_projection_fields(
     model: type[BaseModel],
 ) -> dict[str, tuple[type[Any], Any]]:
@@ -321,12 +299,9 @@ def build_search_schema(
     # Step 1: Copy Original Fields
     new_fields = copy_fields(filter_model)
 
-    # Step 2: Add Sorting values
-    new_fields.update(_build_sort_fields(sortable_fields))
-
-    # Step 3: Add projection field if read_model is provided
+    # Step 2: Add projection field if read_model is provided
     if read_model:
         new_fields.update(_build_projection_fields(read_model))
 
-    # Step 4: Return model
+    # Step 3: Return model
     return create_model(name, **new_fields)  # type: ignore

@@ -169,7 +169,18 @@ UsersPaginatedSchema = PaginatedData[UserReadSchema]
 # --- Query Schemas ---
 
 UserSortableFields = Literal[
-    "createdAt", "name", "email", "password", "imageUrl", "isAdmin"
+    "createdAt",
+    "-createdAt",
+    "name",
+    "-name",
+    "email",
+    "-email",
+    "password",
+    "-password",
+    "imageUrl",
+    "-imageUrl",
+    "isAdmin",
+    "-isAdmin",
 ]
 
 
@@ -183,6 +194,13 @@ class UserFiltersSchema(BaseModel):
     size: Annotated[
         int, Field(settings.MAX_ITEMS_PER_PAGE, description="Items per page")
     ]
+    sort: Annotated[
+        list[UserSortableFields] | None,
+        Field(
+            description="Fields to use for sorting. Use '-' for descending",
+            examples=[["-createdAt"]],
+        ),
+    ] = None
 
 
 class UserSearchSchema(
