@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from beanie import Delete, PydanticObjectId, after_event
 
 from models.collections.base import BaseDocument, document_registry
-from models.fields import UserAnnotations
+from models.fields import user as UserFilds
 from types_ import Collections
 
 if TYPE_CHECKING:
@@ -13,11 +13,11 @@ if TYPE_CHECKING:
 
 class User(BaseDocument):
     # Fields
-    name: UserAnnotations.name
-    email: UserAnnotations.email
-    password: UserAnnotations.password
-    imageUrl: UserAnnotations.imageUrl | None = None
-    isAdmin: UserAnnotations.isAdmin
+    name: UserFilds.name_annot
+    email: UserFilds.email_annot
+    password: UserFilds.password_annot
+    imageUrl: UserFilds.imageUrl_annot | None = None
+    isAdmin: UserFilds.isAdmin_annot
 
     # Relations
     places: list[PydanticObjectId] = []
