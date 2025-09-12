@@ -68,7 +68,7 @@ class FieldMeta:
         metatdata = self._build_metadata()
         return Field(**metatdata)
 
-    def _build_multpart_field(self) -> FieldInfo:
+    def _build_multpart_field(self) -> Any:
         if self.is_file:
             return File(description=self.description)
 
