@@ -1,41 +1,36 @@
 from pydantic import BaseModel, EmailStr
 
-from models.fields import (
-    HttpFilters,
-    UserAnnotations,
-    UserFields,
-    UserSelectableFields,
-    UserSortableFields,
-)
-from models.schemas.utils import BaseFiltersSchema
+from models.fields import HttpFilters, UserSelectableFields, UserSortableFields
+from models.fields import user as UserFields
+from models.schemas.base import BaseFiltersSchema
 from types_ import FileToUpload, PaginatedData
 
 # --- Base Schemas ----
 
 
 class UserBaseSchema(BaseModel):
-    name: UserAnnotations.name
-    email: UserAnnotations.email
-    isAdmin: UserAnnotations.isAdmin
+    name: UserFields.name_annot
+    email: UserFields.email_annot
+    isAdmin: UserFields.isAdmin_annot
 
 
 class UserSeedSchema(UserBaseSchema):
     ref: int
-    password: UserAnnotations.password
-    imageUrl: UserAnnotations.imageUrl | None = None
+    password: UserFields.password_annot
+    imageUrl: UserFields.imageUrl_annot | None = None
 
 
 # --- Creation Schemas ---
 
 
 class UserCreateSchema(UserBaseSchema):
-    password: UserAnnotations.password
-    imageUrl: UserAnnotations.imageUrl | None = None
+    password: UserFields.password_annot
+    imageUrl: UserFields.imageUrl_annot | None = None
 
 
 class UserPostSchema(UserBaseSchema):
-    password: UserAnnotations.password
-    image: UserAnnotations.image | None = None
+    password: UserFields.password_annot
+    image: UserFields.image_annot | None = None
 
 
 # --- Multipart Post ----
@@ -44,11 +39,11 @@ class UserPostSchema(UserBaseSchema):
 class UserMultipartPost:
     def __init__(
         self,
-        name: str = UserFields.name.multipart,
-        email: EmailStr = UserFields.email.multipart,
-        isAdmin: bool = UserFields.isAdmin.multipart,
-        password: str = UserFields.password.multipart,
-        image: FileToUpload | None = UserFields.password.multipart,
+        name: str = UserFields.name_meta.multipart,
+        email: EmailStr = UserFields.email_meta.multipart,
+        isAdmin: bool = UserFields.isAdmin_meta.multipart,
+        password: str = UserFields.password_meta.multipart,
+        image: FileToUpload | None = UserFields.password_meta.multipart,
     ):
         self.name = name
         self.email = email
@@ -70,9 +65,9 @@ class UserMultipartPost:
 
 
 class UserReadSchema(UserBaseSchema):
-    id: UserAnnotations.id
-    imageUrl: UserAnnotations.imageUrl | None = None
-    places: UserAnnotations.places
+    id: UserFields.id_annot
+    imageUrl: UserFields.imageUrl_annot | None = None
+    places: UserFields.places_annot
 
 
 UsersPaginatedSchema = PaginatedData[UserReadSchema]
@@ -82,18 +77,18 @@ UsersPaginatedSchema = PaginatedData[UserReadSchema]
 
 
 class UserFiltersSchema(BaseFiltersSchema[UserSelectableFields, UserSortableFields]):
-    id: HttpFilters[UserAnnotations.id]
-    name: HttpFilters[UserAnnotations.name]
-    email: HttpFilters[UserAnnotations.email]
+    id: HttpFilters[UserFields.id_annot]
+    name: HttpFilters[UserFields.name_annot]
+    email: HttpFilters[UserFields.email_annot]
 
 
 # --- Update Schemas ---
 
 
 class UserUpdateSchema(BaseModel):
-    name: UserAnnotations.name | None = None
-    email: UserAnnotations.email | None = None
-    password: UserAnnotations.password | None = None
+    name: UserFields.name_annot | None = None
+    email: UserFields.email_annot | None = None
+    password: UserFields.password_annot | None = None
 
 
 class UserPutSchema(UserUpdateSchema):

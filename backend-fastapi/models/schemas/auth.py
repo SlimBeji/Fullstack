@@ -2,15 +2,16 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr
 
-from models.fields import AuthAnnotations, AuthFields, UserAnnotations, UserFields
+from models.fields import auth as AuthFields
+from models.fields import user as UserFields
 from types_ import FileToUpload
 
 # --- Token ----
 
 
 class TokenPayload(BaseModel):
-    userId: UserAnnotations.id
-    email: UserAnnotations.email
+    userId: UserFields.id_annot
+    email: UserFields.email_annot
 
 
 # --- Signup Schemas ----
@@ -19,10 +20,10 @@ class TokenPayload(BaseModel):
 class SignupForm:
     def __init__(
         self,
-        name: str = UserFields.name.multipart,
-        email: EmailStr = UserFields.email.multipart,
-        password: str = UserFields.password.multipart,
-        image: FileToUpload | None = UserFields.image.multipart,
+        name: str = UserFields.name_meta.multipart,
+        email: EmailStr = UserFields.email_meta.multipart,
+        password: str = UserFields.password_meta.multipart,
+        image: FileToUpload | None = UserFields.image_meta.multipart,
     ):
         self.name = name
         self.email = email
@@ -41,8 +42,8 @@ class SignupForm:
 class SigninForm:
     def __init__(
         self,
-        username: str = AuthFields.username.multipart,
-        password: str = UserFields.password.multipart,
+        username: str = AuthFields.username_meta.multipart,
+        password: str = UserFields.password_meta.multipart,
     ):
         self.username = username
         self.password = password
@@ -52,8 +53,8 @@ class SigninForm:
 
 
 class EncodedTokenSchema(BaseModel):
-    access_token: AuthAnnotations.access_token
+    access_token: AuthFields.access_token_annot
     token_type: Literal["bearer"]
-    userId: UserAnnotations.id
-    email: UserAnnotations.email
-    expires_in: AuthAnnotations.expires_in
+    userId: UserFields.id_annot
+    email: UserFields.email_annot
+    expires_in: AuthFields.expires_in_annot

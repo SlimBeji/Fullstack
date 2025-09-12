@@ -3,48 +3,40 @@ import json
 from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
-from models.fields import (
-    HttpFilters,
-    PlaceAnnotations,
-    PlaceFields,
-    PlaceSelectableFields,
-    PlaceSortableFields,
-)
-from models.schemas.utils import BaseFiltersSchema
+from models.fields import HttpFilters, PlaceSelectableFields, PlaceSortableFields
+from models.fields import place as PlaceFields
+from models.schemas.base import BaseFiltersSchema
 from types_ import FileToUpload, PaginatedData
-
-# --- Nested Objects ----
-
 
 # --- Base Schemas ----
 
 
 class PlaceBaseSchema(BaseModel):
-    title: PlaceAnnotations.title
-    description: PlaceAnnotations.description
-    address: PlaceAnnotations.address
-    location: PlaceLocation | None = None
+    title: PlaceFields.title_annot
+    description: PlaceFields.description_annot
+    address: PlaceFields.address_annot
+    location: PlaceFields.Location | None = None
 
 
 class PlaceSeedSchema(PlaceBaseSchema):
     ref: int
     creator_ref: int
-    embedding: PlaceAnnotations.embedding | None = None
-    imageUrl: PlaceAnnotations.imageUrl | None = None
+    embedding: PlaceFields.embedding_annot | None = None
+    imageUrl: PlaceFields.imageUrl_annot | None = None
 
 
 # --- Creation Schemas ---
 
 
 class PlaceCreateSchema(PlaceBaseSchema):
-    embedding: PlaceAnnotations.embedding | None = None
-    imageUrl: PlaceAnnotations.imageUrl | None = None
-    creatorId: PlaceAnnotations.creatorId
+    embedding: PlaceFields.embedding_annot | None = None
+    imageUrl: PlaceFields.imageUrl_annot | None = None
+    creatorId: PlaceFields.creatorId_annot
 
 
 class PlacePostSchema(PlaceBaseSchema):
-    image: PlaceAnnotations.image | None = None
-    creatorId: PlaceAnnotations.creatorId
+    image: PlaceFields.image_annot | None = None
+    creatorId: PlaceFields.creatorId_annot
 
 
 # --- Multipart Post ----
@@ -53,15 +45,17 @@ class PlacePostSchema(PlaceBaseSchema):
 class PlaceMultipartPost:
     def __init__(
         self,
-        title: str = PlaceFields.title.multipart,
-        description: str = PlaceFields.description.multipart,
-        address: str = PlaceFields.address.multipart,
-        location: PlaceLocation | str | None = PlaceFields.location.multipart,
-        creatorId: PydanticObjectId = PlaceFields.creatorId.multipart,
-        image: FileToUpload | None = PlaceFields.image.multipart,
+        title: str = PlaceFields.title_meta.multipart,
+        description: str = PlaceFields.description_meta.multipart,
+        address: str = PlaceFields.address_meta.multipart,
+        location: (
+            PlaceFields.Location | str | None
+        ) = PlaceFields.location_meta.multipart,
+        creatorId: PydanticObjectId = PlaceFields.creatorId_meta.multipart,
+        image: FileToUpload | None = PlaceFields.image_meta.multipart,
     ):
         if isinstance(location, str):
-            location = PlaceLocation(**json.loads(location))
+            location = PlaceFields.Location(**json.loads(location))
 
         self.title = title
         self.description = description
@@ -85,9 +79,9 @@ class PlaceMultipartPost:
 
 
 class PlaceReadSchema(PlaceBaseSchema):
-    id: PlaceAnnotations.id
-    imageUrl: PlaceAnnotations.imageUrl | None = None
-    creatorId: PlaceAnnotations.creatorId
+    id: PlaceFields.id_annot
+    imageUrl: PlaceFields.imageUrl_annot | None = None
+    creatorId: PlaceFields.creatorId_annot
 
 
 PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
@@ -96,24 +90,24 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 
 
 class PlaceFiltersSchema(BaseFiltersSchema[PlaceSelectableFields, PlaceSortableFields]):
-    id: HttpFilters[PlaceAnnotations.id]
-    title: HttpFilters[PlaceAnnotations.title]
-    description: HttpFilters[PlaceAnnotations.description]
-    address: HttpFilters[PlaceAnnotations.address]
-    creatorId: HttpFilters[PlaceAnnotations.creatorId]
-    locationLat: HttpFilters[PlaceAnnotations.location_lat]
-    locationLng: HttpFilters[PlaceAnnotations.location_lng]
+    id: HttpFilters[PlaceFields.id_annot]
+    title: HttpFilters[PlaceFields.title_annot]
+    description: HttpFilters[PlaceFields.description_annot]
+    address: HttpFilters[PlaceFields.address_annot]
+    creatorId: HttpFilters[PlaceFields.creatorId_annot]
+    locationLat: HttpFilters[PlaceFields.lat_annot]
+    locationLng: HttpFilters[PlaceFields.lng_annot]
 
 
 # --- Update Schemas ---
 
 
 class PlaceUpdateSchema(BaseModel):
-    title: PlaceAnnotations.title | None = None
-    description: PlaceAnnotations.description | None = None
-    address: PlaceAnnotations.address | None = None
-    location: PlaceLocation | None = None
-    creatorId: PlaceAnnotations.creatorId | None = None
+    title: PlaceFields.title_annot | None = None
+    description: PlaceFields.description_annot | None = None
+    address: PlaceFields.address_annot | None = None
+    location: PlaceFields.Location | None = None
+    creatorId: PlaceFields.creatorId_annot | None = None
 
 
 class PlacePutSchema(PlaceUpdateSchema):
