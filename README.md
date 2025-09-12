@@ -261,6 +261,10 @@ The first step in building a backend is to **design the data layer**—defining 
 
 Each backend will include a `models/` folder containing several key subfolders:
 
+#### 📁 📁 Fields
+
+Each model should define a file with the fields associated to it containing metatdata for documentation/Swagger and defining the validator each field should define.
+
 #### 📁 📁 Schemas
 
 We break down schema definitions based on their **specific purpose** in the application lifecycle: creation, seeding, reading, editing, querying...

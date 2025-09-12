@@ -16,11 +16,6 @@ from types_ import FileToUpload, PaginatedData
 # --- Nested Objects ----
 
 
-class PlaceLocation(BaseModel):
-    lat: PlaceAnnotations.location_lat
-    lng: PlaceAnnotations.location_lng
-
-
 # --- Base Schemas ----
 
 
