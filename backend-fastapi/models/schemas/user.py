@@ -1,9 +1,14 @@
 from pydantic import BaseModel, EmailStr
 
-from models.fields import HttpFilters, UserSelectableFields, UserSortableFields
+from models.fields import (
+    HttpFilters,
+    UserSearchableFields,
+    UserSelectableFields,
+    UserSortableFields,
+)
 from models.fields import user as UserFields
 from models.schemas.base import BaseFiltersSchema
-from types_ import FileToUpload, PaginatedData
+from types_ import FileToUpload, FindQuery, PaginatedData
 
 # --- Base Schemas ----
 
@@ -81,6 +86,10 @@ class UserFiltersSchema(BaseFiltersSchema[UserSelectableFields, UserSortableFiel
     name: HttpFilters[UserFields.name_annot]
     email: HttpFilters[UserFields.email_annot]
 
+
+UserFindQuery = FindQuery[
+    UserSelectableFields, UserSortableFields, UserSearchableFields
+]
 
 # --- Update Schemas ---
 

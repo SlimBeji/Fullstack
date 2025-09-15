@@ -16,12 +16,13 @@ from models.schemas import (
     SignupForm,
     UserCreateSchema,
     UserFiltersSchema,
+    UserFindQuery,
     UserPostSchema,
     UserPutSchema,
     UserReadSchema,
     UserUpdateSchema,
 )
-from types_ import ApiError, Filter, FindQuery, Projection
+from types_ import ApiError, Filter, Projection
 
 
 class CrudUser(
@@ -61,10 +62,8 @@ class CrudUser(
     def add_ownership_filters(
         self,
         user: UserReadSchema,
-        query: FindQuery[
-            UserSelectableFields, UserSortableFields, UserSearchableFields
-        ],
-    ) -> FindQuery[UserSelectableFields, UserSortableFields, UserSearchableFields]:
+        query: UserFindQuery,
+    ) -> UserFindQuery:
         ownership_filters = [Filter(op="eq", val=user.id)]
 
         if query.filters is None:

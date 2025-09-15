@@ -14,13 +14,14 @@ from models.fields import (
 from models.schemas import (
     PlaceCreateSchema,
     PlaceFiltersSchema,
+    PlaceFindQuery,
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
     PlaceUpdateSchema,
     UserReadSchema,
 )
-from types_ import ApiError, Filter, FindQuery
+from types_ import ApiError, Filter
 from worker.tasks import place_embeddding
 
 
@@ -61,12 +62,8 @@ class CrudPlace(
             )
 
     def add_ownership_filters(
-        self,
-        user: UserReadSchema,
-        query: FindQuery[
-            PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
-        ],
-    ) -> FindQuery[PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields]:
+        self, user: UserReadSchema, query: PlaceFindQuery
+    ) -> PlaceFindQuery:
         ownership_filters = [Filter(op="eq", val=user.id)]
 
         if query.filters is None:

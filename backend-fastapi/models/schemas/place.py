@@ -3,10 +3,15 @@ import json
 from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
-from models.fields import HttpFilters, PlaceSelectableFields, PlaceSortableFields
+from models.fields import (
+    HttpFilters,
+    PlaceSearchableFields,
+    PlaceSelectableFields,
+    PlaceSortableFields,
+)
 from models.fields import place as PlaceFields
 from models.schemas.base import BaseFiltersSchema
-from types_ import FileToUpload, PaginatedData
+from types_ import FileToUpload, FindQuery, PaginatedData
 
 # --- Base Schemas ----
 
@@ -98,6 +103,10 @@ class PlaceFiltersSchema(BaseFiltersSchema[PlaceSelectableFields, PlaceSortableF
     locationLat: HttpFilters[PlaceFields.lat_annot]
     locationLng: HttpFilters[PlaceFields.lng_annot]
 
+
+PlaceFindQuery = FindQuery[
+    PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
+]
 
 # --- Update Schemas ---
 
