@@ -12,7 +12,7 @@ export const PlaceCollectionSchema = new Schema<PlaceDB>(
         imageUrl: { type: String, required: false },
         address: { type: String, required: true, min: 1 },
         location: {
-            required: false,
+            required: true,
             _id: false,
             type: {
                 lat: { type: Number, required: true },
