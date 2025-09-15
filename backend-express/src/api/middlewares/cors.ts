@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
+import { env } from "../../config";
+
 export const cors = (req: Request, res: Response, next: NextFunction): void => {
     // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Origin", env.APP_URL);
     res.setHeader(
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, OPTIONS"
