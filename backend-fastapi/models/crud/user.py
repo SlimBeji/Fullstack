@@ -38,7 +38,7 @@ class CrudUser(
         UserPutSchema,
     ]
 ):
-    DEFAULT_PROJECTION: Projection = dict(_version=0, password=0)
+    DEFAULT_PROJECTION: Projection[UserSelectableFields] = dict(_version=0, password=0)
 
     def auth_check(
         self,

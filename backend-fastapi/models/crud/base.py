@@ -54,7 +54,7 @@ class CrudBase(
 ):
     # Constructor & Properties
 
-    DEFAULT_PROJECTION: Projection = dict(_version=0)
+    DEFAULT_PROJECTION: Projection[Selectables] = dict(_version=0)
 
     FILTER_FIELD_MAPPING: dict[str, str] = {}
 
@@ -100,8 +100,10 @@ class CrudBase(
         pass
 
     def add_ownership_filters(
-        self, user: UserReadSchema, filter_query: FindQuery
-    ) -> FindQuery:
+        self,
+        user: UserReadSchema,
+        filter_query: FindQuery[Selectables, Sortables, Searchables],
+    ) -> FindQuery[Selectables, Sortables, Searchables]:
         return filter_query
 
     # Serialization
@@ -162,7 +164,9 @@ class CrudBase(
 
     # Fetch
 
-    def _to_find_query(self, schema: FindQuery | BaseModel) -> FindQuery:
+    def _to_find_query(
+        self, schema: FindQuery[Selectables, Sortables, Searchables] | BaseModel
+    ) -> FindQuery[Selectables, Sortables, Searchables]:
         if isinstance(schema, FindQuery):
             return schema
 
@@ -171,13 +175,15 @@ class CrudBase(
         size = data.pop("size", settings.MAX_ITEMS_PER_PAGE)
         sort = data.pop("sort", None)
         fields = data.pop("fields", None)
-        return FindQuery(page=page, size=size, sort=sort, fields=fields, filters=data)
+        return FindQuery[Selectables, Sortables, Searchables](
+            page=page, size=size, sort=sort, fields=fields, filters=data
+        )
 
-    def _parse_sort_data(self, fields: list[str] | None) -> SortData:
+    def _parse_sort_data(self, fields: list[str] | None) -> SortData[Sortables]:
         if not fields:
             return dict(createdAt=1)
 
-        result: SortData = {}
+        result: SortData[Sortables] = {}
         for field in fields:
             order: Literal[-1, 1] = 1
             if field.startswith("-"):
@@ -186,11 +192,11 @@ class CrudBase(
             result[field] = order
         return result
 
-    def _parse_projection(self, fields: list[str] | None) -> Projection:
+    def _parse_projection(self, fields: list[str] | None) -> Projection[Selectables]:
         if not fields:
             return self.DEFAULT_PROJECTION
 
-        result: Projection = {}
+        result: Projection[Selectables] = {}
         for field in fields:
             result[field] = 1
 
@@ -200,12 +206,12 @@ class CrudBase(
         return result
 
     def _parse_filters(
-        self, filters: FindQueryFilters | None = None
-    ) -> MongoFieldsFilters:
+        self, filters: FindQueryFilters[Searchables] | None = None
+    ) -> MongoFieldsFilters[Searchables]:
         if not filters:
             return {}
 
-        result: MongoFieldsFilters = {}
+        result: MongoFieldsFilters[Searchables] = {}
         for name, values in filters.items():
             if name == "id":
                 name = "_id"
@@ -223,11 +229,15 @@ class CrudBase(
             result[name] = fieldFilters
         return result
 
-    async def count_documents(self, filters: MongoFieldsFilters | None = None) -> int:
+    async def count_documents(
+        self, filters: MongoFieldsFilters[Searchables] | None = None
+    ) -> int:
         filters = filters or {}
         return await self.model.find(filters).count()
 
-    async def fetch_documents(self, query: MongoFindQuery) -> list[dict]:
+    async def fetch_documents(
+        self, query: MongoFindQuery[Selectables, Sortables, Searchables]
+    ) -> list[dict]:
         """Beanie has some bugs for fetching documents using projection.
         Working with raw pymong to avoid them.
         """
@@ -242,14 +252,16 @@ class CrudBase(
             .to_list()
         )
 
-    async def fetch(self, query: FindQuery | BaseModel) -> PaginatedData[ReadSchema]:
+    async def fetch(
+        self, query: FindQuery[Selectables, Sortables, Searchables] | BaseModel
+    ) -> PaginatedData[ReadSchema]:
         # Parsing the FindQuery to Mongo language
         query = self._to_find_query(query)
         pagination = PaginationData(page=query.page, size=query.size)
         projection = self._parse_projection(query.fields)
         sort = self._parse_sort_data(query.sort)
         filters = self._parse_filters(query.filters)
-        parsed = MongoFindQuery(
+        parsed = MongoFindQuery[Selectables, Sortables, Searchables](
             pagination=pagination, projection=projection, sort=sort, filters=filters
         )
 
@@ -269,7 +281,9 @@ class CrudBase(
         )
 
     async def user_fetch(
-        self, user: UserReadSchema, query: FindQuery
+        self,
+        user: UserReadSchema,
+        query: FindQuery[Selectables, Sortables, Searchables],
     ) -> PaginatedData[ReadSchema]:
         query = self.add_ownership_filters(user, query)
         return await self.fetch(query)
