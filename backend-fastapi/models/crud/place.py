@@ -6,6 +6,11 @@ from beanie import PydanticObjectId
 from lib.clients import cloud_storage
 from models.collections.place import Place
 from models.crud.base import CrudBase, CrudEvent
+from models.fields import (
+    PlaceSearchableFields,
+    PlaceSelectableFields,
+    PlaceSortableFields,
+)
 from models.schemas import (
     PlaceCreateSchema,
     PlaceFiltersSchema,
@@ -23,6 +28,9 @@ class CrudPlace(
     CrudBase[
         Place,
         PlaceReadSchema,
+        PlaceSortableFields,
+        PlaceSelectableFields,
+        PlaceSearchableFields,
         PlaceFiltersSchema,
         PlaceCreateSchema,
         PlacePostSchema,

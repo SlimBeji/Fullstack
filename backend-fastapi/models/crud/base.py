@@ -26,6 +26,9 @@ from types_ import (
 
 ModelDocument = TypeVar("ModelDocument", bound=Document)
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
+Sortables = TypeVar("Sortables", bound=str)
+Selectables = TypeVar("Selectables", bound=str)
+Searchables = TypeVar("Searchables", bound=str)
 FiltersSchema = TypeVar("FiltersSchema", bound=BaseModel)
 CreateSchema = TypeVar("CreateSchema", bound=BaseModel)
 PostSchema = TypeVar("PostSchema", bound=BaseModel)
@@ -39,6 +42,9 @@ class CrudBase(
     Generic[
         ModelDocument,  # Beanie Document
         ReadSchema,  # Read Schema
+        Sortables,  # Literal of sortable fields
+        Selectables,  # Literal of Selectable fields
+        Searchables,  # Literal of Searchable fields
         FiltersSchema,  # Filters Schema
         CreateSchema,  # Creation Schema
         PostSchema,  # HTTP Post Schema

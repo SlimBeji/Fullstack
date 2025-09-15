@@ -9,6 +9,7 @@ from lib.clients import cloud_storage
 from lib.encryption import create_token, hash_input, verify_hash
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent
+from models.fields import UserSearchableFields, UserSelectableFields, UserSortableFields
 from models.schemas import (
     EncodedTokenSchema,
     SigninForm,
@@ -27,6 +28,9 @@ class CrudUser(
     CrudBase[
         User,
         UserReadSchema,
+        UserSortableFields,
+        UserSelectableFields,
+        UserSearchableFields,
         UserFiltersSchema,
         UserCreateSchema,
         UserPostSchema,
