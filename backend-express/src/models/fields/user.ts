@@ -3,23 +3,31 @@ import { zodFile, zodObjectId } from "./utils";
 
 //////// Types ///////
 
-export type UserSelectableFields =
-    | "id"
-    | "name"
-    | "email"
-    | "isAdmin"
-    | "imageUrl"
-    | "places";
+export const userSelectableFields = [
+    "id",
+    "name",
+    "email",
+    "isAdmin",
+    "imageUrl",
+    "places",
+];
 
-export type UserSearchableFields = "id" | "name" | "email";
+export type UserSelectableType = (typeof userSelectableFields)[number];
 
-export type UserSortableFields =
-    | "createdAt"
-    | "-createdAt"
-    | "name"
-    | "-name"
-    | "email"
-    | "-email";
+export const userSearchableFields = ["id", "name", "email"];
+
+export type UserSearchableType = (typeof userSearchableFields)[number];
+
+export const userSortableFields = [
+    "createdAt",
+    "-createdAt",
+    "name",
+    "-name",
+    "email",
+    "-email",
+];
+
+export type UserSortableType = (typeof userSortableFields)[number];
 
 //////// First Level Fields ///////
 

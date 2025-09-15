@@ -3,34 +3,43 @@ import { zodFile, zodObject, zodObjectId } from "./utils";
 
 //////// Types ///////
 
-export type PlaceSelectableFields =
-    | "id"
-    | "title"
-    | "description"
-    | "address"
-    | "location.lat"
-    | "location.lng"
-    | "imageUrl"
-    | "creatorId";
+export const placeSelectableFields = [
+    "id",
+    "title",
+    "description",
+    "address",
+    "location.lat",
+    "location.lng",
+    "imageUrl",
+    "creatorId",
+];
 
-export type PlaceSearchableFields =
-    | "id"
-    | "title"
-    | "description"
-    | "address"
-    | "creatorId"
-    | "locationLat"
-    | "locationLng";
+export type PlaceSelectableType = (typeof placeSelectableFields)[number];
 
-export type PlaceSortableFields =
-    | "createdAt"
-    | "-createdAt"
-    | "title"
-    | "-title"
-    | "description"
-    | "-description"
-    | "address"
-    | "-address";
+export const placeSearchableFields = [
+    "id",
+    "title",
+    "description",
+    "address",
+    "creatorId",
+    "locationLat",
+    "locationLng",
+];
+
+export type PlaceSearchableType = (typeof placeSearchableFields)[number];
+
+export const placeSortableFields = [
+    "createdAt",
+    "-createdAt",
+    "title",
+    "-title",
+    "description",
+    "-description",
+    "address",
+    "-address",
+];
+
+export type PlaceSortableType = (typeof placeSortableFields)[number];
 
 //////// First Level Fields ///////
 const id = zodObjectId().openapi({
