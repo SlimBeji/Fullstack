@@ -38,9 +38,6 @@ class UserPostSchema(UserBaseSchema):
     image: UserFields.image_annot | None = None
 
 
-# --- Multipart Post ----
-
-
 class UserMultipartPost:
     def __init__(
         self,

@@ -44,9 +44,6 @@ class PlacePostSchema(PlaceBaseSchema):
     creatorId: PlaceFields.creatorId_annot
 
 
-# --- Multipart Post ----
-
-
 class PlaceMultipartPost:
     def __init__(
         self,
