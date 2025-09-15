@@ -27,9 +27,12 @@ export type CrudEvent = "create" | "read" | "update" | "delete";
 type CrudModel<I, D> = Model<I, {}, {}, {}, D & Document>;
 
 export class Crud<
-    DBInt, // DB Interface
-    Doc extends Document, // Document Type
+    DBInt, // Mongoose DB Interface
+    Doc extends Document, //Mongoose  Document Type
     Read extends object, // The Read interface
+    Sortables extends string, // Literal of sortable fields
+    Selectables extends string, // Literal of Selectable fields
+    Searchables extends string, // Literal of Searchable fields
     Filters extends object, // The Search Filters interface
     Create extends object, // Creation Interface
     Post extends object, // HTTP Post Interface
@@ -66,16 +69,16 @@ export class Crud<
 
     // Accessors
 
-    public safeCheck(
+    public authCheck(
         _user: UserRead,
         _doc: Doc | Post | Put,
         _event: CrudEvent
     ): void {}
 
-    public safeQuery(
+    public addOwnershipFilters(
         _user: UserRead,
-        query: FindQuery<Filters>
-    ): FindQuery<Filters> {
+        query: FindQuery<Selectables, Sortables, Searchables>
+    ): FindQuery<Selectables, Sortables, Searchables> {
         return query;
     }
 
@@ -112,16 +115,16 @@ export class Crud<
         return this.model.findById(id);
     }
 
-    public async get(id: string | Types.ObjectId): Promise<Read | null> {
+    public async get(id: string | Types.ObjectId): Promise<Read> {
         const document = await this.getDocument(id);
         if (!document) {
-            return null;
+            throw this.notFoundError(id);
         }
         const result = await this.post_process(document);
         return result as Read;
     }
 
-    public async safeGet(
+    public async userGet(
         user: UserRead,
         id: string | Types.ObjectId
     ): Promise<Read> {
@@ -129,14 +132,14 @@ export class Crud<
         if (!document) {
             throw this.notFoundError(id);
         }
-        this.safeCheck(user, document, "read");
+        this.authCheck(user, document, "read");
         const result = await this.post_process(document);
         return result as Read;
     }
 
     // Fetch
 
-    private parseSortData(fields: string[] | undefined): SortData {
+    private parseSortData(fields: Sortables[] | undefined): SortData {
         if (!fields || fields.length === 0) {
             return { createdAt: 1 };
         }
@@ -153,7 +156,7 @@ export class Crud<
     }
 
     private parseProjection(
-        fields: string[] | undefined
+        fields: Selectables[] | undefined
     ): ProjectionType<DBInt> {
         if (!fields || fields.length === 0) {
             return this.defaultProjection;
@@ -161,7 +164,7 @@ export class Crud<
 
         const result: ProjectionType<DBInt> = {};
         fields.forEach((item) => {
-            result[item] = 1;
+            result[item as string] = 1;
         });
 
         if (!("id" in result)) {
@@ -171,7 +174,7 @@ export class Crud<
     }
 
     private parseFilters(
-        filters: FindQueryFilters<Filters> | undefined
+        filters: FindQueryFilters<Searchables> | undefined
     ): MongooseFilterQuery<DBInt> {
         if (filters === undefined || Object.keys(filters).length === 0) {
             return {};
@@ -223,16 +226,21 @@ export class Crud<
     }
 
     public async fetch(
-        query: FindQuery<Filters>
+        query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
-        // Parsing the FindQuery to Mongo language
+        // Step 1: Parsing the FindQuery to Mongo language
         const pagination = new PaginationData(query.page, query.size);
         const projection = this.parseProjection(query.fields);
         const sort = this.parseSortData(query.sort);
         const filters = this.parseFilters(query.filters);
-        const parsed = { pagination, sort, filters, projection };
+        const parsed: MongoFindQuery<DBInt> = {
+            pagination,
+            sort,
+            filters,
+            projection,
+        };
 
-        // Counting the output
+        // Step 2: Counting the output
         const totalCount = await this.countDocuments(filters || {});
         const totalPages = Math.ceil(totalCount / pagination.size);
 
@@ -242,11 +250,11 @@ export class Crud<
         return { page: pagination.page, totalPages, totalCount, data };
     }
 
-    public async safeFetch(
+    public async userFetch(
         user: UserRead,
-        query: FindQuery<Filters>
+        query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
-        query = this.safeQuery(user, query);
+        query = this.addOwnershipFilters(user, query);
         return this.fetch(query);
     }
 
@@ -275,8 +283,8 @@ export class Crud<
         return result as Read;
     }
 
-    public async safeCreate(user: UserRead, post: Post): Promise<Read> {
-        this.safeCheck(user, post, "create");
+    public async userCreate(user: UserRead, post: Post): Promise<Read> {
+        this.authCheck(user, post, "create");
         return this.create(post);
     }
 
@@ -315,17 +323,17 @@ export class Crud<
         return this.update(doc, form);
     }
 
-    public async safeUpdate(
+    public async userUpdate(
         user: UserRead,
         doc: Doc,
         form: Put
     ): Promise<Read> {
-        this.safeCheck(user, doc, "read");
-        this.safeCheck(user, form, "update");
+        this.authCheck(user, doc, "read");
+        this.authCheck(user, form, "update");
         return this.update(doc, form);
     }
 
-    public async safeUpdateById(
+    public async userUpdateById(
         user: UserRead,
         id: string | Types.ObjectId,
         form: Put
@@ -334,7 +342,7 @@ export class Crud<
         if (!doc) {
             throw this.notFoundError(id);
         }
-        return this.safeUpdate(user, doc, form);
+        return this.userUpdate(user, doc, form);
     }
 
     // Delete
@@ -365,7 +373,7 @@ export class Crud<
         return this.deleteDocument(doc);
     }
 
-    public async safeDelete(
+    public async userDelete(
         user: UserRead,
         id: string | Types.ObjectId
     ): Promise<void> {
@@ -373,7 +381,7 @@ export class Crud<
         if (!doc) {
             throw this.notFoundError(id);
         }
-        this.safeCheck(user, doc, "delete");
+        this.authCheck(user, doc, "delete");
         return this.deleteDocument(doc);
     }
 }
