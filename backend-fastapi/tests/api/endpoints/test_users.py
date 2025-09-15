@@ -72,7 +72,10 @@ async def test_create_user_as_non_admin(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_get_user_by_id(helpers: Helpers):
-    response = await helpers.client.get(f"/api/users/{helpers.user.id}")
+    headers = dict(Authorization=helpers.user_token)
+    response = await helpers.client.get(
+        f"/api/users/{helpers.user.id}", headers=headers
+    )
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["email"] == "beji.slim@yahoo.fr"
