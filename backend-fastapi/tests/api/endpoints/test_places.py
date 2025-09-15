@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 from typing import cast
 
@@ -57,18 +58,21 @@ async def test_query_places(helpers: Helpers):
 async def test_create_place(helpers: Helpers):
     files = dict(image=open(get_image_path("place1.jpg"), "rb"))
     headers = dict(Authorization=helpers.admin_token)
-    data = dict(
+
+    multipart_data = dict(
         creatorId=str(helpers.admin.id),
         description="A brand new place",
         title="Brand New Place",
         address="Somewhere over the rainbow",
+        location=json.dumps(dict(lat=1.0, lng=2.5)),
     )
     response = await helpers.client.post(
         "/api/places/",
-        data=data,
+        data=multipart_data,
         files=files,
         headers=headers,
     )
+
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["creatorId"] == str(helpers.admin.id)
@@ -81,14 +85,15 @@ async def test_create_place(helpers: Helpers):
 async def test_create_place_belonging_to_others(helpers: Helpers):
     files = dict(image=open(get_image_path("place1.jpg"), "rb"))
     headers = dict(Authorization=helpers.user_token)
-    data = dict(
+    multipart_data = dict(
         creatorId=str(helpers.admin.id),
         description="A brand new place",
         title="Brand New Place",
         address="Somewhere over the rainbow",
+        location=json.dumps(dict(lat=1.0, lng=2.5)),
     )
     response = await helpers.client.post(
-        "/api/places/", data=data, files=files, headers=headers
+        "/api/places/", data=multipart_data, files=files, headers=headers
     )
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
@@ -96,7 +101,8 @@ async def test_create_place_belonging_to_others(helpers: Helpers):
 @pytest.mark.asyncio
 async def test_get_place_by_id(helpers: Helpers):
     place_id = await _get_place_id()
-    response = await helpers.client.get(f"/api/places/{place_id}")
+    headers = dict(Authorization=helpers.user_token)
+    response = await helpers.client.get(f"/api/places/{place_id}", headers=headers)
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["address"] == "Fulham Road, London"
