@@ -43,7 +43,6 @@ type SortData = dict[str, Literal[-1, 1]]
 
 type Projection = dict[str, Literal[0, 1]]
 
-
 type MongoFieldFilters = dict[str, Any]
 
 type MongoFieldsFilters = dict[str, MongoFieldFilters]
