@@ -62,11 +62,11 @@ class CrudBase(
         types = get_args(orig_base)
         self.model: type[ModelDocument] = types[0]
         self.read_schema: type[ReadSchema] = types[1]
-        self.filters_schema: type[FiltersSchema] = types[2]
-        self.create_schema: type[CreateSchema] = types[3]
-        self.post_schema: type[PostSchema] = types[4]
-        self.update_schema: type[UpdateSchema] = types[5]
-        self.put_schema: type[PutSchema] = types[6]
+        self.filters_schema: type[FiltersSchema] = types[5]
+        self.create_schema: type[CreateSchema] = types[6]
+        self.post_schema: type[PostSchema] = types[7]
+        self.update_schema: type[UpdateSchema] = types[8]
+        self.put_schema: type[PutSchema] = types[9]
 
     @property
     def model_name(self) -> str:
