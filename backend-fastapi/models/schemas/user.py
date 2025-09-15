@@ -48,7 +48,7 @@ class UserMultipartPost:
         email: EmailStr = UserFields.email_meta.multipart,
         isAdmin: bool = UserFields.isAdmin_meta.multipart,
         password: str = UserFields.password_meta.multipart,
-        image: FileToUpload | None = UserFields.password_meta.multipart,
+        image: FileToUpload | None = UserFields.image_meta.multipart,
     ):
         self.name = name
         self.email = email
