@@ -6,12 +6,12 @@ from conftest import Helpers
 
 from lib.utils import get_image_path
 from models.crud import crud_place
-from models.schemas import PlaceReadSchema
-from types_ import Filter, FindQuery
+from models.schemas import PlaceFindQuery, PlaceReadSchema
+from types_ import Filter
 
 
 async def _get_place_id() -> str:
-    query = FindQuery(filters=dict(title=[Filter(op="eq", val="Stamford Bridge")]))
+    query = PlaceFindQuery(filters=dict(title=[Filter(op="eq", val="Stamford Bridge")]))
     result = await crud_place.fetch(query)
     data = result.data
     place = cast(PlaceReadSchema, data[0])
