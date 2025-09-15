@@ -14,28 +14,9 @@ Sortables = TypeVar("Sortables", bound=str)
 Selectables = TypeVar("Selectables", bound=str)
 Searchables = TypeVar("Searchables", bound=str)
 
-type SortData[Sortables: str] = dict[Sortables, Literal[-1, 1]]
+#### Public Types for searching data ####
 
-
-type Projection[Selectables: str] = dict[
-    Selectables | Literal["_version"], Literal[0, 1]
-]
-
-type MongoOperation = Literal[
-    "$eq",
-    "$ne",
-    "$gt",
-    "$gte",
-    "$lt",
-    "$lte",
-    "$in",
-    "$nin",
-    "$regex",
-    "$text",
-    "$exists",
-]
-
-type FilterOperation = Literal[
+FilterOperation = Literal[
     "eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text", "exists"
 ]
 
@@ -56,15 +37,22 @@ class FindQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
     filters: FindQueryFilters[Searchables] | None = None
 
 
-type MongoFieldFilters = dict[MongoOperation, Any]
+#### Internal Types for building Mongo queries ####
 
-type MongoFieldsFilters[Searchables: str] = dict[Searchables, MongoFieldFilters]
+type SortData = dict[str, Literal[-1, 1]]
+
+type Projection = dict[str, Literal[0, 1]]
 
 
-class MongoFindQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
+type MongoFieldFilters = dict[str, Any]
+
+type MongoFieldsFilters = dict[str, MongoFieldFilters]
+
+
+class MongoFindQuery(BaseModel):
     pagination: PaginationData | None = PaginationData(
         page=1, size=settings.MAX_ITEMS_PER_PAGE
     )
-    sort: SortData[Sortables] = {}
-    filters: MongoFieldsFilters[Searchables] | None = {}
-    projection: Projection[Selectables] | None = {}
+    sort: SortData = {}
+    filters: MongoFieldsFilters | None = {}
+    projection: Projection | None = {}
