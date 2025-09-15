@@ -20,7 +20,7 @@ from models.schemas import (
     PlaceUpdateSchema,
     UserReadSchema,
 )
-from types_ import ApiError, Filter
+from types_ import ApiError, Filter, FindQuery
 from worker.tasks import place_embeddding
 
 
@@ -61,9 +61,20 @@ class CrudPlace(
             )
 
     def add_ownership_filters(
-        self, user: UserReadSchema, query: PlaceFiltersSchema
-    ) -> PlaceFiltersSchema:
-        query.creatorId = [Filter(op="eq", val=user.id)]
+        self,
+        user: UserReadSchema,
+        query: FindQuery[
+            PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
+        ],
+    ) -> FindQuery[PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields]:
+        ownership_filters = [Filter(op="eq", val=user.id)]
+
+        if query.filters is None:
+            query.filters = {}
+
+        creatorId_filters = query.filters.get("creatorId", [])
+        creatorId_filters.extend(ownership_filters)
+        query.filters["creatorId"] = creatorId_filters
         return query
 
     async def _post_process_dict(self, item: dict) -> dict:

@@ -21,7 +21,7 @@ from models.schemas import (
     UserReadSchema,
     UserUpdateSchema,
 )
-from types_ import ApiError, Filter, Projection
+from types_ import ApiError, Filter, FindQuery, Projection
 
 
 class CrudUser(
@@ -38,7 +38,7 @@ class CrudUser(
         UserPutSchema,
     ]
 ):
-    DEFAULT_PROJECTION: Projection[UserSelectableFields] = dict(_version=0, password=0)
+    DEFAULT_PROJECTION: Projection = dict(_version=0, password=0)
 
     def auth_check(
         self,
@@ -59,9 +59,20 @@ class CrudUser(
             )
 
     def add_ownership_filters(
-        self, user: UserReadSchema, query: UserFiltersSchema
-    ) -> UserFiltersSchema:
-        query.id = [Filter(op="eq", val=user.id)]
+        self,
+        user: UserReadSchema,
+        query: FindQuery[
+            UserSelectableFields, UserSortableFields, UserSearchableFields
+        ],
+    ) -> FindQuery[UserSelectableFields, UserSortableFields, UserSearchableFields]:
+        ownership_filters = [Filter(op="eq", val=user.id)]
+
+        if query.filters is None:
+            query.filters = {}
+
+        id_filters = query.filters.get("id", [])
+        id_filters.extend(ownership_filters)
+        query.filters["id"] = id_filters
         return query
 
     async def _post_process_dict(self, item: dict) -> dict:
