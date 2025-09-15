@@ -144,7 +144,7 @@ class CrudBase(
     async def get_document(self, id: str | ObjectId) -> ModelDocument | None:
         return await self.model.get(id)
 
-    async def get(self, id: str | ObjectId) -> ReadSchema | None:
+    async def get(self, id: str | ObjectId) -> ReadSchema:
         document = await self.get_document(id)
         if document is None:
             raise self.not_found(id)
