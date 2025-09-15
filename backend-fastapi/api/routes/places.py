@@ -25,9 +25,9 @@ place_id_param = Path(
 )
 async def get_places(
     query: Annotated[PlaceFiltersSchema, Query()],
-    user: UserReadSchema = Depends(get_current_user),
+    _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.user_fetch(user, query)
+    return await crud_place.fetch(query)
 
 
 @place_router.post(
@@ -35,9 +35,9 @@ async def get_places(
 )
 async def get_places_from_post(
     query: PlaceFiltersSchema,
-    user: UserReadSchema = Depends(get_current_user),
+    _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.user_fetch(user, query)
+    return await crud_place.fetch(query)
 
 
 @place_router.post("/", summary="Place creation", response_model=PlaceReadSchema)
@@ -55,9 +55,9 @@ async def create_place(
 )
 async def get_place(
     place_id: str = place_id_param,
-    user: UserReadSchema = Depends(get_current_user),
+    _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.user_get(user, place_id)
+    return await crud_place.get(place_id)
 
 
 @place_router.put(

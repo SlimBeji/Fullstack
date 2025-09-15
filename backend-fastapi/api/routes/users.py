@@ -24,9 +24,9 @@ user_id_param = Path(
 )
 async def get_users(
     query: Annotated[UserFiltersSchema, Query()],
-    current_user: UserReadSchema = Depends(get_current_user),
+    _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.user_fetch(current_user, query)
+    return await crud_user.fetch(query)
 
 
 @user_router.post(
@@ -34,9 +34,9 @@ async def get_users(
 )
 async def get_users_from_post(
     query: UserFiltersSchema,
-    current_user: UserReadSchema = Depends(get_current_user),
+    _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.user_fetch(current_user, query)
+    return await crud_user.fetch(query)
 
 
 @user_router.post("/", summary="User creation", response_model=UserReadSchema)
@@ -54,9 +54,9 @@ async def create_user(
 )
 async def get_user(
     user_id: str = user_id_param,
-    current_user: UserReadSchema = Depends(get_current_user),
+    _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.user_get(current_user, user_id)
+    return await crud_user.get(user_id)
 
 
 @user_router.put("/{user_id}", summary="Update users", response_model=UserReadSchema)
