@@ -3,8 +3,8 @@ import z from "../../zodExt";
 import {
     httpFilters,
     PlaceFields,
-    placeSearchableFields,
     PlaceSearchableType,
+    placeSelectableFields,
     PlaceSelectableType,
     placeSortableFields,
     PlaceSortableType,
@@ -86,7 +86,7 @@ export const PlaceFiltersSchema = filtersSchema(
         ).optional(),
     }),
     placeSortableFields,
-    placeSearchableFields
+    placeSelectableFields
 );
 
 export type PlaceFilters = z.infer<typeof PlaceFiltersSchema>;

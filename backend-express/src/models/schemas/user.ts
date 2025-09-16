@@ -3,8 +3,8 @@ import z from "../../zodExt";
 import {
     httpFilters,
     UserFields,
-    userSearchableFields,
     UserSearchableType,
+    userSelectableFields,
     UserSelectableType,
     userSortableFields,
     UserSortableType,
@@ -65,7 +65,7 @@ export const UserFiltersSchema = filtersSchema(
         }).optional(),
     }),
     userSortableFields,
-    userSearchableFields
+    userSelectableFields
 );
 
 export type UserFilters = z.infer<typeof UserFiltersSchema>;

@@ -18,7 +18,7 @@ export const paginatedSchema = (
 export const filtersSchema = (
     baseSchema: AnyZodObject,
     sortables: string[],
-    searchables: string[]
+    selectables: string[]
 ): AnyZodObject => {
     const page = z.coerce.number().int().default(1).openapi("The page number");
     const size = z.coerce
@@ -36,7 +36,7 @@ export const filtersSchema = (
             example: ["-createdAt"],
         });
     const fields = z
-        .array(z.enum(searchables as [string, ...string[]]))
+        .array(z.enum(selectables as [string, ...string[]]))
         .openapi({
             description:
                 "Fields to include in the response; omit for full document",
