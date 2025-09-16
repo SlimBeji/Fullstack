@@ -1,18 +1,17 @@
 import { Request, Response, Router } from "express";
 
 import { crudUser } from "../../models/crud";
+import { zodObjectId } from "../../models/fields";
 import {
+    UserFiltersSchema,
     UserPost,
     UserPostSchema,
     UserPut,
     UserPutSchema,
     UserReadSchema,
-    UserSearchGetSchema,
-    UserSearchSchema,
     UsersPaginatedSchema,
-    z,
-    zodObjectId,
 } from "../../models/schemas";
+import z from "../../zodExt";
 import { Admin, Authenticated, filter, validateBody } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
@@ -25,13 +24,18 @@ async function getUsers(req: Request, res: Response) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.get("/", filter(UserSearchGetSchema, "query"), getUsers);
+userRouter.get(
+    "/",
+    Authenticated,
+    filter(UserFiltersSchema, "query"),
+    getUsers
+);
 
 swaggerRegistery.registerPath({
     method: "get",
     path: "/users/",
     request: {
-        query: UserSearchGetSchema,
+        query: UserFiltersSchema,
     },
     responses: {
         200: {
@@ -45,6 +49,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["User"],
     summary: "Search and Retrieve users",
+    security: [{ OAuth2Password: [] }],
 });
 
 // Post Search
@@ -55,7 +60,7 @@ async function queryUsers(req: Request, res: Response) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.post("/query", filter(UserSearchSchema, "body"), queryUsers);
+userRouter.post("/query", filter(UserFiltersSchema, "body"), queryUsers);
 
 swaggerRegistery.registerPath({
     method: "post",
@@ -64,7 +69,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: UserSearchSchema,
+                    schema: UserFiltersSchema,
                 },
             },
             description: "user advanced Search",
@@ -83,13 +88,14 @@ swaggerRegistery.registerPath({
     },
     tags: ["User"],
     summary: "Search and Retrieve users",
+    security: [{ OAuth2Password: [] }],
 });
 
 // Post a User (admin only)
 async function createUser(req: Request, res: Response) {
     const currentUser = req.currentUser!;
     const parsed = req.parsed as UserPost;
-    const newUser = await crudUser.safeCreate(currentUser, parsed);
+    const newUser = await crudUser.userCreate(currentUser, parsed);
     res.status(200).json(newUser);
 }
 
@@ -156,13 +162,14 @@ swaggerRegistery.registerPath({
     },
     tags: ["User"],
     summary: "Search and Retrieve user by id",
+    security: [{ OAuth2Password: [] }],
 });
 
 // Put User Endpoint
 async function editUser(req: Request, res: Response) {
     const parsed = req.parsed as UserPut;
     const currentUser = req.currentUser!;
-    const updatedUser = await crudUser.safeUpdateById(
+    const updatedUser = await crudUser.userUpdateById(
         currentUser,
         req.params.userId,
         parsed
@@ -215,7 +222,7 @@ swaggerRegistery.registerPath({
 // Delete User Endpoint
 async function deleteUser(req: Request, res: Response) {
     const currentUser = req.currentUser!;
-    await crudUser.safeDelete(currentUser, req.params.userId);
+    await crudUser.userDelete(currentUser, req.params.userId);
     res.status(200).json({
         message: `Deleted user ${req.params.userId}`,
     });

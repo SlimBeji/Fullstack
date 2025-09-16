@@ -1,18 +1,17 @@
 import { Request, Response, Router } from "express";
 
 import { crudPlace } from "../../models/crud";
+import { zodObjectId } from "../../models/fields";
 import {
+    PlaceFiltersSchema,
     PlacePost,
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
     PlaceReadSchema,
-    PlaceSearchGetSchema,
-    PlaceSearchSchema,
     PlacesPaginatedSchema,
-    z,
-    zodObjectId,
 } from "../../models/schemas";
+import z from "../../zodExt";
 import { Authenticated, filter, validateBody } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
@@ -25,13 +24,13 @@ async function getPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.get("/", filter(PlaceSearchGetSchema, "query"), getPlaces);
+placeRouter.get("/", filter(PlaceFiltersSchema, "query"), getPlaces);
 
 swaggerRegistery.registerPath({
     method: "get",
     path: "/places/",
     request: {
-        query: PlaceSearchGetSchema,
+        query: PlaceFiltersSchema,
     },
     responses: {
         200: {
@@ -45,6 +44,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["Place"],
     summary: "Search and Retrieve places",
+    security: [{ OAuth2Password: [] }],
 });
 
 // Post search
@@ -54,7 +54,7 @@ async function queryPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.post("/query", filter(PlaceSearchSchema, "body"), queryPlaces);
+placeRouter.post("/query", filter(PlaceFiltersSchema, "body"), queryPlaces);
 
 swaggerRegistery.registerPath({
     method: "post",
@@ -63,7 +63,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: PlaceSearchSchema,
+                    schema: PlaceFiltersSchema,
                 },
             },
             description: "Place advanced query",
@@ -82,6 +82,7 @@ swaggerRegistery.registerPath({
     },
     tags: ["Place"],
     summary: "Search and Retrieve places",
+    security: [{ OAuth2Password: [] }],
 });
 
 // Post New Places
@@ -89,7 +90,7 @@ async function createPlace(req: Request, resp: Response) {
     // Use safeCreate to avoid a user posting a place for another user
     const parsed = req.parsed as PlacePost;
     const currentUser = req.currentUser!;
-    const newPlace = await crudPlace.safeCreate(currentUser, parsed);
+    const newPlace = await crudPlace.userCreate(currentUser, parsed);
     resp.status(200).json(newPlace);
 }
 
@@ -161,13 +162,14 @@ swaggerRegistery.registerPath({
     },
     tags: ["Place"],
     summary: "Search and Retrieve place by id",
+    security: [{ OAuth2Password: [] }],
 });
 
 // Edit Places
 async function editPlace(req: Request, res: Response) {
     const parsed = req.parsed as PlacePut;
     const currentUser = req.currentUser!;
-    const updatedPlace = await crudPlace.safeUpdateById(
+    const updatedPlace = await crudPlace.userUpdateById(
         currentUser,
         req.params.placeId,
         parsed
@@ -220,7 +222,7 @@ swaggerRegistery.registerPath({
 // Delete Places
 async function deletePlace(req: Request, res: Response) {
     const currentUser = req.currentUser!;
-    await crudPlace.safeDelete(currentUser, req.params.placeId);
+    await crudPlace.userDelete(currentUser, req.params.placeId);
     res.status(200).json({
         message: `Deleted place ${req.params.placeId}`,
     });
