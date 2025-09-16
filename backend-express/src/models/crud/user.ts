@@ -1,8 +1,13 @@
 import { env } from "../../config";
 import { storage } from "../../lib/clients";
 import { createToken, hashInput, verifyHash } from "../../lib/encryption";
-import { ApiError, FindQuery, HttpStatus } from "../../types";
+import { ApiError, Filter, HttpStatus } from "../../types";
 import { UserDocument, UserModel } from "../collections";
+import {
+    UserSearchableType,
+    UserSelectableType,
+    UserSortableType,
+} from "../fields";
 import {
     EncodedToken,
     Signin,
@@ -10,6 +15,7 @@ import {
     UserCreate,
     UserDB,
     UserFilters,
+    UserFindQuery,
     UserPost,
     UserPut,
     UserRead,
@@ -21,6 +27,9 @@ export class CrudUser extends Crud<
     UserDB,
     UserDocument,
     UserRead,
+    UserSortableType,
+    UserSelectableType,
+    UserSearchableType,
     UserFilters,
     UserCreate,
     UserPost,
@@ -33,7 +42,7 @@ export class CrudUser extends Crud<
 
     protected defaultProjection = { password: 0, __v: 0 } as const;
 
-    public safeCheck(
+    public authCheck(
         user: UserRead,
         data: UserDocument | UserPost | UserCreate,
         _event: CrudEvent
@@ -51,13 +60,18 @@ export class CrudUser extends Crud<
         }
     }
 
-    public safeQuery(
+    public addOwnershipFilters(
         user: UserRead,
-        query: FindQuery<UserFilters>
-    ): FindQuery<UserFilters> {
-        if (query.filters) {
-            query.filters.id = [{ op: "eq", val: user.id }];
+        query: UserFindQuery
+    ): UserFindQuery {
+        const ownershipFilters: Filter[] = [{ op: "eq", val: user.id }];
+        if (!query.filters) {
+            query.filters = {};
         }
+
+        const idFilters: Filter[] = query.filters.id || [];
+        idFilters.push(...ownershipFilters);
+        query.filters.id = idFilters;
         return query;
     }
 

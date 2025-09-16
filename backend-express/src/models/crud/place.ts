@@ -1,11 +1,17 @@
 import { storage } from "../../lib/clients";
-import { ApiError, FindQuery, HttpStatus } from "../../types";
+import { ApiError, Filter, HttpStatus } from "../../types";
 import { placeEmbedding } from "../../worker/tasks";
 import { PlaceDocument, PlaceModel } from "../collections";
+import {
+    PlaceSearchableType,
+    PlaceSelectableType,
+    PlaceSortableType,
+} from "../fields";
 import {
     PlaceCreate,
     PlaceDB,
     PlaceFilters,
+    PlaceFindQuery,
     PlacePost,
     PlacePut,
     PlaceRead,
@@ -18,6 +24,9 @@ export class CrudPlace extends Crud<
     PlaceDB,
     PlaceDocument,
     PlaceRead,
+    PlaceSortableType,
+    PlaceSelectableType,
+    PlaceSearchableType,
     PlaceFilters,
     PlaceCreate,
     PlacePost,
@@ -33,7 +42,7 @@ export class CrudPlace extends Crud<
         locationLng: "location.lng",
     };
 
-    public safeCheck(
+    public authCheck(
         user: UserRead,
         data: PlaceDocument | PlacePost | PlaceCreate,
         _event: CrudEvent
@@ -51,13 +60,18 @@ export class CrudPlace extends Crud<
         }
     }
 
-    public safeQuery(
+    public addOwnershipFilters(
         user: UserRead,
-        query: FindQuery<PlaceFilters>
-    ): FindQuery<PlaceFilters> {
-        if (query.filters) {
-            query.filters.creatorId = [{ op: "eq", val: user.id }];
+        query: PlaceFindQuery
+    ): PlaceFindQuery {
+        const ownershipFilters: Filter[] = [{ op: "eq", val: user.id }];
+        if (!query.filters) {
+            query.filters = {};
         }
+
+        const creatorFilters: Filter[] = query.filters.creatorId || [];
+        creatorFilters.push(...ownershipFilters);
+        query.filters.creatorId = creatorFilters;
         return query;
     }
 
