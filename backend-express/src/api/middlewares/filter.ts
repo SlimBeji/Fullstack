@@ -3,8 +3,7 @@ import { ParsedQs } from "qs";
 import { AnyZodObject } from "zod";
 
 import { env } from "../../config";
-import { getZodFields } from "../../models/schemas";
-import { ApiError, Filter, HttpStatus, RawFindQuery } from "../../types";
+import { ApiError, Filter, HttpStatus } from "../../types";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 
@@ -35,10 +34,10 @@ const extractQueryParam = (req: Request, key: string): string[] | undefined => {
 
 const extractQueryParams = (
     req: Request,
-    zodSchema: AnyZodObject
+    allowedFields: string[]
 ): Record<string, string[]> => {
+    const allowedSet = new Set(allowedFields);
     const result: Record<string, string[]> = {};
-    const allowedFilterFields = new Set(getZodFields(zodSchema));
 
     // Iterate over all keys
     for (const key in req.query) {
@@ -48,11 +47,11 @@ const extractQueryParams = (
         }
 
         // Raise error if the field is unknown
-        if (!allowedFilterFields.has(key)) {
+        if (!allowedSet.has(key)) {
             throw new ApiError(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 `Unknown filter field: '${key}'. Allowed fields are: ${Array.from(
-                    allowedFilterFields
+                    allowedSet
                 ).join(", ")}.`
             );
         }
@@ -65,15 +64,13 @@ const extractQueryParams = (
     return result;
 };
 
-const extractFilters = (body: RawFindQuery): Record<string, Filter[]> => {
+const extractFilters = (
+    body: Record<string, Filter[]>
+): Record<string, Filter[]> => {
     const result: Record<string, Filter[]> = {};
     for (const [key, values] of Object.entries(body)) {
         if (GLOBAL_PARAMS.has(key)) continue;
-        const fieldFilters: Filter[] = [];
-        values.forEach(({ op, val }) => {
-            fieldFilters.push({ op, val });
-        });
-        result[key] = fieldFilters;
+        result[key] = values;
     }
     return result;
 };
@@ -83,8 +80,11 @@ export const filter = (
     location: "query" | "body"
 ): RequestHandler => {
     return async (req: Request, resp: Response, next: NextFunction) => {
+        const filterFields = Object.keys(zodSchema.shape);
         const body =
-            location === "body" ? req.body : extractQueryParams(req, zodSchema);
+            location === "body"
+                ? req.body
+                : extractQueryParams(req, filterFields);
 
         const parsing = zodSchema.strict().safeParse(body);
         if (!parsing.success) {

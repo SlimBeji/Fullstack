@@ -33,13 +33,6 @@ export interface FindQuery<
     filters?: FindQueryFilters<Searchables>;
 }
 
-export type RawFindQuery = {
-    page?: number;
-    size?: number;
-    sort?: string[];
-    fields?: string[];
-} & Record<string, { op: FilterOperation; val: string[] }[]>;
-
 //// Internal Types for building Mongo queries
 
 export type SortData = { [key: string]: 1 | -1 };
