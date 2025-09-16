@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
-import { z } from "../../models/schemas";
 import { sendNewsletter } from "../../worker/tasks/email";
+import z from "../../zodExt";
 import { Admin, Authenticated } from "../middlewares";
 import { swaggerRegistery } from "../openapi";
 
