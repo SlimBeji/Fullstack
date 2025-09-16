@@ -5,6 +5,7 @@ import httpx
 from config import settings
 from types_ import ApiError
 
+HF_TIMEOUT = 30
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
@@ -32,7 +33,7 @@ class HuggingFaceClient:
         try:
             payload = {"inputs": [text]}
             response = await self.embedding_model_api.post(
-                "/pipeline/feature-extraction", json=payload
+                "/pipeline/feature-extraction", json=payload, timeout=HF_TIMEOUT
             )
             response.raise_for_status()
             embedding_response: list[list[float]] = response.json()
