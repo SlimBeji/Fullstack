@@ -111,6 +111,8 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 />
                 <Input
                     id={"latitude"}
+                    width="1/2"
+                    padding="pr-2"
                     element="input"
                     onInput={inputHandlers.lat}
                     label="Latitude"
@@ -121,6 +123,8 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 />
                 <Input
                     id={"longitude"}
+                    width="1/2"
+                    padding="pl-2"
                     element="input"
                     onInput={inputHandlers.lng}
                     label="Longitude"

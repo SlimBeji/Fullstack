@@ -93,6 +93,8 @@ const NewPlace: React.FC = () => {
                 />
                 <Input
                     id={"latitude"}
+                    width="1/2"
+                    padding="pr-1"
                     element="input"
                     onInput={inputHandlers.lat}
                     label="Latitude"
@@ -101,6 +103,8 @@ const NewPlace: React.FC = () => {
                 />
                 <Input
                     id={"longitude"}
+                    width="1/2"
+                    padding="pl-1"
                     element="input"
                     onInput={inputHandlers.lng}
                     label="Longitude"
