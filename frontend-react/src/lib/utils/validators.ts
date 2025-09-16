@@ -1,5 +1,6 @@
 export enum ValidatorEnum {
     ANY = "ANY",
+    NUMERIC = "NUMERIC",
     REQUIRE = "REQUIRE",
     MINLENGTH = "MINLENGTH",
     MAXLENGTH = "MAXLENGTH",
@@ -15,6 +16,14 @@ interface AnyValidatorType {
 
 export const anyValidator = (): AnyValidatorType => {
     return { name: ValidatorEnum.ANY };
+};
+
+interface NumericValidatorType {
+    name: ValidatorEnum.NUMERIC;
+}
+
+export const numericValidator = (): NumericValidatorType => {
+    return { name: ValidatorEnum.NUMERIC };
 };
 
 interface RequireValidatorType {
@@ -79,6 +88,7 @@ export const urlValidator = (): UrllValidatorType => {
 
 export type ValidatorType =
     | AnyValidatorType
+    | NumericValidatorType
     | RequireValidatorType
     | MinlengthValidatorType
     | MaxlengthValidatorType
@@ -95,6 +105,8 @@ export const validate = (
         switch (validator.name) {
             case ValidatorEnum.ANY:
                 return true;
+            case ValidatorEnum.NUMERIC:
+                return value.trim() !== "" && !isNaN(Number(value));
             case ValidatorEnum.REQUIRE:
                 if (value.trim().length === 0) return false;
                 break;
