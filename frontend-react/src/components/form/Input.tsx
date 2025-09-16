@@ -52,6 +52,8 @@ interface InputProps {
     id: string;
     label: string;
     onInput: (value: string, isValid: boolean) => void;
+    width?: string;
+    padding?: string;
     rows?: number;
     placeholder?: string;
     validators?: ValidatorType[];
@@ -66,6 +68,8 @@ const Input: React.FC<InputProps> = ({
     id,
     label,
     onInput,
+    width,
+    padding,
     rows,
     placeholder,
     validators,
@@ -73,6 +77,9 @@ const Input: React.FC<InputProps> = ({
     value,
     isValid,
 }) => {
+    padding = padding ?? "";
+    width = width ? `basis-${width} ${padding}` : "basis-full";
+
     const [state, dispatch] = useReducer(inputReducer, {
         value: value || "",
         isValid: isValid || false,
@@ -126,7 +133,7 @@ const Input: React.FC<InputProps> = ({
     }
 
     return (
-        <div className={`input-container ${isError ? "error" : ""}`}>
+        <div className={`input-container ${width} ${isError ? "error" : ""}`}>
             <label htmlFor={id}>{label}</label>
             <Tag {...tagProps} />
             <p className={`error-text ${isError ? "" : "invisible"}`}>
