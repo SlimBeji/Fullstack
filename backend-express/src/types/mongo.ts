@@ -19,7 +19,7 @@ export type FilterOperation =
 
 export type Filter = { op: FilterOperation; val: any };
 
-export type FindQueryFilters<T extends string> = { [K in T]?: [Filter] };
+export type FindQueryFilters<T extends string> = { [K in T]?: Filter[] };
 
 export interface FindQuery<
     Selectables extends string,
