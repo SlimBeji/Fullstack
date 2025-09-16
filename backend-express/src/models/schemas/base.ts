@@ -40,7 +40,7 @@ export const filtersSchema = (
         .openapi({
             description:
                 "Fields to include in the response; omit for full document",
-            example: ["-id"],
+            example: ["id"],
         })
         .optional();
 
