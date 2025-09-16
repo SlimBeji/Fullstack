@@ -1,23 +1,23 @@
 import { env } from "../../config";
 import {
-    DecodedUserToken,
+    DecodedTokenPayload,
     EncodedToken,
+    TokenPayload,
     UserRead,
-    UserTokenInput,
 } from "../../models/schemas";
 import { ApiError, HttpStatus } from "../../types";
 import { decodePayload, encodePayload } from "./helpers";
 
-export const decodeToken = (encoded: string): DecodedUserToken => {
+export const decodeToken = (encoded: string): DecodedTokenPayload => {
     const decoded = decodePayload(encoded);
     if (typeof decoded === "string") {
         throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
     }
-    return decoded as DecodedUserToken;
+    return decoded as DecodedTokenPayload;
 };
 
 export const createToken = (user: UserRead): EncodedToken => {
-    const payload: UserTokenInput = {
+    const payload: TokenPayload = {
         userId: user.id,
         email: user.email,
     };
