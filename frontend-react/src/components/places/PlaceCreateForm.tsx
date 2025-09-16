@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
     emptyStateBuilder,
     minLengthValidator,
+    numericValidator,
     useForm,
     useHttp,
 } from "../../lib";
@@ -14,6 +15,8 @@ const Form = {
     title: true,
     address: true,
     description: true,
+    lat: true,
+    lng: true,
     image: true,
 };
 
@@ -34,6 +37,13 @@ const NewPlace: React.FC = () => {
         formData.append("image", state.inputs.image.val.file);
         formData.append("description", state.inputs.description.val);
         formData.append("address", state.inputs.address.val);
+        formData.append(
+            "location",
+            JSON.stringify({
+                lat: state.inputs.lat.val,
+                lng: state.inputs.lng.val,
+            })
+        );
         formData.append("creatorId", authData?.userId || "");
         try {
             await sendRequest("/places/", "post", formData);
@@ -46,6 +56,7 @@ const NewPlace: React.FC = () => {
     const titleValidators = useMemo(() => [minLengthValidator(10)], []);
     const addressValidators = useMemo(() => [minLengthValidator(1)], []);
     const descriptionValidators = useMemo(() => [minLengthValidator(10)], []);
+    const coordinateValidators = useMemo(() => [numericValidator()], []);
 
     return (
         <>
@@ -80,11 +91,26 @@ const NewPlace: React.FC = () => {
                     validators={descriptionValidators}
                     errorText="Please enter a valid Description"
                 />
+                <Input
+                    id={"latitude"}
+                    element="input"
+                    onInput={inputHandlers.lat}
+                    label="Latitude"
+                    validators={coordinateValidators}
+                    errorText="Please enter a valid Latitude"
+                />
+                <Input
+                    id={"longitude"}
+                    element="input"
+                    onInput={inputHandlers.lng}
+                    label="Longitude"
+                    validators={coordinateValidators}
+                    errorText="Please enter a valid Longitude"
+                />
                 <ImageUpload
                     id="image"
                     color="secondary"
                     onInput={inputHandlers.image}
-                    val={state.inputs.image.val}
                 />
                 <div className="buttons">
                     <Button

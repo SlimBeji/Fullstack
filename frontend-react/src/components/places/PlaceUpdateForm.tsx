@@ -4,9 +4,11 @@ import { useEffect, useMemo } from "react";
 import {
     emptyStateBuilder,
     minLengthValidator,
+    numericValidator,
     useForm,
     useHttp,
 } from "../../lib";
+import { Place } from "../../types";
 import { Button, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
 
@@ -14,6 +16,8 @@ const Form = {
     title: true,
     address: true,
     description: true,
+    lat: true,
+    lng: true,
 };
 
 type FormFields = keyof typeof Form;
@@ -30,27 +34,31 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
     const [data, sendRequest, clearError] = useHttp();
 
     useEffect(() => {
-        sendRequest(`/places/${placeId}`, "get").then((resp: AxiosResponse) => {
-            const { data } = resp;
-            setFormData([
-                { fieldName: "title", val: data.title, isValid: true },
-                { fieldName: "address", val: data.address, isValid: true },
-                {
-                    fieldName: "description",
-                    val: data.description,
-                    isValid: true,
-                },
-            ]);
-        });
+        sendRequest(`/places/${placeId}`, "get").then(
+            (resp: AxiosResponse<Place>) => {
+                const { data } = resp;
+                setFormData({
+                    title: { val: data.title, isValid: true },
+                    address: { val: data.address, isValid: true },
+                    description: { val: data.description, isValid: true },
+                    lat: { val: String(data.location.lat), isValid: true },
+                    lng: { val: String(data.location.lng), isValid: true },
+                });
+            }
+        );
     }, [sendRequest, setFormData, placeId]);
 
     const submitHandler = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         try {
             await sendRequest(`/places/${placeId}`, "put", {
-                title: state.inputs.title?.val,
-                address: state.inputs.address?.val,
-                description: state.inputs.description?.val,
+                title: state.inputs.title.val,
+                address: state.inputs.address.val,
+                description: state.inputs.description.val,
+                location: {
+                    lat: state.inputs.lat.val,
+                    lng: state.inputs.lng.val,
+                },
             });
         } catch (err) {
             console.log(err);
@@ -60,6 +68,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
     const titleValidators = useMemo(() => [minLengthValidator(10)], []);
     const addressValidators = useMemo(() => [minLengthValidator(1)], []);
     const descriptionValidators = useMemo(() => [minLengthValidator(10)], []);
+    const coordinateValidators = useMemo(() => [numericValidator()], []);
 
     if (data.error) {
         return <HttpError error={data.error} onClear={clearError} />;
@@ -99,6 +108,26 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                     errorText="Please enter a valid Description"
                     value={state.inputs.description.val}
                     isValid={state.inputs.description.isValid}
+                />
+                <Input
+                    id={"latitude"}
+                    element="input"
+                    onInput={inputHandlers.lat}
+                    label="Latitude"
+                    validators={coordinateValidators}
+                    errorText="Please enter a valid Latitude"
+                    value={state.inputs.lat.val}
+                    isValid={state.inputs.lat.isValid}
+                />
+                <Input
+                    id={"longitude"}
+                    element="input"
+                    onInput={inputHandlers.lng}
+                    label="Longitude"
+                    validators={coordinateValidators}
+                    errorText="Please enter a valid Longitude"
+                    value={state.inputs.lng.val}
+                    isValid={state.inputs.lng.isValid}
                 />
                 <div className="buttons">
                     <Button
