@@ -116,7 +116,6 @@ const Auth: React.FC = () => {
                             label="Username"
                             validators={usernameValidators}
                             errorText="Please enter a valid username of at least 8 characters"
-                            value={state.inputs.username.val || ""}
                         />
                     )}
                     {!isLoginMode && (
