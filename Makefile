@@ -54,7 +54,7 @@ express-test:
 	docker exec -it express npm test
 
 express-lint:
-	docker exec -it express npx tsc --noEmit
+	docker exec -it express npx tsc -b --noEmit
 	docker exec -it express npx eslint "src/**/*.ts" --fix
 	docker exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
 
