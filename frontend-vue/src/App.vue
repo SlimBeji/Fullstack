@@ -6,5 +6,7 @@ import { MainNavigation } from "./components/navigation";
 
 <template>
     <MainNavigation />
-    <RouterView />
+    <main>
+        <RouterView />
+    </main>
 </template>
