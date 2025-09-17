@@ -1,5 +1,7 @@
 <template>
-    <div>
-        <h1>This is the auth page</h1>
-    </div>
+    <AuthForm />
 </template>
+
+<script setup lang="ts">
+import { AuthForm } from "@/components/user";
+</script>
