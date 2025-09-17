@@ -18,3 +18,40 @@ import { RouterLink } from "vue-router";
 
 import { Backdrop } from "../ui";
 </script>
+
+<style lang="css">
+@reference "../../main.css";
+@layer components {
+    .main-header {
+        @apply flex fixed z-50 top-0 left-0;
+        @apply w-full h-16 px-4 shadow-md;
+        @apply bg-primary;
+    }
+
+    .main-header > div {
+        @apply flex items-center w-full max-w-screen-xl mx-auto;
+        @apply bg-transparent;
+    }
+
+    nav.main {
+        @apply hidden md:block ml-auto;
+    }
+
+    nav.sidedrawer {
+        @apply h-full;
+    }
+
+    h1.app-header {
+        @apply text-2xl font-bold text-pen-inverse;
+    }
+
+    button.hamburger {
+        @apply flex flex-col justify-around md:hidden;
+        @apply w-12 h-12 mr-8 border-none bg-transparent cursor-pointer;
+    }
+
+    button.hamburger span {
+        @apply block w-12 h-1 bg-surface;
+    }
+}
+</style>
