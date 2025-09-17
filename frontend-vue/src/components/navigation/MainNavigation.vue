@@ -1,22 +1,47 @@
 <template>
-    <Backdrop :close="() => console.log('Clicked')" />
-    <header>
-        <div class="wrapper">
-            <nav>
-                <RouterLink to="/auth">Auth</RouterLink>
-                <RouterLink to="/">Users</RouterLink>
-                <RouterLink to="/places/new">New Place</RouterLink>
-                <RouterLink to="/places/p123">Edit Place</RouterLink>
-                <RouterLink to="/u123/places">User Places</RouterLink>
+    <Backdrop v-if="drawerIsOpen" :close="closeDrawer" />
+    <SideDrawer :show="drawerIsOpen" :onClick="closeDrawer">
+        <nav className="sidedrawer">
+            <NavLinks />
+        </nav>
+    </SideDrawer>
+    <header class="main-header">
+        <div>
+            <button v-if="isLoggedIn" class="hamburger" @click="openDrawer">
+                <span />
+                <span />
+                <span />
+            </button>
+            <h1 className="app-header">
+                <RouterLink to="/">Your Places</RouterLink>
+            </h1>
+            <nav v-if="isLoggedIn" class="main">
+                <NavLinks />
             </nav>
         </div>
     </header>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { RouterLink } from "vue-router";
 
+import { useAuthStore } from "@/stores";
+
 import { Backdrop } from "../ui";
+import NavLinks from "./NavLinks.vue";
+import SideDrawer from "./SideDrawer.vue";
+
+const { isLoggedIn } = useAuthStore();
+const drawerIsOpen = ref<boolean>(false);
+
+const openDrawer = () => {
+    drawerIsOpen.value = true;
+};
+
+const closeDrawer = () => {
+    drawerIsOpen.value = false;
+};
 </script>
 
 <style lang="css">
