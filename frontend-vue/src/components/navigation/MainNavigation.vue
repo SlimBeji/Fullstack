@@ -1,4 +1,5 @@
 <template>
+    <Backdrop :close="() => console.log('Clicked')" />
     <header>
         <div class="wrapper">
             <nav>
@@ -14,4 +15,6 @@
 
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+
+import { Backdrop } from "../ui";
 </script>
