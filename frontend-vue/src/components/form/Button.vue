@@ -14,6 +14,7 @@ import { RouterLink } from "vue-router";
 
 import { ButtonType } from "@/types";
 
+// Props definiion
 const props = defineProps<{
     disabled?: boolean;
     inverse?: boolean;
@@ -24,6 +25,8 @@ const props = defineProps<{
     type?: ButtonType;
     onClick?: () => void;
 }>();
+
+// Computed
 const disabled = computed(() => props.disabled ?? false);
 
 const customClasses = computed(() => props.className || "");

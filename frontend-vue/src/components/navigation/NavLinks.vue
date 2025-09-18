@@ -16,7 +16,7 @@
             >
         </li>
         <li>
-            <button @click="onLogout">LOGOUT</button>
+            <button @click="logout">LOGOUT</button>
         </li>
     </ul>
 </template>
@@ -30,7 +30,8 @@ const router = useRouter();
 const authStore = useAuthStore();
 const userId = authStore.userId;
 
-const onLogout = () => {
+// Hanlders
+const logout = () => {
     authStore.logout();
     router.push("/auth");
 };

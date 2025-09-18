@@ -33,8 +33,11 @@ import NavLinks from "./NavLinks.vue";
 import SideDrawer from "./SideDrawer.vue";
 
 const { isLoggedIn } = useAuthStore();
+
+// State definition
 const drawerIsOpen = ref<boolean>(false);
 
+// Hanlders
 const openDrawer = () => {
     drawerIsOpen.value = true;
 };

@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+// Props definition
 defineProps<{
     close: () => void;
 }>();
