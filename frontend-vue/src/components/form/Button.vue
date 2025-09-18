@@ -3,6 +3,7 @@
         :is="tagConfig.tag"
         v-bind="tagConfig.props"
         :class="['btn', colorClass, inverseClass, customClasses]"
+        @click="clickHandler"
     >
         <slot />
     </component>
@@ -23,7 +24,11 @@ const props = defineProps<{
     to?: string;
     href?: string;
     type?: ButtonType;
-    onClick?: () => void;
+}>();
+
+// Events
+const emit = defineEmits<{
+    (e: "click"): void;
 }>();
 
 // Computed
@@ -56,11 +61,15 @@ const tagConfig = computed(() => {
         tag: "button",
         props: {
             type: props.type || "button",
-            onClick: props.onClick,
             disabled: props.disabled ?? false,
         },
     };
 });
+
+// Handlers
+const clickHandler = () => {
+    if (!props.disabled) emit("click");
+};
 </script>
 
 <style lang="css">
