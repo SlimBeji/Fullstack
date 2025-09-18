@@ -75,13 +75,10 @@ const reducer = (state: State, action: Action): State => {
                 json: action.payload.data,
             };
         case ActionType.PARSE_ERROR: {
-            const statusCode = action.payload.status;
+            const statusCode = action.payload.status || 500;
             const response = action.payload.response;
-            const data = response?.data as {
-                message?: string;
-                details?: { error: any };
-            };
-            const message = data.message || "Something went wrong!";
+            const data = response?.data as { message?: string } | undefined;
+            const message = data?.message || "Something went wrong!";
             const tokenExpired = message === TOKEN_EXPIRED;
             return {
                 loading: false,

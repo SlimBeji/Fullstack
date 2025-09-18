@@ -41,12 +41,10 @@ export const useHttp = (options: useHttpOptions = {}) => {
     };
 
     const handleError = (err: AxiosError) => {
-        const statusCode = err.status;
+        const statusCode = err.status || 500;
         const response = err.response;
-        const data = response?.data as {
-            message?: string;
-        };
-        const message = data.message || "Something went wrong!";
+        const data = response?.data as { message?: string } | undefined;
+        const message = data?.message || "Something went wrong!";
         const tokenExpired = message === TOKEN_EXPIRED;
         httpData.value = {
             loading: false,
