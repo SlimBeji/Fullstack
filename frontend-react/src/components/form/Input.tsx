@@ -51,6 +51,7 @@ interface InputProps {
     type?: HTMLInputElement["type"];
     id: string;
     label: string;
+    disabled?: boolean;
     onInput: (value: string, isValid: boolean) => void;
     width?: string;
     padding?: string;
@@ -67,6 +68,7 @@ const Input: React.FC<InputProps> = ({
     type,
     id,
     label,
+    disabled,
     onInput,
     width,
     padding,
@@ -107,7 +109,7 @@ const Input: React.FC<InputProps> = ({
     };
 
     const touchHandler = () => {
-        dispatch({ type: InputActionType.TOUCH });
+        if (!disabled) dispatch({ type: InputActionType.TOUCH });
     };
 
     const isError = !state.isValid && state.isTouched;
@@ -118,6 +120,8 @@ const Input: React.FC<InputProps> = ({
         id,
         onChange: changeHandler,
         onBlur: touchHandler,
+        className: disabled ? "disabled" : "active",
+        disabled: disabled ?? false,
     };
 
     switch (element) {
