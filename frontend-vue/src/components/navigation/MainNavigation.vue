@@ -7,7 +7,7 @@
     </SideDrawer>
     <header class="main-header">
         <div>
-            <button v-if="isLoggedIn" class="hamburger" @click="openDrawer">
+            <button v-if="isLoggedIn" @click="openDrawer" class="hamburger">
                 <span />
                 <span />
                 <span />
