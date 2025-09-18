@@ -37,23 +37,18 @@
 import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 import { fileToUrl } from "@/lib";
+import { ImageUploadValue } from "@/types";
 
 import Button from "./Button.vue";
 
 const filePickerRef = useTemplateRef<HTMLInputElement>("filePicker");
 
 // Props
-interface ImageUploadValue {
-    file: File | null;
-    url: string;
-}
-
 const props = defineProps<{
     id: string;
     disabled?: boolean;
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
-    onInput: (val: ImageUploadValue, isValid: boolean) => void;
     errorText?: string;
     val?: ImageUploadValue;
     required?: boolean;
@@ -64,6 +59,25 @@ const file = ref<File | null>(props.val?.file || null);
 const url = ref<string>(props.val?.url || "");
 const errorMessage = ref<string>("");
 const uploadAttempt = ref<boolean>(false);
+
+// Events
+const emit = defineEmits<{
+    (
+        e: "upload",
+        value: { file: File | null; url: string },
+        isValid: boolean
+    ): void;
+}>();
+
+const emitUpdate = () => {
+    emit("upload", { file: file.value, url: url.value }, isValid.value);
+};
+
+onMounted(() => {
+    // Emit an update on compount mounting in case the Image
+    // is required and no value provided initially
+    emitUpdate();
+});
 
 // Computed
 const disabled = computed(() => props.disabled ?? false);
@@ -87,10 +101,6 @@ const isValid = computed(() => {
 const isError = computed(() => !!errorMessage.value && uploadAttempt.value);
 
 // Hanlders
-const emitUpdate = () => {
-    props.onInput({ file: file.value, url: url.value }, isValid.value);
-};
-
 const changeHanlder = async (event: Event) => {
     uploadAttempt.value = true;
     const target = event.target as HTMLInputElement;
@@ -118,13 +128,6 @@ const changeHanlder = async (event: Event) => {
 const clickHandler = () => {
     filePickerRef.value?.click();
 };
-
-// Events
-onMounted(() => {
-    // Emit an update on compount mounting in case the Image
-    // is required and no value provided initially
-    emitUpdate();
-});
 </script>
 
 <style lang="css">
