@@ -1,12 +1,12 @@
 <template>
     <Modal
-        @close="props.onClear"
+        @close="emit('close')"
         :show="!!props.error"
         :header="props.header || `An Error Occured!`"
     >
         <p>{{ props.error }}</p>
         <template #footer>
-            <Button :onClick="props.onClear">Okay</Button>
+            <Button @click="emit('close')">Okay</Button>
         </template>
     </Modal>
 </template>
@@ -20,6 +20,10 @@ import Modal from "./Modal.vue";
 const props = defineProps<{
     error?: string;
     header?: string;
-    onClear: () => void;
+}>();
+
+// Events
+const emit = defineEmits<{
+    (e: "close"): void;
 }>();
 </script>
