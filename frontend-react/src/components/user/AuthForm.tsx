@@ -23,7 +23,7 @@ type AuthFormTypes = keyof typeof AuthFormData;
 
 const emptyState = emptyStateBuilder<AuthFormTypes>(AuthFormData);
 
-const Auth: React.FC = () => {
+const AuthForm: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const [data, sendRequest, clearError] = useHttp();
@@ -167,4 +167,4 @@ const Auth: React.FC = () => {
     );
 };
 
-export default Auth;
+export default AuthForm;
