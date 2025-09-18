@@ -15,8 +15,14 @@
             </div>
             <Button
                 @click="clickHandler"
-                :class="[`btn`, colorClass, inverseClass]"
+                :class="[
+                    `btn`,
+                    colorClass,
+                    inverseClass,
+                    { disabled: disabled },
+                ]"
                 type="button"
+                :disabled="disabled ?? false"
             >
                 PICK IMAGE
             </Button>
@@ -57,7 +63,7 @@ const props = defineProps<{
 const file = ref<File | null>(props.val?.file || null);
 const url = ref<string>(props.val?.url || "");
 const errorMessage = ref<string>("");
-const uploadAttempt = ref<boolean>(true);
+const uploadAttempt = ref<boolean>(false);
 
 // Computed
 const disabled = computed(() => props.disabled ?? false);
