@@ -4,6 +4,7 @@
         <component
             :is="tagConfig.tag"
             :id="props.id"
+            :class="inputClass"
             v-bind="tagConfig.tagProps"
             @blur="inputTouched"
             @input="valueChanged"
@@ -25,6 +26,7 @@ const props = defineProps<{
     type?: HTMLInputElement["type"];
     id: string;
     label: string;
+    disabled?: boolean;
     onInput: (value: string, isValid: boolean) => void;
     width?: string;
     padding?: string;
@@ -49,6 +51,11 @@ const widthClass = computed(() => {
         return "basis-full";
     }
 });
+
+const inputClass = computed(() => ({
+    disabled: props.disabled,
+    active: !props.disabled,
+}));
 
 const isError = computed(() => !isValid.value && isTouched.value);
 
@@ -75,7 +82,7 @@ const emitUpdate = () => {
 };
 
 const inputTouched = () => {
-    isTouched.value = true;
+    if (!props.disabled) isTouched.value = true;
 };
 
 const valueChanged = (event: Event) => {
@@ -111,6 +118,10 @@ onMounted(() => {
     .input-container textarea,
     .input-container input {
         @apply w-full rounded-md border px-3 py-2;
+    }
+
+    .input-container textarea.active,
+    .input-container input.active {
         @apply text-pen border-pen-ruler bg-surface-alt;
         @apply focus:border-secondary focus:outline-none;
         @apply error:bg-danger-surface error:border-danger;
