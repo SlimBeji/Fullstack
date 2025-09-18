@@ -10,11 +10,7 @@ interface ModalOverlayProps {
     header: string;
     footer: ReactNode;
     onSubmit?: FormSubmitHandler;
-    className?: string;
     style?: React.CSSProperties;
-    headerClass?: string;
-    contentClass?: string;
-    footerClass?: string;
     ref?: React.RefObject<HTMLDivElement | null>;
 }
 
