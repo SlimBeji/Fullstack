@@ -1,7 +1,7 @@
 <template>
     <Modal
         v-if="isTokenExpired"
-        @close="props.onClear"
+        @close="emit('close')"
         header="Session expired"
         :show="!!props.error"
     >
@@ -12,9 +12,9 @@
     </Modal>
     <ErrorModal
         v-else-if="props.error"
+        @close="emit('close')"
         :error="props.error.message"
         :header="props.header"
-        :onClear="props.onClear"
     />
 </template>
 
@@ -37,8 +37,12 @@ const props = defineProps<{
         message?: string;
         response?: AxiosResponse;
     };
-    onClear: () => void;
     header?: string;
+}>();
+
+// Events
+const emit = defineEmits<{
+    (e: "close"): void;
 }>();
 
 // Computed
@@ -48,7 +52,7 @@ const isTokenExpired = computed(() => {
 
 // Handlers
 const tokenExpiredCleaner = () => {
-    props.onClear();
+    emit("close");
     authStore.logout();
 };
 </script>
