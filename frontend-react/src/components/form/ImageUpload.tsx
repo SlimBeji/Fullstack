@@ -1,15 +1,7 @@
 import React, { useEffect, useReducer, useRef } from "react";
 
+import { fileToUrl } from "../../lib";
 import Button from "./Button";
-
-const fileToUrl = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-    });
-};
 
 interface ImageUploadState {
     file: File | null;
