@@ -6,7 +6,7 @@ import ErrorModal from "./ErrorModal";
 import Modal from "./Modal";
 
 interface HttpErrorProps {
-    error: {
+    error?: {
         tokenExpired?: boolean;
         message: string;
         response?: AxiosResponse;
@@ -23,7 +23,22 @@ const HttpError: React.FC<HttpErrorProps> = ({ error, onClear, header }) => {
         dispatch(authSlice.actions.logout());
     };
 
-    if (!error.tokenExpired) {
+    if (error?.tokenExpired) {
+        return (
+            <Modal
+                onCancel={tokenExpiredCleaner}
+                header="Session Expired"
+                show={!!error}
+                footer={
+                    <Button onClick={tokenExpiredCleaner}>Authenticate</Button>
+                }
+            >
+                <p>Token expired! Please login again!</p>
+            </Modal>
+        );
+    }
+
+    if (error) {
         return (
             <ErrorModal
                 error={error.message}
@@ -32,17 +47,6 @@ const HttpError: React.FC<HttpErrorProps> = ({ error, onClear, header }) => {
             />
         );
     }
-
-    return (
-        <Modal
-            onCancel={tokenExpiredCleaner}
-            header="Session Expired"
-            show={!!error}
-            footer={<Button onClick={tokenExpiredCleaner}>Authenticate</Button>}
-        >
-            <p>Token expired! Please login again!</p>
-        </Modal>
-    );
 };
 
 export default HttpError;
