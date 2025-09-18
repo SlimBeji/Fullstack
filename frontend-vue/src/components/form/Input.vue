@@ -61,7 +61,7 @@ const isError = computed(() => !isValid.value && isTouched.value);
 
 const tagConfig = computed(() => {
     let tag = "input";
-    const tagProps: Record<string, any> = {};
+    const tagProps: Record<string, any> = { disabled: props.disabled ?? false };
     switch (props.element) {
         case "textarea":
             tag = "textarea";
