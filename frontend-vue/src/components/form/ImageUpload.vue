@@ -34,6 +34,8 @@ import { fileToUrl } from "@/lib";
 
 import Button from "./Button.vue";
 
+const filePickerRef = useTemplateRef<HTMLInputElement>("filePicker");
+
 // Props definition
 interface ImageUploadValue {
     file: File | null;
@@ -78,15 +80,6 @@ const isValid = computed(() => {
 
 const isError = computed(() => !!errorMessage.value && uploadAttempt.value);
 
-// Refs & Lifecycle
-const filePickerRef = useTemplateRef<HTMLInputElement>("filePicker");
-
-onMounted(() => {
-    // Emit an update on compount mounting in case the Image
-    // is required and no value provided initially
-    emitUpdate();
-});
-
 // Hanlders
 const emitUpdate = () => {
     props.onInput({ file: file.value, url: url.value }, isValid.value);
@@ -119,6 +112,13 @@ const changeHanlder = async (event: Event) => {
 const clickHandler = () => {
     filePickerRef.value?.click();
 };
+
+// Events
+onMounted(() => {
+    // Emit an update on compount mounting in case the Image
+    // is required and no value provided initially
+    emitUpdate();
+});
 </script>
 
 <style lang="css">

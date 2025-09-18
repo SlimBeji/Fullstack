@@ -15,10 +15,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { validate, ValidatorType } from "@/lib";
 
+// Props definition
 const props = defineProps<{
     element?: "input" | "textarea";
     type?: HTMLInputElement["type"];
@@ -35,6 +36,12 @@ const props = defineProps<{
     isValid?: boolean;
 }>();
 
+// State definition
+const data = ref<string>(props.value || "");
+const isValid = ref<boolean>(props.isValid || false);
+const isTouched = ref<boolean>(false);
+
+// Computed
 const widthClass = computed(() => {
     if (props.width) {
         return `basis-${props.width} ${props.padding ?? ""}`;
@@ -42,24 +49,6 @@ const widthClass = computed(() => {
         return "basis-full";
     }
 });
-
-const data = ref<string>(props.value || "");
-const isValid = ref<boolean>(props.isValid || false);
-const isTouched = ref<boolean>(false);
-
-const inputTouched = () => {
-    isTouched.value = true;
-};
-
-const valueChanged = (event: Event) => {
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-    data.value = target.value;
-    const valid = props.validators
-        ? validate(data.value, props.validators)
-        : true;
-    isValid.value = valid;
-    props.onInput(data.value, valid);
-};
 
 const isError = computed(() => !isValid.value && isTouched.value);
 
@@ -78,6 +67,32 @@ const tagConfig = computed(() => {
             break;
     }
     return { tag, tagProps };
+});
+
+// Handlers
+const emitUpdate = () => {
+    props.onInput(data.value, isValid.value);
+};
+
+const inputTouched = () => {
+    isTouched.value = true;
+};
+
+const valueChanged = (event: Event) => {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+    data.value = target.value;
+    const valid = props.validators
+        ? validate(data.value, props.validators)
+        : true;
+    isValid.value = valid;
+    emitUpdate();
+};
+
+// Events
+onMounted(() => {
+    // Emit an update on compount mounting in case the Image
+    // is required and no value provided initially
+    emitUpdate();
 });
 </script>
 
