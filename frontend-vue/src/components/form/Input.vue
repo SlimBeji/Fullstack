@@ -20,7 +20,7 @@ import { computed, onMounted, ref } from "vue";
 
 import { validate, ValidatorType } from "@/lib";
 
-// Props definition
+// Props
 const props = defineProps<{
     element?: "input" | "textarea";
     type?: HTMLInputElement["type"];
@@ -38,7 +38,7 @@ const props = defineProps<{
     isValid?: boolean;
 }>();
 
-// State definition
+// State
 const data = ref<string>(props.value || "");
 const isValid = ref<boolean>(props.isValid || false);
 const isTouched = ref<boolean>(false);

@@ -42,7 +42,7 @@ import Button from "./Button.vue";
 
 const filePickerRef = useTemplateRef<HTMLInputElement>("filePicker");
 
-// Props definition
+// Props
 interface ImageUploadValue {
     file: File | null;
     url: string;
@@ -59,7 +59,7 @@ const props = defineProps<{
     required?: boolean;
 }>();
 
-// State definition
+// State
 const file = ref<File | null>(props.val?.file || null);
 const url = ref<string>(props.val?.url || "");
 const errorMessage = ref<string>("");

@@ -26,15 +26,15 @@
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
 
+import { Backdrop } from "@/components/ui";
 import { useAuthStore } from "@/stores";
 
-import { Backdrop } from "../ui";
 import NavLinks from "./NavLinks.vue";
 import SideDrawer from "./SideDrawer.vue";
 
 const { isLoggedIn } = useAuthStore();
 
-// State definition
+// State
 const drawerIsOpen = ref<boolean>(false);
 
 // Hanlders

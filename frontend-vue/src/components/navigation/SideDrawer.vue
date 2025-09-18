@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-// Props definition
+// Props
 defineProps<{
     show: boolean;
     onClick: () => void;

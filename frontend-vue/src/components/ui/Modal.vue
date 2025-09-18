@@ -21,7 +21,7 @@ import { computed, CSSProperties } from "vue";
 import { Backdrop } from "@/components/ui";
 import { FormSubmitHandler } from "@/types";
 
-// Props definition
+// Props
 const props = defineProps<{
     show: boolean;
     header: string;

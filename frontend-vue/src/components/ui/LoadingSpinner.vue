@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-// Props definition
+// Props
 const props = defineProps<{
     asOverlay?: boolean;
 }>();

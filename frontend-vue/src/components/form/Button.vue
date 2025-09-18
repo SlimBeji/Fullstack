@@ -14,7 +14,7 @@ import { RouterLink } from "vue-router";
 
 import { ButtonType } from "@/types";
 
-// Props definiion
+// Props
 const props = defineProps<{
     disabled?: boolean;
     inverse?: boolean;
