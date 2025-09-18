@@ -11,8 +11,8 @@
         </template>
     </Modal>
     <ErrorModal
-        v-else
-        :error="props.error?.message"
+        v-else-if="props.error"
+        :error="props.error.message"
         :header="props.header"
         :onClear="props.onClear"
     />
