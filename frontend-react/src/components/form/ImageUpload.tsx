@@ -6,7 +6,7 @@ import Button from "./Button";
 interface ImageUploadState {
     file: File | null;
     url: string;
-    isValid: boolean;
+    errorMessage: string;
     uploadAttempt: boolean;
 }
 
@@ -16,7 +16,7 @@ enum ImageUploadActionType {
 
 interface ImageUploadChangeAction {
     type: ImageUploadActionType.CHANGE;
-    payload: { file: File | null; url: string; isValid: boolean };
+    payload: { file: File | null; url: string; errorMessage: string };
 }
 
 const inputReducer = (
@@ -52,27 +52,28 @@ interface ImageUploadProps {
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = (props) => {
+    const filePickerRef = useRef<HTMLInputElement>(null);
+    const [state, dispatch] = useReducer(inputReducer, {
+        file: props.val?.file || null,
+        url: props.val?.url || "",
+        errorMessage: "",
+        uploadAttempt: false,
+    });
+
     const disabled = props.disabled ?? false;
     const inverse = props.inverse && !disabled ? "inverse" : "";
     const color = disabled ? "disabled" : props.color || "primary";
     const className = `btn ${color} ${inverse}`;
-
-    const [state, dispatch] = useReducer(inputReducer, {
-        file: props.val?.file || null,
-        url: props.val?.url || "",
-        isValid: true,
-        uploadAttempt: false,
-    });
-    const filePickerRef = useRef<HTMLInputElement>(null);
+    const isError = !!state.errorMessage && state.uploadAttempt;
 
     const { required, onInput } = props;
     useEffect(() => {
-        let isValid = state.isValid;
+        let isValid = true;
         if (required) {
             isValid = state.url ? true : false;
         }
         onInput({ file: state.file, url: state.url }, isValid);
-    }, [required, onInput, state.url, state.file, state.isValid]);
+    }, [required, onInput, state.url, state.file]);
 
     const onClickHandler = (): void => {
         if (filePickerRef.current) {
@@ -84,26 +85,26 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
         event: React.ChangeEvent<HTMLInputElement>
     ): Promise<void> => {
         let file: File | null = null;
-        let url = state.url;
-        let isValid = state.isValid;
-        if (event.target.files?.length === 1) {
-            file = event.target.files[0];
-            try {
-                url = await fileToUrl(file);
-                isValid = true;
-            } catch {
-                isValid = false;
-            }
+        let url = "";
+        let errorMessage = "";
+        const files = event.target.files;
+        if (!files || files.length === 0) {
+            errorMessage = "Something went wrong! No file found!";
+        } else if (files.length > 1) {
+            errorMessage = "Please upload only one file at a time!";
         } else {
-            isValid = false;
+            try {
+                url = await fileToUrl(files[0]);
+                file = files[0];
+            } catch {
+                errorMessage = "Uploaded file corrupted";
+            }
         }
         dispatch({
             type: ImageUploadActionType.CHANGE,
-            payload: { file, url, isValid },
+            payload: { file, url, errorMessage },
         });
     };
-
-    const isError = !state.isValid && state.uploadAttempt;
 
     return (
         <div className="image-upload">
@@ -123,6 +124,7 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
                     )}
                 </div>
                 <Button
+                    disabled
                     className={className}
                     type="button"
                     onClick={onClickHandler}
@@ -131,7 +133,7 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
                 </Button>
             </div>
             <p className={`error-text ${isError ? "" : "invisible"}`}>
-                {props.errorText}
+                {props.errorText || state.errorMessage}
             </p>
         </div>
     );
