@@ -124,8 +124,8 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
                     )}
                 </div>
                 <Button
-                    disabled
-                    className={className}
+                    disabled={disabled ?? false}
+                    className={disabled ? "disabled" : className}
                     type="button"
                     onClick={onClickHandler}
                 >
