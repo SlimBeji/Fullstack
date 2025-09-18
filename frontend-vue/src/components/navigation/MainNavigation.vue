@@ -1,6 +1,6 @@
 <template>
     <Backdrop v-if="drawerIsOpen" :close="closeDrawer" />
-    <SideDrawer :show="drawerIsOpen" :onClick="closeDrawer">
+    <SideDrawer @click="closeDrawer" :show="drawerIsOpen">
         <nav className="sidedrawer">
             <NavLinks />
         </nav>

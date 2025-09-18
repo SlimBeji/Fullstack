@@ -1,7 +1,7 @@
 <template>
     <Teleport to="#drawer-hook">
         <Transition name="sidedrawer-transition" appear>
-            <aside v-if="show" class="sidedrawer" @click="onClick">
+            <aside v-if="show" class="sidedrawer" @click="emit('click')">
                 <slot />
             </aside>
         </Transition>
@@ -12,7 +12,11 @@
 // Props
 defineProps<{
     show: boolean;
-    onClick: () => void;
+}>();
+
+// Events
+const emit = defineEmits<{
+    (e: "click"): void;
 }>();
 </script>
 
