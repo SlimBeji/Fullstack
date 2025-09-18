@@ -27,7 +27,6 @@ const props = defineProps<{
     id: string;
     label: string;
     disabled?: boolean;
-    onInput: (value: string, isValid: boolean) => void;
     width?: string;
     padding?: string;
     rows?: number;
@@ -42,6 +41,21 @@ const props = defineProps<{
 const data = ref<string>(props.value || "");
 const isValid = ref<boolean>(props.isValid || false);
 const isTouched = ref<boolean>(false);
+
+// Events
+const emit = defineEmits<{
+    (e: "update", value: string, isValid: boolean): void;
+}>();
+
+const emitUpdate = () => {
+    emit("update", data.value, isValid.value);
+};
+
+onMounted(() => {
+    // Emit an update on compount mounting in case the Image
+    // is required and no value provided initially
+    emitUpdate();
+});
 
 // Computed
 const widthClass = computed(() => {
@@ -77,10 +91,6 @@ const tagConfig = computed(() => {
 });
 
 // Handlers
-const emitUpdate = () => {
-    props.onInput(data.value, isValid.value);
-};
-
 const inputTouched = () => {
     if (!props.disabled) isTouched.value = true;
 };
@@ -94,13 +104,6 @@ const valueChanged = (event: Event) => {
     isValid.value = valid;
     emitUpdate();
 };
-
-// Events
-onMounted(() => {
-    // Emit an update on compount mounting in case the Image
-    // is required and no value provided initially
-    emitUpdate();
-});
 </script>
 
 <style lang="css">
