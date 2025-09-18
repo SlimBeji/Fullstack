@@ -18,7 +18,7 @@ import Modal from "./Modal.vue";
 
 // Props
 const props = defineProps<{
-    error: string;
+    error?: string;
     header?: string;
     onClear: () => void;
 }>();
