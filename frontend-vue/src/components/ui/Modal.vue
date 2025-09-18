@@ -1,8 +1,8 @@
 <template>
     <Teleport to="#modal-hook">
-        <Backdrop v-if="props.show" @click="props.onCancel" />
+        <Backdrop v-if="props.show" @click="emit('close')" />
         <Transition name="modal-transition" appear>
-            <div v-if="props.show" class="modal-container" :style="style">
+            <div v-if="props.show" :style="style" class="modal-container">
                 <header>
                     <h2>{{ props.header }}</h2>
                 </header>
@@ -27,7 +27,11 @@ const props = defineProps<{
     header: string;
     onSubmit?: FormSubmitHandler;
     style?: CSSProperties;
-    onCancel: () => void;
+}>();
+
+// Events
+const emit = defineEmits<{
+    (e: "close"): void;
 }>();
 
 // Computed

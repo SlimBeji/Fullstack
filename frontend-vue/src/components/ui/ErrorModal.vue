@@ -1,6 +1,6 @@
 <template>
     <Modal
-        :onCancel="props.onClear"
+        @close="props.onClear"
         :show="!!props.error"
         :header="props.header || `An Error Occured!`"
     >

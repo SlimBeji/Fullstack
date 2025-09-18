@@ -1,7 +1,7 @@
 <template>
     <Modal
         v-if="isTokenExpired"
-        :onCancel="props.onClear"
+        @close="props.onClear"
         header="Session expired"
         :show="!!props.error"
     >
