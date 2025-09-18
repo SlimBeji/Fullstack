@@ -1,6 +1,6 @@
 <template>
     <Teleport to="#modal-hook">
-        <Backdrop v-if="props.show" :close="props.onCancel" />
+        <Backdrop v-if="props.show" @click="props.onCancel" />
         <Transition name="modal-transition" appear>
             <div v-if="props.show" class="modal-container" :style="style">
                 <header>

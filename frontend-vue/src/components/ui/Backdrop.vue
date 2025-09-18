@@ -1,13 +1,13 @@
 <template>
     <teleport to="#backdrop-hook">
-        <div class="modal-backdrop" @click="close"></div>
+        <div class="modal-backdrop" @click="emit('click')"></div>
     </teleport>
 </template>
 
 <script setup lang="ts">
-// Props
-defineProps<{
-    close: () => void;
+// Events
+const emit = defineEmits<{
+    (e: "click"): void;
 }>();
 </script>
 
