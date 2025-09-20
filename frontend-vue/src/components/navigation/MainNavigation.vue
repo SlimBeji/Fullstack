@@ -7,7 +7,11 @@
     </SideDrawer>
     <header class="main-header">
         <div>
-            <button v-if="isLoggedIn" @click="openDrawer" class="hamburger">
+            <button
+                v-if="authStore.isLoggedIn"
+                @click="openDrawer"
+                class="hamburger"
+            >
                 <span />
                 <span />
                 <span />
@@ -15,7 +19,7 @@
             <h1 className="app-header">
                 <RouterLink to="/">Your Places</RouterLink>
             </h1>
-            <nav v-if="isLoggedIn" class="main">
+            <nav v-if="authStore.isLoggedIn" class="main">
                 <NavLinks />
             </nav>
         </div>
@@ -32,7 +36,7 @@ import { useAuthStore } from "@/stores";
 import NavLinks from "./NavLinks.vue";
 import SideDrawer from "./SideDrawer.vue";
 
-const { isLoggedIn } = useAuthStore();
+const authStore = useAuthStore();
 
 // State
 const drawerIsOpen = ref<boolean>(false);
