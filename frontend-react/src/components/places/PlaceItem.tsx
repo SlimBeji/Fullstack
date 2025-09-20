@@ -35,7 +35,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
     };
 
     const onDelteHandler = (): void => {
-        setShowDeleteModal(false);
+        closeDeleteModal();
         sendRequest(`/places/${place.id}`, "delete").then(() => {
             onDelete();
         });
@@ -51,7 +51,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
     );
     return (
         <>
-            {data.error && (
+            {data.error?.message && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
             {data.loading && (
@@ -81,7 +81,9 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 header="Are you sure?"
                 footer={deleteModalFooter}
             >
-                <p>Do you want to proceed and delete this place?</p>
+                <p className="delete-text-messaage">
+                    Do you want to proceed and delete this place?
+                </p>
             </Modal>
 
             <li className="place-item">

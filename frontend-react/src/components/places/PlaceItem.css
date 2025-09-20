@@ -1,4 +1,8 @@
 @layer components {
+    .delete-text-messaage {
+        @apply p-5;
+    }
+
     li.place-item {
         @apply my-4;
     }
