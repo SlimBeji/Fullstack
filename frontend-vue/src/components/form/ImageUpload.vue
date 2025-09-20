@@ -37,7 +37,6 @@
 import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 import { fileToUrl } from "@/lib";
-import { ImageUploadValue } from "@/types";
 
 import Button from "./Button.vue";
 
@@ -50,13 +49,14 @@ const props = defineProps<{
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
     errorText?: string;
-    val?: ImageUploadValue;
+    url?: string;
+    file?: File | null;
     required?: boolean;
 }>();
 
 // State
-const file = ref<File | null>(props.val?.file || null);
-const url = ref<string>(props.val?.url || "");
+const file = ref<File | null>(props.file || null);
+const url = ref<string>(props.url || "");
 const errorMessage = ref<string>("");
 const uploadAttempt = ref<boolean>(false);
 
