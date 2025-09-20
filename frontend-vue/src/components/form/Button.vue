@@ -20,7 +20,7 @@ const props = defineProps<{
     disabled?: boolean;
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
-    class?: string;
+    class?: string | (string | Record<string, boolean>)[];
     to?: string;
     href?: string;
     type?: ButtonType;
