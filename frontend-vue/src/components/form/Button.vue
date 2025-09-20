@@ -20,7 +20,7 @@ const props = defineProps<{
     disabled?: boolean;
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
-    className?: string;
+    class?: string;
     to?: string;
     href?: string;
     type?: ButtonType;
@@ -34,7 +34,7 @@ const emit = defineEmits<{
 // Computed
 const disabled = computed(() => props.disabled ?? false);
 
-const customClasses = computed(() => props.className || "");
+const customClasses = computed(() => props.class || "");
 
 const inverseClass = computed(() =>
     props.inverse && !disabled.value ? "inverse" : ""

@@ -1,7 +1,7 @@
 <template>
     <Backdrop v-if="drawerIsOpen" @click="closeDrawer" />
     <SideDrawer @click="closeDrawer" :show="drawerIsOpen">
-        <nav className="sidedrawer">
+        <nav class="sidedrawer">
             <NavLinks />
         </nav>
     </SideDrawer>
@@ -16,7 +16,7 @@
                 <span />
                 <span />
             </button>
-            <h1 className="app-header">
+            <h1 class="app-header">
                 <RouterLink to="/">Your Places</RouterLink>
             </h1>
             <nav v-if="authStore.isLoggedIn" class="main">

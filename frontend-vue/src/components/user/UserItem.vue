@@ -2,10 +2,10 @@
     <li class="user-item">
         <div class="card">
             <RouterLink :to="`/${props.user.id}/places`" class="user-item-link">
-                <div className="user-avatar">
+                <div class="user-avatar">
                     <Avatar :imageUrl="imageUrl" :alt="props.user.name" />
                 </div>
-                <div className="user-info">
+                <div class="user-info">
                     <h2>{{ user.name }}</h2>
                     <h3>{{ placeNumber }}</h3>
                 </div>

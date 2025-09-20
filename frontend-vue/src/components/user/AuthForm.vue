@@ -47,7 +47,7 @@
                     type="password"
                     errorText="Please enter a password with at least 10 characters"
                 />
-                <div className="buttons">
+                <div class="buttons">
                     <Button
                         :disabled="!formState.isValid"
                         color="secondary"
