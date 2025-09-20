@@ -1,3 +1,4 @@
+export { default as Avatar } from "./Avatar.vue";
 export { default as Backdrop } from "./Backdrop.vue";
 export { default as ErrorModal } from "./ErrorModal.vue";
 export { default as HttpError } from "./HttpError.vue";
