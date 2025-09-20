@@ -88,9 +88,6 @@ import { SigninResponse } from "@/types";
 const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useHttp();
 
-// States
-const isLoginMode = ref<boolean>(true);
-
 // Form
 const AuthFormData = {
     username: false,
@@ -105,6 +102,9 @@ const emptyState = emptyStateBuilder<AuthFormTypes>(AuthFormData);
 emptyState.inputs.image.val = { file: null, url: "" };
 const { formState, inputHandlers, fieldsActivationHandler } =
     useForm<AuthFormTypes>(emptyState);
+
+// States
+const isLoginMode = ref<boolean>(true);
 
 // Computed
 const text = computed(() => {
