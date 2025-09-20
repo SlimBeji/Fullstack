@@ -22,12 +22,7 @@ const UserPlaces: React.FC = () => {
             }
 
             try {
-                await sendRequest(
-                    `/places/?creatorId=${userId}`,
-                    "get",
-                    undefined,
-                    false
-                );
+                await sendRequest(`/places/?creatorId=${userId}`, "get");
             } catch (err) {
                 console.log(err);
             }
@@ -45,7 +40,7 @@ const UserPlaces: React.FC = () => {
 
     const renderPlaces = (): React.JSX.Element | undefined => {
         if (!data.loading && data.json?.data) {
-            let places = data.json.data as Place[];
+            let places = (data.json.data as Place[]) || [];
             if (data.statusCode === HttpStatusCode.NotFound) {
                 places = [];
             }
@@ -61,7 +56,7 @@ const UserPlaces: React.FC = () => {
 
     return (
         <>
-            {data.error && (
+            {data.error?.message && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
             {data.loading && <LoadingSpinner asOverlay />}
