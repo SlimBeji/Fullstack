@@ -1,12 +1,13 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
+import router from "@/router";
 import { EncodedUserToken, LocalStorageKeys, SigninResponse } from "@/types";
 
 export const useAuthStore = defineStore("auth", () => {
     const data = ref<EncodedUserToken | undefined>(undefined);
 
-    const isLoggedIn = computed(() => !!data.value);
+    const isLoggedIn = computed(() => !!data.value?.userId);
     const userId = computed(() => data.value?.userId);
 
     function setAuthData(payload: EncodedUserToken) {
@@ -22,11 +23,13 @@ export const useAuthStore = defineStore("auth", () => {
             LocalStorageKeys.userData,
             JSON.stringify(data.value)
         );
+        router.push("/");
     }
 
     function logout() {
         data.value = undefined;
         localStorage.removeItem(LocalStorageKeys.userData);
+        router.push("/logout");
     }
 
     return {
