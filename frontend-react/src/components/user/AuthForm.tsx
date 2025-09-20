@@ -123,7 +123,8 @@ const AuthForm: React.FC = () => {
                             id="image"
                             color="secondary"
                             onInput={inputHandlers.image}
-                            val={state.inputs.image.val}
+                            file={state.inputs.image.val.file}
+                            url={state.inputs.image.val.url}
                         />
                     )}
                     <Input

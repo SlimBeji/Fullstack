@@ -47,15 +47,16 @@ interface ImageUploadProps {
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
     onInput: (val: ImageUploadValue, isValid: boolean) => void;
     errorText?: string;
-    val?: ImageUploadValue;
+    file?: File | null;
+    url?: string;
     required?: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = (props) => {
     const filePickerRef = useRef<HTMLInputElement>(null);
     const [state, dispatch] = useReducer(inputReducer, {
-        file: props.val?.file || null,
-        url: props.val?.url || "",
+        file: props.file || null,
+        url: props.url || "",
         errorMessage: "",
         uploadAttempt: false,
     });
