@@ -11,6 +11,7 @@ import {
 import { useAppSelector } from "../../store";
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
+
 const Form = {
     title: true,
     address: true,
@@ -60,7 +61,7 @@ const NewPlace: React.FC = () => {
 
     return (
         <>
-            {data.error && (
+            {data.error?.message && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
             <form className="place-create" onSubmit={onSubmit}>
@@ -84,7 +85,7 @@ const NewPlace: React.FC = () => {
                     errorText="Please enter a valid address"
                 />
                 <Input
-                    id={"description"}
+                    id="description"
                     element="textarea"
                     onInput={inputHandlers.description}
                     label="Description"
@@ -92,7 +93,7 @@ const NewPlace: React.FC = () => {
                     errorText="Please enter a valid Description"
                 />
                 <Input
-                    id={"latitude"}
+                    id="latitude"
                     width="1/2"
                     padding="pr-1"
                     element="input"
@@ -102,7 +103,7 @@ const NewPlace: React.FC = () => {
                     errorText="Please enter a valid Latitude"
                 />
                 <Input
-                    id={"longitude"}
+                    id="longitude"
                     width="1/2"
                     padding="pl-1"
                     element="input"
@@ -115,6 +116,7 @@ const NewPlace: React.FC = () => {
                     id="image"
                     color="secondary"
                     onInput={inputHandlers.image}
+                    required
                 />
                 <div className="buttons">
                     <Button
