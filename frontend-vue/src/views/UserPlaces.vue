@@ -23,7 +23,7 @@ import { useHttp } from "@/lib";
 import { useAuthStore } from "@/stores";
 import { Place } from "@/types";
 
-// Setup
+// Init
 const authStore = useAuthStore();
 const route = useRoute();
 const userId = route.params.userId as string;

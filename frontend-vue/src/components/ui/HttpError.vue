@@ -28,6 +28,7 @@ import { useAuthStore } from "@/stores";
 import ErrorModal from "./ErrorModal.vue";
 import Modal from "./Modal.vue";
 
+// Init
 const authStore = useAuthStore();
 
 // Props

@@ -17,6 +17,7 @@ import { UsersList } from "@/components/user";
 import { useHttp } from "@/lib";
 import { User } from "@/types";
 
+// Init
 const { httpData, sendRequest, clear } = useHttp();
 sendRequest("/users/", "get");
 

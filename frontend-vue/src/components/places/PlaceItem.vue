@@ -65,6 +65,7 @@ import { useHttp } from "@/lib";
 import { useAuthStore } from "@/stores";
 import { Place } from "@/types";
 
+// Init
 const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useHttp();
 

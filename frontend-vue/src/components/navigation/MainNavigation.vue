@@ -36,6 +36,7 @@ import { useAuthStore } from "@/stores";
 import NavLinks from "./NavLinks.vue";
 import SideDrawer from "./SideDrawer.vue";
 
+// Init
 const authStore = useAuthStore();
 
 // State

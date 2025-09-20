@@ -84,7 +84,7 @@ import {
 import { useAuthStore } from "@/stores";
 import { SigninResponse } from "@/types";
 
-// Composables
+// Init
 const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useHttp();
 

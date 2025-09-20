@@ -26,6 +26,7 @@ import { RouterLink, useRouter } from "vue-router";
 
 import { useAuthStore } from "@/stores";
 
+// Init
 const router = useRouter();
 const authStore = useAuthStore();
 const userId = authStore.userId;
