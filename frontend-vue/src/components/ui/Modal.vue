@@ -16,32 +16,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, CSSProperties } from "vue";
+import { CSSProperties } from "vue";
 
 import { Backdrop } from "@/components/ui";
-import { FormSubmitHandler } from "@/types";
 
 // Props
 const props = defineProps<{
     show: boolean;
     header: string;
-    onSubmit?: FormSubmitHandler;
     style?: CSSProperties;
 }>();
 
 // Events
 const emit = defineEmits<{
     (e: "close"): void;
+    (e: "submit", event: Event): void;
 }>();
 
-// Computed
-const submitHanlder = computed(() => {
-    if (props.onSubmit) {
-        return props.onSubmit;
-    } else {
-        return (e: Event) => e.preventDefault();
-    }
-});
+// Handlers
+const submitHanlder = (e: Event) => {
+    e.preventDefault();
+    emit("submit", e);
+};
 </script>
 
 <style lang="css">
