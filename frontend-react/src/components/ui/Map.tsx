@@ -9,11 +9,10 @@ import { Location } from "../../types";
 interface MapProps {
     position: Location;
     zoom: number;
-    className?: string;
     markerText: string;
 }
 
-const Map: React.FC<MapProps> = ({ position, zoom, className, markerText }) => {
+const Map: React.FC<MapProps> = ({ position, zoom, markerText }) => {
     const [map, setMap] = useState<MapObject | null>(null);
 
     useEffect(() => {
@@ -28,7 +27,7 @@ const Map: React.FC<MapProps> = ({ position, zoom, className, markerText }) => {
                 center={position}
                 zoom={zoom}
                 scrollWheelZoom={false}
-                className={`w-full h-full ${className}`}
+                className="w-full h-full"
                 whenReady={() => setMap}
             >
                 <TileLayer
