@@ -1,15 +1,13 @@
+<template>
+    <PlaceUpdateForm :place-id="placeId" />
+</template>
+
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 
+import { PlaceUpdateForm } from "@/components/places";
+
+// Init
 const route = useRoute();
 const placeId = route.params.placeId as string;
 </script>
-
-<template>
-    <div>
-        <h1>
-            This is the page where the owner of place {{ placeId }} edits the
-            place informations
-        </h1>
-    </div>
-</template>
