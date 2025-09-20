@@ -21,7 +21,7 @@ The Express backend relies on a `express.env` file for configuration.
 # ENV
 PORT=5000
 API_URL=http://localhost:5000/api
-APP_URL=http://localhost:8000
+APP_URL=*
 SECRET_KEY=NOT_VERY_SECRET
 FILEUPLOAD_MAX_SIZE=100
 JSON_MAX_SIZE=10mb
