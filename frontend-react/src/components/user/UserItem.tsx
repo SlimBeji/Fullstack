@@ -9,6 +9,12 @@ interface UserItemProps {
 }
 
 const UserItem: React.FC<UserItemProps> = ({ user }) => {
+    const number = user.places.length;
+    let placeNumber = `${number} Place`;
+    if (number > 1) {
+        placeNumber = `${number} Places`;
+    }
+
     return (
         <li className="user-item">
             <div className="card">
@@ -21,10 +27,7 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
                     </div>
                     <div className="user-info">
                         <h2>{user.name}</h2>
-                        <h3>
-                            {user.places.length}{" "}
-                            {user.places.length === 1 ? "Place" : "Places"}
-                        </h3>
+                        <h3>{placeNumber}</h3>
                     </div>
                 </Link>
             </div>
