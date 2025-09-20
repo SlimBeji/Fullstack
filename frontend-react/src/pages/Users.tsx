@@ -9,7 +9,7 @@ const Users: React.FC = () => {
     const [data, sendRequest, clearError] = useHttp();
 
     useEffect(() => {
-        sendRequest("/users/", "get", undefined, false);
+        sendRequest("/users/", "get");
     }, [sendRequest]);
 
     return (
