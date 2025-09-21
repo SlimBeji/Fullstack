@@ -1,77 +1,86 @@
-import { reactive, watch } from "vue";
+import { Reactive, reactive, ref, watch } from "vue";
 
-interface InputState {
-    val: any;
-    isActive?: boolean;
-    isValid: boolean;
+import { validate, ValidatorType } from "../utils";
+
+interface FieldConfig {
+    active?: boolean;
+    initial?: any;
+    validators?: ValidatorType[];
+}
+
+interface FieldState extends FieldConfig {
+    value: any;
+    initial?: any;
+    active: boolean;
+    valid: boolean;
+    validators: ValidatorType[];
 }
 
 export interface FormState<T extends string> {
-    inputs: Record<T, InputState>;
-    isValid: boolean; // Is the whole form valid
+    fields: Record<T, FieldState>;
+    valid: boolean; // Is the whole form valid
 }
 
-export const emptyStateBuilder = <T extends string>(
-    formConfig: Record<T, boolean>
-): FormState<T> => {
-    const inputs = (Object.keys(formConfig) as T[]).reduce(
+export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
+    // Setup
+    const fieldNames = Object.keys(config) as T[];
+
+    // State
+    const fields = fieldNames.reduce(
         (result, name) => {
-            result[name] = {
-                val: "",
-                isActive: formConfig[name],
-                isValid: false,
-            };
+            const fieldConfig = config[name];
+            const value = fieldConfig.initial || "";
+            const validators = fieldConfig.validators || [];
+            const initial = fieldConfig.initial;
+            const active = fieldConfig.active ?? true;
+            const valid = validate(value, validators);
+            result[name] = reactive<FieldState>({
+                value,
+                initial,
+                active,
+                valid,
+                validators,
+            });
             return result;
         },
-        {} as Record<T, InputState>
+        {} as Record<T, Reactive<FieldState>>
     );
-    return { inputs, isValid: false };
-};
+    const recheckFormValidity = (): boolean => {
+        for (const name of fieldNames) {
+            const { active, valid } = fields[name];
+            if (active && !valid) return false;
+        }
+        return true;
+    };
+    const formValid = ref<boolean>(recheckFormValidity());
 
-const recheckFormValidity = <T extends string>(
-    inputs: Record<T, InputState>
-): boolean => {
-    for (const key in inputs) {
-        const { isActive, isValid } = inputs[key];
-        if (isActive && !isValid) return false;
+    // Watchers
+    for (const name of fieldNames) {
+        const field = (fields as Record<T, FieldState>)[name];
+        watch([() => field.value, () => field.validators], () => {
+            const isValid = validate(field.value, field.validators);
+            field.valid = isValid;
+            formValid.value = recheckFormValidity();
+        });
     }
-    return true;
-};
 
-type InputHandler = (val: any, isValid: boolean) => void;
-type InputHandlers<T extends string> = Record<T, InputHandler>;
-
-export const useForm = <T extends string>(initialState: FormState<T>) => {
-    const formState = reactive<FormState<T>>(initialState);
-    const formStateInputs = formState.inputs as Record<T, InputState>;
-
-    watch(
-        () => formState.inputs,
-        () => {
-            formState.isValid = recheckFormValidity(formStateInputs);
-        },
-        { deep: true }
-    );
-
-    const inputHandlers = {} as InputHandlers<T>;
-    (Object.keys(formStateInputs) as T[]).forEach((key) => {
-        inputHandlers[key] = (val: any, isValid: boolean) => {
-            formStateInputs[key].val = val;
-            formStateInputs[key].isValid = isValid;
-        };
-    });
-
-    const setFormData = (payload: Partial<Record<T, InputState>>) => {
-        (Object.keys(payload) as T[]).forEach((key) => {
-            formStateInputs[key] = payload[key]!;
+    // Handlers
+    const prefillData = (data: Partial<Record<T, any>>) => {
+        (Object.keys(data) as T[]).forEach((name) => {
+            fields[name].value = data[name]!;
         });
     };
 
-    const fieldsActivationHandler = (payload: Partial<Record<T, boolean>>) => {
-        (Object.keys(payload) as T[]).forEach((key) => {
-            formStateInputs[key].isActive = payload[key];
+    const updateFieldConfig = (update: Partial<Record<T, FieldConfig>>) => {
+        (Object.keys(update) as T[]).forEach((name) => {
+            const field = fields[name];
+            const config = update[name]!;
+            if (config.active !== undefined) field.active = config.active;
+            if (config.validators !== undefined)
+                field.validators = config.validators;
+            if (config.initial !== undefined) field.initial = config.initial;
         });
     };
 
-    return { formState, inputHandlers, setFormData, fieldsActivationHandler };
+    return { fields, formValid, prefillData, updateFieldConfig };
 };
