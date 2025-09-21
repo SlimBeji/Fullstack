@@ -13,8 +13,8 @@
             <form @submit="onSubmit">
                 <Input
                     v-if="!isLoginMode"
-                    @update="inputHandlers.username"
-                    :validators="[minLengthValidator(8)]"
+                    v-model="fields.username.value"
+                    :is-valid="fields.username.valid"
                     element="input"
                     id="username"
                     label="Username"
@@ -23,15 +23,16 @@
                 />
                 <ImageUpload
                     v-if="!isLoginMode"
-                    @upload="inputHandlers.image"
-                    :file="formState.inputs.image.val.file"
-                    :url="formState.inputs.image.val.url"
+                    v-model="fields.image.value"
+                    :is-valid="fields.image.valid"
                     id="image"
                     color="secondary"
+                    button-text="Upload your Avatar"
+                    errorText="Please upload a valid image"
                 />
                 <Input
-                    @update="inputHandlers.email"
-                    :validators="[emailValidator()]"
+                    v-model="fields.email.value"
+                    :is-valid="fields.email.valid"
                     element="input"
                     id="email"
                     label="E-mail"
@@ -39,8 +40,8 @@
                     errorText="Please enter a valid email"
                 />
                 <Input
-                    @update="inputHandlers.password"
-                    :validators="[minLengthValidator(10)]"
+                    v-model="fields.password.value"
+                    :is-valid="fields.password.valid"
                     element="input"
                     id="password"
                     label="Password"
@@ -49,7 +50,7 @@
                 />
                 <div class="buttons">
                     <Button
-                        :disabled="!formState.isValid"
+                        :disabled="!formValid"
                         color="secondary"
                         type="submit"
                     >
@@ -74,13 +75,7 @@ import { computed, ref } from "vue";
 
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import {
-    emailValidator,
-    emptyStateBuilder,
-    minLengthValidator,
-    useForm,
-    useHttp,
-} from "@/lib";
+import { emailValidator, minLengthValidator, useForm, useHttp } from "@/lib";
 import { useAuthStore } from "@/stores";
 import { SigninResponse } from "@/types";
 
@@ -89,19 +84,17 @@ const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useHttp();
 
 // Form
-const AuthFormData = {
-    username: false,
-    image: false,
-    email: true,
-    password: true,
+const AuthFormConfig = {
+    username: { active: false, validators: [minLengthValidator(8)] },
+    image: { active: false, initial: { file: null, url: "" } },
+    email: { validators: [emailValidator()] },
+    password: { validators: [minLengthValidator(10)] },
 };
 
-type AuthFormTypes = keyof typeof AuthFormData;
+type FieldsType = keyof typeof AuthFormConfig;
 
-const emptyState = emptyStateBuilder<AuthFormTypes>(AuthFormData);
-emptyState.inputs.image.val = { file: null, url: "" };
-const { formState, inputHandlers, fieldsActivationHandler } =
-    useForm<AuthFormTypes>(emptyState);
+const { fields, formValid, updateFieldConfig } =
+    useForm<FieldsType>(AuthFormConfig);
 
 // States
 const isLoginMode = ref<boolean>(true);
@@ -126,8 +119,8 @@ const text = computed(() => {
 // Handlers
 const onSignin = async (): Promise<void> => {
     const formData = new FormData();
-    formData.append("username", formState.inputs.email.val);
-    formData.append("password", formState.inputs.password.val);
+    formData.append("username", fields.email.value);
+    formData.append("password", fields.password.value);
     const resp = await sendRequest("/auth/signin", "post", formData, false);
     const data = resp.data as SigninResponse;
     authStore.login(data);
@@ -135,10 +128,10 @@ const onSignin = async (): Promise<void> => {
 
 const onSignup = async (): Promise<void> => {
     const formData = new FormData();
-    formData.append("name", formState.inputs.username.val);
-    formData.append("image", formState.inputs.image.val.file);
-    formData.append("email", formState.inputs.email.val);
-    formData.append("password", formState.inputs.password.val);
+    formData.append("name", fields.username.value);
+    formData.append("image", fields.image.value.file);
+    formData.append("email", fields.email.value);
+    formData.append("password", fields.password.value);
     const resp = await sendRequest("/auth/signup", "post", formData, false);
     const data = resp.data as SigninResponse;
     authStore.login(data);
@@ -160,10 +153,7 @@ const onSwitchModeHandler = () => {
     // enable them so we send prev (true)
     // Same reasoning if we were in Signup Mode
     const prev = isLoginMode.value;
-    fieldsActivationHandler({
-        username: prev,
-        image: prev,
-    });
+    updateFieldConfig({ username: { active: prev }, image: { active: prev } });
     isLoginMode.value = !prev;
 };
 </script>
