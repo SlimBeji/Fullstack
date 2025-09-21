@@ -5,7 +5,7 @@
         </div>
     </div>
     <ul v-else class="users-list">
-        <UserItem v-for="item in props.items" :key="item.id" :user="item" />;
+        <UserItem v-for="item in props.items" :key="item.id" :user="item" />
     </ul>
 </template>
 
