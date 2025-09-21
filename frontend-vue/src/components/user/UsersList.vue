@@ -30,7 +30,7 @@ const noUsers = computed(() => props.items.length === 0);
 
 @layer components {
     .users-list {
-        @apply flex justify-center flex-wrap gap-6;
+        @apply flex flex-wrap gap-6;
         @apply w-[90%] max-w-4xl mx-auto;
     }
 
