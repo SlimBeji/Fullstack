@@ -56,12 +56,16 @@ export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
 
     // Watchers
     for (const name of fieldNames) {
-        const field = (fields as Record<T, FieldState>)[name];
-        watch([() => field.value, () => field.validators], () => {
-            const isValid = validate(field.value, field.validators);
-            field.valid = isValid;
-            formValid.value = recheckFormValidity();
-        });
+        const field = fields[name];
+        watch(
+            [() => field.value, () => field.validators],
+            () => {
+                const isValid = validate(field.value, field.validators);
+                field.valid = isValid;
+                formValid.value = recheckFormValidity();
+            },
+            { deep: true }
+        );
     }
 
     // Handlers
