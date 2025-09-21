@@ -7,8 +7,8 @@
     <form @submit="submitHandler" class="place-create">
         <LoadingSpinner v-if="httpData.loading" as-overlay />
         <Input
-            @update="inputHandlers.title"
-            :validators="[minLengthValidator(10)]"
+            v-model="fields.title.value"
+            :is-valid="fields.title.valid"
             id="title"
             element="input"
             type="text"
@@ -16,8 +16,8 @@
             errorText="Please enter a valid Title"
         />
         <Input
-            @update="inputHandlers.address"
-            :validators="[minLengthValidator(1)]"
+            v-model="fields.address.value"
+            :is-valid="fields.address.valid"
             id="address"
             element="input"
             type="text"
@@ -25,45 +25,40 @@
             errorText="Please enter a valid address"
         />
         <Input
-            @update="inputHandlers.description"
-            :validators="[minLengthValidator(10)]"
+            v-model="fields.description.value"
+            :is-valid="fields.description.valid"
             id="description"
             element="textarea"
             label="Description"
             errorText="Please enter a valid Description"
         />
         <Input
-            @update="inputHandlers.lat"
-            :validators="[numericValidator()]"
+            v-model="fields.lat.value"
+            :is-valid="fields.lat.valid"
             id="latitude"
-            width="1/2"
-            padding="pr-1"
             element="input"
+            type="number"
             label="Latitude"
             errorText="Please enter a valid Latitude"
         />
         <Input
-            @update="inputHandlers.lng"
-            :validators="[numericValidator()]"
+            v-model="fields.lng.value"
+            :is-valid="fields.lng.valid"
             id="longitude"
-            width="1/2"
-            padding="pl-1"
             element="input"
+            type="number"
             label="Longitude"
             errorText="Please enter a valid Longitude"
         />
         <ImageUpload
-            @upload="inputHandlers.image"
+            v-model="fields.image.value"
+            :is-valid="fields.image.valid"
             id="image"
             color="secondary"
             required
         />
         <div class="buttons">
-            <Button
-                :disabled="!formState.isValid"
-                type="submit"
-                color="secondary"
-            >
+            <Button :disabled="!formValid" type="submit" color="secondary">
                 Add Place
             </Button>
         </div>
@@ -74,7 +69,7 @@
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import {
-    emptyStateBuilder,
+    FormConfig,
     minLengthValidator,
     numericValidator,
     useForm,
@@ -88,33 +83,32 @@ const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useHttp();
 
 // Form
-const Form = {
-    title: true,
-    address: true,
-    description: true,
-    lat: true,
-    lng: true,
-    image: true,
+const CreatePlaceFormConfig: FormConfig = {
+    title: { validators: [minLengthValidator(10)] },
+    address: { validators: [minLengthValidator(1)] },
+    description: { validators: [minLengthValidator(10)] },
+    lat: { validators: [numericValidator()] },
+    lng: { validators: [numericValidator()] },
+    image: { initial: { file: null, url: "" } },
 };
 
-type FormFields = keyof typeof Form;
+type FieldsType = keyof typeof CreatePlaceFormConfig;
 
-const initialState = emptyStateBuilder<FormFields>(Form);
-const { formState, inputHandlers } = useForm<FormFields>(initialState);
+const { fields, formValid } = useForm<FieldsType>(CreatePlaceFormConfig);
 
 // Handlers
 const submitHandler = async (e: Event) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("title", formState.inputs.title.val);
-    formData.append("image", formState.inputs.image.val.file);
-    formData.append("description", formState.inputs.description.val);
-    formData.append("address", formState.inputs.address.val);
+    formData.append("title", fields.title.value);
+    formData.append("image", fields.image.value.file);
+    formData.append("description", fields.description.value);
+    formData.append("address", fields.address.value);
     formData.append(
         "location",
         JSON.stringify({
-            lat: formState.inputs.lat.val,
-            lng: formState.inputs.lng.val,
+            lat: fields.lat.value,
+            lng: fields.lng.value,
         })
     );
     formData.append("creatorId", authStore.userId || "");
