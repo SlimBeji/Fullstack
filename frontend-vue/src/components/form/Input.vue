@@ -3,11 +3,12 @@
         <label :for="props.id">{{ props.label }}</label>
         <component
             v-model="value"
+            @input="$emit('update:modelValue', $event.target.value)"
+            @blur="inputTouched"
             :is="tagConfig.tag"
             :id="props.id"
             :class="inputClass"
             v-bind="tagConfig.tagProps"
-            @blur="inputTouched"
         />
         <p class="error-text" :class="{ invisible: !showError }">
             {{ props.errorText || "The input is not valid" }}
@@ -21,7 +22,7 @@ import { computed, ref } from "vue";
 import { CssClass } from "@/types";
 
 // Props
-const value = defineModel<string>("");
+const value = defineModel<string>();
 
 const props = defineProps<{
     id: string;
