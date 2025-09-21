@@ -13,14 +13,14 @@
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
-import { ButtonType } from "@/types";
+import { ButtonType, CssClass } from "@/types";
 
 // Props
 const props = defineProps<{
     disabled?: boolean;
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
-    class?: string | (string | Record<string, boolean>)[];
+    class?: CssClass;
     to?: string;
     href?: string;
     type?: ButtonType;
