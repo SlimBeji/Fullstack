@@ -9,9 +9,9 @@
             accept=".jpg,.png,.jpeg"
         />
         <div>
-            <div>
-                <img v-if="url" :src="url" alt="Preview" />
-                <p v-if="!url" class="placeholder">Please pick an image.</p>
+            <div :class="{ error: showError }">
+                <img v-if="data.url" :src="data.url" alt="Preview" />
+                <p v-else class="placeholder">Please pick an image.</p>
             </div>
             <Button
                 @click="clickHandler"
@@ -24,17 +24,17 @@
                 type="button"
                 :disabled="disabled ?? false"
             >
-                PICK IMAGE
+                {{ props.buttonText || "Pick an image" }}
             </Button>
         </div>
-        <p class="error-text" :class="{ invisible: !isError }">
-            {{ props.errorText || errorMessage }}
+        <p class="error-text" :class="{ invisible: !showError }">
+            {{ props.errorText || uploadError }}
         </p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 
 import { fileToUrl } from "@/lib";
 
@@ -43,41 +43,23 @@ import Button from "./Button.vue";
 const filePickerRef = useTemplateRef<HTMLInputElement>("filePicker");
 
 // Props
+const data = defineModel<{ file: File | null; url: string }>({
+    required: true,
+});
+
 const props = defineProps<{
     id: string;
+    isValid?: boolean;
+    buttonText?: string;
     disabled?: boolean;
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
     errorText?: string;
-    url?: string;
-    file?: File | null;
-    required?: boolean;
 }>();
 
 // State
-const file = ref<File | null>(props.file || null);
-const url = ref<string>(props.url || "");
-const errorMessage = ref<string>("");
+const uploadError = ref<string>("");
 const uploadAttempt = ref<boolean>(false);
-
-// Events
-const emit = defineEmits<{
-    (
-        e: "upload",
-        value: { file: File | null; url: string },
-        isValid: boolean
-    ): void;
-}>();
-
-const emitUpdate = () => {
-    emit("upload", { file: file.value, url: url.value }, isValid.value);
-};
-
-onMounted(() => {
-    // Emit an update on compount mounting in case the Image
-    // is required and no value provided initially
-    emitUpdate();
-});
 
 // Computed
 const disabled = computed(() => props.disabled ?? false);
@@ -90,15 +72,9 @@ const colorClass = computed(() =>
     disabled.value ? "disabled" : props.color || "primary"
 );
 
-const isValid = computed(() => {
-    if (props.required) {
-        return errorMessage.value === "" && !!url.value;
-    } else {
-        return errorMessage.value === "";
-    }
-});
-
-const isError = computed(() => !!errorMessage.value && uploadAttempt.value);
+const showError = computed(
+    () => (!props.isValid || !!uploadError.value) && uploadAttempt.value
+);
 
 // Hanlders
 const changeHanlder = async (event: Event) => {
@@ -106,23 +82,22 @@ const changeHanlder = async (event: Event) => {
     const target = event.target as HTMLInputElement;
     const files = target.files;
     if (!files || files.length === 0) {
-        file.value = null;
-        url.value = "";
-        errorMessage.value = "Something went wrong! No file found!";
+        data.value.file = null;
+        data.value.url = "";
+        uploadError.value = "Something went wrong! No file found!";
     } else if (files.length > 1) {
-        file.value = null;
-        url.value = "";
-        errorMessage.value = "Please upload only one file at a time!";
+        data.value.file = null;
+        data.value.url = "";
+        uploadError.value = "Please upload only one file at a time!";
     } else {
         try {
-            url.value = await fileToUrl(files[0]);
-            file.value = files[0];
-            errorMessage.value = "";
+            data.value.url = await fileToUrl(files[0]);
+            data.value.file = files[0];
+            uploadError.value = "";
         } catch {
-            errorMessage.value = "Uploaded file corrupted";
+            uploadError.value = "Uploaded file corrupted";
         }
     }
-    emitUpdate();
 };
 
 const clickHandler = () => {
