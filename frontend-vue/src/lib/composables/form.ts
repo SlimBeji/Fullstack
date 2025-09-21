@@ -21,6 +21,8 @@ export interface FormState<T extends string> {
     valid: boolean; // Is the whole form valid
 }
 
+export type FormConfig = Record<string, FieldConfig>;
+
 export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
     // Setup
     const fieldNames = Object.keys(config) as T[];

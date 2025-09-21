@@ -75,7 +75,13 @@ import { computed, ref } from "vue";
 
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import { emailValidator, minLengthValidator, useForm, useHttp } from "@/lib";
+import {
+    emailValidator,
+    FormConfig,
+    minLengthValidator,
+    useForm,
+    useHttp,
+} from "@/lib";
 import { useAuthStore } from "@/stores";
 import { SigninResponse } from "@/types";
 
@@ -84,7 +90,7 @@ const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useHttp();
 
 // Form
-const AuthFormConfig = {
+const AuthFormConfig: FormConfig = {
     username: { active: false, validators: [minLengthValidator(8)] },
     image: { active: false, initial: { file: null, url: "" } },
     email: { validators: [emailValidator()] },
