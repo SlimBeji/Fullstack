@@ -1,77 +1,52 @@
 <template>
-    <div class="input-container" :class="[widthClass, { error: isError }]">
+    <div class="input-container" :class="[props.class, { error: showError }]">
         <label :for="props.id">{{ props.label }}</label>
         <component
+            v-model="value"
             :is="tagConfig.tag"
             :id="props.id"
             :class="inputClass"
             v-bind="tagConfig.tagProps"
             @blur="inputTouched"
-            @input="valueChanged"
         />
-        <p class="error-text" :class="{ invisible: !isError }">
+        <p class="error-text" :class="{ invisible: !showError }">
             {{ props.errorText || "The input is not valid" }}
         </p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
-import { validate, ValidatorType } from "@/lib";
+import { CssClass } from "@/types";
 
 // Props
+const value = defineModel<string>("");
+
 const props = defineProps<{
-    element?: "input" | "textarea";
-    type?: HTMLInputElement["type"];
     id: string;
     label: string;
+    isValid?: boolean;
+    class?: CssClass;
+    element?: "input" | "textarea";
+    type?: HTMLInputElement["type"];
     disabled?: boolean;
-    width?: string;
     padding?: string;
     rows?: number;
     placeholder?: string;
-    validators?: ValidatorType[];
     errorText?: string;
-    value?: string;
-    isValid?: boolean;
 }>();
 
 // State
-const data = ref<string>(props.value || "");
-const isValid = ref<boolean>(props.isValid || false);
 const isTouched = ref<boolean>(false);
 
-// Events
-const emit = defineEmits<{
-    (e: "update", value: string, isValid: boolean): void;
-}>();
-
-const emitUpdate = () => {
-    emit("update", data.value, isValid.value);
-};
-
-onMounted(() => {
-    // Emit an update on compount mounting in case the Image
-    // is required and no value provided initially
-    emitUpdate();
-});
-
 // Computed
-const widthClass = computed(() => {
-    if (props.width) {
-        return `basis-${props.width} ${props.padding ?? ""}`;
-    } else {
-        return "basis-full";
-    }
-});
-
 const inputClass = computed(() => ({
     disabled: props.disabled,
     active: !props.disabled,
 }));
 
-const isError = computed(() => !isValid.value && isTouched.value);
+const showError = computed(() => !props.isValid && isTouched.value);
 
 const tagConfig = computed(() => {
     let tag = "input";
@@ -93,16 +68,6 @@ const tagConfig = computed(() => {
 // Handlers
 const inputTouched = () => {
     if (!props.disabled) isTouched.value = true;
-};
-
-const valueChanged = (event: Event) => {
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-    data.value = target.value;
-    const valid = props.validators
-        ? validate(data.value, props.validators)
-        : true;
-    isValid.value = valid;
-    emitUpdate();
 };
 </script>
 
