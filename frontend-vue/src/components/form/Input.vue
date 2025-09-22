@@ -1,5 +1,5 @@
 <template>
-    <div class="input-container" :class="[props.class, { error: showError }]">
+    <div class="input-container" :class="[customClass, { error: showError }]">
         <label :for="props.id">{{ props.label }}</label>
         <component
             v-model="value"
@@ -43,6 +43,13 @@ const props = defineProps<{
 const isTouched = ref<boolean>(false);
 
 // Computed
+const customClass = computed(() => {
+    if (!props.class) {
+        return "basis-full";
+    }
+    return props.class;
+});
+
 const inputClass = computed(() => ({
     disabled: props.disabled,
     active: !props.disabled,

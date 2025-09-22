@@ -35,6 +35,7 @@
         <Input
             v-model="fields.lat.value"
             :is-valid="fields.lat.valid"
+            class="basis-full sm:basis-1/2 sm:pr-2"
             id="latitude"
             element="input"
             type="number"
@@ -44,6 +45,7 @@
         <Input
             v-model="fields.lng.value"
             :is-valid="fields.lng.valid"
+            class="basis-full sm:basis-1/2 sm:pl-2"
             id="longitude"
             element="input"
             type="number"
