@@ -1,122 +1,53 @@
-import { ChangeEvent, ElementType, useEffect, useReducer } from "react";
-
-import { validate, ValidatorType } from "../../lib";
-
-interface InputState {
-    value: string;
-    isValid: boolean;
-    isTouched: boolean;
-}
-
-enum InputActionType {
-    CHANGE = "CHANGE",
-    TOUCH = "TOUCH",
-}
-
-interface InputChangeAction {
-    type: InputActionType.CHANGE;
-    payload: { value: string; validators: ValidatorType[] };
-}
-
-interface InputTouchAction {
-    type: InputActionType.TOUCH;
-}
-
-const inputReducer = (
-    state: InputState,
-    action: InputChangeAction | InputTouchAction
-): InputState => {
-    switch (action.type) {
-        case InputActionType.CHANGE:
-            return {
-                ...state,
-                value: action.payload.value || "",
-                isValid: validate(
-                    action.payload.value,
-                    action.payload.validators
-                ),
-            };
-        case InputActionType.TOUCH:
-            return {
-                ...state,
-                isTouched: true,
-            };
-        default:
-            return state;
-    }
-};
+import { ChangeEvent, ElementType, useState } from "react";
 
 interface InputProps {
-    element?: "input" | "textarea";
-    type?: HTMLInputElement["type"];
-    id: string;
-    label: string;
-    disabled?: boolean;
-    onInput: (value: string, isValid: boolean) => void;
-    width?: string;
-    padding?: string;
-    rows?: number;
-    placeholder?: string;
-    validators?: ValidatorType[];
-    errorText?: string;
+    onInput: (value: string) => void;
     value?: string;
     isValid?: boolean;
+    id: string;
+    label: string;
+    className?: string;
+    element?: "input" | "textarea";
+    type?: HTMLInputElement["type"];
+    disabled?: boolean;
+    rows?: number;
+    placeholder?: string;
+    errorText?: string;
 }
 
 const Input: React.FC<InputProps> = ({
-    element,
-    type,
-    id,
-    label,
-    disabled,
     onInput,
-    width,
-    padding,
-    rows,
-    placeholder,
-    validators,
-    errorText,
     value,
     isValid,
+    id,
+    label,
+    className,
+    element,
+    type,
+    disabled,
+    rows,
+    placeholder,
+    errorText,
 }) => {
-    padding = padding ?? "";
-    width = width ? `basis-${width} ${padding}` : "basis-full";
-
-    const [state, dispatch] = useReducer(inputReducer, {
-        value: value || "",
-        isValid: isValid || false,
-        isTouched: false,
-    });
-
-    useEffect(() => {
-        let isValid = state.isValid;
-        if (validators) {
-            isValid = validate(state.value, validators);
-        }
-        onInput(state.value, isValid);
-    }, [onInput, state.value, state.isValid, validators]);
+    const [inputValue, setValue] = useState<string>(value || "");
+    const [isTouched, setIsTouched] = useState<boolean>(false);
 
     const changeHandler = (
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
-        dispatch({
-            type: InputActionType.CHANGE,
-            payload: {
-                value: event.target.value,
-                validators: validators || [],
-            },
-        });
+        setValue(event.target.value);
+        onInput(event.target.value);
     };
 
     const touchHandler = () => {
-        if (!disabled) dispatch({ type: InputActionType.TOUCH });
+        if (!disabled) setIsTouched(true);
     };
 
-    const isError = !state.isValid && state.isTouched;
+    const isError = !isValid && isTouched;
 
     let Tag: ElementType = "input";
     const tagProps: Record<string, any> = {
-        value: state.value,
+        value: inputValue,
         id,
         onChange: changeHandler,
         onBlur: touchHandler,
@@ -137,7 +68,9 @@ const Input: React.FC<InputProps> = ({
     }
 
     return (
-        <div className={`input-container ${width} ${isError ? "error" : ""}`}>
+        <div
+            className={`input-container ${className || ""} ${isError ? "error" : ""}`}
+        >
             <label htmlFor={id}>{label}</label>
             <Tag {...tagProps} />
             <p className={`error-text ${isError ? "" : "invisible"}`}>
