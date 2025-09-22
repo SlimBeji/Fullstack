@@ -1,39 +1,7 @@
-import React, { useEffect, useReducer, useRef } from "react";
+import React, { useRef, useState } from "react";
 
 import { fileToUrl } from "../../lib";
 import Button from "./Button";
-
-interface ImageUploadState {
-    file: File | null;
-    url: string;
-    errorMessage: string;
-    uploadAttempt: boolean;
-}
-
-enum ImageUploadActionType {
-    CHANGE = "CHANGE",
-}
-
-interface ImageUploadChangeAction {
-    type: ImageUploadActionType.CHANGE;
-    payload: { file: File | null; url: string; errorMessage: string };
-}
-
-const inputReducer = (
-    state: ImageUploadState,
-    action: ImageUploadChangeAction
-): ImageUploadState => {
-    switch (action.type) {
-        case ImageUploadActionType.CHANGE:
-            return {
-                ...state,
-                ...action.payload,
-                uploadAttempt: true,
-            };
-        default:
-            return state;
-    }
-};
 
 interface ImageUploadValue {
     file: File | null;
@@ -41,42 +9,41 @@ interface ImageUploadValue {
 }
 
 interface ImageUploadProps {
+    onInput: (value: ImageUploadValue) => void;
+    value: ImageUploadValue;
+    isValid: boolean;
     id: string;
+    buttonText?: string;
     disabled?: boolean;
     inverse?: boolean;
     color?: "primary" | "secondary" | "success" | "warning" | "danger";
-    onInput: (val: ImageUploadValue, isValid: boolean) => void;
     errorText?: string;
-    file?: File | null;
-    url?: string;
-    required?: boolean;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = (props) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({
+    onInput,
+    value,
+    isValid,
+    id,
+    buttonText,
+    disabled,
+    inverse,
+    color,
+    errorText,
+}) => {
     const filePickerRef = useRef<HTMLInputElement>(null);
-    const [state, dispatch] = useReducer(inputReducer, {
-        file: props.file || null,
-        url: props.url || "",
-        errorMessage: "",
-        uploadAttempt: false,
-    });
 
-    const disabled = props.disabled ?? false;
-    const inverse = props.inverse && !disabled ? "inverse" : "";
-    const color = disabled ? "disabled" : props.color || "primary";
-    const className = `btn ${color} ${inverse}`;
-    const isError = !!state.errorMessage && state.uploadAttempt;
+    const [uploadAttempt, setUploadAttempt] = useState<boolean>(false);
+    const [uploadValue, setUploadValue] = useState<ImageUploadValue>(value);
+    const [uploadError, setUploadError] = useState<string>("");
 
-    const { required, onInput } = props;
-    useEffect(() => {
-        let isValid = true;
-        if (required) {
-            isValid = state.url ? true : false;
-        }
-        onInput({ file: state.file, url: state.url }, isValid);
-    }, [required, onInput, state.url, state.file]);
+    const isDisabled = disabled ?? false;
+    const isInverse = inverse && !isDisabled ? "inverse" : "";
+    const colorChoice = isDisabled ? "disabled" : color || "primary";
+    const className = `btn ${colorChoice} ${isInverse}`;
+    const showError = (!isValid || !!uploadError) && uploadAttempt;
 
-    const onClickHandler = (): void => {
+    const clickHandler = (): void => {
         if (filePickerRef.current) {
             filePickerRef.current.click();
         }
@@ -85,6 +52,8 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
     const changeHandler = async (
         event: React.ChangeEvent<HTMLInputElement>
     ): Promise<void> => {
+        setUploadAttempt(true);
+
         let file: File | null = null;
         let url = "";
         let errorMessage = "";
@@ -101,16 +70,15 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
                 errorMessage = "Uploaded file corrupted";
             }
         }
-        dispatch({
-            type: ImageUploadActionType.CHANGE,
-            payload: { file, url, errorMessage },
-        });
+        setUploadError(errorMessage);
+        setUploadValue({ file, url });
+        onInput(uploadValue);
     };
 
     return (
         <div className="image-upload">
             <input
-                id={props.id}
+                id={id}
                 ref={filePickerRef}
                 className="hidden"
                 type="file"
@@ -119,22 +87,24 @@ const ImageUpload: React.FC<ImageUploadProps> = (props) => {
             />
             <div>
                 <div>
-                    {state.url && <img src={state.url} alt="Preview" />}
-                    {!state.url && (
+                    {uploadValue.url && (
+                        <img src={uploadValue.url} alt="Preview" />
+                    )}
+                    {!uploadValue && (
                         <p className="placeholder">Please pick an image.</p>
                     )}
                 </div>
                 <Button
-                    disabled={disabled ?? false}
-                    className={disabled ? "disabled" : className}
+                    disabled={isDisabled}
+                    className={className}
                     type="button"
-                    onClick={onClickHandler}
+                    onClick={clickHandler}
                 >
-                    PICK IMAGE
+                    {buttonText || "Pick an image"}
                 </Button>
             </div>
-            <p className={`error-text ${isError ? "" : "invisible"}`}>
-                {props.errorText || state.errorMessage}
+            <p className={`error-text ${showError ? "" : "invisible"}`}>
+                {errorText || uploadError}
             </p>
         </div>
     );
