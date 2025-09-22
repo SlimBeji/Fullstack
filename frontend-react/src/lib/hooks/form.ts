@@ -93,12 +93,24 @@ const formReducer = <T extends string>(
                     fields[name].validators = config.validators;
                 if (config.initial !== undefined)
                     fields[name].initial = config.initial;
+
+                // Recheck validity
+                fields[name].valid = validate(
+                    fields[name].value,
+                    fields[name].validators || []
+                );
             });
             break;
         }
         case ActionType.PREFILL: {
             (Object.keys(action.payload) as T[]).forEach((name) => {
                 fields[name].value = action.payload[name]!;
+
+                // Recheck validity
+                fields[name].valid = validate(
+                    fields[name].value,
+                    fields[name].validators || []
+                );
             });
             break;
         }
