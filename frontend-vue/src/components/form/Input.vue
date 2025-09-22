@@ -33,7 +33,6 @@ const props = defineProps<{
     element?: "input" | "textarea";
     type?: HTMLInputElement["type"];
     disabled?: boolean;
-    padding?: string;
     rows?: number;
     placeholder?: string;
     errorText?: string;
