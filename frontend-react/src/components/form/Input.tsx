@@ -29,14 +29,12 @@ const Input: React.FC<InputProps> = ({
     placeholder,
     errorText,
 }) => {
-    const [inputValue, setValue] = useState<string>(value || "");
     const [isTouched, setIsTouched] = useState<boolean>(false);
 
     const changeHandler = (
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
-        setValue(event.target.value);
-        onInput(inputValue);
+        onInput(event.target.value);
     };
 
     const touchHandler = () => {
@@ -47,7 +45,7 @@ const Input: React.FC<InputProps> = ({
 
     let Tag: ElementType = "input";
     const tagProps: Record<string, any> = {
-        value: inputValue,
+        value: value || "",
         id,
         onChange: changeHandler,
         onBlur: touchHandler,

@@ -34,7 +34,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const filePickerRef = useRef<HTMLInputElement>(null);
 
     const [uploadAttempt, setUploadAttempt] = useState<boolean>(false);
-    const [uploadValue, setUploadValue] = useState<ImageUploadValue>(value);
     const [uploadError, setUploadError] = useState<string>("");
 
     const isDisabled = disabled ?? false;
@@ -71,8 +70,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             }
         }
         setUploadError(errorMessage);
-        setUploadValue({ file, url });
-        onInput(uploadValue);
+        onInput({ file, url });
     };
 
     return (
@@ -87,10 +85,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             />
             <div>
                 <div>
-                    {uploadValue.url && (
-                        <img src={uploadValue.url} alt="Preview" />
-                    )}
-                    {!uploadValue && (
+                    {value.url && <img src={value.url} alt="Preview" />}
+                    {!value.url && (
                         <p className="placeholder">Please pick an image.</p>
                     )}
                 </div>
