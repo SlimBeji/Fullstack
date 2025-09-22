@@ -57,7 +57,6 @@
             :is-valid="fields.image.valid"
             id="image"
             color="secondary"
-            required
         />
         <div class="buttons">
             <Button :disabled="!formValid" type="submit" color="secondary">
