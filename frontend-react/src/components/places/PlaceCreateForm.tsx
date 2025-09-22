@@ -1,8 +1,7 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-    emptyStateBuilder,
+    FormConfig,
     minLengthValidator,
     numericValidator,
     useForm,
@@ -12,37 +11,35 @@ import { useAppSelector } from "../../store";
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
 
-const Form = {
-    title: true,
-    address: true,
-    description: true,
-    lat: true,
-    lng: true,
-    image: true,
+const CreatePlaceFormConfig: FormConfig = {
+    title: { validators: [minLengthValidator(10)] },
+    address: { validators: [minLengthValidator(1)] },
+    description: { validators: [minLengthValidator(10)] },
+    lat: { validators: [numericValidator()] },
+    lng: { validators: [numericValidator()] },
+    image: { initial: { file: null, url: "" } },
 };
 
-type FormFields = keyof typeof Form;
-
-const initialState = emptyStateBuilder<FormFields>(Form);
+type FieldsType = keyof typeof CreatePlaceFormConfig;
 
 const NewPlace: React.FC = () => {
     const navigate = useNavigate();
     const authData = useAppSelector((state) => state.auth.data);
     const [data, sendRequest, clearError] = useHttp();
-    const [state, inputHandlers] = useForm<FormFields>(initialState);
+    const [state, inputHandlers] = useForm<FieldsType>(CreatePlaceFormConfig);
 
     const onSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append("title", state.inputs.title.val);
-        formData.append("image", state.inputs.image.val.file);
-        formData.append("description", state.inputs.description.val);
-        formData.append("address", state.inputs.address.val);
+        formData.append("title", state.fields.title.value);
+        formData.append("image", state.fields.image.value.file);
+        formData.append("description", state.fields.description.value);
+        formData.append("address", state.fields.address.value);
         formData.append(
             "location",
             JSON.stringify({
-                lat: state.inputs.lat.val,
-                lng: state.inputs.lng.val,
+                lat: state.fields.lat.value,
+                lng: state.fields.lng.value,
             })
         );
         formData.append("creatorId", authData?.userId || "");
@@ -54,11 +51,6 @@ const NewPlace: React.FC = () => {
         }
     };
 
-    const titleValidators = useMemo(() => [minLengthValidator(10)], []);
-    const addressValidators = useMemo(() => [minLengthValidator(1)], []);
-    const descriptionValidators = useMemo(() => [minLengthValidator(10)], []);
-    const coordinateValidators = useMemo(() => [numericValidator()], []);
-
     return (
         <>
             {data.error?.message && (
@@ -67,62 +59,66 @@ const NewPlace: React.FC = () => {
             <form className="place-create" onSubmit={onSubmit}>
                 {data.loading && <LoadingSpinner asOverlay />}
                 <Input
+                    onInput={inputHandlers.title}
+                    value={state.fields.title.value}
+                    isValid={state.fields.title.valid}
                     id="title"
                     element="input"
                     type="text"
-                    onInput={inputHandlers.title}
                     label="Title"
-                    validators={titleValidators}
                     errorText="Please enter a valid Title"
                 />
                 <Input
+                    onInput={inputHandlers.address}
+                    value={state.fields.address.value}
+                    isValid={state.fields.address.valid}
                     id="address"
                     element="input"
                     type="text"
-                    onInput={inputHandlers.address}
                     label="Address"
-                    validators={addressValidators}
                     errorText="Please enter a valid address"
                 />
                 <Input
+                    onInput={inputHandlers.description}
+                    value={state.fields.description.value}
+                    isValid={state.fields.description.valid}
                     id="description"
                     element="textarea"
-                    onInput={inputHandlers.description}
                     label="Description"
-                    validators={descriptionValidators}
                     errorText="Please enter a valid Description"
                 />
                 <Input
-                    id="latitude"
-                    width="1/2"
-                    padding="pr-1"
-                    element="input"
                     onInput={inputHandlers.lat}
+                    value={state.fields.lat.value}
+                    isValid={state.fields.lat.valid}
+                    id="latitude"
+                    className="basis-full sm:basis-1/2 sm:pr-2"
+                    element="input"
                     label="Latitude"
-                    validators={coordinateValidators}
                     errorText="Please enter a valid Latitude"
                 />
                 <Input
-                    id="longitude"
-                    width="1/2"
-                    padding="pl-1"
-                    element="input"
                     onInput={inputHandlers.lng}
+                    value={state.fields.lng.value}
+                    isValid={state.fields.lng.valid}
+                    id="longitude"
+                    className="basis-full sm:basis-1/2 sm:pl-2"
+                    element="input"
                     label="Longitude"
-                    validators={coordinateValidators}
                     errorText="Please enter a valid Longitude"
                 />
                 <ImageUpload
+                    onInput={inputHandlers.image}
+                    value={state.fields.image.value}
+                    isValid={state.fields.image.valid}
                     id="image"
                     color="secondary"
-                    onInput={inputHandlers.image}
-                    required
                 />
                 <div className="buttons">
                     <Button
                         type="submit"
                         color="secondary"
-                        disabled={!state.isValid}
+                        disabled={!state.valid}
                     >
                         Add Place
                     </Button>
