@@ -5,6 +5,7 @@
             v-model="value"
             @input="$emit('update:modelValue', $event.target.value)"
             @blur="inputTouched"
+            :value="value"
             :is="tagConfig.tag"
             :id="props.id"
             :class="inputClass"
