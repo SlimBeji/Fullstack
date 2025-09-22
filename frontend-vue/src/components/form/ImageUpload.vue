@@ -15,12 +15,7 @@
             </div>
             <Button
                 @click="clickHandler"
-                :class="[
-                    `btn`,
-                    colorClass,
-                    inverseClass,
-                    { disabled: disabled },
-                ]"
+                :class="[`btn`, colorClass, inverseClass]"
                 type="button"
                 :disabled="disabled ?? false"
             >
