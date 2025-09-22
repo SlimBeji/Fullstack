@@ -36,7 +36,7 @@ const Input: React.FC<InputProps> = ({
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         setValue(event.target.value);
-        onInput(event.target.value);
+        onInput(inputValue);
     };
 
     const touchHandler = () => {
