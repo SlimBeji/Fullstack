@@ -16,11 +16,6 @@ interface FieldState extends FieldConfig {
     validators: ValidatorType[];
 }
 
-export interface FormState<T extends string> {
-    fields: Record<T, FieldState>;
-    valid: boolean; // Is the whole form valid
-}
-
 export type FormConfig = Record<string, FieldConfig>;
 
 export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
