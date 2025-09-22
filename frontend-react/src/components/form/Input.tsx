@@ -67,7 +67,7 @@ const Input: React.FC<InputProps> = ({
 
     return (
         <div
-            className={`input-container ${className || ""} ${isError ? "error" : ""}`}
+            className={`input-container ${className || "basis-full"} ${isError ? "error" : ""}`}
         >
             <label htmlFor={id}>{label}</label>
             <Tag {...tagProps} />

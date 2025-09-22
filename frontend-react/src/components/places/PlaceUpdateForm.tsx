@@ -108,6 +108,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 value={state.fields.lat.value}
                 isValid={state.fields.lat.valid}
                 id="latitude"
+                className="basis-full sm:basis-1/2 sm:pr-2"
                 element="input"
                 label="Latitude"
                 errorText="Please enter a valid Latitude"
@@ -117,6 +118,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 value={state.fields.lng.value}
                 isValid={state.fields.lng.valid}
                 id="longitude"
+                className="basis-full sm:basis-1/2 sm:pl-2"
                 element="input"
                 label="Longitude"
                 errorText="Please enter a valid Longitude"
