@@ -46,7 +46,7 @@ Each frontend is a modern **Single Page Application (SPA)** built using popular 
 | Framework | Dev Server URL        | Env File Example |
 | --------- | --------------------- | ---------------- |
 | React     | http://localhost:8000 | `react.env`      |
-| Vue       | _Not Implemented Yet_ | `vue.env`        |
+| Vue       | http://localhost:8001 | `vue.env`        |
 | Svelte    | _Not Implemented Yet_ | `svelte.env`     |
 | Angular   | _Not Implemented Yet_ | `angular.env`    |
 
