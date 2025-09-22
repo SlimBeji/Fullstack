@@ -1,166 +1,174 @@
 import { useCallback, useMemo, useReducer } from "react";
 
-interface InputState {
-    val: any;
-    isActive?: boolean;
-    isValid: boolean;
+import { validate, ValidatorType } from "../utils";
+
+interface FieldConfig {
+    active?: boolean;
+    initial?: any;
+    validators?: ValidatorType[];
 }
 
-export interface FormState<T extends string> {
-    inputs: Record<T, InputState>;
-    isValid: boolean; // Is the whole form valid
+interface FieldState extends FieldConfig {
+    value: any;
+    initial?: any;
+    active: boolean;
+    valid: boolean;
+    validators: ValidatorType[];
 }
 
-const recheckFormValidity = <T extends string>(
-    inputs: Record<T, InputState>
+export type FormConfig = Record<string, FieldConfig>;
+
+interface FormState<T extends string> {
+    fields: Record<T, FieldState>;
+    valid: boolean; // is the whole form valid
+}
+
+const isFormValid = <T extends string>(
+    inputs: Record<T, FieldState>
 ): boolean => {
-    for (const key in inputs) {
-        const { isActive, isValid } = inputs[key];
-        if (isActive && !isValid) return false;
+    for (const name in inputs) {
+        const { active, valid } = inputs[name];
+        if (active && !valid) return false;
     }
     return true;
 };
 
 enum ActionType {
-    UPDATE_FIELD,
+    UPDATE_VALUE,
+    UPDATE_CONFIG,
     PREFILL,
-    FIELDS_ACTIVATION,
 }
 
-interface UpdateInputAction<T extends string> {
-    type: ActionType.UPDATE_FIELD;
-    payload: { fieldName: T; val: any; isValid: boolean };
+interface UpdateValueAction<T extends string> {
+    type: ActionType.UPDATE_VALUE;
+    payload: { name: T; value: any };
+}
+
+interface UpdateConfigAction<T extends string> {
+    type: ActionType.UPDATE_CONFIG;
+    payload: Partial<Record<T, FieldConfig>>;
 }
 
 interface PrefillAction<T extends string> {
     type: ActionType.PREFILL;
-    payload: Partial<Record<T, InputState>>;
-}
-
-interface FieldsActivationAction<T extends string> {
-    type: ActionType.FIELDS_ACTIVATION;
-    payload: Partial<Record<T, boolean>>;
+    payload: Partial<Record<T, any>>;
 }
 
 type FormAction<T extends string> =
-    | UpdateInputAction<T>
-    | PrefillAction<T>
-    | FieldsActivationAction<T>;
+    | UpdateValueAction<T>
+    | UpdateConfigAction<T>
+    | PrefillAction<T>;
 
-const deepStateCopy = <T extends string>(state: FormState<T>): FormState<T> => {
-    return {
-        ...state,
-        inputs: (Object.keys(state.inputs) as T[]).reduce(
-            (accumultaed, key) => {
-                accumultaed[key] = { ...state.inputs[key] };
-                return accumultaed;
-            },
-            {} as Record<T, InputState>
-        ),
-    };
+const fieldsStateCopy = <T extends string>(
+    state: Record<T, FieldState>
+): Record<T, FieldState> => {
+    return (Object.keys(state) as T[]).reduce(
+        (result, key) => {
+            result[key] = { ...state[key] };
+            return result;
+        },
+        {} as Record<T, FieldState>
+    );
 };
 
 const formReducer = <T extends string>(
     state: FormState<T>,
     action: FormAction<T>
 ): FormState<T> => {
-    const newState = deepStateCopy(state);
+    const fields = fieldsStateCopy(state.fields);
     switch (action.type) {
-        case ActionType.UPDATE_FIELD:
-            newState.inputs[action.payload.fieldName] = {
-                val: action.payload.val,
-                isValid: action.payload.isValid,
-                isActive: true,
-            };
-            break;
-        case ActionType.PREFILL: {
-            for (const key of Object.keys(action.payload) as T[]) {
-                const input = action.payload[key]!;
-                input.isActive = !!input.isActive;
-                newState.inputs[key] = input;
-            }
+        case ActionType.UPDATE_VALUE: {
+            const { name, value } = action.payload;
+            const fieldState = fields[name];
+            const valid = validate(value, fieldState.validators || []);
+            fields[name] = { ...fieldState, value, valid };
             break;
         }
-        case ActionType.FIELDS_ACTIVATION:
-            for (const fieldName in action.payload) {
-                newState.inputs[fieldName].isActive = action.payload[fieldName];
-            }
+        case ActionType.UPDATE_CONFIG: {
+            (Object.keys(action.payload) as T[]).forEach((name) => {
+                const config = action.payload[name]!;
+                if (config.active !== undefined)
+                    fields[name].active = config.active;
+                if (config.validators !== undefined)
+                    fields[name].validators = config.validators;
+                if (config.initial !== undefined)
+                    fields[name].initial = config.initial;
+            });
             break;
+        }
+        case ActionType.PREFILL: {
+            (Object.keys(action.payload) as T[]).forEach((name) => {
+                fields[name].value = action.payload[name]!;
+            });
+            break;
+        }
         default:
             return state;
     }
-    newState.isValid = recheckFormValidity(newState.inputs);
-    return newState;
-};
-
-export const emptyStateBuilder = <T extends string>(
-    formConfig: Record<T, boolean>
-): FormState<T> => {
-    const inputs = (Object.keys(formConfig) as T[]).reduce(
-        (result, name) => {
-            result[name] = {
-                val: "",
-                isActive: formConfig[name],
-                isValid: false,
-            };
-            return result;
-        },
-        {} as Record<T, InputState>
-    );
-    return { inputs, isValid: false };
+    return { fields, valid: isFormValid(fields) };
 };
 
 type InputHandler = (val: any, isValid: boolean) => void;
 type InputHandlers<T extends string> = { [key in T]: InputHandler };
-type SetFormData<T extends string> = (
-    payload: Partial<Record<T, InputState>>
-) => void;
-type FieldsActivationHandler<T extends string> = (
-    payload: Partial<Record<T, boolean>>
+type PrefillData<T extends string> = (payload: Partial<Record<T, any>>) => void;
+type UpdateFieldConfig<T extends string> = (
+    payload: Partial<Record<T, FieldConfig>>
 ) => void;
 
 export const useForm = <T extends string>(
-    initialState: FormState<T>
-): [
-    FormState<T>,
-    InputHandlers<T>,
-    SetFormData<T>,
-    FieldsActivationHandler<T>,
-] => {
+    config: FormConfig
+): [FormState<T>, InputHandlers<T>, PrefillData<T>, UpdateFieldConfig<T>] => {
+    // Setup -> Building initial state
+    const fieldNames = useMemo(() => Object.keys(config) as T[], [config]);
+    const initialFields = fieldNames.reduce(
+        (result, name) => {
+            const fieldConfig = config[name];
+            const value = fieldConfig.initial || "";
+            const validators = fieldConfig.validators || [];
+            const initial = fieldConfig.initial;
+            const active = fieldConfig.active ?? true;
+            const valid = validate(value, validators);
+            result[name] = { value, initial, active, valid, validators };
+            return result;
+        },
+        {} as Record<T, FieldState>
+    );
+    const initialState: FormState<T> = {
+        fields: initialFields,
+        valid: isFormValid(initialFields),
+    };
     const [state, dispatch] = useReducer(formReducer<T>, initialState);
 
+    // Values Update
     const inputHandlers = useMemo(() => {
-        const handlers: InputHandlers<T> = {} as any;
-        for (const key in initialState.inputs) {
-            handlers[key] = (val: any, isValid: boolean) => {
+        return fieldNames.reduce((result, name) => {
+            result[name] = (value: any) => {
                 dispatch({
-                    type: ActionType.UPDATE_FIELD,
-                    payload: { fieldName: key, val, isValid },
+                    type: ActionType.UPDATE_VALUE,
+                    payload: { value, name },
                 });
             };
-        }
-        return handlers;
-    }, [initialState.inputs, dispatch]);
+            return result;
+        }, {} as InputHandlers<T>);
+    }, [fieldNames, dispatch]);
 
-    const setFormData = useCallback(
-        (payload: Partial<Record<T, InputState>>) => {
+    /// Prefill Data
+    const prefillData = useCallback((payload: Partial<Record<T, any>>) => {
+        dispatch({
+            type: ActionType.PREFILL,
+            payload,
+        });
+    }, []);
+
+    const updateFieldConfig = useCallback(
+        (payload: Partial<Record<T, FieldConfig>>) => {
             dispatch({
-                type: ActionType.PREFILL,
+                type: ActionType.UPDATE_CONFIG,
                 payload,
             });
         },
         []
     );
 
-    const fieldsActivationHandler = useCallback(
-        (payload: Partial<Record<T, boolean>>) => {
-            dispatch({
-                type: ActionType.FIELDS_ACTIVATION,
-                payload,
-            });
-        },
-        []
-    );
-
-    return [state, inputHandlers, setFormData, fieldsActivationHandler];
+    return [state, inputHandlers, prefillData, updateFieldConfig];
 };
