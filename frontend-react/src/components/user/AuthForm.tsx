@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
     emailValidator,
-    emptyStateBuilder,
+    FormConfig,
     minLengthValidator,
     useForm,
     useHttp,
@@ -12,24 +12,22 @@ import { SigninResponse } from "../../types";
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
 
-const AuthFormData = {
-    username: false,
-    image: false,
-    email: true,
-    password: true,
+const AuthFormConfig: FormConfig = {
+    username: { active: false, validators: [minLengthValidator(8)] },
+    image: { active: false, initial: { file: null, url: "" } },
+    email: { validators: [emailValidator()] },
+    password: { validators: [minLengthValidator(10)] },
 };
 
-type AuthFormTypes = keyof typeof AuthFormData;
-
-const emptyState = emptyStateBuilder<AuthFormTypes>(AuthFormData);
+type FieldsType = keyof typeof AuthFormConfig;
 
 const AuthForm: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const [data, sendRequest, clearError] = useHttp();
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [state, inputHandlers, , fieldsActivationHandler] =
-        useForm<AuthFormTypes>(emptyState);
+    const [state, inputHandlers, , updateFieldConfig] =
+        useForm<FieldsType>(AuthFormConfig);
 
     // Text to display depending if Signin form or Signup form
     let verb: "Authenticate" | "Register";
@@ -47,8 +45,8 @@ const AuthForm: React.FC = () => {
 
     const onSignin = async (): Promise<void> => {
         const formData = new FormData();
-        formData.append("username", state.inputs.email.val);
-        formData.append("password", state.inputs.password.val);
+        formData.append("username", state.fields.email.value);
+        formData.append("password", state.fields.password.value);
         const resp = await sendRequest("/auth/signin", "post", formData, false);
         const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));
@@ -56,10 +54,10 @@ const AuthForm: React.FC = () => {
 
     const onSignup = async (): Promise<void> => {
         const formData = new FormData();
-        formData.append("name", state.inputs.username.val);
-        formData.append("image", state.inputs.image.val.file);
-        formData.append("email", state.inputs.email.val);
-        formData.append("password", state.inputs.password.val);
+        formData.append("name", state.fields.username.value);
+        formData.append("image", state.fields.image.value.file);
+        formData.append("email", state.fields.email.value);
+        formData.append("password", state.fields.password.value);
         const resp = await sendRequest("/auth/signup", "post", formData, false);
         const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));
@@ -81,17 +79,13 @@ const AuthForm: React.FC = () => {
             // Switching to Signup Mode, we want to
             // enable them so we send prev (true)
             // Same reasoning if we were in Signup Mode
-            fieldsActivationHandler({
-                username: prev,
-                image: prev,
+            updateFieldConfig({
+                username: { active: prev },
+                image: { active: prev },
             });
             return !prev;
         });
     };
-
-    const usernameValidators = useMemo(() => [minLengthValidator(8)], []);
-    const emailValidators = useMemo(() => [emailValidator()], []);
-    const passwordValidators = useMemo(() => [minLengthValidator(10)], []);
 
     return (
         <div className="center">
@@ -110,45 +104,50 @@ const AuthForm: React.FC = () => {
                     {!isLoginMode && (
                         <Input
                             onInput={inputHandlers.username}
+                            value={state.fields.username.value}
+                            isValid={state.fields.username.valid}
                             element="input"
                             id="username"
                             type="text"
                             label="Username"
-                            validators={usernameValidators}
                             errorText="Please enter a valid username of at least 8 characters"
                         />
                     )}
                     {!isLoginMode && (
                         <ImageUpload
-                            id="image"
-                            color="secondary"
                             onInput={inputHandlers.image}
-                            file={state.inputs.image.val.file}
-                            url={state.inputs.image.val.url}
+                            value={state.fields.image.value}
+                            isValid={state.fields.image.valid}
+                            id="image"
+                            buttonText="Upload your Avatar"
+                            color="secondary"
+                            errorText="Please upload a valid image"
                         />
                     )}
                     <Input
                         onInput={inputHandlers.email}
+                        value={state.fields.email.value}
+                        isValid={state.fields.email.valid}
                         element="input"
                         id="email"
                         type="email"
                         label="E-Mail"
-                        validators={emailValidators}
                         errorText="Please enter a valid email"
                     />
                     <Input
                         onInput={inputHandlers.password}
+                        value={state.fields.password.value}
+                        isValid={state.fields.password.valid}
                         element="input"
                         id="password"
                         type="password"
                         label="Password"
-                        validators={passwordValidators}
                         errorText="Please enter a password with at least 10 characters"
                     />
                     <div className="buttons">
                         <Button
                             color="secondary"
-                            disabled={!state.isValid}
+                            disabled={!state.valid}
                             type="submit"
                         >
                             {verb}
