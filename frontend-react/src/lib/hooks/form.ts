@@ -108,7 +108,7 @@ const formReducer = <T extends string>(
     return { fields, valid: isFormValid(fields) };
 };
 
-type InputHandler = (val: any, isValid: boolean) => void;
+type InputHandler = (value: any) => void;
 type InputHandlers<T extends string> = { [key in T]: InputHandler };
 type PrefillData<T extends string> = (payload: Partial<Record<T, any>>) => void;
 type UpdateFieldConfig<T extends string> = (
