@@ -105,14 +105,9 @@ Top-level components that represent whole pages
 
 Reusable UI components and layout building blocks. This convention is shared across all frameworks.
 
-#### 📁📁 Store / Stores
+#### 📁📁 Store
 
 Holds application state management logic.
-
--   **React** → with Redux Toolkit, a single `/store` is common since multiple slices are combined into one store.
--   **Vue** → with Pinia, `/stores` (plural) is common since you work with multiple independent stores.
--   **Svelte** → `/store` is used for reactive Svelte stores.
--   **Angular** → `/store` when using NgRx
 
 #### 📁📁 Lib
 

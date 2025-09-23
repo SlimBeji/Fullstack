@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from "vue-router";
 
-import { useAuthStore } from "@/stores";
+import { useAuthStore } from "@/store";
 
 // Init
 const router = useRouter();

@@ -20,7 +20,7 @@ import { useRoute } from "vue-router";
 import { PlacesList } from "@/components/places";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { useHttp } from "@/lib";
-import { useAuthStore } from "@/stores";
+import { useAuthStore } from "@/store";
 import { Place } from "@/types";
 
 // Init

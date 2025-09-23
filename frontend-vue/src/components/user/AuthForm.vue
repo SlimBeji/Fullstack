@@ -82,7 +82,7 @@ import {
     useForm,
     useHttp,
 } from "@/lib";
-import { useAuthStore } from "@/stores";
+import { useAuthStore } from "@/store";
 import { SigninResponse } from "@/types";
 
 // Init

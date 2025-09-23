@@ -23,7 +23,7 @@ import { AxiosResponse } from "axios";
 import { computed } from "vue";
 
 import { Button } from "@/components/form";
-import { useAuthStore } from "@/stores";
+import { useAuthStore } from "@/store";
 
 import ErrorModal from "./ErrorModal.vue";
 import Modal from "./Modal.vue";

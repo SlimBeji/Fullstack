@@ -31,7 +31,7 @@ import { ref } from "vue";
 import { RouterLink } from "vue-router";
 
 import { Backdrop } from "@/components/ui";
-import { useAuthStore } from "@/stores";
+import { useAuthStore } from "@/store";
 
 import NavLinks from "./NavLinks.vue";
 import SideDrawer from "./SideDrawer.vue";

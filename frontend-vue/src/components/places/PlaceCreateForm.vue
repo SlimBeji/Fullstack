@@ -77,7 +77,7 @@ import {
     useHttp,
 } from "@/lib";
 import router from "@/router";
-import { useAuthStore } from "@/stores";
+import { useAuthStore } from "@/store";
 
 // Init
 const authStore = useAuthStore();

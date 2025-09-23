@@ -21,7 +21,7 @@ The app uses **Pinia** as the official state management library for Vue 3, conne
 - **`/router/`** – Centralized application routing configuration (Vue Router).
 - **`/pages/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
-- **`/stores/`** – Pinia stores containing application state and related logic.
+- **`/store/`** – Pinia stores containing application state and related logic.
 - **`/lib/`** – Contains reusable Vue logic including composables and general-purpose TypeScript utilities.
 - **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
 - **`/assets/`** – Static assets such as image placeholders or icons.
