@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap");
+
+@import "tailwindcss";
+
+/* UI Colors */
+@theme {
+    --color-surface: var(--color-white);
+    --color-surface-alt: var(--color-stone-50);
+    --color-surface-on: var(--color-stone-100);
+
+    --color-panel: var(--color-stone-700);
+    --color-panel-alt: var(--color-stone-600);
+    --color-panel-on: var(--color-stone-500);
+
+    --color-pen: var(--color-stone-700);
+    --color-pen-muted: var(--color-stone-500);
+    --color-pen-ruler: var(--color-stone-300);
+    --color-pen-inverse: var(--color-stone-50);
+
+    --color-primary: var(--color-sky-400);
+    --color-primary-on: var(--color-sky-600);
+    --color-primary-surface: var(--color-sky-50);
+
+    --color-secondary: var(--color-pink-500);
+    --color-secondary-on: var(--color-pink-600);
+    --color-secondary-surface: var(--color-pink-50);
+
+    --color-success: var(--color-teal-500);
+    --color-success-on: var(--color-teal-600);
+    --color-success-surface: var(--color-teal-50);
+
+    --color-warning: var(--color-orange-500);
+    --color-warning-on: var(--color-orange-600);
+    --color-warning-surface: var(--color-orange-50);
+
+    --color-danger: var(--color-red-500);
+    --color-danger-on: var(--color-red-600);
+    --color-danger-surface: var(--color-red-50);
+
+    --color-disabled-surface: var(--color-gray-300);
+    --color-disabled-pen: var(--color-gray-500);
+    --color-disabled-ruler: var(--color-gray-300);
+
+    --color-backdrop: var(--color-stone-300);
+}
+
+/* Variants */
+@custom-variant error (&:where(.error *));
+
+/* Global Styles */
+@layer base {
+    * {
+        @apply box-border;
+    }
+
+    html {
+        @apply font-sans;
+    }
+
+    body {
+        @apply m-0 bg-surface;
+    }
+
+    main {
+        @apply mt-20;
+    }
+}
+
+@layer components {
+    .card {
+        @apply relative m-0 shadow-lg rounded-lg;
+        @apply bg-white overflow-hidden;
+        @apply hover:translate-x-1 hover:shadow-xl transition-all duration-300;
+    }
+
+    .primary {
+        @apply bg-primary text-pen-inverse border border-primary;
+        @apply hover:bg-primary-on;
+    }
+
+    .primary.inverse {
+        @apply bg-transparent text-primary border-primary;
+        @apply hover:bg-primary-on hover:text-pen-inverse border;
+    }
+
+    .secondary {
+        @apply bg-secondary text-pen-inverse border border-secondary;
+        @apply hover:bg-secondary-on;
+    }
+
+    .secondary.inverse {
+        @apply bg-transparent text-secondary border-secondary;
+        @apply hover:bg-secondary-on hover:text-pen-inverse border;
+    }
+
+    .success {
+        @apply bg-success text-pen-inverse border border-success;
+        @apply hover:bg-success-on;
+    }
+
+    .success.inverse {
+        @apply bg-transparent text-success border-success;
+        @apply hover:bg-success-on hover:text-pen-inverse border;
+    }
+
+    .warning {
+        @apply bg-warning text-pen-inverse border border-warning;
+        @apply hover:bg-warning-on;
+    }
+
+    .warning.inverse {
+        @apply bg-transparent text-warning border-warning;
+        @apply hover:bg-warning-on hover:text-pen-inverse border;
+    }
+
+    .danger {
+        @apply bg-danger text-pen-inverse border-danger;
+        @apply hover:bg-danger-on;
+    }
+
+    .danger.inverse {
+        @apply bg-transparent text-danger border-danger;
+        @apply hover:bg-danger-on hover:text-pen-inverse border;
+    }
+
+    .disabled {
+        @apply bg-disabled-surface text-disabled-pen border-disabled-ruler cursor-not-allowed;
+    }
+}
