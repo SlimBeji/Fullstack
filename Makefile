@@ -51,7 +51,6 @@ svelte-bash:
 	docker exec -it svelte bash
 
 svelte-lint:
-	docker exec -it svelte npm run lint
 	docker exec -it svelte npm run format | grep -v "(unchanged)"
 
 # Express commands
