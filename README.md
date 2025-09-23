@@ -97,14 +97,9 @@ Entry files that initialize the application (`main`) and define the root compone
 -   **Svelte** → `main.ts` + `App.svelte`
 -   **Angular** → `main.ts` + `app.component.ts` (via `AppModule`)
 
-#### 📁📁 Pages / Views
+#### 📁📁 Pages
 
-Top-level components that represent whole pages. Terminology varies:
-
--   **React** → `/pages`
--   **Vue** → `/views`
--   **Svelte** → `/pages`
--   **Angular** → `/pages` or feature modules
+Top-level components that represent whole pages
 
 #### 📁📁 Components
 
