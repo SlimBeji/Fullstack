@@ -4,7 +4,7 @@ This frontend app is built with **Vite** and uses **TypeScript** for static type
 
 ## 🔐 Environment Variables
 
-The React client relies on a `.env` file for configuration.
+The React client relies on a `react.env` file for configuration.
 
 ```
 VITE_BACKEND_URL=http://localhost:5000/api

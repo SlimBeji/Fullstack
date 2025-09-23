@@ -4,7 +4,7 @@ This frontend app is built with **Vite** and uses **TypeScript** for static type
 
 ## 🔐 Environment Variables
 
-The Vue client relies on a `.env` file for configuration.
+The Vue client relies on a `vue.env` file for configuration.
 
 ```
 VITE_BACKEND_URL=http://localhost:5001/api
@@ -62,7 +62,7 @@ Prettier is used for formatting with the following config:
 
 ## 🛠️ Makefile Commands (Vue)
 
-The following `make` commands help manage the React frontend:
+The following `make` commands help manage the Vue frontend:
 
 | Command          | Description                                                               |
 | ---------------- | ------------------------------------------------------------------------- |
