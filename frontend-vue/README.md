@@ -35,20 +35,35 @@ This project was created with npm create vue@latest, with ESLint (error checking
 ### 🔑 ESLint Customization
 
 - Added eslint-plugin-simple-import-sort to keep imports consistently ordered.
+- Added eslint-plugin-import and eslint-import-resolver-typescript to catch unresolved imports.
 - Disabled vue/multi-word-component-names to allow single-word component names.
 - Enable usage of `any` keyword.
 
 ```js
 {
-    plugins: {
-        "simple-import-sort": pluginImportSort,
-    },
-    rules: {
-        "vue/multi-word-component-names": "off",
-        "simple-import-sort/imports": "warn",
-        "simple-import-sort/exports": "warn",
-    },
-}
+        plugins: {
+            "simple-import-sort": pluginImportSort,
+            import: pluginImport,
+        },
+        settings: {
+            "import/resolver": {
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: "./tsconfig.app.json",
+                },
+                node: {
+                    extensions: [".js", ".ts", ".vue"],
+                },
+            },
+        },
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+            "vue/multi-word-component-names": "off",
+            "simple-import-sort/imports": "warn",
+            "simple-import-sort/exports": "warn",
+            "import/no-unresolved": ["error", { commonjs: true, amd: true }],
+        },
+    }
 ```
 
 ### 🎨 Prettier
