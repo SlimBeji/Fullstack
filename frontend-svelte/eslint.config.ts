@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import prettier from "eslint-config-prettier";
+import pluginImport from "eslint-plugin-import";
 import pluginImportSort from "eslint-plugin-simple-import-sort";
 import pluginSvelte from "eslint-plugin-svelte";
 import svelteParser from "svelte-eslint-parser";
@@ -34,6 +35,18 @@ export default [
         plugins: {
             "@typescript-eslint": tsPlugin,
             "simple-import-sort": pluginImportSort,
+            import: pluginImport,
+        },
+        settings: {
+            "import/resolver": {
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: "./tsconfig.app.json",
+                },
+                node: {
+                    extensions: [".js", ".ts", ".svelte"],
+                },
+            },
         },
         rules: {
             ...tsPlugin.configs.recommended.rules,
@@ -41,6 +54,10 @@ export default [
             "@typescript-eslint/no-explicit-any": "off",
             "simple-import-sort/imports": "warn",
             "simple-import-sort/exports": "warn",
+            "import/no-unresolved": [
+                "error",
+                { ignore: ["^/"], commonjs: true, amd: true },
+            ],
         },
     },
     {
