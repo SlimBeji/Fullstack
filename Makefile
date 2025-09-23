@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach fastapi --attach vue 
+	docker-compose up --attach fastapi --attach svelte 
 
 build:
 	docker-compose build
@@ -41,6 +41,18 @@ vue-bash:
 vue-lint:
 	docker exec -it vue npm run lint
 	docker exec -it vue npm run format | grep -v "(unchanged)"
+
+# Svelte commands
+svelte-build:
+	docker-compose build svelte
+	cd frontend-svelte; npm install
+
+svelte-bash:
+	docker exec -it svelte bash
+
+svelte-lint:
+	docker exec -it svelte npm run lint
+	docker exec -it svelte npm run format | grep -v "(unchanged)"
 
 # Express commands
 express-build:

@@ -29,6 +29,21 @@ services:
         command: npm run dev
         restart: on-failure
 
+    svelte:
+        build:
+            context: .
+            dockerfile: ./frontend-svelte/svelte.Dockerfile
+        container_name: svelte
+        ports:
+            - 8002:5173
+        volumes:
+            - ./frontend-svelte:/app
+            - /app/node_modules
+        env_file:
+            - ./frontend-svelte/svelte.env
+        command: npm run dev
+        restart: on-failure
+
     express:
         build:
             context: .
