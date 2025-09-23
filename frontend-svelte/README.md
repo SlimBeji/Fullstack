@@ -1,0 +1,38 @@
+# 🟢 Svelte + TypeScript + Vite
+
+This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
+
+## 🔐 Environment Variables
+
+The Svelte client relies on a `svelte.env` file for configuration.
+
+```
+VITE_BACKEND_URL=http://localhost:5001/api
+```
+
+## 🧠 State Management
+
+The app uses **Svelte stores** for state management, providing a simple and reactive way to share data between components.  
+Stores such as `writable`, `readable`, and `derived` make it easy to centralize and organize state without the need for an external library.
+
+## 🗂️ Project Structure (`/src`)
+
+-   **`main.ts`** – Application entry point; initializes the Svelte app and mounts the root component.
+-   **`App.svelte`** – Root Svelte component defining the global layout and routing.
+-   **`/routes/`** – Application routing configuration using `svelte-spa-router`.
+-   **`/views/`** – Top-level route components rendered by `App`.
+-   **`/components/`** – Reusable UI components and layout building blocks.
+-   **`/stores/`** – Svelte stores containing application state and related logic.
+-   **`/lib/`** – Shared utilities and helper functions for the app (can include custom runes or general-purpose TypeScript logic).
+-   **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
+-   **`/assets/`** – Static assets such as images, icons, or fonts.
+
+## 🛠️ Makefile Commands (Svelte)
+
+The following `make` commands help manage the React frontend:
+
+| Command             | Description                                                                |
+| ------------------- | -------------------------------------------------------------------------- |
+| `make svelte-build` | Build the Docker container and install dependencies in `frontend-svelte/`. |
+| `make svelte-bash`  | Open an interactive shell inside the running Svelte container.             |
+| `make svelte-lint`  | Run TypeScript type checks, ESLint fixes, and format files with Prettier.  |
