@@ -37,6 +37,13 @@ export default defineConfigWithVueTs(
             },
         },
         rules: {
+            "@typescript-eslint/consistent-type-imports": [
+                "warn",
+                {
+                    prefer: "type-imports",
+                    disallowTypeAnnotations: false,
+                },
+            ],
             "@typescript-eslint/no-explicit-any": "off",
             "vue/multi-word-component-names": "off",
             "simple-import-sort/imports": "warn",
