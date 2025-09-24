@@ -1,6 +1,6 @@
 <script lang="ts">
     import viteLogo from "/vite.svg";
-    import Counter from "./lib/Counter.svelte";
+    import Counter from "./components/Counter.svelte";
 </script>
 
 <main>
