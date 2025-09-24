@@ -28,6 +28,13 @@ export default tseslint.config(
                 "warn",
                 { allowConstantExport: true },
             ],
+            "@typescript-eslint/consistent-type-imports": [
+                "warn",
+                {
+                    prefer: "type-imports",
+                    disallowTypeAnnotations: false,
+                },
+            ],
             "no-unused-vars": "off",
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": [
