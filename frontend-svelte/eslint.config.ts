@@ -5,6 +5,7 @@ import prettier from "eslint-config-prettier";
 import pluginImport from "eslint-plugin-import";
 import pluginImportSort from "eslint-plugin-simple-import-sort";
 import pluginSvelte from "eslint-plugin-svelte";
+import globals from "globals";
 import svelteParser from "svelte-eslint-parser";
 
 export default [
@@ -21,11 +22,7 @@ export default [
     {
         files: ["**/*.{js,ts,svelte}"],
         languageOptions: {
-            globals: {
-                document: "readonly",
-                window: "readonly",
-                navigator: "readonly",
-            },
+            globals: globals.browser,
             parser: tsParser,
             parserOptions: {
                 project: ["./tsconfig.app.json", "./tsconfig.node.json"],
