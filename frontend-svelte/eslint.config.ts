@@ -51,6 +51,7 @@ export default [
             "@typescript-eslint/no-explicit-any": "off",
             "simple-import-sort/imports": "warn",
             "simple-import-sort/exports": "warn",
+            "no-useless-escape": "off",
             "import/no-unresolved": [
                 "error",
                 { ignore: ["^/"], commonjs: true, amd: true },
