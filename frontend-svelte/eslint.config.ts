@@ -48,6 +48,13 @@ export default [
         rules: {
             ...tsPlugin.configs.recommended.rules,
             ...prettier.rules,
+            "@typescript-eslint/consistent-type-imports": [
+                "warn",
+                {
+                    prefer: "type-imports",
+                    disallowTypeAnnotations: false,
+                },
+            ],
             "@typescript-eslint/no-explicit-any": "off",
             "simple-import-sort/imports": "warn",
             "simple-import-sort/exports": "warn",
