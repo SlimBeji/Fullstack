@@ -13,7 +13,7 @@
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
-import { ButtonType, CssClass } from "@/types";
+import type { ButtonType, CssClass } from "@/types";
 
 // Props
 const props = defineProps<{

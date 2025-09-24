@@ -63,7 +63,7 @@ import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useHttp } from "@/lib";
 import { useAuthStore } from "@/store";
-import { Place } from "@/types";
+import type { Place } from "@/types";
 
 // Init
 const authStore = useAuthStore();

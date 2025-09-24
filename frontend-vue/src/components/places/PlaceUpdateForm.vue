@@ -61,19 +61,14 @@
 </template>
 
 <script setup lang="ts">
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 import { onMounted } from "vue";
 
 import { Button, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import {
-    FormConfig,
-    minLengthValidator,
-    numericValidator,
-    useForm,
-    useHttp,
-} from "@/lib";
-import { Place } from "@/types";
+import type { FormConfig } from "@/lib";
+import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
+import type { Place } from "@/types";
 
 // Init
 const { httpData, sendRequest, clear } = useHttp();

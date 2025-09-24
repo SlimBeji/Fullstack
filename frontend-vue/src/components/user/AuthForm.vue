@@ -75,15 +75,10 @@ import { computed, ref } from "vue";
 
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import {
-    emailValidator,
-    FormConfig,
-    minLengthValidator,
-    useForm,
-    useHttp,
-} from "@/lib";
+import type { FormConfig } from "@/lib";
+import { emailValidator, minLengthValidator, useForm, useHttp } from "@/lib";
 import { useAuthStore } from "@/store";
-import { SigninResponse } from "@/types";
+import type { SigninResponse } from "@/types";
 
 // Init
 const authStore = useAuthStore();

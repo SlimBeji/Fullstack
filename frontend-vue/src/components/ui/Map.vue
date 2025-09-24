@@ -21,10 +21,10 @@
 
 <script setup lang="ts">
 import { LMap, LMarker, LPopup, LTileLayer } from "@vue-leaflet/vue-leaflet";
-import { Map as LeafletMap } from "leaflet";
+import type { Map as LeafletMap } from "leaflet";
 import { ref } from "vue";
 
-import { Location } from "@/types";
+import type { Location } from "@/types";
 
 // Props
 const props = defineProps<{

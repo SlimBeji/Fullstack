@@ -15,7 +15,7 @@ import { computed } from "vue";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
 import { useHttp } from "@/lib";
-import { User } from "@/types";
+import type { User } from "@/types";
 
 // Init
 const { httpData, sendRequest, clear } = useHttp();

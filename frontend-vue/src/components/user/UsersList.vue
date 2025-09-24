@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { User } from "@/types";
+import type { User } from "@/types";
 
 import { UserItem } from "./";
 

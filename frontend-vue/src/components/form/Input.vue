@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import { CssClass } from "@/types";
+import type { CssClass } from "@/types";
 
 // Props
 const value = defineModel<string>({ required: true });

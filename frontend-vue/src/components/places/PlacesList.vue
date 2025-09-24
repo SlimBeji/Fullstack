@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { Button } from "@/components/form";
-import { Place } from "@/types";
+import type { Place } from "@/types";
 
 import PlaceItem from "./PlaceItem.vue";
 

@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
 import router from "@/router";
-import { EncodedUserToken, LocalStorageKeys, SigninResponse } from "@/types";
+import type { EncodedUserToken, SigninResponse } from "@/types";
+import { LocalStorageKeys } from "@/types";
 
 export const useAuthStore = defineStore("auth", () => {
     const data = ref<EncodedUserToken | undefined>(undefined);

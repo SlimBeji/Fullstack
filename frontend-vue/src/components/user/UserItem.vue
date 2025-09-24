@@ -20,7 +20,7 @@ import { RouterLink } from "vue-router";
 
 import placeholder from "@/assets/avatar_placeholder.jpg";
 import { Avatar } from "@/components/ui";
-import { User } from "@/types";
+import type { User } from "@/types";
 
 // Props
 const props = defineProps<{

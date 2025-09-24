@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 import { computed } from "vue";
 
 import { Button } from "@/components/form";
