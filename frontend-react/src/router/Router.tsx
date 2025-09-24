@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
-import { getAuthData } from "../lib";
-import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "../pages";
-import { authSlice, useAppDispatch, useAppSelector } from "../store";
+import { getAuthData } from "@/lib";
+import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/pages";
+import { authSlice, useAppDispatch, useAppSelector } from "@/store";
 
 const route = (
     path: string,

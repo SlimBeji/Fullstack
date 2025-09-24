@@ -1,7 +1,7 @@
-import { ElementType, ReactNode } from "react";
+import type { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import { ButtonType } from "../../types";
+import type { ButtonType } from "@/types";
 
 interface ButtonProps {
     children: ReactNode;

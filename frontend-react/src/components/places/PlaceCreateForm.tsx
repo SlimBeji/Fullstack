@@ -1,13 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-import {
-    FormConfig,
-    minLengthValidator,
-    numericValidator,
-    useForm,
-    useHttp,
-} from "../../lib";
-import { useAppSelector } from "../../store";
+import type { FormConfig } from "@/lib";
+import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
+import { useAppSelector } from "@/store";
+
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
 

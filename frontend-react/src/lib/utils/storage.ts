@@ -1,4 +1,5 @@
-import { EncodedUserToken, LocalStorageKeys } from "../../types";
+import type { EncodedUserToken } from "@/types";
+import { LocalStorageKeys } from "@/types";
 
 export const getAuthData = (): EncodedUserToken | null => {
     const raw = localStorage.getItem(LocalStorageKeys.userData);

@@ -1,8 +1,10 @@
 import { Transition } from "@headlessui/react";
-import { Fragment, ReactNode, useRef } from "react";
+import type { ReactNode } from "react";
+import { Fragment, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { FormSubmitHandler } from "../../types";
+import type { FormSubmitHandler } from "@/types";
+
 import Backdrop from "./Backdrop";
 
 interface ModalOverlayProps {

@@ -1,5 +1,6 @@
 import { Transition } from "@headlessui/react";
-import { ReactNode, useRef } from "react";
+import type { ReactNode } from "react";
+import { useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface SideDrawerProps {

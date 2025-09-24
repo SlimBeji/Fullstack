@@ -1,4 +1,5 @@
-import { ChangeEvent, ElementType, useState } from "react";
+import type { ChangeEvent, ElementType } from "react";
+import { useState } from "react";
 
 interface InputProps {
     onInput: (value: string) => void;

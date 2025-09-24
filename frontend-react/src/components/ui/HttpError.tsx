@@ -1,6 +1,7 @@
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 
-import { authSlice, useAppDispatch } from "../../store";
+import { authSlice, useAppDispatch } from "@/store";
+
 import { Button } from "../form";
 import ErrorModal from "./ErrorModal";
 import Modal from "./Modal";

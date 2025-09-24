@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
-import placeholder from "../../assets/avatar_placeholder.jpg";
-import { Avatar } from "../../components/ui";
-import { User } from "../../types";
+import placeholder from "@/assets/avatar_placeholder.jpg";
+import { Avatar } from "@/components/ui";
+import type { User } from "@/types";
 
 interface UserItemProps {
     user: User;

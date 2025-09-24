@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 
-import { MainNavigation } from "./components/navigation";
-import { Router } from "./router";
+import { MainNavigation } from "@/components/navigation";
+import { Router } from "@/router";
 
 function App() {
     return (

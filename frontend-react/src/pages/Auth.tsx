@@ -1,4 +1,4 @@
-import { AuthForm } from "../components/user";
+import { AuthForm } from "@/components/user";
 
 const Auth: React.FC = () => {
     return <AuthForm />;

@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import type { FormEvent } from "react";
 
 export type ButtonType = "button" | "submit" | "reset" | undefined;
 

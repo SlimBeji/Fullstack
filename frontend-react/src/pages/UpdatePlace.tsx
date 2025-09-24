@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { PlaceUpdateForm } from "../components/places";
+import { PlaceUpdateForm } from "@/components/places";
 
 const UpdatePlace: React.FC = () => {
     const placeId = useParams().placeId!;

@@ -1,4 +1,5 @@
-import { Place } from "../../types";
+import type { Place } from "@/types";
+
 import { Button } from "../form";
 import PlaceItem from "./PlaceItem";
 

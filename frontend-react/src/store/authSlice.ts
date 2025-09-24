@@ -1,6 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import { EncodedUserToken, LocalStorageKeys, SigninResponse } from "../types";
+import type { EncodedUserToken, SigninResponse } from "@/types";
+import { LocalStorageKeys } from "@/types";
 
 interface AuthState {
     data?: EncodedUserToken;

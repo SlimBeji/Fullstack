@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 
-import { fileToUrl } from "../../lib";
+import { fileToUrl } from "@/lib";
+
 import Button from "./Button";
 
 interface ImageUploadValue {

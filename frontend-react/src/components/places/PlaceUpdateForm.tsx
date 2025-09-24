@@ -1,14 +1,10 @@
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 import { useEffect } from "react";
 
-import {
-    FormConfig,
-    minLengthValidator,
-    numericValidator,
-    useForm,
-    useHttp,
-} from "../../lib";
-import { Place } from "../../types";
+import type { FormConfig } from "@/lib";
+import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
+import type { Place } from "@/types";
+
 import { Button, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
 

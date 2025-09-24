@@ -1,4 +1,4 @@
-import { PlaceCreateForm } from "../components/places";
+import { PlaceCreateForm } from "@/components/places";
 
 const NewPlace: React.FC = () => {
     return <PlaceCreateForm />;

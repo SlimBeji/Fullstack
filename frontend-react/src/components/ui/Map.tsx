@@ -1,10 +1,10 @@
 import "leaflet/dist/leaflet.css";
 
-import { Map as MapObject } from "leaflet";
+import type { Map as MapObject } from "leaflet";
 import { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
-import { Location } from "../../types";
+import type { Location } from "@/types";
 
 interface MapProps {
     position: Location;
