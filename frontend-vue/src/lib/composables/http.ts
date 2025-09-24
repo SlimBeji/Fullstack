@@ -26,7 +26,7 @@ interface useHttpOptions {
 export const useHttp = (options: useHttpOptions = {}) => {
     const emptyState: State = { loading: false };
 
-    const abortControllerRef = ref<AbortController | null>(null);
+    let abortControllerRef: AbortController | null = null;
     const httpData = ref<State>(emptyState);
 
     const clear = () => {
@@ -61,8 +61,8 @@ export const useHttp = (options: useHttpOptions = {}) => {
         tokenRequired: boolean = true
     ): Promise<AxiosResponse> => {
         // Create abort controller
-        abortControllerRef.value?.abort();
-        abortControllerRef.value = new AbortController();
+        abortControllerRef?.abort();
+        abortControllerRef = new AbortController();
 
         // Prepare the web client
         let contentType: HeaderContent = "application/json";
@@ -74,7 +74,7 @@ export const useHttp = (options: useHttpOptions = {}) => {
         // Check the Token
         const token = webClient.defaults.headers.Authorization;
         if (!token && tokenRequired) {
-            abortControllerRef.value = null;
+            abortControllerRef = null;
             httpData.value = {
                 loading: false,
                 error: {
@@ -90,7 +90,7 @@ export const useHttp = (options: useHttpOptions = {}) => {
         try {
             httpData.value = { loading: true };
             const resp = await webClient[method](url, data, {
-                signal: abortControllerRef.value.signal,
+                signal: abortControllerRef.signal,
             });
             handleSuccess(resp);
             return resp;
@@ -110,7 +110,7 @@ export const useHttp = (options: useHttpOptions = {}) => {
 
             throw err;
         } finally {
-            abortControllerRef.value = null;
+            abortControllerRef = null;
         }
     };
 
