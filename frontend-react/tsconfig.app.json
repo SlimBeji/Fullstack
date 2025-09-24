@@ -12,6 +12,9 @@
         "allowImportingTsExtensions": true,
         "verbatimModuleSyntax": true,
         "isolatedModules": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        },
         "moduleDetection": "force",
         "noEmit": true,
         "jsx": "react-jsx",
