@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { authStore } from "./store";
-    import type { SigninResponse } from "./types";
+    import { authStore } from "@/store";
+    import type { SigninResponse } from "@/types";
 
     const userId = authStore.userId;
     const login = () => {

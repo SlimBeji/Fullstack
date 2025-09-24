@@ -1,8 +1,8 @@
 import { derived, writable } from "svelte/store";
 import { push } from "svelte-spa-router";
 
-import type { EncodedUserToken, SigninResponse } from "../types";
-import { LocalStorageKeys } from "../types";
+import type { EncodedUserToken, SigninResponse } from "@/types";
+import { LocalStorageKeys } from "@/types";
 
 const data = writable<EncodedUserToken | undefined>(undefined);
 const isLoggedIn = derived(data, ($data) => !!$data?.userId);
