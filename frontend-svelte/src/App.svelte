@@ -1,38 +1,27 @@
 <script lang="ts">
-    import viteLogo from "/vite.svg";
+    import { authStore } from "./store";
+    import type { SigninResponse } from "./types";
+
+    const userId = authStore.userId;
+    const login = () => {
+        const resp: SigninResponse = {
+            access_token: "token",
+            token_type: "bearer",
+            userId: "u123",
+            email: "mslimbeji@gmail.com",
+            expires_in: 123333,
+        };
+        authStore.login(resp);
+    };
+    const logout = () => {
+        authStore.logout();
+    };
 </script>
 
 <main>
-    <div>
-        <a href="https://vite.dev" target="_blank" rel="noreferrer">
-            <img src={viteLogo} class="logo" alt="Vite Logo" />
-        </a>
-    </div>
-    <h1>Vite + Svelte</h1>
     <p>
-        Check out <a
-            href="https://github.com/sveltejs/kit#readme"
-            target="_blank"
-            rel="noreferrer">SvelteKit</a
-        >, the official Svelte app framework powered by Vite!
+        Welcome User {$userId}
     </p>
-
-    <p class="read-the-docs">
-        Click on the Vite and Svelte logos to learn more
-    </p>
+    <button onclick={login}>Login</button>
+    <button onclick={logout}>Logout</button>
 </main>
-
-<style>
-    .logo {
-        height: 6em;
-        padding: 1.5em;
-        will-change: filter;
-        transition: filter 300ms;
-    }
-    .logo:hover {
-        filter: drop-shadow(0 0 2em #646cffaa);
-    }
-    .read-the-docs {
-        color: #888;
-    }
-</style>
