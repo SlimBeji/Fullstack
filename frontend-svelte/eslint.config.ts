@@ -41,6 +41,7 @@ export default [
                     project: "./tsconfig.app.json",
                 },
                 node: {
+                    paths: ["src"],
                     extensions: [".js", ".ts", ".svelte"],
                 },
             },

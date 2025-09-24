@@ -5,6 +5,9 @@
         "target": "ES2022",
         "useDefineForClassFields": true,
         "verbatimModuleSyntax": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        },
         "module": "ESNext",
         "types": ["svelte", "vite/client"],
         "noEmit": true,
