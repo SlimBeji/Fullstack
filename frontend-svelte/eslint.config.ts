@@ -22,7 +22,12 @@ export default [
     {
         files: ["**/*.{js,ts,svelte}"],
         languageOptions: {
-            globals: globals.browser,
+            globals: {
+                ...globals.browser,
+                $state: "readonly",
+                $derived: "readonly",
+                $effect: "readonly",
+            },
             parser: tsParser,
             parserOptions: {
                 project: ["./tsconfig.app.json", "./tsconfig.node.json"],
