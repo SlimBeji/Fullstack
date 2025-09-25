@@ -7,5 +7,5 @@
     "svelteSortOrder": "scripts-markup-styles-options",
     "svelteStrictMode": true,
     "svelteAllowShorthand": true,
-    "svelteIndentScriptAndStyle": true
+    "svelteIndentScriptAndStyle": false
 }

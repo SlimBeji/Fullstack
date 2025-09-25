@@ -1,39 +1,39 @@
 <script lang="ts">
-    import { useForm, useHttp } from "@/lib";
-    import { minLengthValidator } from "@/lib";
-    import { authStore } from "@/store";
-    import type { SigninResponse } from "@/types";
+import { useForm, useHttp } from "@/lib";
+import { minLengthValidator } from "@/lib";
+import { authStore } from "@/store";
+import type { SigninResponse } from "@/types";
 
-    // Testing useHttp
-    const { httpData, sendRequest, clear } = useHttp();
+// Testing useHttp
+const { httpData, sendRequest, clear } = useHttp();
 
-    async function load() {
-        await sendRequest("/api/hello-world", "get", undefined, false);
-    }
-    const userId = authStore.userId;
-    const login = () => {
-        const resp: SigninResponse = {
-            access_token: "token",
-            token_type: "bearer",
-            userId: "u123",
-            email: "mslimbeji@gmail.com",
-            expires_in: 123333,
-        };
-        authStore.login(resp);
+async function load() {
+    await sendRequest("/api/hello-world", "get", undefined, false);
+}
+const userId = authStore.userId;
+const login = () => {
+    const resp: SigninResponse = {
+        access_token: "token",
+        token_type: "bearer",
+        userId: "u123",
+        email: "mslimbeji@gmail.com",
+        expires_in: 123333,
     };
-    const logout = () => {
-        authStore.logout();
-    };
+    authStore.login(resp);
+};
+const logout = () => {
+    authStore.logout();
+};
 
-    // Testing useForm
-    const FormConfig = {
-        firstname: { validators: [minLengthValidator(5)] },
-        lastname: { validators: [minLengthValidator(5)] },
-    };
+// Testing useForm
+const FormConfig = {
+    firstname: { validators: [minLengthValidator(5)] },
+    lastname: { validators: [minLengthValidator(5)] },
+};
 
-    type FormTypes = keyof typeof FormConfig;
-    const { fields, formValid } = useForm<FormTypes>(FormConfig);
-    const { firstname, lastname } = fields;
+type FormTypes = keyof typeof FormConfig;
+const { fields, formValid } = useForm<FormTypes>(FormConfig);
+const { firstname, lastname } = fields;
 </script>
 
 <h1>Authentication Page</h1>
@@ -68,9 +68,9 @@
 <p>Validity: <span>{$formValid}</span></p>
 
 <style lang="css">
-    @reference "@/main.css";
+@reference "@/main.css";
 
-    button {
-        @apply bg-red-500 border border-black;
-    }
+button {
+    @apply bg-red-500 border border-black;
+}
 </style>
