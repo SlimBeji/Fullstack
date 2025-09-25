@@ -1,7 +1,7 @@
-<script>
-    import { Auth } from "@/pages";
+<script lang="ts">
+import { AppRouter } from "@/router";
 </script>
 
 <main>
-    <Auth />
+    <AppRouter />
 </main>
