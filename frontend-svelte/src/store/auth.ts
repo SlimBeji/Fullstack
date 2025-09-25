@@ -1,5 +1,5 @@
 import { derived, writable } from "svelte/store";
-import { push } from "svelte-spa-router";
+import { router } from "tinro";
 
 import type { EncodedUserToken, SigninResponse } from "@/types";
 import { LocalStorageKeys } from "@/types";
@@ -18,13 +18,13 @@ function login(payload: SigninResponse) {
     const token: EncodedUserToken = { ...rest, expiresAt };
     data.set({ ...rest, expiresAt });
     localStorage.setItem(LocalStorageKeys.userData, JSON.stringify(token));
-    push("/");
+    router.goto("/");
 }
 
 function logout() {
     data.set(undefined);
     localStorage.removeItem(LocalStorageKeys.userData);
-    push("/logout");
+    router.goto("/logout");
 }
 
 export const authStore = {

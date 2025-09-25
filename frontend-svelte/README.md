@@ -19,7 +19,7 @@ Stores such as `writable`, `readable`, and `derived` make it easy to centralize 
 
 - **`main.ts`** – Application entry point; initializes the Svelte app and mounts the root component.
 - **`App.svelte`** – Root Svelte component defining the global layout and routing.
-- **`/routes/`** – Application routing configuration using `svelte-spa-router`.
+- **`/routes/`** – Application routing configuration using `tinro`.
 - **`/views/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
 - **`/stores/`** – Svelte stores containing application state and related logic.
