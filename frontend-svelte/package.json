@@ -34,8 +34,8 @@
         "vite": "^7.1.7"
     },
     "dependencies": {
+        "@mateothegreat/svelte5-router": "^2.16.19",
         "axios": "^1.12.2",
-        "clsx": "^2.1.1",
-        "tinro": "^0.6.12"
+        "clsx": "^2.1.1"
     }
 }
