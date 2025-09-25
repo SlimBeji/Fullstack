@@ -1,1 +1,1 @@
-export * from "./http.svelte";
+export * from "./http";
