@@ -1,13 +1,16 @@
 <script lang="ts">
 import { onMount, onDestroy } from "svelte";
 
+// Setup
 let backdropElement: HTMLElement | undefined;
 const targetElement = document.getElementById("backdrop-hook"); 
 
+// Props
 const {onClick} = $props<{
     onClick: () => void
 }>()
 
+// Lifecycle events
 onMount(() => {
     if (targetElement && backdropElement) {
         targetElement.appendChild(backdropElement);
