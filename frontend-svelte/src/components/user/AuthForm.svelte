@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button } from "@/components/form";
+import { Button, Input } from "@/components/form";
 import { ErrorModal, LoadingSpinner } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
@@ -78,10 +78,20 @@ const closeModal = () => {
 
 <form>
     <div>
-        <label>Firstname <input bind:value={$firstname.value} /></label>
+        <Input
+            id="firstname"
+            label="Firstname"
+            bind:value={$firstname.value}
+            bind:valid={$firstname.valid}
+        />
     </div>
     <div>
-        <label>Lastname <input bind:value={$lastname.value} /></label>
+        <Input
+            id="lastname"
+            label="Lastname"
+            bind:value={$lastname.value}
+            bind:valid={$lastname.valid}
+        />
     </div>
 </form>
 <p>Validity: <span>{$formValid}</span></p>
