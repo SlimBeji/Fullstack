@@ -44,7 +44,7 @@ const submitHanlder = (e: Event) => {
     <Backdrop onClick={onClose} />
     <div
         class="modal-container"
-        style={style}
+        {style}
         transition:fly={{
             y: -80,
             duration: 300,
