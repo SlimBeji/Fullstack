@@ -73,12 +73,10 @@ const clickHandler = () => {
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    .btn {
-        @apply inline-block px-6 py-2 rounded-md text-base font-medium;
-        @apply transition-colors duration-200 focus:outline-none;
-    }
+.btn {
+    @apply inline-block px-6 py-2 rounded-md text-base font-medium;
+    @apply transition-colors duration-200 focus:outline-none;
 }
 </style>

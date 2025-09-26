@@ -127,17 +127,15 @@ const submitHandler = async (e: Event) => {
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    .place-update {
-        @apply flex flex-wrap;
-        @apply relative w-[90%] max-w-160 my-0 mx-auto p-4;
-        @apply list-none shadow-md rounded-md bg-surface;
-    }
+.place-update {
+    @apply flex flex-wrap;
+    @apply relative w-[90%] max-w-160 my-0 mx-auto p-4;
+    @apply list-none shadow-md rounded-md bg-surface;
+}
 
-    .place-update .buttons {
-        @apply w-full mt-10 text-right;
-    }
+.place-update .buttons {
+    @apply w-full mt-10 text-right;
 }
 </style>

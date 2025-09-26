@@ -45,11 +45,9 @@ const mapReadyHandler = (mapInstance: LeafletMap) => {
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    .map-container {
-        @apply w-full h-50;
-    }
+.map-container {
+    @apply w-full h-50;
 }
 </style>

@@ -41,23 +41,21 @@ const emit = defineEmits<{
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    .places-list {
-        @apply w-[90%] max-w-[40rem] my-4 mx-auto p-0 list-none;
-    }
+.places-list {
+    @apply w-[90%] max-w-[40rem] my-4 mx-auto p-0 list-none;
+}
 
-    .no-places {
-        @apply mx-auto w-100 max-w-[90%];
-    }
+.no-places {
+    @apply mx-auto w-100 max-w-[90%];
+}
 
-    .no-places .card {
-        @apply p-5 text-center;
-    }
+.no-places .card {
+    @apply p-5 text-center;
+}
 
-    .no-places .card h2 {
-        @apply my-5;
-    }
+.no-places .card h2 {
+    @apply my-5;
 }
 </style>

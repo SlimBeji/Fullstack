@@ -26,20 +26,18 @@ const noUsers = computed(() => props.items.length === 0);
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    .users-list {
-        @apply flex flex-wrap gap-6;
-        @apply w-[90%] max-w-4xl mx-auto;
-    }
+.users-list {
+    @apply flex flex-wrap gap-6;
+    @apply w-[90%] max-w-4xl mx-auto;
+}
 
-    .no-users {
-        @apply flex justify-center items-center;
-    }
+.no-users {
+    @apply flex justify-center items-center;
+}
 
-    .no-users h2 {
-        @apply text-xl font-semibold text-pen;
-    }
+.no-users h2 {
+    @apply text-xl font-semibold text-pen;
 }
 </style>

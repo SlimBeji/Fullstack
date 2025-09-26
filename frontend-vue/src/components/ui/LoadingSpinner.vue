@@ -12,15 +12,14 @@ const props = defineProps<{
 </script>
 
 <style lang="css">
-@reference "../../main.css";
-@layer components {
-    .spinner-container.overlay {
-        @apply absolute inset-0 bg-surface/90 flex justify-center items-center;
-    }
+@reference "@/main.css";
 
-    .spinner-container > div {
-        @apply w-12 h-12 rounded-full animate-spin;
-        @apply border-4 border-secondary border-t-transparent;
-    }
+.spinner-container.overlay {
+    @apply absolute inset-0 bg-surface/90 flex justify-center items-center;
+}
+
+.spinner-container > div {
+    @apply w-12 h-12 rounded-full animate-spin;
+    @apply border-4 border-secondary border-t-transparent;
 }
 </style>

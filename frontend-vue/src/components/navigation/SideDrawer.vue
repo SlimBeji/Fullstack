@@ -21,27 +21,25 @@ const emit = defineEmits<{
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    aside.sidedrawer {
-        @apply fixed z-40 top-0 left-0 h-screen w-[70%];
-        @apply bg-surface shadow-md;
-    }
+aside.sidedrawer {
+    @apply fixed z-40 top-0 left-0 h-screen w-[70%];
+    @apply bg-surface shadow-md;
+}
 
-    .sidedrawer-transition-enter-active,
-    .sidedrawer-transition-leave-active {
-        @apply transform transition duration-200;
-    }
+.sidedrawer-transition-enter-active,
+.sidedrawer-transition-leave-active {
+    @apply transform transition duration-200;
+}
 
-    .sidedrawer-transition-enter-from,
-    .sidedrawer-transition-leave-to {
-        @apply -translate-x-full opacity-0;
-    }
+.sidedrawer-transition-enter-from,
+.sidedrawer-transition-leave-to {
+    @apply -translate-x-full opacity-0;
+}
 
-    .sidedrawer-transition-enter-to,
-    .sidedrawer-transition-leave-from {
-        @apply -translate-x-0 opacity-100;
-    }
+.sidedrawer-transition-enter-to,
+.sidedrawer-transition-leave-from {
+    @apply -translate-x-0 opacity-100;
 }
 </style>

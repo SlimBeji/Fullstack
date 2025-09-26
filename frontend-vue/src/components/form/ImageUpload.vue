@@ -101,33 +101,31 @@ const clickHandler = () => {
 </script>
 
 <style lang="css">
-@reference "../../main.css";
+@reference "@/main.css";
 
-@layer components {
-    .image-upload {
-        @apply w-full mb-4;
-    }
+.image-upload {
+    @apply w-full mb-4;
+}
 
-    .image-upload > div {
-        @apply flex flex-col items-center justify-center;
-    }
+.image-upload > div {
+    @apply flex flex-col items-center justify-center;
+}
 
-    .image-upload > div > div {
-        @apply flex items-center justify-center text-center overflow-hidden;
-        @apply w-52 h-52 mb-4 border rounded-md;
-        @apply border-pen-ruler bg-surface-on;
-    }
+.image-upload > div > div {
+    @apply flex items-center justify-center text-center overflow-hidden;
+    @apply w-52 h-52 mb-4 border rounded-md;
+    @apply border-pen-ruler bg-surface-on;
+}
 
-    .image-upload .placeholder {
-        @apply text-pen-muted;
-    }
+.image-upload .placeholder {
+    @apply text-pen-muted;
+}
 
-    .image-upload img {
-        @apply w-full h-full object-cover;
-    }
+.image-upload img {
+    @apply w-full h-full object-cover;
+}
 
-    .image-upload .error-text {
-        @apply mt-1 text-sm text-danger;
-    }
+.image-upload .error-text {
+    @apply mt-1 text-sm text-danger;
 }
 </style>

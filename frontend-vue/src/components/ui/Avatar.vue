@@ -13,15 +13,14 @@ const props = defineProps<{
 </script>
 
 <style lang="css">
-@reference "../../main.css";
-@layer components {
-    .avatar-container {
-        @apply w-16 h-16 overflow-hidden rounded-full;
-        @apply flex justify-center items-center;
-    }
+@reference "@/main.css";
 
-    .avatar-container img {
-        @apply w-full h-full object-cover;
-    }
+.avatar-container {
+    @apply w-16 h-16 overflow-hidden rounded-full;
+    @apply flex justify-center items-center;
+}
+
+.avatar-container img {
+    @apply w-full h-full object-cover;
 }
 </style>
