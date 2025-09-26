@@ -1,4 +1,5 @@
 <script lang="ts">
+import { LoadingSpinner } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
 import { authStore } from "@/store";
@@ -36,6 +37,7 @@ const { fields, formValid } = useForm<FormTypes>(FormConfig);
 const { firstname, lastname } = fields;
 </script>
 
+<LoadingSpinner />
 <h1>Authentication Page</h1>
 <p>
     Welcome User {$userId}
