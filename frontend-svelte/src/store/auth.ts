@@ -24,7 +24,7 @@ function login(payload: SigninResponse) {
 function logout() {
     data.set(undefined);
     localStorage.removeItem(LocalStorageKeys.userData);
-    goto("/logout");
+    goto("/auth");
 }
 
 export const authStore = {
