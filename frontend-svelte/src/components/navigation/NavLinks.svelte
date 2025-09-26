@@ -1,16 +1,17 @@
 <script lang="ts">
+import { active, goto, route } from "@mateothegreat/svelte5-router";
+
 import { authStore } from "@/store";
-import { goto, route, active } from "@mateothegreat/svelte5-router";
 
 // Init
 const userId = authStore.userId;
-const activeAction = {active: {class: "active", absolute: true}};
+const activeAction = { active: { class: "active", absolute: true } };
 
 // Handlers
 const logout = () => {
-    authStore.logout()
-    goto("/auth")
-}
+    authStore.logout();
+    goto("/auth");
+};
 </script>
 
 <ul class="links-container">
@@ -21,7 +22,9 @@ const logout = () => {
         <a href="/places/new" use:active={activeAction} use:route>Add Place</a>
     </li>
     <li>
-        <a href={`/${$userId}/places`} use:active={activeAction} use:route>My places</a>
+        <a href={`/${$userId}/places`} use:active={activeAction} use:route
+            >My places</a
+        >
     </li>
     <li>
         <button onclick={logout}>LOGOUT</button>

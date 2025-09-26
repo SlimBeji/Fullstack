@@ -1,16 +1,17 @@
 <script lang="ts">
-import {Backdrop} from "@/components/ui";
-import NavLinks from "./NavLinks.svelte"
+import { Backdrop } from "@/components/ui";
 
-let showBackdrop = $state(true)
+import NavLinks from "./NavLinks.svelte";
+
+let showBackdrop = $state(true);
 
 function clickHandler() {
-    showBackdrop = false
+    showBackdrop = false;
 }
 </script>
 
 <NavLinks />
-{#if showBackdrop }
+{#if showBackdrop}
     <Backdrop onClick={clickHandler} />
 {/if}
 

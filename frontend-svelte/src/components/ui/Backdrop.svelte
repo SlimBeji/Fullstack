@@ -1,14 +1,14 @@
 <script lang="ts">
-import { onMount, onDestroy } from "svelte";
+import { onDestroy, onMount } from "svelte";
 
 // Setup
 let backdropElement: HTMLElement | undefined;
-const targetElement = document.getElementById("backdrop-hook"); 
+const targetElement = document.getElementById("backdrop-hook");
 
 // Props
-const {onClick} = $props<{
-    onClick: () => void
-}>()
+const { onClick } = $props<{
+    onClick: () => void;
+}>();
 
 // Events
 onMount(() => {
@@ -18,7 +18,7 @@ onMount(() => {
 });
 
 onDestroy(() => {
-    targetElement?.removeChild(backdropElement!)
+    targetElement?.removeChild(backdropElement!);
 });
 </script>
 
