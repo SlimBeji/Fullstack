@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Button } from "@/components/form";
 import { LoadingSpinner, Modal } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
@@ -45,7 +46,8 @@ const closeModal = () => {
 };
 </script>
 
-<button onclick={openModal}>Open Modal</button>
+<Button to="/users">To Users Page</Button>
+<Button onClick={openModal}>Open Modal</Button>
 <Modal
     style="background:red"
     show={modalOpen}
