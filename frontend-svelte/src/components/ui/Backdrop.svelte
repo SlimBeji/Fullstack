@@ -10,7 +10,7 @@ const {onClick} = $props<{
     onClick: () => void
 }>()
 
-// Lifecycle events
+// Events
 onMount(() => {
     if (targetElement && backdropElement) {
         targetElement.appendChild(backdropElement);
