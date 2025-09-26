@@ -1,13 +1,13 @@
 <template>
     <Modal
         v-if="isTokenExpired"
-        @close="emit('close')"
+        @close="tokenExpiredCleaner"
         header="Session expired"
         :show="!!props.error"
     >
-        <p>Token expired! Please login again!</p>
+        <p class="text-error">Token expired! Please login again!</p>
         <template #footer>
-            <Button :onClick="tokenExpiredCleaner">Authenticate</Button>
+            <Button :onclick="tokenExpiredCleaner">Authenticate</Button>
         </template>
     </Modal>
     <ErrorModal
