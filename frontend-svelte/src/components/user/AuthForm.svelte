@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Button } from "@/components/form";
-import { ErrorModal,LoadingSpinner } from "@/components/ui";
+import { ErrorModal, LoadingSpinner } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
 import { authStore } from "@/store";
@@ -49,7 +49,7 @@ const closeModal = () => {
 <Button to="/users">To Users Page</Button>
 <Button onClick={openModal}>Open Modal</Button>
 <ErrorModal
-    error= {errorMessage}
+    error={errorMessage}
     onClose={closeModal}
     header="Testing the modal"
 />

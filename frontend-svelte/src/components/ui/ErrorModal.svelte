@@ -22,7 +22,6 @@ const {
     {/snippet}
 </Modal>
 
-
 <style lang="css">
 @reference "@/main.css";
 
