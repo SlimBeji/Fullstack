@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Button } from "@/components/form";
-import { LoadingSpinner, Modal, ErrorModal } from "@/components/ui";
+import { ErrorModal,LoadingSpinner } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
 import { authStore } from "@/store";
