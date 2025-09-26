@@ -16,8 +16,17 @@ const {
 </script>
 
 <Modal {onClose} show={!!error} {header}>
-    <p>{error}</p>
+    <p class="text-error">{error}</p>
     {#snippet footer()}
         <Button onClick={onClose}>Okay</Button>
     {/snippet}
 </Modal>
+
+
+<style lang="css">
+@reference "@/main.css";
+
+.text-error {
+    @apply p-5;
+}
+</style>

@@ -4,7 +4,7 @@
         :show="!!props.error"
         :header="props.header || `An Error Occured!`"
     >
-        <p>{{ props.error }}</p>
+        <p class="text-error">{{ props.error }}</p>
         <template #footer>
             <Button @click="emit('close')">Okay</Button>
         </template>
@@ -27,3 +27,11 @@ const emit = defineEmits<{
     (e: "close"): void;
 }>();
 </script>
+
+<style lang="css">
+@reference "@/main.css";
+
+.text-error {
+    @apply p-5;
+}
+</style>

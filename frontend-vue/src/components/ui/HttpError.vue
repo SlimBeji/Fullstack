@@ -57,3 +57,11 @@ const tokenExpiredCleaner = () => {
     authStore.logout();
 };
 </script>
+
+<style lang="css">
+@reference "@/main.css";
+
+.text-error {
+    @apply p-5;
+}
+</style>
