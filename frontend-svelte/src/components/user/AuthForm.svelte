@@ -1,5 +1,5 @@
 <script lang="ts">
-import { LoadingSpinner } from "@/components/ui";
+import { LoadingSpinner, Modal } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
 import { authStore } from "@/store";
@@ -35,7 +35,28 @@ const FormConfig = {
 type FormTypes = keyof typeof FormConfig;
 const { fields, formValid } = useForm<FormTypes>(FormConfig);
 const { firstname, lastname } = fields;
+
+let modalOpen = $state<boolean>(false);
+const openModal = () => {
+    modalOpen = true;
+};
+const closeModal = () => {
+    modalOpen = false;
+};
 </script>
+
+<button onclick={openModal}>Open Modal</button>
+<Modal
+    style="background:red"
+    show={modalOpen}
+    onClose={closeModal}
+    header="Testing the modal"
+>
+    <p>Content inside the Modal</p>
+    {#snippet footer()}
+        <button onclick={closeModal}>Close</button>
+    {/snippet}
+</Modal>
 
 <LoadingSpinner />
 <h1>Authentication Page</h1>
