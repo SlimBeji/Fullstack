@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Button } from "@/components/form";
-import { LoadingSpinner, Modal } from "@/components/ui";
+import { LoadingSpinner, Modal, ErrorModal } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
 import { authStore } from "@/store";
@@ -37,28 +37,22 @@ type FormTypes = keyof typeof FormConfig;
 const { fields, formValid } = useForm<FormTypes>(FormConfig);
 const { firstname, lastname } = fields;
 
-let modalOpen = $state<boolean>(false);
+let errorMessage = $state<string>("");
 const openModal = () => {
-    modalOpen = true;
+    errorMessage = "An error occured";
 };
 const closeModal = () => {
-    modalOpen = false;
+    errorMessage = "";
 };
 </script>
 
 <Button to="/users">To Users Page</Button>
 <Button onClick={openModal}>Open Modal</Button>
-<Modal
-    style="background:red"
-    show={modalOpen}
+<ErrorModal
+    error= {errorMessage}
     onClose={closeModal}
     header="Testing the modal"
->
-    <p>Content inside the Modal</p>
-    {#snippet footer()}
-        <button onclick={closeModal}>Close</button>
-    {/snippet}
-</Modal>
+/>
 
 <LoadingSpinner />
 <h1>Authentication Page</h1>
