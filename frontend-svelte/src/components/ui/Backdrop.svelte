@@ -2,13 +2,15 @@
 import { onDestroy, onMount } from "svelte";
 
 // Setup
-let backdropElement: HTMLElement | undefined;
 const targetElement = document.getElementById("backdrop-hook");
 
 // Props
 const { onClick } = $props<{
     onClick: () => void;
 }>();
+
+// States
+let backdropElement = $state<HTMLElement | undefined>(undefined);
 
 // Events
 onMount(() => {
