@@ -134,8 +134,7 @@ li.place-item {
     @apply p-4 text-center border-t border-pen-ruler;
 }
 
-.place-item .place-actions button,
-.place-item .place-actions a {
+.place-item .place-actions :global(.btn){
     @apply mx-1;
 }
 </style>
