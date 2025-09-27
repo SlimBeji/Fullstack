@@ -26,7 +26,7 @@ onMount(() => {
 });
 
 onDestroy(() => {
-    if (targetElement) {
+    if (targetElement && drawerElement) {
         targetElement.removeChild(drawerElement!);
         window.removeEventListener("resize", updateWidth);
     }
