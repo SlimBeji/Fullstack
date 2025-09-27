@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button, Input } from "@/components/form";
+import { Button, ImageUpload, Input } from "@/components/form";
 import { ErrorModal, LoadingSpinner } from "@/components/ui";
 import { useForm, useHttp } from "@/lib";
 import { minLengthValidator } from "@/lib";
@@ -31,11 +31,12 @@ const logout = () => {
 const FormConfig = {
     firstname: { validators: [minLengthValidator(5)] },
     lastname: { validators: [minLengthValidator(5)] },
+    avatar: { initial: { file: null, url: "" } },
 };
 
 type FormTypes = keyof typeof FormConfig;
 const { fields, formValid } = useForm<FormTypes>(FormConfig);
-const { firstname, lastname } = fields;
+const { firstname, lastname, avatar } = fields;
 
 let errorMessage = $state<string>("");
 const openModal = () => {
@@ -92,6 +93,9 @@ const closeModal = () => {
             bind:value={$lastname.value}
             bind:valid={$lastname.valid}
         />
+    </div>
+    <div>
+        <ImageUpload id="avatar" bind:value={$avatar.value} />
     </div>
 </form>
 <p>Validity: <span>{$formValid}</span></p>
