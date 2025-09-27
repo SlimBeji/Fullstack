@@ -6,7 +6,7 @@
         header="Could not fetch users!"
     />
     <LoadingSpinner v-if="httpData.loading" as-overlay />
-    <UsersList :items="items" />
+    <UsersList v-if="items.length" :items="items" />
 </template>
 
 <script setup lang="ts">

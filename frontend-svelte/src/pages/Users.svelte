@@ -10,7 +10,7 @@ import type { User } from "@/types";
 const { httpData, sendRequest, clear } = useHttp();
 
 // Computed
-const items = $derived<User[]>($httpData.json?.data ?? []);
+let items = $derived<User[]>($httpData.json?.data ?? []);
 
 // Events
 onMount(() => {
@@ -28,4 +28,6 @@ onMount(() => {
 {#if $httpData.loading}
     <LoadingSpinner asOverlay />
 {/if}
-<UsersList {items} />
+{#if items.length}
+    <UsersList {items} />
+{/if}
