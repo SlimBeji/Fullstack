@@ -106,7 +106,7 @@ export const validate = (
             case ValidatorEnum.ANY:
                 return true;
             case ValidatorEnum.NUMERIC:
-                return value.trim() !== "" && !isNaN(Number(value));
+                return String(value).trim() !== "" && !isNaN(Number(value));
             case ValidatorEnum.REQUIRE:
                 if (value.trim().length === 0) return false;
                 break;
