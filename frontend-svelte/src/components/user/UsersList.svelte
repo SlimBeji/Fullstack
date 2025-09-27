@@ -5,10 +5,9 @@ import UserItem from "./UserItem.svelte";
 
 // Props
 const props = $props<{ items: User[] }>();
-const items: User[] = props.items;
 
 // Computed
-const noUsers = $derived<boolean>(items.length === 0);
+const noUsers = $derived<boolean>(props.items.length === 0);
 </script>
 
 {#if noUsers}
@@ -19,7 +18,7 @@ const noUsers = $derived<boolean>(items.length === 0);
     </div>
 {:else}
     <div class="users-list">
-        {#each items as item (item.id)}
+        {#each props.items as item (item.id)}
             <UserItem user={item} />
         {/each}
     </div>
