@@ -22,7 +22,7 @@
             Do you want to proceed and delete this place?
         </p>
         <template #footer>
-            <Button color="danger" @click="deleteHandler"> DELETE </Button>
+            <Button color="danger" @click="deleteHandler">DELETE</Button>
             <Button @click="closeDeleteModalHandler">CANCEL</Button>
         </template>
     </Modal>
