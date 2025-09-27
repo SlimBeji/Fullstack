@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
@@ -19,7 +19,6 @@ import type { User } from "@/types";
 
 // Init
 const { httpData, sendRequest, clear } = useHttp();
-sendRequest("/users/", "get");
 
 // Computed
 const items = computed((): User[] => {
@@ -27,5 +26,10 @@ const items = computed((): User[] => {
         return httpData.value.json?.data as User[];
     }
     return [];
+});
+
+// Events
+onMounted(() => {
+    sendRequest("/users/", "get");
 });
 </script>

@@ -1,4 +1,6 @@
 <script lang="ts">
+import { onMount } from "svelte"
+
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
 import { useHttp } from "@/lib";
@@ -6,10 +8,14 @@ import type { User } from "@/types";
 
 // Init
 const { httpData, sendRequest, clear } = useHttp();
-sendRequest("/users/", "get");
 
 // Computed
 const items = $derived<User[]>($httpData.json?.data ?? []);
+
+// Events
+onMount(() => {
+    sendRequest("/users/", "get");
+})
 </script>
 
 {#if $httpData.error?.message}
