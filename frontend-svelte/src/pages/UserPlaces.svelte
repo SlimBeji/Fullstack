@@ -2,6 +2,7 @@
 import { HttpStatusCode } from "axios";
 import { onMount } from "svelte";
 
+import { PlacesList } from "@/components/places";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { useHttp } from "@/lib";
 import { authStore } from "@/store";
@@ -46,6 +47,8 @@ const deleteHandler = async () => {
 {#if $httpData.loading}
     <LoadingSpinner asOverlay />
 {/if}
-<span>{isUserOwned}</span>
-<span>{deleteHandler}</span>
-<pre>{places}</pre>
+<PlacesList
+    onDelete={deleteHandler}
+    items={places}
+    sameAuthenticatedUser={isUserOwned}
+/>
