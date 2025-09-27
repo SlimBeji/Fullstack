@@ -1,109 +1,184 @@
 <script lang="ts">
 import { Button, ImageUpload, Input } from "@/components/form";
-import { ErrorModal, LoadingSpinner } from "@/components/ui";
-import { useForm, useHttp } from "@/lib";
-import { minLengthValidator } from "@/lib";
+import { HttpError, LoadingSpinner } from "@/components/ui";
+import type { FormConfig } from "@/lib";
+import { emailValidator, minLengthValidator, useForm, useHttp } from "@/lib";
 import { authStore } from "@/store";
 import type { SigninResponse } from "@/types";
 
-// Testing useHttp
+// Init
 const { httpData, sendRequest, clear } = useHttp();
 
-async function load() {
-    await sendRequest("/api/hello-world", "get", undefined, false);
-}
-const userId = authStore.userId;
-const login = () => {
-    const resp: SigninResponse = {
-        access_token: "token",
-        token_type: "bearer",
-        userId: "u123",
-        email: "mslimbeji@gmail.com",
-        expires_in: 123333,
-    };
-    authStore.login(resp);
-};
-const logout = () => {
-    authStore.logout();
+// Form
+const AuthFormConfig: FormConfig = {
+    username: { active: false, validators: [minLengthValidator(8)] },
+    image: { active: false, initial: { file: null, url: "" } },
+    email: { validators: [emailValidator()] },
+    password: { validators: [minLengthValidator(10)] },
 };
 
-// Testing useForm
-const FormConfig = {
-    firstname: { validators: [minLengthValidator(5)] },
-    lastname: { validators: [minLengthValidator(5)] },
-    avatar: { initial: { file: null, url: "" } },
+type FieldsType = keyof typeof AuthFormConfig;
+
+const { fields, formValid, updateFieldConfig } =
+    useForm<FieldsType>(AuthFormConfig);
+const { username, image, email, password } = fields;
+
+// States
+let isLoginMode = $state<boolean>(true);
+
+// Computed
+const text = $derived(
+    isLoginMode
+        ? {
+              verb: "Authenticate",
+              requiredText: "Login Required",
+              switchText: "Switch to signup",
+          }
+        : {
+              verb: "Register",
+              requiredText: "Registration Required",
+              switchText: "Swith to login",
+          }
+);
+
+// Handlers
+const onSignin = async (): Promise<void> => {
+    const formData = new FormData();
+    formData.append("username", $email.value);
+    formData.append("password", $password.value);
+    const resp = await sendRequest("/auth/signin", "post", formData, false);
+    const data = resp.data as SigninResponse;
+    authStore.login(data);
 };
 
-type FormTypes = keyof typeof FormConfig;
-const { fields, formValid } = useForm<FormTypes>(FormConfig);
-const { firstname, lastname, avatar } = fields;
-
-let errorMessage = $state<string>("");
-const openModal = () => {
-    errorMessage = "An error occured";
+const onSignup = async (): Promise<void> => {
+    const formData = new FormData();
+    formData.append("name", $username.value);
+    formData.append("image", $image.value.file);
+    formData.append("email", $email.value);
+    formData.append("password", $password.value);
+    const resp = await sendRequest("/auth/signup", "post", formData, false);
+    const data = resp.data as SigninResponse;
+    authStore.login(data);
 };
-const closeModal = () => {
-    errorMessage = "";
+
+const onSubmit = (e: Event): void => {
+    e.preventDefault();
+    if (isLoginMode) {
+        onSignin();
+    } else {
+        onSignup();
+    }
+};
+
+const onSwitchModeHandler = () => {
+    // if prev === true ==> We were in Login Mode
+    // username and image were disabled (false)
+    // Switching to Signup Mode, we want to
+    // enable them so we send prev (true)
+    // Same reasoning if we were in Signup Mode
+    const prev = isLoginMode;
+    updateFieldConfig({ username: { active: prev }, image: { active: prev } });
+    isLoginMode = !prev;
 };
 </script>
 
-<Button to="/users">To Users Page</Button>
-<Button onClick={openModal}>Open Modal</Button>
-<ErrorModal
-    error={errorMessage}
-    onClose={closeModal}
-    header="Testing the modal"
-/>
-
-<LoadingSpinner />
-<h1>Authentication Page</h1>
-<p>
-    Welcome User {$userId}
-</p>
-<button class="test" onclick={login}>Login</button>
-<button class="test" onclick={logout}>Logout</button>
-
-<hr />
-<button class="test" onclick={load}>Load</button>
-<button class="test" onclick={clear}>Clear</button>
-
-{#if $httpData.loading}
-    <p>Loading...</p>
-{:else if $httpData.error}
-    <p>Error: {$httpData.error.message}</p>
-{:else if $httpData.json}
-    <pre>{JSON.stringify($httpData.json, null, 2)}</pre>
-{:else}
-    <p>Nothing to show</p>
-{/if}
-
-<form>
-    <div>
-        <Input
-            id="firstname"
-            label="Firstname"
-            bind:value={$firstname.value}
-            bind:valid={$firstname.valid}
+<div class="center">
+    {#if $httpData.error?.message}
+        <HttpError
+            onClose={clear}
+            error={$httpData.error}
+            header="Credentials not valid!"
         />
+    {/if}
+    <div class="auth-form">
+        {#if $httpData.loading}
+            <LoadingSpinner asOverlay />
+        {/if}
+        <h2>{text.requiredText}</h2>
+        <hr />
+        <form onsubmit={onSubmit}>
+            {#if !isLoginMode}
+                <Input
+                    bind:value={$username.value}
+                    bind:valid={$username.valid}
+                    element="input"
+                    id="username"
+                    label="Username"
+                    type="text"
+                    errorText="Please enter a valid username of at least 8 characters"
+                />
+                <ImageUpload
+                    bind:value={$image.value}
+                    bind:valid={$image.valid}
+                    id="image"
+                    color="secondary"
+                    buttonText="Upload your Avatar"
+                    errorText="Please upload a valid image"
+                />
+            {/if}
+            <Input
+                bind:value={$email.value}
+                bind:valid={$email.valid}
+                element="input"
+                id="email"
+                label="E-mail"
+                type="email"
+                errorText="Please enter a valid email"
+            />
+            <Input
+                bind:value={$password.value}
+                bind:valid={$password.valid}
+                element="input"
+                id="password"
+                label="Password"
+                type="password"
+                errorText="Please enter a password with at least 10 characters"
+            />
+            <div class="buttons">
+                <Button
+                    class="auth-button"
+                    disabled={!$formValid}
+                    color="secondary"
+                    type="submit"
+                >
+                    {text.verb}
+                </Button>
+                <Button
+                    class="auth-button"
+                    onClick={onSwitchModeHandler}
+                    type="button"
+                    color="secondary"
+                    inverse
+                >
+                    {text.switchText}
+                </Button>
+            </div>
+        </form>
     </div>
-    <div>
-        <Input
-            id="lastname"
-            label="Lastname"
-            bind:value={$lastname.value}
-            bind:valid={$lastname.valid}
-        />
-    </div>
-    <div>
-        <ImageUpload id="avatar" bind:value={$avatar.value} />
-    </div>
-</form>
-<p>Validity: <span>{$formValid}</span></p>
+</div>
 
 <style lang="css">
 @reference "@/main.css";
 
-button {
-    @apply bg-red-500 border border-black;
+.auth-form {
+    @apply w-[90%] max-w-md mx-auto mt-10 p-6;
+    @apply text-center shadow-lg rounded-xl bg-surface;
+}
+
+.auth-form > h2 {
+    @apply text-2xl font-bold text-pen mb-2;
+}
+
+.auth-form > hr {
+    @apply border-t-2 border-secondary w-[100%] mb-6;
+}
+
+.auth-form .buttons {
+    @apply flex justify-center space-x-4;
+}
+
+.auth-form .buttons :global(.auth-button) {
+    @apply min-w-40;
 }
 </style>
