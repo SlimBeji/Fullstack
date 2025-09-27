@@ -1,10 +1,10 @@
 <script lang="ts">
 // Props
-const {imageUrl, alt} = $props<{imageUrl: string; alt: string}>()
+const { imageUrl, alt } = $props<{ imageUrl: string; alt: string }>();
 </script>
 
 <div class="avatar-container">
-    <img src={imageUrl} alt={alt} />
+    <img src={imageUrl} {alt} />
 </div>
 
 <style lang="css">
