@@ -17,12 +17,12 @@ const routes: RouteConfig[] = [
         component: Users,
     },
     {
-        path: "/places/new",
-        component: NewPlace,
-    },
-    {
         path: "/places/(?<placeId>[a-z0-9]*)",
         component: UpdatePlace,
+    },
+    {
+        path: "/places/new",
+        component: NewPlace,
     },
     {
         path: "/(?<userId>[a-z0-9]*)/places",
