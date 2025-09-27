@@ -43,7 +43,7 @@ const placeNumber = computed(() => {
 @reference "../../main.css";
 
 .user-item {
-    @apply w-[45%] min-w-[17.5rem] m-4;
+    @apply w-[45%] min-w-[17.5rem] m-4 list-none;
 }
 
 .user-item .card {
