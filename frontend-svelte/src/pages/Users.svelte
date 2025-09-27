@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte"
+import { onMount } from "svelte";
 
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
@@ -15,7 +15,7 @@ const items = $derived<User[]>($httpData.json?.data ?? []);
 // Events
 onMount(() => {
     sendRequest("/users/", "get");
-})
+});
 </script>
 
 {#if $httpData.error?.message}

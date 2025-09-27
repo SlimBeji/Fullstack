@@ -51,7 +51,7 @@ const submitHanlder = (e: Event) => {
             easing: cubicOut,
             opacity: 0,
         }}
-        bind:this="{modalElement}"
+        bind:this={modalElement}
     >
         <header>
             <h2>{header}</h2>
