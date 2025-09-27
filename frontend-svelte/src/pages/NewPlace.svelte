@@ -1,1 +1,5 @@
-<h1>Create a new place</h1>
+<script lang="ts">
+import { PlaceCreateForm } from "@/components/places";
+</script>
+
+<PlaceCreateForm />
