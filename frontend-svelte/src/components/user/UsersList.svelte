@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { User } from "@/types";
 
+import UserItem from "./UserItem.svelte";
+
 // Props
 const props = $props<{ items: User[] }>();
 const items: User[] = props.items;
@@ -16,11 +18,11 @@ const noUsers = $derived<boolean>(items.length === 0);
         </div>
     </div>
 {:else}
-    {#each items as item (item.id)}
-        <div class="users-list">
-            <li>{item.name}</li>
-        </div>
-    {/each}
+    <div class="users-list">
+        {#each items as item (item.id)}
+            <UserItem user={item} />
+        {/each}
+    </div>
 {/if}
 
 <style lang="css">
