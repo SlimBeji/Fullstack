@@ -26,8 +26,14 @@ onMount(() => {
 });
 
 onDestroy(() => {
-    window.removeEventListener("resize", updateWidth);
-    drawerElement?.remove()
+    try {
+        window.removeEventListener("resize", updateWidth);
+    } catch (err) {
+        console.log(err);
+    }
+    if (drawerElement && targetElement?.contains(drawerElement)) {
+        targetElement.removeChild(drawerElement);
+    }
 });
 
 // Handlers
