@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
 
-// Setup
+// Init
 const targetElement = document.getElementById("backdrop-hook");
 
 // Props

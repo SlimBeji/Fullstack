@@ -20,7 +20,7 @@ interface FieldState extends FieldConfig {
 export type FormConfig = Record<string, FieldConfig>;
 
 export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
-    // Setup
+    // Init
     const fieldNames = Object.keys(config) as T[];
 
     // State

@@ -7,7 +7,7 @@ import { authStore } from "@/store";
 import NavLinks from "./NavLinks.svelte";
 import SideDrawer from "./SideDrawer.svelte";
 
-// Setup
+// Init
 const isLoggedIn = authStore.isLoggedIn;
 
 // States

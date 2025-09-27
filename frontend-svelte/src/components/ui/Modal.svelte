@@ -5,7 +5,7 @@ import { fly } from "svelte/transition";
 
 import Backdrop from "./Backdrop.svelte";
 
-// Setup
+// Init
 const targetElement = document.getElementById("modal-hook");
 
 // Props

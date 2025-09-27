@@ -2,7 +2,7 @@
 import { onDestroy, onMount } from "svelte";
 import { fly } from "svelte/transition";
 
-// Setup
+// Init
 const targetElement = document.getElementById("drawer-hook");
 
 // Props

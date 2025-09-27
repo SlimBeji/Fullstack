@@ -5,7 +5,7 @@ import { fileToUrl } from "@/lib";
 
 import Button from "./Button.svelte";
 
-// Setup
+// Init
 let filePickerRef: HTMLInputElement | null = null;
 
 // Props
