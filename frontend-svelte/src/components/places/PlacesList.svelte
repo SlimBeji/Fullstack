@@ -2,6 +2,8 @@
 import { Button } from "@/components/form";
 import type { Place } from "@/types";
 
+import PlaceItem from "./PlaceItem.svelte";
+
 // Props
 const props = $props<{
     sameAuthenticatedUser?: boolean;
@@ -13,8 +15,7 @@ const props = $props<{
 <ul class="places-list">
     {#if props.items.length > 0}
         {#each props.items as place (place.id)}
-            <pre>{place}</pre>
-            <pre>onDelete</pre>
+            <PlaceItem {place} onDelete={props.onDelete} />
         {/each}
     {:else if props.sameAuthenticatedUser}
         <div class="no-places">
