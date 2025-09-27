@@ -1,3 +1,4 @@
+export { default as Avatar } from "./Avatar.svelte";
 export { default as Backdrop } from "./Backdrop.svelte";
 export { default as ErrorModal } from "./ErrorModal.svelte";
 export { default as HttpError } from "./HttpError.svelte";
