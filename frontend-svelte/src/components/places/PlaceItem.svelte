@@ -1,7 +1,7 @@
 <script lang="ts">
 import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
-import { HttpError, LoadingSpinner, Modal } from "@/components/ui";
+import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useHttp } from "@/lib";
 import { authStore } from "@/store";
 import type { Place } from "@/types";
@@ -56,7 +56,11 @@ const deleteHandler = () => {
     <LoadingSpinner asOverlay />
 {/if}
 <Modal onClose={closeMapHandler} show={showMap} header={props.place.address}>
-    <p>Map placeholder</p>
+    <Map
+        position={props.place.location}
+        zoom={13}
+        markerText={props.place.title}
+    />
     {#snippet footer()}
         <Button inverse onClick={closeMapHandler}>CLOSE</Button>
     {/snippet}
@@ -134,7 +138,7 @@ li.place-item {
     @apply p-4 text-center border-t border-pen-ruler;
 }
 
-.place-item .place-actions :global(.btn){
+.place-item .place-actions :global(.btn) {
     @apply mx-1;
 }
 </style>
