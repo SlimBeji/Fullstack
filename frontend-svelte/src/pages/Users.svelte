@@ -28,6 +28,4 @@ onMount(() => {
 {#if $httpData.loading}
     <LoadingSpinner asOverlay />
 {/if}
-{#if $httpData.json?.data}
-    <UsersList {items} />
-{/if}
+<UsersList {items} />
