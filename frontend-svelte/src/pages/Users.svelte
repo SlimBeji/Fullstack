@@ -1,5 +1,6 @@
 <script lang="ts">
 import { HttpError, LoadingSpinner } from "@/components/ui";
+import { UsersList } from "@/components/user";
 import { useHttp } from "@/lib";
 import type { User } from "@/types";
 
@@ -22,5 +23,5 @@ const items = $derived<User[]>($httpData.json?.data ?? []);
     <LoadingSpinner asOverlay />
 {/if}
 {#if $httpData.json?.data}
-    <pre>{items}</pre>
+    <UsersList {items} />
 {/if}
