@@ -20,9 +20,7 @@ onMount(() => {
 });
 
 onDestroy(() => {
-    if (targetElement && backdropElement) {
-        targetElement.removeChild(backdropElement!);
-    }
+    backdropElement?.remove();
 });
 </script>
 

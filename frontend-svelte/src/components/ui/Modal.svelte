@@ -30,9 +30,7 @@ onMount(() => {
 });
 
 onDestroy(() => {
-    if (targetElement && modalElement) {
-        targetElement.removeChild(modalElement!);
-    }
+    modalElement?.remove()
 });
 
 // Handlers
