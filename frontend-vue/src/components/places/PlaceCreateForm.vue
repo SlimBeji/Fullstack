@@ -5,7 +5,7 @@
         :error="httpData.error"
     />
     <LoadingSpinner v-if="httpData.loading" as-overlay />
-    <form v-else @submit="submitHandler" class="place-create">
+    <form @submit="submitHandler" class="place-create">
         <Input
             v-model="fields.title.value"
             :is-valid="fields.title.valid"
