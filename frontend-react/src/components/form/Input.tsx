@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { ChangeEvent, ElementType } from "react";
 import { useState } from "react";
 
@@ -71,11 +72,15 @@ const Input: React.FC<InputProps> = ({
 
     return (
         <div
-            className={`input-container ${className || "basis-full"} ${isError ? "error" : ""}`}
+            className={clsx([
+                "input-container",
+                className || "basis-full",
+                { error: isError },
+            ])}
         >
             <label htmlFor={id}>{label}</label>
             <Tag {...tagProps} />
-            <p className={`error-text ${isError ? "" : "invisible"}`}>
+            <p className={clsx(["error-text", { invisible: !isError }])}>
                 {errorText || "The input is not valid"}
             </p>
         </div>
