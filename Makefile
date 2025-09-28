@@ -116,3 +116,15 @@ gin-build:
 
 gin-bash:
 	docker exec -it gin bash
+
+gin-script/%:
+	docker exec -it gin go run /app/scripts $*
+
+gin-debug:
+	docker exec -it gin go run /app/scripts debug
+
+gin-seed:
+	docker exec -it gin go run /app/scripts seed
+
+gin-dump:
+	docker exec -it gin go run /app/scripts seed
