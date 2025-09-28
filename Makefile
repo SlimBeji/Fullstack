@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach fastapi --attach svelte 
+	docker-compose up --attach gin --attach svelte 
 
 build:
 	docker-compose build
@@ -109,3 +109,10 @@ fastapi-seed:
 
 fastapi-dump:
 	docker exec -it fastapi python /app/scripts/dump_db.py
+
+# Gin commands
+gin-build:
+	docker-compose build gin
+
+gin-bash:
+	docker exec -it gin bash

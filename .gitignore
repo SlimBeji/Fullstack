@@ -1,4 +1,5 @@
 # Builds and locals
+backend-gin/tmp
 **/node_modules
 **/build
 **/dist
@@ -14,6 +15,7 @@ todo.txt
 # Secret .env files
 **/express.env
 **/fastapi.env
+**/gin.env
 
 # Docker local images
 mongo

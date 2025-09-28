@@ -81,6 +81,24 @@ services:
         command: honcho start
         restart: on-failure
 
+    gin:
+        build:
+            context: .
+            dockerfile: ./backend-gin/gin.Dockerfile
+        container_name: gin
+        ports:
+            - 5002:5002
+        volumes:
+            - ./backend-gin:/app
+        env_file:
+            - ./backend-gin/gin.env
+        depends_on:
+            - mongo1
+            - mongo2
+            - gcs
+        command: air
+        restart: on-failure
+
     mongo1:
         image: mongo:latest
         container_name: mongo1
