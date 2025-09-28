@@ -32,6 +32,7 @@ const props = defineProps<{
     class?: CssClass;
     element?: "input" | "textarea";
     type?: HTMLInputElement["type"];
+    step?: string;
     disabled?: boolean;
     rows?: number;
     placeholder?: string;
@@ -67,6 +68,7 @@ const tagConfig = computed(() => {
         case "input":
         default:
             tagProps.type = props.type;
+            tagProps.step = props.step;
             tagProps.placeholder = props.placeholder;
             break;
     }

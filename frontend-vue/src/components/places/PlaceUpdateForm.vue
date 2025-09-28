@@ -39,6 +39,7 @@
             id="latitude"
             element="input"
             type="number"
+            step="any"
             label="Latitude"
             errorText="Please enter a valid Latitude"
         />
@@ -49,6 +50,7 @@
             id="longitude"
             element="input"
             type="number"
+            step="any"
             label="Longitude"
             errorText="Please enter a valid Longitude"
         />
