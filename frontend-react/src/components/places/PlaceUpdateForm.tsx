@@ -106,6 +106,8 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 id="latitude"
                 className="basis-full sm:basis-1/2 sm:pr-2"
                 element="input"
+                type="number"
+                step="any"
                 label="Latitude"
                 errorText="Please enter a valid Latitude"
             />
@@ -116,6 +118,8 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 id="longitude"
                 className="basis-full sm:basis-1/2 sm:pl-2"
                 element="input"
+                type="number"
+                step="any"
                 label="Longitude"
                 errorText="Please enter a valid Longitude"
             />

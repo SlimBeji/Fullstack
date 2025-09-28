@@ -10,6 +10,7 @@ interface InputProps {
     className?: string;
     element?: "input" | "textarea";
     type?: HTMLInputElement["type"];
+    step?: string;
     disabled?: boolean;
     rows?: number;
     placeholder?: string;
@@ -25,6 +26,7 @@ const Input: React.FC<InputProps> = ({
     className,
     element,
     type,
+    step,
     disabled,
     rows,
     placeholder,
@@ -62,6 +64,7 @@ const Input: React.FC<InputProps> = ({
         case "input":
         default:
             tagProps.type = type;
+            tagProps.step = step;
             tagProps.placeholder = placeholder;
             break;
     }
