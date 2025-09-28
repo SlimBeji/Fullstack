@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, { useRef, useState } from "react";
 
 import { fileToUrl } from "@/lib";
@@ -100,7 +101,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     {buttonText || "Pick an image"}
                 </Button>
             </div>
-            <p className={`error-text ${showError ? "" : "invisible"}`}>
+            <p className={clsx(["error-text", { invisible: !showError }])}>
                 {errorText || uploadError}
             </p>
         </div>
