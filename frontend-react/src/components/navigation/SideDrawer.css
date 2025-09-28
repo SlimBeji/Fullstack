@@ -1,18 +1,16 @@
-@layer components {
-    .sidedrawer.effect {
-        @apply transform transition duration-200;
-    }
+.sidedrawer.effect {
+    @apply transform transition duration-200;
+}
 
-    .sidedrawer.a {
-        @apply -translate-x-full opacity-0;
-    }
+.sidedrawer.a {
+    @apply -translate-x-full opacity-0;
+}
 
-    .sidedrawer.b {
-        @apply -translate-x-0 opacity-100;
-    }
+.sidedrawer.b {
+    @apply -translate-x-0 opacity-100;
+}
 
-    aside.sidedrawer {
-        @apply fixed z-40 top-0 left-0 h-screen w-[70%];
-        @apply bg-surface shadow-md;
-    }
+aside.sidedrawer {
+    @apply fixed z-40 top-0 left-0 h-screen w-[70%];
+    @apply bg-surface shadow-md;
 }

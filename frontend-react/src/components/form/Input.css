@@ -1,25 +1,23 @@
-@layer components {
-    .input-container {
-        @apply mb-4;
-    }
+.input-container {
+    @apply mb-4;
+}
 
-    .input-container label {
-        @apply block mb-2 font-semibold text-pen error:text-danger;
-    }
+.input-container label {
+    @apply block mb-2 font-semibold text-pen error:text-danger;
+}
 
-    .input-container textarea,
-    .input-container input {
-        @apply w-full rounded-md border px-3 py-2;
-    }
+.input-container textarea,
+.input-container input {
+    @apply w-full rounded-md border px-3 py-2;
+}
 
-    .input-container textarea.active,
-    .input-container input.active {
-        @apply text-pen border-pen-ruler bg-surface-alt;
-        @apply focus:border-secondary focus:outline-none;
-        @apply error:bg-danger-surface error:border-danger;
-    }
+.input-container textarea.active,
+.input-container input.active {
+    @apply text-pen border-pen-ruler bg-surface-alt;
+    @apply focus:border-secondary focus:outline-none;
+    @apply error:bg-danger-surface error:border-danger;
+}
 
-    .input-container .error-text {
-        @apply mt-1 text-sm text-danger;
-    }
+.input-container .error-text {
+    @apply mt-1 text-sm text-danger;
 }

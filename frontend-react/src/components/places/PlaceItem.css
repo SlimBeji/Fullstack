@@ -1,39 +1,37 @@
-@layer components {
-    .delete-text-messaage {
-        @apply p-5;
-    }
+.delete-text-messaage {
+    @apply p-5;
+}
 
-    li.place-item {
-        @apply my-4;
-    }
+li.place-item {
+    @apply my-4;
+}
 
-    .place-item-card {
-        @apply p-0;
-    }
+.place-item-card {
+    @apply p-0;
+}
 
-    .place-item .image-container {
-        @apply w-full h-52 md:h-80 mr-6;
-    }
+.place-item .image-container {
+    @apply w-full h-52 md:h-80 mr-6;
+}
 
-    .place-item-card img {
-        @apply w-full h-full object-cover;
-    }
+.place-item-card img {
+    @apply w-full h-full object-cover;
+}
 
-    .place-item .place-info {
-        @apply p-4 text-center;
-    }
+.place-item .place-info {
+    @apply p-4 text-center;
+}
 
-    .place-item .place-info h2,
-    .place-item .place-info p {
-        @apply mb-2;
-    }
+.place-item .place-info h2,
+.place-item .place-info p {
+    @apply mb-2;
+}
 
-    .place-item .place-actions {
-        @apply p-4 text-center border-t border-pen-ruler;
-    }
+.place-item .place-actions {
+    @apply p-4 text-center border-t border-pen-ruler;
+}
 
-    .place-item .place-actions button,
-    .place-item .place-actions a {
-        @apply mx-1;
-    }
+.place-item .place-actions button,
+.place-item .place-actions a {
+    @apply mx-1;
 }
