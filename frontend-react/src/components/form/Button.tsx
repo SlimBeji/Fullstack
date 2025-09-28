@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
@@ -16,11 +17,10 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = (props) => {
-    const customClasses = props.className || "";
     const disabled = props.disabled ?? false;
+    const customClasses = props.className || "";
     const inverse = props.inverse && !disabled ? "inverse" : "";
     const color = disabled ? "disabled" : props.color || "primary";
-    const className = `btn ${color} ${inverse} ${customClasses}`;
 
     let Tag: ElementType = "button";
     const tagProps: any = {};
@@ -37,7 +37,10 @@ const Button: React.FC<ButtonProps> = (props) => {
     }
 
     return (
-        <Tag className={className} {...tagProps}>
+        <Tag
+            className={clsx(["btn", color, inverse, customClasses])}
+            {...tagProps}
+        >
             {props.children}
         </Tag>
     );
