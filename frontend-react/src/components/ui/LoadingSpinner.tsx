@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React from "react";
 
 interface LoadingSpinner {
@@ -6,7 +7,7 @@ interface LoadingSpinner {
 
 const LoadingSpinner: React.FC<LoadingSpinner> = ({ asOverlay }) => {
     return (
-        <div className={`spinner-container ${asOverlay ? "overlay" : ""}`}>
+        <div className={clsx(["spinner-container", { overlay: asOverlay }])}>
             <div></div>
         </div>
     );
