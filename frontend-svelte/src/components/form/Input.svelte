@@ -16,6 +16,7 @@ let {
     class?: CssClass;
     element?: "input" | "textarea";
     type?: HTMLInputElement["type"];
+    step?: string;
     disabled?: boolean;
     rows?: number;
     placeholder?: string;
@@ -53,6 +54,7 @@ const inputTouched = () => {
             id={props.id}
             disabled={props.disabled ?? false}
             type={props.type}
+            step={props.step}
             placeholder={props.placeholder}
             class={inputClass}
         />

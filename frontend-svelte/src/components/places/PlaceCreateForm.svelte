@@ -91,6 +91,7 @@ const submitHandler = async (e: Event) => {
         id="latitude"
         element="input"
         type="number"
+        step="any"
         label="Latitude"
         errorText="Please enter a valid Latitude"
     />
@@ -101,6 +102,7 @@ const submitHandler = async (e: Event) => {
         id="longitude"
         element="input"
         type="number"
+        step="any"
         label="Longitude"
         errorText="Please enter a valid Longitude"
     />
