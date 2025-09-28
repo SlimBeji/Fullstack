@@ -34,8 +34,8 @@ Each backend implements the **same logic**, **routes**, and **data models**:
 | ---------- | ---------------------------------------- | ------------------------- |
 | TypeScript | [Express](https://expressjs.com/)        | http://localhost:5000/api |
 | Python     | [FastAPI](https://fastapi.tiangolo.com/) | http://localhost:5001/api |
+| Go         | [Gin](https://gin-gonic.com/)            | http://localhost:5002/api |
 | Rust       | [Axum](https://actix.rs/)                | _Not Implemented Yet_     |
-| Go         | [Gin](https://gin-gonic.com/)            | _Not Implemented Yet_     |
 
 Each backend connects to a shared set of services (e.g., MongoDB, Redis).
 
@@ -602,8 +602,6 @@ Stores **static assets** like images or files that may be served by the backend 
 
 ## 🚀 Next Steps
 
--   Add a **Vue** SPA frontend
--   Add the **Rust/Actix** backend
--   Add a **Svelt** SPA frontend
 -   Add the **Go/Gin** backend
+-   Add the **Rust/Actix** backend
 -   Add an **Angular** SPA frontend
