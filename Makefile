@@ -117,6 +117,9 @@ gin-build:
 gin-bash:
 	docker exec -it gin bash
 
+gin-lint:
+	docker exec -it gin go fmt .
+
 gin-script/%:
 	docker exec -it gin go run /app/scripts $*
 
