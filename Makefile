@@ -118,7 +118,7 @@ gin-bash:
 	docker exec -it gin bash
 
 gin-test:
-	docker exec -it gin go test /app/tests/...
+	docker exec -it gin go test /app/internal/tests/...
 
 gin-lint:
 	docker exec -it gin go fmt .
