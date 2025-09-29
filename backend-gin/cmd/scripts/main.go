@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/scripts"
 	"fmt"
 	"os"
 )
@@ -9,11 +10,11 @@ func main() {
 	input := os.Args[1]
 	switch input {
 	case "debug":
-		Debug()
+		scripts.Debug()
 	case "seed":
-		SeedDB()
+		scripts.SeedDB()
 	case "dump":
-		DumpDb()
+		scripts.DumpDb()
 	default:
 		fmt.Printf("Unknown script %s\n", input)
 	}

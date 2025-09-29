@@ -124,13 +124,13 @@ gin-lint:
 	docker exec -it gin go fmt .
 
 gin-script/%:
-	docker exec -it gin go run /app/scripts $*
+	docker exec -it gin go run /app/cmd/scripts $*
 
 gin-debug:
-	docker exec -it gin go run /app/scripts debug
+	docker exec -it gin go run /app/cmd/scripts debug
 
 gin-seed:
-	docker exec -it gin go run /app/scripts seed
+	docker exec -it gin go run /app/cmd/scripts seed
 
 gin-dump:
-	docker exec -it gin go run /app/scripts seed
+	docker exec -it gin go run /app/cmd/scripts seed
