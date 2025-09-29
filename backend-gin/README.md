@@ -56,6 +56,16 @@ The official go `fmt` package is used for code formatting. No additional utility
 
 ## 📁 Key Directories
 
+The root directory contains the following key directories and files:
+
+-   `internal/` – Contains the main application source code, following the structure defined in the root **README.md**.
+-   `cmd/` – Contains entrypoints for running scripts, schedulers, and background task handlers.
+-   `app.go` – The API server entrypoint.
+
+> For a better development experience, hot reload is enabled in development using [air](https://github.com/air-verse/air). However, **air** does not work well if the entrypoint is placed in the `cmd/` folder. For this reason, the API server entrypoint (`app.go`) is kept separate from other `cmd` entries.
+
+### 📁📁 Internals
+
 -   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
 -   `api/` – Gin server setup: auth, middlewares and REST routes
 -   `types/` – Shared types and data contracts.
