@@ -2,18 +2,13 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/models/schemas"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-var accessToken = struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	UserId      string `json:"userId"`
-	Email       string `json:"email"`
-	ExpiresIn   int16  `json:"expires_in"`
-}{
+var accessToken = schemas.AccessToken{
 	AccessToken: "some_access_token",
 	TokenType:   "bearer",
 	UserId:      "u123",
