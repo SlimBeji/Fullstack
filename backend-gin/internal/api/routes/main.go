@@ -6,4 +6,5 @@ func RegisterRoutes(r *gin.Engine) {
 	RegisterHelloWorld(r)
 	RegisterAuth(r)
 	RegisterUsers(r)
+	RegisterPlaces(r)
 }
