@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"fmt"
-	"io"
+	"backend/internal/api/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,27 +22,15 @@ var accessToken = struct {
 }
 
 func signup(c *gin.Context) {
-	body, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
-		return
-	}
-	fmt.Println("Request body:", string(body))
 	c.JSON(http.StatusOK, accessToken)
 }
 
 func signin(c *gin.Context) {
-	body, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
-		return
-	}
-	fmt.Println("Request body:", string(body))
 	c.JSON(http.StatusOK, accessToken)
 }
 
 func RegisterAuth(r *gin.Engine) {
 	router := r.Group("/api/auth")
-	router.POST("/signup", signup)
-	router.POST("/signin", signin)
+	router.POST("/signup", middlewares.BodyExtractor, signup)
+	router.POST("/signin", middlewares.BodyExtractor, signin)
 }
