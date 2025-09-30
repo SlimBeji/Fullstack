@@ -2,7 +2,10 @@ module backend
 
 go 1.25.1
 
-require github.com/gin-gonic/gin v1.11.0
+require (
+	github.com/gin-gonic/gin v1.11.0
+	github.com/kelseyhightower/envconfig v1.4.0
+)
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect

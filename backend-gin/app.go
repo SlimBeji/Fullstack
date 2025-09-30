@@ -2,6 +2,8 @@ package main
 
 import (
 	"backend/internal/api/routes"
+	"backend/internal/config"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,5 +11,5 @@ import (
 func main() {
 	r := gin.Default()
 	routes.RegisterRoutes(r)
-	r.Run(":5002")
+	r.Run(fmt.Sprintf(":%d", config.Env.Port))
 }
