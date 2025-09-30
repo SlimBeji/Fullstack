@@ -66,6 +66,7 @@ The root directory contains the following key directories and files:
 
 ### 📁📁 Internals
 
+-   `config/` – Environment variables and global parameters setup
 -   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
 -   `api/` – Gin server setup: auth, middlewares and REST routes
 -   `types/` – Shared types and data contracts.

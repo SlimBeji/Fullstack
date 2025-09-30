@@ -245,6 +245,10 @@ It helps separate focus areas from the rest of the UI.
 
 This demo project features two models: **Users** and **Places**. Users can create accounts and add their favorite places to their profiles. Other users can browse and view these favorite places.
 
+### 📁 Config
+
+Config module used to setup environment variables and global parameters.
+
 ### 📁 Models
 
 The first step in building a backend is to **design the data layer**—defining how data is structured, validated, and manipulated. A well-thought-out model setup is critical not only for development but also for testing, seeding, and consistency across different backend implementations.

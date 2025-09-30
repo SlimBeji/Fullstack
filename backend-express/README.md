@@ -84,6 +84,7 @@ Prettier is used for formatting with the following config:
 
 ## 📁 Key Directories
 
+- `config/` – Environment variables and global parameters setup
 - `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
 - `api/` – Express server setup: auth, middlewares, OpenAPI docs, and REST routes
 - `types/` – Shared types, enums, interfaces, and module extensions (e.g., `express.d.ts`)
