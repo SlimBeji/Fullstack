@@ -122,6 +122,7 @@ gin-test:
 
 gin-lint:
 	docker exec -it gin go fmt .
+	docker exec -it gin go build .
 
 gin-script/%:
 	docker exec -it gin go run /app/cmd/scripts $*
