@@ -1,10 +1,14 @@
 package schemas
 
+import (
+	"backend/internal/models/fields/userfields"
+)
+
 type User struct {
-	Name     string   `json:"name"`
-	Email    string   `json:"email"`
-	IsAdmin  bool     `json:"isAdmin"`
-	Id       string   `json:"id"`
-	ImageUrl string   `json:"imageUrl"`
-	Places   []string `json:"places"`
+	ID       userfields.ID       `validate:"required"`
+	Name     userfields.Name     `validate:"required"`
+	Email    userfields.Email    `validate:"required"`
+	IsAdmin  userfields.IsAdmin  `validate:"required"`
+	ImageUrl userfields.ImageUrl `validate:"required"`
+	Places   userfields.Places
 }

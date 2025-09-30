@@ -1,16 +1,15 @@
 package schemas
 
-type Location struct {
-	Lat float32 `json:"lat"`
-	Lng float32 `json:"lng"`
-}
+import (
+	"backend/internal/models/fields/placefields"
+)
 
 type Place struct {
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Address     string   `json:"address"`
-	Location    Location `json:"location"`
-	Id          string   `json:"id"`
-	ImageUrl    string   `json:"imageUrl"`
-	CreatorId   string   `json:"creatorId"`
+	ID          placefields.ID          `validate:"required"`
+	Title       placefields.Title       `validate:"required"`
+	Description placefields.Description `validate:"required"`
+	Address     placefields.Address     `validate:"required"`
+	Location    placefields.Location    `validate:"required"`
+	ImageUrl    placefields.ImageUrl
+	CreatorID   placefields.CreatorID `validate:"required"`
 }

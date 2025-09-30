@@ -1,9 +1,14 @@
 package schemas
 
+import (
+	"backend/internal/models/fields/authfields"
+	"backend/internal/models/fields/userfields"
+)
+
 type AccessToken struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	UserId      string `json:"userId"`
-	Email       string `json:"email"`
-	ExpiresIn   int16  `json:"expires_in"`
+	AccessToken authfields.AccessToken `json:"access_token"`
+	TokenType   authfields.TokenType   `json:"token_type"`
+	UserID      userfields.ID          `json:"userId"`
+	Email       userfields.Email       `json:"email"`
+	ExpiresIn   authfields.ExpiresIn   `json:"expires_in"`
 }
