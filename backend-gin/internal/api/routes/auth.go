@@ -8,13 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var accessToken = schemas.AccessToken{
-	AccessToken: "some_access_token",
-	TokenType:   "bearer",
-	UserId:      "u123",
-	Email:       "mslimbeji@gmail.com",
-	ExpiresIn:   3600,
-}
+var accessToken, _ = schemas.BuildStruct[schemas.AccessToken](map[string]any{
+	"access_token": "some_access_token",
+	"token_type":   "bearer",
+	"userId":       "u1234",
+	"email":        "mslimbeji@gmail.com",
+	"expires_in":   3600,
+})
 
 func signup(c *gin.Context) {
 	c.JSON(http.StatusOK, accessToken)

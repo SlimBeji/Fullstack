@@ -9,18 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var place = schemas.Place{
-	Title:       "Stamford Bridge",
-	Description: "Stadium of Chelsea football club",
-	Address:     "Fulham road",
-	Location: schemas.Location{
-		Lat: 51.48180425016331,
-		Lng: -0.19090418688755467,
-	},
-	Id:        "683b21134e2e5d46978daf1f",
-	ImageUrl:  "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-	CreatorId: "683b21134e2e5d46978daf1f",
-}
+var place, _ = schemas.BuildStruct[schemas.Place](map[string]any{
+	"id":          "683b21134e2e5d46978daf1f",
+	"title":       "Stamford Bridge",
+	"description": "Stadium of Chelsea football club",
+	"address":     "Fulham road",
+	"location":    map[string]float64{"lat": 51.48180425016331, "lng": -0.19090418688755467},
+	"imageUrl":    "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+	"creatorId":   "683b21134e2e5d46978daf1f",
+})
 
 func createPlace(c *gin.Context) {
 	c.JSON(http.StatusOK, place)
