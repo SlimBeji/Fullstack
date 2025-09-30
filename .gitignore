@@ -1,5 +1,6 @@
 # Builds and locals
 backend-gin/tmp
+backend-gin/backend
 **/node_modules
 **/build
 **/dist
