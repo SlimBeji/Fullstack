@@ -9,19 +9,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// //////// Build schemas for map values //////////////
-func BuildStruct[T any](data map[string]any) (T, error) {
-	var result T
-
-	b, err := json.Marshal(data)
-	if err != nil {
-		return result, err
-	}
-
-	err = json.Unmarshal(b, &result)
-	return result, err
-}
-
 ////////// Validating Forms and Schemas //////////////
 
 type ValidationError struct {
@@ -63,4 +50,31 @@ func ValidateSchema(s any) []ValidationError {
 		})
 	}
 	return errs
+}
+
+// //////// Build schemas for map values //////////////
+func BuildStructFromJson[T any](b []byte, validate bool) (T, []ValidationError) {
+	var result T
+	var errs []ValidationError
+	err := json.Unmarshal(b, &result)
+	if err != nil {
+		errs = append(errs, ValidationError{"data", err.Error()})
+		return result, errs
+	}
+	if validate {
+		errs = ValidateSchema(result)
+	}
+	return result, errs
+}
+
+func BuildStructFromMap[T any](data map[string]any, validate bool) (T, []ValidationError) {
+	var result T
+	var errs []ValidationError
+
+	b, err := json.Marshal(data)
+	if err != nil {
+		errs = append(errs, ValidationError{"data", err.Error()})
+		return result, errs
+	}
+	return BuildStructFromJson[T](b, validate)
 }

@@ -15,14 +15,14 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 			return
 		}
 
-		user, _ := schemas.BuildStruct[schemas.User](map[string]any{
+		user, _ := schemas.BuildStructFromMap[schemas.User](map[string]any{
 			"id":       "683b21134e2e5d46978daf1f",
 			"name":     "Slimx",
 			"email":    "mslimbeji@gmail.com",
 			"isAdmin":  false,
 			"imageUrl": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
 			"places":   []string{"683b21134e2e5d46978daf1f"},
-		})
+		}, true)
 
 		if checkAdmin && !user.IsAdmin.Value {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "Not an admin"})
