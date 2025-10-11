@@ -17,47 +17,63 @@ type Location struct {
 /////// Base Schemas /////////////
 
 // schemas:tag
-type PlaceBase struct {
+type PlaceDB struct {
+	ID          any      `tag:"id"`
 	Title       any      `tag:"title"`
 	Description any      `tag:"description"`
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
+	ImageUrl    any      `tag:"imageUrl,optional"`
+	Embedding   any      `tag:"embedding"`
+	CreatorID   any      `tag:"creatorId"`
 }
 
 // schemas:tag
 type PlacSeed struct {
-	Ref        int
-	CreatorRef int
-	Embedding  any `tag:"embedding"`
-	ImageUrl   any `tag:"imageUrl,optional"`
-	PlaceBase
+	Ref         int
+	CreatorRef  int
+	Title       any      `tag:"title"`
+	Description any      `tag:"description"`
+	Address     any      `tag:"address"`
+	Location    Location `tag:"location"`
+	Embedding   any      `tag:"embedding"`
+	ImageUrl    any      `tag:"imageUrl,optional"`
 }
 
 /////// Creation Schemas /////////////
 
 // schemas:tag
 type PlaceCreate struct {
-	PlaceBase
-	Embedding any `tag:"embedding"`
-	ImageUrl  any `tag:"imageUrl,optional"`
-	CreatorID any `tag:"creatorId"`
+	Title       any      `tag:"title"`
+	Description any      `tag:"description"`
+	Address     any      `tag:"address"`
+	Location    Location `tag:"location"`
+	Embedding   any      `tag:"embedding"`
+	ImageUrl    any      `tag:"imageUrl,optional"`
+	CreatorID   any      `tag:"creatorId"`
 }
 
 // schemas:tag
 type PlacePost struct {
-	PlaceBase
-	Image     any `tag:"image,optional"`
-	CreatorID any `tag:"creatorId"`
+	Title       any      `tag:"title"`
+	Description any      `tag:"description"`
+	Address     any      `tag:"address"`
+	Location    Location `tag:"location"`
+	Image       any      `tag:"image,optional"`
+	CreatorID   any      `tag:"creatorId"`
 }
 
 /////// Read Schemas /////////////
 
 // schemas:tag
 type PlaceRead struct {
-	ID any `tag:"id"`
-	PlaceBase
-	ImageUrl  any `tag:"imageUrl,optional"`
-	CreatorID any `tag:"creatorId"`
+	ID          any      `tag:"id"`
+	Title       any      `tag:"title"`
+	Description any      `tag:"description"`
+	Address     any      `tag:"address"`
+	Location    Location `tag:"location"`
+	ImageUrl    any      `tag:"imageUrl,optional"`
+	CreatorID   any      `tag:"creatorId"`
 }
 
 type PlacesPaginated = types_.RecordsPaginated[PlaceRead]

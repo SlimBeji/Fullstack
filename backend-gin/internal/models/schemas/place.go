@@ -11,39 +11,55 @@ type Location struct {
 	Lng float64 `json:"lng" bson:"lng" validate:"required"`
 }
 
-type PlaceBase struct {
+type PlaceDB struct {
+	ID          string    `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
+	Title       string    `json:"title" bson:"title" validate:"required,min=10"`
+	Description string    `json:"description" bson:"description" validate:"required,min=10"`
+	Address     string    `json:"address" bson:"address" validate:"required,min=10"`
+	Location    Location  `json:"location" bson:"location" validate:"required"`
+	ImageUrl    string    `json:"imageUrl" bson:"imageUrl"`
+	Embedding   []float64 `json:"embedding" bson:"embedding" validate:"required,len=384"`
+	CreatorID   string    `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
+}
+
+type PlacSeed struct {
+	Ref         int
+	CreatorRef  int
+	Title       string    `json:"title" bson:"title" validate:"required,min=10"`
+	Description string    `json:"description" bson:"description" validate:"required,min=10"`
+	Address     string    `json:"address" bson:"address" validate:"required,min=10"`
+	Location    Location  `json:"location" bson:"location" validate:"required"`
+	Embedding   []float64 `json:"embedding" bson:"embedding" validate:"required,len=384"`
+	ImageUrl    string    `json:"imageUrl" bson:"imageUrl"`
+}
+
+type PlaceCreate struct {
+	Title       string    `json:"title" bson:"title" validate:"required,min=10"`
+	Description string    `json:"description" bson:"description" validate:"required,min=10"`
+	Address     string    `json:"address" bson:"address" validate:"required,min=10"`
+	Location    Location  `json:"location" bson:"location" validate:"required"`
+	Embedding   []float64 `json:"embedding" bson:"embedding" validate:"required,len=384"`
+	ImageUrl    string    `json:"imageUrl" bson:"imageUrl"`
+	CreatorID   string    `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
+}
+
+type PlacePost struct {
+	Title       string                `json:"title" bson:"title" validate:"required,min=10"`
+	Description string                `json:"description" bson:"description" validate:"required,min=10"`
+	Address     string                `json:"address" bson:"address" validate:"required,min=10"`
+	Location    Location              `json:"location" bson:"location" validate:"required"`
+	Image       *multipart.FileHeader `json:"image" bson:"image"`
+	CreatorID   string                `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
+}
+
+type PlaceRead struct {
+	ID          string   `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
 	Title       string   `json:"title" bson:"title" validate:"required,min=10"`
 	Description string   `json:"description" bson:"description" validate:"required,min=10"`
 	Address     string   `json:"address" bson:"address" validate:"required,min=10"`
 	Location    Location `json:"location" bson:"location" validate:"required"`
-}
-
-type PlacSeed struct {
-	Ref        int
-	CreatorRef int
-	Embedding  []float64 `json:"embedding" bson:"embedding" validate:"required,len=384"`
-	ImageUrl   string    `json:"imageUrl" bson:"imageUrl"`
-	PlaceBase
-}
-
-type PlaceCreate struct {
-	PlaceBase
-	Embedding []float64 `json:"embedding" bson:"embedding" validate:"required,len=384"`
-	ImageUrl  string    `json:"imageUrl" bson:"imageUrl"`
-	CreatorID string    `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
-}
-
-type PlacePost struct {
-	PlaceBase
-	Image     *multipart.FileHeader `json:"image" bson:"image"`
-	CreatorID string                `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
-}
-
-type PlaceRead struct {
-	ID string `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
-	PlaceBase
-	ImageUrl  string `json:"imageUrl" bson:"imageUrl"`
-	CreatorID string `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
+	ImageUrl    string   `json:"imageUrl" bson:"imageUrl"`
+	CreatorID   string   `json:"creatorId" bson:"creatorId" validate:"required,hexadecimal,len=24"`
 }
 
 type PlacesPaginated = types_.RecordsPaginated[PlaceRead]

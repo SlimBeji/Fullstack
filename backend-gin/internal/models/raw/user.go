@@ -7,16 +7,22 @@ import "backend/internal/types_"
 /////// Base Schemas /////////////
 
 // schemas:tag
-type UserBase struct {
-	Name    any `tag:"name"`
-	Email   any `tag:"email"`
-	IsAdmin any `tag:"isAdmin"`
+type UserDB struct {
+	Id       any `tag:"id"`
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	IsAdmin  any `tag:"isAdmin"`
+	Password any `tag:"password"`
+	ImageUrl any `tag:"imageUrl,optional"`
+	Places   any `tag:"places"`
 }
 
 // schemas:tag
 type UserSeed struct {
-	UserBase
 	Ref      int
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	IsAdmin  any `tag:"isAdmin"`
 	Password any `tag:"password"`
 	ImageUrl any `tag:"imageUrl,optional"`
 }
@@ -25,14 +31,18 @@ type UserSeed struct {
 
 // schemas:tag
 type UserCreate struct {
-	UserBase
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	IsAdmin  any `tag:"isAdmin"`
 	Password any `tag:"password"`
 	ImageUrl any `tag:"imageUrl,optional"`
 }
 
 // schemas:tag
 type UserPost struct {
-	UserBase
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	IsAdmin  any `tag:"isAdmin"`
 	Password any `tag:"password"`
 	Image    any `tag:"image,optional"`
 }
@@ -41,8 +51,10 @@ type UserPost struct {
 
 // schemas:tag
 type UserRead struct {
-	UserBase
 	Id       any `tag:"id"`
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	IsAdmin  any `tag:"isAdmin"`
 	ImageUrl any `tag:"imageUrl,optional"`
 	Places   any `tag:"places"`
 }

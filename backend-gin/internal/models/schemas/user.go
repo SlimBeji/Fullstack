@@ -6,34 +6,46 @@ import (
 	"mime/multipart"
 )
 
-type UserBase struct {
-	Name    string `json:"name" bson:"name" validate:"required,min=2"`
-	Email   string `json:"email" bson:"email" validate:"required,email"`
-	IsAdmin bool   `json:"isAdmin" bson:"isAdmin" validate:"required"`
+type UserDB struct {
+	Id       string   `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
+	Name     string   `json:"name" bson:"name" validate:"required,min=2"`
+	Email    string   `json:"email" bson:"email" validate:"required,email"`
+	IsAdmin  bool     `json:"isAdmin" bson:"isAdmin" validate:"required"`
+	Password any      `json:"password" bson:"password" validate:"required,min=8"`
+	ImageUrl string   `json:"imageUrl" bson:"imageUrl"`
+	Places   []string `json:"places" bson:"places" validate:"required,dive,hexadecimal,len=24"`
 }
 
 type UserSeed struct {
-	UserBase
 	Ref      int
+	Name     string `json:"name" bson:"name" validate:"required,min=2"`
+	Email    string `json:"email" bson:"email" validate:"required,email"`
+	IsAdmin  bool   `json:"isAdmin" bson:"isAdmin" validate:"required"`
 	Password any    `json:"password" bson:"password" validate:"required,min=8"`
 	ImageUrl string `json:"imageUrl" bson:"imageUrl"`
 }
 
 type UserCreate struct {
-	UserBase
+	Name     string `json:"name" bson:"name" validate:"required,min=2"`
+	Email    string `json:"email" bson:"email" validate:"required,email"`
+	IsAdmin  bool   `json:"isAdmin" bson:"isAdmin" validate:"required"`
 	Password any    `json:"password" bson:"password" validate:"required,min=8"`
 	ImageUrl string `json:"imageUrl" bson:"imageUrl"`
 }
 
 type UserPost struct {
-	UserBase
+	Name     string                `json:"name" bson:"name" validate:"required,min=2"`
+	Email    string                `json:"email" bson:"email" validate:"required,email"`
+	IsAdmin  bool                  `json:"isAdmin" bson:"isAdmin" validate:"required"`
 	Password any                   `json:"password" bson:"password" validate:"required,min=8"`
 	Image    *multipart.FileHeader `json:"image" bson:"image"`
 }
 
 type UserRead struct {
-	UserBase
 	Id       string   `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
+	Name     string   `json:"name" bson:"name" validate:"required,min=2"`
+	Email    string   `json:"email" bson:"email" validate:"required,email"`
+	IsAdmin  bool     `json:"isAdmin" bson:"isAdmin" validate:"required"`
 	ImageUrl string   `json:"imageUrl" bson:"imageUrl"`
 	Places   []string `json:"places" bson:"places" validate:"required,dive,hexadecimal,len=24"`
 }
