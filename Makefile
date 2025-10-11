@@ -120,7 +120,10 @@ gin-bash:
 gin-test:
 	docker exec -it gin go test /app/internal/tests/...
 
-gin-lint:
+gin-generate:
+	docker exec -it gin go generate ./...
+
+gin-lint: gin-generate
 	docker exec -it gin go fmt .
 	docker exec -it gin go build .
 
