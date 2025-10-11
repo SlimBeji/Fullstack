@@ -10,9 +10,8 @@ import (
 
 // schemas:tag
 type Location struct {
-	A, B string
-	Lat  any `tag:"location.lat"`
-	Lng  any `tag:"location.lng"`
+	Lat any `tag:"location.lat"`
+	Lng any `tag:"location.lng"`
 }
 
 /////// Base Schemas /////////////

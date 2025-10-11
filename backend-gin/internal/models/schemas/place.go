@@ -7,9 +7,8 @@ import (
 )
 
 type Location struct {
-	A, B string
-	Lat  float64 `json:"lat" bson:"lat" validate:"required"`
-	Lng  float64 `json:"lng" bson:"lng" validate:"required"`
+	Lat float64 `json:"lat" bson:"lat" validate:"required"`
+	Lng float64 `json:"lng" bson:"lng" validate:"required"`
 }
 
 type PlaceBase struct {
