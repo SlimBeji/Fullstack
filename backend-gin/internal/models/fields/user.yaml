@@ -1,5 +1,5 @@
 imports:
-    - demo/internals/types_
+    - backend/internal/types_
     - mime/multipart
 fields:
     id:
