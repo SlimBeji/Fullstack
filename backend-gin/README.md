@@ -68,7 +68,7 @@ The root directory contains the following key directories and files:
 
 -   `config/` – Environment variables and global parameters setup
 -   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
--   `api/` – Gin server setup: auth, middlewares and REST routes
+-   `api/` – Gin server setup: auth, middlewares, swagger config and REST routes
 -   `types/` – Shared types and data contracts.
 -   `lib/` – Core business logic, utility functions, and third-party service clients
 -   `worker/` – Background processing (e.g., tasks and scheduled crons)
