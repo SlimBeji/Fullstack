@@ -1,0 +1,49 @@
+imports:
+    - demo/internals/types_
+    - mime/multipart
+fields:
+    id:
+        type: "string"
+        bson: "_id,omitempty"
+        validate: "hexadecimal,len=24"
+    title:
+        type: "string"
+        validate: "min=10"
+    description:
+        type: "string"
+        validate: "min=10"
+    embedding:
+        type: "[]float64"
+        validate: "len=384"
+    imageUrl:
+        type: "string"
+    image:
+        type: "*multipart.FileHeader"
+    address:
+        type: "string"
+        validate: "min=10"
+    creatorId:
+        type: "string"
+        validate: "hexadecimal,len=24"
+    location.lat:
+        type: "float64"
+        json: "lat"
+    location.lng:
+        type: "float64"
+        json: "lng"
+    location:
+        json: "location"
+selectables:
+    - id
+    - title
+    - description
+    - address
+    - location.lat
+    - location.lng
+    - imageUrl
+    - creatorId
+sortables:
+    - createdAt
+    - title
+    - description
+    - address

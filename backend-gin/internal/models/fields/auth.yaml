@@ -1,0 +1,24 @@
+imports:
+    - mime/multipart
+fields:
+    userId:
+        type: "string"
+        validate: "hexadecimal,len=24"
+    email:
+        type: "string"
+        validate: "email"
+    name:
+        type: "string"
+        validate: "min=2"
+    password:
+        type: ""
+        validate: "min=8"
+    image:
+        type: "*multipart.FileHeader"
+    access_token:
+        type: "string"
+    token_type:
+        type: "string"
+        validate: "oneof=bearer"
+    expires_in:
+        type: "int"

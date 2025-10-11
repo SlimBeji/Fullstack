@@ -1,0 +1,37 @@
+imports:
+    - demo/internals/types_
+    - mime/multipart
+fields:
+    id:
+        type: "string"
+        bson: "_id,omitempty"
+        validate: "hexadecimal,len=24"
+    name:
+        type: "string"
+        validate: "min=2"
+    email:
+        type: "string"
+        validate: "email"
+    password:
+        type: ""
+        validate: "min=8"
+    imageUrl:
+        type: "string"
+    image:
+        type: "*multipart.FileHeader"
+    isAdmin:
+        type: "bool"
+    places:
+        type: "[]string"
+        validate: "dive,hexadecimal,len=24"
+selectables:
+    - id
+    - name
+    - email
+    - isAdmin
+    - imageUrl
+    - places
+sortables:
+    - createdAt
+    - name
+    - email
