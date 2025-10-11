@@ -1,0 +1,157 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/accounts/{id}": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "accounts"
+                ],
+                "summary": "Show account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "test@example.com",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "mypassword",
+                        "name": "password",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AccessToken"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "authfields.AccessToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "description": "example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/fields.Field-string"
+                        }
+                    ]
+                }
+            }
+        },
+        "authfields.ExpiresIn": {
+            "type": "object",
+            "properties": {
+                "expires_in": {
+                    "description": "example: 1751879562",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/fields.Field-int"
+                        }
+                    ]
+                }
+            }
+        },
+        "authfields.TokenType": {
+            "type": "object",
+            "properties": {
+                "token_type": {
+                    "description": "example: bearer",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/fields.Field-string"
+                        }
+                    ]
+                }
+            }
+        },
+        "fields.Field-int": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "integer"
+                }
+            }
+        },
+        "fields.Field-string": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.AccessToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "$ref": "#/definitions/authfields.AccessToken"
+                },
+                "email": {
+                    "$ref": "#/definitions/userfields.Email"
+                },
+                "expires_in": {
+                    "$ref": "#/definitions/authfields.ExpiresIn"
+                },
+                "token_type": {
+                    "$ref": "#/definitions/authfields.TokenType"
+                },
+                "userId": {
+                    "$ref": "#/definitions/userfields.ID"
+                }
+            }
+        },
+        "userfields.Email": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "example: mslimbeji@gmail.com",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/fields.Field-string"
+                        }
+                    ]
+                }
+            }
+        },
+        "userfields.ID": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "example: 683b21134e2e5d46978daf1f",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/fields.Field-string"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

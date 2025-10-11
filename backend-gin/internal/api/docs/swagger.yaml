@@ -1,0 +1,94 @@
+definitions:
+  authfields.AccessToken:
+    properties:
+      access_token:
+        allOf:
+        - $ref: '#/definitions/fields.Field-string'
+        description: 'example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    type: object
+  authfields.ExpiresIn:
+    properties:
+      expires_in:
+        allOf:
+        - $ref: '#/definitions/fields.Field-int'
+        description: 'example: 1751879562'
+    type: object
+  authfields.TokenType:
+    properties:
+      token_type:
+        allOf:
+        - $ref: '#/definitions/fields.Field-string'
+        description: 'example: bearer'
+    type: object
+  fields.Field-int:
+    properties:
+      value:
+        type: integer
+    type: object
+  fields.Field-string:
+    properties:
+      value:
+        type: string
+    type: object
+  schemas.AccessToken:
+    properties:
+      access_token:
+        $ref: '#/definitions/authfields.AccessToken'
+      email:
+        $ref: '#/definitions/userfields.Email'
+      expires_in:
+        $ref: '#/definitions/authfields.ExpiresIn'
+      token_type:
+        $ref: '#/definitions/authfields.TokenType'
+      userId:
+        $ref: '#/definitions/userfields.ID'
+    type: object
+  userfields.Email:
+    properties:
+      email:
+        allOf:
+        - $ref: '#/definitions/fields.Field-string'
+        description: 'example: mslimbeji@gmail.com'
+    type: object
+  userfields.ID:
+    properties:
+      id:
+        allOf:
+        - $ref: '#/definitions/fields.Field-string'
+        description: 'example: 683b21134e2e5d46978daf1f'
+    type: object
+info:
+  contact: {}
+paths:
+  /accounts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - example: test@example.com
+        in: query
+        name: email
+        required: true
+        type: string
+      - example: mypassword
+        in: query
+        name: password
+        required: true
+        type: string
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.AccessToken'
+      summary: Show account
+      tags:
+      - accounts
+swagger: "2.0"
