@@ -16,16 +16,13 @@ from types_ import FileToUpload, FindQuery, PaginatedData
 # --- Base Schemas ----
 
 
-class PlaceBaseSchema(BaseModel):
+class PlaceSeedSchema(BaseModel):
+    ref: int
+    creator_ref: int
     title: PlaceFields.title_annot
     description: PlaceFields.description_annot
     address: PlaceFields.address_annot
     location: PlaceFields.Location | None = None
-
-
-class PlaceSeedSchema(PlaceBaseSchema):
-    ref: int
-    creator_ref: int
     embedding: PlaceFields.embedding_annot | None = None
     imageUrl: PlaceFields.imageUrl_annot | None = None
 
@@ -33,13 +30,21 @@ class PlaceSeedSchema(PlaceBaseSchema):
 # --- Creation Schemas ---
 
 
-class PlaceCreateSchema(PlaceBaseSchema):
+class PlaceCreateSchema(BaseModel):
+    title: PlaceFields.title_annot
+    description: PlaceFields.description_annot
+    address: PlaceFields.address_annot
+    location: PlaceFields.Location | None = None
     embedding: PlaceFields.embedding_annot | None = None
     imageUrl: PlaceFields.imageUrl_annot | None = None
     creatorId: PlaceFields.creatorId_annot
 
 
-class PlacePostSchema(PlaceBaseSchema):
+class PlacePostSchema(BaseModel):
+    title: PlaceFields.title_annot
+    description: PlaceFields.description_annot
+    address: PlaceFields.address_annot
+    location: PlaceFields.Location | None = None
     image: PlaceFields.image_annot | None = None
     creatorId: PlaceFields.creatorId_annot
 
@@ -80,8 +85,12 @@ class PlaceMultipartPost:
 # --- Read Schemas ---
 
 
-class PlaceReadSchema(PlaceBaseSchema):
+class PlaceReadSchema(BaseModel):
     id: PlaceFields.id_annot
+    title: PlaceFields.title_annot
+    description: PlaceFields.description_annot
+    address: PlaceFields.address_annot
+    location: PlaceFields.Location | None = None
     imageUrl: PlaceFields.imageUrl_annot | None = None
     creatorId: PlaceFields.creatorId_annot
 

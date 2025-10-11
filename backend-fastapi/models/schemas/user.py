@@ -13,14 +13,11 @@ from types_ import FileToUpload, FindQuery, PaginatedData
 # --- Base Schemas ----
 
 
-class UserBaseSchema(BaseModel):
+class UserSeedSchema(BaseModel):
+    ref: int
     name: UserFields.name_annot
     email: UserFields.email_annot
     isAdmin: UserFields.isAdmin_annot
-
-
-class UserSeedSchema(UserBaseSchema):
-    ref: int
     password: UserFields.password_annot
     imageUrl: UserFields.imageUrl_annot | None = None
 
@@ -28,12 +25,18 @@ class UserSeedSchema(UserBaseSchema):
 # --- Creation Schemas ---
 
 
-class UserCreateSchema(UserBaseSchema):
+class UserCreateSchema(BaseModel):
+    name: UserFields.name_annot
+    email: UserFields.email_annot
+    isAdmin: UserFields.isAdmin_annot
     password: UserFields.password_annot
     imageUrl: UserFields.imageUrl_annot | None = None
 
 
-class UserPostSchema(UserBaseSchema):
+class UserPostSchema(BaseModel):
+    name: UserFields.name_annot
+    email: UserFields.email_annot
+    isAdmin: UserFields.isAdmin_annot
     password: UserFields.password_annot
     image: UserFields.image_annot | None = None
 
@@ -66,8 +69,11 @@ class UserMultipartPost:
 # --- Read Schemas ---
 
 
-class UserReadSchema(UserBaseSchema):
+class UserReadSchema(BaseModel):
     id: UserFields.id_annot
+    name: UserFields.name_annot
+    email: UserFields.email_annot
+    isAdmin: UserFields.isAdmin_annot
     imageUrl: UserFields.imageUrl_annot | None = None
     places: UserFields.places_annot
 
