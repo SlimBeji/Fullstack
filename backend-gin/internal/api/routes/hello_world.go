@@ -16,7 +16,7 @@ func hello(c *gin.Context) {
 }
 
 func helloUser(c *gin.Context) {
-	user := c.MustGet("currentUser").(schemas.User)
+	user := c.MustGet("currentUser").(schemas.UserRead)
 	message := fmt.Sprintf("Hello %s!", user.Name)
 	c.JSON(http.StatusOK, gin.H{
 		"message": message,
@@ -24,7 +24,7 @@ func helloUser(c *gin.Context) {
 }
 
 func helloAdmin(c *gin.Context) {
-	user := c.MustGet("currentUser").(schemas.User)
+	user := c.MustGet("currentUser").(schemas.UserRead)
 	message := fmt.Sprintf("Hello Admin %s!", user.Name)
 	c.JSON(http.StatusOK, gin.H{
 		"message": message,

@@ -9,30 +9,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var place, _ = schemas.BuildStructFromMap[schemas.Place](map[string]any{
-	"id":          "683b21134e2e5d46978daf1f",
-	"title":       "Stamford Bridge",
-	"description": "Stadium of Chelsea football club",
-	"address":     "Fulham road",
-	"location":    map[string]float64{"lat": 51.48180425016331, "lng": -0.19090418688755467},
-	"imageUrl":    "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-	"creatorId":   "683b21134e2e5d46978daf1f",
-}, true)
+func dummyPlace() schemas.PlaceRead {
+	var place schemas.PlaceRead
+	place.ID = "683b21134e2e5d46978daf1f"
+	place.Title = "Stamford Bridge"
+	place.Description = "Stadium of Chelsea football club"
+	place.Address = "Fulham road"
+	place.Location = schemas.Location{Lat: 51.48180425016331, Lng: -0.19090418688755467}
+	place.ImageUrl = "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
+	place.CreatorID = "683b21134e2e5d46978daf1f"
+	return place
+}
 
 func createPlace(c *gin.Context) {
-	c.JSON(http.StatusOK, place)
+	c.JSON(http.StatusOK, dummyPlace())
 }
 
 func getPlace(c *gin.Context) {
 	placeId := c.Param("placeId")
 	fmt.Println(placeId)
-	c.JSON(http.StatusOK, place)
+	c.JSON(http.StatusOK, dummyPlace())
 }
 
 func updatePlace(c *gin.Context) {
 	placeId := c.Param("placeId")
 	fmt.Println(placeId)
-	c.JSON(http.StatusOK, place)
+	c.JSON(http.StatusOK, dummyPlace())
 }
 
 func deletePlace(c *gin.Context) {

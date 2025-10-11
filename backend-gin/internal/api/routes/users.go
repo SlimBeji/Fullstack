@@ -10,19 +10,19 @@ import (
 )
 
 func createUser(c *gin.Context) {
-	user := c.MustGet("currentUser").(schemas.User)
+	user := c.MustGet("currentUser").(schemas.UserRead)
 	c.JSON(http.StatusOK, user)
 }
 
 func getUser(c *gin.Context) {
 	fmt.Println(c.Param("userId"))
-	user := c.MustGet("currentUser").(schemas.User)
+	user := c.MustGet("currentUser").(schemas.UserRead)
 	c.JSON(http.StatusOK, user)
 }
 
 func updateUser(c *gin.Context) {
 	fmt.Println(c.Param("userId"))
-	user := c.MustGet("currentUser").(schemas.User)
+	user := c.MustGet("currentUser").(schemas.UserRead)
 	c.JSON(http.StatusOK, user)
 }
 
