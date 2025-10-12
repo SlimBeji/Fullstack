@@ -18,7 +18,7 @@ type SignupForm struct {
 
 // schemas:tag
 type SigninForm struct {
-	Username any `tag:"email,json=username"`
+	Username any `tag:"username"`
 	Password any `tag:"password"`
 }
 
