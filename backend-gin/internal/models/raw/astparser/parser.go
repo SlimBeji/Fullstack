@@ -244,46 +244,23 @@ func (ft *FieldTransformer) MergedNames() string {
 
 func (ft *FieldTransformer) AnnotationString() string {
 	var parts []string
+	skipExample := false
+	usedTags := []string{"json", "form", "filter", "validate", "default", "example", "bson", "swaggerignore"}
 
-	val, exists := ft.annotations["json"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("json:\"%s\"", val))
-	}
-
-	val, exists = ft.annotations["form"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("form:\"%s\"", val))
-	}
-
-	val, exists = ft.annotations["filter"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("filter:\"%s\"", val))
-	}
-
-	val, exists = ft.annotations["validate"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("validate:\"%s\"", val))
-	}
-
-	val, exists = ft.annotations["default"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("default:\"%s\"", val))
-	} else {
-		// No point of writing an example if a default value is provided
-		val, exists = ft.annotations["example"]
-		if exists {
-			parts = append(parts, fmt.Sprintf("example:\"%s\"", val))
+	for _, t := range usedTags {
+		if t == "example" && skipExample {
+			continue
 		}
-	}
 
-	val, exists = ft.annotations["bson"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("bson:\"%s\"", val))
-	}
+		val, exists := ft.annotations[t]
+		if exists {
+			parts = append(parts, fmt.Sprintf("%s:\"%s\"", t, val))
+		}
 
-	val, exists = ft.annotations["swaggerignore"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("swaggerignore:\"%s\"", val))
+		if t == "default" && exists {
+			// No point of adding example if we have a default value
+			skipExample = true
+		}
 	}
 
 	merged := strings.Join(parts, " ")
