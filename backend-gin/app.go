@@ -12,6 +12,14 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @tag.name Auth
+// @tag.description Registration and Authentication endpoints
+// @tag.name Hello World
+// @tag.description Hello World endpoints
+// @tag.name User
+// @tag.description User crud endpoints
+// @tag.name Place
+// @tag.description Place crud endpoints
 func main() {
 	r := gin.Default()
 	routes.RegisterRoutes(r)
