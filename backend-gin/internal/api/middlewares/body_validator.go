@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"backend/internal/lib/utils"
-	"backend/internal/types_"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,11 +11,9 @@ func BodyExtractor[T any](c *gin.Context) {
 	var form T
 	var err error
 
-	contentType := c.GetHeader("Content-Type")
-	switch types_.ContentType(contentType) {
-	case types_.CONTENT_TYPE_MULTIPART, types_.CONTENT_TYPE_FORM_URLENCODED:
+	if utils.IsMultipart(c) {
 		err = c.ShouldBind(&form)
-	default:
+	} else {
 		err = c.ShouldBindJSON(&form)
 	}
 
