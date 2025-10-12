@@ -11,15 +11,15 @@ type TokenPayload struct {
 }
 
 type SignupForm struct {
-	Name     string                `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`             // The user name, two characters at least
-	Email    string                `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"` // The user email
-	Password string                `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" bson:"image"`                                                         // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`               // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`  // The user email
+	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret" bson:"password"` // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" bson:"image"`                                                          // User's profile image (JPEG)
 }
 
 type SigninForm struct {
-	Username string `json:"username" validate:"required,email" default:"mslimbeji@gmail.com" bson:"username"` // The user email (We use username here because of OAuth spec)
-	Password string `json:"password" validate:"required,min=8" default:"very_secret" bson:"password"`         // The user password, 8 characters at least
+	Username string `json:"username" form:"username" validate:"required,email" default:"mslimbeji@gmail.com" bson:"username"` // The user email (We use username here because of OAuth spec)
+	Password string `json:"password" form:"password" validate:"required,min=8" default:"very_secret" bson:"password"`         // The user password, 8 characters at least
 }
 
 type EncodedToken struct {

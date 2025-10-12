@@ -249,6 +249,11 @@ func (ft *FieldTransformer) AnnotationString() string {
 		parts = append(parts, fmt.Sprintf("json:\"%s\"", val))
 	}
 
+	val, exists = ft.annotations["form"]
+	if exists {
+		parts = append(parts, fmt.Sprintf("form:\"%s\"", val))
+	}
+
 	val, exists = ft.annotations["filter"]
 	if exists {
 		parts = append(parts, fmt.Sprintf("filter:\"%s\"", val))
