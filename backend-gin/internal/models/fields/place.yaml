@@ -26,7 +26,7 @@ fields:
         description: "Title + Description embedding"
     imageUrl:
         type: "string"
-        example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+        example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
         description: "local url on the storage"
     image:
         type: "*multipart.FileHeader"

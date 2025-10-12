@@ -22,7 +22,7 @@ fields:
         description: "The user name, two characters at least"
         example: "Slim Beji"
     password:
-        type: ""
+        type: "string"
         validate: "min=8"
         description: "The user password, 8 characters at least"
         example: "very_secret"
