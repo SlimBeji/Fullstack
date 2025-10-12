@@ -13,3 +13,14 @@ func IsMultipart(c *gin.Context) bool {
 	formData := strings.HasPrefix(contentType, string(types_.CONTENT_TYPE_MULTIPART))
 	return xxxUrlEncoded || formData
 }
+
+func GetBody[T any](c *gin.Context) (T, bool) {
+	var zero T
+	raw, exists := c.Get("requestBody")
+	if !exists {
+		return zero, false
+	}
+
+	body, ok := raw.(T)
+	return body, ok
+}
