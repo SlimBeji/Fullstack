@@ -32,6 +32,7 @@ fields:
     image:
         type: "*multipart.FileHeader"
         description: "User's profile image (JPEG)"
+        swaggerignore: true
     isAdmin:
         type: "bool"
         description: "Whether the user is an admin or not"

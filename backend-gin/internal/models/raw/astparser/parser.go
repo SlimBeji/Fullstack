@@ -48,6 +48,7 @@ type FieldMeta struct {
 	Default       string `yaml:"default"`
 	Example       string `yaml:"example"`
 	FilterExample string `yaml:"filter-example"`
+	SwaggerIgnore string `yaml:"swaggerignore"`
 }
 
 type Config struct {
@@ -280,6 +281,11 @@ func (ft *FieldTransformer) AnnotationString() string {
 		parts = append(parts, fmt.Sprintf("bson:\"%s\"", val))
 	}
 
+	val, exists = ft.annotations["swaggerignore"]
+	if exists {
+		parts = append(parts, fmt.Sprintf("swaggerignore:\"%s\"", val))
+	}
+
 	merged := strings.Join(parts, " ")
 	if merged == "" {
 		return ""
@@ -356,6 +362,11 @@ func (ft *FieldTransformer) updateSchemasAnnotations() {
 	// Example tag
 	if ft.meta.Example != "" {
 		ft.annotations["example"] = ft.meta.Example
+	}
+
+	// SwaggerIgnore
+	if ft.meta.SwaggerIgnore == "true" {
+		ft.annotations["swaggerignore"] = "true"
 	}
 }
 

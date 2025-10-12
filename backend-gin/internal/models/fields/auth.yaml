@@ -29,6 +29,7 @@ fields:
     image:
         type: "*multipart.FileHeader"
         description: "User's profile image (JPEG)"
+        swaggerignore: true
     access_token:
         type: "string"
         description: "A generated web token. The 'Bearer ' prefix needs to be added for authentication"
