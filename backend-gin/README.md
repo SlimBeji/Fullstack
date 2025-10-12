@@ -80,17 +80,18 @@ The root directory contains the following key directories and files:
 
 The following `make` commands help manage the Gin backend:
 
-| Command                  | Description                                                                   |
-| ------------------------ | ----------------------------------------------------------------------------- |
-| `make gin-build`         | Build the Docker container for the Gin service.                               |
-| `make gin-bash`          | Open an interactive shell inside the running Gin container.                   |
-| `make gin-test`          | Run unit tests using.                                                         |
-| `make gin-generate`      | Run go generate ./... for metaprogramming                                     |
-| `make gin-lint`          | Run go generate + go fmt + go build to make sure format + compilation is good |
-| `make gin-script/⟨name⟩` | Execute a script from `scripts/` directory (e.g. `make fastapi-script/foo`).  |
-| `make gin-debug`         | Run `debug.go` for debugging or manual testing.                               |
-| `make gin-seed`          | Run `seed_db.go` to populate the database with seed data.                     |
-| `make gin-dump`          | Run `dump_db.go` to export the database contents.                             |
+| Command                  | Description                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| `make gin-build`         | Build the Docker container for the Gin service.                                           |
+| `make gin-bash`          | Open an interactive shell inside the running Gin container.                               |
+| `make gin-test`          | Run unit tests using.                                                                     |
+| `make gin-swagger`       | Run go swag init command and generate OpenAPI specifiications for Swagger UI              |
+| `make gin-generate`      | Run go generate ./... for metaprogramming                                                 |
+| `make gin-lint`          | Run go generate + swag init + go fmt + go build to make sure format + compilation is good |
+| `make gin-script/⟨name⟩` | Execute a script from `scripts/` directory (e.g. `make fastapi-script/foo`).              |
+| `make gin-debug`         | Run `debug.go` for debugging or manual testing.                                           |
+| `make gin-seed`          | Run `seed_db.go` to populate the database with seed data.                                 |
+| `make gin-dump`          | Run `dump_db.go` to export the database contents.                                         |
 
 ## 📌 Notes
 
