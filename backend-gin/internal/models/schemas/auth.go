@@ -14,7 +14,7 @@ type SignupForm struct {
 	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`               // The user name, two characters at least
 	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`  // The user email
 	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret" bson:"password"` // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" bson:"image"`                                                          // User's profile image (JPEG)
+	Image    *multipart.FileHeader `json:"image" form:"image" bson:"image" swaggerignore:"true"`                                     // User's profile image (JPEG)
 }
 
 type SigninForm struct {

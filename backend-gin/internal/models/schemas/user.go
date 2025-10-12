@@ -38,7 +38,7 @@ type UserPost struct {
 	Email    string                `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"` // The user email
 	IsAdmin  bool                  `json:"isAdmin" validate:"required" example:"false" bson:"isAdmin"`                 // Whether the user is an admin or not
 	Password any                   `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" bson:"image"`                                                         // User's profile image (JPEG)
+	Image    *multipart.FileHeader `json:"image" bson:"image" swaggerignore:"true"`                                    // User's profile image (JPEG)
 }
 
 type UserRead struct {
