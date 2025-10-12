@@ -4,39 +4,34 @@
         "contact": {}
     },
     "paths": {
-        "/accounts/{id}": {
-            "get": {
-                "description": "get string by ID",
+        "/api/auth/signin": {
+            "post": {
                 "consumes": [
-                    "application/json"
+                    "application/x-www-form-urlencoded"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "accounts"
+                    "Auth"
                 ],
-                "summary": "Show account",
+                "summary": "User authentication",
                 "parameters": [
                     {
+                        "minLength": 8,
                         "type": "string",
-                        "example": "test@example.com",
-                        "name": "email",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "example": "mypassword",
+                        "default": "very_secret",
+                        "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "Account ID",
-                        "name": "id",
-                        "in": "path",
+                        "type": "string",
+                        "default": "mslimbeji@gmail.com",
+                        "description": "The user email (We use username here because of OAuth spec)",
+                        "name": "username",
+                        "in": "formData",
                         "required": true
                     }
                 ],
@@ -44,7 +39,64 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.AccessToken"
+                            "$ref": "#/definitions/schemas.EncodedToken"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/signup": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User registration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "mslimbeji@gmail.com",
+                        "description": "The user email",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 2,
+                        "type": "string",
+                        "example": "Slim Beji",
+                        "description": "The user name, two characters at least",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 8,
+                        "type": "string",
+                        "example": "very_secret",
+                        "description": "The user password, 8 characters at least",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "User's profile image (JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.EncodedToken"
                         }
                     }
                 }
@@ -52,106 +104,63 @@
         }
     },
     "definitions": {
-        "authfields.AccessToken": {
+        "schemas.EncodedToken": {
             "type": "object",
+            "required": [
+                "access_token",
+                "email",
+                "expires_in",
+                "token_type",
+                "userId"
+            ],
             "properties": {
                 "access_token": {
-                    "description": "example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/fields.Field-string"
-                        }
-                    ]
-                }
-            }
-        },
-        "authfields.ExpiresIn": {
-            "type": "object",
-            "properties": {
-                "expires_in": {
-                    "description": "example: 1751879562",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/fields.Field-int"
-                        }
-                    ]
-                }
-            }
-        },
-        "authfields.TokenType": {
-            "type": "object",
-            "properties": {
-                "token_type": {
-                    "description": "example: bearer",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/fields.Field-string"
-                        }
-                    ]
-                }
-            }
-        },
-        "fields.Field-int": {
-            "type": "object",
-            "properties": {
-                "value": {
-                    "type": "integer"
-                }
-            }
-        },
-        "fields.Field-string": {
-            "type": "object",
-            "properties": {
-                "value": {
-                    "type": "string"
-                }
-            }
-        },
-        "schemas.AccessToken": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "$ref": "#/definitions/authfields.AccessToken"
+                    "description": "A generated web token. The 'Bearer ' prefix needs to be added for authentication",
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"
                 },
                 "email": {
-                    "$ref": "#/definitions/userfields.Email"
+                    "description": "The user email",
+                    "type": "string",
+                    "example": "mslimbeji@gmail.com"
                 },
                 "expires_in": {
-                    "$ref": "#/definitions/authfields.ExpiresIn"
+                    "description": "The UNIX timestamp the token expires at",
+                    "type": "integer",
+                    "example": 1751879562
                 },
                 "token_type": {
-                    "$ref": "#/definitions/authfields.TokenType"
+                    "description": "The type of token. Only 'bearer' is supported.",
+                    "type": "string",
+                    "enum": [
+                        "bearer"
+                    ],
+                    "example": "bearer"
                 },
                 "userId": {
-                    "$ref": "#/definitions/userfields.ID"
-                }
-            }
-        },
-        "userfields.Email": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "description": "example: mslimbeji@gmail.com",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/fields.Field-string"
-                        }
-                    ]
-                }
-            }
-        },
-        "userfields.ID": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "description": "example: 683b21134e2e5d46978daf1f",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/fields.Field-string"
-                        }
-                    ]
+                    "description": "The user ID, 24 characters",
+                    "type": "string",
+                    "example": "683b21134e2e5d46978daf1f"
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "Registration and Authentication endpoints",
+            "name": "Auth"
+        },
+        {
+            "description": "Hello World endpoints",
+            "name": "Hello World"
+        },
+        {
+            "description": "User crud endpoints",
+            "name": "User"
+        },
+        {
+            "description": "Place crud endpoints",
+            "name": "Place"
+        }
+    ]
 }

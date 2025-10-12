@@ -1,94 +1,114 @@
 definitions:
-  authfields.AccessToken:
+  schemas.EncodedToken:
     properties:
       access_token:
-        allOf:
-        - $ref: '#/definitions/fields.Field-string'
-        description: 'example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-    type: object
-  authfields.ExpiresIn:
-    properties:
-      expires_in:
-        allOf:
-        - $ref: '#/definitions/fields.Field-int'
-        description: 'example: 1751879562'
-    type: object
-  authfields.TokenType:
-    properties:
-      token_type:
-        allOf:
-        - $ref: '#/definitions/fields.Field-string'
-        description: 'example: bearer'
-    type: object
-  fields.Field-int:
-    properties:
-      value:
-        type: integer
-    type: object
-  fields.Field-string:
-    properties:
-      value:
+        description: A generated web token. The 'Bearer ' prefix needs to be added
+          for authentication
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM
         type: string
-    type: object
-  schemas.AccessToken:
-    properties:
-      access_token:
-        $ref: '#/definitions/authfields.AccessToken'
       email:
-        $ref: '#/definitions/userfields.Email'
+        description: The user email
+        example: mslimbeji@gmail.com
+        type: string
       expires_in:
-        $ref: '#/definitions/authfields.ExpiresIn'
+        description: The UNIX timestamp the token expires at
+        example: 1751879562
+        type: integer
       token_type:
-        $ref: '#/definitions/authfields.TokenType'
+        description: The type of token. Only 'bearer' is supported.
+        enum:
+        - bearer
+        example: bearer
+        type: string
       userId:
-        $ref: '#/definitions/userfields.ID'
-    type: object
-  userfields.Email:
-    properties:
-      email:
-        allOf:
-        - $ref: '#/definitions/fields.Field-string'
-        description: 'example: mslimbeji@gmail.com'
-    type: object
-  userfields.ID:
-    properties:
-      id:
-        allOf:
-        - $ref: '#/definitions/fields.Field-string'
-        description: 'example: 683b21134e2e5d46978daf1f'
+        description: The user ID, 24 characters
+        example: 683b21134e2e5d46978daf1f
+        type: string
+    required:
+    - access_token
+    - email
+    - expires_in
+    - token_type
+    - userId
     type: object
 info:
   contact: {}
 paths:
-  /accounts/{id}:
-    get:
+  /api/auth/signin:
+    post:
       consumes:
-      - application/json
-      description: get string by ID
+      - application/x-www-form-urlencoded
       parameters:
-      - example: test@example.com
-        in: query
-        name: email
-        required: true
-        type: string
-      - example: mypassword
-        in: query
+      - default: very_secret
+        description: The user password, 8 characters at least
+        in: formData
+        minLength: 8
         name: password
         required: true
         type: string
-      - description: Account ID
-        in: path
-        name: id
+      - default: mslimbeji@gmail.com
+        description: The user email (We use username here because of OAuth spec)
+        in: formData
+        name: username
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemas.AccessToken'
-      summary: Show account
+            $ref: '#/definitions/schemas.EncodedToken'
+      summary: User authentication
       tags:
-      - accounts
+      - Auth
+  /api/auth/signup:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: The user email
+        example: mslimbeji@gmail.com
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: The user name, two characters at least
+        example: Slim Beji
+        in: formData
+        minLength: 2
+        name: name
+        required: true
+        type: string
+      - description: The user password, 8 characters at least
+        example: very_secret
+        in: formData
+        minLength: 8
+        name: password
+        required: true
+        type: string
+      - description: User's profile image (JPEG)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.EncodedToken'
+      summary: User registration
+      tags:
+      - Auth
 swagger: "2.0"
+tags:
+- description: Registration and Authentication endpoints
+  name: Auth
+- description: Hello World endpoints
+  name: Hello World
+- description: User crud endpoints
+  name: User
+- description: Place crud endpoints
+  name: Place
