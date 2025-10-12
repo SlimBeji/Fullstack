@@ -7,47 +7,47 @@ import (
 )
 
 type UserDB struct {
-	Id       string   `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
-	Name     string   `json:"name" bson:"name" validate:"required,min=2"`
-	Email    string   `json:"email" bson:"email" validate:"required,email"`
-	IsAdmin  bool     `json:"isAdmin" bson:"isAdmin" validate:"required"`
-	Password any      `json:"password" bson:"password" validate:"required,min=8"`
-	ImageUrl string   `json:"imageUrl" bson:"imageUrl"`
-	Places   []string `json:"places" bson:"places" validate:"required,dive,hexadecimal,len=24"`
+	Id       string   `json:"id" validate:"required,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`         // The user ID, 24 characters
+	Name     string   `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`                                            // The user name, two characters at least
+	Email    string   `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`                                // The user email
+	IsAdmin  bool     `json:"isAdmin" validate:"required" example:"false" bson:"isAdmin"`                                                // Whether the user is an admin or not
+	Password any      `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`                                  // The user password, 8 characters at least
+	ImageUrl string   `json:"imageUrl" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"`                       // local url on the storage
+	Places   []string `json:"places" validate:"required,dive,hexadecimal,len=24" example:"[\"683b21134e2e5d46978daf1f\"]" bson:"places"` // The id of places belonging to the user, 24 characters
 }
 
 type UserSeed struct {
 	Ref      int
-	Name     string `json:"name" bson:"name" validate:"required,min=2"`
-	Email    string `json:"email" bson:"email" validate:"required,email"`
-	IsAdmin  bool   `json:"isAdmin" bson:"isAdmin" validate:"required"`
-	Password any    `json:"password" bson:"password" validate:"required,min=8"`
-	ImageUrl string `json:"imageUrl" bson:"imageUrl"`
+	Name     string `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`                      // The user name, two characters at least
+	Email    string `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`          // The user email
+	IsAdmin  bool   `json:"isAdmin" validate:"required" example:"false" bson:"isAdmin"`                          // Whether the user is an admin or not
+	Password any    `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`            // The user password, 8 characters at least
+	ImageUrl string `json:"imageUrl" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 }
 
 type UserCreate struct {
-	Name     string `json:"name" bson:"name" validate:"required,min=2"`
-	Email    string `json:"email" bson:"email" validate:"required,email"`
-	IsAdmin  bool   `json:"isAdmin" bson:"isAdmin" validate:"required"`
-	Password any    `json:"password" bson:"password" validate:"required,min=8"`
-	ImageUrl string `json:"imageUrl" bson:"imageUrl"`
+	Name     string `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`                      // The user name, two characters at least
+	Email    string `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`          // The user email
+	IsAdmin  bool   `json:"isAdmin" validate:"required" example:"false" bson:"isAdmin"`                          // Whether the user is an admin or not
+	Password any    `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`            // The user password, 8 characters at least
+	ImageUrl string `json:"imageUrl" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 }
 
 type UserPost struct {
-	Name     string                `json:"name" bson:"name" validate:"required,min=2"`
-	Email    string                `json:"email" bson:"email" validate:"required,email"`
-	IsAdmin  bool                  `json:"isAdmin" bson:"isAdmin" validate:"required"`
-	Password any                   `json:"password" bson:"password" validate:"required,min=8"`
-	Image    *multipart.FileHeader `json:"image" bson:"image"`
+	Name     string                `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`             // The user name, two characters at least
+	Email    string                `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"` // The user email
+	IsAdmin  bool                  `json:"isAdmin" validate:"required" example:"false" bson:"isAdmin"`                 // Whether the user is an admin or not
+	Password any                   `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" bson:"image"`                                                         // User's profile image (JPEG)
 }
 
 type UserRead struct {
-	Id       string   `json:"id" bson:"_id,omitempty" validate:"required,hexadecimal,len=24"`
-	Name     string   `json:"name" bson:"name" validate:"required,min=2"`
-	Email    string   `json:"email" bson:"email" validate:"required,email"`
-	IsAdmin  bool     `json:"isAdmin" bson:"isAdmin" validate:"required"`
-	ImageUrl string   `json:"imageUrl" bson:"imageUrl"`
-	Places   []string `json:"places" bson:"places" validate:"required,dive,hexadecimal,len=24"`
+	Id       string   `json:"id" validate:"required,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`         // The user ID, 24 characters
+	Name     string   `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`                                            // The user name, two characters at least
+	Email    string   `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`                                // The user email
+	IsAdmin  bool     `json:"isAdmin" validate:"required" example:"false" bson:"isAdmin"`                                                // Whether the user is an admin or not
+	ImageUrl string   `json:"imageUrl" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"`                       // local url on the storage
+	Places   []string `json:"places" validate:"required,dive,hexadecimal,len=24" example:"[\"683b21134e2e5d46978daf1f\"]" bson:"places"` // The id of places belonging to the user, 24 characters
 }
 
 type UsersPaginated = types_.RecordsPaginated[PlaceRead]
@@ -57,15 +57,15 @@ type UserFilters struct {
 	Size   string   `json:"size"`
 	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email"`
 	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places"`
-	Id     []string `json:"id" filter:"string,hexadecimal,len=24"`
-	Name   []string `json:"name" filter:"string,min=2"`
-	Email  []string `json:"email" filter:"string,email"`
+	Id     []string `json:"id" filter:"string,hexadecimal,len=24"`                        // The user ID, 24 characters
+	Name   []string `json:"name" filter:"string,min=2" example:"eq:Slim Beji"`            // The user name, two characters at least
+	Email  []string `json:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com"` // The user email
 }
 
 type UserUpdate struct {
-	Name     string `json:"name" bson:"name" validate:"min=2"`
-	Email    string `json:"email" bson:"email" validate:"email"`
-	Password any    `json:"password" bson:"password" validate:"min=8"`
+	Name     string `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`             // The user name, two characters at least
+	Email    string `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"` // The user email
+	Password any    `json:"password" validate:"min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
 }
 
 type UserPut struct {

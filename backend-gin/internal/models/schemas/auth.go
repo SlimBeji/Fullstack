@@ -6,26 +6,26 @@ import (
 )
 
 type TokenPayload struct {
-	UserId string `json:"userId" bson:"userId" validate:"required,hexadecimal,len=24"`
-	Email  string `json:"email" bson:"email" validate:"required,email"`
+	UserId string `json:"userId" validate:"required,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"userId"` // The user ID, 24 characters
+	Email  string `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`                     // The user email
 }
 
 type SignupForm struct {
-	Name     string                `json:"name" bson:"name" validate:"required,min=2"`
-	Email    string                `json:"email" bson:"email" validate:"required,email"`
-	Password any                   `json:"password" bson:"password" validate:"required,min=8"`
-	Image    *multipart.FileHeader `json:"image" bson:"image"`
+	Name     string                `json:"name" validate:"required,min=2" example:"Slim Beji" bson:"name"`             // The user name, two characters at least
+	Email    string                `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"` // The user email
+	Password string                `json:"password" validate:"required,min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" bson:"image"`                                                         // User's profile image (JPEG)
 }
 
 type SigninForm struct {
-	Username string `json:"username" bson:"username" validate:"required,email"`
-	Password any    `json:"password" bson:"password" validate:"required,min=8"`
+	Username string `json:"username" validate:"required,email" default:"mslimbeji@gmail.com" bson:"username"` // The user email (We use username here because of OAuth spec)
+	Password string `json:"password" validate:"required,min=8" default:"very_secret" bson:"password"`         // The user password, 8 characters at least
 }
 
 type EncodedToken struct {
-	AccessToken string `json:"access_token" bson:"access_token" validate:"required"`
-	TokenType   string `json:"token_type" bson:"token_type" validate:"required,oneof=bearer"`
-	UserId      string `json:"userId" bson:"userId" validate:"required,hexadecimal,len=24"`
-	Email       string `json:"email" bson:"email" validate:"required,email"`
-	ExpiresIn   int    `json:"expires_in" bson:"expires_in" validate:"required"`
+	AccessToken string `json:"access_token" validate:"required" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM" bson:"access_token"` // A generated web token. The 'Bearer ' prefix needs to be added for authentication
+	TokenType   string `json:"token_type" validate:"required,oneof=bearer" example:"bearer" bson:"token_type"`                                                                                                                                                                                                         // The type of token. Only 'bearer' is supported.
+	UserId      string `json:"userId" validate:"required,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"userId"`                                                                                                                                                                                         // The user ID, 24 characters
+	Email       string `json:"email" validate:"required,email" example:"mslimbeji@gmail.com" bson:"email"`                                                                                                                                                                                                             // The user email
+	ExpiresIn   int    `json:"expires_in" validate:"required" example:"1751879562" bson:"expires_in"`                                                                                                                                                                                                                  // The UNIX timestamp the token expires at
 }
