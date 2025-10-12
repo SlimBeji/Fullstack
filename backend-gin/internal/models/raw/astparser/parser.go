@@ -40,10 +40,14 @@ func parseFlags() (*Flags, error) {
 }
 
 type FieldMeta struct {
-	Type     string `yaml:"type"`
-	JSON     string `yaml:"json"`
-	BSON     string `yaml:"bson"`
-	Validate string `yaml:"validate"`
+	Type          string `yaml:"type"`
+	JSON          string `yaml:"json"`
+	BSON          string `yaml:"bson"`
+	Validate      string `yaml:"validate"`
+	Description   string `yaml:"description"`
+	Default       string `yaml:"default"`
+	Example       string `yaml:"example"`
+	FilterExample string `yaml:"filter-example"`
 }
 
 type Config struct {
@@ -225,6 +229,7 @@ type FieldTransformer struct {
 	names       []string
 	typeStr     string
 	annotations map[string]string
+	comment     string
 	meta        *FieldMeta
 	required    bool
 	targetTag   string
@@ -249,14 +254,25 @@ func (ft *FieldTransformer) AnnotationString() string {
 		parts = append(parts, fmt.Sprintf("filter:\"%s\"", val))
 	}
 
-	val, exists = ft.annotations["bson"]
-	if exists {
-		parts = append(parts, fmt.Sprintf("bson:\"%s\"", val))
-	}
-
 	val, exists = ft.annotations["validate"]
 	if exists {
 		parts = append(parts, fmt.Sprintf("validate:\"%s\"", val))
+	}
+
+	val, exists = ft.annotations["default"]
+	if exists {
+		parts = append(parts, fmt.Sprintf("default:\"%s\"", val))
+	} else {
+		// No point of writing an example if a default value is provided
+		val, exists = ft.annotations["example"]
+		if exists {
+			parts = append(parts, fmt.Sprintf("example:\"%s\"", val))
+		}
+	}
+
+	val, exists = ft.annotations["bson"]
+	if exists {
+		parts = append(parts, fmt.Sprintf("bson:\"%s\"", val))
 	}
 
 	merged := strings.Join(parts, " ")
@@ -267,9 +283,15 @@ func (ft *FieldTransformer) AnnotationString() string {
 }
 
 func (ft *FieldTransformer) String() string {
-	ident := ft.MergedNames()
+	result := ft.MergedNames() + " " + ft.typeStr
 	annotations := ft.AnnotationString()
-	return strings.TrimSpace(ident + " " + ft.typeStr + " " + annotations)
+	if annotations != "" {
+		result = result + " " + annotations
+	}
+	if ft.comment != "" {
+		result = result + " // " + ft.comment
+	}
+	return strings.TrimSpace(result)
 }
 
 func (ft *FieldTransformer) LoadConfig(config Config, cmd SchemasCommand) error {
@@ -284,12 +306,14 @@ func (ft *FieldTransformer) LoadConfig(config Config, cmd SchemasCommand) error 
 		// Generating filters schema mode
 		ft.typeStr = "[]string"
 		ft.updateFiltersAnnotations()
+		ft.comment = ft.meta.Description
 	default:
 		// Annotating schemas mode
 		if ft.typeStr == "any" && meta.Type != "" {
 			ft.typeStr = meta.Type
 		}
 		ft.updateSchemasAnnotations()
+		ft.comment = ft.meta.Description
 	}
 
 	return nil
@@ -323,6 +347,11 @@ func (ft *FieldTransformer) updateSchemasAnnotations() {
 	if validate != "" {
 		ft.annotations["validate"] = strings.Trim(validate, ",")
 	}
+
+	// Example tag
+	if ft.meta.Example != "" {
+		ft.annotations["example"] = ft.meta.Example
+	}
 }
 
 func (ft *FieldTransformer) updateFiltersAnnotations() {
@@ -345,6 +374,11 @@ func (ft *FieldTransformer) updateFiltersAnnotations() {
 	}
 	if filter != "" {
 		ft.annotations["filter"] = strings.Trim(filter, ",")
+	}
+
+	// Example tag
+	if ft.meta.FilterExample != "" {
+		ft.annotations["example"] = ft.meta.FilterExample
 	}
 }
 
