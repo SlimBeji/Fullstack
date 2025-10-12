@@ -3,8 +3,9 @@ package types_
 type ContentType string
 
 const (
-	CONTENT_TYPE_MULTIPART ContentType = "multipart/form-data"
-	CONTENT_TYPE_JSON      ContentType = "application/json"
+	CONTENT_TYPE_MULTIPART       ContentType = "multipart/form-data"
+	CONTENT_TYPE_FORM_URLENCODED ContentType = "application/x-www-form-urlencoded"
+	CONTENT_TYPE_JSON            ContentType = "application/json"
 )
 
 type MimeType string
