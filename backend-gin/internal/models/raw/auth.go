@@ -18,8 +18,8 @@ type SignupForm struct {
 
 // schemas:tag
 type SigninForm struct {
-	Username any `tag:"username"`
-	Password any `tag:"password"`
+	Username any `tag:"username" default:"mslimbeji@gmail.com"`
+	Password any `tag:"password" default:"very_secret"`
 }
 
 // schemas:tag
