@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/api/middlewares"
 	"backend/internal/api/routes"
 	"backend/internal/config"
 	"fmt"
@@ -22,6 +23,7 @@ import (
 // @tag.description Place crud endpoints
 func main() {
 	r := gin.Default()
+	r.Use(middlewares.CORS())
 	routes.RegisterRoutes(r)
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run(fmt.Sprintf(":%d", config.Env.Port))
