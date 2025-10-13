@@ -19,7 +19,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 		user.Id = "683b21134e2e5d46978daf1f"
 		user.Name = "Slimx"
 		user.Email = "mslimbeji@gmail.com"
-		user.IsAdmin = false
+		user.IsAdmin = true
 		user.ImageUrl = "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
 		user.Places = []string{"683b21134e2e5d46978daf1f"}
 
