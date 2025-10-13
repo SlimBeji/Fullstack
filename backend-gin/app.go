@@ -21,6 +21,8 @@ import (
 // @tag.description User crud endpoints
 // @tag.name Place
 // @tag.description Place crud endpoints
+// @securityDefinitions.oauth2.password OAuth2Password
+// @tokenUrl /api/auth/signin
 func main() {
 	r := gin.Default()
 	r.Use(middlewares.CORS())
