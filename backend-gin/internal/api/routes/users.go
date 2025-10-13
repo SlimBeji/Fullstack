@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
 	"fmt"
 	"net/http"
@@ -9,23 +10,65 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary      User creation
+// @Tags         User
+// @Accept       mpfd
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        params formData schemas.UserPost true "POST parameters"
+// @Param        image  formData file   true "the user profile image"
+// @Success      200  {object}  schemas.UserRead
+// @Router       /api/users [post]
 func createUser(c *gin.Context) {
+	body, _ := utils.GetBody[schemas.UserPost](c)
+	fmt.Println(body)
 	user := c.MustGet("currentUser").(schemas.UserRead)
 	c.JSON(http.StatusOK, user)
 }
 
+// @Summary      Search and Retrieve user by id
+// @Tags         User
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        userId path string true "User ID"
+// @Success      200  {object}  schemas.UserRead
+// @Router       /api/users/{userId} [get]
 func getUser(c *gin.Context) {
 	fmt.Println(c.Param("userId"))
 	user := c.MustGet("currentUser").(schemas.UserRead)
 	c.JSON(http.StatusOK, user)
 }
 
+// @Summary      Update users
+// @Tags         User
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        userId path string true "User ID"
+// @Param        params body schemas.UserPut true "PUT parameters"
+// @Success      200  {object}  schemas.UserRead
+// @Router       /api/users/{userId} [put]
 func updateUser(c *gin.Context) {
+	body, _ := utils.GetBody[schemas.UserPut](c)
+	fmt.Println(body)
 	fmt.Println(c.Param("userId"))
 	user := c.MustGet("currentUser").(schemas.UserRead)
 	c.JSON(http.StatusOK, user)
 }
 
+type DeleteResponseExample struct {
+	Message string `json:"message" example:"Deleted user 507f1f77bcf86cd799439011"`
+}
+
+// @Summary      Delete user by id
+// @Tags         User
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        userId path string true "User ID"
+// @Success      200  {object}  DeleteResponseExample
+// @Router       /api/users/{userId} [delete]
 func deleteUser(c *gin.Context) {
 	userId := c.Param("userId")
 	message := fmt.Sprintf("Deleted user %s", userId)
@@ -34,8 +77,18 @@ func deleteUser(c *gin.Context) {
 
 func RegisterUsers(r *gin.Engine) {
 	router := r.Group(("/api/users"))
-	router.POST("", middlewares.Admin, createUser)
+	router.POST(
+		"",
+		middlewares.Admin,
+		middlewares.BodyExtractor[schemas.UserPost],
+		createUser,
+	)
 	router.GET("/:userId", middlewares.Authenticated, getUser)
-	router.PUT("/:userId", middlewares.Authenticated, updateUser)
+	router.PUT(
+		"/:userId",
+		middlewares.Authenticated,
+		middlewares.BodyExtractor[schemas.UserPut],
+		updateUser,
+	)
 	router.DELETE("/:userId", middlewares.Admin, deleteUser)
 }

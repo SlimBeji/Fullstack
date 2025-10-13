@@ -1,4 +1,10 @@
 definitions:
+  routes.DeleteResponseExample:
+    properties:
+      message:
+        example: Deleted user 507f1f77bcf86cd799439011
+        type: string
+    type: object
   routes.ResponseExample:
     properties:
       message:
@@ -35,6 +41,60 @@ definitions:
     - expires_in
     - token_type
     - userId
+    type: object
+  schemas.UserPut:
+    properties:
+      email:
+        description: The user email
+        example: mslimbeji@gmail.com
+        type: string
+      name:
+        description: The user name, two characters at least
+        example: Slim Beji
+        minLength: 2
+        type: string
+      password:
+        description: The user password, 8 characters at least
+        example: very_secret
+        minLength: 8
+        type: string
+    type: object
+  schemas.UserRead:
+    properties:
+      email:
+        description: The user email
+        example: mslimbeji@gmail.com
+        type: string
+      id:
+        description: The user ID, 24 characters
+        example: 683b21134e2e5d46978daf1f
+        type: string
+      imageUrl:
+        description: local url on the storage
+        example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
+        type: string
+      isAdmin:
+        description: Whether the user is an admin or not
+        example: false
+        type: boolean
+      name:
+        description: The user name, two characters at least
+        example: Slim Beji
+        minLength: 2
+        type: string
+      places:
+        description: The id of places belonging to the user, 24 characters
+        example:
+        - 683b21134e2e5d46978daf1f
+        items:
+          type: string
+        type: array
+    required:
+    - email
+    - id
+    - isAdmin
+    - name
+    - places
     type: object
 info:
   contact: {}
@@ -149,6 +209,128 @@ paths:
       summary: Hello World Endpoint for authenticated users
       tags:
       - Hello World
+  /api/users:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: The user email
+        example: mslimbeji@gmail.com
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Whether the user is an admin or not
+        example: false
+        in: formData
+        name: isAdmin
+        required: true
+        type: boolean
+      - description: The user name, two characters at least
+        example: Slim Beji
+        in: formData
+        minLength: 2
+        name: name
+        required: true
+        type: string
+      - description: The user password, 8 characters at least
+        example: very_secret
+        in: formData
+        minLength: 8
+        name: password
+        required: true
+        type: string
+      - description: the user profile image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: User creation
+      tags:
+      - User
+  /api/users/{userId}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.DeleteResponseExample'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Delete user by id
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Search and Retrieve user by id
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: PUT parameters
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserPut'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Update users
+      tags:
+      - User
 securityDefinitions:
   OAuth2Password:
     flow: password
