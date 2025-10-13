@@ -21,7 +21,7 @@ fields:
         example: "mslimbeji@gmail.com"
         filter-example: "eq:mslimbeji@gmail.com"
     password:
-        type: ""
+        type: "string"
         validate: "min=8"
         description: "The user password, 8 characters at least"
         example: "very_secret"
@@ -41,7 +41,7 @@ fields:
         type: "[]string"
         validate: "dive,hexadecimal,len=24"
         description: "The id of places belonging to the user, 24 characters"
-        example: '[\"683b21134e2e5d46978daf1f\"]'
+        example: "683b21134e2e5d46978daf1f"
 selectables:
     - id
     - name

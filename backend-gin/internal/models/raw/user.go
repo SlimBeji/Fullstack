@@ -40,11 +40,11 @@ type UserCreate struct {
 
 // schemas:tag
 type UserPost struct {
-	Name     any `tag:"name"`
-	Email    any `tag:"email"`
-	IsAdmin  any `tag:"isAdmin"`
-	Password any `tag:"password"`
-	Image    any `tag:"image,optional"`
+	Name     any `tag:"name" form:"name"`
+	Email    any `tag:"email" form:"email"`
+	IsAdmin  any `tag:"isAdmin" form:"isAdmin"`
+	Password any `tag:"password" form:"password"`
+	Image    any `tag:"image,optional" form:"image"`
 }
 
 /////// Read Schemas /////////////
