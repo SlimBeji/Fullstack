@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func BodyExtractor[T any](c *gin.Context) {
+func BodyValidator[T any](c *gin.Context) {
 	var form T
 	var err error
 

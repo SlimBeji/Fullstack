@@ -80,14 +80,14 @@ func RegisterUsers(r *gin.Engine) {
 	router.POST(
 		"",
 		middlewares.Admin,
-		middlewares.BodyExtractor[schemas.UserPost],
+		middlewares.BodyValidator[schemas.UserPost],
 		createUser,
 	)
 	router.GET("/:userId", middlewares.Authenticated, getUser)
 	router.PUT(
 		"/:userId",
 		middlewares.Authenticated,
-		middlewares.BodyExtractor[schemas.UserPut],
+		middlewares.BodyValidator[schemas.UserPut],
 		updateUser,
 	)
 	router.DELETE("/:userId", middlewares.Admin, deleteUser)

@@ -49,6 +49,6 @@ func signin(c *gin.Context) {
 
 func RegisterAuth(r *gin.Engine) {
 	router := r.Group("/api/auth")
-	router.POST("/signup", middlewares.BodyExtractor[schemas.SignupForm], signup)
-	router.POST("/signin", middlewares.BodyExtractor[schemas.SigninForm], signin)
+	router.POST("/signup", middlewares.BodyValidator[schemas.SignupForm], signup)
+	router.POST("/signin", middlewares.BodyValidator[schemas.SigninForm], signin)
 }
