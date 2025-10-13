@@ -1,4 +1,9 @@
 definitions:
+  routes.ResponseExample:
+    properties:
+      message:
+        type: string
+    type: object
   schemas.EncodedToken:
     properties:
       access_token:
@@ -102,6 +107,53 @@ paths:
       summary: User registration
       tags:
       - Auth
+  /api/hello-world/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.ResponseExample'
+      summary: Hello World Endpoint
+      tags:
+      - Hello World
+  /api/hello-world/admin:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.ResponseExample'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Hello World Endpoint for admins only
+      tags:
+      - Hello World
+  /api/hello-world/user:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.ResponseExample'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Hello World Endpoint for authenticated users
+      tags:
+      - Hello World
+securityDefinitions:
+  OAuth2Password:
+    flow: password
+    tokenUrl: /api/auth/signin
+    type: oauth2
 swagger: "2.0"
 tags:
 - description: Registration and Authentication endpoints

@@ -112,9 +112,88 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/hello-world/": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hello World"
+                ],
+                "summary": "Hello World Endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.ResponseExample"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/hello-world/admin": {
+            "get": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hello World"
+                ],
+                "summary": "Hello World Endpoint for admins only",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.ResponseExample"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/hello-world/user": {
+            "get": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hello World"
+                ],
+                "summary": "Hello World Endpoint for authenticated users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.ResponseExample"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "routes.ResponseExample": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.EncodedToken": {
             "type": "object",
             "required": [
@@ -154,6 +233,13 @@ const docTemplate = `{
                     "example": "683b21134e2e5d46978daf1f"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "OAuth2Password": {
+            "type": "oauth2",
+            "flow": "password",
+            "tokenUrl": "/api/auth/signin"
         }
     },
     "tags": [
