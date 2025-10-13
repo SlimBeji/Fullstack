@@ -13,7 +13,7 @@ type UserDB struct {
 	Email    any `tag:"email"`
 	IsAdmin  any `tag:"isAdmin"`
 	Password any `tag:"password"`
-	ImageUrl any `tag:"imageUrl,optional"`
+	ImageUrl any `tag:"imageUrl,omitempty"`
 	Places   any `tag:"places"`
 }
 
@@ -24,7 +24,7 @@ type UserSeed struct {
 	Email    any `tag:"email"`
 	IsAdmin  any `tag:"isAdmin"`
 	Password any `tag:"password"`
-	ImageUrl any `tag:"imageUrl,optional"`
+	ImageUrl any `tag:"imageUrl,omitempty"`
 }
 
 /////// Creation Schemas /////////////
@@ -35,7 +35,7 @@ type UserCreate struct {
 	Email    any `tag:"email"`
 	IsAdmin  any `tag:"isAdmin"`
 	Password any `tag:"password"`
-	ImageUrl any `tag:"imageUrl,optional"`
+	ImageUrl any `tag:"imageUrl,omitempty"`
 }
 
 // schemas:tag
@@ -44,7 +44,7 @@ type UserPost struct {
 	Email    any `tag:"email" form:"email"`
 	IsAdmin  any `tag:"isAdmin" form:"isAdmin"`
 	Password any `tag:"password" form:"password"`
-	Image    any `tag:"image,optional" form:"image"`
+	Image    any `tag:"image,omitempty" form:"image"`
 }
 
 /////// Read Schemas /////////////
@@ -55,7 +55,7 @@ type UserRead struct {
 	Name     any `tag:"name"`
 	Email    any `tag:"email"`
 	IsAdmin  any `tag:"isAdmin"`
-	ImageUrl any `tag:"imageUrl,optional"`
+	ImageUrl any `tag:"imageUrl,omitempty"`
 	Places   any `tag:"places"`
 }
 
@@ -72,11 +72,11 @@ type UserFilters struct {
 
 /////// Update Schemas /////////////
 
-// schemas:tag
+// schemas:tag omitall
 type UserUpdate struct {
-	Name     any `tag:"name,optional"`
-	Email    any `tag:"email,optional"`
-	Password any `tag:"password,optional"`
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	Password any `tag:"password"`
 }
 
 // schemas:tag

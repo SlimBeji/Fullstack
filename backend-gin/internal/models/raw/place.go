@@ -23,7 +23,7 @@ type PlaceDB struct {
 	Description any      `tag:"description"`
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
-	ImageUrl    any      `tag:"imageUrl,optional"`
+	ImageUrl    any      `tag:"imageUrl,omitempty"`
 	Embedding   any      `tag:"embedding"`
 	CreatorID   any      `tag:"creatorId"`
 }
@@ -37,7 +37,7 @@ type PlacSeed struct {
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
 	Embedding   any      `tag:"embedding"`
-	ImageUrl    any      `tag:"imageUrl,optional"`
+	ImageUrl    any      `tag:"imageUrl,omitempty"`
 }
 
 /////// Creation Schemas /////////////
@@ -49,7 +49,7 @@ type PlaceCreate struct {
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
 	Embedding   any      `tag:"embedding"`
-	ImageUrl    any      `tag:"imageUrl,optional"`
+	ImageUrl    any      `tag:"imageUrl,omitempty"`
 	CreatorID   any      `tag:"creatorId"`
 }
 
@@ -59,7 +59,7 @@ type PlacePost struct {
 	Description any      `tag:"description"`
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
-	Image       any      `tag:"image,optional"`
+	Image       any      `tag:"image,omitempty"`
 	CreatorID   any      `tag:"creatorId"`
 }
 
@@ -72,7 +72,7 @@ type PlaceRead struct {
 	Description any      `tag:"description"`
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
-	ImageUrl    any      `tag:"imageUrl,optional"`
+	ImageUrl    any      `tag:"imageUrl,omitempty"`
 	CreatorID   any      `tag:"creatorId"`
 }
 
@@ -93,13 +93,13 @@ type PlaceFilters struct {
 
 /////// Update Schemas /////////////
 
-// schemas:tag
+// schemas:tag omitall
 type PlaceUpdate struct {
-	Title       any      `tag:"title,optional"`
-	Description any      `tag:"description,optional"`
-	Address     any      `tag:"address,optional"`
-	Location    Location `tag:"location,optional"`
-	CreatorID   any      `tag:"creatorId,optional"`
+	Title       any      `tag:"title"`
+	Description any      `tag:"description"`
+	Address     any      `tag:"address"`
+	Location    Location `tag:"location"`
+	CreatorID   any      `tag:"creatorId"`
 }
 
 // schemas:tag

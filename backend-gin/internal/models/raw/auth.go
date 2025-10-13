@@ -13,7 +13,7 @@ type SignupForm struct {
 	Name     any `tag:"name" form:"name"`
 	Email    any `tag:"email" form:"email"`
 	Password any `tag:"password" form:"password"`
-	Image    any `tag:"image,optional" form:"image"`
+	Image    any `tag:"image,omitempty" form:"image"`
 }
 
 // schemas:tag
