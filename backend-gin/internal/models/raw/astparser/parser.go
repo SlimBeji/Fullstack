@@ -2,6 +2,7 @@ package astparser
 
 import (
 	"backend/internal/lib/utils"
+	"regexp"
 
 	"errors"
 	"flag"
@@ -122,34 +123,50 @@ func addImports(
 	return nil
 }
 
-const SchemasPrefix = "schemas:"
-
 type SchemasCommand string
 
 const (
-	SkipCmd    SchemasCommand = "skip"
 	TagCmd     SchemasCommand = "tag"
 	FiltersCmd SchemasCommand = "filters"
 )
 
-func parseCommand(group *ast.CommentGroup) SchemasCommand {
+type StructParsingOptions struct {
+	cmd       SchemasCommand
+	allownil  bool
+	multipart bool
+}
+
+func parseOptions(group *ast.CommentGroup) *StructParsingOptions {
+	const SchemasPrefix = "schemas:"
+
 	if group == nil {
-		return SkipCmd
+		return nil
 	}
 
 	text := strings.TrimSpace(group.Text())
 	if !strings.HasPrefix(text, string(SchemasPrefix)) {
-		return SkipCmd
+		return nil
 	}
 
-	cmd := strings.TrimSpace(strings.TrimPrefix(text, string(SchemasPrefix)))
-	parsed := SchemasCommand(cmd)
-	switch parsed {
-	case TagCmd, FiltersCmd:
-		return parsed
-	default:
-		return SkipCmd
+	// extract command
+	cmdString := strings.TrimSpace(strings.TrimPrefix(text, string(SchemasPrefix)))
+	re := regexp.MustCompile(`^([^\s]+)`)
+	match := re.FindStringSubmatch(cmdString)
+	if len(match) < 2 {
+		return nil
 	}
+	cmd := SchemasCommand(match[1])
+	if cmd != TagCmd && cmd != FiltersCmd {
+		return nil
+	}
+
+	// Check if we allownil
+	allownil := strings.Contains(cmdString, "allownil")
+
+	// Check if multipart
+	multipart := strings.Contains(cmdString, "multipart")
+
+	return &StructParsingOptions{cmd: cmd, allownil: allownil, multipart: multipart}
 }
 
 func iterateOverDeclarations(
@@ -168,8 +185,8 @@ func iterateOverDeclarations(
 			case token.CONST, token.VAR:
 				fileBuilder.WriteString(nodeToGoCode(decl, fset) + "\n")
 			case token.TYPE:
-				cmd := parseCommand(d.Doc)
-				if cmd == SkipCmd {
+				options := parseOptions(d.Doc)
+				if options == nil {
 					fileBuilder.WriteString(nodeToGoCode(decl, fset) + "\n")
 				} else {
 					if len(d.Specs) > 1 {
@@ -180,7 +197,7 @@ func iterateOverDeclarations(
 					if !ok {
 						return errors.New("schemas directive should be used with structs only")
 					}
-					err := processCmd(cmd, structType, typeSpec.Name.Name, config, fileBuilder)
+					err := writeStruct(structType, typeSpec.Name.Name, options, config, fileBuilder)
 					if err != nil {
 						return err
 					}
@@ -200,46 +217,230 @@ func nodeToGoCode(node ast.Node, fset *token.FileSet) string {
 	return buf.String()
 }
 
-func processCmd(
-	cmd SchemasCommand,
-	typeSpec *ast.StructType,
-	name string,
-	config Config,
-	fileBuilder *strings.Builder,
-) error {
-	var err error
-
-	switch cmd {
-	case TagCmd:
-		err = annotateStructDefinition(
-			typeSpec,
-			name,
-			config,
-			fileBuilder,
-		)
-	case FiltersCmd:
-		err = buildFilters(typeSpec, name, config, fileBuilder)
-
-	default:
-		err = fmt.Errorf("invalid schemas command: %s", cmd)
-	}
-	return err
-}
-
 type FieldTransformer struct {
-	names       []string
-	typeStr     string
-	annotations map[string]string
-	comment     string
-	meta        *FieldMeta
-	required    bool
+	field       *ast.Field
+	name        string
 	targetTag   string
-	jsonOption  string
-	tagOptions  []string
+	omitempty   bool
+	jsonName    string
+	annotations map[string]string
+	meta        *FieldMeta
+	comment     string
+	mode        SchemasCommand
+	isNullable  bool
+	isMultipart bool
+	typeStr     string
 }
 
-func (ft *FieldTransformer) MergedNames() string {
-	return strings.Join(ft.names, ", ")
+func (ft *FieldTransformer) readName() error {
+	if len(ft.field.Names) > 1 {
+		return errors.New("cannot annoatate more than one field per line")
+	}
+	if len(ft.field.Names) == 0 {
+		// Embdeded struct -> do nothing
+		return nil
+	}
+
+	ft.name = ft.field.Names[0].Name
+	return nil
+}
+
+func (ft *FieldTransformer) wrongTagFormat(tag string) error {
+	return fmt.Errorf("wrong tag format for field %s. Expected key:\"val\" or key:\"val1,val2\". Received: %s", ft.name, tag)
+}
+
+func (ft *FieldTransformer) readSpecialTag(tag string) error {
+	// example value: number,json=num,omitempty
+	if tag == "" {
+		return ft.wrongTagFormat(tag)
+	}
+	tag = strings.Trim(tag, "\"")
+
+	// extract targetTag
+	re := regexp.MustCompile(`^([^,]+)`)
+	match := re.FindStringSubmatch(tag)
+	if len(match) > 1 {
+		ft.targetTag = strings.Trim(match[1], `"`)
+	} else {
+		return ft.wrongTagFormat(tag)
+	}
+
+	// Check omitempty presence
+	ft.omitempty = strings.Contains(tag, "omitempty")
+
+	// Check json presence
+	re = regexp.MustCompile(`json=([^,]+)`)
+	match = re.FindStringSubmatch(tag)
+	if len(match) > 1 {
+		ft.jsonName = match[1]
+	}
+
+	return nil
+}
+
+func (ft *FieldTransformer) readTag() (bool, error) {
+	// Return false, nil if no tag
+	// Return false, err if an error encountered
+	// Return true, nil if the tag was read successfully
+
+	ft.annotations = make(map[string]string)
+	if ft.field.Tag == nil {
+		return false, nil
+	}
+
+	rawStr := strings.Trim(ft.field.Tag.Value, "`")
+	for tagStr := range strings.SplitSeq(rawStr, " ") {
+		if tagStr == "" {
+			continue
+		}
+
+		parts := strings.SplitN(tagStr, ":", 2)
+		if len(parts) != 2 {
+			return false, ft.wrongTagFormat(tagStr)
+		}
+
+		if parts[0] == "tag" {
+			if err := ft.readSpecialTag(parts[1]); err != nil {
+				return false, err
+			}
+		} else {
+			ft.annotations[parts[0]] = strings.Trim(parts[1], "\"")
+		}
+	}
+
+	return true, nil
+}
+
+func (ft *FieldTransformer) readConfig(config Config) error {
+	meta, exists := config.Fields[ft.targetTag]
+	if !exists {
+		return fmt.Errorf("no config for field(s) %s", ft.name)
+	}
+	ft.meta = &meta
+	ft.comment = meta.Description
+	return nil
+}
+
+func (ft *FieldTransformer) readStructOptions(options *StructParsingOptions) error {
+	if options.cmd != TagCmd && options.cmd != FiltersCmd {
+		return fmt.Errorf("unknown schemas command %s", options.cmd)
+	}
+	ft.mode = options.cmd
+
+	if options.allownil {
+		ft.isNullable = true
+	} else {
+		ft.isNullable = false
+	}
+
+	if options.multipart {
+		ft.isMultipart = true
+	} else {
+		ft.isMultipart = false
+	}
+
+	return nil
+}
+
+func (ft *FieldTransformer) readExpressionType(expr ast.Expr) string {
+	switch t := expr.(type) {
+	case *ast.Ident:
+		return t.Name
+	case *ast.ArrayType:
+		return "[]" + ft.readExpressionType(t.Elt)
+	case *ast.StarExpr:
+		return "*" + ft.readExpressionType(t.X)
+	case *ast.InterfaceType:
+		return "any"
+	default:
+		return "any"
+	}
+}
+
+func (ft *FieldTransformer) readType() error {
+	if ft.mode == FiltersCmd {
+		ft.typeStr = "[]string"
+	} else {
+		ft.typeStr = ft.readExpressionType(ft.field.Type)
+		if ft.typeStr == "any" && ft.meta.Type != "" {
+			ft.typeStr = ft.meta.Type
+		}
+		if ft.isNullable && !strings.HasPrefix(ft.typeStr, "*") {
+			// If nullable then use pointer as type
+			ft.typeStr = "*" + ft.typeStr
+		}
+	}
+	return nil
+}
+
+func (ft *FieldTransformer) syncSchemasAnnotations() {
+	// JSON tag
+	if ft.jsonName != "" {
+		ft.annotations["json"] = strings.TrimSpace(ft.jsonName)
+	} else if ft.meta.JSON != "" {
+		ft.annotations["json"] = strings.TrimSpace(ft.meta.JSON)
+	} else {
+		ft.annotations["json"] = ft.targetTag
+	}
+
+	// Form tag
+	if ft.isMultipart {
+		ft.annotations["form"] = ft.annotations["json"]
+	}
+
+	// BSON tag
+	if ft.meta.BSON != "" {
+		ft.annotations["bson"] = strings.TrimSpace(ft.meta.BSON)
+	} else {
+		ft.annotations["bson"] = ft.annotations["json"]
+	}
+
+	// Validate tag
+	validate := ""
+	if ft.omitempty || ft.isNullable {
+		validate = "omitempty"
+	}
+	if ft.meta.Validate != "" {
+		validate = validate + "," + ft.meta.Validate
+	}
+	if validate != "" {
+		ft.annotations["validate"] = strings.Trim(validate, ",")
+	}
+
+	// Example tag
+	if ft.meta.Example != "" {
+		ft.annotations["example"] = ft.meta.Example
+	}
+
+	// SwaggerIgnore
+	if ft.meta.SwaggerIgnore == "true" {
+		ft.annotations["swaggerignore"] = "true"
+	}
+}
+
+func (ft *FieldTransformer) syncFiltersAnnotations() {
+	// JSON tag
+	if ft.jsonName != "" {
+		ft.annotations["json"] = strings.TrimSpace(ft.jsonName)
+	} else if ft.meta.JSON != "" {
+		ft.annotations["json"] = strings.TrimSpace(ft.meta.JSON)
+	} else {
+		ft.annotations["json"] = ft.targetTag
+	}
+
+	// Filter tag
+	filter := ft.meta.Type
+	if ft.meta.Validate != "" {
+		filter = filter + "," + ft.meta.Validate
+	}
+	if filter != "" {
+		ft.annotations["filter"] = strings.Trim(filter, ",")
+	}
+
+	// Example tag
+	if ft.meta.FilterExample != "" {
+		ft.annotations["example"] = ft.meta.FilterExample
+	}
 }
 
 func (ft *FieldTransformer) AnnotationString() string {
@@ -271,7 +472,7 @@ func (ft *FieldTransformer) AnnotationString() string {
 }
 
 func (ft *FieldTransformer) String() string {
-	result := ft.MergedNames() + " " + ft.typeStr
+	result := ft.name + " " + ft.typeStr
 	annotations := ft.AnnotationString()
 	if annotations != "" {
 		result = result + " " + annotations
@@ -282,201 +483,73 @@ func (ft *FieldTransformer) String() string {
 	return strings.TrimSpace(result)
 }
 
-func (ft *FieldTransformer) LoadConfig(config Config, cmd SchemasCommand) error {
-	meta, exists := config.Fields[ft.targetTag]
-	if !exists {
-		return fmt.Errorf("no config for field(s) %s", ft.MergedNames())
-	}
-	ft.meta = &meta
+func newFieldTransformer(field *ast.Field, options *StructParsingOptions, config Config) (FieldTransformer, error) {
+	ft := FieldTransformer{field: field}
 
-	switch cmd {
-	case FiltersCmd:
-		// Generating filters schema mode
-		ft.typeStr = "[]string"
-		ft.updateFiltersAnnotations()
-		ft.comment = ft.meta.Description
-	default:
-		// Annotating schemas mode
-		if ft.typeStr == "any" && meta.Type != "" {
-			ft.typeStr = meta.Type
-		}
-		ft.updateSchemasAnnotations()
-		ft.comment = ft.meta.Description
+	// Step 1: Reading the field name
+	if err := ft.readName(); err != nil {
+		return ft, err
 	}
 
-	return nil
-}
+	// Step 2: reading the field tags
+	tagFound, err := ft.readTag()
+	if !tagFound {
+		// read the type and return
+		ft.typeStr = ft.readExpressionType(ft.field.Type)
+		return ft, nil
+	} else if err != nil {
+		return ft, err
+	}
 
-func (ft *FieldTransformer) updateSchemasAnnotations() {
-	// JSON tag
-	if ft.jsonOption != "" {
-		ft.annotations["json"] = strings.TrimSpace(ft.jsonOption)
-	} else if ft.meta.JSON != "" {
-		ft.annotations["json"] = strings.TrimSpace(ft.meta.JSON)
+	// Step 3: reading the config
+	if err := ft.readConfig(config); err != nil {
+		return ft, err
+	}
+
+	// Step 4: reading the struct options
+	if err := ft.readStructOptions(options); err != nil {
+		return ft, err
+	}
+
+	// Step 5: reading the type
+	if err := ft.readType(); err != nil {
+		return ft, err
+	}
+
+	// Step 6: sync the annotations
+	if ft.mode == FiltersCmd {
+		ft.syncFiltersAnnotations()
 	} else {
-		ft.annotations["json"] = ft.targetTag
+		ft.syncSchemasAnnotations()
 	}
 
-	// BSON tag
-	if ft.meta.BSON != "" {
-		ft.annotations["bson"] = strings.TrimSpace(ft.meta.BSON)
-	} else {
-		ft.annotations["bson"] = ft.annotations["json"]
-	}
-
-	// Validate tag
-	validate := ""
-	if ft.required {
-		validate = "required"
-	}
-	if ft.meta.Validate != "" {
-		validate = validate + "," + ft.meta.Validate
-	}
-	if validate != "" {
-		ft.annotations["validate"] = strings.Trim(validate, ",")
-	}
-
-	// Example tag
-	if ft.meta.Example != "" {
-		ft.annotations["example"] = ft.meta.Example
-	}
-
-	// SwaggerIgnore
-	if ft.meta.SwaggerIgnore == "true" {
-		ft.annotations["swaggerignore"] = "true"
-	}
+	return ft, nil
 }
 
-func (ft *FieldTransformer) updateFiltersAnnotations() {
-	// JSON tag
-	if ft.jsonOption != "" {
-		ft.annotations["json"] = strings.TrimSpace(ft.jsonOption)
-	} else if ft.meta.JSON != "" {
-		ft.annotations["json"] = strings.TrimSpace(ft.meta.JSON)
-	} else {
-		ft.annotations["json"] = ft.targetTag
-	}
-
-	// Filter tag
-	filter := ft.meta.Type
-	if ft.meta.Validate != "" {
-		filter = filter + "," + ft.meta.Validate
-	}
-	if len(ft.tagOptions) > 0 {
-		filter = filter + "," + strings.Join(ft.tagOptions, ",")
-	}
-	if filter != "" {
-		ft.annotations["filter"] = strings.Trim(filter, ",")
-	}
-
-	// Example tag
-	if ft.meta.FilterExample != "" {
-		ft.annotations["example"] = ft.meta.FilterExample
-	}
-}
-
-func parseFieldType(expr ast.Expr) string {
-	switch t := expr.(type) {
-	case *ast.Ident:
-		return t.Name
-	case *ast.ArrayType:
-		return "[]" + parseFieldType(t.Elt)
-	case *ast.StarExpr:
-		return "*" + parseFieldType(t.X)
-	case *ast.InterfaceType:
-		return "any"
-	default:
-		return "any"
-	}
-}
-
-func parseFieldTags(tags *ast.BasicLit) map[string]string {
-	result := make(map[string]string)
-	if tags == nil {
-		return result
-	}
-
-	rawTagsStr := strings.Trim(tags.Value, "`")
-	for _, tag := range strings.Split(rawTagsStr, " ") {
-		if tag == "" {
-			continue
-		}
-
-		parts := strings.SplitN(tag, ":", 2)
-		if len(parts) == 2 {
-			result[parts[0]] = strings.Trim(parts[1], "\"")
-		} else {
-			result[parts[0]] = ""
-		}
-	}
-
-	return result
-}
-
-func newAnnotatedField(field *ast.Field) FieldTransformer {
-	names := make([]string, 0, len(field.Names))
-	for _, n := range field.Names {
-		names = append(names, n.Name)
-	}
-	typeStr := parseFieldType(field.Type)
-	annotations := parseFieldTags(field.Tag)
-	targetTag, exists := annotations["tag"]
-	if exists {
-		delete(annotations, "tag")
-	}
-
-	// targetTag example tage:"title,optional,indexed,json=titleX"
-	targetTagParts := strings.Split(targetTag, ",")
-
-	// Extract the targetTag name
-	targetTag = strings.TrimSpace(targetTagParts[0])
-	tagOptions := targetTagParts[1:]
-
-	// Check if field is optional or not
-	tagOptions, isOptional := utils.RemoveFromList(tagOptions, "optional")
-	required := !isOptional
-
-	// Check if a json flag was specified
-	tagOptions, jsonOption := utils.RemoveReFromList(tagOptions, "json=")
-	jsonOption = strings.TrimPrefix(jsonOption, "json=")
-
-	return FieldTransformer{
-		names:       names,
-		typeStr:     typeStr,
-		required:    required,
-		annotations: annotations,
-		targetTag:   targetTag,
-		jsonOption:  jsonOption,
-		tagOptions:  tagOptions,
-	}
-}
-
-func annotateStructDefinition(
+func writeAnnotatedStruct(
 	structType *ast.StructType,
 	name string,
+	options *StructParsingOptions,
 	config Config,
 	fileBuilder *strings.Builder,
 ) error {
 	fileBuilder.WriteString("\ntype " + name + " struct {\n")
 
 	for _, field := range structType.Fields.List {
-		a := newAnnotatedField(field)
-		if a.targetTag != "" {
-			err := a.LoadConfig(config, TagCmd)
-			if err != nil {
-				return err
-			}
+		ft, err := newFieldTransformer(field, options, config)
+		if err != nil {
+			return err
 		}
-		newLine := a.String()
-		fileBuilder.WriteString(newLine + "\n")
+		fileBuilder.WriteString(ft.String() + "\n")
 	}
 	fileBuilder.WriteString("}\n\n")
 	return nil
 }
 
-func buildFilters(
+func writeFiltersStruct(
 	structType *ast.StructType,
 	name string,
+	options *StructParsingOptions,
 	config Config,
 	fileBuilder *strings.Builder,
 ) error {
@@ -501,22 +574,37 @@ func buildFilters(
 
 	// Write the field filters
 	for _, field := range structType.Fields.List {
-		a := newAnnotatedField(field)
-		a.typeStr = "[]string"
-		if a.targetTag != "" {
-			err := a.LoadConfig(config, FiltersCmd)
-			if err != nil {
-				return err
-			}
+		ft, err := newFieldTransformer(field, options, config)
+		if err != nil {
+			return err
 		}
-		newLine := a.String()
-		fileBuilder.WriteString(newLine + "\n")
+		fileBuilder.WriteString(ft.String() + "\n")
 	}
 
 	// Write struct tail
 	fileBuilder.WriteString("}\n\n")
 
 	return nil
+}
+
+func writeStruct(
+	typeSpec *ast.StructType,
+	name string,
+	options *StructParsingOptions,
+	config Config,
+	fileBuilder *strings.Builder,
+) error {
+	var err error
+
+	switch options.cmd {
+	case TagCmd:
+		err = writeAnnotatedStruct(typeSpec, name, options, config, fileBuilder)
+	case FiltersCmd:
+		err = writeFiltersStruct(typeSpec, name, options, config, fileBuilder)
+	default:
+		err = fmt.Errorf("invalid schemas command: %s", options.cmd)
+	}
+	return err
 }
 
 func ParseSchemaFile() {
