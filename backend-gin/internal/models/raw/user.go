@@ -72,7 +72,7 @@ type UserFilters struct {
 
 /////// Update Schemas /////////////
 
-// schemas:tag omitall
+// schemas:tag allownil
 type UserUpdate struct {
 	Name     any `tag:"name"`
 	Email    any `tag:"email"`

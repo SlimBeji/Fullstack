@@ -93,7 +93,7 @@ type PlaceFilters struct {
 
 /////// Update Schemas /////////////
 
-// schemas:tag omitall
+// schemas:tag allownil
 type PlaceUpdate struct {
 	Title       any      `tag:"title"`
 	Description any      `tag:"description"`
