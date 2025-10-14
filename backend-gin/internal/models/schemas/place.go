@@ -65,11 +65,11 @@ type PlaceRead struct {
 type PlacesPaginated = types_.RecordsPaginated[PlaceRead]
 
 type PlaceFilters struct {
-	Page        string   `json:"page"`
-	Size        string   `json:"size"`
-	Sort        []string `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address"`
-	Fields      []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId"`
-	Id          []string `json:"id" filter:"string,hexadecimal,len=24"`                                              // The ID of the place 24 characters
+	Page        int      `json:"page" example:"1"`
+	Size        int      `json:"size" example:"100"`
+	Sort        []string `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" example:"createdAt"`
+	Fields      []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId" example:"id,title"`
+	Id          []string `json:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f"`           // The ID of the place 24 characters
 	Title       []string `json:"title" filter:"string,min=10" example:"eq:Some Place"`                               // The place title/name, 10 characters minimum
 	Description []string `json:"description" filter:"string,min=10" example:"regex:football"`                        // The place description, 10 characters minimum
 	Address     []string `json:"address" filter:"string,min=10" example:"regex:d{1,2} Boulevard"`                    // The place address

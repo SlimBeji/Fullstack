@@ -53,13 +53,13 @@ type UserRead struct {
 type UsersPaginated = types_.RecordsPaginated[PlaceRead]
 
 type UserFilters struct {
-	Page   string   `json:"page"`
-	Size   string   `json:"size"`
-	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email"`
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places"`
-	Id     []string `json:"id" filter:"string,hexadecimal,len=24"`                        // The user ID, 24 characters
-	Name   []string `json:"name" filter:"string,min=2" example:"eq:Slim Beji"`            // The user name, two characters at least
-	Email  []string `json:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com"` // The user email
+	Page   int      `json:"page" example:"1"`
+	Size   int      `json:"size" example:"100"`
+	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`
+	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places" example:"id,name"`
+	Id     []string `json:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f"` // The user ID, 24 characters
+	Name   []string `json:"name" filter:"string,min=2" example:"eq:Slim Beji"`                        // The user name, two characters at least
+	Email  []string `json:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com"`             // The user email
 }
 
 type UserUpdate struct {

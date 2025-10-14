@@ -440,6 +440,8 @@ func (ft *FieldTransformer) syncFiltersAnnotations() {
 	// Example tag
 	if ft.meta.FilterExample != "" {
 		ft.annotations["example"] = ft.meta.FilterExample
+	} else if ft.meta.Example != "" {
+		ft.annotations["example"] = ft.meta.Example
 	}
 }
 
@@ -557,19 +559,19 @@ func writeFiltersStruct(
 	fileBuilder.WriteString("\ntype " + name + " struct {\n")
 
 	// Write Page field
-	fileBuilder.WriteString("\tPage\tstring\t`json:\"page\"`\n")
+	fileBuilder.WriteString("\tPage\tint\t`json:\"page\" example:\"1\"`\n")
 
 	// Write Size field
-	fileBuilder.WriteString("\tSize\tstring\t`json:\"size\"`\n")
+	fileBuilder.WriteString("\tSize\tint\t`json:\"size\" example:\"100\"`\n")
 
 	// Write Sort field
 	sortOptions := strings.Join(config.Sortables, " ")
-	sortLine := fmt.Sprintf("Sort []string `json:\"sort\" validate:\"dive,oneof=%s\"`", sortOptions)
+	sortLine := fmt.Sprintf("Sort []string `json:\"sort\" validate:\"dive,oneof=%s\" example:\"%s\"`", sortOptions, config.Sortables[0])
 	fileBuilder.WriteString("\t" + sortLine + "\n")
 
 	// Write Fields field
 	fieldsOptions := strings.Join(config.Selectables, " ")
-	fieldsLine := fmt.Sprintf("Fields []string `json:\"fields\" validate:\"dive,oneof=%s\"`", fieldsOptions)
+	fieldsLine := fmt.Sprintf("Fields []string `json:\"fields\" validate:\"dive,oneof=%s\" example:\"%s,%s\"`", fieldsOptions, config.Selectables[0], config.Selectables[1])
 	fileBuilder.WriteString("\t" + fieldsLine + "\n")
 
 	// Write the field filters
