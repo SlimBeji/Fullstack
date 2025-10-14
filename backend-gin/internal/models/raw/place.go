@@ -53,7 +53,7 @@ type PlaceCreate struct {
 	CreatorID   any      `tag:"creatorId"`
 }
 
-// schemas:tag
+// schemas:tag multipart
 type PlacePost struct {
 	Title       any      `tag:"title"`
 	Description any      `tag:"description"`

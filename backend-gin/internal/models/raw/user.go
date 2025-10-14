@@ -38,13 +38,13 @@ type UserCreate struct {
 	ImageUrl any `tag:"imageUrl,omitempty"`
 }
 
-// schemas:tag
+// schemas:tag multipart
 type UserPost struct {
-	Name     any `tag:"name" form:"name"`
-	Email    any `tag:"email" form:"email"`
-	IsAdmin  any `tag:"isAdmin" form:"isAdmin"`
-	Password any `tag:"password" form:"password"`
-	Image    any `tag:"image,omitempty" form:"image"`
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	IsAdmin  any `tag:"isAdmin"`
+	Password any `tag:"password"`
+	Image    any `tag:"image,omitempty"`
 }
 
 /////// Read Schemas /////////////

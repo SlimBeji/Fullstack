@@ -8,18 +8,18 @@ type TokenPayload struct {
 	Email  any `tag:"email"`
 }
 
-// schemas:tag
+// schemas:tag multipart
 type SignupForm struct {
-	Name     any `tag:"name" form:"name"`
-	Email    any `tag:"email" form:"email"`
-	Password any `tag:"password" form:"password"`
-	Image    any `tag:"image,omitempty" form:"image"`
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	Password any `tag:"password"`
+	Image    any `tag:"image,omitempty"`
 }
 
-// schemas:tag
+// schemas:tag multipart
 type SigninForm struct {
-	Username any `tag:"username" form:"username" default:"mslimbeji@gmail.com"`
-	Password any `tag:"password" form:"password" default:"very_secret"`
+	Username any `tag:"username" default:"mslimbeji@gmail.com"`
+	Password any `tag:"password" default:"very_secret"`
 }
 
 // schemas:tag
