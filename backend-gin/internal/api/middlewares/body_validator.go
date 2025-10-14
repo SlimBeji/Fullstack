@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func BodyValidator[T any](c *gin.Context) {
+func extractBody[T any](c *gin.Context) (T, []string) {
 	var form T
 	var err error
 
@@ -16,19 +16,16 @@ func BodyValidator[T any](c *gin.Context) {
 	} else {
 		err = c.ShouldBindJSON(&form)
 	}
-
-	// return bad request if could not do the bind
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Bad request",
-			"details": err.Error(),
-		})
-		c.Abort()
-		return
+		return form, []string{err.Error()}
 	}
 
-	// Validate the data
 	errs := utils.ValidateStruct(&form)
+	return form, errs
+}
+
+func BodyValidator[T any](c *gin.Context) {
+	form, errs := extractBody[T](c)
 	if len(errs) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error":   "Invalid request body",
