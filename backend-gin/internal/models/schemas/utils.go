@@ -30,15 +30,21 @@ func BuildFindQuery(
 
 		switch type_.Name {
 		case "Page":
-			val, err := strconv.Atoi(value.String())
-			if err != nil || val <= 0 {
+			if value.Kind() != reflect.Int {
 				result["page"] = []string{"Page value must be a positive integer"}
 			}
-			findQuery.Page = val
+			val := value.Int()
+			if val <= 0 {
+				result["page"] = []string{"Page value must be a positive integer"}
+			}
+			findQuery.Page = int(val)
 		case "Size":
-			val, err := strconv.Atoi(value.String())
-			if err != nil || val <= 0 || val > config.Env.MaxItemsPerPage {
-				result["size"] = []string{fmt.Sprintf("Page value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
+			if value.Kind() != reflect.Int {
+				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
+			}
+			val := int(value.Int())
+			if val <= 0 || val > config.Env.MaxItemsPerPage {
+				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
 			}
 			findQuery.Size = val
 		case "Sort":
