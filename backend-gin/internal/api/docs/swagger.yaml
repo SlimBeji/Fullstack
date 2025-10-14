@@ -10,6 +10,23 @@ definitions:
       message:
         type: string
     type: object
+  routes.UserPut:
+    properties:
+      email:
+        description: The user email
+        example: mslimbeji@gmail.com
+        type: string
+      name:
+        description: The user name, two characters at least
+        example: Slim Beji
+        minLength: 2
+        type: string
+      password:
+        description: The user password, 8 characters at least
+        example: very_secret
+        minLength: 8
+        type: string
+    type: object
   schemas.EncodedToken:
     properties:
       access_token:
@@ -41,23 +58,6 @@ definitions:
     - expires_in
     - token_type
     - userId
-    type: object
-  schemas.UserPut:
-    properties:
-      email:
-        description: The user email
-        example: mslimbeji@gmail.com
-        type: string
-      name:
-        description: The user name, two characters at least
-        example: Slim Beji
-        minLength: 2
-        type: string
-      password:
-        description: The user password, 8 characters at least
-        example: very_secret
-        minLength: 8
-        type: string
     type: object
   schemas.UserRead:
     properties:
@@ -317,7 +317,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/schemas.UserPut'
+          $ref: '#/definitions/routes.UserPut'
       produces:
       - application/json
       responses:

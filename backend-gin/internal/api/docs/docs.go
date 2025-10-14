@@ -325,7 +325,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.UserPut"
+                            "$ref": "#/definitions/routes.UserPut"
                         }
                     }
                 ],
@@ -394,6 +394,28 @@ const docTemplate = `{
                 }
             }
         },
+        "routes.UserPut": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "The user email",
+                    "type": "string",
+                    "example": "mslimbeji@gmail.com"
+                },
+                "name": {
+                    "description": "The user name, two characters at least",
+                    "type": "string",
+                    "minLength": 2,
+                    "example": "Slim Beji"
+                },
+                "password": {
+                    "description": "The user password, 8 characters at least",
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "very_secret"
+                }
+            }
+        },
         "schemas.EncodedToken": {
             "type": "object",
             "required": [
@@ -431,28 +453,6 @@ const docTemplate = `{
                     "description": "The user ID, 24 characters",
                     "type": "string",
                     "example": "683b21134e2e5d46978daf1f"
-                }
-            }
-        },
-        "schemas.UserPut": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "description": "The user email",
-                    "type": "string",
-                    "example": "mslimbeji@gmail.com"
-                },
-                "name": {
-                    "description": "The user name, two characters at least",
-                    "type": "string",
-                    "minLength": 2,
-                    "example": "Slim Beji"
-                },
-                "password": {
-                    "description": "The user password, 8 characters at least",
-                    "type": "string",
-                    "minLength": 8,
-                    "example": "very_secret"
                 }
             }
         },
