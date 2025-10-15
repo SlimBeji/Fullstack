@@ -4,6 +4,7 @@ import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
+	"backend/internal/types_"
 	"fmt"
 	"net/http"
 
@@ -20,6 +21,34 @@ func dummyPlace() schemas.PlaceRead {
 	place.ImageUrl = "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
 	place.CreatorID = "683b21134e2e5d46978daf1f"
 	return place
+}
+
+// @Summary      Search and Filter places
+// @Tags         Place
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        params query schemas.PlaceFilters true "GET parameters"
+// @Success      200  {object}  schemas.PlacesPaginated
+// @Router       /api/places/ [get]
+func getPlaces(c *gin.Context) {
+	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	fmt.Println(findQuery)
+	c.JSON(http.StatusOK, dummyPlace())
+}
+
+// @Summary      Search and Retrieve places
+// @Tags         Place
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        params body schemas.PlaceFilters true "POST parameters"
+// @Success      200  {object}  schemas.PlacesPaginated
+// @Router       /api/places/query [post]
+func queryPlaces(c *gin.Context) {
+	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	fmt.Println(findQuery)
+	c.JSON(http.StatusOK, dummyPlace())
 }
 
 // @Summary      Place creation
@@ -88,6 +117,18 @@ func deletePlace(c *gin.Context) {
 
 func RegisterPlaces(r *gin.Engine) {
 	router := r.Group("/api/places")
+	router.GET(
+		"",
+		middlewares.Authenticated,
+		middlewares.Filter[schemas.PlaceFilters],
+		getPlaces,
+	)
+	router.POST(
+		"/query",
+		middlewares.Authenticated,
+		middlewares.Filter[schemas.PlaceFilters],
+		queryPlaces,
+	)
 	router.POST(
 		"",
 		middlewares.Authenticated,
