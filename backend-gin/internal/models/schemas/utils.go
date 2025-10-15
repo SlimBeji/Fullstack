@@ -33,17 +33,24 @@ func BuildFindQuery(
 			if value.Kind() != reflect.Int {
 				result["page"] = []string{"Page value must be a positive integer"}
 			}
-			val := value.Int()
-			if val <= 0 {
+			val := int(value.Int())
+			if val < 0 {
 				result["page"] = []string{"Page value must be a positive integer"}
+			} else if val == 0 {
+				// zero value, probably was not set
+				val = 1
 			}
-			findQuery.Page = int(val)
+			findQuery.Page = val
 		case "Size":
 			if value.Kind() != reflect.Int {
 				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
 			}
 			val := int(value.Int())
-			if val <= 0 || val > config.Env.MaxItemsPerPage {
+			if val == 0 {
+				// zero value, probably was not set
+				val = config.Env.MaxItemsPerPage
+			}
+			if val < 0 || val > config.Env.MaxItemsPerPage {
 				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
 			}
 			findQuery.Size = val
