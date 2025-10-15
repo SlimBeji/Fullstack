@@ -4,11 +4,42 @@ import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
+	"backend/internal/types_"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+// @Summary      Search and Filter users
+// @Tags         User
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        params query schemas.UserFilters true "GET parameters"
+// @Success      200  {object}  schemas.UsersPaginated
+// @Router       /api/users/ [get]
+func getUsers(c *gin.Context) {
+	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	fmt.Println(findQuery)
+	user := c.MustGet("currentUser").(schemas.UserRead)
+	c.JSON(http.StatusOK, user)
+}
+
+// @Summary      Search and Retrieve users
+// @Tags         User
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        params body schemas.UserFilters true "POST parameters"
+// @Success      200  {object}  schemas.UsersPaginated
+// @Router       /api/users/query [post]
+func queryUsers(c *gin.Context) {
+	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	fmt.Println(findQuery)
+	user := c.MustGet("currentUser").(schemas.UserRead)
+	c.JSON(http.StatusOK, user)
+}
 
 // @Summary      User creation
 // @Tags         User
@@ -77,6 +108,18 @@ func deleteUser(c *gin.Context) {
 
 func RegisterUsers(r *gin.Engine) {
 	router := r.Group(("/api/users"))
+	router.GET(
+		"",
+		middlewares.Authenticated,
+		middlewares.Filter[schemas.UserFilters],
+		getUsers,
+	)
+	router.POST(
+		"/query",
+		middlewares.Authenticated,
+		middlewares.Filter[schemas.UserFilters],
+		queryUsers,
+	)
 	router.POST(
 		"",
 		middlewares.Admin,
