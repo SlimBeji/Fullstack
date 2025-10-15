@@ -428,6 +428,10 @@ func (ft *FieldTransformer) syncFiltersAnnotations() {
 		ft.annotations["json"] = ft.targetTag
 	}
 
+	// Form Tag
+	ft.annotations["form"] = ft.annotations["json"]
+	ft.annotations["collectionFormat"] = "multi"
+
 	// Filter tag
 	filter := ft.meta.Type
 	if ft.meta.Validate != "" {
@@ -448,7 +452,7 @@ func (ft *FieldTransformer) syncFiltersAnnotations() {
 func (ft *FieldTransformer) AnnotationString() string {
 	var parts []string
 	skipExample := false
-	usedTags := []string{"json", "form", "filter", "validate", "default", "example", "bson", "swaggerignore"}
+	usedTags := []string{"json", "form", "filter", "validate", "default", "example", "bson", "swaggerignore", "collectionFormat"}
 
 	for _, t := range usedTags {
 		if t == "example" && skipExample {
@@ -559,10 +563,10 @@ func writeFiltersStruct(
 	fileBuilder.WriteString("\ntype " + name + " struct {\n")
 
 	// Write Page field
-	fileBuilder.WriteString("\tPage\tint\t`json:\"page\" example:\"1\"`\n")
+	fileBuilder.WriteString("\tPage\tint\t`json:\"page\" default:\"1\"`\n")
 
 	// Write Size field
-	fileBuilder.WriteString("\tSize\tint\t`json:\"size\" example:\"100\"`\n")
+	fileBuilder.WriteString("\tSize\tint\t`json:\"size\" default:\"100\"`\n")
 
 	// Write Sort field
 	sortOptions := strings.Join(config.Sortables, " ")
