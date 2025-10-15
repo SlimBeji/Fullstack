@@ -88,7 +88,7 @@ func updateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-type DeleteResponseExample struct {
+type UserDeleteResponse struct {
 	Message string `json:"message" example:"Deleted user 507f1f77bcf86cd799439011"`
 }
 
@@ -98,7 +98,7 @@ type DeleteResponseExample struct {
 // @Produce      json
 // @Security     OAuth2Password[admin]
 // @Param        userId path string true "User ID"
-// @Success      200  {object}  DeleteResponseExample
+// @Success      200  {object}  UserDeleteResponse
 // @Router       /api/users/{userId} [delete]
 func deleteUser(c *gin.Context) {
 	userId := c.Param("userId")
