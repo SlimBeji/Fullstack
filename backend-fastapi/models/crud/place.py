@@ -84,6 +84,9 @@ class CrudPlace(
 
     async def create(self, form: PlacePostSchema) -> PlaceReadSchema:
         data = form.model_dump()
+        lat = data.pop("lat")
+        lng = data.pop("lng")
+        data["location"] = dict(lat=lat, lng=lng)
         image = data.pop("image", None)
         data["imageUrl"] = cloud_storage.upload_file(image)
         create_form = PlaceCreateSchema(**data)

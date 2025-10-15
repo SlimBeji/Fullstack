@@ -1,5 +1,3 @@
-import json
-
 from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
@@ -44,7 +42,8 @@ class PlacePostSchema(BaseModel):
     title: PlaceFields.title_annot
     description: PlaceFields.description_annot
     address: PlaceFields.address_annot
-    location: PlaceFields.Location | None = None
+    lat: PlaceFields.lat_annot
+    lng: PlaceFields.lng_annot
     image: PlaceFields.image_annot | None = None
     creatorId: PlaceFields.creatorId_annot
 
@@ -55,19 +54,16 @@ class PlaceMultipartPost:
         title: str = PlaceFields.title_meta.multipart,
         description: str = PlaceFields.description_meta.multipart,
         address: str = PlaceFields.address_meta.multipart,
-        location: (
-            PlaceFields.Location | str | None
-        ) = PlaceFields.location_meta.multipart,
+        lat: float = PlaceFields.lat_meta.multipart,
+        lng: float = PlaceFields.lng_meta.multipart,
         creatorId: PydanticObjectId = PlaceFields.creatorId_meta.multipart,
         image: FileToUpload | None = PlaceFields.image_meta.multipart,
     ):
-        if isinstance(location, str):
-            location = PlaceFields.Location(**json.loads(location))
-
         self.title = title
         self.description = description
         self.address = address
-        self.location = location or None
+        self.lat = lat
+        self.lng = lng
         self.creatorId = creatorId
         self.image = image or None
 
@@ -76,7 +72,8 @@ class PlaceMultipartPost:
             title=self.title,
             description=self.description,
             address=self.address,
-            location=self.location,
+            lat=self.lat,
+            lng=self.lng,
             creatorId=self.creatorId,
             image=self.image,
         )

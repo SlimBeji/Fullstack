@@ -1,4 +1,3 @@
-import json
 from http import HTTPStatus
 from typing import cast
 
@@ -64,7 +63,8 @@ async def test_create_place(helpers: Helpers):
         description="A brand new place",
         title="Brand New Place",
         address="Somewhere over the rainbow",
-        location=json.dumps(dict(lat=1.0, lng=2.5)),
+        lat=1.0,
+        lng=2.5,
     )
     response = await helpers.client.post(
         "/api/places/",
@@ -90,7 +90,8 @@ async def test_create_place_belonging_to_others(helpers: Helpers):
         description="A brand new place",
         title="Brand New Place",
         address="Somewhere over the rainbow",
-        location=json.dumps(dict(lat=1.0, lng=2.5)),
+        lat=1.0,
+        lng=2.5,
     )
     response = await helpers.client.post(
         "/api/places/", data=multipart_data, files=files, headers=headers
