@@ -34,13 +34,8 @@ const submitHandler = async (e: Event) => {
     formData.append("image", $image.value.file);
     formData.append("description", $description.value);
     formData.append("address", $address.value);
-    formData.append(
-        "location",
-        JSON.stringify({
-            lat: $lat.value,
-            lng: $lng.value,
-        })
-    );
+    formData.append("lat", $lat.value);
+    formData.append("lng", $lng.value);
     formData.append("creatorId", $loggedUserId as string);
     try {
         await sendRequest("/places/", "post", formData);

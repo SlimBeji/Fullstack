@@ -31,13 +31,8 @@ const NewPlace: React.FC = () => {
         formData.append("image", state.fields.image.value.file);
         formData.append("description", state.fields.description.value);
         formData.append("address", state.fields.address.value);
-        formData.append(
-            "location",
-            JSON.stringify({
-                lat: state.fields.lat.value,
-                lng: state.fields.lng.value,
-            })
-        );
+        formData.append("lat", state.fields.lat.value);
+        formData.append("lng", state.fields.lng.value);
         formData.append("creatorId", authData?.userId || "");
         try {
             await sendRequest("/places/", "post", formData);
