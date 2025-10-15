@@ -179,6 +179,407 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/places": {
+            "post": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Place creation",
+                "parameters": [
+                    {
+                        "minLength": 10,
+                        "type": "string",
+                        "example": "Fulham road",
+                        "description": "The place address",
+                        "name": "address",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "example": "683b21134e2e5d46978daf1f",
+                        "description": "The ID of the place creator, 24 characters",
+                        "name": "creatorId",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 10,
+                        "type": "string",
+                        "example": "Stadium of Chelsea football club",
+                        "description": "The place description, 10 characters minimum",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "example": 51.48180425016331,
+                        "description": "The latitude of the place",
+                        "name": "lat",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "example": -0.19090418688755467,
+                        "description": "The longitude of the place",
+                        "name": "lng",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 10,
+                        "type": "string",
+                        "example": "Stamford Bridge",
+                        "description": "The place title/name, 10 characters minimum",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Place Image (JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlaceRead"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/places/": {
+            "get": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Search and Filter places",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "regex:d{2} Boulevard"
+                        ],
+                        "description": "The place address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "eq:683b21134e2e5d46978daf1f"
+                        ],
+                        "description": "The ID of the place creator, 24 characters",
+                        "name": "creatorId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "regex:football"
+                        ],
+                        "description": "The place description, 10 characters minimum",
+                        "name": "description",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "id",
+                            "title"
+                        ],
+                        "name": "fields",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "683b21134e2e5d46978daf1f"
+                        ],
+                        "description": "The ID of the place 24 characters",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "gt:3.5"
+                        ],
+                        "description": "The latitude of the place",
+                        "name": "locationLat",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "lt:4.5"
+                        ],
+                        "description": "The longitude of the place",
+                        "name": "locationLng",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 100,
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "createdAt"
+                        ],
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "eq:Some Place"
+                        ],
+                        "description": "The place title/name, 10 characters minimum",
+                        "name": "title",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlacesPaginated"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/places/query": {
+            "post": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Search and Retrieve places",
+                "parameters": [
+                    {
+                        "description": "POST parameters",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlaceFilters"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlacesPaginated"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/places/{placeId}": {
+            "get": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Search and Retrieve place by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Place ID",
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlaceRead"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Update places",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Place ID",
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "PUT parameters",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlacePut"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlaceRead"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Delete place by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Place ID",
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.PlaceDeleteResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users": {
             "post": {
                 "security": [
@@ -507,7 +908,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/routes.DeleteResponseExample"
+                            "$ref": "#/definitions/routes.UserDeleteResponse"
                         }
                     }
                 }
@@ -515,12 +916,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "routes.DeleteResponseExample": {
+        "routes.PlaceDeleteResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string",
-                    "example": "Deleted user 507f1f77bcf86cd799439011"
+                    "example": "Deleted place 507f1f77bcf86cd799439011"
                 }
             }
         },
@@ -529,6 +930,15 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "routes.UserDeleteResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Deleted user 507f1f77bcf86cd799439011"
                 }
             }
         },
@@ -580,6 +990,144 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.PlaceFilters": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "The place address",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "regex:d{2} Boulevard"
+                    ]
+                },
+                "creatorId": {
+                    "description": "The ID of the place creator, 24 characters",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "eq:683b21134e2e5d46978daf1f"
+                    ]
+                },
+                "description": {
+                    "description": "The place description, 10 characters minimum",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "regex:football"
+                    ]
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "id",
+                        "title"
+                    ]
+                },
+                "id": {
+                    "description": "The ID of the place 24 characters",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "683b21134e2e5d46978daf1f"
+                    ]
+                },
+                "locationLat": {
+                    "description": "The latitude of the place",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "gt:3.5"
+                    ]
+                },
+                "locationLng": {
+                    "description": "The longitude of the place",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "lt:4.5"
+                    ]
+                },
+                "page": {
+                    "type": "integer",
+                    "default": 1
+                },
+                "size": {
+                    "type": "integer",
+                    "default": 100
+                },
+                "sort": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "createdAt"
+                    ]
+                },
+                "title": {
+                    "description": "The place title/name, 10 characters minimum",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "eq:Some Place"
+                    ]
+                }
+            }
+        },
+        "schemas.PlacePut": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "The place address",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Fulham road"
+                },
+                "creatorId": {
+                    "description": "The ID of the place creator, 24 characters",
+                    "type": "string",
+                    "example": "683b21134e2e5d46978daf1f"
+                },
+                "description": {
+                    "description": "The place description, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stadium of Chelsea football club"
+                },
+                "location": {
+                    "description": "Location object (can be sent as JSON string)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Location"
+                        }
+                    ]
+                },
+                "title": {
+                    "description": "The place title/name, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stamford Bridge"
+                }
+            }
+        },
         "schemas.PlaceRead": {
             "type": "object",
             "properties": {
@@ -623,6 +1171,26 @@ const docTemplate = `{
                     "type": "string",
                     "minLength": 10,
                     "example": "Stamford Bridge"
+                }
+            }
+        },
+        "schemas.PlacesPaginated": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.PlaceRead"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "type": "integer"
                 }
             }
         },

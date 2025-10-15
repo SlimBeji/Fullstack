@@ -1,13 +1,19 @@
 definitions:
-  routes.DeleteResponseExample:
+  routes.PlaceDeleteResponse:
     properties:
       message:
-        example: Deleted user 507f1f77bcf86cd799439011
+        example: Deleted place 507f1f77bcf86cd799439011
         type: string
     type: object
   routes.ResponseExample:
     properties:
       message:
+        type: string
+    type: object
+  routes.UserDeleteResponse:
+    properties:
+      message:
+        example: Deleted user 507f1f77bcf86cd799439011
         type: string
     type: object
   schemas.EncodedToken:
@@ -47,6 +53,103 @@ definitions:
         example: -0.19090418688755467
         type: number
     type: object
+  schemas.PlaceFilters:
+    properties:
+      address:
+        description: The place address
+        example:
+        - regex:d{2} Boulevard
+        items:
+          type: string
+        type: array
+      creatorId:
+        description: The ID of the place creator, 24 characters
+        example:
+        - eq:683b21134e2e5d46978daf1f
+        items:
+          type: string
+        type: array
+      description:
+        description: The place description, 10 characters minimum
+        example:
+        - regex:football
+        items:
+          type: string
+        type: array
+      fields:
+        example:
+        - id
+        - title
+        items:
+          type: string
+        type: array
+      id:
+        description: The ID of the place 24 characters
+        example:
+        - 683b21134e2e5d46978daf1f
+        items:
+          type: string
+        type: array
+      locationLat:
+        description: The latitude of the place
+        example:
+        - gt:3.5
+        items:
+          type: string
+        type: array
+      locationLng:
+        description: The longitude of the place
+        example:
+        - lt:4.5
+        items:
+          type: string
+        type: array
+      page:
+        default: 1
+        type: integer
+      size:
+        default: 100
+        type: integer
+      sort:
+        example:
+        - createdAt
+        items:
+          type: string
+        type: array
+      title:
+        description: The place title/name, 10 characters minimum
+        example:
+        - eq:Some Place
+        items:
+          type: string
+        type: array
+    type: object
+  schemas.PlacePut:
+    properties:
+      address:
+        description: The place address
+        example: Fulham road
+        minLength: 10
+        type: string
+      creatorId:
+        description: The ID of the place creator, 24 characters
+        example: 683b21134e2e5d46978daf1f
+        type: string
+      description:
+        description: The place description, 10 characters minimum
+        example: Stadium of Chelsea football club
+        minLength: 10
+        type: string
+      location:
+        allOf:
+        - $ref: '#/definitions/schemas.Location'
+        description: Location object (can be sent as JSON string)
+      title:
+        description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        minLength: 10
+        type: string
+    type: object
   schemas.PlaceRead:
     properties:
       address:
@@ -80,6 +183,19 @@ definitions:
         example: Stamford Bridge
         minLength: 10
         type: string
+    type: object
+  schemas.PlacesPaginated:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/schemas.PlaceRead'
+        type: array
+      page:
+        type: integer
+      totalCount:
+        type: integer
+      totalPages:
+        type: integer
     type: object
   schemas.UserFilters:
     properties:
@@ -293,6 +409,265 @@ paths:
       summary: Hello World Endpoint for authenticated users
       tags:
       - Hello World
+  /api/places:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: The place address
+        example: Fulham road
+        in: formData
+        minLength: 10
+        name: address
+        type: string
+      - description: The ID of the place creator, 24 characters
+        example: 683b21134e2e5d46978daf1f
+        in: formData
+        name: creatorId
+        type: string
+      - description: The place description, 10 characters minimum
+        example: Stadium of Chelsea football club
+        in: formData
+        minLength: 10
+        name: description
+        type: string
+      - description: The latitude of the place
+        example: 51.48180425016331
+        in: formData
+        name: lat
+        type: number
+      - description: The longitude of the place
+        example: -0.19090418688755467
+        in: formData
+        name: lng
+        type: number
+      - description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        in: formData
+        minLength: 10
+        name: title
+        type: string
+      - description: Place Image (JPEG)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PlaceRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Place creation
+      tags:
+      - Place
+  /api/places/:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - collectionFormat: multi
+        description: The place address
+        example:
+        - regex:d{2} Boulevard
+        in: query
+        items:
+          type: string
+        name: address
+        type: array
+      - collectionFormat: multi
+        description: The ID of the place creator, 24 characters
+        example:
+        - eq:683b21134e2e5d46978daf1f
+        in: query
+        items:
+          type: string
+        name: creatorId
+        type: array
+      - collectionFormat: multi
+        description: The place description, 10 characters minimum
+        example:
+        - regex:football
+        in: query
+        items:
+          type: string
+        name: description
+        type: array
+      - collectionFormat: csv
+        example:
+        - id
+        - title
+        in: query
+        items:
+          type: string
+        name: fields
+        type: array
+      - collectionFormat: multi
+        description: The ID of the place 24 characters
+        example:
+        - 683b21134e2e5d46978daf1f
+        in: query
+        items:
+          type: string
+        name: id
+        type: array
+      - collectionFormat: multi
+        description: The latitude of the place
+        example:
+        - gt:3.5
+        in: query
+        items:
+          type: string
+        name: locationLat
+        type: array
+      - collectionFormat: multi
+        description: The longitude of the place
+        example:
+        - lt:4.5
+        in: query
+        items:
+          type: string
+        name: locationLng
+        type: array
+      - default: 1
+        in: query
+        name: page
+        type: integer
+      - default: 100
+        in: query
+        name: size
+        type: integer
+      - collectionFormat: csv
+        example:
+        - createdAt
+        in: query
+        items:
+          type: string
+        name: sort
+        type: array
+      - collectionFormat: multi
+        description: The place title/name, 10 characters minimum
+        example:
+        - eq:Some Place
+        in: query
+        items:
+          type: string
+        name: title
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PlacesPaginated'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Search and Filter places
+      tags:
+      - Place
+  /api/places/{placeId}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Place ID
+        in: path
+        name: placeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.PlaceDeleteResponse'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Delete place by id
+      tags:
+      - Place
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Place ID
+        in: path
+        name: placeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PlaceRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Search and Retrieve place by id
+      tags:
+      - Place
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Place ID
+        in: path
+        name: placeId
+        required: true
+        type: string
+      - description: PUT parameters
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.PlacePut'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PlaceRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Update places
+      tags:
+      - Place
+  /api/places/query:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: POST parameters
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.PlaceFilters'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PlacesPaginated'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Search and Retrieve places
+      tags:
+      - Place
   /api/users:
     post:
       consumes:
@@ -424,7 +799,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.DeleteResponseExample'
+            $ref: '#/definitions/routes.UserDeleteResponse'
       security:
       - OAuth2Password:
         - admin
