@@ -41,7 +41,12 @@ export type PlaceCreate = z.infer<typeof PlaceCreateSchema>;
 
 export const PlacePostSchema = PlaceCreateSchema.omit({
     imageUrl: true,
-}).extend({ image: PlaceFields.image.optional() });
+    location: true,
+}).extend({
+    lat: PlaceFields.lat,
+    lng: PlaceFields.lng,
+    image: PlaceFields.image.optional(),
+});
 
 export type PlacePost = z.infer<typeof PlacePostSchema>;
 

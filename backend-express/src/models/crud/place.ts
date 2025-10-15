@@ -88,8 +88,8 @@ export class CrudPlace extends Crud<
 
     public async create(form: PlacePost): Promise<PlaceRead> {
         const imageUrl = await storage.uploadFile(form.image || null);
-        const { image: _image, ...body } = form;
-        const data = { ...body, imageUrl };
+        const { image: _image, lat, lng, ...body } = form;
+        const data = { ...body, imageUrl, location: { lat, lng } };
         const doc = await this.createDocument(data);
         placeEmbedding(doc.id);
         const result = await this.post_process(doc);
