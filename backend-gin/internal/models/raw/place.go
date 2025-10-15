@@ -55,12 +55,13 @@ type PlaceCreate struct {
 
 // schemas:tag multipart
 type PlacePost struct {
-	Title       any      `tag:"title"`
-	Description any      `tag:"description"`
-	Address     any      `tag:"address"`
-	Location    Location `tag:"location"`
-	Image       any      `tag:"image,omitempty"`
-	CreatorID   any      `tag:"creatorId"`
+	Title       any `tag:"title"`
+	Description any `tag:"description"`
+	Address     any `tag:"address"`
+	Lat         any `tag:"location.lat"`
+	Lng         any `tag:"location.lng"`
+	Image       any `tag:"image,omitempty"`
+	CreatorID   any `tag:"creatorId"`
 }
 
 /////// Read Schemas /////////////

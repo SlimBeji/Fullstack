@@ -47,7 +47,8 @@ type PlacePost struct {
 	Title       string                `json:"title" form:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                    // The place title/name, 10 characters minimum
 	Description string                `json:"description" form:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
 	Address     string                `json:"address" form:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                  // The place address
-	Location    Location              `json:"location" form:"location" bson:"location"`                                                                       // Location object (can be sent as JSON string)
+	Lat         float64               `json:"lat" form:"lat" example:"51.48180425016331" bson:"lat"`                                                          // The latitude of the place
+	Lng         float64               `json:"lng" form:"lng" example:"-0.19090418688755467" bson:"lng"`                                                       // The longitude of the place
 	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`                                      // Place Image (JPEG)
 	CreatorID   string                `json:"creatorId" form:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`   // The ID of the place creator, 24 characters
 }
