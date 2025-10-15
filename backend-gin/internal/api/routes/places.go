@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
 	"fmt"
 	"net/http"
@@ -21,22 +22,64 @@ func dummyPlace() schemas.PlaceRead {
 	return place
 }
 
+// @Summary      Place creation
+// @Tags         Place
+// @Accept       mpfd
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        params formData schemas.PlacePost true "POST parameters"
+// @Param        image  formData file   true "Place Image (JPEG)"
+// @Success      200  {object}  schemas.PlaceRead
+// @Router       /api/places [post]
 func createPlace(c *gin.Context) {
+	body, _ := utils.GetBody[schemas.PlacePost](c)
+	fmt.Println(body)
 	c.JSON(http.StatusOK, dummyPlace())
 }
 
+// @Summary      Search and Retrieve place by id
+// @Tags         Place
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        placeId path string true "Place ID"
+// @Success      200  {object}  schemas.PlaceRead
+// @Router       /api/places/{placeId} [get]
 func getPlace(c *gin.Context) {
 	placeId := c.Param("placeId")
 	fmt.Println(placeId)
 	c.JSON(http.StatusOK, dummyPlace())
 }
 
+// @Summary      Update places
+// @Tags         Place
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        placeId path string true "Place ID"
+// @Param        params body schemas.PlacePut true "PUT parameters"
+// @Success      200  {object}  schemas.PlaceRead
+// @Router       /api/places/{placeId} [put]
 func updatePlace(c *gin.Context) {
+	body, _ := utils.GetBody[schemas.PlacePut](c)
+	fmt.Println(body)
 	placeId := c.Param("placeId")
 	fmt.Println(placeId)
 	c.JSON(http.StatusOK, dummyPlace())
 }
 
+type PlaceDeleteResponse struct {
+	Message string `json:"message" example:"Deleted place 507f1f77bcf86cd799439011"`
+}
+
+// @Summary      Delete place by id
+// @Tags         Place
+// @Accept       application/json
+// @Produce      json
+// @Security     OAuth2Password[admin]
+// @Param        placeId path string true "Place ID"
+// @Success      200  {object}  PlaceDeleteResponse
+// @Router       /api/places/{placeId} [delete]
 func deletePlace(c *gin.Context) {
 	placeId := c.Param("placeId")
 	message := fmt.Sprintf("Deleted place %s", placeId)
@@ -45,8 +88,18 @@ func deletePlace(c *gin.Context) {
 
 func RegisterPlaces(r *gin.Engine) {
 	router := r.Group("/api/places")
-	router.POST("", middlewares.Authenticated, createPlace)
+	router.POST(
+		"",
+		middlewares.Authenticated,
+		middlewares.BodyValidator[schemas.PlacePost],
+		createPlace,
+	)
 	router.GET("/:placeId", middlewares.Authenticated, getPlace)
-	router.PUT("/:placeId", middlewares.Authenticated, updatePlace)
+	router.PUT(
+		"/:placeId",
+		middlewares.Authenticated,
+		middlewares.BodyValidator[schemas.PlacePut],
+		updatePlace,
+	)
 	router.DELETE("/:placeId", middlewares.Authenticated, deletePlace)
 }
