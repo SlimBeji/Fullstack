@@ -12,8 +12,8 @@ import {
     PlacesPaginatedSchema,
 } from "../../models/schemas";
 import z from "../../zodExt";
+import { swaggerRegistery } from "../docs";
 import { Authenticated, filter, validateBody } from "../middlewares";
-import { swaggerRegistery } from "../openapi";
 
 export const placeRouter = Router();
 

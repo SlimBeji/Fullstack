@@ -8,8 +8,8 @@ import {
     Signup,
     SignupSchema,
 } from "../../models/schemas";
+import { swaggerRegistery } from "../docs";
 import { validateBody } from "../middlewares";
-import { swaggerRegistery } from "../openapi";
 
 export const authRouter = Router();
 

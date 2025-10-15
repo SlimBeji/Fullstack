@@ -5,8 +5,8 @@ import cookieSession from "cookie-session";
 import express from "express";
 
 import { env } from "../config";
+import { registerSwaggger } from "./docs";
 import { cors, errorHandler, noRouteMatchHandler } from "./middlewares";
-import { registerSwaggger } from "./openapi";
 import { registerRoutes } from "./routes";
 
 const app = express();
