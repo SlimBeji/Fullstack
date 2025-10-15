@@ -9,8 +9,8 @@ import (
 
 func IsMultipart(c *gin.Context) bool {
 	contentType := c.GetHeader("Content-Type")
-	xxxUrlEncoded := strings.HasPrefix(contentType, string(types_.CONTENT_TYPE_FORM_URLENCODED))
-	formData := strings.HasPrefix(contentType, string(types_.CONTENT_TYPE_MULTIPART))
+	xxxUrlEncoded := strings.HasPrefix(contentType, string(types_.ContentTypeFormUrlencoded))
+	formData := strings.HasPrefix(contentType, string(types_.ContentTypeMultipart))
 	return xxxUrlEncoded || formData
 }
 
