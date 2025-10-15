@@ -34,16 +34,14 @@ const docTemplate = `{
                         "default": "very_secret",
                         "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "string",
                         "default": "mslimbeji@gmail.com",
                         "description": "The user email (We use username here because of OAuth spec)",
                         "name": "username",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -74,8 +72,7 @@ const docTemplate = `{
                         "example": "mslimbeji@gmail.com",
                         "description": "The user email",
                         "name": "email",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "minLength": 2,
@@ -83,8 +80,7 @@ const docTemplate = `{
                         "example": "Slim Beji",
                         "description": "The user name, two characters at least",
                         "name": "name",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "minLength": 8,
@@ -92,8 +88,7 @@ const docTemplate = `{
                         "example": "very_secret",
                         "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "file",
@@ -209,16 +204,14 @@ const docTemplate = `{
                         "example": "mslimbeji@gmail.com",
                         "description": "The user email",
                         "name": "email",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "boolean",
                         "example": false,
                         "description": "Whether the user is an admin or not",
                         "name": "isAdmin",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "minLength": 2,
@@ -226,8 +219,7 @@ const docTemplate = `{
                         "example": "Slim Beji",
                         "description": "The user name, two characters at least",
                         "name": "name",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "minLength": 8,
@@ -235,8 +227,7 @@ const docTemplate = `{
                         "example": "very_secret",
                         "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "file",
@@ -251,6 +242,153 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.UserRead"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/": {
+            "get": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Search and Filter users",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "eq:mslimbeji@gmail.com"
+                        ],
+                        "description": "The user email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "id",
+                            "name"
+                        ],
+                        "name": "fields",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "683b21134e2e5d46978daf1f"
+                        ],
+                        "description": "The user ID, 24 characters",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
+                            "eq:Slim Beji"
+                        ],
+                        "description": "The user name, two characters at least",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 100,
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "createdAt"
+                        ],
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UsersPaginated"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/query": {
+            "post": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Search and Retrieve users",
+                "parameters": [
+                    {
+                        "description": "POST parameters",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserFilters"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UsersPaginated"
                         }
                     }
                 }
@@ -325,7 +463,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/routes.UserPut"
+                            "$ref": "#/definitions/schemas.UserPut"
                         }
                     }
                 ],
@@ -394,37 +532,8 @@ const docTemplate = `{
                 }
             }
         },
-        "routes.UserPut": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "description": "The user email",
-                    "type": "string",
-                    "example": "mslimbeji@gmail.com"
-                },
-                "name": {
-                    "description": "The user name, two characters at least",
-                    "type": "string",
-                    "minLength": 2,
-                    "example": "Slim Beji"
-                },
-                "password": {
-                    "description": "The user password, 8 characters at least",
-                    "type": "string",
-                    "minLength": 8,
-                    "example": "very_secret"
-                }
-            }
-        },
         "schemas.EncodedToken": {
             "type": "object",
-            "required": [
-                "access_token",
-                "email",
-                "expires_in",
-                "token_type",
-                "userId"
-            ],
             "properties": {
                 "access_token": {
                     "description": "A generated web token. The 'Bearer ' prefix needs to be added for authentication",
@@ -456,15 +565,153 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.Location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "description": "The latitude of the place",
+                    "type": "number",
+                    "example": 51.48180425016331
+                },
+                "lng": {
+                    "description": "The longitude of the place",
+                    "type": "number",
+                    "example": -0.19090418688755467
+                }
+            }
+        },
+        "schemas.PlaceRead": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "The place address",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Fulham road"
+                },
+                "creatorId": {
+                    "description": "The ID of the place creator, 24 characters",
+                    "type": "string",
+                    "example": "683b21134e2e5d46978daf1f"
+                },
+                "description": {
+                    "description": "The place description, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stadium of Chelsea football club"
+                },
+                "id": {
+                    "description": "The ID of the place 24 characters",
+                    "type": "string",
+                    "example": "683b21134e2e5d46978daf1f"
+                },
+                "imageUrl": {
+                    "description": "local url on the storage",
+                    "type": "string",
+                    "example": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
+                },
+                "location": {
+                    "description": "Location object (can be sent as JSON string)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Location"
+                        }
+                    ]
+                },
+                "title": {
+                    "description": "The place title/name, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stamford Bridge"
+                }
+            }
+        },
+        "schemas.UserFilters": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "The user email",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "eq:mslimbeji@gmail.com"
+                    ]
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "id",
+                        "name"
+                    ]
+                },
+                "id": {
+                    "description": "The user ID, 24 characters",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "683b21134e2e5d46978daf1f"
+                    ]
+                },
+                "name": {
+                    "description": "The user name, two characters at least",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "eq:Slim Beji"
+                    ]
+                },
+                "page": {
+                    "type": "integer",
+                    "default": 1
+                },
+                "size": {
+                    "type": "integer",
+                    "default": 100
+                },
+                "sort": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "createdAt"
+                    ]
+                }
+            }
+        },
+        "schemas.UserPut": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "The user email",
+                    "type": "string",
+                    "example": "mslimbeji@gmail.com"
+                },
+                "name": {
+                    "description": "The user name, two characters at least",
+                    "type": "string",
+                    "minLength": 2,
+                    "example": "Slim Beji"
+                },
+                "password": {
+                    "description": "The user password, 8 characters at least",
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "very_secret"
+                }
+            }
+        },
         "schemas.UserRead": {
             "type": "object",
-            "required": [
-                "email",
-                "id",
-                "isAdmin",
-                "name",
-                "places"
-            ],
             "properties": {
                 "email": {
                     "description": "The user email",
@@ -501,6 +748,26 @@ const docTemplate = `{
                     "example": [
                         "683b21134e2e5d46978daf1f"
                     ]
+                }
+            }
+        },
+        "schemas.UsersPaginated": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.PlaceRead"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "type": "integer"
                 }
             }
         }

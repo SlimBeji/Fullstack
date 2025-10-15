@@ -10,23 +10,6 @@ definitions:
       message:
         type: string
     type: object
-  routes.UserPut:
-    properties:
-      email:
-        description: The user email
-        example: mslimbeji@gmail.com
-        type: string
-      name:
-        description: The user name, two characters at least
-        example: Slim Beji
-        minLength: 2
-        type: string
-      password:
-        description: The user password, 8 characters at least
-        example: very_secret
-        minLength: 8
-        type: string
-    type: object
   schemas.EncodedToken:
     properties:
       access_token:
@@ -52,12 +35,111 @@ definitions:
         description: The user ID, 24 characters
         example: 683b21134e2e5d46978daf1f
         type: string
-    required:
-    - access_token
-    - email
-    - expires_in
-    - token_type
-    - userId
+    type: object
+  schemas.Location:
+    properties:
+      lat:
+        description: The latitude of the place
+        example: 51.48180425016331
+        type: number
+      lng:
+        description: The longitude of the place
+        example: -0.19090418688755467
+        type: number
+    type: object
+  schemas.PlaceRead:
+    properties:
+      address:
+        description: The place address
+        example: Fulham road
+        minLength: 10
+        type: string
+      creatorId:
+        description: The ID of the place creator, 24 characters
+        example: 683b21134e2e5d46978daf1f
+        type: string
+      description:
+        description: The place description, 10 characters minimum
+        example: Stadium of Chelsea football club
+        minLength: 10
+        type: string
+      id:
+        description: The ID of the place 24 characters
+        example: 683b21134e2e5d46978daf1f
+        type: string
+      imageUrl:
+        description: local url on the storage
+        example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
+        type: string
+      location:
+        allOf:
+        - $ref: '#/definitions/schemas.Location'
+        description: Location object (can be sent as JSON string)
+      title:
+        description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        minLength: 10
+        type: string
+    type: object
+  schemas.UserFilters:
+    properties:
+      email:
+        description: The user email
+        example:
+        - eq:mslimbeji@gmail.com
+        items:
+          type: string
+        type: array
+      fields:
+        example:
+        - id
+        - name
+        items:
+          type: string
+        type: array
+      id:
+        description: The user ID, 24 characters
+        example:
+        - 683b21134e2e5d46978daf1f
+        items:
+          type: string
+        type: array
+      name:
+        description: The user name, two characters at least
+        example:
+        - eq:Slim Beji
+        items:
+          type: string
+        type: array
+      page:
+        default: 1
+        type: integer
+      size:
+        default: 100
+        type: integer
+      sort:
+        example:
+        - createdAt
+        items:
+          type: string
+        type: array
+    type: object
+  schemas.UserPut:
+    properties:
+      email:
+        description: The user email
+        example: mslimbeji@gmail.com
+        type: string
+      name:
+        description: The user name, two characters at least
+        example: Slim Beji
+        minLength: 2
+        type: string
+      password:
+        description: The user password, 8 characters at least
+        example: very_secret
+        minLength: 8
+        type: string
     type: object
   schemas.UserRead:
     properties:
@@ -89,12 +171,19 @@ definitions:
         items:
           type: string
         type: array
-    required:
-    - email
-    - id
-    - isAdmin
-    - name
-    - places
+    type: object
+  schemas.UsersPaginated:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/schemas.PlaceRead'
+        type: array
+      page:
+        type: integer
+      totalCount:
+        type: integer
+      totalPages:
+        type: integer
     type: object
 info:
   contact: {}
@@ -109,13 +198,11 @@ paths:
         in: formData
         minLength: 8
         name: password
-        required: true
         type: string
       - default: mslimbeji@gmail.com
         description: The user email (We use username here because of OAuth spec)
         in: formData
         name: username
-        required: true
         type: string
       produces:
       - application/json
@@ -136,21 +223,18 @@ paths:
         example: mslimbeji@gmail.com
         in: formData
         name: email
-        required: true
         type: string
       - description: The user name, two characters at least
         example: Slim Beji
         in: formData
         minLength: 2
         name: name
-        required: true
         type: string
       - description: The user password, 8 characters at least
         example: very_secret
         in: formData
         minLength: 8
         name: password
-        required: true
         type: string
       - description: User's profile image (JPEG)
         in: formData
@@ -218,27 +302,23 @@ paths:
         example: mslimbeji@gmail.com
         in: formData
         name: email
-        required: true
         type: string
       - description: Whether the user is an admin or not
         example: false
         in: formData
         name: isAdmin
-        required: true
         type: boolean
       - description: The user name, two characters at least
         example: Slim Beji
         in: formData
         minLength: 2
         name: name
-        required: true
         type: string
       - description: The user password, 8 characters at least
         example: very_secret
         in: formData
         minLength: 8
         name: password
-        required: true
         type: string
       - description: the user profile image
         in: formData
@@ -256,6 +336,76 @@ paths:
       - OAuth2Password:
         - admin
       summary: User creation
+      tags:
+      - User
+  /api/users/:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - collectionFormat: multi
+        description: The user email
+        example:
+        - eq:mslimbeji@gmail.com
+        in: query
+        items:
+          type: string
+        name: email
+        type: array
+      - collectionFormat: csv
+        example:
+        - id
+        - name
+        in: query
+        items:
+          type: string
+        name: fields
+        type: array
+      - collectionFormat: multi
+        description: The user ID, 24 characters
+        example:
+        - 683b21134e2e5d46978daf1f
+        in: query
+        items:
+          type: string
+        name: id
+        type: array
+      - collectionFormat: multi
+        description: The user name, two characters at least
+        example:
+        - eq:Slim Beji
+        in: query
+        items:
+          type: string
+        name: name
+        type: array
+      - default: 1
+        in: query
+        name: page
+        type: integer
+      - default: 100
+        in: query
+        name: size
+        type: integer
+      - collectionFormat: csv
+        example:
+        - createdAt
+        in: query
+        items:
+          type: string
+        name: sort
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UsersPaginated'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Search and Filter users
       tags:
       - User
   /api/users/{userId}:
@@ -317,7 +467,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/routes.UserPut'
+          $ref: '#/definitions/schemas.UserPut'
       produces:
       - application/json
       responses:
@@ -329,6 +479,30 @@ paths:
       - OAuth2Password:
         - admin
       summary: Update users
+      tags:
+      - User
+  /api/users/query:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: POST parameters
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserFilters'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UsersPaginated'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Search and Retrieve users
       tags:
       - User
 securityDefinitions:
