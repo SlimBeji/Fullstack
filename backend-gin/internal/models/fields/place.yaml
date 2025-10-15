@@ -37,7 +37,7 @@ fields:
         validate: "min=10"
         description: "The place address"
         example: "Fulham road"
-        filter-example: "regex:d{1,2} Boulevard"
+        filter-example: "regex:d{2} Boulevard"
     creatorId:
         type: "string"
         validate: "hexadecimal,len=24"
