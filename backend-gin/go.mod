@@ -11,6 +11,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/google/uuid v1.6.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/redis/go-redis/v9 v9.14.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
@@ -40,6 +41,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
