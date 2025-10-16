@@ -22,6 +22,7 @@ export const env = {
     MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),
     GOD_MODE_LOGIN: parseVar("GOD_MODE_LOGIN"),
     JWT_EXPIRATION: Number(parseVar("JWT_EXPIRATION", "3600")),
+    DEFAULT_TIMEOUT: Number(parseVar("DEFAULT_TIMEOUT", "20")),
     ENV: parseVar("ENV"),
 
     // DATABASE config

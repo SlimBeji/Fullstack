@@ -17,6 +17,7 @@ export class HuggingFaceClient {
                 Authorization: `Bearer ${this.token}`,
                 "Content-Type": "application/json",
             },
+            timeout: env.DEFAULT_TIMEOUT * 1000,
         });
     }
 
