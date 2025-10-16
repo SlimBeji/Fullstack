@@ -80,32 +80,5 @@ class RedisClient:
     async def delete(self, key: str) -> None:
         return await self.client.delete(key)
 
-    def wrap(
-        self,
-        keygen: Callable[P, str],
-        format: OutputFormat = "",
-        expiration: int | None = None,
-    ):
-        expiration = expiration or self.default_expirartion
-
-        def decorator(fn: Callable[P, R]) -> Callable[P, Awaitable[R]]:
-            async def wrapper(*args, **kwargs) -> R:
-                key = keygen(*args, **kwargs)
-                stored_raw = await self.get(key, format=format)
-                if stored_raw is not None:
-                    return stored_raw
-
-                if asyncio.iscoroutinefunction(fn):
-                    result = await fn(*args, **kwargs)
-                else:
-                    result = fn(*args, **kwargs)
-
-                await self.set(key, result, expiration)
-                return result
-
-            return wrapper
-
-        return decorator
-
 
 redis_client = RedisClient()

@@ -80,22 +80,6 @@ export class RedisClient {
         await this.connect();
         await this.client.del([key]);
     }
-
-    public wrap<I extends any[], O>(
-        fn: ((...inputs: I) => O) | ((...inputs: I) => Promise<O>),
-        keygen: (...inputs: I) => string,
-        expiration: number | null = null
-    ): (...inputs: I) => Promise<O> {
-        return async (...inputs: I): Promise<O> => {
-            const key = keygen(...inputs);
-            const stored = (await this.get(key)) as O;
-            if (stored) return stored;
-            const result = fn(...inputs);
-            const finalResult = await Promise.resolve(result);
-            await this.set(key, finalResult, expiration);
-            return finalResult;
-        };
-    }
 }
 
 export const redisClient = new RedisClient();
