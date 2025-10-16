@@ -1,5 +1,6 @@
-import { FindQuery } from "../../types";
-import z from "../../zodExt";
+import { FindQuery } from "@/types";
+import z from "@/zodExt";
+
 import {
     httpFilters,
     UserFields,

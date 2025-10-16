@@ -1,4 +1,5 @@
-import { getImagePath } from "../../lib/utils";
+import { getImagePath } from "@/lib/utils";
+
 import { PlaceSeed } from "../schemas";
 
 const embedding1 = [

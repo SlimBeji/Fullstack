@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
 import { ZodTypeAny } from "zod";
 
-import { env } from "../../config";
-import { ApiError, FilterOperation, HttpStatus, MimeType } from "../../types";
-import z from "../../zodExt";
+import { env } from "@/config";
+import { ApiError, FilterOperation, HttpStatus, MimeType } from "@/types";
+import z from "@/zodExt";
 
 //// Custom Fields ////
 

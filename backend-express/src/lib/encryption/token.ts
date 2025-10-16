@@ -1,11 +1,12 @@
-import { env } from "../../config";
+import { env } from "@/config";
 import {
     DecodedTokenPayload,
     EncodedToken,
     TokenPayload,
     UserRead,
-} from "../../models/schemas";
-import { ApiError, HttpStatus } from "../../types";
+} from "@/models/schemas";
+import { ApiError, HttpStatus } from "@/types";
+
 import { decodePayload, encodePayload } from "./helpers";
 
 export const decodeToken = (encoded: string): DecodedTokenPayload => {

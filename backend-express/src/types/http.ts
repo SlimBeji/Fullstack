@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import mime from "mime-types";
 import path from "path";
 
-import { env } from "../config";
+import { env } from "@/config";
 
 export class PaginationData {
     constructor(

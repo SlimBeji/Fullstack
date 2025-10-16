@@ -1,8 +1,8 @@
 import supertest from "supertest";
 
-import app from "../../../api";
-import { closeAll, seedTestData } from "../../../lib/sync";
-import { crudUser } from "../../../models/crud";
+import app from "@/api";
+import { closeAll, seedTestData } from "@/lib/sync";
+import { crudUser } from "@/models/crud";
 
 const request = supertest(app);
 

@@ -1,13 +1,14 @@
 import { Request, Response, Router } from "express";
 
-import { crudUser } from "../../models/crud";
+import { crudUser } from "@/models/crud";
 import {
     EncodedTokenSchema,
     Signin,
     SigninSchema,
     Signup,
     SignupSchema,
-} from "../../models/schemas";
+} from "@/models/schemas";
+
 import { swaggerRegistery } from "../docs";
 import { validateBody } from "../middlewares";
 

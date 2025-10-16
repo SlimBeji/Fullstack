@@ -1,7 +1,8 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 
-import z from "../../zodExt";
+import z from "@/zodExt";
+
 import { AuthFields, UserFields } from "../fields";
 
 // --- Token ----

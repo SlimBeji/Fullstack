@@ -1,7 +1,7 @@
 import { compare, hash } from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-import { env } from "../../config";
+import { env } from "@/config";
 
 const DEFAULT_HASH_SALT = 12;
 

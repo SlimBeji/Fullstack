@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 
-import { ApiError, CollectionEnum, HttpStatus } from "../../types";
+import { ApiError, CollectionEnum, HttpStatus } from "@/types";
+
 import { PlaceDB } from "../schemas";
 
 // Schema creation

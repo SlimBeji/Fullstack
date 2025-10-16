@@ -1,6 +1,6 @@
-import { storage } from "../lib/clients";
-import { closeAll, startAll } from "../lib/sync";
-import { getImagePath } from "../lib/utils";
+import { storage } from "@/lib/clients";
+import { closeAll, startAll } from "@/lib/sync";
+import { getImagePath } from "@/lib/utils";
 
 async function test() {
     const path = getImagePath("avatar1.jpg");

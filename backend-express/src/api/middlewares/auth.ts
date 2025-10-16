@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 
-import { ApiError, HttpStatus } from "../../types";
+import { ApiError, HttpStatus } from "@/types";
+
 import { getUserFromToken } from "../auth";
 
 const getError = (message?: string): ApiError => {

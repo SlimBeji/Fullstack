@@ -9,7 +9,7 @@ import {
     Types,
 } from "mongoose";
 
-import { env } from "../../config";
+import { env } from "@/config";
 import {
     Filter,
     FindQueryFilters,
@@ -18,8 +18,9 @@ import {
     MongoFindQuery,
     PaginationData,
     SortData,
-} from "../../types";
-import { ApiError, FindQuery, HttpStatus, PaginatedData } from "../../types";
+} from "@/types";
+import { ApiError, FindQuery, HttpStatus, PaginatedData } from "@/types";
+
 import { UserRead } from "../schemas";
 
 export type CrudEvent = "create" | "read" | "update" | "delete";

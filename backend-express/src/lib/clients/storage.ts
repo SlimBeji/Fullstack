@@ -8,8 +8,8 @@ import { randomUUID } from "crypto";
 import { existsSync } from "fs";
 import path from "path";
 
-import { env } from "../../config";
-import { FileToUpload } from "../../types";
+import { env } from "@/config";
+import { FileToUpload } from "@/types";
 
 interface GCSConfig {
     GCP_PROJECT_ID: string;

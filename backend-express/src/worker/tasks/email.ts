@@ -1,6 +1,7 @@
 import { Job, Queue, Worker } from "bullmq";
 
-import { Queues, Tasks } from "../../types";
+import { Queues, Tasks } from "@/types";
+
 import { config } from "./config";
 
 // Define Queue

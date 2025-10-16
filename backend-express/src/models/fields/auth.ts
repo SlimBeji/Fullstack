@@ -1,4 +1,4 @@
-import z from "../../zodExt";
+import z from "@/zodExt";
 
 const username = z.string().email().openapi({
     description: "The user email (We use username here because of OAuth spec)",

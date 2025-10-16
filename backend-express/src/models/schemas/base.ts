@@ -1,7 +1,7 @@
 import { AnyZodObject } from "zod";
 
-import { env } from "../../config";
-import z from "../../zodExt";
+import { env } from "@/config";
+import z from "@/zodExt";
 
 export const paginatedSchema = (
     schema: AnyZodObject,

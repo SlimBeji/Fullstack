@@ -1,11 +1,11 @@
 import supertest from "supertest";
 
-import app from "../../../api";
-import { closeAll, seedTestData } from "../../../lib/sync";
-import { getImagePath } from "../../../lib/utils";
-import { crudPlace, crudUser } from "../../../models/crud";
-import { PlaceRead } from "../../../models/schemas";
-import { HttpStatus } from "../../../types";
+import app from "@/api";
+import { closeAll, seedTestData } from "@/lib/sync";
+import { getImagePath } from "@/lib/utils";
+import { crudPlace, crudUser } from "@/models/crud";
+import { PlaceRead } from "@/models/schemas";
+import { HttpStatus } from "@/types";
 
 let adminToken: string = "";
 let token: string = "";

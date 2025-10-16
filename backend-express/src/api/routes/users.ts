@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
-import { crudUser } from "../../models/crud";
-import { zodObjectId } from "../../models/fields";
+import { crudUser } from "@/models/crud";
+import { zodObjectId } from "@/models/fields";
 import {
     UserFiltersSchema,
     UserPost,
@@ -10,8 +10,9 @@ import {
     UserPutSchema,
     UserReadSchema,
     UsersPaginatedSchema,
-} from "../../models/schemas";
-import z from "../../zodExt";
+} from "@/models/schemas";
+import z from "@/zodExt";
+
 import { swaggerRegistery } from "../docs";
 import { Admin, Authenticated, filter, validateBody } from "../middlewares";
 

@@ -1,7 +1,8 @@
-import { env } from "../../config";
-import { storage } from "../../lib/clients";
-import { createToken, hashInput, verifyHash } from "../../lib/encryption";
-import { ApiError, Filter, HttpStatus } from "../../types";
+import { env } from "@/config";
+import { storage } from "@/lib/clients";
+import { createToken, hashInput, verifyHash } from "@/lib/encryption";
+import { ApiError, Filter, HttpStatus } from "@/types";
+
 import { UserDocument, UserModel } from "../collections";
 import {
     UserSearchableType,

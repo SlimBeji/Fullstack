@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
-import { crudPlace } from "../../models/crud";
-import { zodObjectId } from "../../models/fields";
+import { crudPlace } from "@/models/crud";
+import { zodObjectId } from "@/models/fields";
 import {
     PlaceFiltersSchema,
     PlacePost,
@@ -10,8 +10,9 @@ import {
     PlacePutSchema,
     PlaceReadSchema,
     PlacesPaginatedSchema,
-} from "../../models/schemas";
-import z from "../../zodExt";
+} from "@/models/schemas";
+import z from "@/zodExt";
+
 import { swaggerRegistery } from "../docs";
 import { Authenticated, filter, validateBody } from "../middlewares";
 

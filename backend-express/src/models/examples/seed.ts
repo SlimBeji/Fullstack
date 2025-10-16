@@ -1,7 +1,8 @@
 import { Types } from "mongoose";
 
-import { db, redisClient, storage } from "../../lib/clients";
-import { CollectionEnum } from "../../types";
+import { db, redisClient, storage } from "@/lib/clients";
+import { CollectionEnum } from "@/types";
+
 import { crudPlace, crudUser } from "../crud";
 import { PlaceSeed, UserSeed } from "../schemas";
 import { places } from "./places";

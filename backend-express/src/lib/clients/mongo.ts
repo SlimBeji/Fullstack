@@ -1,6 +1,6 @@
 import mongoose, { Mongoose } from "mongoose";
 
-import { env } from "../../config";
+import { env } from "@/config";
 
 export class MongoClient {
     public conn: Mongoose | null = null;

@@ -1,6 +1,7 @@
-import { storage } from "../../lib/clients";
-import { ApiError, Filter, HttpStatus } from "../../types";
-import { placeEmbedding } from "../../worker/tasks";
+import { storage } from "@/lib/clients";
+import { ApiError, Filter, HttpStatus } from "@/types";
+import { placeEmbedding } from "@/worker/tasks";
+
 import { PlaceDocument, PlaceModel } from "../collections";
 import {
     PlaceSearchableType,

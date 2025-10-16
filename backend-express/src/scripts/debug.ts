@@ -1,4 +1,4 @@
-import { closeAll, startAll } from "../lib/sync";
+import { closeAll, startAll } from "@/lib/sync";
 
 async function debug() {
     console.log("I was executed");

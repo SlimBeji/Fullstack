@@ -1,6 +1,7 @@
-import { dumpDb, seedDb } from "../../models/examples";
-import { closeCrons } from "../../worker/crons";
-import { closeWorkers } from "../../worker/tasks";
+import { dumpDb, seedDb } from "@/models/examples";
+import { closeCrons } from "@/worker/crons";
+import { closeWorkers } from "@/worker/tasks";
+
 import { closeDbs, connectDbs } from "../clients";
 
 export const startAll = async () => {

@@ -1,4 +1,5 @@
-import { getImagePath } from "../../lib/utils";
+import { getImagePath } from "@/lib/utils";
+
 import { UserSeed } from "../schemas";
 
 export const users: UserSeed[] = [

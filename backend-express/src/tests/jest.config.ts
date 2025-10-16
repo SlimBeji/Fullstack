@@ -7,6 +7,9 @@ const config: Config.InitialOptions = {
     testMatch: ["**/*.test.ts"],
     collectCoverage: false,
     coverageDirectory: "coverage",
+    moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/../$1",
+    },
 };
 
 export default config;

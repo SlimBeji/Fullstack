@@ -1,4 +1,4 @@
-import { parseDotNotation } from "../../lib/utils";
+import { parseDotNotation } from "@/lib/utils";
 
 describe("parseDotNotation helper method", () => {
     it("converts flat json with keys using dot notation to a nested object", () => {
