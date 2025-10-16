@@ -15,6 +15,8 @@ func main() {
 		scripts.SeedDB()
 	case "dump":
 		scripts.DumpDb()
+	case "storage":
+		scripts.TestStorage()
 	default:
 		fmt.Printf("Unknown script %s\n", input)
 	}
