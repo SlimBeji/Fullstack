@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     MAX_ITEMS_PER_PAGE: int = 100
     GOD_MODE_LOGIN: str
     JWT_EXPIRATION: int = 3600
+    DEFAULT_TIMEOUT: int = 20
     ENV: Literal["dev", "test", "production"]
 
     # DATABASE

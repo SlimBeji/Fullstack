@@ -26,7 +26,9 @@ class HuggingFaceClient:
             f"https://api-inference.huggingface.co/models/{self.embeding_model}"
         )
         self.embedding_model_api = httpx.AsyncClient(
-            base_url=self.embedding_model_url, headers=self.headers
+            base_url=self.embedding_model_url,
+            headers=self.headers,
+            timeout=settings.DEFAULT_TIMEOUT,
         )
 
     async def embed_text(self, text: str) -> list[float]:
