@@ -1,7 +1,15 @@
 package scripts
 
-import "fmt"
+import (
+	"backend/internal/lib/clients"
+	"fmt"
+)
 
 func Debug() {
-	fmt.Println("Executing debugging script")
+	vector, err := clients.HuggingFace.EmbedText("I love coding")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(vector)
+	}
 }
