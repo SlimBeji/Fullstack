@@ -17,6 +17,8 @@ func main() {
 		scripts.DumpDb()
 	case "storage":
 		scripts.TestStorage()
+	case "redis":
+		scripts.TestRedis()
 	default:
 		fmt.Printf("Unknown script %s\n", input)
 	}
