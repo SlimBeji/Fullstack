@@ -70,7 +70,6 @@ func (cs *CloudStorage) getStorageClient() *storage.Client {
 func (cs *CloudStorage) initEmulator() {
 	_, err := cs.bucket.Attrs(cs.ctx)
 	if err == nil {
-		fmt.Printf("Bucket %s already exists in emulator\n", cs.bucketName)
 		return
 	}
 
