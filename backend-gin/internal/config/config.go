@@ -17,6 +17,7 @@ type Settings struct {
 	MaxItemsPerPage   int    `envconfig:"MAX_ITEMS_PER_PAGE" default:"100"`
 	GodModeLogin      string `envconfig:"GOD_MODE_LOGIN" required:"true"`
 	JWTExpiration     int    `envconfig:"JWT_EXPIRATION" default:"3600"`
+	DefaultTimeout    int    `envconfig:"DEFAULT_TIMEOUT" default:"30"`
 	Env               string `envconfig:"ENV" required:"true"`
 
 	// DATABASE config
