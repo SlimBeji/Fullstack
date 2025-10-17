@@ -6,11 +6,12 @@ import (
 )
 
 func Debug() {
-	hf := clients.NewHuggingFaceClient()
-	vector, err := hf.EmbedText("I love coding")
+	mongo := clients.GetMongo()
+	defer mongo.Close()
+	collections, err := mongo.ListCollections()
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(vector)
+		fmt.Println(collections)
 	}
 }
