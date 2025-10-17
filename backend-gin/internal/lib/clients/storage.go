@@ -19,15 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type GCSConfig struct {
-	GCPProjectID                 string
-	GCSBucketName                string
-	GCSBlobAccessExpiration      int
-	GoogleApplicationCredentials string
-	GCSEmulatorPrivateURL        string
-	GCSEmulatorPublicURL         string
-}
-
 type CloudStorage struct {
 	projectID          string
 	bucketName         string
@@ -174,16 +165,23 @@ func (cs *CloudStorage) DeleteFile(filename string) (bool, error) {
 	return true, nil
 }
 
-func NewCloudStorage(config GCSConfig) *CloudStorage {
+func (cs *CloudStorage) Close() error {
+	if cs.storageClient != nil {
+		return cs.storageClient.Close()
+	}
+	return nil
+}
+
+func newCloudStorage() *CloudStorage {
 	ctx := context.Background()
 
 	cs := &CloudStorage{
-		projectID:          config.GCPProjectID,
-		bucketName:         config.GCSBucketName,
-		urlExpiration:      time.Duration(config.GCSBlobAccessExpiration) * time.Second,
-		emulatorPublicURL:  config.GCSEmulatorPublicURL,
-		emulatorPrivateURL: config.GCSEmulatorPrivateURL + "/storage/v1/",
-		credentialsFile:    config.GoogleApplicationCredentials,
+		projectID:          config.Env.GCPProjectID,
+		bucketName:         config.Env.GCSBucketName,
+		urlExpiration:      time.Duration(config.Env.GCSBlobExpiration) * time.Second,
+		emulatorPublicURL:  config.Env.GCSEmulatorPub,
+		emulatorPrivateURL: config.Env.GCSEmulatorPriv + "/storage/v1/",
+		credentialsFile:    config.Env.GoogleCredentials,
 		ctx:                ctx,
 	}
 
@@ -199,16 +197,11 @@ func NewCloudStorage(config GCSConfig) *CloudStorage {
 	return cs
 }
 
-var Storage *CloudStorage
-
-func init() {
-	config := GCSConfig{
-		GCPProjectID:                 config.Env.GCPProjectID,
-		GCSBucketName:                config.Env.GCSBucketName,
-		GCSBlobAccessExpiration:      config.Env.GCSBlobExpiration,
-		GoogleApplicationCredentials: config.Env.GoogleCredentials,
-		GCSEmulatorPrivateURL:        config.Env.GCSEmulatorPriv,
-		GCSEmulatorPublicURL:         config.Env.GCSEmulatorPub,
+func GetStorage() *CloudStorage {
+	if gcsStorage == nil {
+		gcsStorage = newCloudStorage()
 	}
-	Storage = NewCloudStorage(config)
+	return gcsStorage
 }
+
+var gcsStorage *CloudStorage

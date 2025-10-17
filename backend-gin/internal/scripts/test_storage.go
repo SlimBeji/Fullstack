@@ -8,12 +8,14 @@ import (
 
 func TestStorage() {
 	path := utils.GetImagePath("avatar1.jpg")
-	destination, err := clients.Storage.UploadFile(path)
+	storage := clients.GetStorage()
+	defer storage.Close()
+	destination, err := storage.UploadFile(path)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	url, err := clients.Storage.GetSignedUrl(destination)
+	url, err := storage.GetSignedUrl(destination)
 	if err != nil {
 		fmt.Println(err)
 	} else {
