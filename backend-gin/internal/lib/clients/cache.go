@@ -71,8 +71,11 @@ func NewRedisClient() *RedisClient {
 	}
 }
 
-var Redis *RedisClient
-
-func init() {
-	Redis = NewRedisClient()
+func GetRedisClient() *RedisClient {
+	if redisClient == nil {
+		redisClient = NewRedisClient()
+	}
+	return redisClient
 }
+
+var redisClient *RedisClient
