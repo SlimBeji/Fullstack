@@ -55,7 +55,7 @@ func getDuration(expirationSeconds ...int) time.Duration {
 	return exp
 }
 
-func NewRedisClient() *RedisClient {
+func newRedisClient() *RedisClient {
 	url := config.Env.RedisURL
 	if testing.Testing() {
 		url = config.Env.RedisTestURL
@@ -73,7 +73,7 @@ func NewRedisClient() *RedisClient {
 
 func GetRedisClient() *RedisClient {
 	if redisClient == nil {
-		redisClient = NewRedisClient()
+		redisClient = newRedisClient()
 	}
 	return redisClient
 }
