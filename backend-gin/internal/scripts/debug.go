@@ -6,7 +6,8 @@ import (
 )
 
 func Debug() {
-	vector, err := clients.HuggingFace.EmbedText("I love coding")
+	hf := clients.NewHuggingFaceClient()
+	vector, err := hf.EmbedText("I love coding")
 	if err != nil {
 		fmt.Println(err)
 	} else {

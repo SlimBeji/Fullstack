@@ -37,21 +37,15 @@ func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
 	return embeddingResponse[0], nil
 }
 
-func NewHuggingFaceClient(token string, embedModel ...string) *HuggingFaceClient {
+func NewHuggingFaceClient(embedModel ...string) *HuggingFaceClient {
 	model := "sentence-transformers/all-MiniLM-L6-v2"
 	if len(embedModel) > 0 && embedModel[0] != "" {
 		model = embedModel[0]
 	}
 
 	return &HuggingFaceClient{
-		token:      token,
+		token:      config.Env.HFAPIToken,
 		embedModel: model,
 		baseURL:    fmt.Sprintf("https://api-inference.huggingface.co/models/%s/pipeline/feature-extraction", model),
 	}
-}
-
-var HuggingFace *HuggingFaceClient
-
-func init() {
-	HuggingFace = NewHuggingFaceClient(config.Env.HFAPIToken)
 }
