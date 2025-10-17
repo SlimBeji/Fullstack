@@ -4,6 +4,7 @@ import (
 	"backend/internal/api/middlewares"
 	"backend/internal/api/routes"
 	"backend/internal/config"
+	"backend/internal/lib/clients"
 	"fmt"
 
 	_ "backend/internal/api/docs"
@@ -24,6 +25,10 @@ import (
 // @securityDefinitions.oauth2.password OAuth2Password
 // @tokenUrl /api/auth/signin
 func main() {
+	// Initialize DBS connection
+	dbs := clients.GetDbs()
+	defer dbs.Redis.Close()
+
 	r := gin.Default()
 	r.Use(middlewares.CORS())
 	routes.RegisterRoutes(r)
