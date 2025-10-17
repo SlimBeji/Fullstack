@@ -28,6 +28,7 @@ func main() {
 	// Initialize DBS connection
 	dbs := clients.GetDbs()
 	defer dbs.Redis.Close()
+	defer dbs.Storage.Close()
 
 	r := gin.Default()
 	r.Use(middlewares.CORS())
