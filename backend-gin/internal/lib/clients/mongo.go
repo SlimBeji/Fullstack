@@ -12,24 +12,24 @@ import (
 )
 
 type MongoClient struct {
-	conn *mongo.Client
-	db   *mongo.Database
+	Conn *mongo.Client
+	DB   *mongo.Database
 }
 
 func (mc *MongoClient) Close() {
-	mc.conn.Disconnect(context.Background())
+	mc.Conn.Disconnect(context.Background())
 }
 
 func (mc *MongoClient) CreateCollection(name string) error {
-	return mc.db.CreateCollection(context.Background(), name)
+	return mc.DB.CreateCollection(context.Background(), name)
 }
 
 func (mc *MongoClient) ListCollections() ([]string, error) {
-	return mc.db.ListCollectionNames(context.Background(), map[string]any{})
+	return mc.DB.ListCollectionNames(context.Background(), map[string]any{})
 }
 
 func (m *MongoClient) DropCollection(name string) error {
-	return m.db.Collection(name).Drop(context.Background())
+	return m.DB.Collection(name).Drop(context.Background())
 }
 
 func newMongoClient() *MongoClient {
@@ -53,7 +53,7 @@ func newMongoClient() *MongoClient {
 	}
 	db := conn.Database(dbName)
 
-	return &MongoClient{conn: conn, db: db}
+	return &MongoClient{Conn: conn, DB: db}
 }
 
 var mongoClient *MongoClient
