@@ -1,6 +1,7 @@
 imports:
     - backend/internal/types_
     - mime/multipart
+    - time
 fields:
     id:
         type: "string"
@@ -59,6 +60,10 @@ fields:
     location:
         json: "location"
         description: "Location object (can be sent as JSON string)"
+    createdAt:
+        type: "time.Time"
+    updatedAt:
+        type: "time.Time"
 selectables:
     - id
     - title

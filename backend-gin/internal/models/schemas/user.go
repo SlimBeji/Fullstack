@@ -4,16 +4,19 @@ package schemas
 import (
 	"backend/internal/types_"
 	"mime/multipart"
+	"time"
 )
 
 type UserDB struct {
-	Id       string   `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The user ID, 24 characters
-	Name     string   `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
-	Email    string   `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                        // The user email
-	IsAdmin  bool     `json:"isAdmin" example:"false" bson:"isAdmin"`                                                                   // Whether the user is an admin or not
-	Password string   `json:"password" validate:"min=8" example:"very_secret" bson:"password"`                                          // The user password, 8 characters at least
-	ImageUrl string   `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	Places   []string `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"places"`               // The id of places belonging to the user, 24 characters
+	Id        string    `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The user ID, 24 characters
+	Name      string    `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
+	Email     string    `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                        // The user email
+	IsAdmin   bool      `json:"isAdmin" example:"false" bson:"isAdmin"`                                                                   // Whether the user is an admin or not
+	Password  string    `json:"password" validate:"min=8" example:"very_secret" bson:"password"`                                          // The user password, 8 characters at least
+	ImageUrl  string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
+	Places    []string  `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"places"`               // The id of places belonging to the user, 24 characters
+	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
 }
 
 type UserSeed struct {

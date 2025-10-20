@@ -26,6 +26,8 @@ type PlaceDB struct {
 	ImageUrl    any      `tag:"imageUrl,omitempty"`
 	Embedding   any      `tag:"embedding"`
 	CreatorID   any      `tag:"creatorId"`
+	CreatedAt   any      `tag:"createdAt"`
+	UpdatedAt   any      `tag:"updatedAt"`
 }
 
 // schemas:tag

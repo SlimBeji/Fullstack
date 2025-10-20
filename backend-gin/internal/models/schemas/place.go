@@ -4,6 +4,7 @@ package schemas
 import (
 	"backend/internal/types_"
 	"mime/multipart"
+	"time"
 )
 
 type Location struct {
@@ -20,6 +21,8 @@ type PlaceDB struct {
 	ImageUrl    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 	Embedding   []float64 `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
 	CreatorID   string    `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
+	CreatedAt   time.Time `json:"createdAt" bson:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt" bson:"updatedAt"`
 }
 
 type PlacSeed struct {
