@@ -85,5 +85,7 @@ type UserUpdate struct {
 
 // schemas:tag
 type UserPut struct {
-	UserUpdate
+	Name     any `tag:"name"`
+	Email    any `tag:"email"`
+	Password any `tag:"password"`
 }

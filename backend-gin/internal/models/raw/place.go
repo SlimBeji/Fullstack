@@ -107,5 +107,9 @@ type PlaceUpdate struct {
 
 // schemas:tag
 type PlacePut struct {
-	PlaceUpdate
+	Title       any      `tag:"title"`
+	Description any      `tag:"description"`
+	Address     any      `tag:"address"`
+	Location    Location `tag:"location"`
+	CreatorID   any      `tag:"creatorId"`
 }
