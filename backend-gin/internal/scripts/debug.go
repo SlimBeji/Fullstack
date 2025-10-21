@@ -1,12 +1,14 @@
 package scripts
 
 import (
+	"backend/internal/config"
 	"backend/internal/lib/clients"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"reflect"
 	"strings"
@@ -218,6 +220,18 @@ func (crud *CrudUser) UserGet(user schemas.UserRead, id string, ctx context.Cont
 
 // Fetch
 
+func (crud *CrudUser) parsePagination(page int, size int) types_.Pagination {
+	if page == 0 {
+		page = 1
+	}
+
+	if size == 0 || size > config.Env.MaxItemsPerPage {
+		size = config.Env.MaxItemsPerPage
+	}
+
+	return types_.Pagination{Page: page, Size: size}
+}
+
 func (crud *CrudUser) parseSortData(fields []string) bson.D {
 	result := bson.D{}
 
@@ -292,6 +306,101 @@ func (crud *CrudUser) parseFilters(filters types_.FindQueryFilters) bson.M {
 func (crud *CrudUser) CountDocuments(filters bson.M, ctx context.Context) (int, error) {
 	count, err := crud.collection.CountDocuments(ctx, filters)
 	return int(count), err
+}
+
+func (crud *CrudUser) FetchDocuments(query types_.MongoFindQuery, ctx context.Context) ([]bson.Raw, error) {
+	pagination := types_.Pagination{Page: 1, Size: config.Env.MaxItemsPerPage}
+	if query.Pagination != nil {
+		pagination = *query.Pagination
+	}
+
+	filters := bson.M{}
+	if query.Filters != nil {
+		filters = *query.Filters
+	}
+
+	sort := bson.D{{Key: "createdAt", Value: 1}}
+	if query.Sort != nil {
+		sort = *query.Sort
+	}
+
+	projection := bson.M{}
+	if query.Projection != nil {
+		projection = *query.Projection
+	}
+
+	opts := options.Find().
+		SetSort(sort).
+		SetProjection(projection).
+		SetCollation(&options.Collation{Locale: "en", Strength: 2}).
+		SetSkip(int64(pagination.Skip())).
+		SetLimit(int64(pagination.Size))
+
+	result := []bson.Raw{}
+	cursor, err := crud.collection.Find(ctx, filters, opts)
+	if err != nil {
+		return result, fmt.Errorf("could not fetch data: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		result = append(result, cursor.Current)
+	}
+	return result, nil
+}
+
+func (crud *CrudUser) Fetch(findQuery types_.FindQuery, dest any, ctx context.Context) error {
+	// Step 1: Parsing the FindQuery to Mongo language
+	pagination := crud.parsePagination(findQuery.Page, findQuery.Size)
+	projection := crud.parseProjection(findQuery.Fields)
+	sort := crud.parseSortData(findQuery.Sort)
+	filters := crud.parseFilters(findQuery.Filters)
+	query := types_.MongoFindQuery{
+		Pagination: &pagination,
+		Projection: &projection,
+		Sort:       &sort,
+		Filters:    &filters,
+	}
+
+	// Step 2: Counting teh output
+	totalCount, err := crud.CountDocuments(filters, ctx)
+	if err != nil {
+		return fmt.Errorf("could not fetch data: %w", err)
+	}
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pagination.Size)))
+
+	// Step 3: Fetching the raw data and serialize it
+	raw, err := crud.FetchDocuments(query, ctx)
+	if err != nil {
+		return fmt.Errorf("could not fetch data: %w", err)
+	}
+
+	// Step 4: Deserialize the data
+	switch d := dest.(type) {
+	case *types_.RecordsPaginated[schemas.UserRead]:
+		d.Page = pagination.Page
+		d.TotalPages = totalPages
+		d.TotalCount = totalCount
+		d.Data = []schemas.UserRead{}
+		for _, b := range raw {
+			var user schemas.UserRead
+			bson.Unmarshal(b, &user)
+			d.Data = append(d.Data, user)
+		}
+	case *types_.DataPaginated:
+		d.Page = pagination.Page
+		d.TotalPages = totalPages
+		d.TotalCount = totalCount
+		for _, b := range raw {
+			var data bson.M
+			bson.Unmarshal(b, &data)
+			d.Data = append(d.Data, data)
+		}
+	default:
+		return fmt.Errorf("could not serialize data: unhandled type %T", d)
+	}
+
+	return nil
 }
 
 // Create
@@ -475,6 +584,17 @@ func Debug() {
 	// user, _ := crud.UserCreate(admin, form, context.Background())
 	// fmt.Println("Created:", user)
 
-	count, err := crud.CountDocuments(bson.M{"name": bson.M{"$regex": "Slim"}}, context.Background())
-	fmt.Println(count, err)
+	// nameFilters := []types_.Filter{{Op: "regex", Val: "Slim"}}
+	// filters := map[string][]types_.Filter{"name": nameFilters}
+	// query := types_.FindQuery{Filters: filters}
+
+	query := types_.FindQuery{
+		Filters: types_.FindQueryFilters{
+			"name": {{Op: "regex", Val: "Slim"}},
+		},
+	}
+	data := types_.RecordsPaginated[schemas.UserRead]{}
+	err := crud.Fetch(query, &data, context.Background())
+	fmt.Println(data)
+	fmt.Println(err)
 }
