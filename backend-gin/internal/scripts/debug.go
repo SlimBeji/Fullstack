@@ -132,28 +132,71 @@ func (crud *CrudUser) authCheck(item *schemas.UserRead, data any, event CrudEven
 	return nil
 }
 
+func (crud *CrudUser) addOwnershipFilters(user *schemas.UserRead, findQuery *types_.FindQuery) {
+	if findQuery.Filters == nil {
+		findQuery.Filters = make(types_.FindQueryFilters)
+	}
+
+	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
+	findQuery.Filters["id"] = append(findQuery.Filters["id"], ownershipFilter)
+}
+
 // Serialization
 
-func (crud *CrudUser) postProcess(item *schemas.UserRead) error {
+func (crud *CrudUser) postProcess(item any) error {
 	storage := clients.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(item.ImageUrl)
-	if err != nil {
-		return err
+
+	switch d := item.(type) {
+	case *schemas.UserRead:
+		signedUrl, err := storage.GetSignedUrl(d.ImageUrl)
+		if err != nil {
+			return err
+		}
+		d.ImageUrl = signedUrl
+	case *bson.M:
+		imageUrl, exists := (*d)["imageUrl"]
+		if !exists {
+			return nil
+		}
+
+		signedUrl, err := storage.GetSignedUrl(imageUrl.(string))
+		if err != nil {
+			return err
+		}
+		(*d)["imageUrl"] = signedUrl
+	default:
+		return fmt.Errorf("unhandled type %T for %s serialization", d, crud.ModelName())
 	}
-	item.ImageUrl = signedUrl
+
 	return nil
 }
 
-func (crud *CrudUser) postProcessResults(items []*schemas.UserRead) []error {
+func (crud *CrudUser) postProcessBsons(items []bson.M) []error {
 	errors := make([]error, len(items))
 	var wg sync.WaitGroup
 
-	for i, item := range items {
+	for i := range items {
 		wg.Add(1)
-		go func(index int, item *schemas.UserRead) {
+		go func(index int) {
 			defer wg.Done()
-			errors[index] = crud.postProcess(item)
-		}(i, item)
+			errors[index] = crud.postProcess(&items[index])
+		}(i)
+	}
+
+	wg.Wait()
+	return errors
+}
+
+func (crud *CrudUser) postProcessRecords(items []schemas.UserRead) []error {
+	errors := make([]error, len(items))
+	var wg sync.WaitGroup
+
+	for i := range items {
+		wg.Add(1)
+		go func(index int) {
+			defer wg.Done()
+			errors[index] = crud.postProcess(&items[index])
+		}(i)
 	}
 
 	wg.Wait()
@@ -291,7 +334,14 @@ func (crud *CrudUser) parseFilters(filters types_.FindQueryFilters) bson.M {
 			if fieldFilter.Op == types_.FilterText {
 				conditions[operator] = bson.M{"$search": fieldFilter.Val}
 			} else {
-				conditions[operator] = fieldFilter.Val
+				if field == "_id" {
+					objectId, err := primitive.ObjectIDFromHex(fieldFilter.Val.(string))
+					if err == nil {
+						conditions[operator] = objectId
+					}
+				} else {
+					conditions[operator] = fieldFilter.Val
+				}
 			}
 		}
 
@@ -381,26 +431,61 @@ func (crud *CrudUser) Fetch(findQuery types_.FindQuery, dest any, ctx context.Co
 		d.Page = pagination.Page
 		d.TotalPages = totalPages
 		d.TotalCount = totalCount
-		d.Data = []schemas.UserRead{}
+		data := []schemas.UserRead{}
 		for _, b := range raw {
 			var user schemas.UserRead
 			bson.Unmarshal(b, &user)
-			d.Data = append(d.Data, user)
+			data = append(data, user)
 		}
+
+		errs := crud.postProcessRecords(data)
+		msgs := []string{}
+		for _, err := range errs {
+			if err != nil {
+				msgs = append(msgs, err.Error())
+			}
+		}
+		msg := strings.Join(msgs, "\n")
+		if msg != "" {
+			return fmt.Errorf("post processing failed: %s", msg)
+		}
+
+		d.Data = data
+
 	case *types_.DataPaginated:
 		d.Page = pagination.Page
 		d.TotalPages = totalPages
 		d.TotalCount = totalCount
+		data := []bson.M{}
 		for _, b := range raw {
-			var data bson.M
-			bson.Unmarshal(b, &data)
-			d.Data = append(d.Data, data)
+			var item bson.M
+			bson.Unmarshal(b, &item)
+			data = append(data, item)
 		}
+
+		errs := crud.postProcessBsons(data)
+		msgs := []string{}
+		for _, err := range errs {
+			if err != nil {
+				msgs = append(msgs, err.Error())
+			}
+		}
+		msg := strings.Join(msgs, "\n")
+		if msg != "" {
+			return fmt.Errorf("post processing failed: %s", msg)
+		}
+
+		d.Data = data
 	default:
 		return fmt.Errorf("could not serialize data: unhandled type %T", d)
 	}
 
 	return nil
+}
+
+func (crud *CrudUser) UserFetch(user schemas.UserRead, findQuery types_.FindQuery, dest any, ctx context.Context) error {
+	crud.addOwnershipFilters(&user, &findQuery)
+	return crud.Fetch(findQuery, dest, ctx)
 }
 
 // Create
@@ -572,7 +657,8 @@ func (crud *CrudUser) UserDelete(user schemas.UserRead, id string, ctx context.C
 
 func Debug() {
 	crud := NewCrudUser()
-	// admin, _ := crud.Get("68d950a9fdc14be002c64151", context.Background())
+	user, _ := crud.Get("68d950a9fdc14be002c64151", context.Background())
+	fmt.Println(user)
 	// fmt.Println("Admin user", admin)
 
 	// form := schemas.UserPost{
@@ -593,7 +679,10 @@ func Debug() {
 			"name": {{Op: "regex", Val: "Slim"}},
 		},
 	}
-	data := types_.RecordsPaginated[schemas.UserRead]{}
+	// data := types_.RecordsPaginated[schemas.UserRead]{}
+	data := types_.DataPaginated{}
+
+	// err := crud.UserFetch(user, query, &data, context.Background())
 	err := crud.Fetch(query, &data, context.Background())
 	fmt.Println(data)
 	fmt.Println(err)
