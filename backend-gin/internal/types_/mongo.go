@@ -1,5 +1,9 @@
 package types_
 
+import (
+	"go.mongodb.org/mongo-driver/bson"
+)
+
 type FilterOp string
 
 const (
@@ -29,4 +33,11 @@ type FindQuery struct {
 	Sort    []string
 	Fields  []string
 	Filters FindQueryFilters
+}
+
+type MongoFindQuery struct {
+	Pagination *Pagination
+	Filters    *bson.M
+	Sort       *bson.D
+	Projection *bson.M
 }
