@@ -8,6 +8,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+type Pagination struct {
+	Page int
+	Size int
+}
+
+func (p *Pagination) Skip() int {
+	return (p.Page - 1) * p.Size
+}
+
 type RecordsPaginated[T any] struct {
 	Page       int `json:"page"`
 	TotalPages int `json:"totalPages"`
