@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -18,7 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type CrudEvent string
@@ -332,7 +330,7 @@ func (crud *CrudUser) CreateDocument(
 	doc.CreatedAt = time.Now()
 	doc.Places = []string{}
 
-	return collections.CreateDocument(crud.collection, doc, ctx)
+	return collections.CreateDocument(crud.collection, &doc, ctx)
 }
 
 func (crud *CrudUser) Create(
@@ -366,39 +364,20 @@ func (crud *CrudUser) UserCreate(
 
 // Update
 
-func (crud *CrudUser) UpdateDocument(filter bson.M, form schemas.UserUpdate, ctx context.Context) (*mongo.SingleResult, error) {
-	return collections.RunWithinSession(ctx, func(session mongo.SessionContext) (*mongo.SingleResult, error) {
-		var zero *mongo.SingleResult
-		update := bson.M{
-			"$set": bson.M{
-				"updatedAt": time.Now(),
-			},
-		}
-
-		formValue := reflect.ValueOf(form)
-		formType := formValue.Type()
-		for i := 0; i < formValue.NumField(); i++ {
-			fieldValue := formValue.Field(i)
-			fieldType := formType.Field(i)
-			if fieldValue.Kind() == reflect.Pointer && !fieldValue.IsNil() {
-				value := fieldValue.Elem().Interface()
-				bsonTag := fieldType.Tag.Get("bson")
-				update["$set"].(bson.M)[bsonTag] = value
-			}
-		}
-
-		opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-		result := crud.collection.FindOneAndUpdate(session, filter, update, opts)
-
-		if result.Err() != nil {
-			return zero, result.Err()
-		}
-
-		return result, nil
-	})
+func (crud *CrudUser) UpdateDocument(
+	filter bson.M, form *schemas.UserUpdate, ctx context.Context,
+) (*mongo.SingleResult, error) {
+	return collections.UpdateDocument(
+		crud.collection,
+		filter,
+		form,
+		ctx,
+	)
 }
 
-func (crud *CrudUser) Update(id string, data schemas.UserPut, ctx context.Context) (schemas.UserRead, error) {
+func (crud *CrudUser) Update(
+	id string, data schemas.UserPut, ctx context.Context,
+) (schemas.UserRead, error) {
 	var result schemas.UserRead
 	var form schemas.UserUpdate
 	err := copier.Copy(&form, &data)
@@ -411,7 +390,7 @@ func (crud *CrudUser) Update(id string, data schemas.UserPut, ctx context.Contex
 		return result, fmt.Errorf("invalid user ID %s: %w", id, err)
 	}
 
-	raw, err := crud.UpdateDocument(bson.M{"_id": objectId}, form, ctx)
+	raw, err := crud.UpdateDocument(bson.M{"_id": objectId}, &form, ctx)
 	if err != nil {
 		return result, fmt.Errorf("could not update %s document: %w", id, err)
 	}
@@ -420,17 +399,22 @@ func (crud *CrudUser) Update(id string, data schemas.UserPut, ctx context.Contex
 	return result, err
 }
 
-func (crud *CrudUser) UserUpdate(user schemas.UserRead, id string, data schemas.UserPut, ctx context.Context) (schemas.UserRead, error) {
+func (crud *CrudUser) UserUpdate(
+	user *schemas.UserRead,
+	id string,
+	data schemas.UserPut,
+	ctx context.Context,
+) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
 	// Read document to see if acessible by the user
-	_, err := crud.UserGet(&user, id, ctx)
+	_, err := crud.UserGet(user, id, ctx)
 
 	if err != nil {
 		return zero, err
 	}
 
-	if err := crud.authCheck(&user, data, UpdateEvent); err != nil {
+	if err := crud.authCheck(user, data, UpdateEvent); err != nil {
 		return zero, err
 	}
 

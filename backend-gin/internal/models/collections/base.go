@@ -7,7 +7,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -245,19 +247,61 @@ func FetchDocuments(
 // Create
 
 func CreateDocument[T any](
-	collection *mongo.Collection, doc T, ctx context.Context,
+	collection *mongo.Collection, doc *T, ctx context.Context,
 ) (*mongo.SingleResult, error) {
 	return RunWithinSession(
 		ctx,
 		func(session mongo.SessionContext) (*mongo.SingleResult, error) {
 			var zero *mongo.SingleResult
 
-			raw, err := collection.InsertOne(session, doc)
+			raw, err := collection.InsertOne(session, *doc)
 			if err != nil {
 				return zero, err
 			}
 
 			result := collection.FindOne(session, bson.M{"_id": raw.InsertedID})
+			return result, nil
+		},
+	)
+}
+
+// Update
+
+func UpdateDocument[T any](
+	collection *mongo.Collection,
+	filter bson.M,
+	form *T,
+	ctx context.Context,
+) (*mongo.SingleResult, error) {
+	return RunWithinSession(
+		ctx,
+		func(session mongo.SessionContext) (*mongo.SingleResult, error) {
+			var zero *mongo.SingleResult
+			update := bson.M{
+				"$set": bson.M{
+					"updatedAt": time.Now(),
+				},
+			}
+
+			formValue := reflect.ValueOf(form)
+			formType := formValue.Type()
+			for i := 0; i < formValue.NumField(); i++ {
+				fieldValue := formValue.Field(i)
+				fieldType := formType.Field(i)
+				if fieldValue.Kind() == reflect.Pointer && !fieldValue.IsNil() {
+					value := fieldValue.Elem().Interface()
+					bsonTag := fieldType.Tag.Get("bson")
+					update["$set"].(bson.M)[bsonTag] = value
+				}
+			}
+
+			opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+			result := collection.FindOneAndUpdate(session, filter, update, opts)
+
+			if result.Err() != nil {
+				return zero, result.Err()
+			}
+
 			return result, nil
 		},
 	)
