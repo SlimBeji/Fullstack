@@ -3,10 +3,10 @@ package scripts
 import (
 	"backend/internal/config"
 	"backend/internal/lib/clients"
+	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
-	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -87,10 +87,7 @@ func (crud *CrudUser) ModelName() string {
 // Helpers
 
 func (crud *CrudUser) NotFoundErr(id string) *types_.ApiError {
-	return &types_.ApiError{
-		Code:    http.StatusNotFound,
-		Message: fmt.Sprintf("No document with id %s found in %s", id, crud.ModelName()),
-	}
+	return collections.NotFoundErr(crud.ModelName(), id)
 }
 
 // Accessors
@@ -203,50 +200,38 @@ func (crud *CrudUser) postProcessRecords(items []schemas.UserRead) []error {
 	return errors
 }
 
-func (crud *CrudUser) decodeResult(raw *mongo.SingleResult) (schemas.UserRead, error) {
-	var result schemas.UserRead
-
-	err := raw.Decode(&result)
+func (crud *CrudUser) decodeResult(
+	raw *mongo.SingleResult, dest *schemas.UserRead,
+) error {
+	err := raw.Decode(dest)
 	if err != nil {
-		return result, fmt.Errorf("decode failed: %w", err)
+		return fmt.Errorf("decode failed: %w", err)
 	}
 
-	if err := crud.postProcess(&result); err != nil {
-		return result, fmt.Errorf("post-process failed: %w", err)
+	if err := crud.postProcess(dest); err != nil {
+		return fmt.Errorf("post-process failed: %w", err)
 	}
 
-	return result, err
+	return nil
 }
 
 // Read
 
-func (crud *CrudUser) GetDocument(id string, ctx context.Context) (*mongo.SingleResult, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, fmt.Errorf("invalid user ID %s: %w", id, err)
-	}
-	return crud.collection.FindOne(ctx, bson.M{"_id": objectId}), nil
+func (crud *CrudUser) GetDocument(
+	id string, ctx context.Context,
+) (*mongo.SingleResult, error) {
+	return collections.GetDocument(crud.collection, id, ctx)
 }
 
-func (crud *CrudUser) Get(id string, ctx context.Context) (schemas.UserRead, error) {
-	var result schemas.UserRead
-	raw, err := crud.GetDocument(id, ctx)
-	if err != nil {
-		return result, fmt.Errorf("get document failed: %w", err)
-	}
-
-	result, err = crud.decodeResult(raw)
-	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return result, crud.NotFoundErr(id)
-		}
-		return result, fmt.Errorf("decode failed: %w", err)
-	}
-
-	return result, err
+func (crud *CrudUser) Get(
+	id string, ctx context.Context,
+) (schemas.UserRead, error) {
+	return collections.Get(crud.collection, id, ctx, crud.decodeResult)
 }
 
-func (crud *CrudUser) UserGet(user schemas.UserRead, id string, ctx context.Context) (schemas.UserRead, error) {
+func (crud *CrudUser) UserGet(
+	user *schemas.UserRead, id string, ctx context.Context,
+) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
 	result, err := crud.Get(id, ctx)
@@ -254,7 +239,7 @@ func (crud *CrudUser) UserGet(user schemas.UserRead, id string, ctx context.Cont
 		return zero, err
 	}
 
-	if err := crud.authCheck(&user, result, ReadEvent); err != nil {
+	if err := crud.authCheck(user, result, ReadEvent); err != nil {
 		return zero, err
 	}
 
@@ -513,19 +498,20 @@ func (crud *CrudUser) CreateDocument(data schemas.UserCreate, ctx context.Contex
 }
 
 func (crud *CrudUser) Create(data schemas.UserPost, ctx context.Context) (schemas.UserRead, error) {
-	var zero schemas.UserRead
+	var result schemas.UserRead
 	var form schemas.UserCreate
 	err := copier.Copy(&form, &data)
 	if err != nil {
-		return zero, fmt.Errorf("could not prepare creation form: %w", err)
+		return result, fmt.Errorf("could not prepare creation form: %w", err)
 	}
 
 	raw, err := crud.CreateDocument(form, ctx)
 	if err != nil {
-		return zero, fmt.Errorf("could not create document: %w", err)
+		return result, fmt.Errorf("could not create document: %w", err)
 	}
 
-	return crud.decodeResult(raw)
+	err = crud.decodeResult(raw, &result)
+	return result, err
 }
 
 func (crud *CrudUser) UserCreate(user schemas.UserRead, data schemas.UserPost, ctx context.Context) (schemas.UserRead, error) {
@@ -571,31 +557,32 @@ func (crud *CrudUser) UpdateDocument(filter bson.M, form schemas.UserUpdate, ctx
 }
 
 func (crud *CrudUser) Update(id string, data schemas.UserPut, ctx context.Context) (schemas.UserRead, error) {
-	var zero schemas.UserRead
+	var result schemas.UserRead
 	var form schemas.UserUpdate
 	err := copier.Copy(&form, &data)
 	if err != nil {
-		return zero, fmt.Errorf("could not prepare update form: %w", err)
+		return result, fmt.Errorf("could not prepare update form: %w", err)
 	}
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return zero, fmt.Errorf("invalid user ID %s: %w", id, err)
+		return result, fmt.Errorf("invalid user ID %s: %w", id, err)
 	}
 
 	raw, err := crud.UpdateDocument(bson.M{"_id": objectId}, form, ctx)
 	if err != nil {
-		return zero, fmt.Errorf("could not update %s document: %w", id, err)
+		return result, fmt.Errorf("could not update %s document: %w", id, err)
 	}
 
-	return crud.decodeResult(raw)
+	err = crud.decodeResult(raw, &result)
+	return result, err
 }
 
 func (crud *CrudUser) UserUpdate(user schemas.UserRead, id string, data schemas.UserPut, ctx context.Context) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
 	// Read document to see if acessible by the user
-	_, err := crud.UserGet(user, id, ctx)
+	_, err := crud.UserGet(&user, id, ctx)
 
 	if err != nil {
 		return zero, err
@@ -674,16 +661,16 @@ func Debug() {
 	// filters := map[string][]types_.Filter{"name": nameFilters}
 	// query := types_.FindQuery{Filters: filters}
 
-	query := types_.FindQuery{
-		Filters: types_.FindQueryFilters{
-			"name": {{Op: "regex", Val: "Slim"}},
-		},
-	}
-	// data := types_.RecordsPaginated[schemas.UserRead]{}
-	data := types_.DataPaginated{}
+	// query := types_.FindQuery{
+	// 	Filters: types_.FindQueryFilters{
+	// 		"name": {{Op: "regex", Val: "Slim"}},
+	// 	},
+	// }
+	// // data := types_.RecordsPaginated[schemas.UserRead]{}
+	// data := types_.DataPaginated{}
 
-	// err := crud.UserFetch(user, query, &data, context.Background())
-	err := crud.Fetch(query, &data, context.Background())
-	fmt.Println(data)
-	fmt.Println(err)
+	// // err := crud.UserFetch(user, query, &data, context.Background())
+	// err := crud.Fetch(query, &data, context.Background())
+	// fmt.Println(data)
+	// fmt.Println(err)
 }
