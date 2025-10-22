@@ -2,6 +2,7 @@ package collections
 
 import (
 	"backend/internal/config"
+	"backend/internal/lib/clients"
 	"backend/internal/types_"
 	"context"
 	"fmt"
@@ -13,6 +14,37 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// ACID
+
+func RunWithinSession[T any](
+	ctx context.Context,
+	operation func(mongo.SessionContext) (T, error),
+) (T, error) {
+	var result T
+
+	mc := clients.GetMongo()
+	session, err := mc.Conn.StartSession()
+	if err != nil {
+		return result, err
+	}
+	defer session.EndSession(ctx)
+
+	err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
+		if err := session.StartTransaction(); err != nil {
+			return err
+		}
+		result, err = operation(sessionContext)
+		if err != nil {
+			session.AbortTransaction(sessionContext)
+			return err
+		}
+
+		return session.CommitTransaction(sessionContext)
+	})
+
+	return result, err
+}
 
 // Helpers
 
@@ -32,7 +64,7 @@ func GetDocument(
 ) (*mongo.SingleResult, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, fmt.Errorf("invalid user ID %s: %w", id, err)
+		return nil, fmt.Errorf("invalid object ID %s: %w", id, err)
 	}
 	return collection.FindOne(ctx, bson.M{"_id": objectId}), nil
 }
@@ -208,4 +240,25 @@ func FetchDocuments(
 		result = append(result, cursor.Current)
 	}
 	return result, nil
+}
+
+// Create
+
+func CreateDocument[T any](
+	collection *mongo.Collection, doc T, ctx context.Context,
+) (*mongo.SingleResult, error) {
+	return RunWithinSession(
+		ctx,
+		func(session mongo.SessionContext) (*mongo.SingleResult, error) {
+			var zero *mongo.SingleResult
+
+			raw, err := collection.InsertOne(session, doc)
+			if err != nil {
+				return zero, err
+			}
+
+			result := collection.FindOne(session, bson.M{"_id": raw.InsertedID})
+			return result, nil
+		},
+	)
 }

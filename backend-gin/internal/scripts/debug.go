@@ -50,35 +50,6 @@ func NewCrudUser() *CrudUser {
 	}
 }
 
-func RunWithinSession[T any](
-	mc clients.MongoClient,
-	ctx context.Context,
-	operation func(mongo.SessionContext) (T, error),
-) (T, error) {
-	var result T
-
-	session, err := mc.Conn.StartSession()
-	if err != nil {
-		return result, err
-	}
-	defer session.EndSession(ctx)
-
-	err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
-		if err := session.StartTransaction(); err != nil {
-			return err
-		}
-		result, err = operation(sessionContext)
-		if err != nil {
-			session.AbortTransaction(sessionContext)
-			return err
-		}
-
-		return session.CommitTransaction(sessionContext)
-	})
-
-	return result, err
-}
-
 // Helpers
 
 func (crud *CrudUser) NotFoundErr(id string) *types_.ApiError {
@@ -347,29 +318,26 @@ func (crud *CrudUser) UserFetch(
 
 // Create
 
-func (crud *CrudUser) CreateDocument(data schemas.UserCreate, ctx context.Context) (*mongo.SingleResult, error) {
-	return RunWithinSession(*crud.client, ctx, func(session mongo.SessionContext) (*mongo.SingleResult, error) {
-		var zero *mongo.SingleResult
-		var doc schemas.UserDB
+func (crud *CrudUser) CreateDocument(
+	data *schemas.UserCreate, ctx context.Context,
+) (*mongo.SingleResult, error) {
+	var zero *mongo.SingleResult
+	var doc schemas.UserDB
 
-		err := copier.Copy(&doc, &data)
-		if err != nil {
-			return zero, err
-		}
-		doc.UpdatedAt = time.Now()
-		doc.CreatedAt = time.Now()
-		doc.Places = []string{}
+	err := copier.Copy(&doc, data)
+	if err != nil {
+		return zero, err
+	}
+	doc.UpdatedAt = time.Now()
+	doc.CreatedAt = time.Now()
+	doc.Places = []string{}
 
-		raw, err := crud.collection.InsertOne(session, doc)
-		if err != nil {
-			return zero, err
-		}
-
-		return crud.collection.FindOne(session, bson.M{"_id": raw.InsertedID}), nil
-	})
+	return collections.CreateDocument(crud.collection, doc, ctx)
 }
 
-func (crud *CrudUser) Create(data schemas.UserPost, ctx context.Context) (schemas.UserRead, error) {
+func (crud *CrudUser) Create(
+	data *schemas.UserPost, ctx context.Context,
+) (schemas.UserRead, error) {
 	var result schemas.UserRead
 	var form schemas.UserCreate
 	err := copier.Copy(&form, &data)
@@ -377,7 +345,7 @@ func (crud *CrudUser) Create(data schemas.UserPost, ctx context.Context) (schema
 		return result, fmt.Errorf("could not prepare creation form: %w", err)
 	}
 
-	raw, err := crud.CreateDocument(form, ctx)
+	raw, err := crud.CreateDocument(&form, ctx)
 	if err != nil {
 		return result, fmt.Errorf("could not create document: %w", err)
 	}
@@ -386,9 +354,11 @@ func (crud *CrudUser) Create(data schemas.UserPost, ctx context.Context) (schema
 	return result, err
 }
 
-func (crud *CrudUser) UserCreate(user schemas.UserRead, data schemas.UserPost, ctx context.Context) (schemas.UserRead, error) {
+func (crud *CrudUser) UserCreate(
+	user *schemas.UserRead, data *schemas.UserPost, ctx context.Context,
+) (schemas.UserRead, error) {
 	var zero schemas.UserRead
-	if err := crud.authCheck(&user, data, CreateEvent); err != nil {
+	if err := crud.authCheck(user, data, CreateEvent); err != nil {
 		return zero, err
 	}
 	return crud.Create(data, ctx)
@@ -397,7 +367,7 @@ func (crud *CrudUser) UserCreate(user schemas.UserRead, data schemas.UserPost, c
 // Update
 
 func (crud *CrudUser) UpdateDocument(filter bson.M, form schemas.UserUpdate, ctx context.Context) (*mongo.SingleResult, error) {
-	return RunWithinSession(*crud.client, ctx, func(session mongo.SessionContext) (*mongo.SingleResult, error) {
+	return collections.RunWithinSession(ctx, func(session mongo.SessionContext) (*mongo.SingleResult, error) {
 		var zero *mongo.SingleResult
 		update := bson.M{
 			"$set": bson.M{
@@ -476,7 +446,7 @@ func (crud *CrudUser) DeleteDocument(filter bson.M, ctx context.Context) error {
 		return crud.collection.DeleteOne(session, filter)
 	}
 
-	_, err := RunWithinSession(*crud.client, ctx, opertaion)
+	_, err := collections.RunWithinSession(ctx, opertaion)
 	if err != nil {
 		return err
 	}
