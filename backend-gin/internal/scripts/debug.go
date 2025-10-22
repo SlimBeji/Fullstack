@@ -1,7 +1,6 @@
 package scripts
 
 import (
-	"backend/internal/config"
 	"backend/internal/lib/clients"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
@@ -80,14 +79,10 @@ func RunWithinSession[T any](
 	return result, err
 }
 
-func (crud *CrudUser) ModelName() string {
-	return crud.collection.Name()
-}
-
 // Helpers
 
 func (crud *CrudUser) NotFoundErr(id string) *types_.ApiError {
-	return collections.NotFoundErr(crud.ModelName(), id)
+	return collections.NotFoundErr(crud.collection.Name(), id)
 }
 
 // Accessors
@@ -162,7 +157,7 @@ func (crud *CrudUser) postProcess(item any) error {
 		}
 		(*d)["imageUrl"] = signedUrl
 	default:
-		return fmt.Errorf("unhandled type %T for %s serialization", d, crud.ModelName())
+		return fmt.Errorf("unhandled type %T for %s serialization", d, crud.collection.Name())
 	}
 
 	return nil
@@ -248,148 +243,20 @@ func (crud *CrudUser) UserGet(
 
 // Fetch
 
-func (crud *CrudUser) parsePagination(page int, size int) types_.Pagination {
-	if page == 0 {
-		page = 1
-	}
-
-	if size == 0 || size > config.Env.MaxItemsPerPage {
-		size = config.Env.MaxItemsPerPage
-	}
-
-	return types_.Pagination{Page: page, Size: size}
+func (crud *CrudUser) FetchDocuments(
+	query types_.MongoFindQuery, ctx context.Context,
+) ([]bson.Raw, error) {
+	return collections.FetchDocuments(crud.collection, query, ctx)
 }
 
-func (crud *CrudUser) parseSortData(fields []string) bson.D {
-	result := bson.D{}
-
-	if len(fields) == 0 {
-		return bson.D{{Key: "createdAt", Value: 1}}
-	}
-
-	for _, field := range fields {
-		order := 1
-		if strings.HasPrefix(field, "-") {
-			order = -1
-			field = strings.TrimLeft(field, "-")
-		}
-		result = append(result, bson.E{Key: field, Value: order})
-	}
-
-	return result
-}
-
-func (crud *CrudUser) parseProjection(fields []string) bson.M {
-	if len(fields) == 0 {
-		return crud.defaultProjection
-	}
-
-	result := make(bson.M)
-	for _, item := range fields {
-		if item == "id" {
-			result["_id"] = 1
-		} else {
-			result[item] = 1
-		}
-	}
-
-	return result
-}
-
-func (crud *CrudUser) parseFilters(filters types_.FindQueryFilters) bson.M {
-	result := bson.M{}
-	if len(filters) == 0 {
-		return result
-	}
-
-	for key, fieldFilters := range filters {
-		field := key
-		if field == "id" {
-			field = "_id"
-		}
-		match, found := crud.filterFieldsMapping[field]
-		if found {
-			field = match
-		}
-
-		conditions := bson.M{}
-		for _, fieldFilter := range fieldFilters {
-			operator := "$" + string(fieldFilter.Op)
-
-			if fieldFilter.Op == types_.FilterText {
-				conditions[operator] = bson.M{"$search": fieldFilter.Val}
-			} else {
-				if field == "_id" {
-					objectId, err := primitive.ObjectIDFromHex(fieldFilter.Val.(string))
-					if err == nil {
-						conditions[operator] = objectId
-					}
-				} else {
-					conditions[operator] = fieldFilter.Val
-				}
-			}
-		}
-
-		if len(conditions) > 0 {
-			result[field] = conditions
-		}
-
-	}
-	return result
-}
-
-func (crud *CrudUser) CountDocuments(filters bson.M, ctx context.Context) (int, error) {
-	count, err := crud.collection.CountDocuments(ctx, filters)
-	return int(count), err
-}
-
-func (crud *CrudUser) FetchDocuments(query types_.MongoFindQuery, ctx context.Context) ([]bson.Raw, error) {
-	pagination := types_.Pagination{Page: 1, Size: config.Env.MaxItemsPerPage}
-	if query.Pagination != nil {
-		pagination = *query.Pagination
-	}
-
-	filters := bson.M{}
-	if query.Filters != nil {
-		filters = *query.Filters
-	}
-
-	sort := bson.D{{Key: "createdAt", Value: 1}}
-	if query.Sort != nil {
-		sort = *query.Sort
-	}
-
-	projection := bson.M{}
-	if query.Projection != nil {
-		projection = *query.Projection
-	}
-
-	opts := options.Find().
-		SetSort(sort).
-		SetProjection(projection).
-		SetCollation(&options.Collation{Locale: "en", Strength: 2}).
-		SetSkip(int64(pagination.Skip())).
-		SetLimit(int64(pagination.Size))
-
-	result := []bson.Raw{}
-	cursor, err := crud.collection.Find(ctx, filters, opts)
-	if err != nil {
-		return result, fmt.Errorf("could not fetch data: %w", err)
-	}
-	defer cursor.Close(ctx)
-
-	for cursor.Next(ctx) {
-		result = append(result, cursor.Current)
-	}
-	return result, nil
-}
-
-func (crud *CrudUser) Fetch(findQuery types_.FindQuery, dest any, ctx context.Context) error {
+func (crud *CrudUser) Fetch(
+	findQuery types_.FindQuery, dest any, ctx context.Context,
+) error {
 	// Step 1: Parsing the FindQuery to Mongo language
-	pagination := crud.parsePagination(findQuery.Page, findQuery.Size)
-	projection := crud.parseProjection(findQuery.Fields)
-	sort := crud.parseSortData(findQuery.Sort)
-	filters := crud.parseFilters(findQuery.Filters)
+	pagination := collections.ParsePagination(findQuery.Page, findQuery.Size)
+	projection := collections.ParseProjection(findQuery.Fields, crud.defaultProjection)
+	sort := collections.ParseSortData(findQuery.Sort)
+	filters := collections.ParseFilters(findQuery.Filters, crud.filterFieldsMapping)
 	query := types_.MongoFindQuery{
 		Pagination: &pagination,
 		Projection: &projection,
@@ -398,7 +265,7 @@ func (crud *CrudUser) Fetch(findQuery types_.FindQuery, dest any, ctx context.Co
 	}
 
 	// Step 2: Counting teh output
-	totalCount, err := crud.CountDocuments(filters, ctx)
+	totalCount, err := collections.CountDocuments(crud.collection, filters, ctx)
 	if err != nil {
 		return fmt.Errorf("could not fetch data: %w", err)
 	}
@@ -468,7 +335,12 @@ func (crud *CrudUser) Fetch(findQuery types_.FindQuery, dest any, ctx context.Co
 	return nil
 }
 
-func (crud *CrudUser) UserFetch(user schemas.UserRead, findQuery types_.FindQuery, dest any, ctx context.Context) error {
+func (crud *CrudUser) UserFetch(
+	user schemas.UserRead,
+	findQuery types_.FindQuery,
+	dest any,
+	ctx context.Context,
+) error {
 	crud.addOwnershipFilters(&user, &findQuery)
 	return crud.Fetch(findQuery, dest, ctx)
 }
@@ -622,7 +494,7 @@ func (crud *CrudUser) Delete(id string, ctx context.Context) error {
 	filter := bson.M{"_id": objectId}
 	err = crud.DeleteDocument(filter, ctx)
 	if err != nil {
-		return fmt.Errorf("could not delete document %s from collection %s: %w", id, crud.ModelName(), err)
+		return fmt.Errorf("could not delete document %s from collection %s: %w", id, crud.collection.Name(), err)
 	}
 
 	return nil

@@ -1,14 +1,17 @@
 package collections
 
 import (
+	"backend/internal/config"
 	"backend/internal/types_"
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Helpers
@@ -59,4 +62,150 @@ func Get[T any](
 	}
 
 	return result, err
+}
+
+// Fetch
+
+func ParsePagination(page int, size int) types_.Pagination {
+	if page == 0 {
+		page = 1
+	}
+
+	if size == 0 || size > config.Env.MaxItemsPerPage {
+		size = config.Env.MaxItemsPerPage
+	}
+
+	return types_.Pagination{Page: page, Size: size}
+}
+
+func ParseSortData(fields []string) bson.D {
+	result := bson.D{}
+
+	if len(fields) == 0 {
+		return bson.D{{Key: "createdAt", Value: 1}}
+	}
+
+	for _, field := range fields {
+		order := 1
+		if strings.HasPrefix(field, "-") {
+			order = -1
+			field = strings.TrimLeft(field, "-")
+		}
+		result = append(result, bson.E{Key: field, Value: order})
+	}
+
+	return result
+}
+
+func ParseProjection(fields []string, defaultProjection bson.M) bson.M {
+	if len(fields) == 0 {
+		return defaultProjection
+	}
+
+	result := make(bson.M)
+	for _, item := range fields {
+		if item == "id" {
+			result["_id"] = 1
+		} else {
+			result[item] = 1
+		}
+	}
+
+	return result
+}
+
+func ParseFilters(
+	filters types_.FindQueryFilters, nameMapping map[string]string,
+) bson.M {
+	result := bson.M{}
+	if len(filters) == 0 {
+		return result
+	}
+
+	for key, fieldFilters := range filters {
+		field := key
+		if field == "id" {
+			field = "_id"
+		}
+		match, found := nameMapping[field]
+		if found {
+			field = match
+		}
+
+		conditions := bson.M{}
+		for _, fieldFilter := range fieldFilters {
+			operator := "$" + string(fieldFilter.Op)
+
+			if fieldFilter.Op == types_.FilterText {
+				conditions[operator] = bson.M{"$search": fieldFilter.Val}
+			} else {
+				if field == "_id" {
+					objectId, err := primitive.ObjectIDFromHex(fieldFilter.Val.(string))
+					if err == nil {
+						conditions[operator] = objectId
+					}
+				} else {
+					conditions[operator] = fieldFilter.Val
+				}
+			}
+		}
+
+		if len(conditions) > 0 {
+			result[field] = conditions
+		}
+
+	}
+	return result
+}
+
+func CountDocuments(
+	collection *mongo.Collection, filters bson.M, ctx context.Context,
+) (int, error) {
+	count, err := collection.CountDocuments(ctx, filters)
+	return int(count), err
+}
+
+func FetchDocuments(
+	collection *mongo.Collection,
+	query types_.MongoFindQuery,
+	ctx context.Context,
+) ([]bson.Raw, error) {
+	pagination := types_.Pagination{Page: 1, Size: config.Env.MaxItemsPerPage}
+	if query.Pagination != nil {
+		pagination = *query.Pagination
+	}
+
+	filters := bson.M{}
+	if query.Filters != nil {
+		filters = *query.Filters
+	}
+
+	sort := bson.D{{Key: "createdAt", Value: 1}}
+	if query.Sort != nil {
+		sort = *query.Sort
+	}
+
+	projection := bson.M{}
+	if query.Projection != nil {
+		projection = *query.Projection
+	}
+
+	opts := options.Find().
+		SetSort(sort).
+		SetProjection(projection).
+		SetCollation(&options.Collation{Locale: "en", Strength: 2}).
+		SetSkip(int64(pagination.Skip())).
+		SetLimit(int64(pagination.Size))
+
+	result := []bson.Raw{}
+	cursor, err := collection.Find(ctx, filters, opts)
+	if err != nil {
+		return result, fmt.Errorf("could not fetch data: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		result = append(result, cursor.Current)
+	}
+	return result, nil
 }
