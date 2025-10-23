@@ -4,8 +4,6 @@ import (
 	"mime"
 	"os"
 	"path/filepath"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Pagination struct {
@@ -22,13 +20,6 @@ type RecordsPaginated[T any] struct {
 	TotalPages int `json:"totalPages"`
 	TotalCount int `json:"totalCount"`
 	Data       []T `json:"data"`
-}
-
-type DataPaginated struct {
-	Page       int      `json:"page"`
-	TotalPages int      `json:"totalPages"`
-	TotalCount int      `json:"totalCount"`
-	Data       []bson.M `json:"data"`
 }
 
 type FileToUpload struct {
