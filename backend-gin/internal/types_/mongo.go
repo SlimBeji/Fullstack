@@ -4,6 +4,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+type CrudEvent string
+
+const (
+	CreateEvent CrudEvent = "create"
+	ReadEvent   CrudEvent = "read"
+	UpdateEvent CrudEvent = "update"
+	DeleteEvent CrudEvent = "delete"
+)
+
 type FilterOp string
 
 const (
