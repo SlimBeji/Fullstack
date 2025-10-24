@@ -105,3 +105,58 @@ func (uc *UserCollection) UserGetById(
 ) (schemas.UserRead, error) {
 	return crud.UserGetById(uc, user, id, ctx)
 }
+
+// Fetch
+
+func (uc *UserCollection) GetSecretFields() []string {
+	return []string{"password"}
+}
+
+func (uc *UserCollection) GetDefaultSorting() bson.D {
+	return bson.D{{Key: "createdAt", Value: -1}}
+}
+
+func (uc *UserCollection) GetFiltersMapping() map[string]string {
+	return map[string]string{}
+}
+
+func (uc *UserCollection) AddOwnershipFilters(
+	user *schemas.UserRead, findQuery *types_.FindQuery,
+) {
+	if findQuery.Filters == nil {
+		findQuery.Filters = make(types_.FindQueryFilters)
+	}
+
+	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
+	findQuery.Filters["id"] = append(findQuery.Filters["id"], ownershipFilter)
+}
+
+func (uc *UserCollection) FetchDocuments(
+	query *types_.MongoFindQuery, ctx context.Context,
+) ([]bson.Raw, error) {
+	return crud.FetchDocuments(uc, query, ctx)
+}
+
+func (uc *UserCollection) FetchBsonPage(
+	findQuery *types_.FindQuery, ctx context.Context,
+) (types_.RecordsPaginated[bson.M], error) {
+	return crud.FetchBsonPage(uc, findQuery, ctx)
+}
+
+func (uc *UserCollection) FetchPage(
+	findQuery *types_.FindQuery, ctx context.Context,
+) (types_.RecordsPaginated[schemas.UserRead], error) {
+	return crud.FetchPage(uc, findQuery, ctx)
+}
+
+func (uc *UserCollection) UserFetchBsonPage(
+	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
+) (types_.RecordsPaginated[bson.M], error) {
+	return crud.UserFetchBsonPage(uc, user, findQuery, ctx)
+}
+
+func (uc *UserCollection) UserFetchPage(
+	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
+) (types_.RecordsPaginated[schemas.UserRead], error) {
+	return crud.UserFetchPage(uc, user, findQuery, ctx)
+}
