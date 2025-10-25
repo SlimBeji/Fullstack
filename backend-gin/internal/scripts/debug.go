@@ -2,35 +2,48 @@ package scripts
 
 import (
 	"backend/internal/models/collections"
-	"backend/internal/types_"
+	"backend/internal/models/schemas"
 	"context"
 	"fmt"
 )
 
 func Debug() {
+	// Get the collection
 	uc := collections.NewUserCollection()
-	admin, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+
+	admin, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println(admin)
 	}
 
-	namefilters := []types_.Filter{{Op: "regex", Val: "Slim"}}
-	filters := types_.FindQueryFilters{"name": namefilters}
-	sort := []string{"-email"}
-	fields := []string{"email"}
-	query := types_.FindQuery{
-		Filters: filters,
-		Fields:  fields,
-		Sort:    sort,
-		Page:    1,
-		Size:    1,
+	// Prepare the document to insert
+	postForm := schemas.UserPost{
+		Name:     "Frank",
+		Email:    "frank.lampard@chelsea.com",
+		IsAdmin:  true,
+		Password: "superfrank",
 	}
-	page, err := uc.FetchBsonPage(&query, context.Background())
+
+	// Insert the doc
+	raw, err := uc.UserCreate(&admin, &postForm, context.Background())
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(page)
+		fmt.Println(raw)
 	}
+
+	// namefilters := []types_.Filter{{Op: "regex", Val: "Slim"}}
+	// filters := types_.FindQueryFilters{"name": namefilters}
+	// sort := []string{"-email"}
+	// fields := []string{"email"}
+	// query := types_.FindQuery{
+	// 	Filters: filters,
+	// 	Fields:  fields,
+	// 	Sort:    sort,
+	// 	Page:    1,
+	// 	Size:    1,
+	// }
+	// page, err := uc.FetchBsonPage(&query, context.Background())
 }

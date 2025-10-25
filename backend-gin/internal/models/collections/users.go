@@ -7,7 +7,9 @@ import (
 	"backend/internal/types_"
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -159,4 +161,58 @@ func (uc *UserCollection) UserFetchPage(
 	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.RecordsPaginated[schemas.UserRead], error) {
 	return crud.UserFetchPage(uc, user, findQuery, ctx)
+}
+
+// Create
+
+func (uc *UserCollection) ToCreateForm(
+	post *schemas.UserPost,
+) (schemas.UserCreate, error) {
+	var form schemas.UserCreate
+	err := copier.Copy(&form, post)
+	return form, err
+}
+
+func (uc *UserCollection) ToDBDoc(
+	form *schemas.UserCreate,
+) (schemas.UserDB, error) {
+	var result schemas.UserDB
+	if err := copier.Copy(&result, form); err != nil {
+		return result, err
+	}
+	result.UpdatedAt = time.Now()
+	result.CreatedAt = time.Now()
+	result.Places = []string{}
+	return result, nil
+}
+
+func (uc *UserCollection) PostCreate(sc mongo.SessionContext) error {
+	return nil
+}
+
+func (uc *UserCollection) AuthCreate(
+	user *schemas.UserRead, item *schemas.UserPost,
+) error {
+	if user.IsAdmin {
+		return nil
+	}
+	return fmt.Errorf("only admins can create new users")
+}
+
+func (uc *UserCollection) CreateDocument(
+	form *schemas.UserCreate, ctx context.Context,
+) (bson.Raw, error) {
+	return crud.CreateDocument(uc, form, ctx)
+}
+
+func (uc *UserCollection) Create(
+	post *schemas.UserPost, ctx context.Context,
+) (schemas.UserRead, error) {
+	return crud.Create(uc, post, ctx)
+}
+
+func (uc *UserCollection) UserCreate(
+	user *schemas.UserRead, post *schemas.UserPost, ctx context.Context,
+) (schemas.UserRead, error) {
+	return crud.UserCreate(uc, user, post, ctx)
 }
