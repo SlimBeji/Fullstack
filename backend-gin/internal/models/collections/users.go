@@ -276,3 +276,33 @@ func (uc *UserCollection) UserUpdateById(
 ) (schemas.UserRead, error) {
 	return crud.UserUpdateById(uc, user, id, put, ctx)
 }
+
+// Delete
+
+func (uc *UserCollection) PostDelete(sc mongo.SessionContext) error {
+	return nil
+}
+
+func (uc *UserCollection) AuthDelete(
+	user *schemas.UserRead, item *schemas.UserRead,
+) error {
+	return nil
+}
+
+func (uc *UserCollection) DeleteDocument(
+	filter bson.M, ctx context.Context,
+) error {
+	return crud.DeleteDocument(uc, filter, ctx)
+}
+
+func (uc *UserCollection) Delete(
+	id string, ctx context.Context,
+) error {
+	return crud.Delete(uc, id, ctx)
+}
+
+func (uc *UserCollection) UserDelete(
+	user *schemas.UserRead, id string, ctx context.Context,
+) error {
+	return crud.UserDelete(uc, user, id, ctx)
+}

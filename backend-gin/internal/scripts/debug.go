@@ -18,19 +18,24 @@ func Debug() {
 		fmt.Println(admin)
 	}
 
-	// Prepare update form
-	name := "Super Frank"
-	email := "super.frank.lampard@chelsea.com"
-	putForm := schemas.UserPut{Name: &name, Email: &email}
-
-	// Update the doc
-	raw, err := uc.UserUpdateById(
-		&admin, "68fc94b4d8776090be5fe670", &putForm, context.Background(),
-	)
+	// Prepare post form
+	postForm := schemas.UserPost{
+		Name:     "Frank Lampard",
+		Email:    "frank.lampard@chelsea.com",
+		IsAdmin:  true,
+		Password: "blues is the color",
+	}
+	doc, err := uc.Create(&postForm, context.Background())
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(raw)
+		fmt.Println(doc)
+	}
+
+	// Update the doc
+	err = uc.Delete(doc.Id, context.Background())
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	// namefilters := []types_.Filter{{Op: "regex", Val: "Slim"}}
