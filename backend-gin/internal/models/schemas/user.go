@@ -71,8 +71,4 @@ type UserUpdate struct {
 	Password *string `json:"password" validate:"omitempty,min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
 }
 
-type UserPut struct {
-	Name     *string `json:"name" validate:"omitempty,min=2" example:"Slim Beji" bson:"name"`             // The user name, two characters at least
-	Email    *string `json:"email" validate:"omitempty,email" example:"mslimbeji@gmail.com" bson:"email"` // The user email
-	Password *string `json:"password" validate:"omitempty,min=8" example:"very_secret" bson:"password"`   // The user password, 8 characters at least
-}
+type UserPut = UserUpdate

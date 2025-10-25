@@ -105,11 +105,4 @@ type PlaceUpdate struct {
 	CreatorID   any      `tag:"creatorId"`
 }
 
-// schemas:tag allownil
-type PlacePut struct {
-	Title       any      `tag:"title"`
-	Description any      `tag:"description"`
-	Address     any      `tag:"address"`
-	Location    Location `tag:"location"`
-	CreatorID   any      `tag:"creatorId"`
-}
+type PlacePut = PlaceUpdate
