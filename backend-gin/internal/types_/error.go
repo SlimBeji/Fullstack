@@ -50,6 +50,14 @@ func NotFoundErr(collection string, filters bson.M) error {
 	}
 }
 
+func NotAdminErr(err error) error {
+	return ApiError{
+		Code:    http.StatusUnauthorized,
+		Message: "not an admin!",
+		Err:     err,
+	}
+}
+
 func IdNotFoundErr(collection string, id string) error {
 	return ApiError{
 		Code:    http.StatusNotFound,
