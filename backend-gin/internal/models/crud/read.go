@@ -38,7 +38,7 @@ func GetDocumentById[T any](
 	return GetDocument(dr, bson.M{"_id": objectId}, ctx)
 }
 
-func parseRaw[T any](
+func ParseRaw[T any](
 	dr DocumentReader[T], raw bson.Raw,
 ) (T, error) {
 	var result T
@@ -71,7 +71,7 @@ func GetById[T any](
 		}
 	}
 
-	return parseRaw(dr, raw)
+	return ParseRaw(dr, raw)
 }
 
 func Get[T any](
@@ -89,7 +89,7 @@ func Get[T any](
 		}
 	}
 
-	return parseRaw(dr, raw)
+	return ParseRaw(dr, raw)
 }
 
 func UserGet[T any](
