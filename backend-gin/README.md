@@ -96,6 +96,8 @@ The following `make` commands help manage the Gin backend:
 
 ## 📌 Notes
 
+### Metaprogramming
+
 Go is a statically typed language and lacks advanced metaprogramming features like Rust’s macros. Writing HTTP schemas for an API backend can therefore become verbose, especially due to the repetitive definition of validation rules and metadata (e.g., Swagger documentation) for each field.
 
 A single model field is often reused across multiple schemas (e.g., **read**, **create**, **update**), and redefining its metadata each time quickly becomes cumbersome.
@@ -103,3 +105,12 @@ A single model field is often reused across multiple schemas (e.g., **read**, **
 To address this, all field metadata are defined once in YAML files under `/models/fields`. Using **AST parsing** and the **`go generate`** utility, raw schema definitions are automatically transformed into fully annotated schemas, eliminating metadata repetition.
 
 The AST parsing logic is implemented in `/internal/models/raw/astparser`.
+
+### CRUD
+
+Unlike the **FastAPI** and **Express** backends, the `models/collections` and `models/crud` packages are structured differently.
+
+The `models/crud` folder contains five files — `create.go`, `read.go`, `fetch.go`, `update.go`, and `delete.go`.
+Each file defines an interface that a **collection struct** must implement to use the corresponding CRUD methods.
+
+The `models/collections` folder provides the concrete implementations of these interfaces, along with additional helper methods specific to each model.
