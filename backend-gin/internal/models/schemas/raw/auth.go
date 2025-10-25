@@ -1,4 +1,4 @@
-//go:generate go run ../../../cmd/schemas_parser/main.go -in ./auth.go -meta ../fields/auth.yaml -out ../schemas/auth.go
+//go:generate go run ../../../../cmd/schemas_parser/main.go -in ./auth.go -meta ../../fields/auth.yaml -out ../auth.go
 
 package raw
 

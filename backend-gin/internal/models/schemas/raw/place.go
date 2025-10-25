@@ -1,4 +1,4 @@
-//go:generate go run ../../../cmd/schemas_parser/main.go -in ./place.go -meta ../fields/place.yaml -out ../schemas/place.go
+//go:generate go run ../../../../cmd/schemas_parser/main.go -in ./place.go -meta ../../fields/place.yaml -out ../place.go
 
 package raw
 

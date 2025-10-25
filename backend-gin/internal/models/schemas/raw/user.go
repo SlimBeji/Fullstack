@@ -1,4 +1,4 @@
-//go:generate go run ../../../cmd/schemas_parser/main.go -in ./user.go -meta ../fields/user.yaml -out ../schemas/user.go
+//go:generate go run ../../../../cmd/schemas_parser/main.go -in ./user.go -meta ../../fields/user.yaml -out ../user.go
 
 package raw
 
