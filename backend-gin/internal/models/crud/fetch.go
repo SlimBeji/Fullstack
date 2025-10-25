@@ -17,14 +17,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type DocumentFetcher[T any] interface {
-	DocumentReader[T]
+type DocumentFetcher[Read any] interface {
+	DocumentReader[Read]
 	GetSecretFields() []string
 	GetDefaultSorting() bson.D
 	GetFiltersMapping() map[string]string
 	CountDocuments(context.Context, any, ...*options.CountOptions) (int64, error)
 	Find(context.Context, any, ...*options.FindOptions) (*mongo.Cursor, error)
-	PostProcess(*T) error
+	PostProcess(*Read) error
 	PostProcessBson(bson.M) error
 	AddOwnershipFilters(*schemas.UserRead, *types_.FindQuery)
 }
@@ -112,7 +112,9 @@ func parseFilters(
 	return result
 }
 
-func sanitizeProjection[T any](df DocumentFetcher[T], projection bson.M) {
+func sanitizeProjection[Read any](
+	df DocumentFetcher[Read], projection bson.M,
+) {
 	for _, field := range df.GetSecretFields() {
 		val, found := projection[field]
 		if found && val == 1 {
@@ -121,8 +123,8 @@ func sanitizeProjection[T any](df DocumentFetcher[T], projection bson.M) {
 	}
 }
 
-func parseFindQuery[T any](
-	df DocumentFetcher[T], findQuery *types_.FindQuery,
+func parseFindQuery[Read any](
+	df DocumentFetcher[Read], findQuery *types_.FindQuery,
 ) *types_.MongoFindQuery {
 	// Step 1: Parse the pagination
 	pagination := parsePagination(findQuery.Page, findQuery.Size)
@@ -149,15 +151,15 @@ func parseFindQuery[T any](
 	}
 }
 
-func CountDocuments[T any](
-	df DocumentFetcher[T], filters bson.M, ctx context.Context,
+func CountDocuments[Read any](
+	df DocumentFetcher[Read], filters bson.M, ctx context.Context,
 ) (int, error) {
 	count, err := df.CountDocuments(ctx, filters)
 	return int(count), err
 }
 
-func FetchDocuments[T any](
-	df DocumentFetcher[T],
+func FetchDocuments[Read any](
+	df DocumentFetcher[Read],
 	query *types_.MongoFindQuery,
 	ctx context.Context,
 ) ([]bson.Raw, error) {
@@ -202,8 +204,8 @@ func FetchDocuments[T any](
 	return result, nil
 }
 
-func fetchRawPage[T any](
-	df DocumentFetcher[T],
+func fetchRawPage[Read any](
+	df DocumentFetcher[Read],
 	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.RecordsPaginated[bson.Raw], error) {
@@ -232,18 +234,18 @@ func fetchRawPage[T any](
 	return result, nil
 }
 
-func postProcessBatch[T any](
-	items []bson.Raw, callback func(item *T) error,
-) ([]T, error) {
+func postProcessBatch[Read any](
+	items []bson.Raw, callback func(item *Read) error,
+) ([]Read, error) {
 	var wg sync.WaitGroup
-	results := make([]T, len(items))
+	results := make([]Read, len(items))
 	errs := make([]error, len(items))
 
 	for i := range items {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			var decoded T
+			var decoded Read
 			err := bson.Unmarshal(items[i], &decoded)
 			if err != nil {
 				errs[i] = err
@@ -293,8 +295,8 @@ func postProcessBsonBatch(
 	return results, nil
 }
 
-func FetchBsonPage[T any](
-	df DocumentFetcher[T],
+func FetchBsonPage[Read any](
+	df DocumentFetcher[Read],
 	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.RecordsPaginated[bson.M], error) {
@@ -313,12 +315,12 @@ func FetchBsonPage[T any](
 	return result, err
 }
 
-func FetchPage[T any](
-	df DocumentFetcher[T],
+func FetchPage[Read any](
+	df DocumentFetcher[Read],
 	findQuery *types_.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[T], error) {
-	var result types_.RecordsPaginated[T]
+) (types_.RecordsPaginated[Read], error) {
+	var result types_.RecordsPaginated[Read]
 	if len(findQuery.Fields) > 0 {
 		err := fmt.Errorf("fields projection detected. use FetchBsonPage isntead")
 		return result, err
@@ -337,8 +339,8 @@ func FetchPage[T any](
 	return result, err
 }
 
-func UserFetchBsonPage[T any](
-	df DocumentFetcher[T],
+func UserFetchBsonPage[Read any](
+	df DocumentFetcher[Read],
 	user *schemas.UserRead,
 	findQuery *types_.FindQuery,
 	ctx context.Context,
@@ -347,12 +349,12 @@ func UserFetchBsonPage[T any](
 	return FetchBsonPage(df, findQuery, ctx)
 }
 
-func UserFetchPage[T any](
-	df DocumentFetcher[T],
+func UserFetchPage[Read any](
+	df DocumentFetcher[Read],
 	user *schemas.UserRead,
 	findQuery *types_.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[T], error) {
+) (types_.RecordsPaginated[Read], error) {
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchPage(df, findQuery, ctx)
 }
