@@ -12,22 +12,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type DocumentReader[T any] interface {
+type DocumentReader[Read any] interface {
 	FindOne(context.Context, any, ...*options.FindOneOptions) *mongo.SingleResult
 	Name() string
-	PostProcess(*T) error
-	AuthRead(*schemas.UserRead, *T) error
+	PostProcess(*Read) error
+	AuthRead(*schemas.UserRead, *Read) error
 }
 
-func GetDocument[T any](
-	dr DocumentReader[T], filter bson.M, ctx context.Context,
+func GetDocument[Read any](
+	dr DocumentReader[Read], filter bson.M, ctx context.Context,
 ) (bson.Raw, error) {
 	result := dr.FindOne(ctx, filter)
 	return result.Raw()
 }
 
-func GetDocumentById[T any](
-	dr DocumentReader[T], id string, ctx context.Context,
+func GetDocumentById[Read any](
+	dr DocumentReader[Read], id string, ctx context.Context,
 ) (bson.Raw, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -38,10 +38,10 @@ func GetDocumentById[T any](
 	return GetDocument(dr, bson.M{"_id": objectId}, ctx)
 }
 
-func ParseRaw[T any](
-	dr DocumentReader[T], raw bson.Raw,
-) (T, error) {
-	var result T
+func ParseRaw[Read any](
+	dr DocumentReader[Read], raw bson.Raw,
+) (Read, error) {
+	var result Read
 
 	// Decode bson.Raw to T
 	if err := bson.Unmarshal(raw, &result); err != nil {
@@ -56,10 +56,10 @@ func ParseRaw[T any](
 	return result, nil
 }
 
-func GetById[T any](
-	dr DocumentReader[T], id string, ctx context.Context,
-) (T, error) {
-	var zero T
+func GetById[Read any](
+	dr DocumentReader[Read], id string, ctx context.Context,
+) (Read, error) {
+	var zero Read
 
 	// Get raw bson.Raw
 	raw, err := GetDocumentById(dr, id, ctx)
@@ -74,10 +74,10 @@ func GetById[T any](
 	return ParseRaw(dr, raw)
 }
 
-func Get[T any](
-	dr DocumentReader[T], filter bson.M, ctx context.Context,
-) (T, error) {
-	var zero T
+func Get[Read any](
+	dr DocumentReader[Read], filter bson.M, ctx context.Context,
+) (Read, error) {
+	var zero Read
 
 	// Get raw bson.Raw
 	raw, err := GetDocument(dr, filter, ctx)
@@ -92,12 +92,12 @@ func Get[T any](
 	return ParseRaw(dr, raw)
 }
 
-func UserGet[T any](
-	dr DocumentReader[T],
+func UserGet[Read any](
+	dr DocumentReader[Read],
 	user *schemas.UserRead,
 	filters bson.M,
 	ctx context.Context,
-) (T, error) {
+) (Read, error) {
 	result, err := Get(dr, filters, ctx)
 	if err != nil {
 		return result, err
@@ -110,12 +110,12 @@ func UserGet[T any](
 	return result, nil
 }
 
-func UserGetById[T any](
-	dr DocumentReader[T],
+func UserGetById[Read any](
+	dr DocumentReader[Read],
 	user *schemas.UserRead,
 	id string,
 	ctx context.Context,
-) (T, error) {
+) (Read, error) {
 	result, err := GetById(dr, id, ctx)
 	if err != nil {
 		return result, err
