@@ -83,7 +83,7 @@ type UserUpdate struct {
 	Password any `tag:"password"`
 }
 
-// schemas:tag
+// schemas:tag allownil
 type UserPut struct {
 	Name     any `tag:"name"`
 	Email    any `tag:"email"`

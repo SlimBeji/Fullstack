@@ -91,9 +91,9 @@ type PlaceUpdate struct {
 }
 
 type PlacePut struct {
-	Title       string   `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
-	Description string   `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
-	Address     string   `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                              // The place address
-	Location    Location `json:"location" bson:"location"`                                                                    // Location object (can be sent as JSON string)
-	CreatorID   string   `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"` // The ID of the place creator, 24 characters
+	Title       *string   `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
+	Description *string   `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
+	Address     *string   `json:"address" validate:"omitempty,min=10" example:"Fulham road" bson:"address"`                              // The place address
+	Location    *Location `json:"location" validate:"omitempty" bson:"location"`                                                         // Location object (can be sent as JSON string)
+	CreatorID   *string   `json:"creatorId" validate:"omitempty,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"` // The ID of the place creator, 24 characters
 }
