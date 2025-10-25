@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Read is the schemas for users
+// Read is the schemas to be serialized and returned
 // Db is the schemas representing the DB document
 // Form is the schemas for creation form, will be converted to Db
 // Post is the schemas for POST request, will be converted to Form
