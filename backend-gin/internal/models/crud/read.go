@@ -31,7 +31,7 @@ func GetDocumentById[T any](
 ) (bson.Raw, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, types_.UnprocessableErr(
+		return bson.Raw{}, types_.UnprocessableErr(
 			fmt.Sprintf("invalid object ID %s", id), err,
 		)
 	}
