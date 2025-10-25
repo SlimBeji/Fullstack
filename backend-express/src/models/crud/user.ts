@@ -45,7 +45,7 @@ export class CrudUser extends Crud<
 
     public authCheck(
         user: UserRead,
-        data: UserDocument | UserPost | UserCreate,
+        data: UserDocument | UserPost | UserPut,
         _event: CrudEvent
     ): void {
         if (!user) {

@@ -45,7 +45,7 @@ export class CrudPlace extends Crud<
 
     public authCheck(
         user: UserRead,
-        data: PlaceDocument | PlacePost | PlaceCreate,
+        data: PlaceDocument | PlacePost | PlacePut,
         _event: CrudEvent
     ): void {
         if (!user) {
