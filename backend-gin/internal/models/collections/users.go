@@ -216,3 +216,63 @@ func (uc *UserCollection) UserCreate(
 ) (schemas.UserRead, error) {
 	return crud.UserCreate(uc, user, post, ctx)
 }
+
+// Update
+
+func (uc *UserCollection) ToUpdateForm(
+	put *schemas.UserPut,
+) (schemas.UserUpdate, error) {
+	return *put, nil
+}
+
+func (uc *UserCollection) AuthUpdate(
+	user *schemas.UserRead, put *schemas.UserPut,
+) error {
+	return nil
+}
+
+func (uc *UserCollection) PostUpdate(sc mongo.SessionContext) error {
+	return nil
+}
+
+func (uc *UserCollection) UpdateDocument(
+	filter bson.M, form *schemas.UserUpdate, ctx context.Context,
+) (bson.Raw, error) {
+	return crud.UpdateDocument(uc, filter, form, ctx)
+}
+
+func (uc *UserCollection) UpdateDocumentById(
+	id string, form *schemas.UserUpdate, ctx context.Context,
+) (bson.Raw, error) {
+	return crud.UpdateDocumentById(uc, id, form, ctx)
+}
+
+func (uc *UserCollection) Update(
+	filter bson.M, put *schemas.UserPut, ctx context.Context,
+) (schemas.UserRead, error) {
+	return crud.Update(uc, filter, put, ctx)
+}
+
+func (uc *UserCollection) UpdateById(
+	id string, put *schemas.UserPut, ctx context.Context,
+) (schemas.UserRead, error) {
+	return crud.UpdateById(uc, id, put, ctx)
+}
+
+func (uc *UserCollection) UserUpdate(
+	user *schemas.UserRead,
+	filters bson.M,
+	put *schemas.UserUpdate,
+	ctx context.Context,
+) (schemas.UserRead, error) {
+	return crud.UserUpdate(uc, user, filters, put, ctx)
+}
+
+func (uc *UserCollection) UserUpdateById(
+	user *schemas.UserRead,
+	id string,
+	put *schemas.UserUpdate,
+	ctx context.Context,
+) (schemas.UserRead, error) {
+	return crud.UserUpdateById(uc, user, id, put, ctx)
+}

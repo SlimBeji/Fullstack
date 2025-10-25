@@ -18,16 +18,15 @@ func Debug() {
 		fmt.Println(admin)
 	}
 
-	// Prepare the document to insert
-	postForm := schemas.UserPost{
-		Name:     "Frank",
-		Email:    "frank.lampard@chelsea.com",
-		IsAdmin:  true,
-		Password: "superfrank",
-	}
+	// Prepare update form
+	name := "Super Frank"
+	email := "super.frank.lampard@chelsea.com"
+	putForm := schemas.UserPut{Name: &name, Email: &email}
 
-	// Insert the doc
-	raw, err := uc.UserCreate(&admin, &postForm, context.Background())
+	// Update the doc
+	raw, err := uc.UserUpdateById(
+		&admin, "68fc94b4d8776090be5fe670", &putForm, context.Background(),
+	)
 	if err != nil {
 		fmt.Println(err)
 	} else {
