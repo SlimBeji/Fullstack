@@ -16,8 +16,6 @@ import (
 
 type DocumentUpdater[Read any, Form any, Put any] interface {
 	DocumentReader[Read]
-	Name() string
-	Database() *mongo.Database
 	FindOneAndUpdate(context.Context, any, any, ...*options.FindOneAndUpdateOptions) *mongo.SingleResult
 	PostUpdate(mongo.SessionContext) error
 	ToUpdateForm(*Put) (Form, error)

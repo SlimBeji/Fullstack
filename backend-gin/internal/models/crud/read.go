@@ -13,8 +13,9 @@ import (
 )
 
 type DocumentReader[Read any] interface {
-	FindOne(context.Context, any, ...*options.FindOneOptions) *mongo.SingleResult
 	Name() string
+	Database() *mongo.Database
+	FindOne(context.Context, any, ...*options.FindOneOptions) *mongo.SingleResult
 	PostProcess(*Read) error
 	AuthRead(*schemas.UserRead, *Read) error
 }

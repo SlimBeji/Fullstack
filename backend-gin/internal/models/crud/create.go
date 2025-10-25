@@ -17,8 +17,6 @@ import (
 // Post is the schemas for POST request, will be converted to Form
 type DocumentCreator[Read any, Db any, Form any, Post any] interface {
 	DocumentReader[Read]
-	Name() string
-	Database() *mongo.Database
 	InsertOne(context.Context, any, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
 	PostCreate(mongo.SessionContext) error
 	ToCreateForm(*Post) (Form, error)

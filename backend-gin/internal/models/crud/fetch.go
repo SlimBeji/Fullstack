@@ -18,7 +18,7 @@ import (
 )
 
 type DocumentFetcher[T any] interface {
-	Name() string
+	DocumentReader[T]
 	GetSecretFields() []string
 	GetDefaultSorting() bson.D
 	GetFiltersMapping() map[string]string
