@@ -69,7 +69,7 @@ func UpdateDocument[Read any, Form any, Put any](
 				return err
 			}
 
-			raw := du.FindOneAndUpdate(ctx, filter, updates, opts)
+			raw := du.FindOneAndUpdate(sc, filter, updates, opts)
 			result, err = raw.Raw()
 			if err != nil {
 				session.AbortTransaction(sc)
