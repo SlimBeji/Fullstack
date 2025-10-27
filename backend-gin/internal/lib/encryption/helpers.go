@@ -2,6 +2,7 @@ package encryption
 
 import (
 	"backend/internal/config"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -21,6 +22,16 @@ func VerifyHash(plain, hashed string) bool {
 	return bcrypt.CompareHashAndPassword(
 		[]byte(hashed), []byte(plain),
 	) == nil
+}
+
+func IsHashed(input string) bool {
+	if len(input) != 60 {
+		return false
+	}
+
+	return strings.HasPrefix(input, "$2a$") ||
+		strings.HasPrefix(input, "$2b$") ||
+		strings.HasPrefix(input, "$2y$")
 }
 
 func EncodePayload(

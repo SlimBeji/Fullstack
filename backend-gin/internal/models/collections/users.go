@@ -216,6 +216,15 @@ func (uc *UserCollection) ToCreateForm(
 ) (schemas.UserCreate, error) {
 	var form schemas.UserCreate
 	err := copier.Copy(&form, post)
+	if err != nil {
+		return form, err
+	}
+
+	form.Password, err = encryption.HashInput(form.Password)
+	if err != nil {
+		return form, fmt.Errorf("could not hash password: %w", err)
+	}
+
 	return form, err
 }
 
@@ -226,6 +235,11 @@ func (uc *UserCollection) ToDBDoc(
 	if err := copier.Copy(&result, form); err != nil {
 		return result, err
 	}
+
+	if !encryption.IsHashed(result.Password) {
+		return result, fmt.Errorf("password field is not hashed")
+	}
+
 	result.UpdatedAt = time.Now()
 	result.CreatedAt = time.Now()
 	result.Places = []string{}
