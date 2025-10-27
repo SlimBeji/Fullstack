@@ -17,6 +17,7 @@ type DocumentReader[Read any] interface {
 	Database() *mongo.Database
 	FindOne(context.Context, any, ...*options.FindOneOptions) *mongo.SingleResult
 	PostProcess(*Read) error
+	PostProcessBson(bson.M) error
 	AuthRead(*schemas.UserRead, *Read) error
 }
 

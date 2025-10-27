@@ -24,8 +24,6 @@ type DocumentFetcher[Read any] interface {
 	GetFiltersMapping() map[string]string
 	CountDocuments(context.Context, any, ...*options.CountOptions) (int64, error)
 	Find(context.Context, any, ...*options.FindOptions) (*mongo.Cursor, error)
-	PostProcess(*Read) error
-	PostProcessBson(bson.M) error
 	AddOwnershipFilters(*schemas.UserRead, *types_.FindQuery)
 }
 
