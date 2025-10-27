@@ -1,0 +1,61 @@
+package encryption
+
+import (
+	"backend/internal/config"
+	"backend/internal/models/schemas"
+	"fmt"
+)
+
+func DecodeEncodedToken(encoded string) (schemas.TokenPayload, error) {
+	var zero schemas.TokenPayload
+
+	decoded, err := DecodePayload(encoded)
+	if err != nil {
+		return zero, fmt.Errorf(
+			"token %s not valid, could not decode it: %w", encoded, err,
+		)
+	}
+
+	userIdRaw, found := decoded["userId"]
+	if !found {
+		return zero, fmt.Errorf("token %s not valid, no userId found", encoded)
+	}
+	userId, ok := userIdRaw.(string)
+	if !ok {
+		return zero, fmt.Errorf(
+			"token %s not valid, userId %s not valid", encoded, userIdRaw,
+		)
+	}
+
+	emailRaw, found := decoded["email"]
+	if !found {
+		return zero, fmt.Errorf("token %s not valid, no email found", encoded)
+	}
+	email, ok := emailRaw.(string)
+	if !ok {
+		return zero, fmt.Errorf(
+			"token %s not valid, email %s not valid", encoded, emailRaw,
+		)
+	}
+
+	return schemas.TokenPayload{
+		UserId: userId, Email: email,
+	}, nil
+}
+
+func CreateToken(user *schemas.UserRead) (schemas.EncodedToken, error) {
+	payload := map[string]any{"userId": user.Id, "email": user.Email}
+	acccessToken, err := EncodePayload(payload)
+	if err != nil {
+		var zero schemas.EncodedToken
+		return zero, fmt.Errorf("could not encode payload for user %s", user.Id)
+	}
+
+	return schemas.EncodedToken{
+		AccessToken: acccessToken,
+		TokenType:   "bearer",
+		Email:       user.Email,
+		UserId:      user.Id,
+		ExpiresIn:   config.Env.JWTExpiration,
+	}, nil
+}
