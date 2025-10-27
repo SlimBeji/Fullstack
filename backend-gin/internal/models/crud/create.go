@@ -62,13 +62,18 @@ func CreateDocument[Read any, Db any, Form any, Post any](
 				return err
 			}
 
+			filter := bson.M{"_id": insertResult.InsertedID}
+			result, err = GetDocument(dc, filter, sc)
+			if err != nil {
+				session.AbortTransaction(sc)
+				return err
+			}
+
 			if err := session.CommitTransaction(sc); err != nil {
 				return err
 			}
 
-			filter := bson.M{"_id": insertResult.InsertedID}
-			result, err = GetDocument(dc, filter, sc)
-			return err
+			return nil
 		},
 	)
 
