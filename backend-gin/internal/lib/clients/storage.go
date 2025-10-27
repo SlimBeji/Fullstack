@@ -123,7 +123,7 @@ func (cs *CloudStorage) UploadFile(file any, destination ...string) (string, err
 	case *types_.FileToUpload:
 		fileToUpload = *f
 	default:
-		return "", errors.New("unsupported file type")
+		return "", fmt.Errorf("unsupported file type %T", file)
 	}
 
 	// Generate filename
