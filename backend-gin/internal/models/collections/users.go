@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/copier"
@@ -269,22 +270,39 @@ func (uc *UserCollection) AuthCreate(
 	return fmt.Errorf("only admins can create new users")
 }
 
+func checkGetError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if strings.Contains(err.Error(), "E11000 duplicate key error collection") {
+		return types_.ApiError{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Email or Username already exists",
+		}
+	}
+	return err
+}
+
 func (uc *UserCollection) CreateDocument(
 	form *schemas.UserCreate, ctx context.Context,
 ) (bson.Raw, error) {
-	return crud.CreateDocument(uc, form, ctx)
+	result, err := crud.CreateDocument(uc, form, ctx)
+	return result, checkGetError(err)
 }
 
 func (uc *UserCollection) Create(
 	post *schemas.UserPost, ctx context.Context,
 ) (schemas.UserRead, error) {
-	return crud.Create(uc, post, ctx)
+	result, err := crud.Create(uc, post, ctx)
+	return result, checkGetError(err)
 }
 
 func (uc *UserCollection) UserCreate(
 	user *schemas.UserRead, post *schemas.UserPost, ctx context.Context,
 ) (schemas.UserRead, error) {
-	return crud.UserCreate(uc, user, post, ctx)
+	result, err := crud.UserCreate(uc, user, post, ctx)
+	return result, checkGetError(err)
 }
 
 // Update

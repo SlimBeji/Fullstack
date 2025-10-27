@@ -11,11 +11,6 @@ func Debug() {
 	// Get the collection
 	uc := collections.NewUserCollection()
 
-	err := uc.CheckDuplicate("mslimbejsi@gmail.com", "Slim Beji", context.Background())
-	fmt.Println("----------------")
-	fmt.Println(err)
-	fmt.Println("----------------")
-
 	admin, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
 	if err != nil {
 		fmt.Println(err)
@@ -37,11 +32,11 @@ func Debug() {
 		fmt.Println(doc)
 	}
 
-	// Update the doc
-	err = uc.Delete(doc.Id, context.Background())
-	if err != nil {
-		fmt.Println(err)
-	}
+	// // Delete the doc
+	// err = uc.Delete(doc.Id, context.Background())
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
 	// namefilters := []types_.Filter{{Op: "regex", Val: "Slim"}}
 	// filters := types_.FindQueryFilters{"name": namefilters}
