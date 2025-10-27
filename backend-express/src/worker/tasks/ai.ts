@@ -1,6 +1,6 @@
 import { Job, Queue, Worker } from "bullmq";
 
-import { huggingFace } from "@/lib/clients/huggingFace";
+import { huggingFace } from "@/lib/clients";
 import { crudPlace } from "@/models/crud";
 import { Queues, Tasks } from "@/types";
 
