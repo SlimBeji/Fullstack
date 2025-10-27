@@ -225,7 +225,17 @@ func (uc *UserCollection) ToCreateForm(
 		return form, fmt.Errorf("could not hash password: %w", err)
 	}
 
-	return form, err
+	if post.Image != nil {
+		var f types_.FileToUpload
+		f.FromMultipartHeader(post.Image)
+		storage := clients.GetStorage()
+		form.ImageUrl, err = storage.UploadFile(&f)
+		if err != nil {
+			return form, fmt.Errorf("could not upload image: %w", err)
+		}
+	}
+
+	return form, nil
 }
 
 func (uc *UserCollection) ToDBDoc(

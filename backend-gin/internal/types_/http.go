@@ -1,7 +1,9 @@
 package types_
 
 import (
+	"io"
 	"mime"
+	"mime/multipart"
 	"os"
 	"path/filepath"
 )
@@ -47,4 +49,27 @@ func (f *FileToUpload) FromPath(filePath string) error {
 
 	f.Buffer = buffer
 	return nil
+}
+
+func (f *FileToUpload) FromMultipartHeader(
+	fileHeader *multipart.FileHeader,
+) error {
+	f.OriginalName = fileHeader.Filename
+
+	f.MimeType = mime.TypeByExtension(filepath.Ext(f.OriginalName))
+	if f.MimeType == "" {
+		f.MimeType = fileHeader.Header.Get("Content-Type")
+		if f.MimeType == "" {
+			f.MimeType = "application/octet-stream"
+		}
+	}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	f.Buffer, err = io.ReadAll(file)
+	return err
 }
