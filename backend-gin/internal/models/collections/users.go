@@ -7,6 +7,7 @@ import (
 	"backend/internal/types_"
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/jinzhu/copier"
@@ -94,6 +95,32 @@ func (uc *UserCollection) GetById(
 	id string, ctx context.Context,
 ) (schemas.UserRead, error) {
 	return crud.GetById(uc, id, ctx)
+}
+
+func (uc *UserCollection) CheckDuplicate(
+	email string, name string, ctx context.Context,
+) error {
+	filter := bson.M{"$or": []bson.M{
+		{"email": email},
+		{"name": name},
+	}}
+	found, err := crud.Get(uc, filter, ctx)
+	if err == nil {
+		if found.Email == email {
+			return fmt.Errorf("email %s is already used", email)
+		}
+		if found.Name == name {
+			return fmt.Errorf("name %s is already used", name)
+		}
+	}
+
+	apiErr, ok := err.(types_.ApiError)
+	if ok {
+		if apiErr.Code == http.StatusNotFound {
+			return nil
+		}
+	}
+	return err
 }
 
 func (uc *UserCollection) GetByEmail(
