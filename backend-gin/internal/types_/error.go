@@ -50,18 +50,18 @@ func NotFoundErr(collection string, filters bson.M) error {
 	}
 }
 
+func IdNotFoundErr(collection string, id string) error {
+	return ApiError{
+		Code:    http.StatusNotFound,
+		Message: fmt.Sprintf("%s document %s not found", collection, id),
+	}
+}
+
 func NotAdminErr(err error) error {
 	return ApiError{
 		Code:    http.StatusUnauthorized,
 		Message: "not an admin!",
 		Err:     err,
-	}
-}
-
-func IdNotFoundErr(collection string, id string) error {
-	return ApiError{
-		Code:    http.StatusNotFound,
-		Message: fmt.Sprintf("%s document %s not found", collection, id),
 	}
 }
 
