@@ -2,6 +2,7 @@ package collections
 
 import (
 	"backend/internal/lib/clients"
+	"backend/internal/lib/encryption"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
@@ -127,6 +128,24 @@ func (uc *UserCollection) GetByEmail(
 	email string, ctx context.Context,
 ) (schemas.UserRead, error) {
 	return crud.Get(uc, bson.M{"email": email}, ctx)
+}
+
+func (uc *UserCollection) GetBearer(
+	email string, ctx context.Context,
+) (string, error) {
+	user, err := uc.GetByEmail(email, ctx)
+	if err != nil {
+		return "", fmt.Errorf(
+			"could not extract user with email %s: %w", email, err,
+		)
+	}
+
+	token, err := encryption.CreateToken(&user)
+	if err != nil {
+		return "", fmt.Errorf("could not create token for user %s: %w", email, err)
+	}
+
+	return "Bearer " + token.AccessToken, nil
 }
 
 func (uc *UserCollection) UserGetById(
