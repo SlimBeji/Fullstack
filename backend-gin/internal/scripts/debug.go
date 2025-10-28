@@ -19,13 +19,11 @@ func Debug() {
 	}
 
 	// Prepare post form
-	postForm := schemas.UserPost{
-		Name:     "Frank Lampard",
-		Email:    "frank.lampard@chelsea.com",
-		IsAdmin:  true,
+	signin := schemas.SigninForm{
+		Username: "frank.lampard@chelsea.com",
 		Password: "blues is the color",
 	}
-	doc, err := uc.Create(&postForm, context.Background())
+	doc, err := uc.Signin(&signin, context.Background())
 	if err != nil {
 		fmt.Println(err)
 	} else {

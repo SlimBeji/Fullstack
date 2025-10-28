@@ -43,19 +43,19 @@ func DecodeEncodedToken(encoded string) (schemas.TokenPayload, error) {
 	}, nil
 }
 
-func CreateToken(user *schemas.UserRead) (schemas.EncodedToken, error) {
-	payload := map[string]any{"userId": user.Id, "email": user.Email}
+func CreateToken(id string, email string) (schemas.EncodedToken, error) {
+	payload := map[string]any{"userId": id, "email": email}
 	acccessToken, err := EncodePayload(payload)
 	if err != nil {
 		var zero schemas.EncodedToken
-		return zero, fmt.Errorf("could not encode payload for user %s", user.Id)
+		return zero, fmt.Errorf("could not encode payload for user %s", id)
 	}
 
 	return schemas.EncodedToken{
 		AccessToken: acccessToken,
 		TokenType:   "bearer",
-		Email:       user.Email,
-		UserId:      user.Id,
+		Email:       email,
+		UserId:      id,
 		ExpiresIn:   config.Env.JWTExpiration,
 	}, nil
 }

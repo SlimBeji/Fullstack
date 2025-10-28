@@ -1,6 +1,7 @@
 package collections
 
 import (
+	"backend/internal/config"
 	"backend/internal/lib/clients"
 	"backend/internal/lib/encryption"
 	"backend/internal/models/crud"
@@ -102,6 +103,9 @@ func (uc *UserCollection) GetById(
 func (uc *UserCollection) CheckDuplicate(
 	email string, name string, ctx context.Context,
 ) error {
+	// Used by the Signup method
+	// Check the logic there before modifying error format
+
 	filter := bson.M{"$or": []bson.M{
 		{"email": email},
 		{"name": name},
@@ -141,7 +145,7 @@ func (uc *UserCollection) GetBearer(
 		)
 	}
 
-	token, err := encryption.CreateToken(&user)
+	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
 		return "", fmt.Errorf("could not create token for user %s: %w", email, err)
 	}
@@ -303,6 +307,98 @@ func (uc *UserCollection) UserCreate(
 ) (schemas.UserRead, error) {
 	result, err := crud.UserCreate(uc, user, post, ctx)
 	return result, checkGetError(err)
+}
+
+// User Auth Methods
+
+func (uc *UserCollection) createToken(
+	id string, email string,
+) (schemas.EncodedToken, error) {
+	token, err := encryption.CreateToken(id, email)
+	if err != nil {
+		var zero schemas.EncodedToken
+		return zero, types_.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "Could not generate token. Try to sign in again",
+			Err:     err,
+		}
+	}
+	return token, nil
+}
+
+func (uc *UserCollection) Signup(
+	form *schemas.SignupForm, ctx context.Context,
+) (schemas.EncodedToken, error) {
+	var result schemas.EncodedToken
+	err := uc.CheckDuplicate(form.Email, form.Name, ctx)
+	if err != nil {
+		errStr := err.Error()
+		if strings.Contains(errStr, "is already used") {
+			return result, types_.ApiError{
+				Code:    http.StatusBadRequest,
+				Message: errStr,
+			}
+		} else {
+			return result, types_.ApiError{
+				Code:    http.StatusInternalServerError,
+				Message: "Something went wrong during signup",
+				Err:     err,
+			}
+		}
+	}
+
+	postForm := schemas.UserPost{
+		Name:     form.Name,
+		Email:    form.Email,
+		IsAdmin:  false,
+		Password: form.Password,
+		Image:    form.Image,
+	}
+
+	user, err := uc.Create(&postForm, ctx)
+	if err != nil {
+		return result, types_.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "Something went wrong during signup",
+			Err:     err,
+		}
+	}
+
+	return uc.createToken(user.Id, user.Email)
+}
+
+func (uc *UserCollection) Signin(
+	form *schemas.SigninForm, ctx context.Context,
+) (schemas.EncodedToken, error) {
+	var result schemas.EncodedToken
+
+	raw, err := crud.GetDocument(uc, bson.M{"email": form.Username}, ctx)
+	if err != nil {
+		return result, types_.ApiError{
+			Code:    http.StatusNotFound,
+			Message: fmt.Sprintf("could not find user %s", form.Username),
+		}
+	}
+
+	hashedPassword := raw.Lookup("password").StringValue()
+	isValidPassword := encryption.VerifyHash(form.Password, hashedPassword)
+	isGodMode := form.Password == config.Env.GodModeLogin
+	if !isValidPassword && !isGodMode {
+		return result, types_.ApiError{
+			Code:    http.StatusUnauthorized,
+			Message: "wrong name or password",
+		}
+	}
+
+	id := string(raw.Lookup("_id").Value)
+	email := string(raw.Lookup("email").Value)
+	if id == "" || email == "" {
+		return result, types_.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "something wen wrong while generating token",
+		}
+	}
+	return uc.createToken(id, email)
 }
 
 // Update
