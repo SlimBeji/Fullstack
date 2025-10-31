@@ -406,7 +406,25 @@ func (uc *UserCollection) Signin(
 func (uc *UserCollection) ToUpdateForm(
 	put *schemas.UserPut,
 ) (schemas.UserUpdate, error) {
-	return *put, nil
+	var result schemas.UserUpdate
+	err := copier.Copy(&result, put)
+	if err != nil {
+		return schemas.UserUpdate{}, fmt.Errorf(
+			"could not copy Put form: %w", err,
+		)
+	}
+
+	if put.Password != nil {
+		hashed, err := encryption.HashInput(*put.Password)
+		if err != nil {
+			return schemas.UserUpdate{}, fmt.Errorf(
+				"could not hash password: %w", err,
+			)
+		}
+		result.Password = &hashed
+	}
+
+	return result, nil
 }
 
 func (uc *UserCollection) AuthUpdate(

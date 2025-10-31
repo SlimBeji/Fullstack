@@ -5,6 +5,8 @@ import (
 	"backend/internal/models/schemas"
 	"context"
 	"fmt"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func Debug() {
@@ -18,10 +20,21 @@ func Debug() {
 		fmt.Println(admin)
 	}
 
-	// Prepare post form
+	// Prepare put form
+	password := "chelsea"
+	updateForm := schemas.UserPut{
+		Password: &password,
+	}
+	uc.Update(
+		bson.M{"email": "frank.lampard@chelsea.com"},
+		&updateForm,
+		context.Background(),
+	)
+
+	// Signin
 	signin := schemas.SigninForm{
 		Username: "frank.lampard@chelsea.com",
-		Password: "blues is the color",
+		Password: "chelsea",
 	}
 	doc, err := uc.Signin(&signin, context.Background())
 	if err != nil {
@@ -29,23 +42,4 @@ func Debug() {
 	} else {
 		fmt.Println(doc)
 	}
-
-	// // Delete the doc
-	// err = uc.Delete(doc.Id, context.Background())
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// namefilters := []types_.Filter{{Op: "regex", Val: "Slim"}}
-	// filters := types_.FindQueryFilters{"name": namefilters}
-	// sort := []string{"-email"}
-	// fields := []string{"email"}
-	// query := types_.FindQuery{
-	// 	Filters: filters,
-	// 	Fields:  fields,
-	// 	Sort:    sort,
-	// 	Page:    1,
-	// 	Size:    1,
-	// }
-	// page, err := uc.FetchBsonPage(&query, context.Background())
 }
