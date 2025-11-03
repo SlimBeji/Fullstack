@@ -399,8 +399,8 @@ func (uc *UserCollection) Signin(
 		}
 	}
 
-	id := string(raw.Lookup("_id").Value)
-	email := string(raw.Lookup("email").Value)
+	id := raw.Lookup("_id").ObjectID().Hex()
+	email := raw.Lookup("email").StringValue()
 	if id == "" || email == "" {
 		return result, types_.ApiError{
 			Code:    http.StatusInternalServerError,
