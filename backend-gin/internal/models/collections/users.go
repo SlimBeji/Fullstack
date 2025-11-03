@@ -24,6 +24,15 @@ type UserCollection struct {
 	*mongo.Collection
 }
 
+var UserCol *UserCollection
+
+func GetUserCollection() *UserCollection {
+	if UserCol == nil {
+		UserCol = NewUserCollection()
+	}
+	return UserCol
+}
+
 func NewUserCollection() *UserCollection {
 	client := clients.GetMongo()
 	name := string(types_.CollectionUsers)
