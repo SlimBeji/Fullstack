@@ -11,6 +11,7 @@ import (
 type ApiError struct {
 	Code    int
 	Message string
+	Details map[string]any
 	Err     error
 }
 
