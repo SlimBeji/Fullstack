@@ -2,6 +2,7 @@ package encryption
 
 import (
 	"backend/internal/config"
+	"errors"
 	"strings"
 	"time"
 
@@ -57,5 +58,6 @@ func DecodePayload(encoded string) (jwt.MapClaims, error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return claims, nil
 	}
-	return nil, err
+
+	return nil, errors.New("token not valid")
 }
