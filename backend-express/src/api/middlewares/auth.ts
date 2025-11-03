@@ -5,13 +5,8 @@ import { ApiError, HttpStatus } from "@/types";
 
 import { getUserFromToken } from "../auth";
 
-const getError = (message?: string): ApiError => {
-    const details = message ? { error: message } : {};
-    return new ApiError(
-        HttpStatus.UNAUTHORIZED,
-        "Authentication Error",
-        details
-    );
+const getError = (message: string): ApiError => {
+    return new ApiError(HttpStatus.UNAUTHORIZED, message);
 };
 
 const checkAuthToken = async (
@@ -39,7 +34,7 @@ const checkAuthToken = async (
         if (err instanceof TokenExpiredError) {
             return getError("Token expired");
         }
-        return getError("Token not valid");
+        return getError("Token Not Valid");
     }
     return null;
 };

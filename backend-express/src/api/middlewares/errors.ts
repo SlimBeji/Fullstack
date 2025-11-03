@@ -17,11 +17,13 @@ export const errorHandler = (
     if (error) {
         const statusCode = error.code || 500;
         res.status(statusCode);
-        const jsonResp = {
+        const jsonResp: Record<string, any> = {
             error: true,
             message: error.message,
-            details: error.details,
         };
+        if (Object.keys(error.details).length > 0) {
+            jsonResp["details"] = error.details;
+        }
         if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
             console.error(error);
         }
