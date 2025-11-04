@@ -113,6 +113,13 @@ func parseFilters(
 func sanitizeProjection[Read any](
 	df DocumentFetcher[Read], projection bson.M,
 ) {
+	if len(projection) == 0 {
+		for _, field := range df.GetSecretFields() {
+			projection[field] = 0
+		}
+		return
+	}
+
 	for _, field := range df.GetSecretFields() {
 		val, found := projection[field]
 		if found && val == 1 {
@@ -343,6 +350,9 @@ func UserFetchBsonPage[Read any](
 	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.RecordsPaginated[bson.M], error) {
+	if findQuery == nil {
+		findQuery = &types_.FindQuery{}
+	}
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchBsonPage(df, findQuery, ctx)
 }
@@ -353,6 +363,9 @@ func UserFetchPage[Read any](
 	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.RecordsPaginated[Read], error) {
+	if findQuery == nil {
+		findQuery = &types_.FindQuery{}
+	}
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchPage(df, findQuery, ctx)
 }
