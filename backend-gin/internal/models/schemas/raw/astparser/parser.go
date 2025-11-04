@@ -346,6 +346,9 @@ func (ft *FieldTransformer) readExpressionType(expr ast.Expr) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
 		return t.Name
+	case *ast.SelectorExpr:
+		pkg := ft.readExpressionType(t.X)
+		return pkg + "." + t.Sel.Name
 	case *ast.ArrayType:
 		return "[]" + ft.readExpressionType(t.Elt)
 	case *ast.StarExpr:
