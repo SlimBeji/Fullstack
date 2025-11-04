@@ -53,8 +53,12 @@ func DecodePayload(encoded string) (jwt.MapClaims, error) {
 		return []byte(config.Env.SecretKey), nil
 	})
 	if err != nil {
-		return nil, err
+		if strings.Contains(err.Error(), "token is expired") {
+			return nil, errors.New("token expired")
+		}
+		return nil, errors.New("token not valid")
 	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return claims, nil
 	}
