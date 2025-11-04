@@ -3,22 +3,13 @@ package routes
 import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/utils"
+	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
-	"fmt"
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-func dummyToken() schemas.EncodedToken {
-	return schemas.EncodedToken{
-		AccessToken: "some_access_token",
-		TokenType:   "bearer",
-		UserId:      "683b21134e2e5d46978daf1f",
-		Email:       "mslimbeji@gmail.com",
-		ExpiresIn:   3600,
-	}
-}
 
 // @Summary      User registration
 // @Tags         Auth
@@ -30,8 +21,14 @@ func dummyToken() schemas.EncodedToken {
 // @Router       /api/auth/signup [post]
 func signup(c *gin.Context) {
 	body, _ := utils.GetBody[schemas.SignupForm](c)
-	fmt.Println(body)
-	c.JSON(http.StatusOK, dummyToken())
+	uc := collections.GetUserCollection()
+	ctx := context.Background()
+	resp, err := uc.Signup(&body, ctx)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 // @Summary      User authentication
@@ -43,12 +40,22 @@ func signup(c *gin.Context) {
 // @Router       /api/auth/signin [post]
 func signin(c *gin.Context) {
 	body, _ := utils.GetBody[schemas.SigninForm](c)
-	fmt.Println(body)
-	c.JSON(http.StatusOK, dummyToken())
+	uc := collections.GetUserCollection()
+	ctx := context.Background()
+	resp, err := uc.Signin(&body, ctx)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 func RegisterAuth(r *gin.Engine) {
 	router := r.Group("/api/auth")
-	router.POST("/signup", middlewares.BodyValidator[schemas.SignupForm], signup)
-	router.POST("/signin", middlewares.BodyValidator[schemas.SigninForm], signin)
+	router.POST(
+		"/signup", middlewares.BodyValidator[schemas.SignupForm], signup,
+	)
+	router.POST(
+		"/signin", middlewares.BodyValidator[schemas.SigninForm], signin,
+	)
 }
