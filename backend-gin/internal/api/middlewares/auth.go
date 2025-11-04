@@ -1,8 +1,11 @@
 package middlewares
 
 import (
-	"backend/internal/models/schemas"
+	"backend/internal/api/auth"
+	"backend/internal/lib/utils"
+	"backend/internal/types_"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,20 +14,37 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "Not authenticated"})
+			err := types_.ApiError{
+				Code:    http.StatusUnauthorized,
+				Message: "Not authenticated",
+			}
+			utils.AbortWithStatusJSON(c, err)
 			return
 		}
 
-		var user schemas.UserRead
-		user.Id = "683b21134e2e5d46978daf1f"
-		user.Name = "Slimx"
-		user.Email = "mslimbeji@gmail.com"
-		user.IsAdmin = true
-		user.ImageUrl = "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
-		user.Places = []string{"683b21134e2e5d46978daf1f"}
+		re := regexp.MustCompile(`^Bearer\s+(.+)$`)
+		match := re.FindStringSubmatch(token)
+		if len(match) < 2 {
+			err := types_.ApiError{
+				Code:    http.StatusUnauthorized,
+				Message: "No bearer token found",
+			}
+			utils.AbortWithStatusJSON(c, err)
+			return
+		}
+		authtoken := match[1]
+		user, err := auth.GetUserFromToken(authtoken)
+		if err != nil {
+			utils.AbortWithStatusJSON(c, err)
+			return
+		}
 
 		if checkAdmin && !user.IsAdmin {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "Not an admin"})
+			err := types_.ApiError{
+				Code:    http.StatusUnauthorized,
+				Message: "Not an admin",
+			}
+			utils.AbortWithStatusJSON(c, err)
 			return
 		}
 
