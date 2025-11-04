@@ -4,6 +4,8 @@ package raw
 
 import (
 	"backend/internal/types_"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 /////// Nested Fields //////////////
@@ -18,16 +20,16 @@ type Location struct {
 
 // schemas:tag
 type PlaceDB struct {
-	ID          any      `tag:"id"`
-	Title       any      `tag:"title"`
-	Description any      `tag:"description"`
-	Address     any      `tag:"address"`
-	Location    Location `tag:"location"`
-	ImageUrl    any      `tag:"imageUrl,omitempty"`
-	Embedding   any      `tag:"embedding"`
-	CreatorID   any      `tag:"creatorId"`
-	CreatedAt   any      `tag:"createdAt"`
-	UpdatedAt   any      `tag:"updatedAt"`
+	ID          primitive.ObjectID `tag:"id"`
+	Title       any                `tag:"title"`
+	Description any                `tag:"description"`
+	Address     any                `tag:"address"`
+	Location    Location           `tag:"location"`
+	ImageUrl    any                `tag:"imageUrl,omitempty"`
+	Embedding   any                `tag:"embedding"`
+	CreatorID   primitive.ObjectID `tag:"creatorId"`
+	CreatedAt   any                `tag:"createdAt"`
+	UpdatedAt   any                `tag:"updatedAt"`
 }
 
 // schemas:tag

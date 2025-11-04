@@ -4,21 +4,23 @@ package raw
 
 import (
 	"backend/internal/types_"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 /////// Base Schemas /////////////
 
 // schemas:tag
 type UserDB struct {
-	Id        any `tag:"id"`
-	Name      any `tag:"name"`
-	Email     any `tag:"email"`
-	IsAdmin   any `tag:"isAdmin"`
-	Password  any `tag:"password"`
-	ImageUrl  any `tag:"imageUrl,omitempty"`
-	Places    any `tag:"places"`
-	CreatedAt any `tag:"createdAt"`
-	UpdatedAt any `tag:"updatedAt"`
+	Id        primitive.ObjectID `tag:"id"`
+	Name      any                `tag:"name"`
+	Email     any                `tag:"email"`
+	IsAdmin   any                `tag:"isAdmin"`
+	Password  any                `tag:"password"`
+	ImageUrl  any                `tag:"imageUrl,omitempty"`
+	Places    any                `tag:"places"`
+	CreatedAt any                `tag:"createdAt"`
+	UpdatedAt any                `tag:"updatedAt"`
 }
 
 // schemas:tag
