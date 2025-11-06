@@ -219,7 +219,17 @@ func (pc *PlaceCollection) ToDBDoc(
 	return result, nil
 }
 
-func (pc *PlaceCollection) PostCreate(sc mongo.SessionContext) error {
+func (pc *PlaceCollection) PreCreate(
+	sc mongo.SessionContext, doc *schemas.PlaceDB,
+) error {
+	return nil
+}
+
+func (pc *PlaceCollection) PostCreate(
+	sc mongo.SessionContext,
+	doc *schemas.PlaceDB,
+	result *mongo.InsertOneResult,
+) error {
 	return nil
 }
 

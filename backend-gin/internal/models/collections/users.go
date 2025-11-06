@@ -264,7 +264,17 @@ func (uc *UserCollection) ToDBDoc(
 	return result, nil
 }
 
-func (uc *UserCollection) PostCreate(sc mongo.SessionContext) error {
+func (uc *UserCollection) PreCreate(
+	sc mongo.SessionContext, doc *schemas.UserDB,
+) error {
+	return nil
+}
+
+func (uc *UserCollection) PostCreate(
+	sc mongo.SessionContext,
+	doc *schemas.UserDB,
+	result *mongo.InsertOneResult,
+) error {
 	return nil
 }
 

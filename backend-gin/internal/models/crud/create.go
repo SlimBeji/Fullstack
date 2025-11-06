@@ -19,7 +19,8 @@ import (
 type DocumentCreator[Read any, Db any, Form any, Post any] interface {
 	DocumentReader[Read]
 	InsertOne(context.Context, any, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
-	PostCreate(mongo.SessionContext) error
+	PreCreate(mongo.SessionContext, *Db) error
+	PostCreate(mongo.SessionContext, *Db, *mongo.InsertOneResult) error
 	ToCreateForm(*Post) (Form, error)
 	ToDBDoc(*Form) (Db, error)
 	AuthCreate(*schemas.UserRead, *Post) error
@@ -51,13 +52,19 @@ func CreateDocument[Read any, Db any, Form any, Post any](
 				return err
 			}
 
+			err := dc.PreCreate(sc, &docIn)
+			if err != nil {
+				session.AbortTransaction(sc)
+				return err
+			}
+
 			insertResult, err := dc.InsertOne(sc, docIn)
 			if err != nil {
 				session.AbortTransaction(sc)
 				return err
 			}
 
-			err = dc.PostCreate(sc)
+			err = dc.PostCreate(sc, &docIn, insertResult)
 			if err != nil {
 				session.AbortTransaction(sc)
 				return err
