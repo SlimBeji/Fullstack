@@ -6,6 +6,7 @@ import (
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -334,7 +335,37 @@ func (pc *PlaceCollection) UserUpdateById(
 
 // Delete
 
-func (pc *PlaceCollection) PostDelete(sc mongo.SessionContext) error {
+func (pc *PlaceCollection) PostDelete(
+	sc mongo.SessionContext, raw bson.Raw,
+) error {
+	// Remove image from the cloud
+	imageUrlVal := raw.Lookup("imageUrl")
+	if !imageUrlVal.IsZero() {
+		// Not handling errors, file might still exists
+		imageUrl, _ := imageUrlVal.StringValueOK()
+		storage := clients.GetStorage()
+		storage.DeleteFile(imageUrl)
+	}
+
+	// Remove id from creator places
+	placeId := raw.Lookup("_id").ObjectID()
+	creatorId, ok := raw.Lookup("creatorId").ObjectIDOK()
+	if !ok {
+		return errors.New(
+			"could not extract creatorId during post delete",
+		)
+	}
+	filter := bson.M{"_id": creatorId}
+	update := bson.M{"$pull": bson.M{"places": placeId}}
+	db := clients.GetMongoDB(sc.Client())
+	collection := db.Collection(string(types_.CollectionUsers))
+	res := collection.FindOneAndUpdate(sc, filter, update)
+	if err := res.Err(); err != nil {
+		return fmt.Errorf(
+			"could not delete user place: %w", err,
+		)
+	}
+
 	return nil
 }
 
