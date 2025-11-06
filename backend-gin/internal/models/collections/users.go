@@ -15,6 +15,7 @@ import (
 
 	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -490,7 +491,40 @@ func (uc *UserCollection) UserUpdateById(
 
 // Delete
 
-func (uc *UserCollection) PostDelete(sc mongo.SessionContext) error {
+func (uc *UserCollection) PostDelete(
+	sc mongo.SessionContext, raw bson.Raw,
+) error {
+	// Remove image from the cloud
+	imageUrlVal := raw.Lookup("imageUrl")
+	if !imageUrlVal.IsZero() {
+		// Not handling errors, file might still exists
+		imageUrl, _ := imageUrlVal.StringValueOK()
+		storage := clients.GetStorage()
+		storage.DeleteFile(imageUrl)
+	}
+
+	// Delete all places
+	placesRaw := raw.Lookup("places")
+	if !placesRaw.IsZero() {
+		var result []primitive.ObjectID
+		err := placesRaw.Unmarshal(&result)
+		if err != nil {
+			return fmt.Errorf(
+				"could not delete user, corrrupted places format: %w", err,
+			)
+		}
+
+		// Get the place collection
+		db := clients.GetMongoDB(sc.Client())
+		collection := db.Collection(string(types_.CollectionPlaces))
+		filters := bson.M{"_id": bson.M{"$in": result}}
+		if _, err := collection.DeleteMany(sc, filters); err != nil {
+			return fmt.Errorf(
+				"could not delete user places: %w", err,
+			)
+		}
+	}
+
 	return nil
 }
 
