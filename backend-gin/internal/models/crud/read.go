@@ -105,6 +105,11 @@ func UserGet[Read any](
 		return result, err
 	}
 
+	if user == nil {
+		var zero Read
+		return zero, types_.NotAuthenticatedErr()
+	}
+
 	err = dr.AuthRead(user, &result)
 	if err != nil {
 		return result, err
@@ -121,6 +126,11 @@ func UserGetById[Read any](
 	result, err := GetById(dr, id, ctx)
 	if err != nil {
 		return result, err
+	}
+
+	if user == nil {
+		var zero Read
+		return zero, types_.NotAuthenticatedErr()
 	}
 
 	err = dr.AuthRead(user, &result)

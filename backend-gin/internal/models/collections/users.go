@@ -79,14 +79,6 @@ func (uc *UserCollection) PostProcessBson(item bson.M) error {
 func (uc *UserCollection) AuthRead(
 	user *schemas.UserRead, doc *schemas.UserRead,
 ) error {
-	if doc == nil {
-		return fmt.Errorf("no document provided")
-	}
-
-	if user == nil {
-		return types_.NotAuthenticatedErr()
-	}
-
 	if user.IsAdmin {
 		return nil
 	}
