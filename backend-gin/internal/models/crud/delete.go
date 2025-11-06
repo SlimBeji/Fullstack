@@ -80,6 +80,10 @@ func UserDelete[Read any](
 		return err
 	}
 
+	if user == nil {
+		return types_.NotAuthenticatedErr()
+	}
+
 	if err := dd.AuthDelete(user, &doc); err != nil {
 		return err
 	}
