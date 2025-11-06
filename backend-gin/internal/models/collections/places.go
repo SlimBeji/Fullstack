@@ -276,7 +276,22 @@ func (pc *PlaceCollection) ToUpdateForm(
 func (pc *PlaceCollection) AuthUpdate(
 	user *schemas.UserRead, put *schemas.PlacePut,
 ) error {
-	return nil
+	creatorId := put.CreatorID
+	if creatorId == nil {
+		return nil
+	}
+
+	if user.IsAdmin {
+		return nil
+	}
+
+	if user.Id == *creatorId {
+		return nil
+	}
+
+	return types_.AccessDeiniedErr(
+		string(types_.CollectionUsers), *creatorId,
+	)
 }
 
 func (pc *PlaceCollection) PostUpdate(sc mongo.SessionContext) error {

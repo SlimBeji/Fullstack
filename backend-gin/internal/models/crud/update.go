@@ -4,6 +4,7 @@ import (
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -158,6 +159,14 @@ func UserUpdate[Read any, Form any, Put any](
 ) (Read, error) {
 	var zero Read
 
+	if user == nil {
+		return zero, types_.NotAuthenticatedErr()
+	}
+
+	if put == nil {
+		return zero, errors.New("no put form was provided")
+	}
+
 	_, err := UserGet(du, user, filters, ctx)
 	if err != nil {
 		return zero, err
@@ -178,6 +187,14 @@ func UserUpdateById[Read any, Form any, Put any](
 	ctx context.Context,
 ) (Read, error) {
 	var zero Read
+
+	if user == nil {
+		return zero, types_.NotAuthenticatedErr()
+	}
+
+	if put == nil {
+		return zero, errors.New("no put form was provided")
+	}
 
 	_, err := UserGetById(du, user, id, ctx)
 	if err != nil {
