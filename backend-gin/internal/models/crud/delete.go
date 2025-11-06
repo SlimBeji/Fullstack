@@ -15,7 +15,7 @@ import (
 type DocumentDeleter[Read any] interface {
 	DocumentReader[Read]
 	FindOneAndDelete(context.Context, any, ...*options.FindOneAndDeleteOptions) *mongo.SingleResult
-	PostDelete(mongo.SessionContext) error
+	PostDelete(mongo.SessionContext, bson.Raw) error
 	AuthDelete(*schemas.UserRead, *Read) error
 }
 
@@ -38,12 +38,13 @@ func DeleteDocument[Read any](
 			}
 
 			deleteResult := dd.FindOneAndDelete(ctx, filter)
-			if err := deleteResult.Err(); err != nil {
+			raw, err := deleteResult.Raw()
+			if err != nil {
 				session.AbortTransaction(sc)
 				return err
 			}
 
-			if err := dd.PostDelete(sc); err != nil {
+			if err := dd.PostDelete(sc, raw); err != nil {
 				session.AbortTransaction(sc)
 				return err
 			}
