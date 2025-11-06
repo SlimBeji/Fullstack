@@ -32,12 +32,8 @@ func (m *MongoClient) DropCollection(name string) error {
 	return m.DB.Collection(name).Drop(context.Background())
 }
 
-func newMongoClient() *MongoClient {
+func getConnection() (*mongo.Client, error) {
 	uri := config.Env.MongoURL
-	dbName := config.Env.MongoDBName
-	if testing.Testing() {
-		dbName = config.Env.MongoTestDBName
-	}
 
 	// Add connection pool options and timeouts for better reliability
 	clientOptions := options.Client().ApplyURI(uri)
@@ -46,12 +42,27 @@ func newMongoClient() *MongoClient {
 	clientOptions.SetMaxConnIdleTime(30 * time.Second)
 	clientOptions.SetServerSelectionTimeout(10 * time.Second)
 
-	// Attempt connection
-	conn, err := mongo.Connect(context.Background(), clientOptions)
+	return mongo.Connect(context.Background(), clientOptions)
+}
+
+func GetMongoDB(client *mongo.Client) *mongo.Database {
+	dbName := config.Env.MongoDBName
+	if testing.Testing() {
+		dbName = config.Env.MongoTestDBName
+	}
+
+	return client.Database(dbName)
+}
+
+func newMongoClient() *MongoClient {
+	// Get connection to Database
+	conn, err := getConnection()
 	if err != nil {
 		panic(fmt.Sprintf("Could not establish mongo connection: %s", err.Error()))
 	}
-	db := conn.Database(dbName)
+
+	// Get database
+	db := GetMongoDB(conn)
 
 	return &MongoClient{Conn: conn, DB: db}
 }
