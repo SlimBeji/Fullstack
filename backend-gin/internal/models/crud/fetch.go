@@ -353,6 +353,10 @@ func UserFetchBsonPage[Read any](
 	if findQuery == nil {
 		findQuery = &types_.FindQuery{}
 	}
+	if user == nil {
+		var zero types_.RecordsPaginated[bson.M]
+		return zero, types_.NotAuthenticatedErr()
+	}
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchBsonPage(df, findQuery, ctx)
 }
@@ -365,6 +369,10 @@ func UserFetchPage[Read any](
 ) (types_.RecordsPaginated[Read], error) {
 	if findQuery == nil {
 		findQuery = &types_.FindQuery{}
+	}
+	if user == nil {
+		var zero types_.RecordsPaginated[Read]
+		return zero, types_.NotAuthenticatedErr()
 	}
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchPage(df, findQuery, ctx)

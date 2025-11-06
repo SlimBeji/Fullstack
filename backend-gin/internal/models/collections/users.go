@@ -182,6 +182,7 @@ func (uc *UserCollection) AddOwnershipFilters(
 		findQuery.Filters = make(types_.FindQueryFilters)
 	}
 
+	// No need to convert id to primitive.ObjectId
 	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
 	findQuery.Filters["id"] = append(findQuery.Filters["id"], ownershipFilter)
 }
