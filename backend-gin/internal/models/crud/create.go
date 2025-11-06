@@ -4,6 +4,7 @@ import (
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
+	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -109,6 +110,15 @@ func UserCreate[Read any, Db any, Form any, Post any](
 	ctx context.Context,
 ) (Read, error) {
 	var zero Read
+
+	if user == nil {
+		return zero, types_.NotAuthenticatedErr()
+	}
+
+	if post == nil {
+		return zero, errors.New("no post form was provided")
+	}
+
 	if err := dc.AuthCreate(user, post); err != nil {
 		return zero, types_.NotAdminErr(err)
 	}
