@@ -9,7 +9,11 @@ from lib.clients import cloud_storage
 from lib.encryption import create_token, hash_input, verify_hash
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent
-from models.fields import UserSearchableFields, UserSelectableFields, UserSortableFields
+from models.fields import (
+    UserSearchableFields,
+    UserSelectableFields,
+    UserSortableFields,
+)
 from models.schemas import (
     EncodedTokenSchema,
     SigninForm,
@@ -39,7 +43,7 @@ class CrudUser(
         UserPutSchema,
     ]
 ):
-    DEFAULT_PROJECTION: Projection = dict(_version=0, password=0)
+    DEFAULT_PROJECTION: Projection = {"_version": 0, "password": 0}
 
     def auth_check(
         self,
@@ -83,7 +87,9 @@ class CrudUser(
         return item
 
     async def check_duplicate(self, email: str, name: str) -> str:
-        user = await self.model.find_one({"$or": [{"email": email}, {"name": name}]})
+        user = await self.model.find_one(
+            {"$or": [{"email": email}, {"name": name}]}
+        )
         if user is None:
             return ""
 
@@ -104,7 +110,8 @@ class CrudUser(
         user = await self.get_by_email(email)
         if user is None:
             raise ApiError(
-                HTTPStatus.NOT_FOUND, f"No user with email {email} in the database"
+                HTTPStatus.NOT_FOUND,
+                f"No user with email {email} in the database",
             )
         token = create_token(user)
         return f"Bearer {token.access_token}"
@@ -122,9 +129,10 @@ class CrudUser(
             document = await self.create_document(create_form)
             result = await self.post_process(document)
             return cast(UserReadSchema, result)
-        except DuplicateKeyError as e:
+        except DuplicateKeyError:
             raise ApiError(
-                HTTPStatus.UNPROCESSABLE_ENTITY, "Email or Username already exists"
+                HTTPStatus.UNPROCESSABLE_ENTITY,
+                "Email or Username already exists",
             )
 
     async def signup(self, form: SignupForm) -> EncodedTokenSchema:
@@ -149,7 +157,7 @@ class CrudUser(
         ):
             raise error
 
-        return create_token(user)
+        return create_token(UserReadSchema(**user.model_dump()))
 
     async def update(self, user: User, form: UserPutSchema) -> UserReadSchema:
         if form.password:

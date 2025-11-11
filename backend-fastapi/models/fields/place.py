@@ -20,7 +20,13 @@ type PlaceSelectableFields = Literal[
 ]
 
 type PlaceSearchableFields = Literal[
-    "id", "title", "description", "address", "creatorId", "locationLat", "locationLng"
+    "id",
+    "title",
+    "description",
+    "address",
+    "creatorId",
+    "locationLat",
+    "locationLng",
 ]
 
 type PlaceSortableFields = Literal[
@@ -34,10 +40,12 @@ type PlaceSortableFields = Literal[
     "-address",
 ]
 
-###### 1st Level Fields #########
+# ------- 1st Level Fields --------
 
 # id
-id_meta = FieldMeta(description="The Place ID", examples=["683b21134e2e5d46978daf1f"])
+id_meta = FieldMeta(
+    description="The Place ID", examples=["683b21134e2e5d46978daf1f"]
+)
 id_annot = Annotated[PydanticObjectId, id_meta.info]
 
 # title
@@ -92,7 +100,7 @@ creatorId_meta = FieldMeta(
 )
 creatorId_annot = Annotated[PydanticObjectId, creatorId_meta.info]
 
-###### Location Fields #########
+# ----- Location Fields -------
 
 # lat
 lat_meta = FieldMeta(

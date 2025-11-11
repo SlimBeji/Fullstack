@@ -14,7 +14,7 @@ Sortables = TypeVar("Sortables", bound=str)
 Selectables = TypeVar("Selectables", bound=str)
 Searchables = TypeVar("Searchables", bound=str)
 
-#### Public Types for searching data ####
+# ---- Public Types for searching data ----
 
 FilterOperation = Literal[
     "eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text", "exists"
@@ -37,7 +37,7 @@ class FindQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
     filters: FindQueryFilters[Searchables] | None = None
 
 
-#### Internal Types for building Mongo queries ####
+# ---- Internal Types for building Mongo queries ----
 
 type SortData = dict[str, Literal[-1, 1]]
 

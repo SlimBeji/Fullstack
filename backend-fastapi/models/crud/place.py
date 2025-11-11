@@ -95,7 +95,9 @@ class CrudPlace(
         result = await self.post_process(document)
         return cast(PlaceReadSchema, result)
 
-    async def update(self, document: Place, form: PlacePutSchema) -> PlaceReadSchema:
+    async def update(
+        self, document: Place, form: PlacePutSchema
+    ) -> PlaceReadSchema:
         j = form.model_dump(exclude_none=True, exclude_unset=True)
         update = self.update_schema(**j)
         document = await self.update_document(document, update)

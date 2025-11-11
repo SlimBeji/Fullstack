@@ -57,7 +57,9 @@ class FieldMeta:
         )
 
         if self.filter_examples:
-            metadata["json_schema_extra"] = dict(filter_examples=self.filter_examples)
+            metadata["json_schema_extra"] = dict(
+                filter_examples=self.filter_examples
+            )
 
         return metadata
 
@@ -112,14 +114,14 @@ def _numeric_filter_validator(
 ) -> FieldFilter:
     if op in ["eq", "ne", "gt", "gte", "lt", "lte"]:
         val = adapter.validate_python(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     else:
         raise PydanticCustomError(
             "invalid numeric operation",
@@ -128,27 +130,30 @@ def _numeric_filter_validator(
 
 
 def _string_filter_validator(
-    op: FilterOperation, raw: str, adapter: TypeAdapter, is_indexed: bool = False
+    op: FilterOperation,
+    raw: str,
+    adapter: TypeAdapter,
+    is_indexed: bool = False,
 ) -> FieldFilter:
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op == "regex":
-        return dict(op=op, val=raw)
+        return FieldFilter(op=op, val=raw)
     elif op == "text":
-        if is_indexed == False:
+        if is_indexed is False:
             raise PydanticCustomError(
                 "invalid $text operation",
-                f"$text operation can only be performed of indexed string fields",
+                "$text operation can only be performed of indexed string fields",
             )
-        return dict(op=op, val=raw)
+        return FieldFilter(op=op, val=raw)
     else:
         raise PydanticCustomError(
             "invalid string operation",
@@ -161,7 +166,7 @@ def _boolean_filter_validator(
 ) -> FieldFilter:
     if op in ["eq", "ne", "exists"]:
         val = str_to_bool(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     else:
         raise PydanticCustomError(
             "invalid boolean operation",
@@ -174,14 +179,14 @@ def _datetime_filter_validator(
 ) -> FieldFilter:
     if op in ["eq", "ne", "gt", "gte", "lt", "lte"]:
         val = adapter.validate_python(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     else:
         raise PydanticCustomError(
             "invalid datetime operation",
@@ -194,14 +199,14 @@ def _id_filter_validator(
 ) -> FieldFilter:
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     elif op == "exists":
         val = str_to_bool(raw)
-        return dict(op=op, val=val)
+        return FieldFilter(op=op, val=val)
     else:
         raise PydanticCustomError(
             "invalid ObjectId operation",
@@ -216,7 +221,15 @@ def make_filter_validator(real_type: Any):
     is_indexed: bool = json_schema_extra.get("is_indexed", False)
     adapter = TypeAdapter(real_type)
 
-    if base_class not in [int, float, str, EmailStr, bool, datetime, PydanticObjectId]:
+    if base_class not in [
+        int,
+        float,
+        str,
+        EmailStr,
+        bool,
+        datetime,
+        PydanticObjectId,
+    ]:
         raise RuntimeError(f"Unknow base type {base_class}")
 
     def validator(value: str | dict) -> FieldFilter:
@@ -227,10 +240,10 @@ def make_filter_validator(real_type: Any):
                 op = value["op"]
                 raw_val = value["val"]
             except KeyError:
-                raise PydanticCustomError(
-                    "Invalid Field Filter",
-                    f"Field Filter {value} is not valid. It must define the op and val fields",
+                message: str = (
+                    f"Field Filter {value} is not valid. It must define the op and val fields"
                 )
+                raise PydanticCustomError("Invalid Field Filter", message)  # type: ignore
 
         if base_class in [int, float]:
             return _numeric_filter_validator(op, raw_val, adapter)
@@ -254,7 +267,7 @@ class HttpFilter(Generic[T]):
         field_info = _get_field_info(item)
         extra = getattr(field_info, "json_schema_extra", None) or {}
         examples = extra.get("filter_examples", None)
-        if not examples:
+        if not examples and field_info is not None:
             examples = field_info.examples
 
         return Annotated[

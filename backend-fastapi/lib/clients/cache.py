@@ -1,6 +1,5 @@
-import asyncio
 import json
-from typing import Any, Awaitable, Callable, Literal, ParamSpec, TypeVar
+from typing import Any, Literal, ParamSpec, TypeVar
 
 import redis.asyncio as async_redis
 from pydantic import BaseModel
@@ -28,7 +27,9 @@ class RedisClient:
     @property
     def client(self) -> async_redis.Redis:
         if self._client is None:
-            raise RuntimeError("Redis client is not connected. Call connect() first.")
+            raise RuntimeError(
+                "Redis client is not connected. Call connect() first."
+            )
         return self._client
 
     async def connect(self) -> None:
@@ -54,7 +55,7 @@ class RedisClient:
         if isinstance(format, type) and issubclass(format, BaseModel):
             try:
                 return format(**json.loads(stored))
-            except:
+            except Exception:
                 # Value become not valid, purge it and return None
                 await self.delete(key)
                 return None
@@ -69,7 +70,9 @@ class RedisClient:
             return str_to_bool(str(stored))
         return stored
 
-    async def set(self, key: str, val: Any, expiration: int | None = None) -> None:
+    async def set(
+        self, key: str, val: Any, expiration: int | None = None
+    ) -> None:
         expiration = expiration or self.default_expirartion
         if isinstance(val, dict) or isinstance(val, list):
             val = json.dumps(val)

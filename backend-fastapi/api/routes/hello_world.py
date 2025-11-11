@@ -13,11 +13,15 @@ async def hello():
     return dict(message="Hello World!")
 
 
-@hello_world_router.get("/user", summary="Hello World Endpoint for authenticated users")
+@hello_world_router.get(
+    "/user", summary="Hello World Endpoint for authenticated users"
+)
 async def hello_user(user: UserReadSchema = Depends(get_current_user)):
     return dict(message=f"Hello {user.name}!")
 
 
-@hello_world_router.get("/admin", summary="Hello World Endpoint for admins only")
+@hello_world_router.get(
+    "/admin", summary="Hello World Endpoint for admins only"
+)
 async def hello_admin(user: UserReadSchema = Depends(get_current_admin)):
     return dict(message=f"Hello Admin {user.name}!")

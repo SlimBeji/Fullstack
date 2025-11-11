@@ -33,7 +33,7 @@ def flatten_json(
     )
 
     for key, value in enumerator:
-        new_key = f"{prefix}.{key}" if prefix else key
+        new_key = f"{prefix}.{key}" if prefix else str(key)
 
         if isinstance(value, list):
             if not accept_arrays:

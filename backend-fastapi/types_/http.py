@@ -89,4 +89,4 @@ class FileToUpload:
             MAX_SIZE = size_mb
 
         FileWithCustomLimit.__name__ = f"FileToUpload_{size_mb}MB"
-        return FileWithCustomLimit
+        return cast(type[Self], FileWithCustomLimit)

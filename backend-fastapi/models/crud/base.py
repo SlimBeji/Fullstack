@@ -53,7 +53,7 @@ class CrudBase(
 ):
     # Constructor & Properties
 
-    DEFAULT_PROJECTION: Projection = dict(_version=0)
+    DEFAULT_PROJECTION: Projection = {"_version": 0}
 
     FILTER_FIELD_MAPPING: dict[str, str] = {}
 
@@ -136,7 +136,8 @@ class CrudBase(
     async def post_process(
         self, result: ModelDocument | dict, to_dict: bool = False
     ) -> ReadSchema | dict:
-        output = await self.post_process_results([result], to_dict=to_dict)
+        items = cast(list[ModelDocument] | list[dict], [result])
+        output = await self.post_process_results(items, to_dict=to_dict)
         return output[0]
 
     # Read
@@ -152,7 +153,9 @@ class CrudBase(
         result = await self.post_process(document)
         return cast(ReadSchema, result)
 
-    async def user_get(self, user: UserReadSchema, id: str | ObjectId) -> ReadSchema:
+    async def user_get(
+        self, user: UserReadSchema, id: str | ObjectId
+    ) -> ReadSchema:
         doc = await self.get_document(id)
         if not doc:
             raise self.not_found(id)
@@ -164,7 +167,8 @@ class CrudBase(
     # Fetch
 
     def _to_find_query(
-        self, schema: FindQuery[Selectables, Sortables, Searchables] | FiltersSchema
+        self,
+        schema: FindQuery[Selectables, Sortables, Searchables] | FiltersSchema,
     ) -> FindQuery[Selectables, Sortables, Searchables]:
         if isinstance(schema, FindQuery):
             return schema
@@ -181,7 +185,7 @@ class CrudBase(
 
     def _parse_sort_data(self, fields: list[Sortables] | None) -> SortData:
         if fields is None:
-            return dict(createdAt=1)
+            return {"createdAt": 1}
 
         result: SortData = {}
         for field in fields:
@@ -231,7 +235,9 @@ class CrudBase(
             result[field_name] = fieldFilters
         return result
 
-    async def count_documents(self, filters: MongoFieldsFilters | None = None) -> int:
+    async def count_documents(
+        self, filters: MongoFieldsFilters | None = None
+    ) -> int:
         filters = filters or {}
         return await self.model.find(filters).count()
 
@@ -253,7 +259,8 @@ class CrudBase(
         return await mongo_query.to_list()
 
     async def fetch(
-        self, query: FindQuery[Selectables, Sortables, Searchables] | FiltersSchema
+        self,
+        query: FindQuery[Selectables, Sortables, Searchables] | FiltersSchema,
     ) -> PaginatedData[ReadSchema]:
         # Step 1: If the input is a FiltersSchema, convert to FindQuery object
         query = self._to_find_query(query)
@@ -264,7 +271,10 @@ class CrudBase(
         sort = self._parse_sort_data(query.sort)
         filters = self._parse_filters(query.filters)
         parsed = MongoFindQuery(
-            pagination=pagination, projection=projection, sort=sort, filters=filters
+            pagination=pagination,
+            projection=projection,
+            sort=sort,
+            filters=filters,
         )
 
         # Step 3: Counting the Output
@@ -304,7 +314,9 @@ class CrudBase(
         result = await self.post_process(document)
         return cast(ReadSchema, result)
 
-    async def user_create(self, user: UserReadSchema, form: PostSchema) -> ReadSchema:
+    async def user_create(
+        self, user: UserReadSchema, form: PostSchema
+    ) -> ReadSchema:
         self.auth_check(user, form, "create")
         return await self.create(form)
 
@@ -319,14 +331,18 @@ class CrudBase(
         await self.save_document(document)
         return document
 
-    async def update(self, document: ModelDocument, form: PutSchema) -> ReadSchema:
+    async def update(
+        self, document: ModelDocument, form: PutSchema
+    ) -> ReadSchema:
         j = form.model_dump(exclude_none=True, exclude_unset=True)
         update = self.update_schema(**j)
         document = await self.update_document(document, update)
         result = await self.post_process(document)
         return cast(ReadSchema, result)
 
-    async def update_by_id(self, id: str | ObjectId, form: PutSchema) -> ReadSchema:
+    async def update_by_id(
+        self, id: str | ObjectId, form: PutSchema
+    ) -> ReadSchema:
         document = await self.get_document(id)
         if document is None:
             raise self.not_found(id)
@@ -357,7 +373,7 @@ class CrudBase(
             async with db.session_transaction() as session:
                 await document.delete(session=session)
                 await self.delete_cleanup(document)
-        except:
+        except Exception:
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not delete {self.model_name} object!",
@@ -370,7 +386,9 @@ class CrudBase(
 
         return await self.delete_document(document)
 
-    async def user_delete(self, user: UserReadSchema, id: str | ObjectId) -> None:
+    async def user_delete(
+        self, user: UserReadSchema, id: str | ObjectId
+    ) -> None:
         document = await self.get_document(id)
         if document is None:
             raise self.not_found(id)

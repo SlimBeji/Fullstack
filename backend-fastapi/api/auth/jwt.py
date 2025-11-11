@@ -29,12 +29,16 @@ async def get_user_from_token(token: str) -> UserReadSchema:
     return user
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserReadSchema:
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+) -> UserReadSchema:
     return await get_user_from_token(token)
 
 
-async def get_current_admin(token: str = Depends(oauth2_scheme)) -> UserReadSchema:
+async def get_current_admin(
+    token: str = Depends(oauth2_scheme),
+) -> UserReadSchema:
     user = await get_user_from_token(token)
     if not user.isAdmin:
-        raise ApiError(HTTPStatus.UNAUTHORIZED, f"Only admins are allowed")
+        raise ApiError(HTTPStatus.UNAUTHORIZED, "Only admins are allowed")
     return user

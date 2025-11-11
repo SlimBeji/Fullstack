@@ -1,6 +1,7 @@
 import os
 import uuid
 from datetime import UTC, datetime, timedelta
+from typing import cast
 from urllib.parse import quote
 
 from google.api_core.exceptions import Conflict, NotFound
@@ -42,7 +43,9 @@ class CloudStorage:
         return bool(self.emulator_private_url and self.emulator_public_url)
 
     @property
-    def credentials(self) -> service_account.Credentials | AnonymousCredentials | None:
+    def credentials(
+        self,
+    ) -> service_account.Credentials | AnonymousCredentials | None:
         if self.is_emulator:
             return AnonymousCredentials()
 
@@ -72,7 +75,9 @@ class CloudStorage:
         download_url = f"{bucket_url}/o/{quote(filename)}?alt=media"
         return download_url
 
-    def get_signed_url(self, filename: str, expiration: int | None = None) -> str:
+    def get_signed_url(
+        self, filename: str, expiration: int | None = None
+    ) -> str:
         if self.is_emulator:
             return self._get_emulator_file_url(filename)
 
@@ -87,7 +92,9 @@ class CloudStorage:
         return url
 
     def upload_file(
-        self, param: FileToUpload | UploadFile | str | None, destination: str = ""
+        self,
+        param: FileToUpload | UploadFile | str | None,
+        destination: str = "",
     ) -> str:
         if not param:
             return ""
@@ -105,8 +112,7 @@ class CloudStorage:
 
         blob = self.bucket.blob(filename)
         blob.upload_from_string(file.buffer, content_type=file.mimetype)
-
-        return blob.name
+        return cast(str, blob.name)
 
     def delete_file(self, filename: str) -> bool:
         try:

@@ -16,12 +16,16 @@ from models.schemas import (
 place_router = APIRouter(prefix="/api/places", tags=["Place"])
 
 place_id_param = Path(
-    ..., examples=["507f1f77bcf86cd799439011"], description="The ID of the place"
+    ...,
+    examples=["507f1f77bcf86cd799439011"],
+    description="The ID of the place",
 )
 
 
 @place_router.get(
-    "/", summary="Search and Filter places", response_model=PlacesPaginatedSchema
+    "/",
+    summary="Search and Filter places",
+    response_model=PlacesPaginatedSchema,
 )
 async def get_places(
     query: Annotated[PlaceFiltersSchema, Query()],
@@ -31,7 +35,9 @@ async def get_places(
 
 
 @place_router.post(
-    "/query", summary="Search and Retrieve places", response_model=PlacesPaginatedSchema
+    "/query",
+    summary="Search and Retrieve places",
+    response_model=PlacesPaginatedSchema,
 )
 async def get_places_from_post(
     query: PlaceFiltersSchema,
@@ -40,7 +46,9 @@ async def get_places_from_post(
     return await crud_place.fetch(query)
 
 
-@place_router.post("/", summary="Place creation", response_model=PlaceReadSchema)
+@place_router.post(
+    "/", summary="Place creation", response_model=PlaceReadSchema
+)
 async def create_place(
     multipart_form: PlaceMultipartPost = Depends(),
     user: UserReadSchema = Depends(get_current_user),
@@ -79,14 +87,17 @@ async def update_place(
             "description": "Deletion confirmation message",
             "content": {
                 "application/json": {
-                    "example": {"message": "Deleted place 507f1f77bcf86cd799439011"}
+                    "example": {
+                        "message": "Deleted place 507f1f77bcf86cd799439011"
+                    }
                 }
             },
         }
     },
 )
 async def delete_place(
-    user: UserReadSchema = Depends(get_current_user), place_id: str = place_id_param
+    user: UserReadSchema = Depends(get_current_user),
+    place_id: str = place_id_param,
 ):
     await crud_place.user_delete(user, place_id)
     return dict(message=f"Deleted place {place_id}")

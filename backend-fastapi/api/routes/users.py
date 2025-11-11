@@ -30,7 +30,9 @@ async def get_users(
 
 
 @user_router.post(
-    "/query", summary="Search and Retrieve users", response_model=UsersPaginatedSchema
+    "/query",
+    summary="Search and Retrieve users",
+    response_model=UsersPaginatedSchema,
 )
 async def get_users_from_post(
     query: UserFiltersSchema,
@@ -59,7 +61,9 @@ async def get_user(
     return await crud_user.get(user_id)
 
 
-@user_router.put("/{user_id}", summary="Update users", response_model=UserReadSchema)
+@user_router.put(
+    "/{user_id}", summary="Update users", response_model=UserReadSchema
+)
 async def update_user(
     form: UserPutSchema,
     user_id: str = user_id_param,
@@ -76,14 +80,17 @@ async def update_user(
             "description": "Deletion confirmation message",
             "content": {
                 "application/json": {
-                    "example": {"message": "Deleted user 507f1f77bcf86cd799439011"}
+                    "example": {
+                        "message": "Deleted user 507f1f77bcf86cd799439011"
+                    }
                 }
             },
         }
     },
 )
 async def delete_user(
-    user: UserReadSchema = Depends(get_current_admin), user_id: str = user_id_param
+    user: UserReadSchema = Depends(get_current_admin),
+    user_id: str = user_id_param,
 ):
     await crud_user.user_delete(user, user_id)
     return dict(message=f"Deleted user {user_id}")

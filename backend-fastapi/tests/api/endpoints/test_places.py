@@ -7,11 +7,14 @@ from conftest import Helpers
 from lib.utils import get_image_path
 from models.crud import crud_place
 from models.schemas import PlaceFindQuery, PlaceReadSchema
-from types_ import Filter
+from types_ import Filter, FindQueryFilters
 
 
 async def _get_place_id() -> str:
-    query = PlaceFindQuery(filters=dict(title=[Filter(op="eq", val="Stamford Bridge")]))
+    filters = cast(
+        FindQueryFilters, dict(title=[Filter(op="eq", val="Stamford Bridge")])
+    )
+    query = PlaceFindQuery(filters=filters)
     result = await crud_place.fetch(query)
     data = result.data
     place = cast(PlaceReadSchema, data[0])
@@ -34,7 +37,9 @@ async def test_get_places(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_query_places(helpers: Helpers):
-    payload = dict(title=["Stamford Bridge"], fields=["location.lng", "location.lat"])
+    payload = dict(
+        title=["Stamford Bridge"], fields=["location.lng", "location.lat"]
+    )
     headers = dict(Authorization=helpers.user_token)
     response = await helpers.client.post(
         "/api/places/query",
@@ -103,7 +108,9 @@ async def test_create_place_belonging_to_others(helpers: Helpers):
 async def test_get_place_by_id(helpers: Helpers):
     place_id = await _get_place_id()
     headers = dict(Authorization=helpers.user_token)
-    response = await helpers.client.get(f"/api/places/{place_id}", headers=headers)
+    response = await helpers.client.get(
+        f"/api/places/{place_id}", headers=headers
+    )
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["address"] == "Fulham Road, London"
@@ -141,7 +148,9 @@ async def test_update_place_belonging_to_others(helpers: Helpers):
 async def test_delete_place_belonging_to_others(helpers: Helpers):
     headers = dict(Authorization=helpers.user_token)
     place_id = await _get_place_id()
-    response = await helpers.client.delete(f"/api/places/{place_id}", headers=headers)
+    response = await helpers.client.delete(
+        f"/api/places/{place_id}", headers=headers
+    )
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 
@@ -149,6 +158,8 @@ async def test_delete_place_belonging_to_others(helpers: Helpers):
 async def test_delete_place(helpers: Helpers):
     headers = dict(Authorization=helpers.admin_token)
     place_id = await _get_place_id()
-    response = await helpers.client.delete(f"/api/places/{place_id}", headers=headers)
+    response = await helpers.client.delete(
+        f"/api/places/{place_id}", headers=headers
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json()["message"] == f"Deleted place {place_id}"

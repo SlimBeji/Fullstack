@@ -18,7 +18,7 @@ type UserSortableFields = Literal[
     "createdAt", "-createdAt", "name", "-name", "email", "-email"
 ]
 
-###### 1st Level Fields #########
+# ----- 1st Level Fields -------
 
 # id
 id_meta = FieldMeta(
@@ -78,7 +78,8 @@ places_annot = Annotated[
         Annotated[
             PydanticObjectId,
             FieldMeta(
-                description="The Place ID", examples=["683b21134e2e5d46978daf1f"]
+                description="The Place ID",
+                examples=["683b21134e2e5d46978daf1f"],
             ).info,
         ]
     ],
