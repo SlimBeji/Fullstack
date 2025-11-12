@@ -28,7 +28,7 @@ class User(BaseDocument):
 
     @after_event([Delete])
     async def remove_child_places(self) -> None:
-        Places = cast(type[Place], document_registry[Collections.PLACES])
+        Places = cast(type["Place"], document_registry[Collections.PLACES])
         await Places.find(Places.creatorId == self.id).delete()
 
 
