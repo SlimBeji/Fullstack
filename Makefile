@@ -71,16 +71,16 @@ express-lint:
 	docker exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
 
 express-script/%:
-	docker exec -it express npx ts-node src/scripts/$*
+	docker exec -it express npx ts-node -r tsconfig-paths/register src/scripts/$*
 
 express-debug:
-	docker exec -it express npx ts-node src/scripts/debug.ts
+	docker exec -it express npx ts-node -r tsconfig-paths/register src/scripts/debug.ts
 
 express-seed:
-	docker exec -it express npx ts-node src/scripts/seedDb.ts
+	docker exec -it express npx ts-node -r tsconfig-paths/register src/scripts/seedDb.ts
 
 express-dump:
-	docker exec -it express npx ts-node src/scripts/dumpDb.ts
+	docker exec -it express npx ts-node -r tsconfig-paths/register src/scripts/dumpDb.ts
 
 # FastAPI commands
 fastapi-build:
