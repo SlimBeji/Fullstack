@@ -4,7 +4,9 @@ from worker.crons.base import ScheduledTask
 from worker.crons.emails import email_crons
 
 
-def register_crons(scheduler: BlockingScheduler, tasks: list[ScheduledTask]) -> None:
+def register_crons(
+    scheduler: BlockingScheduler, tasks: list[ScheduledTask]
+) -> None:
     for t in tasks:
         t.register(scheduler)
 

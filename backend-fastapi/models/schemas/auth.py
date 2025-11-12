@@ -32,7 +32,10 @@ class SignupForm:
 
     def model_dump(self) -> dict:
         return dict(
-            name=self.name, email=self.email, password=self.password, image=self.image
+            name=self.name,
+            email=self.email,
+            password=self.password,
+            image=self.image,
         )
 
 

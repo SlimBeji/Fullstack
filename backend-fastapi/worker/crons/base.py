@@ -19,4 +19,6 @@ class ScheduledTask:
         self.kwargs = kwargs
 
     def register(self, scheduler: BlockingScheduler) -> None:
-        scheduler.add_job(self.fn, self.trigger, args=self.args, kwargs=self.kwargs)
+        scheduler.add_job(
+            self.fn, self.trigger, args=self.args, kwargs=self.kwargs
+        )

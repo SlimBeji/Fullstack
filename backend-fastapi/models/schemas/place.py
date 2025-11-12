@@ -97,7 +97,9 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 # --- Query Schemas ---
 
 
-class PlaceFiltersSchema(BaseFiltersSchema[PlaceSelectableFields, PlaceSortableFields]):
+class PlaceFiltersSchema(
+    BaseFiltersSchema[PlaceSelectableFields, PlaceSortableFields]
+):
     id: HttpFilters[PlaceFields.id_annot]
     title: HttpFilters[PlaceFields.title_annot]
     description: HttpFilters[PlaceFields.description_annot]

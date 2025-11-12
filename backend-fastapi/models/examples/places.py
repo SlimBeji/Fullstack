@@ -785,7 +785,9 @@ PLACES: list[PlaceSeedSchema] = [
         embedding=EMBEDDING_1,
         imageUrl=get_image_path("place1.jpg"),
         address="Fulham Road, London",
-        location=PlaceFields.Location(lat=51.48180425016331, lng=-0.19090418688755467),
+        location=PlaceFields.Location(
+            lat=51.48180425016331, lng=-0.19090418688755467
+        ),
     ),
     PlaceSeedSchema(
         ref=2,
@@ -795,6 +797,8 @@ PLACES: list[PlaceSeedSchema] = [
         embedding=EMBEDDING_2,
         imageUrl=get_image_path("place2.jpg"),
         address="64 Stoke Rd, Stoke D'Abernon, Cobham KT11 3PT",
-        location=PlaceFields.Location(lat=51.31735558375386, lng=-0.38584590510204153),
+        location=PlaceFields.Location(
+            lat=51.31735558375386, lng=-0.38584590510204153
+        ),
     ),
 ]

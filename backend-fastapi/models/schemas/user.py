@@ -84,7 +84,9 @@ UsersPaginatedSchema = PaginatedData[UserReadSchema]
 # --- Query Schemas ---
 
 
-class UserFiltersSchema(BaseFiltersSchema[UserSelectableFields, UserSortableFields]):
+class UserFiltersSchema(
+    BaseFiltersSchema[UserSelectableFields, UserSortableFields]
+):
     id: HttpFilters[UserFields.id_annot]
     name: HttpFilters[UserFields.name_annot]
     email: HttpFilters[UserFields.email_annot]

@@ -8,7 +8,9 @@ FILEDIR = os.path.dirname(__file__)
 
 class Settings(BaseSettings):
     if os.environ.get("ENV") != "production":
-        _CONFIG = SettingsConfigDict(env_file=os.path.join(FILEDIR, "fastapi.env"))
+        _CONFIG = SettingsConfigDict(
+            env_file=os.path.join(FILEDIR, "fastapi.env")
+        )
 
     # APP
     PORT: int = 5001

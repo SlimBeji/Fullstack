@@ -30,13 +30,17 @@ class MongoClient:
     @property
     def client(self) -> AsyncIOMotorClient:
         if self._client is None:
-            raise RuntimeError("Mongo client is not connected. Call connect() first.")
+            raise RuntimeError(
+                "Mongo client is not connected. Call connect() first."
+            )
         return self._client
 
     @property
     def db(self) -> AsyncIOMotorDatabase:
         if self._db is None:
-            raise RuntimeError("Mongo client is not connected. Call connect() first.")
+            raise RuntimeError(
+                "Mongo client is not connected. Call connect() first."
+            )
         return self._db
 
     async def create_collection(self, name: str) -> None:

@@ -23,7 +23,9 @@ class AsyncIOWithBeanie(AsyncIO):
         """Oveloading AsyncIo before_worker_boot"""
         event_loop_thread = EventLoopThread(self.logger)
         event_loop_thread.start(timeout=1.0)
-        asyncio.run_coroutine_threadsafe(connect_dbs(), event_loop_thread.loop).result()
+        asyncio.run_coroutine_threadsafe(
+            connect_dbs(), event_loop_thread.loop
+        ).result()
         set_event_loop_thread(event_loop_thread)
 
 
@@ -37,7 +39,9 @@ else:
     broker = RedisBroker(url=settings.REDIS_URL)
     backend = RedisBackend(url=settings.REDIS_URL)
 
-broker.add_middleware(Results(backend=backend, result_ttl=7 * 24 * 60 * 60 * 1000))
+broker.add_middleware(
+    Results(backend=backend, result_ttl=7 * 24 * 60 * 60 * 1000)
+)
 broker.add_middleware(AsyncIOWithBeanie())
 set_broker(broker)
 
