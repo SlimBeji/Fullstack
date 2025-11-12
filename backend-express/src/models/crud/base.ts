@@ -142,7 +142,7 @@ export class Crud<
 
     private parseSortData(fields: Sortables[] | undefined): SortData {
         if (!fields || fields.length === 0) {
-            return { createdAt: 1 };
+            return { createdAt: -1 };
         }
 
         const result: SortData = {};
@@ -218,7 +218,7 @@ export class Crud<
         const size = pagination ? pagination.size : env.MAX_ITEMS_PER_PAGE;
         const documents = await this.model
             .find(filters || {}, projection || {})
-            .sort(sort || { createdAt: 1 })
+            .sort(sort || { createdAt: -1 })
             .collation({ locale: "en", strength: 2 })
             .skip(skip)
             .limit(size)
