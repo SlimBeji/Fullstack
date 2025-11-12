@@ -185,7 +185,7 @@ class CrudBase(
 
     def _parse_sort_data(self, fields: list[Sortables] | None) -> SortData:
         if fields is None:
-            return {"createdAt": 1}
+            return {"createdAt": -1}
 
         result: SortData = {}
         for field in fields:
@@ -248,7 +248,7 @@ class CrudBase(
         collection = self.model.get_pymongo_collection()
         mongo_query = (
             collection.find(query.filters, query.projection)
-            .sort({"email": 1})
+            .sort(query.sort)
             .collation({"locale": "en", "strength": 2})
         )
         if query.pagination is not None:
