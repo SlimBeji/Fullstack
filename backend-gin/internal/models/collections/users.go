@@ -446,7 +446,15 @@ func (uc *UserCollection) AuthUpdate(
 	return nil
 }
 
-func (uc *UserCollection) PostUpdate(sc mongo.SessionContext) error {
+func (uc *UserCollection) PreUpdate(
+	sc mongo.SessionContext, before bson.Raw, updates bson.M,
+) error {
+	return nil
+}
+
+func (uc *UserCollection) PostUpdate(
+	sc mongo.SessionContext, before bson.Raw, after bson.Raw,
+) error {
 	return nil
 }
 

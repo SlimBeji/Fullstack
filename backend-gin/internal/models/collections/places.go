@@ -304,7 +304,15 @@ func (pc *PlaceCollection) AuthUpdate(
 	)
 }
 
-func (pc *PlaceCollection) PostUpdate(sc mongo.SessionContext) error {
+func (pc *PlaceCollection) PreUpdate(
+	sc mongo.SessionContext, before bson.Raw, updates bson.M,
+) error {
+	return nil
+}
+
+func (pc *PlaceCollection) PostUpdate(
+	sc mongo.SessionContext, before bson.Raw, after bson.Raw,
+) error {
 	return nil
 }
 

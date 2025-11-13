@@ -18,7 +18,8 @@ import (
 type DocumentUpdater[Read any, Form any, Put any] interface {
 	DocumentReader[Read]
 	FindOneAndUpdate(context.Context, any, any, ...*options.FindOneAndUpdateOptions) *mongo.SingleResult
-	PostUpdate(mongo.SessionContext) error
+	PreUpdate(mongo.SessionContext, bson.Raw, bson.M) error
+	PostUpdate(mongo.SessionContext, bson.Raw, bson.Raw) error
 	ToUpdateForm(*Put) (Form, error)
 	AuthUpdate(*schemas.UserRead, *Put) error
 }
@@ -70,14 +71,24 @@ func UpdateDocument[Read any, Form any, Put any](
 				return err
 			}
 
-			raw := du.FindOneAndUpdate(sc, filter, updates, opts)
-			result, err = raw.Raw()
+			before, err := du.FindOne(sc, filter).Raw()
 			if err != nil {
 				session.AbortTransaction(sc)
 				return err
 			}
 
-			if err := du.PostUpdate(sc); err != nil {
+			if err := du.PreUpdate(sc, before, updates); err != nil {
+				session.AbortTransaction(sc)
+				return err
+			}
+
+			after, err := du.FindOneAndUpdate(sc, filter, updates, opts).Raw()
+			if err != nil {
+				session.AbortTransaction(sc)
+				return err
+			}
+
+			if err := du.PostUpdate(sc, before, after); err != nil {
 				session.AbortTransaction(sc)
 				return err
 			}
