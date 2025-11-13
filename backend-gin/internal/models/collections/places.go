@@ -343,7 +343,7 @@ func (pc *PlaceCollection) UpdateById(
 func (pc *PlaceCollection) UserUpdate(
 	user *schemas.UserRead,
 	filters bson.M,
-	put *schemas.PlaceUpdate,
+	put *schemas.PlacePut,
 	ctx context.Context,
 ) (schemas.PlaceRead, error) {
 	return crud.UserUpdate(pc, user, filters, put, ctx)
@@ -352,7 +352,7 @@ func (pc *PlaceCollection) UserUpdate(
 func (pc *PlaceCollection) UserUpdateById(
 	user *schemas.UserRead,
 	id string,
-	put *schemas.PlaceUpdate,
+	put *schemas.PlacePut,
 	ctx context.Context,
 ) (schemas.PlaceRead, error) {
 	return crud.UserUpdateById(pc, user, id, put, ctx)
