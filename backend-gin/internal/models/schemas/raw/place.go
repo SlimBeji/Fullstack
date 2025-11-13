@@ -48,13 +48,13 @@ type PlacSeed struct {
 
 // schemas:tag
 type PlaceCreate struct {
-	Title       any      `tag:"title"`
-	Description any      `tag:"description"`
-	Address     any      `tag:"address"`
-	Location    Location `tag:"location"`
-	Embedding   any      `tag:"embedding"`
-	ImageUrl    any      `tag:"imageUrl,omitempty"`
-	CreatorID   any      `tag:"creatorId"`
+	Title       any                `tag:"title"`
+	Description any                `tag:"description"`
+	Address     any                `tag:"address"`
+	Location    Location           `tag:"location"`
+	Embedding   any                `tag:"embedding"`
+	ImageUrl    any                `tag:"imageUrl,omitempty"`
+	CreatorID   primitive.ObjectID `tag:"creatorId"`
 }
 
 // schemas:tag multipart
@@ -100,11 +100,18 @@ type PlaceFilters struct {
 
 // schemas:tag allownil
 type PlaceUpdate struct {
+	Title       any                `tag:"title"`
+	Description any                `tag:"description"`
+	Address     any                `tag:"address"`
+	Location    Location           `tag:"location"`
+	CreatorID   primitive.ObjectID `tag:"creatorId"`
+}
+
+// schemas:tag allownil
+type PlacePut struct {
 	Title       any      `tag:"title"`
 	Description any      `tag:"description"`
 	Address     any      `tag:"address"`
 	Location    Location `tag:"location"`
 	CreatorID   any      `tag:"creatorId"`
 }
-
-type PlacePut = PlaceUpdate

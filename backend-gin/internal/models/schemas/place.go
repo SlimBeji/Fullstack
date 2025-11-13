@@ -38,13 +38,13 @@ type PlacSeed struct {
 }
 
 type PlaceCreate struct {
-	Title       string    `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
-	Description string    `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
-	Address     string    `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
-	Location    Location  `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	Embedding   []float64 `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
-	ImageUrl    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	CreatorID   string    `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
+	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
+	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
+	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
+	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
+	Embedding   []float64          `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
+	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
+	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
 }
 
 type PlacePost struct {
@@ -84,11 +84,17 @@ type PlaceFilters struct {
 }
 
 type PlaceUpdate struct {
+	Title       *string             `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
+	Description *string             `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
+	Address     *string             `json:"address" validate:"omitempty,min=10" example:"Fulham road" bson:"address"`                              // The place address
+	Location    *Location           `json:"location" validate:"omitempty" bson:"location"`                                                         // Location object (can be sent as JSON string)
+	CreatorID   *primitive.ObjectID `json:"creatorId" validate:"omitempty,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"` // The ID of the place creator, 24 characters
+}
+
+type PlacePut struct {
 	Title       *string   `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
 	Description *string   `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
 	Address     *string   `json:"address" validate:"omitempty,min=10" example:"Fulham road" bson:"address"`                              // The place address
 	Location    *Location `json:"location" validate:"omitempty" bson:"location"`                                                         // Location object (can be sent as JSON string)
 	CreatorID   *string   `json:"creatorId" validate:"omitempty,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"` // The ID of the place creator, 24 characters
 }
-
-type PlacePut = PlaceUpdate
