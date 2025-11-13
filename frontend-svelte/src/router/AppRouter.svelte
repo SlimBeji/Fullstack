@@ -2,6 +2,7 @@
 import type { RouteConfig, RouteResult } from "@mateothegreat/svelte5-router";
 import { goto, Router, StatusCode } from "@mateothegreat/svelte5-router";
 
+import { getAuthData } from "@/lib";
 import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/pages";
 import { authStore } from "@/store";
 
@@ -31,6 +32,14 @@ const routes: RouteConfig[] = [
 ];
 
 const authGuard = async (route: RouteResult): Promise<boolean> => {
+    if (!$isLoggedIn) {
+        // Check the local storage if no token found
+        const authData = getAuthData();
+        if (authData !== null) {
+            authStore.setAuthData(authData);
+        }
+    }
+
     const path = route.route?.path;
     if (!$isLoggedIn && path !== "/auth") {
         goto("/auth");
