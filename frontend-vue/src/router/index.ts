@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import { getAuthData } from "@/lib";
 import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/pages";
 import { useAuthStore } from "@/store";
 
@@ -40,6 +41,14 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
+    if (!authStore.isLoggedIn) {
+        // Check the local storage if no token found
+        const authData = getAuthData();
+        if (authData !== null) {
+            authStore.setAuthData(authData);
+        }
+    }
+
     if (to.path !== "/auth" && !authStore.isLoggedIn) {
         return next("/auth");
     }
