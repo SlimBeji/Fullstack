@@ -176,12 +176,21 @@ func (pc *PlaceCollection) ToCreateForm(
 	post *schemas.PlacePost,
 ) (schemas.PlaceCreate, error) {
 	var form schemas.PlaceCreate
-	err := copier.Copy(&form, post)
+
+	creatorId, err := primitive.ObjectIDFromHex(post.CreatorID)
+	if err != nil {
+		return form, fmt.Errorf(
+			"creatorId %s is not a valid objectId", post.CreatorID,
+		)
+	}
+
+	err = copier.Copy(&form, post)
 	if err != nil {
 		return form, err
 	}
 	form.Location.Lat = post.Lat
 	form.Location.Lng = post.Lng
+	form.CreatorID = creatorId
 
 	if post.Image != nil {
 		var f types_.FileToUpload
@@ -207,15 +216,6 @@ func (pc *PlaceCollection) ToDBDoc(
 	result.UpdatedAt = time.Now()
 	result.CreatedAt = time.Now()
 	result.Embedding = []float64{}
-
-	objectId, err := primitive.ObjectIDFromHex(form.CreatorID)
-	if err != nil {
-		return result, fmt.Errorf(
-			"could not convert %s to an object id", form.CreatorID,
-		)
-	}
-	result.CreatorID = objectId
-
 	return result, nil
 }
 
@@ -273,13 +273,22 @@ func (pc *PlaceCollection) ToUpdateForm(
 	put *schemas.PlacePut,
 ) (schemas.PlaceUpdate, error) {
 	var result schemas.PlaceUpdate
-	err := copier.Copy(&result, put)
+
+	creatorId, err := primitive.ObjectIDFromHex(*put.CreatorID)
+	if err != nil {
+		return result, fmt.Errorf(
+			"creatorId %s is not a valid objectId", *put.CreatorID,
+		)
+	}
+
+	err = copier.Copy(&result, put)
 	if err != nil {
 		return result, fmt.Errorf(
 			"could not copy Put form: %w", err,
 		)
 	}
 
+	result.CreatorID = &creatorId
 	return result, nil
 }
 
