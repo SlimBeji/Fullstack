@@ -247,6 +247,20 @@ func (pc *PlaceCollection) PostCreate(
 	doc *schemas.PlaceDB,
 	result *mongo.InsertOneResult,
 ) error {
+	placeId, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return fmt.Errorf("could not extract the inserted place id")
+	}
+
+	update := bson.M{"$addToSet": bson.M{"places": placeId}}
+	userFilter := bson.M{"_id": doc.CreatorID}
+	db := clients.GetMongoDB(sc.Client())
+	collection := db.Collection(string(types_.CollectionUsers))
+	_, err := collection.FindOneAndUpdate(sc, userFilter, update).Raw()
+	if err != nil {
+		return fmt.Errorf("could add the place id to creator places")
+	}
+
 	return nil
 }
 
