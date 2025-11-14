@@ -314,7 +314,7 @@ func (pc *PlaceCollection) AuthUpdate(
 }
 
 func (pc *PlaceCollection) PreUpdate(
-	sc mongo.SessionContext, before bson.Raw, updates bson.M,
+	sc mongo.SessionContext, before bson.Raw, form *schemas.PlaceUpdate,
 ) error {
 	return nil
 }

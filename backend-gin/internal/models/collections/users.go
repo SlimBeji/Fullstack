@@ -447,7 +447,7 @@ func (uc *UserCollection) AuthUpdate(
 }
 
 func (uc *UserCollection) PreUpdate(
-	sc mongo.SessionContext, before bson.Raw, updates bson.M,
+	sc mongo.SessionContext, before bson.Raw, form *schemas.UserUpdate,
 ) error {
 	return nil
 }
