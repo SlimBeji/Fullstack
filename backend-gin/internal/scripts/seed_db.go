@@ -1,7 +1,9 @@
 package scripts
 
-import "fmt"
+import (
+	"backend/internal/models/examples"
+)
 
 func SeedDB() {
-	fmt.Println("Seeding the database")
+	examples.SeedDb(true)
 }

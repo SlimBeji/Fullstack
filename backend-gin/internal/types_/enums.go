@@ -22,6 +22,8 @@ const (
 	CollectionPlaces Collections = "places"
 )
 
+var AllCollections = []Collections{CollectionUsers, CollectionPlaces}
+
 type Queues string
 
 const (
