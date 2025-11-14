@@ -30,6 +30,8 @@ func DumpDb(verbose ...bool) error {
 				fmt.Println(message)
 			}
 			return errors.New(message)
+		} else if isVerbose {
+			fmt.Printf("✅ Collection %s cleared!\n", name)
 		}
 	}
 
