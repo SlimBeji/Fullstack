@@ -14,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Constructor & Functions & Properties
@@ -36,6 +37,18 @@ func GetPlaceCollection() *PlaceCollection {
 		PlaceCol = NewPlaceCollection()
 	}
 	return PlaceCol
+}
+
+// Helpers
+
+func checkCreator(
+	sc mongo.SessionContext, creatorId primitive.ObjectID,
+) bool {
+	filter := bson.M{"_id": creatorId}
+	db := clients.GetMongoDB(sc.Client())
+	collection := db.Collection(string(types_.CollectionUsers))
+	count, _ := collection.CountDocuments(sc, filter, options.Count().SetLimit(1))
+	return count > 0
 }
 
 // Serialization
@@ -222,6 +235,10 @@ func (pc *PlaceCollection) ToDBDoc(
 func (pc *PlaceCollection) PreCreate(
 	sc mongo.SessionContext, doc *schemas.PlaceDB,
 ) error {
+	if !checkCreator(sc, doc.CreatorID) {
+		return fmt.Errorf("user %s does not exists", doc.CreatorID.Hex())
+	}
+
 	return nil
 }
 
@@ -316,6 +333,11 @@ func (pc *PlaceCollection) AuthUpdate(
 func (pc *PlaceCollection) PreUpdate(
 	sc mongo.SessionContext, before bson.Raw, form *schemas.PlaceUpdate,
 ) error {
+	if form.CreatorID != nil {
+		if !checkCreator(sc, *form.CreatorID) {
+			return fmt.Errorf("user %s does not exists", (*form.CreatorID).Hex())
+		}
+	}
 	return nil
 }
 
