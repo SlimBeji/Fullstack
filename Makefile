@@ -140,4 +140,4 @@ gin-seed:
 	docker exec -it gin go run /app/cmd/scripts seed
 
 gin-dump:
-	docker exec -it gin go run /app/cmd/scripts seed
+	docker exec -it gin go run /app/cmd/scripts dump

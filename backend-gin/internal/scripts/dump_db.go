@@ -1,7 +1,9 @@
 package scripts
 
-import "fmt"
+import (
+	"backend/internal/models/examples"
+)
 
 func DumpDb() {
-	fmt.Println("Dumping the database")
+	examples.DumpDb(true)
 }
