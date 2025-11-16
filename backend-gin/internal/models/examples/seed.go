@@ -2,39 +2,165 @@ package examples
 
 import (
 	"backend/internal/lib/clients"
+	"backend/internal/models/collections"
+	"backend/internal/models/crud"
+	"backend/internal/models/schemas"
 	"backend/internal/types_"
+	"context"
 	"errors"
 	"fmt"
+	"sync"
+
+	"github.com/jinzhu/copier"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/sync/errgroup"
 )
 
 func createCollections(mc *clients.MongoClient, isVerbose bool) error {
+	var eg errgroup.Group
+
 	for _, collection := range types_.AllCollections {
 		name := string(collection)
-		err := mc.CreateCollection(name)
-		if err != nil {
-			if isVerbose {
-				fmt.Printf(
-					"could not create collection %s: %s", name, err.Error(),
+		eg.Go(func() error {
+			if err := mc.CreateCollection(name); err != nil {
+				if isVerbose {
+					fmt.Printf(
+						"could not create collection %s: %s", name, err.Error(),
+					)
+				}
+				return fmt.Errorf(
+					"could not create collection %s: %w", name, err,
 				)
 			}
-			return fmt.Errorf(
-				"could not create collection %s: %w", name, err,
-			)
-		}
+			return nil
+		})
 	}
-	return nil
+	return eg.Wait()
 }
 
-func seedUsers(mc *clients.MongoClient, isVerbose bool) error {
-	return nil
+func seedUsers(refs RefMappings, isVerbose bool) error {
+	userRefs := make(map[int]primitive.ObjectID)
+	refs[types_.CollectionUsers] = userRefs
+	uc := collections.GetUserCollection()
+	storage := clients.GetStorage()
+	ctx := context.Background()
+
+	handleError := func(err error, isVerbose bool) error {
+		if isVerbose {
+			fmt.Println(err.Error())
+		}
+		return fmt.Errorf(
+			"could not create user document: %w", err,
+		)
+	}
+
+	var eg errgroup.Group
+	var mu sync.Mutex
+	for _, userEx := range Users {
+		example := userEx // capture loop variable
+		eg.Go(func() error {
+			var userIn schemas.UserCreate
+			if err := copier.Copy(&userIn, &example); err != nil {
+				return handleError(err, isVerbose)
+			}
+
+			url, err := storage.UploadFile(userIn.ImageUrl)
+			if err != nil {
+				return handleError(err, isVerbose)
+			}
+			userIn.ImageUrl = url
+
+			raw, err := crud.InsertExample(uc, &userIn, ctx)
+			if err != nil {
+				return handleError(err, isVerbose)
+			}
+
+			mu.Lock()
+			userRefs[example.Ref] = raw.InsertedID.(primitive.ObjectID)
+			mu.Unlock()
+			return nil
+		})
+	}
+
+	return eg.Wait()
 }
 
-func seedPlaces(mc *clients.MongoClient, isVerbose bool) error {
-	return nil
+func seedPlaces(refs RefMappings, isVerbose bool) error {
+	placeRefs := make(map[int]primitive.ObjectID)
+	refs[types_.CollectionPlaces] = placeRefs
+	uc := collections.GetUserCollection()
+	pc := collections.GetPlaceCollection()
+	storage := clients.GetStorage()
+	ctx := context.Background()
+
+	handleError := func(err error, isVerbose bool) error {
+		if isVerbose {
+			fmt.Println(err.Error())
+		}
+		return fmt.Errorf(
+			"could not create place document: %w", err,
+		)
+	}
+
+	var eg errgroup.Group
+	var mu sync.Mutex
+	for _, placeEx := range Places {
+		example := placeEx // capture loop variable
+		eg.Go(func() error {
+			var placeIn schemas.PlaceCreate
+			if err := copier.Copy(&placeIn, &example); err != nil {
+				return handleError(err, isVerbose)
+			}
+
+			url, err := storage.UploadFile(placeIn.ImageUrl)
+			if err != nil {
+				return handleError(err, isVerbose)
+			}
+			placeIn.ImageUrl = url
+
+			creatorId, found := refs[types_.CollectionUsers][placeEx.CreatorRef]
+			if !found {
+				message := fmt.Sprintf(
+					"examples corrrupted, could not find user with ref %d while creating place with ref %d",
+					placeEx.CreatorRef,
+					placeEx.Ref,
+				)
+				if isVerbose {
+					fmt.Println(message)
+				}
+				return errors.New(message)
+			}
+			placeIn.CreatorID = creatorId
+
+			raw, err := crud.InsertExample(pc, &placeIn, ctx)
+			if err != nil {
+				return handleError(err, isVerbose)
+			}
+
+			insertedId := raw.InsertedID.(primitive.ObjectID)
+			update := bson.M{"$addToSet": bson.M{"places": insertedId}}
+			userFilter := bson.M{"_id": creatorId}
+			_, err = uc.FindOneAndUpdate(ctx, userFilter, update).Raw()
+			if err != nil {
+				handleError(err, isVerbose)
+			}
+
+			mu.Lock()
+			placeRefs[example.Ref] = insertedId
+			mu.Unlock()
+			return nil
+		})
+	}
+
+	return eg.Wait()
 }
+
+type RefMappings map[types_.Collections]map[int]primitive.ObjectID
 
 func SeedDb(verbose ...bool) error {
 	mc := clients.GetMongo()
+	refs := make(RefMappings)
 
 	isVerbose := false
 	if len(verbose) > 0 {
@@ -48,7 +174,7 @@ func SeedDb(verbose ...bool) error {
 		return err
 	}
 
-	if err := seedUsers(mc, isVerbose); err != nil {
+	if err := seedUsers(refs, isVerbose); err != nil {
 		if isVerbose {
 			fmt.Println(err.Error())
 		}
@@ -57,7 +183,7 @@ func SeedDb(verbose ...bool) error {
 		fmt.Println("✅ Collection User seeded!")
 	}
 
-	if err := seedPlaces(mc, isVerbose); err != nil {
+	if err := seedPlaces(refs, isVerbose); err != nil {
 		if isVerbose {
 			fmt.Println(err.Error())
 		}
