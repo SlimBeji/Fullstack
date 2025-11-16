@@ -267,7 +267,7 @@ var embedding2 = []float64{
 	-0.015591200441122055, 0.0348491407930851, -0.05045893415808678,
 }
 
-var Places = []schemas.PlacSeed{
+var Places = []schemas.PlaceSeed{
 	{
 		Ref:         1,
 		CreatorRef:  1,

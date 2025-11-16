@@ -26,7 +26,7 @@ type PlaceDB struct {
 	UpdatedAt   time.Time          `json:"updatedAt" bson:"updatedAt"`
 }
 
-type PlacSeed struct {
+type PlaceSeed struct {
 	Ref         int
 	CreatorRef  int
 	Title       string    `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum

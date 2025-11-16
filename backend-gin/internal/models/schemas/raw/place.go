@@ -33,7 +33,7 @@ type PlaceDB struct {
 }
 
 // schemas:tag
-type PlacSeed struct {
+type PlaceSeed struct {
 	Ref         int
 	CreatorRef  int
 	Title       any      `tag:"title"`
