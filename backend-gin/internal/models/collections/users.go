@@ -228,11 +228,6 @@ func (uc *UserCollection) ToCreateForm(
 		return form, err
 	}
 
-	form.Password, err = encryption.HashInput(form.Password)
-	if err != nil {
-		return form, fmt.Errorf("could not hash password: %w", err)
-	}
-
 	if post.Image != nil {
 		var f types_.FileToUpload
 		f.FromMultipartHeader(post.Image)
@@ -254,13 +249,15 @@ func (uc *UserCollection) ToDBDoc(
 		return result, err
 	}
 
-	if !encryption.IsHashed(result.Password) {
-		return result, fmt.Errorf("password field is not hashed")
+	hashed, err := encryption.HashInput(form.Password)
+	if err != nil {
+		return result, fmt.Errorf("could not hash password: %w", err)
 	}
 
 	result.UpdatedAt = time.Now()
 	result.CreatedAt = time.Now()
 	result.Places = []string{}
+	result.Password = hashed
 	return result, nil
 }
 
