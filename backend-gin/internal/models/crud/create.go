@@ -26,9 +26,25 @@ type DocumentCreator[Read any, Db any, Form any, Post any] interface {
 	AuthCreate(*schemas.UserRead, *Post) error
 }
 
+func InsertExample[Read any, Db any, Form any, Post any](
+	dc DocumentCreator[Read, Db, Form, Post],
+	form *Form,
+	ctx context.Context,
+) (*mongo.InsertOneResult, error) {
+	var result mongo.InsertOneResult
+
+	docIn, err := dc.ToDBDoc(form)
+	if err != nil {
+		return &result, err
+	}
+
+	return dc.InsertOne(ctx, docIn)
+}
+
 func CreateDocument[Read any, Db any, Form any, Post any](
 	dc DocumentCreator[Read, Db, Form, Post],
-	form *Form, ctx context.Context,
+	form *Form,
+	ctx context.Context,
 ) (bson.Raw, error) {
 	var result bson.Raw
 
