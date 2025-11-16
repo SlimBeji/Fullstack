@@ -228,7 +228,6 @@ func (pc *PlaceCollection) ToDBDoc(
 
 	result.UpdatedAt = time.Now()
 	result.CreatedAt = time.Now()
-	result.Embedding = []float64{}
 	return result, nil
 }
 
