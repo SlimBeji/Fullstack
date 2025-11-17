@@ -1,17 +1,12 @@
 package main
 
 import (
-	"backend/internal/api/middlewares"
 	"backend/internal/api/routes"
 	"backend/internal/config"
 	"backend/internal/lib/clients"
 	"fmt"
 
 	_ "backend/internal/api/docs"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @tag.name Auth
@@ -28,10 +23,6 @@ func main() {
 	// Initialize DBS connection
 	dbs := clients.GetDbs()
 	defer dbs.Close()
-
-	r := gin.Default()
-	r.Use(middlewares.CORS())
-	routes.RegisterRoutes(r)
-	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r := routes.SetupRouter()
 	r.Run(fmt.Sprintf(":%d", config.Env.Port))
 }
