@@ -75,7 +75,7 @@ func BuildFindQuery(
 				findQuery.Filters = make(types_.FindQueryFilters)
 			}
 			if len(val) > 0 {
-				findQuery.Filters[type_.Name] = val
+				findQuery.Filters[type_.Tag.Get("json")] = val
 			}
 		}
 	}
