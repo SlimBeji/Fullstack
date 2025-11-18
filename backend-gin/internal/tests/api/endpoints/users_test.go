@@ -6,6 +6,7 @@ import (
 	"backend/internal/lib/encryption"
 	"backend/internal/models/collections"
 	"backend/internal/types_"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -64,5 +65,74 @@ func TestFetchUsers(t *testing.T) {
 
 	if len(resp.Data) == 0 {
 		t.Fatalf("missing data")
+	}
+}
+
+func TestQueryUsers(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	uc := collections.GetUserCollection()
+	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	if err != nil {
+		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+	}
+	token, err := encryption.CreateToken(user.Id, "beji.slim@yahoo.fr")
+	if err != nil {
+		t.Fatal("Could not create token for beji.slim@yahoo.fr")
+	}
+	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
+
+	// sending the request
+	payload := map[string]any{
+		"email":  []string{"regex:@gmail.com"},
+		"fields": []string{"email", "name"},
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal("could not marshal data for TestQueryUsers")
+	}
+	formReader := bytes.NewReader(body)
+	req := httptest.NewRequest(http.MethodPost, "/api/users/query", formReader)
+	req.Header.Set("Authorization", bearerToken)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+
+	type UserData struct {
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}
+	var resp types_.RecordsPaginated[UserData]
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("invalid JSON: %v", err)
+	}
+
+	if resp.Page != 1 {
+		t.Fatalf("expected to get only one page")
+	}
+
+	if resp.TotalPages != 1 {
+		t.Fatalf("expected totalPages to be 1")
+	}
+
+	if resp.TotalCount != 1 {
+		t.Fatalf("expected totalPages to be 1")
+	}
+
+	if resp.Data[0].Name != "Slim Beji" {
+		t.Fatalf("expected user name to be Slim Beji")
+	}
+
+	if resp.Data[0].Email != "mslimbeji@gmail.com" {
+		t.Fatalf("expected user email to be mslimbeji@gmail.com")
 	}
 }
