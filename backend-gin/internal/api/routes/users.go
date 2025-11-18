@@ -3,6 +3,7 @@ package routes
 import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/utils"
+	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"fmt"
@@ -21,9 +22,13 @@ import (
 // @Router       /api/users/ [get]
 func getUsers(c *gin.Context) {
 	findQuery, _ := utils.GetBody[types_.FindQuery](c)
-	fmt.Println(findQuery)
-	user := c.MustGet("currentUser").(schemas.UserRead)
-	c.JSON(http.StatusOK, user)
+	uc := collections.GetUserCollection()
+	data, err := uc.FetchBsonPage(&findQuery, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, data)
 }
 
 // @Summary      Search and Retrieve users
