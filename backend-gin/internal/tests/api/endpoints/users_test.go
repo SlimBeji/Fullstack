@@ -5,6 +5,7 @@ import (
 	"backend/internal/lib/backendsync"
 	"backend/internal/lib/encryption"
 	"backend/internal/models/collections"
+	"backend/internal/types_"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -27,11 +28,11 @@ func TestFetchUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal("Could not create token for beji.slim@yahoo.fr")
 	}
-	access_token := fmt.Sprintf("Bearer %s", token.AccessToken)
+	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
 	req := httptest.NewRequest(http.MethodGet, "/api/users", nil)
-	req.Header.Set("Authorization", access_token)
+	req.Header.Set("Authorization", bearerToken)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -44,25 +45,24 @@ func TestFetchUsers(t *testing.T) {
 		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
 	}
 
-	var resp map[string]any
+	var resp types_.RecordsPaginated[any]
 	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 
-	if _, ok := resp["page"]; !ok {
-		t.Fatalf("%s", resp)
-		t.Fatalf("missing page")
+	if resp.Page != 1 {
+		t.Fatalf("expected to get only one page")
 	}
 
-	if _, ok := resp["totalPages"]; !ok {
-		t.Fatalf("missing totalPages")
+	if resp.TotalPages != 1 {
+		t.Fatalf("expected totalPages to be 1")
 	}
 
-	if _, ok := resp["totalCount"]; !ok {
-		t.Fatalf("missing totalCount")
+	if resp.TotalCount != 2 {
+		t.Fatalf("expected totalPages to be 2")
 	}
 
-	if _, ok := resp["data"]; !ok {
+	if len(resp.Data) == 0 {
 		t.Fatalf("missing data")
 	}
 }
