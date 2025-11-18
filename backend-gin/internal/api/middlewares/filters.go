@@ -4,6 +4,7 @@ import (
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
@@ -15,9 +16,13 @@ func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 	queryParams := c.Request.URL.Query()
 	paramsMap := make(map[string]any)
 	for key, values := range queryParams {
-		if key == "page" || key == "size" {
+		switch key {
+		case "page", "size":
 			paramsMap[key] = values[0]
-		} else {
+		case "sort", "fields":
+			paramsMap[key] = strings.Split(values[0], ",")
+		default:
+			// Filter fields here
 			paramsMap[key] = c.QueryArray(key)
 		}
 	}
