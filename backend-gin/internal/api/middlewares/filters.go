@@ -27,6 +27,7 @@ func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 		}
 	}
 
+	// using WeaklyTypedInput for easy int conversion like "1"->1
 	decoderConfig := &mapstructure.DecoderConfig{
 		Result:           &body,
 		TagName:          "json",
