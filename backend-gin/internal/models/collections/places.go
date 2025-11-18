@@ -69,6 +69,11 @@ func (pc *PlaceCollection) PostProcess(item *schemas.PlaceRead) error {
 }
 
 func (pc *PlaceCollection) PostProcessBson(item bson.M) error {
+	if id, exists := item["_id"]; exists {
+		item["id"] = id
+		delete(item, "_id")
+	}
+
 	imageUrl, exists := item["imageUrl"]
 	if !exists {
 		return nil

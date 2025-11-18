@@ -59,6 +59,11 @@ func (uc *UserCollection) PostProcess(item *schemas.UserRead) error {
 }
 
 func (uc *UserCollection) PostProcessBson(item bson.M) error {
+	if id, exists := item["_id"]; exists {
+		item["id"] = id
+		delete(item, "_id")
+	}
+
 	imageUrl, exists := item["imageUrl"]
 	if !exists {
 		return nil
