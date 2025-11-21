@@ -303,3 +303,77 @@ func TestGetUserById(t *testing.T) {
 		t.Fatalf("expected name to be Mohamed Slim Beji, got %s", resp.Name)
 	}
 }
+
+func TestDeleteUserAsAdmin(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	uc := collections.GetUserCollection()
+	user, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
+	if err != nil {
+		t.Fatal("Could not extract user mslimbeji@gmail.com")
+	}
+	token, err := encryption.CreateToken(user.Id, user.Email)
+	if err != nil {
+		t.Fatalf("Could not create token for %s", user.Email)
+	}
+	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
+
+	// sending the request
+	url := fmt.Sprintf("/api/users/%s", user.Id)
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
+	req.Header.Set("Authorization", bearerToken)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+
+	var resp routes.UserDeleteResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("invalid JSON: %v", err)
+	}
+
+	expected := fmt.Sprintf("Deleted user %s", user.Id)
+	if resp.Message != expected {
+		t.Fatalf("expected %s, got %s", expected, resp.Message)
+	}
+}
+
+func TestDeleteUserAsNonAdmin(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	uc := collections.GetUserCollection()
+	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	if err != nil {
+		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+	}
+	token, err := encryption.CreateToken(user.Id, user.Email)
+	if err != nil {
+		t.Fatalf("Could not create token for %s", user.Email)
+	}
+	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
+
+	// sending the request
+	url := fmt.Sprintf("/api/users/%s", user.Id)
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
+	req.Header.Set("Authorization", bearerToken)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+}

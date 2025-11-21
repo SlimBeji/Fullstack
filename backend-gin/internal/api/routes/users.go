@@ -121,6 +121,13 @@ type UserDeleteResponse struct {
 // @Router       /api/users/{userId} [delete]
 func deleteUser(c *gin.Context) {
 	userId := c.Param("userId")
+	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	uc := collections.GetUserCollection()
+	err := uc.UserDelete(&currentUser, userId, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
 	message := fmt.Sprintf("Deleted user %s", userId)
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
