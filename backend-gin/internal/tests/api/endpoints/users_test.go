@@ -30,9 +30,9 @@ func TestFetchUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal("Could not extract user beji.slim@yahoo.fr")
 	}
-	token, err := encryption.CreateToken(user.Id, "beji.slim@yahoo.fr")
+	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
-		t.Fatal("Could not create token for beji.slim@yahoo.fr")
+		t.Fatalf("Could not create token for %s", user.Email)
 	}
 	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
@@ -268,9 +268,9 @@ func TestGetUserById(t *testing.T) {
 	if err != nil {
 		t.Fatal("Could not extract user beji.slim@yahoo.fr")
 	}
-	token, err := encryption.CreateToken(user.Id, "beji.slim@yahoo.fr")
+	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
-		t.Fatal("Could not create token for beji.slim@yahoo.fr")
+		t.Fatalf("Could not create token for %s", user.Email)
 	}
 	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
