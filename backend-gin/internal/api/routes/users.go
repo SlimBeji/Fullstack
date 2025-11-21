@@ -61,9 +61,14 @@ func queryUsers(c *gin.Context) {
 // @Router       /api/users [post]
 func createUser(c *gin.Context) {
 	body, _ := utils.GetBody[schemas.UserPost](c)
-	fmt.Println(body)
-	user := c.MustGet("currentUser").(schemas.UserRead)
-	c.JSON(http.StatusOK, user)
+	uc := collections.GetUserCollection()
+	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	newUser, err := uc.UserCreate(&currentUser, &body, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, newUser)
 }
 
 // @Summary      Search and Retrieve user by id
