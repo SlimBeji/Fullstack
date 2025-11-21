@@ -2,44 +2,44 @@ imports:
     - mime/multipart
 fields:
     userId:
-        type: "string"
-        validate: "hexadecimal,len=24"
-        description: "The user ID, 24 characters"
-        example: "683b21134e2e5d46978daf1f"
+        type: 'string'
+        validate: 'hexadecimal,len=24'
+        description: 'The user ID, 24 characters'
+        example: '683b21134e2e5d46978daf1f'
     email:
-        type: "string"
-        validate: "email"
-        description: "The user email"
-        example: "mslimbeji@gmail.com"
+        type: 'string'
+        validate: 'email'
+        description: 'The user email'
+        example: 'mslimbeji@gmail.com'
     username:
-        type: "string"
-        validate: "email"
-        description: "The user email (We use username here because of OAuth spec)"
-        example: "mslimbeji@gmail.com"
+        type: 'string'
+        validate: 'email'
+        description: 'The user email (We use username here because of OAuth spec)'
+        example: 'mslimbeji@gmail.com'
     name:
-        type: "string"
-        validate: "min=2"
-        description: "The user name, two characters at least"
-        example: "Slim Beji"
+        type: 'string'
+        validate: 'min=2'
+        description: 'The user name, two characters at least'
+        example: 'Slim Beji'
     password:
-        type: "string"
-        validate: "min=8"
-        description: "The user password, 8 characters at least"
-        example: "very_secret"
+        type: 'string'
+        validate: 'min=10'
+        description: 'The user password, 10 characters at least'
+        example: 'very_secret'
     image:
-        type: "*multipart.FileHeader"
+        type: '*multipart.FileHeader'
         description: "User's profile image (JPEG)"
         swaggerignore: true
     access_token:
-        type: "string"
+        type: 'string'
         description: "A generated web token. The 'Bearer ' prefix needs to be added for authentication"
-        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM'
     token_type:
-        type: "string"
-        validate: "oneof=bearer"
+        type: 'string'
+        validate: 'oneof=bearer'
         description: "The type of token. Only 'bearer' is supported."
-        example: "bearer"
+        example: 'bearer'
     expires_in:
-        type: "int"
-        description: "The UNIX timestamp the token expires at"
+        type: 'int'
+        description: 'The UNIX timestamp the token expires at'
         example: 1751879562

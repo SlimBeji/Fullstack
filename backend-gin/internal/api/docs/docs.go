@@ -29,10 +29,10 @@ const docTemplate = `{
                 "summary": "User authentication",
                 "parameters": [
                     {
-                        "minLength": 8,
+                        "minLength": 10,
                         "type": "string",
                         "default": "very_secret",
-                        "description": "The user password, 8 characters at least",
+                        "description": "The user password, 10 characters at least",
                         "name": "password",
                         "in": "formData"
                     },
@@ -83,10 +83,10 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "minLength": 8,
+                        "minLength": 10,
                         "type": "string",
                         "example": "very_secret",
-                        "description": "The user password, 8 characters at least",
+                        "description": "The user password, 10 characters at least",
                         "name": "password",
                         "in": "formData"
                     },
@@ -623,10 +623,10 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "minLength": 8,
+                        "minLength": 10,
                         "type": "string",
                         "example": "very_secret",
-                        "description": "The user password, 8 characters at least",
+                        "description": "The user password, 10 characters at least",
                         "name": "password",
                         "in": "formData"
                     },
@@ -1271,9 +1271,9 @@ const docTemplate = `{
                     "example": "Slim Beji"
                 },
                 "password": {
-                    "description": "The user password, 8 characters at least",
+                    "description": "The user password, 10 characters at least",
                     "type": "string",
-                    "minLength": 8,
+                    "minLength": 10,
                     "example": "very_secret"
                 }
             }

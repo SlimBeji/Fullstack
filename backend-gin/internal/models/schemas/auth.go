@@ -11,15 +11,15 @@ type TokenPayload struct {
 }
 
 type SignupForm struct {
-	Name     string                `json:"name" form:"name" validate:"min=2" example:"Slim Beji" bson:"name"`               // The user name, two characters at least
-	Email    string                `json:"email" form:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`  // The user email
-	Password string                `json:"password" form:"password" validate:"min=8" example:"very_secret" bson:"password"` // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`       // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`   // The user email
+	Password string                `json:"password" form:"password" validate:"min=10" example:"very_secret" bson:"password"` // The user password, 10 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`        // User's profile image (JPEG)
 }
 
 type SigninForm struct {
 	Username string `json:"username" form:"username" validate:"email" default:"mslimbeji@gmail.com" bson:"username"` // The user email (We use username here because of OAuth spec)
-	Password string `json:"password" form:"password" validate:"min=8" default:"very_secret" bson:"password"`         // The user password, 8 characters at least
+	Password string `json:"password" form:"password" validate:"min=10" default:"very_secret" bson:"password"`        // The user password, 10 characters at least
 }
 
 type EncodedToken struct {
