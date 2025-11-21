@@ -3,13 +3,10 @@ package endpoints
 import (
 	"backend/internal/api/routes"
 	"backend/internal/lib/backendsync"
-	"backend/internal/lib/encryption"
 	"backend/internal/lib/utils"
-	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -25,20 +22,14 @@ func TestFetchUsers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
 	req := httptest.NewRequest(http.MethodGet, "/api/users", nil)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -77,16 +68,10 @@ func TestQueryUsers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
 	payload := map[string]any{
@@ -99,7 +84,7 @@ func TestQueryUsers(t *testing.T) {
 	}
 	formReader := bytes.NewReader(body)
 	req := httptest.NewRequest(http.MethodPost, "/api/users/query", formReader)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -146,16 +131,10 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
+	token, err := getToken(adminEmail)
 	if err != nil {
-		t.Fatal("Could not extract user mslimbeji@gmail.com")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// creating form
 	buffer := &bytes.Buffer{}
@@ -179,7 +158,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 
 	// sending the request
 	req := httptest.NewRequest(http.MethodPost, "/api/users", buffer)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -215,16 +194,10 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// creating form
 	buffer := &bytes.Buffer{}
@@ -248,7 +221,7 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 
 	// sending the request
 	req := httptest.NewRequest(http.MethodPost, "/api/users", buffer)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -263,21 +236,15 @@ func TestGetUserById(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
-	url := fmt.Sprintf("/api/users/%s", user.Id)
+	url := fmt.Sprintf("/api/users/%s", token.UserId)
 	req := httptest.NewRequest(http.MethodGet, url, nil)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -308,16 +275,10 @@ func TestUpdateUser(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
 	payload := map[string]any{"name": "Slim El Beji"}
@@ -326,9 +287,9 @@ func TestUpdateUser(t *testing.T) {
 		t.Fatal("could not marshal data for TestUpdateUser")
 	}
 	formReader := bytes.NewReader(body)
-	url := fmt.Sprintf("/api/users/%s", user.Id)
+	url := fmt.Sprintf("/api/users/%s", token.UserId)
 	req := httptest.NewRequest(http.MethodPut, url, formReader)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -359,20 +320,14 @@ func TestUpdateOtherUsers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	admin, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user mslimbeji@gmail.com")
+		t.Fatal(err.Error())
 	}
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	admin, err := getUser(adminEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
 	payload := map[string]any{"name": "Slim El Beji"}
@@ -383,7 +338,7 @@ func TestUpdateOtherUsers(t *testing.T) {
 	formReader := bytes.NewReader(body)
 	url := fmt.Sprintf("/api/users/%s", admin.Id)
 	req := httptest.NewRequest(http.MethodPut, url, formReader)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -401,21 +356,15 @@ func TestDeleteUserAsAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
+	token, err := getToken(adminEmail)
 	if err != nil {
-		t.Fatal("Could not extract user mslimbeji@gmail.com")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
-	url := fmt.Sprintf("/api/users/%s", user.Id)
+	url := fmt.Sprintf("/api/users/%s", token.UserId)
 	req := httptest.NewRequest(http.MethodDelete, url, nil)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -433,7 +382,7 @@ func TestDeleteUserAsAdmin(t *testing.T) {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 
-	expected := fmt.Sprintf("Deleted user %s", user.Id)
+	expected := fmt.Sprintf("Deleted user %s", token.UserId)
 	if resp.Message != expected {
 		t.Fatalf("expected %s, got %s", expected, resp.Message)
 	}
@@ -443,21 +392,15 @@ func TestDeleteUserAsNonAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	backendsync.SeedTestData()
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	token, err := getToken(userEmail)
 	if err != nil {
-		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+		t.Fatal(err.Error())
 	}
-	token, err := encryption.CreateToken(user.Id, user.Email)
-	if err != nil {
-		t.Fatalf("Could not create token for %s", user.Email)
-	}
-	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
 
 	// sending the request
-	url := fmt.Sprintf("/api/users/%s", user.Id)
+	url := fmt.Sprintf("/api/users/%s", token.UserId)
 	req := httptest.NewRequest(http.MethodDelete, url, nil)
-	req.Header.Set("Authorization", bearerToken)
+	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
