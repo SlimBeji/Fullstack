@@ -100,10 +100,15 @@ func getUser(c *gin.Context) {
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users/{userId} [put]
 func updateUser(c *gin.Context) {
+	userId := c.Param("userId")
+	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	uc := collections.GetUserCollection()
 	body, _ := utils.GetBody[schemas.UserPut](c)
-	fmt.Println(body)
-	fmt.Println(c.Param("userId"))
-	user := c.MustGet("currentUser").(schemas.UserRead)
+	user, err := uc.UserUpdateById(&currentUser, userId, &body, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
 	c.JSON(http.StatusOK, user)
 }
 
