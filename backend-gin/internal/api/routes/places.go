@@ -111,6 +111,13 @@ type PlaceDeleteResponse struct {
 // @Router       /api/places/{placeId} [delete]
 func deletePlace(c *gin.Context) {
 	placeId := c.Param("placeId")
+	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	pc := collections.GetPlaceCollection()
+	err := pc.UserDelete(&currentUser, placeId, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
 	message := fmt.Sprintf("Deleted place %s", placeId)
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
