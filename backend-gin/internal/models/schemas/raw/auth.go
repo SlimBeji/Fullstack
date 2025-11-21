@@ -2,6 +2,8 @@
 
 package raw
 
+import "fmt"
+
 // schemas:tag
 type TokenPayload struct {
 	UserId any `tag:"userId"`
@@ -29,4 +31,8 @@ type EncodedToken struct {
 	UserId      any `tag:"userId"`
 	Email       any `tag:"email"`
 	ExpiresIn   any `tag:"expires_in"`
+}
+
+func (et *EncodedToken) Bearer() string {
+	return fmt.Sprintf("Bearer %s", et.AccessToken)
 }

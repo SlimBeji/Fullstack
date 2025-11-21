@@ -2,6 +2,7 @@
 package schemas
 
 import (
+	"fmt"
 	"mime/multipart"
 )
 
@@ -28,4 +29,8 @@ type EncodedToken struct {
 	UserId      string `json:"userId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"userId"`                                                                                                                                                                              // The user ID, 24 characters
 	Email       string `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                                                                                                                                                                                  // The user email
 	ExpiresIn   int    `json:"expires_in" example:"1751879562" bson:"expires_in"`                                                                                                                                                                                                                  // The UNIX timestamp the token expires at
+}
+
+func (et *EncodedToken) Bearer() string {
+	return fmt.Sprintf("Bearer %s", et.AccessToken)
 }
