@@ -3,6 +3,7 @@ package routes
 import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/utils"
+	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"fmt"
@@ -10,18 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-func dummyPlace() schemas.PlaceRead {
-	var place schemas.PlaceRead
-	place.ID = "683b21134e2e5d46978daf1f"
-	place.Title = "Stamford Bridge"
-	place.Description = "Stadium of Chelsea football club"
-	place.Address = "Fulham road"
-	place.Location = schemas.Location{Lat: 51.48180425016331, Lng: -0.19090418688755467}
-	place.ImageUrl = "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
-	place.CreatorID = "683b21134e2e5d46978daf1f"
-	return place
-}
 
 // @Summary      Search and Filter places
 // @Tags         Place
@@ -75,9 +64,14 @@ func createPlace(c *gin.Context) {
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places/{placeId} [get]
 func getPlace(c *gin.Context) {
+	pc := collections.GetPlaceCollection()
 	placeId := c.Param("placeId")
-	fmt.Println(placeId)
-	c.JSON(http.StatusOK, dummyPlace())
+	place, err := pc.GetById(placeId, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, place)
 }
 
 // @Summary      Update places
