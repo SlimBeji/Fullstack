@@ -80,8 +80,13 @@ func createUser(c *gin.Context) {
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users/{userId} [get]
 func getUser(c *gin.Context) {
-	fmt.Println(c.Param("userId"))
-	user := c.MustGet("currentUser").(schemas.UserRead)
+	uc := collections.GetUserCollection()
+	userId := c.Param("userId")
+	user, err := uc.GetById(userId, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
 	c.JSON(http.StatusOK, user)
 }
 

@@ -199,12 +199,11 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	}
 
 	if resp.Email != "test@test.com" {
-		t.Fatalf("%s", w.Body.String())
 		t.Fatalf("expected email to be test@test.com, got %s", resp.Email)
 	}
 
 	if resp.Name != "Test Van Test" {
-		t.Fatalf("expected name to be TestVanTest, got %s", resp.Name)
+		t.Fatalf("expected name to be Test Van Test, got %s", resp.Name)
 	}
 
 	if resp.IsAdmin != true {
@@ -257,5 +256,50 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 	// checking request response
 	if w.Code != http.StatusUnauthorized {
 		t.Fatalf("expected 401, got %d", w.Code)
+	}
+}
+
+func TestGetUserById(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	uc := collections.GetUserCollection()
+	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
+	if err != nil {
+		t.Fatal("Could not extract user beji.slim@yahoo.fr")
+	}
+	token, err := encryption.CreateToken(user.Id, "beji.slim@yahoo.fr")
+	if err != nil {
+		t.Fatal("Could not create token for beji.slim@yahoo.fr")
+	}
+	bearerToken := fmt.Sprintf("Bearer %s", token.AccessToken)
+
+	// sending the request
+	url := fmt.Sprintf("/api/users/%s", user.Id)
+	req := httptest.NewRequest(http.MethodGet, url, nil)
+	req.Header.Set("Authorization", bearerToken)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+
+	var resp schemas.UserRead
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("invalid JSON: %v", err)
+	}
+
+	if resp.Email != "beji.slim@yahoo.fr" {
+		t.Fatalf("expected email to be beji.slim@yahoo.fr, got %s", resp.Email)
+	}
+
+	if resp.Name != "Mohamed Slim Beji" {
+		t.Fatalf("expected name to be Mohamed Slim Beji, got %s", resp.Name)
 	}
 }
