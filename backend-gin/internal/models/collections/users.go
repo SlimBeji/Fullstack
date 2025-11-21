@@ -142,22 +142,33 @@ func (uc *UserCollection) GetByEmail(
 	return crud.Get(uc, bson.M{"email": email}, ctx)
 }
 
-func (uc *UserCollection) GetBearer(
+func (uc *UserCollection) GetTokenPayload(
 	email string, ctx context.Context,
-) (string, error) {
+) (schemas.EncodedToken, error) {
+	var zero schemas.EncodedToken
 	user, err := uc.GetByEmail(email, ctx)
 	if err != nil {
-		return "", fmt.Errorf(
+		return zero, fmt.Errorf(
 			"could not extract user with email %s: %w", email, err,
 		)
 	}
 
 	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
-		return "", fmt.Errorf("could not create token for user %s: %w", email, err)
+		return zero, fmt.Errorf("could not create token for user %s: %w", email, err)
 	}
 
-	return "Bearer " + token.AccessToken, nil
+	return token, nil
+}
+
+func (uc *UserCollection) GetBearer(
+	email string, ctx context.Context,
+) (string, error) {
+	token, err := uc.GetTokenPayload(email, ctx)
+	if err != nil {
+		return "", err
+	}
+	return token.Bearer(), nil
 }
 
 func (uc *UserCollection) UserGetById(
