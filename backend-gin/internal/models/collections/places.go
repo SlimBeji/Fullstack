@@ -309,21 +309,23 @@ func (pc *PlaceCollection) ToUpdateForm(
 ) (schemas.PlaceUpdate, error) {
 	var result schemas.PlaceUpdate
 
-	creatorId, err := primitive.ObjectIDFromHex(*put.CreatorID)
-	if err != nil {
-		return result, fmt.Errorf(
-			"creatorId %s is not a valid objectId", *put.CreatorID,
-		)
-	}
-
-	err = copier.Copy(&result, put)
+	err := copier.Copy(&result, put)
 	if err != nil {
 		return result, fmt.Errorf(
 			"could not copy Put form: %w", err,
 		)
 	}
 
-	result.CreatorID = &creatorId
+	if put.CreatorID != nil {
+		creatorId, err := primitive.ObjectIDFromHex(*put.CreatorID)
+		if err != nil {
+			return result, fmt.Errorf(
+				"creatorId %s is not a valid objectId", *put.CreatorID,
+			)
+		}
+		result.CreatorID = &creatorId
+	}
+
 	return result, nil
 }
 
