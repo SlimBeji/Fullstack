@@ -80,7 +80,7 @@ func TestQueryUsers(t *testing.T) {
 	uc := collections.GetUserCollection()
 	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
 	if err != nil {
-		t.Fatalf("Could not extract user %s", user.Email)
+		t.Fatal("Could not extract user beji.slim@yahoo.fr")
 	}
 	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
@@ -149,7 +149,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	uc := collections.GetUserCollection()
 	user, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
 	if err != nil {
-		t.Fatalf("Could not extract user %s", user.Email)
+		t.Fatal("Could not extract user mslimbeji@gmail.com")
 	}
 	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
@@ -218,7 +218,7 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 	uc := collections.GetUserCollection()
 	user, err := uc.GetByEmail("beji.slim@yahoo.fr", context.Background())
 	if err != nil {
-		t.Fatalf("Could not extract user %s", user.Email)
+		t.Fatal("Could not extract user beji.slim@yahoo.fr")
 	}
 	token, err := encryption.CreateToken(user.Id, user.Email)
 	if err != nil {
