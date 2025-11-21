@@ -56,7 +56,7 @@ func MergeUnique[T comparable](l1, l2 []T) []T {
 	result := make([]T, 0, maxCapacity)
 	seen := make(map[T]struct{}, maxCapacity)
 	for _, item := range l1 {
-		if _, exists := seen[item]; exists {
+		if _, exists := seen[item]; !exists {
 			result = append(result, item)
 			seen[item] = struct{}{}
 		}
