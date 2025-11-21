@@ -51,8 +51,14 @@ func queryPlaces(c *gin.Context) {
 // @Router       /api/places [post]
 func createPlace(c *gin.Context) {
 	body, _ := utils.GetBody[schemas.PlacePost](c)
-	fmt.Println(body)
-	c.JSON(http.StatusOK, dummyPlace())
+	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	pc := collections.GetPlaceCollection()
+	place, err := pc.UserCreate(&currentUser, &body, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, place)
 }
 
 // @Summary      Search and Retrieve place by id
