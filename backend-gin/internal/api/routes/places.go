@@ -90,11 +90,16 @@ func getPlace(c *gin.Context) {
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places/{placeId} [put]
 func updatePlace(c *gin.Context) {
-	body, _ := utils.GetBody[schemas.PlacePut](c)
-	fmt.Println(body)
 	placeId := c.Param("placeId")
-	fmt.Println(placeId)
-	c.JSON(http.StatusOK, dummyPlace())
+	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	pc := collections.GetPlaceCollection()
+	body, _ := utils.GetBody[schemas.PlacePut](c)
+	place, err := pc.UserUpdateById(&currentUser, placeId, &body, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, place)
 }
 
 type PlaceDeleteResponse struct {

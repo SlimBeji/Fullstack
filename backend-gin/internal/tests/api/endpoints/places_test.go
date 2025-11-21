@@ -213,6 +213,99 @@ func TestGetPlaceById(t *testing.T) {
 	}
 }
 
+func TestUpdatePlaceById(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	token, err := getToken(adminEmail)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	examples, err := getPlaceExamples()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// sending the request
+	payload := map[string]any{
+		"description": "Stamford Bridge - Home of the Blues",
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal("could not marshal data for TestUpdatePlaceById")
+	}
+	formReader := bytes.NewReader(body)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	req := httptest.NewRequest(http.MethodPut, url, formReader)
+	req.Header.Set("Authorization", token.Bearer())
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+
+	var resp schemas.PlaceRead
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("invalid JSON: %v", err)
+	}
+
+	if resp.Address != "Fulham Road, London" {
+		t.Fatalf("expected email to be Fulham Road, London, got %s", resp.Address)
+	}
+
+	if resp.Title != "Stamford Bridge" {
+		t.Fatalf("expected name to be Stamford Bridge, got %s", resp.Title)
+	}
+
+	if resp.Description != "Stamford Bridge - Home of the Blues" {
+		t.Fatalf("expected name to be Stamford Bridge - Home of the Blues, got %s", resp.Description)
+	}
+}
+
+func TestUpdatePlaceForOthers(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	token, err := getToken(userEmail)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	examples, err := getPlaceExamples()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// sending the request
+	payload := map[string]any{
+		"description": "Stamford Bridge - Home of the Blues",
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal("could not marshal data for TestUpdatePlaceById")
+	}
+	formReader := bytes.NewReader(body)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	req := httptest.NewRequest(http.MethodPut, url, formReader)
+	req.Header.Set("Authorization", token.Bearer())
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+}
+
 func TestDeletePlaceForOthers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
