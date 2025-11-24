@@ -76,7 +76,7 @@ func TestGetPlaces(t *testing.T) {
 	}
 
 	if resp.TotalCount != 1 {
-		t.Fatalf("expected totalPages to be 2")
+		t.Fatalf("expected totalPages to be 1")
 	}
 
 	if len(resp.Data) == 0 {
