@@ -22,8 +22,13 @@ import (
 // @Router       /api/places/ [get]
 func getPlaces(c *gin.Context) {
 	findQuery, _ := utils.GetBody[types_.FindQuery](c)
-	fmt.Println(findQuery)
-	c.JSON(http.StatusOK, dummyPlace())
+	pc := collections.GetPlaceCollection()
+	data, err := pc.FetchBsonPage(&findQuery, c)
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, data)
 }
 
 // @Summary      Search and Retrieve places

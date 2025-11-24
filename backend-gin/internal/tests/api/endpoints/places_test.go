@@ -37,6 +37,53 @@ func getPlaceExamples() ([]schemas.PlaceRead, error) {
 	return data.Data, nil
 }
 
+func TestGetPlaces(t *testing.T) {
+	// setup
+	router := routes.SetupRouter()
+	backendsync.SeedTestData()
+	token, err := getToken(userEmail)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// sending the request
+	url := "/api/places?title=eq:Stamford%20Bridge"
+	req := httptest.NewRequest(http.MethodGet, url, nil)
+	req.Header.Set("Authorization", token.Bearer())
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// checking request response
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "application/json") {
+		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
+	}
+
+	var resp types_.RecordsPaginated[any]
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("invalid JSON: %v", err)
+	}
+
+	if resp.Page != 1 {
+		t.Fatalf("expected to get only one page")
+	}
+
+	if resp.TotalPages != 1 {
+		t.Fatalf("expected totalPages to be 1")
+	}
+
+	if resp.TotalCount != 1 {
+		t.Fatalf("expected totalPages to be 2")
+	}
+
+	if len(resp.Data) == 0 {
+		t.Fatalf("missing data")
+	}
+}
+
 func TestCreatePlace(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
