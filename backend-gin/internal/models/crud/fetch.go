@@ -55,7 +55,10 @@ func parseSortData(fields []string) bson.D {
 }
 
 func parseProjection(fields []string) bson.M {
-	result := bson.M{"_id": 0}
+	result := make(bson.M)
+	if len(fields) > 0 {
+		result = bson.M{"_id": 0}
+	}
 	for _, item := range fields {
 		if item == "id" {
 			result["_id"] = 1
