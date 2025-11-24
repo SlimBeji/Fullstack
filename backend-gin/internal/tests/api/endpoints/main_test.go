@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/gin-gonic/gin"
 )
 
 const userEmail = "beji.slim@yahoo.fr"
@@ -34,6 +36,7 @@ func getUser(email string) (schemas.UserRead, error) {
 }
 
 func TestMain(m *testing.M) {
+	gin.SetMode(gin.ReleaseMode)
 	dbs := clients.GetDbs()
 	code := m.Run()
 	dbs.Close()
