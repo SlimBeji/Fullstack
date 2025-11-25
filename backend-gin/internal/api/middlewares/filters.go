@@ -10,6 +10,26 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
+func smartDecode(in map[string]any, out any) error {
+	// using WeaklyTypedInput for easy int conversion like "1"->1
+	decoderConfig := &mapstructure.DecoderConfig{
+		Result:           out,
+		TagName:          "json",
+		WeaklyTypedInput: true,
+	}
+
+	decoder, err := mapstructure.NewDecoder(decoderConfig)
+	if err != nil {
+		return err
+	}
+
+	if err := decoder.Decode(in); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 	var body T
 
@@ -27,18 +47,7 @@ func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 		}
 	}
 
-	// using WeaklyTypedInput for easy int conversion like "1"->1
-	decoderConfig := &mapstructure.DecoderConfig{
-		Result:           &body,
-		TagName:          "json",
-		WeaklyTypedInput: true,
-	}
-
-	decoder, err := mapstructure.NewDecoder(decoderConfig)
-	if err != nil {
-		return body, []string{err.Error()}
-	}
-	if err := decoder.Decode(paramsMap); err != nil {
+	if err := smartDecode(paramsMap, &body); err != nil {
 		return body, []string{err.Error()}
 	}
 
