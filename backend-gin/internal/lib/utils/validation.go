@@ -9,7 +9,7 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
 
-func GetBaseVliadator() *validator.Validate {
+func GetBaseValidator() *validator.Validate {
 	validate := validator.New()
 	en_translations.RegisterDefaultTranslations(validate, ErrorTranslator)
 	return validate
@@ -60,5 +60,5 @@ func init() {
 	ErrorTranslator, _ = uni.GetTranslator("en")
 
 	// Initialize the main validator
-	Validate = GetBaseVliadator()
+	Validate = GetBaseValidator()
 }
