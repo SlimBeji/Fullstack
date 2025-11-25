@@ -71,10 +71,10 @@ func parseProjection(fields []string) bson.M {
 
 func parseFilters(
 	filters types_.FindQueryFilters, nameMapping map[string]string,
-) bson.M {
+) (bson.M, error) {
 	result := bson.M{}
 	if len(filters) == 0 {
-		return result
+		return result, nil
 	}
 
 	for key, fieldFilters := range filters {
@@ -93,11 +93,17 @@ func parseFilters(
 			if fieldFilter.Op == types_.FilterText {
 				conditions[operator] = bson.M{"$search": fieldFilter.Val}
 			} else {
-				if field == "_id" {
-					objectId, err := primitive.ObjectIDFromHex(fieldFilter.Val.(string))
-					if err == nil {
-						conditions[operator] = objectId
+				if field == "_id" || field == "creatorId" {
+					idErr := fmt.Errorf("%s is not a valid objectId", fieldFilter.Val)
+					rawId, ok := fieldFilter.Val.(string)
+					if !ok {
+						return bson.M{}, idErr
 					}
+					objectId, err := primitive.ObjectIDFromHex(rawId)
+					if err != nil {
+						return bson.M{}, idErr
+					}
+					conditions[operator] = objectId
 				} else {
 					conditions[operator] = fieldFilter.Val
 				}
@@ -109,7 +115,7 @@ func parseFilters(
 		}
 
 	}
-	return result
+	return result, nil
 }
 
 func sanitizeProjection[Read any](
@@ -132,7 +138,7 @@ func sanitizeProjection[Read any](
 
 func parseFindQuery[Read any](
 	df DocumentFetcher[Read], findQuery *types_.FindQuery,
-) *types_.MongoFindQuery {
+) (*types_.MongoFindQuery, error) {
 	// Step 1: Parse the pagination
 	pagination := parsePagination(findQuery.Page, findQuery.Size)
 
@@ -147,7 +153,10 @@ func parseFindQuery[Read any](
 	}
 
 	// Step 4: Parse Filters
-	filters := parseFilters(findQuery.Filters, df.GetFiltersMapping())
+	filters, err := parseFilters(findQuery.Filters, df.GetFiltersMapping())
+	if err != nil {
+
+	}
 
 	// Step 5: Return the MongoFindQuery
 	return &types_.MongoFindQuery{
@@ -155,7 +164,7 @@ func parseFindQuery[Read any](
 		Projection: &projection,
 		Sort:       &sort,
 		Filters:    &filters,
-	}
+	}, nil
 }
 
 func CountDocuments[Read any](
@@ -219,7 +228,10 @@ func fetchRawPage[Read any](
 	var result types_.RecordsPaginated[bson.Raw]
 
 	// Step 1: Parsing the FindQuery to Mongo language
-	query := parseFindQuery(df, findQuery)
+	query, err := parseFindQuery(df, findQuery)
+	if err != nil {
+		return result, fmt.Errorf("could not parse the find query: %w", err)
+	}
 
 	// Step 2: Counting the output
 	totalCount, err := CountDocuments(df, *query.Filters, ctx)
