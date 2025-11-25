@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { HttpStatusCode } from "axios";
-import { computed, onMounted } from "vue";
+import { computed, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { PlacesList } from "@/components/places";
@@ -26,17 +26,12 @@ import type { Place } from "@/types";
 // Init
 const authStore = useAuthStore();
 const route = useRoute();
-const userId = route.params.userId as string;
 const { httpData, sendRequest, clear } = useHttp({ ignoreNotFound: true });
 
-// Events
-onMounted(() => {
-    fetchPlaces(userId);
-});
-
 // Computed
+const userId = computed(() => route.params.userId as string | undefined);
 const isUserOwned = computed(() => {
-    return userId === authStore.userId;
+    return userId.value === authStore.userId;
 });
 
 const places = computed(() => {
@@ -54,6 +49,9 @@ const fetchPlaces = (userId: string | undefined) => {
 };
 
 const deleteHandler = async () => {
-    fetchPlaces(userId);
+    fetchPlaces(userId.value);
 };
+
+// Watchers
+watch(userId, fetchPlaces, { immediate: true });
 </script>
