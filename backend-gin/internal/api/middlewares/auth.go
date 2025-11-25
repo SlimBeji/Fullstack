@@ -39,7 +39,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 			return
 		}
 
-		if checkAdmin && !user.IsAdmin {
+		if checkAdmin && !bool(user.IsAdmin) {
 			err := types_.ApiError{
 				Code:    http.StatusUnauthorized,
 				Message: "Not an admin",
