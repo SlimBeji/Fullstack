@@ -159,11 +159,11 @@ func validateFilter(
 	switch params.typeStr {
 	case "string":
 		return validateStringFilter(rawVal, op, params)
-	case "int":
+	case "int", "types_.FlexInt":
 		return validateIntFilter(rawVal, op, params)
-	case "float64":
+	case "float64", "types_.FlexFloat":
 		return validateFloat64Filter(rawVal, op, params)
-	case "bool":
+	case "bool", "types_.FlexBool":
 		return validateBoolFilter(rawVal, op, params)
 	case "time.Time":
 		return validateTimeFilter(rawVal, op, params)
