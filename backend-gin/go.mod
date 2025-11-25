@@ -4,6 +4,7 @@ go 1.25.1
 
 require (
 	cloud.google.com/go/storage v1.57.0
+	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
