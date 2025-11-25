@@ -581,74 +581,6 @@ const docTemplate = `{
             }
         },
         "/api/users": {
-            "post": {
-                "security": [
-                    {
-                        "OAuth2Password": [
-                            "admin"
-                        ]
-                    }
-                ],
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "User creation",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "example": "mslimbeji@gmail.com",
-                        "description": "The user email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "example": false,
-                        "description": "Whether the user is an admin or not",
-                        "name": "isAdmin",
-                        "in": "formData"
-                    },
-                    {
-                        "minLength": 2,
-                        "type": "string",
-                        "example": "Slim Beji",
-                        "description": "The user name, two characters at least",
-                        "name": "name",
-                        "in": "formData"
-                    },
-                    {
-                        "minLength": 10,
-                        "type": "string",
-                        "example": "very_secret",
-                        "description": "The user password, 10 characters at least",
-                        "name": "password",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "file",
-                        "description": "the user profile image",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.UserRead"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/users/": {
             "get": {
                 "security": [
                     {
@@ -750,6 +682,72 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.UsersPaginated"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User creation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "mslimbeji@gmail.com",
+                        "description": "The user email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "Whether the user is an admin or not",
+                        "name": "isAdmin",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 2,
+                        "type": "string",
+                        "example": "Slim Beji",
+                        "description": "The user name, two characters at least",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 10,
+                        "type": "string",
+                        "example": "very_secret",
+                        "description": "The user password, 10 characters at least",
+                        "name": "password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "the user profile image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserRead"
                         }
                     }
                 }

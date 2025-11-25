@@ -19,7 +19,7 @@ import (
 // @Security     OAuth2Password[admin]
 // @Param        params query schemas.UserFilters true "GET parameters"
 // @Success      200  {object}  schemas.UsersPaginated
-// @Router       /api/users/ [get]
+// @Router       /api/users [get]
 func getUsers(c *gin.Context) {
 	findQuery, _ := utils.GetBody[types_.FindQuery](c)
 	uc := collections.GetUserCollection()
