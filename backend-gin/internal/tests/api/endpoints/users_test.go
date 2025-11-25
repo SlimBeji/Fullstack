@@ -28,7 +28,7 @@ func TestFetchUsers(t *testing.T) {
 	}
 
 	// sending the request
-	req := httptest.NewRequest(http.MethodGet, "/api/users", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/users/", nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)

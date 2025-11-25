@@ -140,7 +140,7 @@ func deletePlace(c *gin.Context) {
 func RegisterPlaces(r *gin.Engine) {
 	router := r.Group("/api/places")
 	router.GET(
-		"",
+		"/",
 		middlewares.Authenticated,
 		middlewares.Filter[schemas.PlaceFilters],
 		getPlaces,

@@ -47,7 +47,7 @@ func TestGetPlaces(t *testing.T) {
 	}
 
 	// sending the request
-	url := "/api/places?title=eq:Stamford%20Bridge"
+	url := "/api/places/?title=eq:Stamford%20Bridge"
 	req := httptest.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
