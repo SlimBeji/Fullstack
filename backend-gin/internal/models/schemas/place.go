@@ -9,8 +9,8 @@ import (
 )
 
 type Location struct {
-	Lat float64 `json:"lat" example:"51.48180425016331" bson:"lat"`    // The latitude of the place
-	Lng float64 `json:"lng" example:"-0.19090418688755467" bson:"lng"` // The longitude of the place
+	Lat types_.FlexFloat `json:"lat" example:"51.48180425016331" bson:"lat"`    // The latitude of the place
+	Lng types_.FlexFloat `json:"lng" example:"-0.19090418688755467" bson:"lng"` // The longitude of the place
 }
 
 type PlaceDB struct {
@@ -20,7 +20,7 @@ type PlaceDB struct {
 	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
 	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
 	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	Embedding   []float64          `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
+	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
 	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
 	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt   time.Time          `json:"updatedAt" bson:"updatedAt"`
@@ -29,12 +29,12 @@ type PlaceDB struct {
 type PlaceSeed struct {
 	Ref         int
 	CreatorRef  int
-	Title       string    `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
-	Description string    `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
-	Address     string    `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
-	Location    Location  `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	Embedding   []float64 `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
-	ImageUrl    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
+	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
+	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
+	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
+	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
+	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
+	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 }
 
 type PlaceCreate struct {
@@ -42,7 +42,7 @@ type PlaceCreate struct {
 	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
 	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
 	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	Embedding   []float64          `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
+	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=384" bson:"embedding"`                                                            // Title + Description embedding
 	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
 }
@@ -51,8 +51,8 @@ type PlacePost struct {
 	Title       string                `json:"title" form:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                    // The place title/name, 10 characters minimum
 	Description string                `json:"description" form:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
 	Address     string                `json:"address" form:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                  // The place address
-	Lat         float64               `json:"lat" form:"lat" example:"51.48180425016331" bson:"lat"`                                                          // The latitude of the place
-	Lng         float64               `json:"lng" form:"lng" example:"-0.19090418688755467" bson:"lng"`                                                       // The longitude of the place
+	Lat         types_.FlexFloat      `json:"lat" form:"lat" example:"51.48180425016331" bson:"lat"`                                                          // The latitude of the place
+	Lng         types_.FlexFloat      `json:"lng" form:"lng" example:"-0.19090418688755467" bson:"lng"`                                                       // The longitude of the place
 	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`                                      // Place Image (JPEG)
 	CreatorID   string                `json:"creatorId" form:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`   // The ID of the place creator, 24 characters
 }
@@ -79,8 +79,8 @@ type PlaceFilters struct {
 	Description []string `json:"description" form:"description" filter:"string,min=10" example:"regex:football" collectionFormat:"multi"`                      // The place description, 10 characters minimum
 	Address     []string `json:"address" form:"address" filter:"string,min=10" example:"regex:d{2} Boulevard" collectionFormat:"multi"`                        // The place address
 	CreatorId   []string `json:"creatorId" form:"creatorId" filter:"string,hexadecimal,len=24" example:"eq:683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The ID of the place creator, 24 characters
-	LocationLat []string `json:"locationLat" form:"locationLat" filter:"float64" example:"gt:3.5" collectionFormat:"multi"`                                    // The latitude of the place
-	LocationLng []string `json:"locationLng" form:"locationLng" filter:"float64" example:"lt:4.5" collectionFormat:"multi"`                                    // The longitude of the place
+	LocationLat []string `json:"locationLat" form:"locationLat" filter:"types_.FlexFloat" example:"gt:3.5" collectionFormat:"multi"`                           // The latitude of the place
+	LocationLng []string `json:"locationLng" form:"locationLng" filter:"types_.FlexFloat" example:"lt:4.5" collectionFormat:"multi"`                           // The longitude of the place
 }
 
 type PlaceUpdate struct {

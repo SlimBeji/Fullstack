@@ -5,66 +5,66 @@ imports:
     - backend/internal/types_
 fields:
     id:
-        type: "string"
-        bson: "_id,omitempty"
-        validate: "hexadecimal,len=24"
-        description: "The ID of the place 24 characters"
-        example: "683b21134e2e5d46978daf1f"
+        type: 'string'
+        bson: '_id,omitempty'
+        validate: 'hexadecimal,len=24'
+        description: 'The ID of the place 24 characters'
+        example: '683b21134e2e5d46978daf1f'
     title:
-        type: "string"
-        validate: "min=10"
-        description: "The place title/name, 10 characters minimum"
-        example: "Stamford Bridge"
-        filter-example: "eq:Some Place"
+        type: 'string'
+        validate: 'min=10'
+        description: 'The place title/name, 10 characters minimum'
+        example: 'Stamford Bridge'
+        filter-example: 'eq:Some Place'
     description:
-        type: "string"
-        validate: "min=10"
-        description: "The place description, 10 characters minimum"
-        example: "Stadium of Chelsea football club"
-        filter-example: "regex:football"
+        type: 'string'
+        validate: 'min=10'
+        description: 'The place description, 10 characters minimum'
+        example: 'Stadium of Chelsea football club'
+        filter-example: 'regex:football'
     embedding:
-        type: "[]float64"
-        validate: "len=384"
-        description: "Title + Description embedding"
+        type: '[]types_.FlexFloat'
+        validate: 'len=384'
+        description: 'Title + Description embedding'
     imageUrl:
-        type: "string"
-        example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
-        description: "local url on the storage"
+        type: 'string'
+        example: 'avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg'
+        description: 'local url on the storage'
     image:
-        type: "*multipart.FileHeader"
-        description: "Place Image (JPEG)"
+        type: '*multipart.FileHeader'
+        description: 'Place Image (JPEG)'
         swaggerignore: true
     address:
-        type: "string"
-        validate: "min=10"
-        description: "The place address"
-        example: "Fulham road"
-        filter-example: "regex:d{2} Boulevard"
+        type: 'string'
+        validate: 'min=10'
+        description: 'The place address'
+        example: 'Fulham road'
+        filter-example: 'regex:d{2} Boulevard'
     creatorId:
-        type: "string"
-        validate: "hexadecimal,len=24"
-        description: "The ID of the place creator, 24 characters"
-        example: "683b21134e2e5d46978daf1f"
-        filter-example: "eq:683b21134e2e5d46978daf1f"
+        type: 'string'
+        validate: 'hexadecimal,len=24'
+        description: 'The ID of the place creator, 24 characters'
+        example: '683b21134e2e5d46978daf1f'
+        filter-example: 'eq:683b21134e2e5d46978daf1f'
     location.lat:
-        type: "float64"
-        json: "lat"
-        description: "The latitude of the place"
+        type: 'types_.FlexFloat'
+        json: 'lat'
+        description: 'The latitude of the place'
         example: 51.48180425016331
-        filter-example: "gt:3.5"
+        filter-example: 'gt:3.5'
     location.lng:
-        type: "float64"
-        json: "lng"
-        description: "The longitude of the place"
+        type: 'types_.FlexFloat'
+        json: 'lng'
+        description: 'The longitude of the place'
         example: -0.19090418688755467
-        filter-example: "lt:4.5"
+        filter-example: 'lt:4.5'
     location:
-        json: "location"
-        description: "Location object (can be sent as JSON string)"
+        json: 'location'
+        description: 'Location object (can be sent as JSON string)'
     createdAt:
-        type: "time.Time"
+        type: 'time.Time'
     updatedAt:
-        type: "time.Time"
+        type: 'time.Time'
 selectables:
     - id
     - title
