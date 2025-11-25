@@ -21,22 +21,22 @@ import (
 
 type PlaceCollection struct {
 	*mongo.Collection
+	validate bool
 }
 
-var PlaceCol *PlaceCollection
+func (pc *PlaceCollection) ShouldValidate() bool {
+	return pc.validate
+}
 
-func NewPlaceCollection() *PlaceCollection {
+func GetPlaceCollection(validate ...bool) *PlaceCollection {
+	validateStructs := false
+	if len(validate) > 0 {
+		validateStructs = validate[0]
+	}
 	client := clients.GetMongo()
 	name := string(types_.CollectionPlaces)
 	collection := client.DB.Collection(name)
-	return &PlaceCollection{collection}
-}
-
-func GetPlaceCollection() *PlaceCollection {
-	if PlaceCol == nil {
-		PlaceCol = NewPlaceCollection()
-	}
-	return PlaceCol
+	return &PlaceCollection{collection, validateStructs}
 }
 
 // Helpers

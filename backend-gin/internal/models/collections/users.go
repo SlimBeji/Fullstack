@@ -23,22 +23,22 @@ import (
 
 type UserCollection struct {
 	*mongo.Collection
+	validate bool
 }
 
-var UserCol *UserCollection
+func (uc *UserCollection) ShouldValidate() bool {
+	return uc.validate
+}
 
-func GetUserCollection() *UserCollection {
-	if UserCol == nil {
-		UserCol = NewUserCollection()
+func GetUserCollection(validate ...bool) *UserCollection {
+	validateStructs := false
+	if len(validate) > 0 {
+		validateStructs = validate[0]
 	}
-	return UserCol
-}
-
-func NewUserCollection() *UserCollection {
 	client := clients.GetMongo()
 	name := string(types_.CollectionUsers)
 	collection := client.DB.Collection(name)
-	return &UserCollection{collection}
+	return &UserCollection{collection, validateStructs}
 }
 
 // Serialization
