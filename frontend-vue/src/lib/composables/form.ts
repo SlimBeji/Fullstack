@@ -53,20 +53,6 @@ export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
     };
     const formValid = ref<boolean>(recheckFormValidity());
 
-    // Watchers
-    for (const name of fieldNames) {
-        const field = fields[name];
-        watch(
-            [() => field.value, () => field.validators],
-            () => {
-                const isValid = validate(field.value, field.validators);
-                field.valid = isValid;
-                formValid.value = recheckFormValidity();
-            },
-            { deep: true }
-        );
-    }
-
     // Handlers
     const prefillData = (data: Partial<Record<T, any>>) => {
         (Object.keys(data) as T[]).forEach((name) => {
@@ -84,6 +70,20 @@ export const useForm = <T extends string>(config: Record<T, FieldConfig>) => {
             if (config.initial !== undefined) field.initial = config.initial;
         });
     };
+
+    // Watchers
+    for (const name of fieldNames) {
+        const field = fields[name];
+        watch(
+            [() => field.value, () => field.validators],
+            () => {
+                const isValid = validate(field.value, field.validators);
+                field.valid = isValid;
+                formValid.value = recheckFormValidity();
+            },
+            { deep: true }
+        );
+    }
 
     return { fields, formValid, prefillData, updateFieldConfig };
 };
