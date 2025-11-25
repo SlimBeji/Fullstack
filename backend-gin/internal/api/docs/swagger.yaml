@@ -669,6 +669,51 @@ paths:
       tags:
       - Place
   /api/users:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: The user email
+        example: mslimbeji@gmail.com
+        in: formData
+        name: email
+        type: string
+      - description: Whether the user is an admin or not
+        example: false
+        in: formData
+        name: isAdmin
+        type: boolean
+      - description: The user name, two characters at least
+        example: Slim Beji
+        in: formData
+        minLength: 2
+        name: name
+        type: string
+      - description: The user password, 10 characters at least
+        example: very_secret
+        in: formData
+        minLength: 10
+        name: password
+        type: string
+      - description: the user profile image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: User creation
+      tags:
+      - User
+  /api/users/:
     get:
       consumes:
       - application/json
@@ -736,50 +781,6 @@ paths:
       - OAuth2Password:
         - admin
       summary: Search and Filter users
-      tags:
-      - User
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: The user email
-        example: mslimbeji@gmail.com
-        in: formData
-        name: email
-        type: string
-      - description: Whether the user is an admin or not
-        example: false
-        in: formData
-        name: isAdmin
-        type: boolean
-      - description: The user name, two characters at least
-        example: Slim Beji
-        in: formData
-        minLength: 2
-        name: name
-        type: string
-      - description: The user password, 10 characters at least
-        example: very_secret
-        in: formData
-        minLength: 10
-        name: password
-        type: string
-      - description: the user profile image
-        in: formData
-        name: image
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemas.UserRead'
-      security:
-      - OAuth2Password:
-        - admin
-      summary: User creation
       tags:
       - User
   /api/users/{userId}:
