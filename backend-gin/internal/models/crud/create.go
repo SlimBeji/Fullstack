@@ -63,7 +63,7 @@ func CreateDocument[Read any, Db any, Form any, Post any](
 		errs := utils.ValidateStruct(form)
 		if len(errs) > 0 {
 			return result, types_.ValidationErrs(
-				"wrong input for CreateDocument", errs,
+				fmt.Sprintf("create form for %s not valid", dc.Name()), errs,
 			)
 		}
 	}
