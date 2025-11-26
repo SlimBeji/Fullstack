@@ -2,8 +2,10 @@ package types_
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -71,5 +73,16 @@ func UnprocessableErr(message string, err error) error {
 		Code:    http.StatusUnprocessableEntity,
 		Message: message,
 		Err:     err,
+	}
+}
+
+func ValidationErrs(message string, errMessages []string) error {
+	merged := strings.Join(errMessages, "\n")
+	err := errors.New(merged)
+	return ApiError{
+		Code:    http.StatusUnprocessableEntity,
+		Message: message,
+		Err:     err,
+		Details: map[string]any{"errs": errMessages},
 	}
 }
