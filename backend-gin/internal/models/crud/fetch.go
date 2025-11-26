@@ -254,7 +254,7 @@ func fetchRawPage[Read any](
 }
 
 func postProcessBatch[Read any](
-	items []bson.Raw, callback func(item *Read) error,
+	items []bson.Raw, callback func(bson.Raw) (Read, error),
 ) ([]Read, error) {
 	var wg sync.WaitGroup
 	results := make([]Read, len(items))
@@ -264,14 +264,9 @@ func postProcessBatch[Read any](
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			var decoded Read
-			err := bson.Unmarshal(items[i], &decoded)
-			if err != nil {
-				errs[i] = err
-			} else {
-				errs[index] = callback(&decoded)
-			}
+			decoded, err := callback(items[i])
 			results[i] = decoded
+			errs[i] = err
 		}(i)
 	}
 
@@ -285,7 +280,7 @@ func postProcessBatch[Read any](
 }
 
 func postProcessBsonBatch(
-	items []bson.Raw, callback func(item bson.M) error,
+	items []bson.Raw, callback func(item bson.Raw) (bson.M, error),
 ) ([]bson.M, error) {
 	var wg sync.WaitGroup
 	results := make([]bson.M, len(items))
@@ -295,14 +290,9 @@ func postProcessBsonBatch(
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			decoded := bson.M{}
-			err := bson.Unmarshal(items[i], decoded)
-			if err != nil {
-				errs[i] = err
-			} else {
-				errs[index] = callback(decoded)
-			}
+			decoded, err := callback(items[0])
 			results[i] = decoded
+			errs[i] = err
 		}(i)
 	}
 

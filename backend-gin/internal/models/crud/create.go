@@ -123,7 +123,7 @@ func Create[Read any, Db any, Form any, Post any](
 		return result, err
 	}
 
-	return ParseRaw(dc, raw)
+	return dc.PostProcess(raw)
 }
 
 func UserCreate[Read any, Db any, Form any, Post any](

@@ -17,6 +17,7 @@ import (
 
 type DocumentUpdater[Read any, Form any, Put any] interface {
 	DocumentReader[Read]
+	ShouldValidate() bool
 	FindOneAndUpdate(context.Context, any, any, ...*options.FindOneAndUpdateOptions) *mongo.SingleResult
 	PreUpdate(mongo.SessionContext, bson.Raw, *Form) error
 	PostUpdate(mongo.SessionContext, bson.Raw, bson.Raw) error
@@ -142,7 +143,7 @@ func Update[Read any, Form any, Put any](
 		}
 	}
 
-	return ParseRaw(du, raw)
+	return du.PostProcess(raw)
 }
 
 func UpdateById[Read any, Form any, Put any](

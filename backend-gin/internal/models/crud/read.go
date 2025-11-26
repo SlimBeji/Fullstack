@@ -16,8 +16,8 @@ type DocumentReader[Read any] interface {
 	Name() string
 	Database() *mongo.Database
 	FindOne(context.Context, any, ...*options.FindOneOptions) *mongo.SingleResult
-	PostProcess(*Read) error
-	PostProcessBson(bson.M) error
+	PostProcess(bson.Raw) (Read, error)
+	PostProcessBson(bson.Raw) (bson.M, error)
 	AuthRead(*schemas.UserRead, *Read) error
 }
 
@@ -40,24 +40,6 @@ func GetDocumentById[Read any](
 	return GetDocument(dr, bson.M{"_id": objectId}, ctx)
 }
 
-func ParseRaw[Read any](
-	dr DocumentReader[Read], raw bson.Raw,
-) (Read, error) {
-	var result Read
-
-	// Decode bson.Raw to T
-	if err := bson.Unmarshal(raw, &result); err != nil {
-		return result, fmt.Errorf("decode failed: %w", err)
-	}
-
-	// Post process decoded struct
-	if err := dr.PostProcess(&result); err != nil {
-		return result, fmt.Errorf("post processing failed: %w", err)
-	}
-
-	return result, nil
-}
-
 func GetById[Read any](
 	dr DocumentReader[Read], id string, ctx context.Context,
 ) (Read, error) {
@@ -73,7 +55,7 @@ func GetById[Read any](
 		}
 	}
 
-	return ParseRaw(dr, raw)
+	return dr.PostProcess(raw)
 }
 
 func Get[Read any](
@@ -91,7 +73,7 @@ func Get[Read any](
 		}
 	}
 
-	return ParseRaw(dr, raw)
+	return dr.PostProcess(raw)
 }
 
 func UserGet[Read any](
