@@ -8,6 +8,7 @@ import (
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -43,40 +44,54 @@ func GetUserCollection(validate ...bool) *UserCollection {
 
 // Serialization
 
-func (uc *UserCollection) PostProcess(item *schemas.UserRead) error {
-	if item.ImageUrl == "" {
-		return nil
+func (uc *UserCollection) PostProcess(
+	raw bson.Raw,
+) (schemas.UserRead, error) {
+	var result schemas.UserRead
+	if err := bson.Unmarshal(raw, &result); err != nil {
+		return result, errors.New("decoding of user documenet failed")
+	}
+
+	if result.ImageUrl == "" {
+		return result, nil
 	}
 
 	storage := clients.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(item.ImageUrl)
+	signedUrl, err := storage.GetSignedUrl(result.ImageUrl)
 	if err != nil {
-		return err
+		return result, err
 	}
 
-	item.ImageUrl = signedUrl
-	return nil
+	result.ImageUrl = signedUrl
+	return result, nil
 }
 
-func (uc *UserCollection) PostProcessBson(item bson.M) error {
-	if id, exists := item["_id"]; exists {
-		item["id"] = id
-		delete(item, "_id")
+func (uc *UserCollection) PostProcessBson(
+	raw bson.Raw,
+) (bson.M, error) {
+	var result bson.M
+	if err := bson.Unmarshal(raw, &result); err != nil {
+		return result, errors.New("decoding of user documenet failed")
 	}
 
-	imageUrl, exists := item["imageUrl"]
+	if id, exists := result["_id"]; exists {
+		result["id"] = id
+		delete(result, "_id")
+	}
+
+	imageUrl, exists := result["imageUrl"]
 	if !exists {
-		return nil
+		return result, nil
 	}
 
 	storage := clients.GetStorage()
 	signedUrl, err := storage.GetSignedUrl(imageUrl.(string))
 	if err != nil {
-		return err
+		return result, err
 	}
 
-	item["imageUrl"] = signedUrl
-	return nil
+	result["imageUrl"] = signedUrl
+	return result, nil
 }
 
 // Read

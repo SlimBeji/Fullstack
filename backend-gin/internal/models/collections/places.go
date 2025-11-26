@@ -53,40 +53,54 @@ func checkCreator(
 
 // Serialization
 
-func (pc *PlaceCollection) PostProcess(item *schemas.PlaceRead) error {
-	if item.ImageUrl == "" {
-		return nil
+func (pc *PlaceCollection) PostProcess(
+	raw bson.Raw,
+) (schemas.PlaceRead, error) {
+	var result schemas.PlaceRead
+	if err := bson.Unmarshal(raw, &result); err != nil {
+		return result, errors.New("decoding of place documenet failed")
+	}
+
+	if result.ImageUrl == "" {
+		return result, nil
 	}
 
 	storage := clients.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(item.ImageUrl)
+	signedUrl, err := storage.GetSignedUrl(result.ImageUrl)
 	if err != nil {
-		return err
+		return result, err
 	}
 
-	item.ImageUrl = signedUrl
-	return nil
+	result.ImageUrl = signedUrl
+	return result, nil
 }
 
-func (pc *PlaceCollection) PostProcessBson(item bson.M) error {
-	if id, exists := item["_id"]; exists {
-		item["id"] = id
-		delete(item, "_id")
+func (pc *PlaceCollection) PostProcessBson(
+	raw bson.Raw,
+) (bson.M, error) {
+	var result bson.M
+	if err := bson.Unmarshal(raw, &result); err != nil {
+		return result, errors.New("decoding of place documenet failed")
 	}
 
-	imageUrl, exists := item["imageUrl"]
+	if id, exists := result["_id"]; exists {
+		result["id"] = id
+		delete(result, "_id")
+	}
+
+	imageUrl, exists := result["imageUrl"]
 	if !exists {
-		return nil
+		return result, nil
 	}
 
 	storage := clients.GetStorage()
 	signedUrl, err := storage.GetSignedUrl(imageUrl.(string))
 	if err != nil {
-		return err
+		return result, err
 	}
 
-	item["imageUrl"] = signedUrl
-	return nil
+	result["imageUrl"] = signedUrl
+	return result, nil
 }
 
 // Read
