@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
@@ -53,6 +54,15 @@ func UpdateDocument[Read any, Form any, Put any](
 	ctx context.Context,
 ) (bson.Raw, error) {
 	var result bson.Raw
+
+	if du.ShouldValidate() {
+		errs := utils.ValidateStruct(form)
+		if len(errs) > 0 {
+			return result, types_.ValidationErrs(
+				fmt.Sprintf("update form for %s not valid", du.Name()), errs,
+			)
+		}
+	}
 
 	updates := updateFormToBson(form)
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
