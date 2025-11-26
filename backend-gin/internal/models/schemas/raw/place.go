@@ -27,7 +27,7 @@ type PlaceDB struct {
 	Location    Location           `tag:"location"`
 	ImageUrl    any                `tag:"imageUrl,omitempty"`
 	Embedding   any                `tag:"embedding"`
-	CreatorID   primitive.ObjectID `tag:"creatorId"`
+	CreatorID   primitive.ObjectID `tag:"creatorIdObj,json=creatorId"`
 	CreatedAt   any                `tag:"createdAt"`
 	UpdatedAt   any                `tag:"updatedAt"`
 }
@@ -54,7 +54,7 @@ type PlaceCreate struct {
 	Location    Location           `tag:"location"`
 	Embedding   any                `tag:"embedding"`
 	ImageUrl    any                `tag:"imageUrl,omitempty"`
-	CreatorID   primitive.ObjectID `tag:"creatorId"`
+	CreatorID   primitive.ObjectID `tag:"creatorIdObj,json=creatorId"`
 }
 
 // schemas:tag multipart
@@ -104,7 +104,7 @@ type PlaceUpdate struct {
 	Description any                `tag:"description"`
 	Address     any                `tag:"address"`
 	Location    Location           `tag:"location"`
-	CreatorID   primitive.ObjectID `tag:"creatorId"`
+	CreatorID   primitive.ObjectID `tag:"creatorIdObj,json=creatorId"`
 }
 
 // schemas:tag allownil
