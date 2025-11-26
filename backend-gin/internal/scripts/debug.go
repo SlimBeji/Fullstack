@@ -11,7 +11,7 @@ import (
 
 func Debug() {
 	// Get the collection
-	uc := collections.NewUserCollection()
+	uc := collections.GetUserCollection()
 
 	admin, err := uc.GetByEmail("mslimbeji@gmail.com", context.Background())
 	if err != nil {
