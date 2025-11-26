@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
@@ -18,6 +19,7 @@ import (
 // Post is the schemas for POST request, will be converted to Form
 type DocumentCreator[Read any, Db any, Form any, Post any] interface {
 	DocumentReader[Read]
+	ShouldValidate() bool
 	InsertOne(context.Context, any, ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
 	PreCreate(mongo.SessionContext, *Db) error
 	PostCreate(mongo.SessionContext, *Db, *mongo.InsertOneResult) error
@@ -33,6 +35,15 @@ func InsertExample[Read any, Db any, Form any, Post any](
 ) (*mongo.InsertOneResult, error) {
 	var result mongo.InsertOneResult
 
+	if dc.ShouldValidate() {
+		errs := utils.ValidateStruct(form)
+		if len(errs) > 0 {
+			return &result, types_.ValidationErrs(
+				"wrong input for InsertExample", errs,
+			)
+		}
+	}
+
 	docIn, err := dc.ToDBDoc(form)
 	if err != nil {
 		return &result, err
@@ -47,6 +58,15 @@ func CreateDocument[Read any, Db any, Form any, Post any](
 	ctx context.Context,
 ) (bson.Raw, error) {
 	var result bson.Raw
+
+	if dc.ShouldValidate() {
+		errs := utils.ValidateStruct(form)
+		if len(errs) > 0 {
+			return result, types_.ValidationErrs(
+				"wrong input for CreateDocument", errs,
+			)
+		}
+	}
 
 	docIn, err := dc.ToDBDoc(form)
 	if err != nil {
