@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, cast
 
 from beanie import Delete, PydanticObjectId, after_event
+from pymongo import ASCENDING, IndexModel
 
 from models.collections.base import BaseDocument, document_registry
 from models.fields import user as UserFilds
@@ -24,7 +25,11 @@ class User(BaseDocument):
 
     class Settings:
         name = Collections.USERS
-        indexes = ["createdAt"]
+        indexes = [
+            IndexModel([("name", ASCENDING)], unique=True),
+            IndexModel([("email", ASCENDING)], unique=True),
+            IndexModel([("createdAt", ASCENDING)]),
+        ]
 
     @after_event([Delete])
     async def remove_child_places(self) -> None:
