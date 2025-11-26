@@ -8,16 +8,15 @@ import { UserDB } from "../schemas";
 const UserCollectionSchema = new Schema<UserDB>(
     {
         // Fields
-        name: { type: String, required: true, unique: true, min: 2 },
-        email: { type: String, required: true, unique: true },
-        password: { type: String, required: true, min: 8 },
-        imageUrl: { type: String, required: false },
-        isAdmin: { type: Boolean, required: true, default: false },
+        name: { type: String },
+        email: { type: String },
+        password: { type: String },
+        imageUrl: { type: String },
+        isAdmin: { type: Boolean },
         // Relations
         places: [
             {
                 type: Schema.ObjectId,
-                required: true,
                 ref: CollectionEnum.PLACES,
             },
         ],
@@ -25,6 +24,8 @@ const UserCollectionSchema = new Schema<UserDB>(
     { timestamps: true }
 );
 UserCollectionSchema.index({ createdAt: 1 });
+UserCollectionSchema.index({ name: 1 }, { unique: true });
+UserCollectionSchema.index({ email: 1 }, { unique: true });
 
 // Hooks
 UserCollectionSchema.pre("deleteOne", async function (next) {

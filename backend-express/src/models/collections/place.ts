@@ -8,24 +8,22 @@ import { PlaceDB } from "../schemas";
 export const PlaceCollectionSchema = new Schema<PlaceDB>(
     {
         // Fields
-        title: { type: String, required: true },
-        description: { type: String, required: true, min: 10 },
-        imageUrl: { type: String, required: false },
-        address: { type: String, required: true, min: 1 },
+        title: { type: String },
+        description: { type: String },
+        imageUrl: { type: String },
+        address: { type: String },
         location: {
-            required: true,
             _id: false,
             type: {
-                lat: { type: Number, required: true },
-                lng: { type: Number, required: true },
+                lat: { type: Number },
+                lng: { type: Number },
             },
         },
         // AI
-        embedding: { type: [Number], required: false },
+        embedding: { type: [Number] },
         // Foreign Keys:
         creatorId: {
             type: Schema.ObjectId,
-            required: true,
             ref: CollectionEnum.USERS,
         },
     },
