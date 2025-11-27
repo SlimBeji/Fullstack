@@ -1,7 +1,7 @@
 package endpoints
 
 import (
-	"backend/internal/lib/clients"
+	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"context"
@@ -37,8 +37,8 @@ func getUser(email string) (schemas.UserRead, error) {
 
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.ReleaseMode)
-	dbs := clients.GetDbs()
+	setup := setup.New()
 	code := m.Run()
-	dbs.Close()
+	setup.CloseSerives()
 	os.Exit(code)
 }
