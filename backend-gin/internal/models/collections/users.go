@@ -330,7 +330,7 @@ func (uc *UserCollection) AuthCreate(
 	return fmt.Errorf("only admins can create new users")
 }
 
-func checkGetError(err error) error {
+func checkUserCreateError(err error) error {
 	if err == nil {
 		return nil
 	}
@@ -348,21 +348,21 @@ func (uc *UserCollection) CreateDocument(
 	form *schemas.UserCreate, ctx context.Context,
 ) (bson.Raw, error) {
 	result, err := crud.CreateDocument(uc, form, ctx)
-	return result, checkGetError(err)
+	return result, checkUserCreateError(err)
 }
 
 func (uc *UserCollection) Create(
 	post *schemas.UserPost, ctx context.Context,
 ) (schemas.UserRead, error) {
 	result, err := crud.Create(uc, post, ctx)
-	return result, checkGetError(err)
+	return result, checkUserCreateError(err)
 }
 
 func (uc *UserCollection) UserCreate(
 	user *schemas.UserRead, post *schemas.UserPost, ctx context.Context,
 ) (schemas.UserRead, error) {
 	result, err := crud.UserCreate(uc, user, post, ctx)
-	return result, checkGetError(err)
+	return result, checkUserCreateError(err)
 }
 
 // User Auth Methods
