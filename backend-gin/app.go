@@ -3,7 +3,7 @@ package main
 import (
 	"backend/internal/api/routes"
 	"backend/internal/config"
-	"backend/internal/lib/clients"
+	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
 	"fmt"
 
@@ -22,9 +22,9 @@ import (
 // @tokenUrl /api/auth/signin
 func main() {
 	// Initialize DBS connection
-	dbs := clients.GetDbs()
-	dbs.IndexCollections(collections.IndexStore)
-	defer dbs.Close()
+	setup := setup.New()
+	setup.IndexCollections(collections.IndexStore)
+	defer setup.CloseSerives()
 	r := routes.SetupRouter()
 	r.Run(fmt.Sprintf(":%d", config.Env.Port))
 }
