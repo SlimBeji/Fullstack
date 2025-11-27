@@ -1,6 +1,7 @@
 package scripts
 
 import (
+	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"context"
@@ -10,6 +11,10 @@ import (
 )
 
 func Debug() {
+	// Setup
+	setup := setup.New()
+	defer setup.CloseSerives()
+
 	// Get the collection
 	uc := collections.GetUserCollection()
 
