@@ -4,6 +4,7 @@ import (
 	"backend/internal/api/routes"
 	"backend/internal/config"
 	"backend/internal/lib/clients"
+	"backend/internal/models/collections"
 	"fmt"
 
 	_ "backend/internal/api/docs"
@@ -22,6 +23,7 @@ import (
 func main() {
 	// Initialize DBS connection
 	dbs := clients.GetDbs()
+	dbs.IndexCollections(collections.IndexStore)
 	defer dbs.Close()
 	r := routes.SetupRouter()
 	r.Run(fmt.Sprintf(":%d", config.Env.Port))
