@@ -8,6 +8,9 @@ from worker.tasks import close_workers
 
 
 async def connect_dbs() -> None:
+    # when updating this, dont forget to update connect_dbs
+    # in tasks/broker.py. This method was duplicated there
+    # to avoid circular imports or complicated code reorganization
     await asyncio.gather(db.connect(), redis_client.connect())
 
 

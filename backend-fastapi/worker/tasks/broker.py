@@ -12,9 +12,13 @@ from dramatiq.results.backends.redis import RedisBackend
 from dramatiq.results.backends.stub import StubBackend
 
 from config import settings
-from lib.setup import connect_dbs
+from lib.clients import db, redis_client
 
 MAX_AGE = 7 * 24 * 60 * 60 * 1000
+
+
+async def connect_dbs() -> None:
+    await asyncio.gather(db.connect(), redis_client.connect())
 
 
 # Overloading AsyncIO middleware
