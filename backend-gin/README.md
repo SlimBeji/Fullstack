@@ -10,7 +10,7 @@ This backend is written in **Go** and follows the architecture and principles de
 | Database ORM    | [mongo-go-driver](https://github.com/mongodb/mongo-go-driver)         |
 | Data Validation | [go-playground/validator](https://github.com/go-playground/validator) |
 | OpenAPI Docs    | [gin-swagger](github.com/swaggo/gin-swagger)                          |
-| Background Jobs | [async](https://github.com/hibiken/asynq)                             |
+| Background Jobs | [asynq](https://github.com/hibiken/asynq)                             |
 | Task Scheduling | [gocron](https://github.com/go-co-op/gocron)                          |
 
 ## 🔐 Environment Variables
