@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any
 
-from lib.sync import close_all, start_all
+from lib.setup import close_all, start_all
 from models.crud import crud_place
 
 

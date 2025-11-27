@@ -8,7 +8,7 @@ from api.docs import OPENAPI_METADATA
 from api.middlewares import catch_exceptions, limit_json_size
 from api.routes import routers
 from config import settings
-from lib.sync import close_all, start_all
+from lib.setup import close_all, start_all
 
 
 def register_routers(

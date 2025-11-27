@@ -76,7 +76,7 @@ However, since all backends are designed to be interchangeable, **camelCase** wi
 -   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
 -   `api/` – FastAPI server setup: auth, middlewares, OpenAPI Swagger metadata, and REST routes
 -   `types_/` – Shared types, enums, annotations and data contracts. An underscore was added as suffix to avoid conflicts with the `types` package used by the `enum` module
--   `lib/` – Core business logic, utility functions, and third-party service clients
+-   `lib/` – Core business logic, utility functions, third-party service clients and app setup utilities
 -   `worker/` – Background processing (e.g., tasks and scheduled crons)
 -   `tests/` – Unit tests
 -   `scripts/` – One-off scripts (e.g., migrations, debugging utilities)

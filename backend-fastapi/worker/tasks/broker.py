@@ -12,7 +12,7 @@ from dramatiq.results.backends.redis import RedisBackend
 from dramatiq.results.backends.stub import StubBackend
 
 from config import settings
-from lib.clients import connect_dbs
+from lib.setup import connect_dbs
 
 MAX_AGE = 7 * 24 * 60 * 60 * 1000
 

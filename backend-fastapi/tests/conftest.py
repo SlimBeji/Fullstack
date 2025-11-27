@@ -10,7 +10,7 @@ from httpx import ASGITransport, AsyncClient
 from api.app import create_app
 from config import settings
 from lib.encryption import create_token
-from lib.sync import close_all, seed_test_data, start_all
+from lib.setup import close_all, seed_test_data, start_all
 from models.crud import crud_user
 from models.schemas import UserReadSchema
 

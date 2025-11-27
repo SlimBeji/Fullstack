@@ -1,6 +1,6 @@
 import asyncio
 
-from lib.sync import close_all, start_all
+from lib.setup import close_all, start_all
 from models.examples import seed_db
 
 

@@ -1,7 +1,18 @@
-from lib.clients.utils import close_dbs, connect_dbs
+import asyncio
+
+from lib.clients.cache import redis_client
+from lib.clients.mongo import db
 from models.examples import dump_db, seed_db
 from worker.crons import close_crons
 from worker.tasks import close_workers
+
+
+async def connect_dbs() -> None:
+    await asyncio.gather(db.connect(), redis_client.connect())
+
+
+async def close_dbs() -> None:
+    await asyncio.gather(db.close(), redis_client.close())
 
 
 async def start_all() -> None:
