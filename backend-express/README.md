@@ -89,7 +89,7 @@ Prettier is used for formatting with the following config:
 - `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
 - `api/` – Express server setup: auth, middlewares, OpenAPI docs, and REST routes
 - `types/` – Shared types, enums, interfaces, and module extensions (e.g., `express.d.ts`)
-- `lib/` – Core business logic, utility functions, and third-party service clients
+- `lib/` – Core business logic, utility functions, third-party service clients and app setup utilities
 - `worker/` – Background processing (e.g., tasks and scheduled crons)
 - `tests/` – Unit tests
 - `scripts/` – One-off scripts (e.g., migrations, debugging utilities)

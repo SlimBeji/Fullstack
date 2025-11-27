@@ -2,7 +2,7 @@ import supertest from "supertest";
 
 import app from "@/api";
 import { createToken } from "@/lib/encryption";
-import { closeAll, seedTestData } from "@/lib/sync";
+import { closeAll, seedTestData } from "@/lib/setup";
 import { readImage } from "@/lib/utils";
 import { crudUser } from "@/models/crud";
 import { UserRead } from "@/models/schemas";

@@ -1,5 +1,5 @@
 import { redisClient } from "@/lib/clients";
-import { closeAll, startAll } from "@/lib/sync";
+import { closeAll, startAll } from "@/lib/setup";
 
 async function test() {
     await redisClient.set("secret_number", 158);

@@ -1,5 +1,5 @@
 import { storage } from "@/lib/clients";
-import { closeAll, startAll } from "@/lib/sync";
+import { closeAll, startAll } from "@/lib/setup";
 import { getImagePath } from "@/lib/utils";
 
 async function test() {

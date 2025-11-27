@@ -1,4 +1,4 @@
-import { closeAll, startAll } from "@/lib/sync";
+import { closeAll, startAll } from "@/lib/setup";
 import { dumpDb } from "@/models/examples";
 
 if (require.main === module) {
