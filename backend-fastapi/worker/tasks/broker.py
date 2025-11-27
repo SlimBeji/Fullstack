@@ -43,9 +43,7 @@ else:
     broker = RedisBroker(url=settings.REDIS_URL)
     backend = RedisBackend(url=settings.REDIS_URL)
 
-broker.add_middleware(
-    Results(backend=backend, result_ttl=7 * 24 * 60 * 60 * 1000)
-)
+broker.add_middleware(Results(backend=backend, result_ttl=MAX_AGE))
 broker.add_middleware(AsyncIOWithBeanie())
 set_broker(broker)
 
