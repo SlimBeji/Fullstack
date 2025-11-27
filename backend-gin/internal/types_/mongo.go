@@ -2,6 +2,7 @@ package types_
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type FilterOp string
@@ -41,3 +42,5 @@ type MongoFindQuery struct {
 	Sort       *bson.D
 	Projection *bson.M
 }
+
+type IndexMapping map[Collections][]mongo.IndexModel

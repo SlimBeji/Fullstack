@@ -19,6 +19,12 @@ import (
 
 // Constructor & Functions & Properties
 
+var PlaceIndexes []mongo.IndexModel = []mongo.IndexModel{
+	{
+		Keys: bson.D{{Key: "createdAt", Value: 1}},
+	},
+}
+
 type PlaceCollection struct {
 	*mongo.Collection
 	validate bool
