@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/lib/backendsync"
+	"backend/internal/lib/setup"
 	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
@@ -21,7 +21,7 @@ import (
 func TestFetchUsers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -67,7 +67,7 @@ func TestFetchUsers(t *testing.T) {
 func TestQueryUsers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -130,7 +130,7 @@ func TestQueryUsers(t *testing.T) {
 func TestCreateUserAsAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(adminEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -193,7 +193,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 func TestCreateUserAsNonAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -235,7 +235,7 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 func TestGetUserById(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -274,7 +274,7 @@ func TestGetUserById(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -319,7 +319,7 @@ func TestUpdateUser(t *testing.T) {
 func TestUpdateOtherUsers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -355,7 +355,7 @@ func TestUpdateOtherUsers(t *testing.T) {
 func TestDeleteUserAsAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(adminEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -391,7 +391,7 @@ func TestDeleteUserAsAdmin(t *testing.T) {
 func TestDeleteUserAsNonAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())

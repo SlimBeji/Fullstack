@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/lib/backendsync"
+	"backend/internal/lib/setup"
 	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
@@ -40,7 +40,7 @@ func getPlaceExamples() ([]schemas.PlaceRead, error) {
 func TestGetPlaces(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -87,7 +87,7 @@ func TestGetPlaces(t *testing.T) {
 func TestFetchPlaces(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -155,7 +155,7 @@ func TestFetchPlaces(t *testing.T) {
 func TestCreatePlace(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -232,7 +232,7 @@ func TestCreatePlace(t *testing.T) {
 func TestCreatePlaceForOthers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -284,7 +284,7 @@ func TestCreatePlaceForOthers(t *testing.T) {
 func TestGetPlaceById(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -331,7 +331,7 @@ func TestGetPlaceById(t *testing.T) {
 func TestUpdatePlaceById(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(adminEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -386,7 +386,7 @@ func TestUpdatePlaceById(t *testing.T) {
 func TestUpdatePlaceForOthers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -424,7 +424,7 @@ func TestUpdatePlaceForOthers(t *testing.T) {
 func TestDeletePlaceForOthers(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(userEmail)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -454,7 +454,7 @@ func TestDeletePlaceForOthers(t *testing.T) {
 func TestDeletePlace(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	token, err := getToken(adminEmail)
 	if err != nil {
 		t.Fatal(err.Error())

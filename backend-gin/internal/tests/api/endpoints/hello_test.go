@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/lib/backendsync"
+	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
 	"context"
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 func TestHelloWorld(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 
 	// sending the request
 	req := httptest.NewRequest(http.MethodGet, "/api/hello-world", nil)
@@ -46,7 +46,7 @@ func TestHelloWorld(t *testing.T) {
 func TestHelloUser(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	uc := collections.GetUserCollection()
 	token, err := uc.GetBearer("mslimbeji@gmail.com", context.Background())
 	if err != nil {
@@ -83,7 +83,7 @@ func TestHelloUser(t *testing.T) {
 func TestHelloAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 	uc := collections.GetUserCollection()
 	token, err := uc.GetBearer("mslimbeji@gmail.com", context.Background())
 	if err != nil {

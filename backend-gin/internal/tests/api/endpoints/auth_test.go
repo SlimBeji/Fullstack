@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/lib/backendsync"
+	"backend/internal/lib/setup"
 	"backend/internal/lib/utils"
 	"bytes"
 	"encoding/json"
@@ -18,7 +18,7 @@ import (
 func TestSignup(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 
 	// creating form
 	body := &bytes.Buffer{}
@@ -75,7 +75,7 @@ func TestSignup(t *testing.T) {
 func TestSignin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
-	backendsync.SeedTestData()
+	setup.SeedTestData()
 
 	// sending the request
 	form := "username=mslimbeji@gmail.com&password=very_secret"
