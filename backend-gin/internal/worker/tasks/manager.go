@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/hibiken/asynq"
 )
+
+const MAX_AGE = 7 * 20 * time.Hour
 
 type TasksManager struct {
 	client *asynq.Client
@@ -32,6 +35,7 @@ func (tm *TasksManager) NewTask(
 	name types_.Tasks, payload []byte, opts ...asynq.Option,
 ) (*asynq.TaskInfo, error) {
 	task := asynq.NewTask(string(name), payload)
+	opts = append(opts, asynq.Retention(MAX_AGE))
 	return tm.client.Enqueue(task, opts...)
 }
 
