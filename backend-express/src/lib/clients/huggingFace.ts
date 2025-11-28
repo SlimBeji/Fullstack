@@ -12,7 +12,7 @@ export class HuggingFaceClient {
         private embedModel = "sentence-transformers/all-MiniLM-L6-v2"
     ) {
         this.embedApi = axios.create({
-            baseURL: `https://api-inference.huggingface.co/models/${this.embedModel}/pipeline/feature-extraction`,
+            baseURL: `https://router.huggingface.co/hf-inference/models/${this.embedModel}/pipeline/feature-extraction`,
             headers: {
                 Authorization: `Bearer ${this.token}`,
                 "Content-Type": "application/json",
