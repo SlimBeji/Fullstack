@@ -46,6 +46,6 @@ func NewHuggingFaceClient(embedModel ...string) *HuggingFaceClient {
 	return &HuggingFaceClient{
 		token:      config.Env.HFAPIToken,
 		embedModel: model,
-		baseURL:    fmt.Sprintf("https://api-inference.huggingface.co/models/%s/pipeline/feature-extraction", model),
+		baseURL:    fmt.Sprintf("https://router.huggingface.co/hf-inference/models/%s/pipeline/feature-extraction", model),
 	}
 }
