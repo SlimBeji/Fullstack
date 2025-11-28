@@ -19,6 +19,8 @@ func main() {
 		scripts.TestStorage()
 	case "redis":
 		scripts.TestRedis()
+	case "hf":
+		scripts.TestHuggingFace()
 	default:
 		fmt.Printf("Unknown script %s\n", input)
 	}
