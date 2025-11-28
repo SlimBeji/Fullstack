@@ -23,21 +23,3 @@ const (
 )
 
 var AllCollections = []Collections{CollectionUsers, CollectionPlaces}
-
-type Queues string
-
-const (
-	QueueeEmails Queues = "emails"
-	QueuesAI     Queues = "ai"
-)
-
-var AllQueues = []Queues{QueueeEmails, QueuesAI}
-
-type Tasks string
-
-const (
-	TasksNewsletter     Tasks = "newsletter"
-	TasksPlaceEmbedding Tasks = "place_embedding"
-)
-
-var AllTasks = []Tasks{TasksNewsletter, TasksPlaceEmbedding}
