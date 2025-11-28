@@ -31,9 +31,13 @@ const (
 	QueuesAI     Queues = "ai"
 )
 
+var AllQueues = []Queues{QueueeEmails, QueuesAI}
+
 type Tasks string
 
 const (
 	TasksNewsletter     Tasks = "newsletter"
 	TasksPlaceEmbedding Tasks = "place_embedding"
 )
+
+var AllTasks = []Tasks{TasksNewsletter, TasksPlaceEmbedding}
