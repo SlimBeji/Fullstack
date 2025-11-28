@@ -5,6 +5,7 @@ import (
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
+	"backend/internal/worker/tasks/publisher"
 	"context"
 	"errors"
 	"fmt"
@@ -271,9 +272,10 @@ func (pc *PlaceCollection) PostCreate(
 	doc *schemas.PlaceDB,
 	result *mongo.InsertOneResult,
 ) error {
+	// Add placeId to the crator places
 	placeId, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return fmt.Errorf("could not extract the inserted place id")
+		return errors.New("could not extract the inserted place id")
 	}
 
 	update := bson.M{"$addToSet": bson.M{"places": placeId}}
@@ -283,6 +285,12 @@ func (pc *PlaceCollection) PostCreate(
 	_, err := collection.FindOneAndUpdate(sc, userFilter, update).Raw()
 	if err != nil {
 		return fmt.Errorf("could add the place id to creator places")
+	}
+
+	// Run embedding
+	_, err = publisher.PlaceEmbedding(placeId.Hex())
+	if err != nil {
+		return errors.New("could not run embedding for newly created place")
 	}
 
 	return nil
@@ -384,6 +392,20 @@ func (pc *PlaceCollection) PreUpdate(
 func (pc *PlaceCollection) PostUpdate(
 	sc mongo.SessionContext, before bson.Raw, after bson.Raw,
 ) error {
+	pre, err := pc.PostProcess(before)
+	if err != nil {
+		return errors.New("something went wrong while serializing the before update place")
+	}
+
+	post, err := pc.PostProcess(after)
+	if err != nil {
+		return errors.New("something went wrong while serializing the after update place")
+	}
+
+	if pre.Description != post.Description || pre.Title != post.Title {
+		_, err := publisher.PlaceEmbedding(post.ID)
+		return err
+	}
 	return nil
 }
 
