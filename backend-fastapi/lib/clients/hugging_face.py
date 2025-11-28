@@ -22,9 +22,7 @@ class HuggingFaceClient:
 
         # Embedding
         self.embeding_model = embeding_model
-        self.embedding_model_url = (
-            f"https://api-inference.huggingface.co/models/{self.embeding_model}"
-        )
+        self.embedding_model_url = f"https://router.huggingface.co/hf-inference/models/{self.embeding_model}"
         self.embedding_model_api = httpx.AsyncClient(
             base_url=self.embedding_model_url,
             headers=self.headers,
