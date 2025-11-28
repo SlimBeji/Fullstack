@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/hibiken/asynq"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,42 +17,51 @@ import (
 func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
 	var data taskspec.PlaceEmbeddingData
 	if err := json.Unmarshal(t.Payload(), &data); err != nil {
-		return fmt.Errorf("could not unmarshal data for place embedding task: %w", err)
+		newErr := fmt.Errorf("could not unmarshal data for place embedding task: %w", err)
+		log.Println(newErr.Error())
+		return newErr
 	}
 
 	pc := collections.GetPlaceCollection()
 	place, err := pc.GetById(data.PlaceId, ctx)
 	if err != nil {
-		return fmt.Errorf(
-			"could not extract place with id %s", data.PlaceId,
-		)
+		newErr := fmt.Errorf("could not extract place with id %s", data.PlaceId)
+		log.Println(newErr.Error())
+		return newErr
+
 	}
 	text := fmt.Sprintf("%s - %s", place.Title, place.Description)
 	hf := clients.NewHuggingFaceClient()
 	result, err := hf.EmbedText(text)
 	if err != nil {
-		return fmt.Errorf(
+		newErr := fmt.Errorf(
 			"could not run embedding of place %s with huggingface: %w",
 			data.PlaceId,
 			err,
 		)
+		log.Println(newErr.Error())
+		return newErr
 	}
 
 	objId, err := primitive.ObjectIDFromHex(data.PlaceId)
 	if err != nil {
-		return fmt.Errorf(
+		newErr := fmt.Errorf(
 			"unexpected error: could not convert %s to objectId in place embdedding task",
 			place.ID,
 		)
+		log.Println(newErr.Error())
+		return newErr
 	}
 	filter := bson.M{"_id": objId}
-	update := bson.M{"embedding": result}
+	update := bson.M{"$set": bson.M{"embedding": result}}
 	if _, err = pc.UpdateOne(ctx, filter, update); err != nil {
-		return fmt.Errorf(
+		newErr := fmt.Errorf(
 			"could not update place %s embedding: %w",
 			place.ID,
 			err,
 		)
+		log.Println(newErr.Error())
+		return newErr
 	}
 
 	fmt.Println(result)
