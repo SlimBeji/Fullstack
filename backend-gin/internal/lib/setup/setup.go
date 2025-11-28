@@ -4,20 +4,23 @@ import (
 	"backend/internal/lib/clients"
 	"backend/internal/models/examples"
 	"backend/internal/types_"
+	"backend/internal/worker/tasks"
 	"context"
 	"fmt"
 )
 
 type AppSetup struct {
-	Mongo   *clients.MongoClient
-	Redis   *clients.RedisClient
-	Storage *clients.CloudStorage
+	Mongo       *clients.MongoClient
+	Redis       *clients.RedisClient
+	Storage     *clients.CloudStorage
+	TaskManager *tasks.TasksManager
 }
 
 func (a *AppSetup) CloseSerives() {
 	a.Mongo.Close()
 	a.Redis.Close()
 	a.Storage.Close()
+	a.TaskManager.Close()
 }
 
 func (a *AppSetup) IndexCollections(mapping types_.IndexMapping) {
@@ -34,9 +37,10 @@ func (a *AppSetup) IndexCollections(mapping types_.IndexMapping) {
 
 func New() *AppSetup {
 	return &AppSetup{
-		Mongo:   clients.GetMongo(),
-		Redis:   clients.GetRedisClient(),
-		Storage: clients.GetStorage(),
+		Mongo:       clients.GetMongo(),
+		Redis:       clients.GetRedisClient(),
+		Storage:     clients.GetStorage(),
+		TaskManager: tasks.GetTaskManager(),
 	}
 }
 

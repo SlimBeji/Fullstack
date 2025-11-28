@@ -2,7 +2,9 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
+	"backend/internal/worker/tasks"
 	"fmt"
 	"net/http"
 
@@ -19,6 +21,12 @@ type ResponseExample struct {
 // @Success      200  {object}  ResponseExample
 // @Router       /api/hello-world/ [get]
 func hello(c *gin.Context) {
+	_, err := tasks.SendNewsletter("Slim", "mslimbeji@gmail.com")
+	if err != nil {
+		utils.AbortWithStatusJSON(c, err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Hello World!",
 	})
