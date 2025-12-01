@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -71,11 +72,14 @@ func newRedisClient() *RedisClient {
 	}
 }
 
+// Singleteon pattern
+
+var (
+	cacheOnce   sync.Once
+	redisClient *RedisClient
+)
+
 func GetRedisClient() *RedisClient {
-	if redisClient == nil {
-		redisClient = newRedisClient()
-	}
+	cacheOnce.Do(func() { redisClient = newRedisClient() })
 	return redisClient
 }
-
-var redisClient *RedisClient

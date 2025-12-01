@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -197,11 +198,14 @@ func newCloudStorage() *CloudStorage {
 	return cs
 }
 
+// Singleteon pattern
+
+var (
+	storageOnce sync.Once
+	gcsStorage  *CloudStorage
+)
+
 func GetStorage() *CloudStorage {
-	if gcsStorage == nil {
-		gcsStorage = newCloudStorage()
-	}
+	storageOnce.Do(func() { gcsStorage = newCloudStorage() })
 	return gcsStorage
 }
-
-var gcsStorage *CloudStorage

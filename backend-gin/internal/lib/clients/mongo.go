@@ -4,6 +4,7 @@ import (
 	"backend/internal/config"
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -68,11 +69,14 @@ func newMongoClient() *MongoClient {
 	return &MongoClient{Conn: conn, DB: db}
 }
 
-var mongoClient *MongoClient
+// Singleteon pattern
+
+var (
+	mongoOnce   sync.Once
+	mongoClient *MongoClient
+)
 
 func GetMongo() *MongoClient {
-	if mongoClient == nil {
-		mongoClient = newMongoClient()
-	}
+	mongoOnce.Do(func() { mongoClient = newMongoClient() })
 	return mongoClient
 }
