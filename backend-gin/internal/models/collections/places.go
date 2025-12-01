@@ -41,7 +41,7 @@ func GetPlaceCollection(validate ...bool) *PlaceCollection {
 		validateStructs = validate[0]
 	}
 	client := clients.GetMongo()
-	name := string(types_.CollectionPlaces)
+	name := string(Places)
 	collection := client.DB.Collection(name)
 	return &PlaceCollection{collection, validateStructs}
 }
@@ -53,7 +53,7 @@ func checkCreator(
 ) bool {
 	filter := bson.M{"_id": creatorId}
 	db := clients.GetMongoDB(sc.Client())
-	collection := db.Collection(string(types_.CollectionUsers))
+	collection := db.Collection(string(Users))
 	count, _ := collection.CountDocuments(sc, filter, options.Count().SetLimit(1))
 	return count > 0
 }
@@ -281,7 +281,7 @@ func (pc *PlaceCollection) PostCreate(
 	update := bson.M{"$addToSet": bson.M{"places": placeId}}
 	userFilter := bson.M{"_id": doc.CreatorID}
 	db := clients.GetMongoDB(sc.Client())
-	collection := db.Collection(string(types_.CollectionUsers))
+	collection := db.Collection(string(Users))
 	_, err := collection.FindOneAndUpdate(sc, userFilter, update).Raw()
 	if err != nil {
 		return fmt.Errorf("could add the place id to creator places")
@@ -305,7 +305,7 @@ func (pc *PlaceCollection) AuthCreate(
 
 	if user.Id != item.CreatorID {
 		return types_.AccessDeiniedErr(
-			string(types_.CollectionUsers), item.CreatorID,
+			string(Users), item.CreatorID,
 		)
 	}
 
@@ -374,7 +374,7 @@ func (pc *PlaceCollection) AuthUpdate(
 	}
 
 	return types_.AccessDeiniedErr(
-		string(types_.CollectionUsers), *creatorId,
+		string(Users), *creatorId,
 	)
 }
 
@@ -476,7 +476,7 @@ func (pc *PlaceCollection) PostDelete(
 	filter := bson.M{"_id": creatorId}
 	update := bson.M{"$pull": bson.M{"places": placeId}}
 	db := clients.GetMongoDB(sc.Client())
-	collection := db.Collection(string(types_.CollectionUsers))
+	collection := db.Collection(string(Users))
 	res := collection.FindOneAndUpdate(sc, filter, update)
 	if err := res.Err(); err != nil {
 		return fmt.Errorf(

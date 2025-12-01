@@ -52,7 +52,7 @@ func GetUserCollection(validate ...bool) *UserCollection {
 		validateStructs = validate[0]
 	}
 	client := clients.GetMongo()
-	name := string(types_.CollectionUsers)
+	name := string(Users)
 	collection := client.DB.Collection(name)
 	return &UserCollection{collection, validateStructs}
 }
@@ -570,7 +570,7 @@ func (uc *UserCollection) PostDelete(
 
 		// Get the place collection
 		db := clients.GetMongoDB(sc.Client())
-		collection := db.Collection(string(types_.CollectionPlaces))
+		collection := db.Collection(string(Places))
 		filters := bson.M{"_id": bson.M{"$in": result}}
 		if _, err := collection.DeleteMany(sc, filters); err != nil {
 			return fmt.Errorf(

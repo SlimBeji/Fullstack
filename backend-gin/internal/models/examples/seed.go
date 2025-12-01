@@ -5,7 +5,6 @@ import (
 	"backend/internal/models/collections"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
@@ -20,7 +19,7 @@ import (
 func createCollections(mc *clients.MongoClient, isVerbose bool) error {
 	var eg errgroup.Group
 
-	for _, collection := range types_.AllCollections {
+	for _, collection := range collections.AllCollections {
 		name := string(collection)
 		eg.Go(func() error {
 			if err := mc.CreateCollection(name); err != nil {
@@ -41,7 +40,7 @@ func createCollections(mc *clients.MongoClient, isVerbose bool) error {
 
 func seedUsers(refs RefMappings, isVerbose bool) error {
 	userRefs := make(map[int]primitive.ObjectID)
-	refs[types_.CollectionUsers] = userRefs
+	refs[collections.Users] = userRefs
 	uc := collections.GetUserCollection()
 	storage := clients.GetStorage()
 	ctx := context.Background()
@@ -88,7 +87,7 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 
 func seedPlaces(refs RefMappings, isVerbose bool) error {
 	placeRefs := make(map[int]primitive.ObjectID)
-	refs[types_.CollectionPlaces] = placeRefs
+	refs[collections.Places] = placeRefs
 	uc := collections.GetUserCollection()
 	pc := collections.GetPlaceCollection()
 	storage := clients.GetStorage()
@@ -119,7 +118,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 			}
 			placeIn.ImageUrl = url
 
-			creatorId, found := refs[types_.CollectionUsers][placeEx.CreatorRef]
+			creatorId, found := refs[collections.Users][placeEx.CreatorRef]
 			if !found {
 				message := fmt.Sprintf(
 					"examples corrrupted, could not find user with ref %d while creating place with ref %d",
@@ -156,7 +155,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 	return eg.Wait()
 }
 
-type RefMappings map[types_.Collections]map[int]primitive.ObjectID
+type RefMappings map[collections.CollectionName]map[int]primitive.ObjectID
 
 func SeedDb(verbose ...bool) error {
 	mc := clients.GetMongo()
