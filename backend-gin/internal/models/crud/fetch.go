@@ -264,9 +264,9 @@ func postProcessBatch[Read any](
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			decoded, err := callback(items[i])
-			results[i] = decoded
-			errs[i] = err
+			decoded, err := callback(items[index])
+			results[index] = decoded
+			errs[index] = err
 		}(i)
 	}
 
@@ -290,9 +290,9 @@ func postProcessBsonBatch(
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			decoded, err := callback(items[0])
-			results[i] = decoded
-			errs[i] = err
+			decoded, err := callback(items[index])
+			results[index] = decoded
+			errs[index] = err
 		}(i)
 	}
 
