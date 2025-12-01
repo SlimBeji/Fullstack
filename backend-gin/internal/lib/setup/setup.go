@@ -2,8 +2,8 @@ package setup
 
 import (
 	"backend/internal/lib/clients"
+	"backend/internal/models/collections"
 	"backend/internal/models/examples"
-	"backend/internal/types_"
 	"backend/internal/worker/tasks/handler"
 	"backend/internal/worker/tasks/publisher"
 	"context"
@@ -26,7 +26,7 @@ func (a *AppSetup) CloseSerives() {
 	a.TaskHandler.Close()
 }
 
-func (a *AppSetup) IndexCollections(mapping types_.IndexMapping) {
+func (a *AppSetup) IndexCollections(mapping collections.IndexMapping) {
 	for name, indexes := range mapping {
 		collection := a.Mongo.DB.Collection(string(name))
 		_, err := collection.Indexes().CreateMany(

@@ -1,10 +1,21 @@
 package collections
 
 import (
-	"backend/internal/types_"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var IndexStore types_.IndexMapping = types_.IndexMapping{
-	types_.CollectionUsers:  UserIndexes,
-	types_.CollectionPlaces: PlaceIndexes,
+type CollectionName string
+
+const (
+	Users  CollectionName = "users"
+	Places CollectionName = "places"
+)
+
+var AllCollections = []CollectionName{Users, Places}
+
+type IndexMapping map[CollectionName][]mongo.IndexModel
+
+var IndexStore = IndexMapping{
+	Users:  UserIndexes,
+	Places: PlaceIndexes,
 }

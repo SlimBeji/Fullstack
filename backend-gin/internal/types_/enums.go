@@ -14,12 +14,3 @@ const (
 	MimetypeJPEG MimeType = "image/jpeg"
 	MimetypePNG  MimeType = "image/png"
 )
-
-type Collections string
-
-const (
-	CollectionUsers  Collections = "users"
-	CollectionPlaces Collections = "places"
-)
-
-var AllCollections = []Collections{CollectionUsers, CollectionPlaces}
