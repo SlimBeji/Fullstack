@@ -4,6 +4,7 @@ import (
 	"backend/internal/lib/clients"
 	"backend/internal/models/collections"
 	"backend/internal/models/examples"
+	"backend/internal/worker/crons"
 	"backend/internal/worker/tasks/handler"
 	"backend/internal/worker/tasks/publisher"
 	"context"
@@ -16,6 +17,7 @@ type AppSetup struct {
 	Storage       *clients.CloudStorage
 	TaskPublisher *publisher.TaskPublisher
 	TaskHandler   *handler.TaskHandler
+	TaskScheduler *crons.TaskScheduler
 }
 
 func (a *AppSetup) CloseSerives() {
@@ -24,6 +26,7 @@ func (a *AppSetup) CloseSerives() {
 	a.Storage.Close()
 	a.TaskPublisher.Close()
 	a.TaskHandler.Close()
+	a.TaskScheduler.Close()
 }
 
 func (a *AppSetup) IndexCollections(mapping collections.IndexMapping) {
@@ -45,6 +48,7 @@ func New() *AppSetup {
 		Storage:       clients.GetStorage(),
 		TaskPublisher: publisher.GetPublisher(),
 		TaskHandler:   handler.GetHandler(),
+		TaskScheduler: crons.GetScheduler(),
 	}
 }
 
