@@ -1,6 +1,7 @@
 # Builds and locals
 backend-gin/tmp
 backend-gin/backend
+backend-axum/target
 **/node_modules
 **/build
 **/dist
@@ -17,6 +18,7 @@ todo.txt
 **/express.env
 **/fastapi.env
 **/gin.env
+**/axum.env
 
 # Docker local images
 mongo

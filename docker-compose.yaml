@@ -99,6 +99,24 @@ services:
         command: air
         restart: on-failure
 
+    axum:
+        build:
+            context: .
+            dockerfile: ./backend-axum/axum.Dockerfile
+        container_name: axum
+        ports:
+            - 5003:5003
+        volumes:
+            - ./backend-axum:/app
+        env_file:
+            - ./backend-axum/axum.env
+        depends_on:
+            - mongo1
+            - mongo2
+            - gcs
+        command: cargo watch -x run
+        restart: on-failure
+
     mongo1:
         image: mongo:latest
         container_name: mongo1

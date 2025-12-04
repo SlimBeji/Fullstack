@@ -35,7 +35,7 @@ Each backend implements the **same logic**, **routes**, and **data models**:
 | TypeScript | [Express](https://expressjs.com/)        | http://localhost:5000/api |
 | Python     | [FastAPI](https://fastapi.tiangolo.com/) | http://localhost:5001/api |
 | Go         | [Gin](https://gin-gonic.com/)            | http://localhost:5002/api |
-| Rust       | [Axum](https://actix.rs/)                | _Not Implemented Yet_     |
+| Rust       | [Axum](https://github.com/tokio-rs/axum) | http://localhost:5003/api |
 
 Each backend connects to a shared set of services (e.g., MongoDB, Redis).
 
@@ -400,7 +400,7 @@ It is used to **auto-generate Swagger UI documentation** from the defined routes
 > ⚠️ Depending on the framework:
 >
 > -   **FastAPI**: Automatically generates Swagger UI from route and schema definitions.
-> -   **Express/Gin/Actix**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
+> -   **Express/Gin/Axum**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
 
 #### 📁📁 Routes
 
@@ -606,6 +606,5 @@ Stores **static assets** like images or files that may be served by the backend 
 
 ## 🚀 Next Steps
 
--   Add the **Go/Gin** backend
--   Add the **Rust/Actix** backend
+-   Add the **Rust/Axum** backend (ongoing)
 -   Add an **Angular** SPA frontend

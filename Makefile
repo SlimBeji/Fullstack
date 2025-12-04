@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach gin
+	docker-compose up --attach axum
 
 build:
 	docker-compose build
@@ -141,3 +141,29 @@ gin-seed:
 
 gin-dump:
 	docker exec -it gin go run /app/cmd/scripts dump
+
+# Axum commands
+axum-build:
+	docker-compose build axum
+
+axum-bash:
+	docker exec -it axum bash
+
+axum-test:
+	docker exec -it axum cargo test
+
+axum-lint:
+	docker exec -it axum cargo fmt
+	docker exec -it axum cargo check
+
+axum-script/%:
+	docker exec -it axum cargo run --bin $*
+
+axum-debug:
+	docker exec -it axum cargo run --bin debug
+
+axum-seed:
+	docker exec -it axum cargo run --bin seed
+
+axum-dump:
+	docker exec -it axum cargo run --bin dump
