@@ -526,14 +526,14 @@ would generate this MongoDB query
 db.users
     .find(
         {
-            name: { $regex: "Slim" },
+            name: { $regex: 'Slim' },
             age: { $gte: 30, $lte: 40 },
-            "address.zipcode": { $eq: 2040 },
+            'address.zipcode': { $eq: 2040 },
         },
         {
             id: 1,
             name: 1,
-            "address.zipcode": 1,
+            'address.zipcode': 1,
         }
     )
     .sort({ name: 1 })
