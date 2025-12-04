@@ -106,7 +106,7 @@ services:
             - 27017:27017
         volumes:
             - ./mongo/1:/data/db
-        command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+        command: ['mongod', '--replSet', 'rs0', '--bind_ip_all']
         restart: on-failure
 
     mongo2:
@@ -116,7 +116,7 @@ services:
             - 27018:27017
         volumes:
             - ./mongo/2:/data/db
-        command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+        command: ['mongod', '--replSet', 'rs0', '--bind_ip_all']
         restart: on-failure
 
     mongo-setup:
@@ -160,16 +160,16 @@ services:
             - ./gcs:/storage
         command:
             [
-                "-scheme",
-                "http",
-                "-public-host",
-                "gcs:4443",
-                "-external-url",
-                "http://gcs:4443",
-                "-backend",
-                "filesystem",
-                "-filesystem-root",
-                "/storage",
+                '-scheme',
+                'http',
+                '-public-host',
+                'gcs:4443',
+                '-external-url',
+                'http://gcs:4443',
+                '-backend',
+                'filesystem',
+                '-filesystem-root',
+                '/storage',
             ]
         restart: on-failure
 
