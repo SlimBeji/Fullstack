@@ -85,7 +85,7 @@ The following `make` commands help manage the Gin backend:
 | ------------------------ | ----------------------------------------------------------------------------------------- |
 | `make gin-build`         | Build the Docker container for the Gin service.                                           |
 | `make gin-bash`          | Open an interactive shell inside the running Gin container.                               |
-| `make gin-test`          | Run unit tests using.                                                                     |
+| `make gin-test`          | Run unit tests                                                                            |
 | `make gin-swagger`       | Run go swag init command and generate OpenAPI specifiications for Swagger UI              |
 | `make gin-generate`      | Run go generate ./... for metaprogramming                                                 |
 | `make gin-lint`          | Run go generate + swag init + go fmt + go build to make sure format + compilation is good |
