@@ -8,6 +8,8 @@ use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
+mod config;
+
 #[cfg(test)]
 mod tests;
 
@@ -15,7 +17,7 @@ mod tests;
 async fn main() {
     // initialize tracing
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::TRACE)
+        .with_max_level(config::ENV.trace_lvl())
         .with_target(false)
         .init();
 
@@ -27,7 +29,7 @@ async fn main() {
     let app = add_trace_layer(app);
 
     // serve the app
-    let listener = TcpListener::bind("0.0.0.0:5003")
+    let listener = TcpListener::bind(config::ENV.bind_addr())
         .await
         .expect("Failed to bind listener");
 
