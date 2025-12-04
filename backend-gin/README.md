@@ -19,7 +19,7 @@ The Gin backend relies on a `gin.env` file for configuration.
 
 ```
 # ENV
-PORT=5001
+PORT=5002
 API_URL=http://localhost:5002/api
 APP_URL=*
 SECRET_KEY=NOT_VERY_SECRET
