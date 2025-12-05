@@ -20,3 +20,6 @@ tower-http = { version = "0.5", features = ["trace"] }
 # Schemas
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+utoipa = { version = "5", features = ["macros"] }
+utoipa-swagger-ui = { version = "9", features = ["axum", "vendored"] }
+utoipa-axum = "0.2"
