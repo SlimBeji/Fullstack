@@ -4,10 +4,12 @@ use tower_http::trace::TraceLayer;
 
 use crate::config;
 
+mod docs;
 mod routes;
 
 pub fn get_app() -> Router {
-    let app = routes::create_router("/api");
+    let router = routes::create_router("/api");
+    let app = docs::add_swagger_ui(router);
     add_trace_layer(app)
 }
 
