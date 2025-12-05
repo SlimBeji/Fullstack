@@ -10,12 +10,22 @@ pub fn routes() -> OpenApiRouter {
         .routes(routes!(signin_route))
 }
 
-#[utoipa::path(post, path = "/signup")]
+#[utoipa::path(
+    post,
+    path = "/signup",
+    tag = "Auth",
+    summary = "User registration"
+)]
 async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
 
-#[utoipa::path(post, path = "/signin")]
+#[utoipa::path(
+    post,
+    path = "/signin",
+    tag = "Auth",
+    summary = "User authentication"
+)]
 async fn signin_route(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }

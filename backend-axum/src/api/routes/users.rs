@@ -14,27 +14,42 @@ pub fn routes() -> OpenApiRouter {
         .routes(routes!(delete_user))
 }
 
-#[utoipa::path(get, path = "/")]
+#[utoipa::path(
+    get,
+    path = "/",
+    tag = "User",
+    summary = "Search and Retrieve users"
+)]
 async fn get_users() -> String {
     "Get Users".to_string()
 }
 
-#[utoipa::path(post, path = "/query")]
+#[utoipa::path(
+    post,
+    path = "/query",
+    tag = "User",
+    summary = "Search and Retrieve users"
+)]
 async fn query_users(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
 
-#[utoipa::path(post, path = "/")]
+#[utoipa::path(post, path = "/", tag = "User", summary = "User Creation")]
 async fn create_user(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
 
-#[utoipa::path(get, path = "/{id}")]
+#[utoipa::path(
+    get,
+    path = "/{id}",
+    tag = "User",
+    summary = "Search and Retrieve user by id"
+)]
 async fn get_user(Path(id): Path<String>) -> String {
     format!("returning user {}", id)
 }
 
-#[utoipa::path(put, path = "/{id}")]
+#[utoipa::path(put, path = "/{id}", tag = "User", summary = "Update users")]
 async fn update_user(
     Path(id): Path<String>,
     Json(body): Json<Value>,
@@ -43,7 +58,12 @@ async fn update_user(
     Json(body)
 }
 
-#[utoipa::path(delete, path = "/{id}")]
+#[utoipa::path(
+    delete,
+    path = "/{id}",
+    tag = "User",
+    summary = "Delete user by id"
+)]
 async fn delete_user(Path(id): Path<String>) -> String {
     format!("Deleted user {}", id)
 }
