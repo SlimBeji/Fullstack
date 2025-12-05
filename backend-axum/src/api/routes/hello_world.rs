@@ -1,13 +1,12 @@
-use axum::routing::get;
-use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub const PATH: &str = "/hello-world";
 
 pub fn routes() -> OpenApiRouter {
     OpenApiRouter::new()
-        .route("/", get(hello))
-        .route("/user", get(hello_user))
-        .route("/admin", get(hello_admin))
+        .routes(routes!(hello))
+        .routes(routes!(hello_user))
+        .routes(routes!(hello_admin))
 }
 
 #[utoipa::path(get, path = "/")]

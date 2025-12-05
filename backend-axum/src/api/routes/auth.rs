@@ -1,13 +1,13 @@
-use axum::{Json, routing::post};
+use axum::Json;
 use serde_json::Value;
-use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub const PATH: &str = "/auth";
 
 pub fn routes() -> OpenApiRouter {
     OpenApiRouter::new()
-        .route("/signup", post(signup_route))
-        .route("/signin", post(signin_route))
+        .routes(routes!(signup_route))
+        .routes(routes!(signin_route))
 }
 
 #[utoipa::path(post, path = "/signup")]

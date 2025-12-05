@@ -1,21 +1,17 @@
-use axum::{
-    Json,
-    extract::Path,
-    routing::{delete, get, post, put},
-};
+use axum::{Json, extract::Path};
 use serde_json::Value;
-use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub const PATH: &str = "/users";
 
 pub fn routes() -> OpenApiRouter {
     OpenApiRouter::new()
-        .route("/", get(get_users))
-        .route("/query", post(query_users))
-        .route("/", post(create_user))
-        .route("/{id}", get(get_user))
-        .route("/{id}", put(update_user))
-        .route("/{id}", delete(delete_user))
+        .routes(routes!(get_users))
+        .routes(routes!(query_users))
+        .routes(routes!(create_user))
+        .routes(routes!(get_user))
+        .routes(routes!(update_user))
+        .routes(routes!(delete_user))
 }
 
 #[utoipa::path(get, path = "/")]
