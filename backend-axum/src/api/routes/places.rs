@@ -1,14 +1,15 @@
 use axum::{
-    Json, Router,
+    Json,
     extract::Path,
     routing::{delete, get, post, put},
 };
 use serde_json::Value;
+use utoipa_axum::router::OpenApiRouter;
 
 pub const PATH: &str = "/places";
 
-pub fn routes() -> Router {
-    Router::new()
+pub fn routes() -> OpenApiRouter {
+    OpenApiRouter::new()
         .route("/", get(get_places))
         .route("/query", post(query_places))
         .route("/", post(create_place))
@@ -17,22 +18,27 @@ pub fn routes() -> Router {
         .route("/{id}", delete(delete_place))
 }
 
+#[utoipa::path(get, path = "/")]
 async fn get_places() -> String {
     "Get Places".to_string()
 }
 
+#[utoipa::path(post, path = "/query")]
 async fn query_places(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
 
+#[utoipa::path(post, path = "/")]
 async fn create_place(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
 
+#[utoipa::path(get, path = "/{id}")]
 async fn get_place(Path(id): Path<String>) -> String {
     format!("returning place {}", id)
 }
 
+#[utoipa::path(put, path = "/{id}")]
 async fn update_place(
     Path(id): Path<String>,
     Json(body): Json<Value>,
@@ -41,6 +47,7 @@ async fn update_place(
     Json(body)
 }
 
+#[utoipa::path(delete, path = "/{id}")]
 async fn delete_place(Path(id): Path<String>) -> String {
     format!("Deleted place {}", id)
 }

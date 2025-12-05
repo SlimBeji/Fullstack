@@ -1,12 +1,12 @@
-use axum::Router;
+use utoipa_axum::router::OpenApiRouter;
 
 mod auth;
 mod hello_world;
 mod places;
 mod users;
 
-pub fn create_router(prefix: &str) -> Router {
-    Router::new()
+pub fn create_router(prefix: &str) -> OpenApiRouter {
+    OpenApiRouter::new()
         .nest(&format!("{}{}", prefix, auth::PATH), auth::routes())
         .nest(
             &format!("{}{}", prefix, hello_world::PATH),
