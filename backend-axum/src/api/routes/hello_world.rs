@@ -1,3 +1,5 @@
+use axum::{Json, response::IntoResponse};
+use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -22,8 +24,10 @@ pub fn routes() -> OpenApiRouter {
     tag = "Hello World",
     summary = "Hello World Endpoint"
 )]
-async fn hello() -> String {
-    "Hello World!".to_string()
+async fn hello() -> impl IntoResponse {
+    Json(json!({
+        "message": "Hello World!"
+    }))
 }
 
 #[utoipa::path(
@@ -32,8 +36,10 @@ async fn hello() -> String {
     tag = "Hello World",
     summary = "Hello World Endpoint for authenticated users"
 )]
-async fn hello_user() -> String {
-    "Hello User!".to_string()
+async fn hello_user() -> impl IntoResponse {
+    Json(json!({
+        "message": "Hello Slim Beji!"
+    }))
 }
 
 #[utoipa::path(
@@ -42,6 +48,8 @@ async fn hello_user() -> String {
     tag = "Hello World",
     summary = "Hello World Endpoint for admins only"
 )]
-async fn hello_admin() -> String {
-    "Hello Admin!".to_string()
+async fn hello_admin() -> impl IntoResponse {
+    Json(json!({
+        "message": "Hello Admin Slim Beji!"
+    }))
 }
