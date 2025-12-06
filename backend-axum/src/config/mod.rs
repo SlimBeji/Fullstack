@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 pub struct Settings {
     // Env Config
     pub port: u16,
-    //pub api_url: String,
+    pub api_url: String,
     //pub app_url: String,
     //pub secret_key: String,
     //pub file_upload_max_size: u64,
@@ -42,7 +42,7 @@ impl Settings {
         Ok(Settings {
             // Env Config
             port: env_to_num(&get_env_or("PORT", "5002"))?,
-            //api_url: get_env_or("API_URL", "http://localhost:5002/api"),
+            api_url: get_env_or("API_URL", "http://localhost:5002/api"),
             //app_url: get_env("APP_URL")?,
             //secret_key: get_env("SECRET_KEY")?,
             //file_upload_max_size: env_to_num(&get_env_or("FILEUPLOAD_MAX_SIZE","100",))?,
@@ -75,6 +75,13 @@ impl Settings {
 
     pub fn bind_addr(&self) -> String {
         format!("0.0.0.0:{}", self.port)
+    }
+
+    pub fn server_url(&self) -> String {
+        self.api_url
+            .strip_suffix("/api")
+            .unwrap_or(&self.api_url)
+            .to_string()
     }
 
     pub fn trace_lvl(&self) -> tracing::Level {
