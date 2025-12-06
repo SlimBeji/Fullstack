@@ -1,17 +1,24 @@
 use axum::{Json, extract::Path};
 use serde_json::Value;
+use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub const PATH: &str = "/users";
 
 pub fn routes() -> OpenApiRouter {
-    OpenApiRouter::new()
+    let mut router = OpenApiRouter::new()
         .routes(routes!(get_users))
         .routes(routes!(query_users))
         .routes(routes!(create_user))
         .routes(routes!(get_user))
         .routes(routes!(update_user))
-        .routes(routes!(delete_user))
+        .routes(routes!(delete_user));
+
+    let openapi = router.get_openapi_mut();
+    let mut tag = Tag::new("User");
+    tag.description = Some("User crud endpoints".to_string());
+    openapi.tags = Some(vec![tag]);
+    router
 }
 
 #[utoipa::path(

@@ -1,17 +1,24 @@
 use axum::{Json, extract::Path};
 use serde_json::Value;
+use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub const PATH: &str = "/places";
 
 pub fn routes() -> OpenApiRouter {
-    OpenApiRouter::new()
+    let mut router = OpenApiRouter::new()
         .routes(routes!(get_places))
         .routes(routes!(query_places))
         .routes(routes!(create_place))
         .routes(routes!(get_place))
         .routes(routes!(update_place))
-        .routes(routes!(delete_place))
+        .routes(routes!(delete_place));
+
+    let openapi = router.get_openapi_mut();
+    let mut tag = Tag::new("Place");
+    tag.description = Some("Place crud endpoints".to_string());
+    openapi.tags = Some(vec![tag]);
+    router
 }
 
 #[utoipa::path(

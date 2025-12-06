@@ -1,12 +1,19 @@
+use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub const PATH: &str = "/hello-world";
 
 pub fn routes() -> OpenApiRouter {
-    OpenApiRouter::new()
+    let mut router = OpenApiRouter::new()
         .routes(routes!(hello))
         .routes(routes!(hello_user))
-        .routes(routes!(hello_admin))
+        .routes(routes!(hello_admin));
+
+    let openapi = router.get_openapi_mut();
+    let mut tag = Tag::new("Hello World");
+    tag.description = Some("Hello World endpoints".to_string());
+    openapi.tags = Some(vec![tag]);
+    router
 }
 
 #[utoipa::path(
