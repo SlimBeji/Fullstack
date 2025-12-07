@@ -50,12 +50,6 @@ async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
 )]
 async fn signin_route(Form(payload): Form<SigninSchema>) -> impl IntoResponse {
     println!("{:?}", payload);
-    let response = EncodedTokenSchema{
-        access_token: "a_very_secret_token".to_string(),
-        token_type: "bearer".to_string(),
-        user_id: "1234".to_string(),
-        email: "mslimbeji@gmail.com".to_string(),
-        expires_in: 3600
-    };
+    let response = EncodedTokenSchema::example();
     (StatusCode::OK, Json(response))
 }
