@@ -44,7 +44,7 @@ async fn query_users(Json(body): Json<Value>) -> Json<Value> {
 }
 
 #[utoipa::path(
-    post, 
+    post,
     path = "/", 
     tag = "User", 
     summary = "User Creation", 
@@ -66,7 +66,7 @@ async fn get_user(Path(id): Path<String>) -> String {
 }
 
 #[utoipa::path(
-    put, 
+    put,
     path = "/{id}", 
     tag = "User", 
     summary = "Update users",

@@ -44,7 +44,7 @@ async fn query_places(Json(body): Json<Value>) -> Json<Value> {
 }
 
 #[utoipa::path(
-    post, 
+    post,
     path = "/", 
     tag = "Place", 
     summary = "Place Creation", 
@@ -66,7 +66,7 @@ async fn get_place(Path(id): Path<String>) -> String {
 }
 
 #[utoipa::path(
-    put, 
+    put,
     path = "/{id}", 
     tag = "Place", 
     summary = "Update places", 

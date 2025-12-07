@@ -39,12 +39,12 @@ async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
     tag = "Auth",
     summary = "User authentication",
     request_body(
-        content = SigninSchema, 
+        content = SigninSchema,
         content_type = "application/x-www-form-urlencoded"
     ),
     responses((
-        status = 200, 
-        body=EncodedTokenSchema, 
+        status = 200,
+        body=EncodedTokenSchema,
         content_type = "application/json"
     ))
 )]
