@@ -1,7 +1,11 @@
-use axum::Json;
+use axum::{Json, http::StatusCode};
+use axum::extract::Form;
+use axum::response::IntoResponse;
 use serde_json::Value;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
+
+use crate::models::schemas::auth::{SigninSchema, EncodedTokenSchema};
 
 pub const PATH: &str = "/auth";
 
@@ -34,8 +38,24 @@ async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
     path = "/signin",
     tag = "Auth",
     summary = "User authentication",
-    responses((status = 200, content_type = "application/json"))
+    request_body(
+        content = SigninSchema, 
+        content_type = "application/x-www-form-urlencoded"
+    ),
+    responses((
+        status = 200, 
+        body=EncodedTokenSchema, 
+        content_type = "application/json"
+    ))
 )]
-async fn signin_route(Json(body): Json<Value>) -> Json<Value> {
-    Json(body)
+async fn signin_route(Form(payload): Form<SigninSchema>) -> impl IntoResponse {
+    println!("{:?}", payload);
+    let response = EncodedTokenSchema{
+        access_token: "a_very_secret_token".to_string(),
+        token_type: "bearer".to_string(),
+        user_id: "1234".to_string(),
+        email: "mslimbeji@gmail.com".to_string(),
+        expires_in: 3600
+    };
+    (StatusCode::OK, Json(response))
 }
