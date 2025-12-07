@@ -25,7 +25,8 @@ pub fn routes() -> OpenApiRouter {
     get,
     path = "/",
     tag = "Place",
-    summary = "Search and Retrieve places"
+    summary = "Search and Retrieve places",
+    responses((status = 200, content_type = "application/json"))
 )]
 async fn get_places() -> String {
     "Get Places".to_string()
@@ -35,13 +36,20 @@ async fn get_places() -> String {
     post,
     path = "/query",
     tag = "Place",
-    summary = "Search and Retrieve places"
+    summary = "Search and Retrieve places",
+    responses((status = 200, content_type = "application/json"))
 )]
 async fn query_places(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
 
-#[utoipa::path(post, path = "/", tag = "Place", summary = "Place Creation")]
+#[utoipa::path(
+    post, 
+    path = "/", 
+    tag = "Place", 
+    summary = "Place Creation", 
+    responses((status = 200, content_type = "application/json"))
+)]
 async fn create_place(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
 }
@@ -50,13 +58,20 @@ async fn create_place(Json(body): Json<Value>) -> Json<Value> {
     get,
     path = "/{id}",
     tag = "Place",
-    summary = "Search and Retrieve place by id"
+    summary = "Search and Retrieve place by id",
+    responses((status = 200, content_type = "application/json"))
 )]
 async fn get_place(Path(id): Path<String>) -> String {
     format!("returning place {}", id)
 }
 
-#[utoipa::path(put, path = "/{id}", tag = "Place", summary = "Update places")]
+#[utoipa::path(
+    put, 
+    path = "/{id}", 
+    tag = "Place", 
+    summary = "Update places", 
+    responses((status = 200, content_type = "application/json"))
+)]
 async fn update_place(
     Path(id): Path<String>,
     Json(body): Json<Value>,
@@ -69,7 +84,8 @@ async fn update_place(
     delete,
     path = "/{id}",
     tag = "Place",
-    summary = "Delete place by id"
+    summary = "Delete place by id",
+    responses((status = 200, content_type = "application/json"))
 )]
 async fn delete_place(Path(id): Path<String>) -> String {
     format!("Deleted place {}", id)

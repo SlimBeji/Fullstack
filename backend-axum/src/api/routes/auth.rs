@@ -22,7 +22,8 @@ pub fn routes() -> OpenApiRouter {
     post,
     path = "/signup",
     tag = "Auth",
-    summary = "User registration"
+    summary = "User registration",
+    responses((status = 200, content_type = "application/json"))
 )]
 async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
@@ -32,7 +33,8 @@ async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
     post,
     path = "/signin",
     tag = "Auth",
-    summary = "User authentication"
+    summary = "User authentication",
+    responses((status = 200, content_type = "application/json"))
 )]
 async fn signin_route(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
