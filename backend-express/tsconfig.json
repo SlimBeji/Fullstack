@@ -5,7 +5,7 @@
         "esModuleInterop": true,
         "rootDir": "./src",
         "outDir": "./build",
-        "typeRoots": ["./src/types", "./node_modules/@types"],
+        "typeRoots": ["./src", "./node_modules/@types"],
         "types": ["jest"],
         "forceConsistentCasingInFileNames": true,
         "strict": true,

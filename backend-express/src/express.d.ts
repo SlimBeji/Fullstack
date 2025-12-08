@@ -2,7 +2,7 @@ import "express";
 
 import { UserRead } from "@/models/schemas";
 
-import { FindQuery } from "./mongo";
+import { FindQuery } from "./types/mongo";
 
 declare module "express-serve-static-core" {
     interface Request {
