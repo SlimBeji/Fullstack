@@ -1,9 +1,9 @@
 import { model, Schema } from "mongoose";
 
 import { ApiError, HttpStatus } from "@/lib/express";
-import { CollectionEnum } from "@/types";
 
 import { PlaceDB } from "../schemas";
+import { PLACES_COLLECTION, USERS_COLLECTION } from "./base";
 
 // Schema creation
 export const PlaceCollectionSchema = new Schema<PlaceDB>(
@@ -25,7 +25,7 @@ export const PlaceCollectionSchema = new Schema<PlaceDB>(
         // Foreign Keys:
         creatorId: {
             type: Schema.ObjectId,
-            ref: CollectionEnum.USERS,
+            ref: USERS_COLLECTION,
         },
     },
     { timestamps: true }
@@ -63,7 +63,7 @@ PlaceCollectionSchema.pre("deleteOne", async function (next) {
 
 // Model Creation
 export const PlaceModel = model<PlaceDB>(
-    CollectionEnum.PLACES,
+    PLACES_COLLECTION,
     PlaceCollectionSchema
 );
 

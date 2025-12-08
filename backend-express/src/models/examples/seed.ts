@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 
 import { db, redisClient, storage } from "@/lib/clients";
-import { CollectionEnum } from "@/types";
 
+import { ALL_COLLECTIONS } from "../collections/base";
 import { crudPlace, crudUser } from "../crud";
 import { PlaceSeed, UserSeed } from "../schemas";
 import { places } from "./places";
@@ -13,7 +13,7 @@ const placeRefMapping: Map<number, Types.ObjectId> = new Map();
 
 const createCollections = async (): Promise<void> => {
     await Promise.all(
-        Object.values(CollectionEnum).map(async (collectionName: string) => {
+        ALL_COLLECTIONS.map(async (collectionName: string) => {
             await db.createCollection(collectionName);
         })
     );

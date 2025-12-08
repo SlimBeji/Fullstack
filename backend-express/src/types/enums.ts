@@ -1,8 +1,3 @@
-export enum CollectionEnum {
-    USERS = "users",
-    PLACES = "places",
-}
-
 export enum Queues {
     EMAILS = "emails",
     AI = "ai",
