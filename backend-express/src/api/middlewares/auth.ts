@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 
-import { HttpStatus } from "@/lib/express";
-import { ApiError } from "@/types";
+import { ApiError, HttpStatus } from "@/lib/express";
 
 import { getUserFromToken } from "../auth";
 

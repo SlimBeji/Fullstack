@@ -1,12 +1,11 @@
 import { env } from "@/config";
-import { HttpStatus } from "@/lib/express";
+import { ApiError, HttpStatus } from "@/lib/express";
 import {
     DecodedTokenPayload,
     EncodedToken,
     TokenPayload,
     UserRead,
 } from "@/models/schemas";
-import { ApiError } from "@/types";
 
 import { decodePayload, encodePayload } from "./helpers";
 

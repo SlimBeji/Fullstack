@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { HttpStatus } from "@/lib/express";
-import { ApiError } from "@/types";
+import { ApiError, HttpStatus } from "@/lib/express";
 
 export const errorHandler = (
     error: ApiError,
