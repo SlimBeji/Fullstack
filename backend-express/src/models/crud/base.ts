@@ -10,6 +10,7 @@ import {
 } from "mongoose";
 
 import { env } from "@/config";
+import { HttpStatus } from "@/lib/express";
 import {
     Filter,
     FindQueryFilters,
@@ -19,7 +20,7 @@ import {
     PaginationData,
     SortData,
 } from "@/types";
-import { ApiError, FindQuery, HttpStatus, PaginatedData } from "@/types";
+import { ApiError, FindQuery, PaginatedData } from "@/types";
 
 import { UserRead } from "../schemas";
 

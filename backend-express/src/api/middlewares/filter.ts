@@ -3,7 +3,8 @@ import { ParsedQs } from "qs";
 import { AnyZodObject } from "zod";
 
 import { env } from "@/config";
-import { ApiError, Filter, HttpStatus } from "@/types";
+import { HttpStatus } from "@/lib/express";
+import { ApiError, Filter } from "@/types";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 

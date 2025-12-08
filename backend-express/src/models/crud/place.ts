@@ -1,5 +1,6 @@
 import { storage } from "@/lib/clients";
-import { ApiError, Filter, HttpStatus } from "@/types";
+import { HttpStatus } from "@/lib/express";
+import { ApiError, Filter } from "@/types";
 import { placeEmbedding } from "@/worker/tasks";
 
 import { PlaceDocument, PlaceModel } from "../collections";

@@ -3,7 +3,8 @@ import multer from "multer";
 import { AnyZodObject, ZodTypeAny } from "zod";
 
 import { isMultipartFormData } from "@/lib/express";
-import { ApiError, HttpStatus } from "@/types";
+import { HttpStatus } from "@/lib/express";
+import { ApiError } from "@/types";
 
 const isFileField = (field: ZodTypeAny | any): boolean => {
     if (field._def?.openapi?.metadata?.format === "binary") {
