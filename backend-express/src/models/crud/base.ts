@@ -11,7 +11,7 @@ import {
 
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
-import { PaginatedData, PaginationData } from "@/lib/express";
+import { PaginatedData, PaginationData } from "@/lib/types";
 import {
     Filter,
     FindQuery,

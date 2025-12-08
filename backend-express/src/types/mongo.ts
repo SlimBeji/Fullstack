@@ -1,6 +1,6 @@
 import { FilterQuery, ProjectionType } from "mongoose";
 
-import { PaginationData } from "@/lib/express";
+import { PaginationData } from "@/lib/types";
 
 //// Public Types for searching data
 

@@ -9,7 +9,7 @@ import { existsSync } from "fs";
 import path from "path";
 
 import { env } from "@/config";
-import { FileToUpload } from "@/types";
+import { FileToUpload } from "@/lib/types";
 
 interface GCSConfig {
     GCP_PROJECT_ID: string;
