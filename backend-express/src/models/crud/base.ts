@@ -11,16 +11,16 @@ import {
 
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
+import { PaginatedData, PaginationData } from "@/lib/express";
 import {
     Filter,
+    FindQuery,
     FindQueryFilters,
     MongoFieldFilters,
     MongoFieldsFilters,
     MongoFindQuery,
-    PaginationData,
     SortData,
 } from "@/types";
-import { FindQuery, PaginatedData } from "@/types";
 
 import { UserRead } from "../schemas";
 
