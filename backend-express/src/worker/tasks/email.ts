@@ -1,8 +1,6 @@
 import { Job, Queue, Worker } from "bullmq";
 
-import { Queues, Tasks } from "@/types";
-
-import { config } from "./config";
+import { config, Queues, Tasks } from "./config";
 
 // Define Queue
 const emailQueue = new Queue(Queues.EMAILS, config);

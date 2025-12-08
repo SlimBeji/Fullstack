@@ -2,9 +2,8 @@ import { Job, Queue, Worker } from "bullmq";
 
 import { huggingFace } from "@/lib/clients";
 import { crudPlace } from "@/models/crud";
-import { Queues, Tasks } from "@/types";
 
-import { config } from "./config";
+import { config, Queues, Tasks } from "./config";
 
 // Define Queue
 const aiQueue = new Queue(Queues.AI, config);
