@@ -1,11 +1,12 @@
-use axum::{Json, http::StatusCode};
 use axum::extract::Form;
 use axum::response::IntoResponse;
-use serde_json::Value;
+use axum::{Json, http::StatusCode};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::models::schemas::auth::{SigninSchema, EncodedTokenSchema};
+use crate::models::schemas::auth::{
+    EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
+};
 
 pub const PATH: &str = "/auth";
 
@@ -27,10 +28,30 @@ pub fn routes() -> OpenApiRouter {
     path = "/signup",
     tag = "Auth",
     summary = "User registration",
-    responses((status = 200, content_type = "application/json"))
+    request_body(
+        content = SignupSchemaSwagger,
+        content_type = "multipart/form-data"
+    ),
+    responses((
+        status = 200,
+        body=EncodedTokenSchema,
+        content_type = "application/json"
+    ))
 )]
-async fn signup_route(Json(body): Json<Value>) -> Json<Value> {
-    Json(body)
+async fn signup_route(payload: SignupSchema) -> impl IntoResponse {
+    println!("{:?}", payload.name);
+    println!("{:?}", payload.email);
+    println!("{:?}", payload.password);
+    match payload.image {
+        Some(image) => {
+            println!("{}", image.originalname);
+            println!("{}", image.mimetype);
+            println!("{}", image.data.len());
+        }
+        _ => (),
+    }
+    let response = EncodedTokenSchema::example();
+    (StatusCode::OK, Json(response))
 }
 
 #[utoipa::path(
