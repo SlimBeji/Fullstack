@@ -251,24 +251,23 @@ impl MultipartForm {
             )),
         }
     }
-}
 
-async fn parse_multipart_request<S>(
-    req: Request,
-    state: &S,
-) -> Result<MultipartForm, (StatusCode, Json<Value>)>
-where
-    S: Send + Sync,
-{
-    let mut multipart = multipart::Multipart::from_request(req, state).await.map_err(|e| {
+    pub async fn parse_multipart_request<S>(
+        req: Request,
+        state: &S,
+    ) -> Result<MultipartForm, (StatusCode, Json<Value>)>
+    where
+        S: Send + Sync,
+    {
+        let mut multipart = multipart::Multipart::from_request(req, state).await.map_err(|e| {
         (
             StatusCode::BAD_REQUEST,
             Json(json!({"error": format!("Could not parse multipart request: {}", e)}))
         )
     })?;
-    let mut map = HashMap::new();
+        let mut map = HashMap::new();
 
-    while let Some(field) = multipart.next_field().await.map_err(|e| {
+        while let Some(field) = multipart.next_field().await.map_err(|e| {
         (
             StatusCode::BAD_REQUEST,
             Json(json!({"error": format!("Could not process multipart request: {}", e)}))
@@ -280,5 +279,6 @@ where
         }
         map.insert(name.to_string(), MultipartField::from_field(field).await?);
     };
-    Ok(MultipartForm::new(map))
+        Ok(MultipartForm::new(map))
+    }
 }
