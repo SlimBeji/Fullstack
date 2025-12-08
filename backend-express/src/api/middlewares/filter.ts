@@ -4,7 +4,7 @@ import { AnyZodObject } from "zod";
 
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
-import { Filter } from "@/types";
+import { Filter } from "@/lib/types";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 

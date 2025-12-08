@@ -1,4 +1,4 @@
-import { FindQuery } from "@/types";
+import { FindQuery } from "@/lib/types";
 import z from "@/zodExt";
 
 import {

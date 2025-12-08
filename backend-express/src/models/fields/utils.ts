@@ -3,7 +3,7 @@ import { ZodTypeAny } from "zod";
 
 import { env } from "@/config";
 import { ApiError, HttpStatus, MimeType } from "@/lib/express";
-import { FilterOperation } from "@/types";
+import { FilterOperation } from "@/lib/types";
 import z from "@/zodExt";
 
 //// Custom Fields ////

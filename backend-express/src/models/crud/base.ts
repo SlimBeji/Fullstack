@@ -12,8 +12,13 @@ import {
 
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
-import { PaginatedData, PaginationData } from "@/lib/types";
-import { Filter, FindQuery, FindQueryFilters } from "@/types";
+import {
+    Filter,
+    FindQuery,
+    FindQueryFilters,
+    PaginatedData,
+    PaginationData,
+} from "@/lib/types";
 
 import { UserRead } from "../schemas";
 
