@@ -1,6 +1,7 @@
 import {
     Document,
     ExclusionProjection,
+    FilterQuery,
     FilterQuery as MongooseFilterQuery,
     Model,
     ProjectionType,
@@ -12,17 +13,22 @@ import {
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { PaginatedData, PaginationData } from "@/lib/types";
-import {
-    Filter,
-    FindQuery,
-    FindQueryFilters,
-    MongoFieldFilters,
-    MongoFieldsFilters,
-    MongoFindQuery,
-    SortData,
-} from "@/types";
+import { Filter, FindQuery, FindQueryFilters } from "@/types";
 
 import { UserRead } from "../schemas";
+
+export type SortData = { [key: string]: 1 | -1 };
+
+export type MongoFieldFilters = { [key: string]: any };
+
+export type MongoFieldsFilters = { [key: string]: MongoFieldFilters };
+
+export interface MongoFindQuery<T> {
+    pagination?: PaginationData;
+    sort?: SortData;
+    filters?: FilterQuery<T>;
+    projection?: ProjectionType<T>;
+}
 
 export type CrudEvent = "create" | "read" | "update" | "delete";
 

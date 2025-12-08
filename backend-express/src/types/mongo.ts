@@ -1,9 +1,3 @@
-import { FilterQuery, ProjectionType } from "mongoose";
-
-import { PaginationData } from "@/lib/types";
-
-//// Public Types for searching data
-
 export type FilterOperation =
     | "eq"
     | "ne"
@@ -31,19 +25,4 @@ export interface FindQuery<
     sort?: Sortables[];
     fields?: Selectables[];
     filters?: FindQueryFilters<Searchables>;
-}
-
-//// Internal Types for building Mongo queries
-
-export type SortData = { [key: string]: 1 | -1 };
-
-export type MongoFieldFilters = { [key: string]: any };
-
-export type MongoFieldsFilters = { [key: string]: MongoFieldFilters };
-
-export interface MongoFindQuery<T> {
-    pagination?: PaginationData;
-    sort?: SortData;
-    filters?: FilterQuery<T>;
-    projection?: ProjectionType<T>;
 }
