@@ -2,6 +2,7 @@ use tokio::net::TcpListener;
 
 mod api;
 mod config;
+mod lib;
 mod models;
 mod types;
 
