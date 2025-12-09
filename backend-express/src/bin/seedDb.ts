@@ -1,8 +1,8 @@
-import { closeAll, startAll } from "@/lib/setup";
+import { db } from "@/lib/clients";
 import { seedDb } from "@/models/examples";
 
 if (require.main === module) {
-    startAll()
+    db.connect()
         .then(() => seedDb(true))
-        .finally(closeAll);
+        .finally(() => db.close());
 }

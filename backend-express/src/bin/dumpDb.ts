@@ -1,8 +1,8 @@
-import { closeAll, startAll } from "@/lib/setup";
+import { closeClients, connectClients } from "@/lib/clients";
 import { dumpDb } from "@/models/examples";
 
 if (require.main === module) {
-    startAll()
+    connectClients()
         .then(() => dumpDb(true))
-        .finally(closeAll);
+        .finally(closeClients);
 }
