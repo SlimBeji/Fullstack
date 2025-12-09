@@ -1,4 +1,4 @@
-import { getImagePath } from "@/lib/utils";
+import { getImagePath } from "@/static";
 
 import { PlaceSeed } from "../schemas";
 

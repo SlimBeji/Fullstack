@@ -1,5 +1,3 @@
-import fs from "fs";
-
 export const sleep = (seconds: number) => {
     return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 };
@@ -62,12 +60,4 @@ export const flattenJson = (
     }
 
     return result;
-};
-
-export const getImagePath = (p: string) => {
-    return `/app/src/static/images/${p}`;
-};
-
-export const readImage = (p: string) => {
-    return fs.readFileSync(getImagePath(p));
 };

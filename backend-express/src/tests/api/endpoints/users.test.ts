@@ -4,9 +4,9 @@ import app from "@/api";
 import { createToken } from "@/lib/encryption";
 import { HttpStatus } from "@/lib/express";
 import { closeAll, seedTestData } from "@/lib/setup";
-import { readImage } from "@/lib/utils";
 import { crudUser } from "@/models/crud";
 import { UserRead } from "@/models/schemas";
+import { readImage } from "@/static";
 
 let adminExample: UserRead;
 let adminToken: string = "";

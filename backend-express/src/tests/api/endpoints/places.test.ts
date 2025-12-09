@@ -3,9 +3,9 @@ import supertest from "supertest";
 import app from "@/api";
 import { HttpStatus } from "@/lib/express";
 import { closeAll, seedTestData } from "@/lib/setup";
-import { getImagePath } from "@/lib/utils";
 import { crudPlace, crudUser } from "@/models/crud";
 import { PlaceRead } from "@/models/schemas";
+import { getImagePath } from "@/static";
 
 let adminToken: string = "";
 let token: string = "";
