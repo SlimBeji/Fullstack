@@ -1,5 +1,4 @@
 import { storage } from "@/lib/clients";
-import { closeAll, startAll } from "@/lib/setup";
 import { getImagePath } from "@/static";
 
 async function test() {
@@ -10,5 +9,5 @@ async function test() {
 }
 
 if (require.main === module) {
-    startAll().then(test).finally(closeAll);
+    test().then(() => console.log("Finished testing storage client"));
 }

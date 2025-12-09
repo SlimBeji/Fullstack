@@ -1,5 +1,4 @@
 import { huggingFace } from "@/lib/clients";
-import { closeAll, startAll } from "@/lib/setup";
 
 async function test() {
     const result = await huggingFace.embedText(
@@ -9,5 +8,5 @@ async function test() {
 }
 
 if (require.main === module) {
-    startAll().then(test).finally(closeAll);
+    test().then(() => console.log("Finished testing hugging face client"));
 }
