@@ -1,13 +1,10 @@
-import cron from "node-cron";
-
 import { sendNewsletter } from "../publishers";
 
-export const sendNewsletterCron = cron.schedule(
-    "0 * * * *",
-    () => {
+export const NewsletterCronConfig = {
+    name: "Newsletter Job",
+    expression: "0 * * * *",
+    task: () => {
         sendNewsletter("Slim Beji", "mslimbjei@gmail.com");
     },
-    {
-        timezone: "Africa/Tunis",
-    }
-);
+    options: { timezone: "Africa/Tunis" },
+};
