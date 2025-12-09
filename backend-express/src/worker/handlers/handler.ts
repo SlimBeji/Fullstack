@@ -1,16 +1,16 @@
 import { Job, Worker } from "bullmq";
 
-import { broker_config, Queues } from "../config";
+import { broker_config, Queues, QueueType } from "../config";
 import { aiTasksRouter } from "./ai";
 import { emailTasksRouter } from "./emails";
 
-const taskRegistry: Record<string, (job: Job) => Promise<void>> = {
+const taskRegistry: Record<QueueType, (job: Job) => Promise<void>> = {
     [Queues.AI]: aiTasksRouter,
     [Queues.EMAILS]: emailTasksRouter,
 };
 
 export class TaskHanlder {
-    private workers: Record<string, Worker> = {};
+    private workers: Partial<Record<QueueType, Worker>> = {};
 
     public start(): void {
         for (const [queue, router] of Object.entries(taskRegistry)) {
@@ -20,7 +20,7 @@ export class TaskHanlder {
                     `Job ${job?.id} failed with error ${err.message}`
                 );
             });
-            this.workers[queue] = worker;
+            this.workers[queue as QueueType] = worker;
         }
     }
 

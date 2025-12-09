@@ -21,6 +21,8 @@ export enum Queues {
     AI = "ai",
 }
 
+export type QueueType = (typeof Queues)[keyof typeof Queues];
+
 // Tasks & Payload
 
 export const TASK_PLACE_EMBEDDING = "place_embedding";
