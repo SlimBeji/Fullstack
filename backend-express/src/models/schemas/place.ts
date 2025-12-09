@@ -1,4 +1,4 @@
-import { env } from "@/config";
+import { env } from "@/config/env";
 import { FindQuery } from "@/lib/types";
 import {
     filtersSchema,

@@ -1,4 +1,4 @@
-import { env } from "@/config";
+import { env } from "@/config/env";
 import { zod, zodFile, zodObjectId } from "@/lib/zod";
 
 //////// Types ///////

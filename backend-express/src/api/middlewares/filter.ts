@@ -2,7 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParsedQs } from "qs";
 import { AnyZodObject } from "zod";
 
-import { env } from "@/config";
+import { env } from "@/config/env";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
 

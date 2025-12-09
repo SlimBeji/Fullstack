@@ -10,7 +10,7 @@ import {
     Types,
 } from "mongoose";
 
-import { env } from "@/config";
+import { env } from "@/config/env";
 import { ApiError, HttpStatus } from "@/lib/express";
 import {
     Filter,

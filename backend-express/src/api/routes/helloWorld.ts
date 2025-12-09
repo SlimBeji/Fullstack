@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
+import { sendNewsletter } from "@/background/publishers";
 import { zod } from "@/lib/zod";
-import { sendNewsletter } from "@/worker/publishers";
 
 import { swaggerRegistery } from "../docs";
 import { Admin, Authenticated } from "../middlewares";

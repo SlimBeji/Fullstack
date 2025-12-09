@@ -1,8 +1,8 @@
 import supertest from "supertest";
 
 import app from "@/api";
+import { closeAll, seedTestData } from "@/config/setup";
 import { HttpStatus } from "@/lib/express";
-import { closeAll, seedTestData } from "@/lib/setup";
 import { crudPlace, crudUser } from "@/models/crud";
 import { PlaceRead } from "@/models/schemas";
 import { getImagePath } from "@/static";

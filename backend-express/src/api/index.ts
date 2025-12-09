@@ -1,10 +1,10 @@
 import "express-async-errors";
-import "../worker/crons";
 
 import cookieSession from "cookie-session";
 import express from "express";
 
-import { env } from "../config";
+import { env } from "@/config/env";
+
 import { registerSwaggger } from "./docs";
 import { cors, errorHandler, noRouteMatchHandler } from "./middlewares";
 import { registerRoutes } from "./routes";

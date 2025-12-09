@@ -1,10 +1,10 @@
-import app from "./api";
-import { env } from "./config";
-import { connectDbs } from "./lib/setup";
+import app from "@/api";
+import { env } from "@/config/env";
+import { startAll } from "@/config/setup";
 
 // Connect Mongoose than run the app
 if (require.main === module) {
-    connectDbs()
+    startAll()
         .then(() => {
             app.listen(env.PORT, () => {
                 console.log(`Listening on port ${env.PORT}`);
