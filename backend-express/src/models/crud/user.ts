@@ -1,8 +1,9 @@
 import { env } from "@/config";
 import { storage } from "@/lib/clients";
-import { createToken, hashInput, verifyHash } from "@/lib/encryption";
+import { createToken } from "@/lib/encryption";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
+import { hashInput, verifyHash } from "@/lib/utils";
 
 import { UserDocument, UserModel } from "../collections";
 import {
@@ -122,7 +123,7 @@ export class CrudUser extends Crud<
     }
 
     public async createDocument(form: UserCreate): Promise<UserDocument> {
-        form.password = await hashInput(form.password);
+        form.password = await hashInput(form.password, env.DEFAULT_HASH_SALT);
         return super.createDocument(form);
     }
 
@@ -173,7 +174,10 @@ export class CrudUser extends Crud<
 
     public async update(user: UserDocument, form: UserPut): Promise<UserRead> {
         if (form.password) {
-            form.password = await hashInput(form.password);
+            form.password = await hashInput(
+                form.password,
+                env.DEFAULT_HASH_SALT
+            );
         }
         const doc = await super.updateDocument(user, form);
         const result = await this.post_process(doc);

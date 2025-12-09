@@ -7,10 +7,10 @@ import {
     UserRead,
 } from "@/models/schemas";
 
-import { decodePayload, encodePayload } from "./helpers";
+import { decodePayload, encodePayload } from "../utils";
 
 export const decodeToken = (encoded: string): DecodedTokenPayload => {
-    const decoded = decodePayload(encoded);
+    const decoded = decodePayload(encoded, env.SECRET_KEY);
     if (typeof decoded === "string") {
         throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
     }
@@ -22,7 +22,11 @@ export const createToken = (user: UserRead): EncodedToken => {
         userId: user.id,
         email: user.email,
     };
-    const access_token = encodePayload(payload);
+    const access_token = encodePayload(
+        payload,
+        env.SECRET_KEY,
+        env.JWT_EXPIRATION
+    );
     return {
         access_token,
         token_type: "bearer",
