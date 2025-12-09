@@ -30,3 +30,5 @@ export class TaskHanlder {
         );
     }
 }
+
+export const handler = new TaskHanlder();
