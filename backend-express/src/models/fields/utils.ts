@@ -4,12 +4,12 @@ import { ZodTypeAny } from "zod";
 import { env } from "@/config";
 import { ApiError, HttpStatus, MimeType } from "@/lib/express";
 import { FilterOperation } from "@/lib/types";
-import z from "@/zodExt";
+import { RefinementCtx, zod, ZodNever } from "@/lib/zod";
 
 //// Custom Fields ////
 
 export const zodObjectId = () => {
-    return z
+    return zod
         .string()
         .min(24)
         .refine((val) => Types.ObjectId.isValid(val), {
@@ -23,15 +23,15 @@ const _zodFile = (
     maxSize: number = env.FILEUPLOAD_MAX_SIZE
 ) => {
     acceptedMimetypes = acceptedMimetypes || [MimeType.JPEG, MimeType.PNG];
-    return z.object({
-        fieldname: z.string(),
-        originalname: z.string(),
-        encoding: z.string(),
-        mimetype: z.string().refine((val) => acceptedMimetypes.includes(val)),
-        size: z
+    return zod.object({
+        fieldname: zod.string(),
+        originalname: zod.string(),
+        encoding: zod.string(),
+        mimetype: zod.string().refine((val) => acceptedMimetypes.includes(val)),
+        size: zod
             .number()
             .max(maxSize * 1024 * 1024, `File must be ≤${maxSize}MB`),
-        buffer: z.instanceof(Buffer),
+        buffer: zod.instanceof(Buffer),
     });
 };
 
@@ -40,7 +40,7 @@ export const zodFile = (
     acceptedMimetypes: string[] | null = null,
     maxSize: number = env.FILEUPLOAD_MAX_SIZE
 ) => {
-    return z
+    return zod
         .any()
         .transform((val) => {
             const rs = _zodFile(acceptedMimetypes, maxSize);
@@ -62,9 +62,9 @@ export const zodFile = (
 
 export const zodObject = (config: { [fieldname: string]: ZodTypeAny }) => {
     // Fix swagger UI error of stringifying objects
-    return z.preprocess(
+    return zod.preprocess(
         (val) => (typeof val === "string" ? JSON.parse(val) : val),
-        z.object(config)
+        zod.object(config)
     );
 };
 
@@ -77,10 +77,10 @@ type TransformOption = { isIndexed?: boolean; isObjectId?: boolean };
 type OpenapiDoc = { description?: string; example?: any };
 
 const updateContextFromError = (
-    ctx: z.RefinementCtx,
+    ctx: RefinementCtx,
     err: any,
     message: string
-): z.ZodNever => {
+): ZodNever => {
     let msg: any;
     try {
         msg = JSON.parse(err.message);
@@ -88,15 +88,15 @@ const updateContextFromError = (
         msg = message;
     }
 
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: msg });
-    return z.NEVER;
+    ctx.addIssue({ code: zod.ZodIssueCode.custom, message: msg });
+    return zod.NEVER;
 };
 
 const numericQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
-    context: z.RefinementCtx
-): { op: FilterOperation; val: number | number[] | boolean } | z.ZodNever => {
+    context: RefinementCtx
+): { op: FilterOperation; val: number | number[] | boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(Number(value)) };
@@ -131,7 +131,7 @@ const numericQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: z.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -141,24 +141,24 @@ const numericQueryParamTransform = (
             }
 
         case "exists":
-            const boolValue = z.coerce.boolean().parse(val);
+            const boolValue = zod.coerce.boolean().parse(val);
             return { op, val: boolValue };
 
         default:
             context.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: zod.ZodIssueCode.custom,
                 message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,exists`,
             });
-            return z.NEVER;
+            return zod.NEVER;
     }
 };
 
 const stringQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
-    context: z.RefinementCtx,
+    context: RefinementCtx,
     options?: TransformOption
-): { op: FilterOperation; val: string | string[] | boolean } | z.ZodNever => {
+): { op: FilterOperation; val: string | string[] | boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(value) };
@@ -189,7 +189,7 @@ const stringQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: z.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -199,52 +199,52 @@ const stringQueryParamTransform = (
             }
 
         case "exists":
-            const boolValue = z.coerce.boolean().parse(val);
+            const boolValue = zod.coerce.boolean().parse(val);
             return { op, val: boolValue };
 
         case "regex":
             if (options?.isObjectId) {
                 context.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: zod.ZodIssueCode.custom,
                     message: "regex search is not enabled objectId fields",
                 });
-                return z.NEVER;
+                return zod.NEVER;
             }
             try {
                 new RegExp(val);
                 return { op, val };
             } catch {
                 context.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: zod.ZodIssueCode.custom,
                     message: "Invalid regular expression",
                 });
-                return z.NEVER;
+                return zod.NEVER;
             }
 
         case "text":
             if (!options?.isIndexed) {
                 context.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: zod.ZodIssueCode.custom,
                     message: "Text search is not enabled for this field",
                 });
-                return z.NEVER;
+                return zod.NEVER;
             }
             return { op, val };
 
         default:
             context.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: zod.ZodIssueCode.custom,
                 message: `Unknown operator "${op}". Valid: eq,ne,in,nin,exists,regex,text`,
             });
-            return z.NEVER;
+            return zod.NEVER;
     }
 };
 
 const booleanQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
-    context: z.RefinementCtx
-): { op: FilterOperation; val: boolean } | z.ZodNever => {
+    context: RefinementCtx
+): { op: FilterOperation; val: boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(value === "true") };
@@ -263,7 +263,7 @@ const booleanQueryParamTransform = (
         case "ne":
         case "exists":
             try {
-                const boolValue = z.coerce.boolean().parse(val);
+                const boolValue = zod.coerce.boolean().parse(val);
                 field.parse(boolValue);
                 return { op, val: boolValue };
             } catch (err) {
@@ -272,18 +272,18 @@ const booleanQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: zod.ZodIssueCode.custom,
                 message: `Unknown operator "${op}". Valid: eq,ne,exists`,
             });
-            return z.NEVER;
+            return zod.NEVER;
     }
 };
 
 const dateQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
-    context: z.RefinementCtx
-): { op: FilterOperation; val: Date | Date[] | boolean } | z.ZodNever => {
+    context: RefinementCtx
+): { op: FilterOperation; val: Date | Date[] | boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
             const date = new Date(value);
@@ -320,7 +320,7 @@ const dateQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: z.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -331,7 +331,7 @@ const dateQueryParamTransform = (
 
         case "exists":
             try {
-                return { op, val: z.coerce.boolean().parse(val) };
+                return { op, val: zod.coerce.boolean().parse(val) };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -342,25 +342,25 @@ const dateQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: zod.ZodIssueCode.custom,
                 message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,exists`,
             });
-            return z.NEVER;
+            return zod.NEVER;
     }
 };
 
 const guessType = (field: ZodTypeAny): QueryParamTypes => {
-    if (field instanceof z.ZodNumber) {
+    if (field instanceof zod.ZodNumber) {
         return "numeric";
-    } else if (field instanceof z.ZodString) {
+    } else if (field instanceof zod.ZodString) {
         return "string";
-    } else if (field instanceof z.ZodBoolean) {
+    } else if (field instanceof zod.ZodBoolean) {
         return "boolean";
-    } else if (field instanceof z.ZodDate) {
+    } else if (field instanceof zod.ZodDate) {
         return "date";
-    } else if (field instanceof z.ZodTransformer) {
+    } else if (field instanceof zod.ZodTransformer) {
         return guessType(field._def.schema);
-    } else if (field instanceof z.ZodOptional) {
+    } else if (field instanceof zod.ZodOptional) {
         return guessType(field._def.innerType);
     } else {
         throw new Error(`Could not guess the type of field ${field}`);
@@ -372,7 +372,7 @@ export const httpFilter = (
     doc?: OpenapiDoc,
     options?: TransformOption
 ): ZodTypeAny => {
-    let transformFunction: (val: any, ctx: z.RefinementCtx) => any;
+    let transformFunction: (val: any, ctx: RefinementCtx) => any;
     const baseType = guessType(field);
     if (baseType === "numeric") {
         transformFunction = (val, ctx) =>
@@ -393,7 +393,7 @@ export const httpFilter = (
     let { description, example } = doc;
     description = description || "";
     example = example || null;
-    return z
+    return zod
         .string()
         .openapi({ description, example })
         .transform(transformFunction);
@@ -404,5 +404,5 @@ export const httpFilters = (
     doc?: OpenapiDoc,
     options?: TransformOption
 ): ZodTypeAny => {
-    return z.array(httpFilter(field, doc, options));
+    return zod.array(httpFilter(field, doc, options));
 };

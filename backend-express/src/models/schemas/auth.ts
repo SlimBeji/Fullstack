@@ -1,7 +1,7 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 
-import z from "@/zodExt";
+import { zod, ZodInfer } from "@/lib/zod";
 
 import { AuthFields, UserFields } from "../fields";
 
@@ -14,26 +14,26 @@ export interface TokenPayload {
 export interface DecodedTokenPayload extends TokenPayload, JwtPayload {}
 
 // --- Signup Schemas ----
-export const SignupSchema = z.object({
+export const SignupSchema = zod.object({
     name: UserFields.name,
     email: UserFields.email,
     password: UserFields.password,
     image: UserFields.image.optional(),
 });
 
-export type Signup = z.infer<typeof SignupSchema>;
+export type Signup = ZodInfer<typeof SignupSchema>;
 
 // --- Signin Schemas ----
-export const SigninSchema = z.object({
+export const SigninSchema = zod.object({
     username: AuthFields.username,
     password: UserFields.password,
 });
 
-export type Signin = z.infer<typeof SigninSchema>;
+export type Signin = ZodInfer<typeof SigninSchema>;
 
 // Response Schemas
 
-export const EncodedTokenSchema = z.object({
+export const EncodedTokenSchema = zod.object({
     access_token: AuthFields.accessToken,
     token_type: AuthFields.tokenType,
     userId: UserFields.id,
@@ -41,4 +41,4 @@ export const EncodedTokenSchema = z.object({
     expires_in: AuthFields.expiresIn,
 });
 
-export type EncodedToken = z.infer<typeof EncodedTokenSchema>;
+export type EncodedToken = ZodInfer<typeof EncodedTokenSchema>;

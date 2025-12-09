@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
+import { zod } from "@/lib/zod";
 import { sendNewsletter } from "@/worker/tasks/email";
-import z from "@/zodExt";
 
 import { swaggerRegistery } from "../docs";
 import { Admin, Authenticated } from "../middlewares";
@@ -24,8 +24,8 @@ swaggerRegistery.registerPath({
             description: "A simple response with message field",
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string().openapi({
+                    schema: zod.object({
+                        message: zod.string().openapi({
                             example: "Hello World",
                         }),
                     }),
@@ -52,8 +52,8 @@ swaggerRegistery.registerPath({
             description: "A simple response with message field",
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string().openapi({
+                    schema: zod.object({
+                        message: zod.string().openapi({
                             example: "Hello Slim",
                         }),
                     }),
@@ -83,8 +83,8 @@ swaggerRegistery.registerPath({
             description: "A simple response with message field",
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string().openapi({
+                    schema: zod.object({
+                        message: zod.string().openapi({
                             example: "Hello Admin Slim",
                         }),
                     }),

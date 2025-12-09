@@ -1,4 +1,4 @@
-import z from "@/zodExt";
+import { zod } from "@/lib/zod";
 
 import { zodFile, zodObject, zodObjectId } from "./utils";
 
@@ -48,21 +48,21 @@ const id = zodObjectId().openapi({
     example: "683b21134e2e5d46978daf1f",
 });
 
-const title = z.string().min(10).openapi({
+const title = zod.string().min(10).openapi({
     description: "The place title/name, 10 characters minimum",
     example: "Stamford Bridge",
 });
 
-const description = z.string().min(10).openapi({
+const description = zod.string().min(10).openapi({
     description: "The place description, 10 characters minimum",
     example: "Stadium of Chelsea football club",
 });
 
-const embedding = z.array(z.number()).length(384).openapi({
+const embedding = zod.array(zod.number()).length(384).openapi({
     description: "Title + Description embedding",
 });
 
-const imageUrl = z.string().openapi({
+const imageUrl = zod.string().openapi({
     type: "string",
     example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
     description: "local url on the storage",
@@ -70,7 +70,7 @@ const imageUrl = z.string().openapi({
 
 const image = zodFile("Place Image (JPEG)");
 
-const address = z.string().min(1).openapi({
+const address = zod.string().min(1).openapi({
     description: "The place address",
     example: "Fulham road",
 });
@@ -81,12 +81,12 @@ const creatorId = zodObjectId().openapi({
 });
 
 //////// Location Fields ///////
-const lat = z.coerce.number().openapi({
+const lat = zod.coerce.number().openapi({
     description: "The latitude of the place",
     example: 51.48180425016331,
 });
 
-const lng = z.coerce.number().openapi({
+const lng = zod.coerce.number().openapi({
     description: "The longitude of the place",
     example: -0.19090418688755467,
 });

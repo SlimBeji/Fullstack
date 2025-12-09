@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 
+import { zod } from "@/lib/zod";
 import { crudPlace } from "@/models/crud";
 import { zodObjectId } from "@/models/fields";
 import {
@@ -11,7 +12,6 @@ import {
     PlaceReadSchema,
     PlacesPaginatedSchema,
 } from "@/models/schemas";
-import z from "@/zodExt";
 
 import { swaggerRegistery } from "../docs";
 import { Authenticated, filter, validateBody } from "../middlewares";
@@ -144,7 +144,7 @@ swaggerRegistery.registerPath({
     method: "get",
     path: "/places/{placeId}",
     request: {
-        params: z.object({
+        params: zod.object({
             placeId: zodObjectId().openapi({
                 example: "507f1f77bcf86cd799439011",
                 description: "Place Id",
@@ -189,7 +189,7 @@ swaggerRegistery.registerPath({
     method: "put",
     path: "/places/{placeId}",
     request: {
-        params: z.object({
+        params: zod.object({
             placeId: zodObjectId().openapi({
                 example: "507f1f77bcf86cd799439011",
                 description: "Place id",
@@ -235,7 +235,7 @@ swaggerRegistery.registerPath({
     method: "delete",
     path: "/places/{placeId}",
     request: {
-        params: z.object({
+        params: zod.object({
             placeId: zodObjectId().openapi({
                 example: "507f1f77bcf86cd799439011",
                 description: "Place Id",
@@ -247,8 +247,8 @@ swaggerRegistery.registerPath({
             description: "Deletion confirmation message",
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string().openapi({
+                    schema: zod.object({
+                        message: zod.string().openapi({
                             example: "Deleted place 507f1f77bcf86cd799439011",
                         }),
                     }),

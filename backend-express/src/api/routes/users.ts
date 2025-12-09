@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 
+import { zod } from "@/lib/zod";
 import { crudUser } from "@/models/crud";
 import { zodObjectId } from "@/models/fields";
 import {
@@ -11,7 +12,6 @@ import {
     UserReadSchema,
     UsersPaginatedSchema,
 } from "@/models/schemas";
-import z from "@/zodExt";
 
 import { swaggerRegistery } from "../docs";
 import { Admin, Authenticated, filter, validateBody } from "../middlewares";
@@ -144,7 +144,7 @@ swaggerRegistery.registerPath({
     method: "get",
     path: "/users/{userId}",
     request: {
-        params: z.object({
+        params: zod.object({
             userId: zodObjectId().openapi({
                 example: "507f1f77bcf86cd799439011",
                 description: "MongoDB ObjectId",
@@ -189,7 +189,7 @@ swaggerRegistery.registerPath({
     method: "put",
     path: "/users/{userId}",
     request: {
-        params: z.object({
+        params: zod.object({
             userId: zodObjectId().openapi({
                 example: "507f1f77bcf86cd799439011",
                 description: "MongoDB ObjectId",
@@ -235,7 +235,7 @@ swaggerRegistery.registerPath({
     method: "delete",
     path: "/users/{userId}",
     request: {
-        params: z.object({
+        params: zod.object({
             userId: zodObjectId().openapi({
                 example: "507f1f77bcf86cd799439011",
                 description: "MongoDB ObjectId",
@@ -247,8 +247,8 @@ swaggerRegistery.registerPath({
             description: "Deletion confirmation message",
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string().openapi({
+                    schema: zod.object({
+                        message: zod.string().openapi({
                             example: "Deleted user 507f1f77bcf86cd799439011",
                         }),
                     }),

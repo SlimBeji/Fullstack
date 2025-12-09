@@ -1,5 +1,5 @@
 import { FindQuery } from "@/lib/types";
-import z from "@/zodExt";
+import { zod, ZodInfer } from "@/lib/zod";
 
 import {
     httpFilters,
@@ -13,7 +13,7 @@ import {
 import { filtersSchema, paginatedSchema } from "./base";
 
 // --- Base Schemas ----
-export const UserDBSchema = z.object({
+export const UserDBSchema = zod.object({
     id: UserFields.id,
     name: UserFields.name,
     email: UserFields.email,
@@ -23,7 +23,7 @@ export const UserDBSchema = z.object({
     places: UserFields.places,
 });
 
-export type UserDB = z.infer<typeof UserDBSchema>;
+export type UserDB = ZodInfer<typeof UserDBSchema>;
 
 export type UserSeed = Omit<UserDB, "id" | "places"> & {
     _ref: number;
@@ -33,28 +33,28 @@ export type UserSeed = Omit<UserDB, "id" | "places"> & {
 
 export const UserCreateSchema = UserDBSchema.omit({ id: true, places: true });
 
-export type UserCreate = z.infer<typeof UserCreateSchema>;
+export type UserCreate = ZodInfer<typeof UserCreateSchema>;
 
 export const UserPostSchema = UserCreateSchema.omit({ imageUrl: true }).extend({
     image: UserFields.image.optional(),
 });
 
-export type UserPost = z.infer<typeof UserPostSchema>;
+export type UserPost = ZodInfer<typeof UserPostSchema>;
 
 // ---  Read Schemas ----
 
 export const UserReadSchema = UserDBSchema.omit({ password: true });
 
-export type UserRead = z.infer<typeof UserReadSchema>;
+export type UserRead = ZodInfer<typeof UserReadSchema>;
 
 export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
 
-export type UsersPaginated = z.infer<typeof UsersPaginatedSchema>;
+export type UsersPaginated = ZodInfer<typeof UsersPaginatedSchema>;
 
 // ---  Quey Schemas ----
 
 export const UserFiltersSchema = filtersSchema(
-    z.object({
+    zod.object({
         id: httpFilters(UserFields.id, {
             example: "683b21134e2e5d46978daf1f",
         }).optional(),
@@ -69,7 +69,7 @@ export const UserFiltersSchema = filtersSchema(
     userSelectableFields
 );
 
-export type UserFilters = z.infer<typeof UserFiltersSchema>;
+export type UserFilters = ZodInfer<typeof UserFiltersSchema>;
 
 export type UserFindQuery = FindQuery<
     UserSelectableType,
@@ -78,14 +78,14 @@ export type UserFindQuery = FindQuery<
 >;
 
 // --- Update Schemas ---
-export const UserUpdateSchema = z.object({
+export const UserUpdateSchema = zod.object({
     name: UserFields.name.optional(),
     email: UserFields.email.optional(),
     password: UserFields.password.optional(),
 });
 
-export type UserUpdate = z.infer<typeof UserUpdateSchema>;
+export type UserUpdate = ZodInfer<typeof UserUpdateSchema>;
 
 export const UserPutSchema = UserUpdateSchema.extend({});
 
-export type UserPut = z.infer<typeof UserPutSchema>;
+export type UserPut = ZodInfer<typeof UserPutSchema>;

@@ -1,5 +1,5 @@
 import { FindQuery } from "@/lib/types";
-import z from "@/zodExt";
+import { zod, ZodInfer } from "@/lib/zod";
 
 import {
     httpFilters,
@@ -13,7 +13,7 @@ import {
 import { filtersSchema, paginatedSchema } from "./base";
 
 // --- Base Schemas ----
-export const PlaceDBSchema = z.object({
+export const PlaceDBSchema = zod.object({
     id: PlaceFields.id,
     title: PlaceFields.title,
     description: PlaceFields.description,
@@ -24,7 +24,7 @@ export const PlaceDBSchema = z.object({
     creatorId: PlaceFields.creatorId,
 });
 
-export type PlaceDB = z.infer<typeof PlaceDBSchema>;
+export type PlaceDB = ZodInfer<typeof PlaceDBSchema>;
 
 export type PlaceSeed = Omit<PlaceDB, "id" | "creatorId"> & {
     _ref: number;
@@ -38,7 +38,7 @@ export const PlaceCreateSchema = PlaceDBSchema.omit({
     embedding: true,
 });
 
-export type PlaceCreate = z.infer<typeof PlaceCreateSchema>;
+export type PlaceCreate = ZodInfer<typeof PlaceCreateSchema>;
 
 export const PlacePostSchema = PlaceCreateSchema.omit({
     imageUrl: true,
@@ -49,22 +49,22 @@ export const PlacePostSchema = PlaceCreateSchema.omit({
     image: PlaceFields.image.optional(),
 });
 
-export type PlacePost = z.infer<typeof PlacePostSchema>;
+export type PlacePost = ZodInfer<typeof PlacePostSchema>;
 
 // ---  Read Schemas ----
 
 export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true });
 
-export type PlaceRead = z.infer<typeof PlaceReadSchema>;
+export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
 
 export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
-export type PlacesPaginated = z.infer<typeof PlacesPaginatedSchema>;
+export type PlacesPaginated = ZodInfer<typeof PlacesPaginatedSchema>;
 
 // ---  Quey Schemas ----
 
 export const PlaceFiltersSchema = filtersSchema(
-    z.object({
+    zod.object({
         id: httpFilters(PlaceFields.id, {
             example: "683b21134e2e5d46978daf1f",
         }).optional(),
@@ -95,7 +95,7 @@ export const PlaceFiltersSchema = filtersSchema(
     placeSelectableFields
 );
 
-export type PlaceFilters = z.infer<typeof PlaceFiltersSchema>;
+export type PlaceFilters = ZodInfer<typeof PlaceFiltersSchema>;
 
 export type PlaceFindQuery = FindQuery<
     PlaceSelectableType,
@@ -105,7 +105,7 @@ export type PlaceFindQuery = FindQuery<
 
 // --- Update Schemas ---
 
-export const PlaceUpdateSchema = z.object({
+export const PlaceUpdateSchema = zod.object({
     title: PlaceFields.title.optional(),
     description: PlaceFields.description.optional(),
     address: PlaceFields.address.optional(),
@@ -113,8 +113,8 @@ export const PlaceUpdateSchema = z.object({
     creatorId: PlaceFields.creatorId.optional(),
 });
 
-export type PlaceUpdate = z.infer<typeof PlaceUpdateSchema>;
+export type PlaceUpdate = ZodInfer<typeof PlaceUpdateSchema>;
 
 export const PlacePutSchema = PlaceUpdateSchema.extend({});
 
-export type PlacePut = z.infer<typeof PlacePutSchema>;
+export type PlacePut = ZodInfer<typeof PlacePutSchema>;

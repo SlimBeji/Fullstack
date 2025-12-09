@@ -1,4 +1,4 @@
-import z from "@/zodExt";
+import { zod } from "@/lib/zod";
 
 import { zodFile, zodObjectId } from "./utils";
 
@@ -37,22 +37,22 @@ const id = zodObjectId().openapi({
     example: "683b21134e2e5d46978daf1f",
 });
 
-const name = z.string().min(2).openapi({
+const name = zod.string().min(2).openapi({
     description: "The user name, two characters at least",
     example: "Slim Beji",
 });
 
-const email = z.string().email().openapi({
+const email = zod.string().email().openapi({
     description: "The user email",
     example: "mslimbeji@gmail.com",
 });
 
-const password = z.string().min(8).openapi({
+const password = zod.string().min(8).openapi({
     description: "The user password, 8 characters at least",
     example: "very_secret",
 });
 
-const imageUrl = z.string().openapi({
+const imageUrl = zod.string().openapi({
     type: "string",
     example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
     description: "local url on the storage",
@@ -60,12 +60,12 @@ const imageUrl = z.string().openapi({
 
 const image = zodFile("User's profile image (JPEG)");
 
-const isAdmin = z.coerce.boolean().openapi({
+const isAdmin = zod.coerce.boolean().openapi({
     description: "Whether the user is an admin or not",
     example: false,
 });
 
-const places = z.array(
+const places = zod.array(
     zodObjectId().openapi({
         description: "The id of places belonging to the user, 24 characters",
         example: "683b21134e2e5d46978daf1f",
