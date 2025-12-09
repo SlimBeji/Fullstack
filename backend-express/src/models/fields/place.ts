@@ -1,6 +1,4 @@
-import { zod } from "@/lib/zod";
-
-import { zodFile, zodObject, zodObjectId } from "./utils";
+import { zod, zodFile, zodObject, zodObjectId } from "@/lib/zod";
 
 //////// Types ///////
 

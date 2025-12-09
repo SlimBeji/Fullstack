@@ -1,8 +1,7 @@
 import { Request, Response, Router } from "express";
 
-import { zod } from "@/lib/zod";
+import { zod, zodObjectId } from "@/lib/zod";
 import { crudUser } from "@/models/crud";
-import { zodObjectId } from "@/models/fields";
 import {
     UserFiltersSchema,
     UserPost,
