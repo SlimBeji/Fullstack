@@ -1,10 +1,8 @@
-import { Queue } from "bullmq";
-
-import { broker_config, Queues, TASK_NEWSLETTER } from "../config";
-
-export const emailQueue = new Queue(Queues.EMAILS, broker_config);
+import { Queues, TASK_NEWSLETTER } from "../config";
+import { publisher } from "./publisher";
 
 export const sendNewsletter = (name: string, email: string) => {
     if (process.env.JEST_WORKER_ID) return;
-    emailQueue.add(TASK_NEWSLETTER, { name, email });
+    let queue = publisher.getQueue(Queues.EMAILS);
+    queue.add(TASK_NEWSLETTER, { name, email });
 };
