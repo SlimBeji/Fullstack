@@ -1,6 +1,5 @@
 import { dumpDb, seedDb } from "@/models/examples";
 import { closeCrons } from "@/worker/crons";
-import { closeWorkers } from "@/worker/tasks";
 
 import { db, redisClient } from "../clients";
 
@@ -18,7 +17,6 @@ export const startAll = async () => {
 
 export const closeAll = async () => {
     await closeDbs();
-    await closeWorkers();
     await closeCrons();
 };
 

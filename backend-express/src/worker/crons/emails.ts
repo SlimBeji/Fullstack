@@ -1,6 +1,6 @@
 import cron from "node-cron";
 
-import { sendNewsletter } from "../tasks";
+import { sendNewsletter } from "../publishers";
 
 export const sendNewsletterCron = cron.schedule(
     "0 * * * *",
