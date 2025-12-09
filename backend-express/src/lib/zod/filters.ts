@@ -1,9 +1,7 @@
-import { ZodTypeAny } from "zod";
+import { RefinementCtx, ZodNever, ZodTypeAny } from "zod";
 
-import { FilterOperation } from "@/lib/types";
-import { RefinementCtx, zod, ZodNever } from "@/lib/zod";
-
-/// HttpFilters ////
+import { FilterOperation } from "../types";
+import { zod } from "./base";
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
 

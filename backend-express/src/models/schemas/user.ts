@@ -1,8 +1,7 @@
 import { FindQuery } from "@/lib/types";
-import { zod, ZodInfer } from "@/lib/zod";
+import { httpFilters, zod, ZodInfer } from "@/lib/zod";
 
 import {
-    httpFilters,
     UserFields,
     UserSearchableType,
     userSelectableFields,

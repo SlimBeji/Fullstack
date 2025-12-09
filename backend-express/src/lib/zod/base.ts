@@ -1,7 +1,7 @@
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import { infer, RefinementCtx, z, ZodNever } from "zod";
+import { infer, z } from "zod";
 
 extendZodWithOpenApi(z);
 
 export const zod = z;
-export type { RefinementCtx, infer as ZodInfer, ZodNever };
+export type { infer as ZodInfer };
