@@ -1,11 +1,13 @@
-import { Job, Queue, Worker } from "bullmq";
+import { Job, Worker } from "bullmq";
 
-import { config, NewsletterData, Queues, TASK_NEWSLETTER } from "./config";
+import {
+    NewsletterData,
+    Queues,
+    TASK_NEWSLETTER,
+    worker_config,
+} from "../config";
 
-// Define Queue
-const emailQueue = new Queue(Queues.EMAILS, config);
-
-// Define Tasks, Types and Callers
+// Create Tasks
 
 async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -15,12 +17,7 @@ async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
     );
 }
 
-export const sendNewsletter = (name: string, email: string) => {
-    if (process.env.JEST_WORKER_ID) return;
-    emailQueue.add(TASK_NEWSLETTER, { name, email });
-};
-
-// Worker
+// Tasks Router
 type emailTaskData = NewsletterData;
 
 async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
@@ -33,13 +30,12 @@ async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
     }
 }
 
-const emailWorker = new Worker(Queues.EMAILS, emailTasksProcessor, config);
+// Start Worker
+export const emailWorker = new Worker(
+    Queues.EMAILS,
+    emailTasksProcessor,
+    worker_config
+);
 emailWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);
 });
-
-// Cleaner
-export const closeAiWorker = async () => {
-    await emailQueue.close();
-    await emailWorker.close();
-};

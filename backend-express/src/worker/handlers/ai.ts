@@ -1,19 +1,16 @@
-import { Job, Queue, Worker } from "bullmq";
+import { Job, Worker } from "bullmq";
 
 import { huggingFace } from "@/lib/clients";
 import { crudPlace } from "@/models/crud";
 
 import {
-    config,
     PlaceEmbeddingData,
     Queues,
     TASK_PLACE_EMBEDDING,
-} from "./config";
+    worker_config,
+} from "../config";
 
-// Define Queue
-const aiQueue = new Queue(Queues.AI, config);
-
-// Embedding Text
+// Create Tasks
 
 async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
     const { placeId } = job.data;
@@ -29,12 +26,7 @@ async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
     console.log(result);
 }
 
-export const placeEmbedding = (placeId: string) => {
-    if (process.env.JEST_WORKER_ID) return;
-    aiQueue.add(TASK_PLACE_EMBEDDING, { placeId });
-};
-
-// Worker
+// Tasks Router
 type AiTasksData = PlaceEmbeddingData;
 
 async function aiTasksProcessor(job: Job<AiTasksData>) {
@@ -47,13 +39,8 @@ async function aiTasksProcessor(job: Job<AiTasksData>) {
     }
 }
 
-const aiWorker = new Worker(Queues.AI, aiTasksProcessor, config);
+// Start Worker
+export const aiWorker = new Worker(Queues.AI, aiTasksProcessor, worker_config);
 aiWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);
 });
-
-// Cleaner
-export const closeEmailWorker = async () => {
-    await aiQueue.close();
-    await aiWorker.close();
-};
