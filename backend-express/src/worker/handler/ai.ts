@@ -1,14 +1,9 @@
-import { Job, Worker } from "bullmq";
+import { Job } from "bullmq";
 
 import { huggingFace } from "@/lib/clients";
 import { crudPlace } from "@/models/crud";
 
-import {
-    broker_config,
-    PlaceEmbeddingData,
-    Queues,
-    TASK_PLACE_EMBEDDING,
-} from "../config";
+import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../config";
 
 // Create Tasks
 
@@ -29,7 +24,7 @@ async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
 // Tasks Router
 type AiTasksData = PlaceEmbeddingData;
 
-async function aiTasksRouter(job: Job<AiTasksData>) {
+export async function aiTasksRouter(job: Job<AiTasksData>) {
     switch (job.name) {
         case TASK_PLACE_EMBEDDING:
             await placeEmbeddingTask(job);
@@ -38,9 +33,3 @@ async function aiTasksRouter(job: Job<AiTasksData>) {
             throw new Error(`Unknown job name: ${job.name}`);
     }
 }
-
-// Start Worker
-export const aiWorker = new Worker(Queues.AI, aiTasksRouter, broker_config);
-aiWorker.on("failed", (job, err) => {
-    console.error(`Job ${job?.id} failed with error ${err.message}`);
-});

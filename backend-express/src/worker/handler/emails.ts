@@ -1,11 +1,6 @@
-import { Job, Worker } from "bullmq";
+import { Job } from "bullmq";
 
-import {
-    broker_config,
-    NewsletterData,
-    Queues,
-    TASK_NEWSLETTER,
-} from "../config";
+import { NewsletterData, TASK_NEWSLETTER } from "../config";
 
 // Create Tasks
 
@@ -20,7 +15,7 @@ async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
 // Tasks Router
 type emailTaskData = NewsletterData;
 
-async function emailTasksRouter(job: Job<emailTaskData>): Promise<void> {
+export async function emailTasksRouter(job: Job<emailTaskData>): Promise<void> {
     switch (job.name) {
         case TASK_NEWSLETTER:
             await sendNewsletterTask(job);
@@ -29,13 +24,3 @@ async function emailTasksRouter(job: Job<emailTaskData>): Promise<void> {
             throw new Error(`Unknown job name: ${job.name}`);
     }
 }
-
-// Start Worker
-export const emailWorker = new Worker(
-    Queues.EMAILS,
-    emailTasksRouter,
-    broker_config
-);
-emailWorker.on("failed", (job, err) => {
-    console.error(`Job ${job?.id} failed with error ${err.message}`);
-});
