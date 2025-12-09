@@ -3,15 +3,17 @@ import { Job, Queue, Worker } from "bullmq";
 import { huggingFace } from "@/lib/clients";
 import { crudPlace } from "@/models/crud";
 
-import { config, Queues, Tasks } from "./config";
+import {
+    config,
+    PlaceEmbeddingData,
+    Queues,
+    TASK_PLACE_EMBEDDING,
+} from "./config";
 
 // Define Queue
 const aiQueue = new Queue(Queues.AI, config);
 
 // Embedding Text
-interface PlaceEmbeddingData {
-    placeId: string;
-}
 
 async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
     const { placeId } = job.data;
@@ -29,7 +31,7 @@ async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
 
 export const placeEmbedding = (placeId: string) => {
     if (process.env.JEST_WORKER_ID) return;
-    aiQueue.add(Tasks.PLACE_EMBEDDING, { placeId });
+    aiQueue.add(TASK_PLACE_EMBEDDING, { placeId });
 };
 
 // Worker
@@ -37,7 +39,7 @@ type AiTasksData = PlaceEmbeddingData;
 
 async function aiTasksProcessor(job: Job<AiTasksData>) {
     switch (job.name) {
-        case Tasks.PLACE_EMBEDDING:
+        case TASK_PLACE_EMBEDDING:
             await placeEmbeddingTask(job);
             break;
         default:

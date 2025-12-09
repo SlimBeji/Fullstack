@@ -1,5 +1,7 @@
 import { env } from "@/config";
 
+// Broker setup
+
 export const config = {
     connection: { url: env.REDIS_URL },
     defaultJobOptions: {
@@ -12,12 +14,24 @@ export const config = {
     },
 };
 
+// Queues
+
 export enum Queues {
     EMAILS = "emails",
     AI = "ai",
 }
 
-export enum Tasks {
-    NEWSLETTER = "newsletter",
-    PLACE_EMBEDDING = "place_embedding",
+// Tasks & Payload
+
+export const TASK_PLACE_EMBEDDING = "place_embedding";
+
+export interface PlaceEmbeddingData {
+    placeId: string;
+}
+
+export const TASK_NEWSLETTER = "newsletter";
+
+export interface NewsletterData {
+    name: string;
+    email: string;
 }

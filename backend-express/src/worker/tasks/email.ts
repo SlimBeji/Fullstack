@@ -1,15 +1,11 @@
 import { Job, Queue, Worker } from "bullmq";
 
-import { config, Queues, Tasks } from "./config";
+import { config, NewsletterData, Queues, TASK_NEWSLETTER } from "./config";
 
 // Define Queue
 const emailQueue = new Queue(Queues.EMAILS, config);
 
 // Define Tasks, Types and Callers
-interface NewsletterData {
-    name: string;
-    email: string;
-}
 
 async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -21,7 +17,7 @@ async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
 
 export const sendNewsletter = (name: string, email: string) => {
     if (process.env.JEST_WORKER_ID) return;
-    emailQueue.add(Tasks.NEWSLETTER, { name, email });
+    emailQueue.add(TASK_NEWSLETTER, { name, email });
 };
 
 // Worker
@@ -29,7 +25,7 @@ type emailTaskData = NewsletterData;
 
 async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
     switch (job.name) {
-        case Tasks.NEWSLETTER:
+        case TASK_NEWSLETTER:
             await sendNewsletterTask(job);
             break;
         default:
