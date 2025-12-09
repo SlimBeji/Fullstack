@@ -1,6 +1,5 @@
 import { env } from "@/config";
 import { storage } from "@/lib/clients";
-import { createToken } from "@/lib/encryption";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
@@ -12,6 +11,7 @@ import {
     UserSortableType,
 } from "../fields";
 import {
+    createToken,
     EncodedToken,
     Signin,
     Signup,

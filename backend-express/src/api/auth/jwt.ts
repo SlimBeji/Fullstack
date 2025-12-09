@@ -1,7 +1,6 @@
-import { decodeToken } from "@/lib/encryption";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { crudUser } from "@/models/crud";
-import { UserRead } from "@/models/schemas";
+import { decodeToken, UserRead } from "@/models/schemas";
 
 export const getUserFromToken = async (token: string): Promise<UserRead> => {
     const payload = decodeToken(token);

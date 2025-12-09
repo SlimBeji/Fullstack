@@ -1,17 +1,29 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Types } from "mongoose";
 
+import { env } from "@/config";
+import { ApiError, HttpStatus } from "@/lib/express";
+import { decodePayload, encodePayload } from "@/lib/utils";
 import { zod, ZodInfer } from "@/lib/zod";
 
 import { AuthFields, UserFields } from "../fields";
+import { UserRead } from "./user";
 
-// --- Token ----
+// --- Access Token ----
 export interface TokenPayload {
     userId: Types.ObjectId;
     email: string;
 }
 
 export interface DecodedTokenPayload extends TokenPayload, JwtPayload {}
+
+export const decodeToken = (encoded: string): DecodedTokenPayload => {
+    const decoded = decodePayload(encoded, env.SECRET_KEY);
+    if (typeof decoded === "string") {
+        throw new ApiError(HttpStatus.BAD_REQUEST, "Invalid token payload");
+    }
+    return decoded as DecodedTokenPayload;
+};
 
 // --- Signup Schemas ----
 export const SignupSchema = zod.object({
@@ -31,7 +43,7 @@ export const SigninSchema = zod.object({
 
 export type Signin = ZodInfer<typeof SigninSchema>;
 
-// Response Schemas
+// --- Response Schemas ---
 
 export const EncodedTokenSchema = zod.object({
     access_token: AuthFields.accessToken,
@@ -42,3 +54,22 @@ export const EncodedTokenSchema = zod.object({
 });
 
 export type EncodedToken = ZodInfer<typeof EncodedTokenSchema>;
+
+export const createToken = (user: UserRead): EncodedToken => {
+    const payload: TokenPayload = {
+        userId: user.id,
+        email: user.email,
+    };
+    const access_token = encodePayload(
+        payload,
+        env.SECRET_KEY,
+        env.JWT_EXPIRATION
+    );
+    return {
+        access_token,
+        token_type: "bearer",
+        email: user.email,
+        userId: user.id,
+        expires_in: env.JWT_EXPIRATION,
+    };
+};
