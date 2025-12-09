@@ -1,6 +1,6 @@
 import app from "@/api";
 import { env } from "@/config/env";
-import { startAll } from "@/config/setup";
+import { startAll } from "@/services";
 
 // Connect Mongoose than run the app
 if (require.main === module) {

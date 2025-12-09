@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach axum
+	docker-compose up --attach express
 
 build:
 	docker-compose build

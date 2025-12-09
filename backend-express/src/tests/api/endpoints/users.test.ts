@@ -1,10 +1,10 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { closeAll, seedTestData } from "@/config/setup";
 import { HttpStatus } from "@/lib/express";
 import { crudUser } from "@/models/crud";
 import { createToken, UserRead } from "@/models/schemas";
+import { closeAll, seedTestData } from "@/services";
 import { readImage } from "@/static";
 
 let adminExample: UserRead;

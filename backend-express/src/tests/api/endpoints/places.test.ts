@@ -1,10 +1,10 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { closeAll, seedTestData } from "@/config/setup";
 import { HttpStatus } from "@/lib/express";
 import { crudPlace, crudUser } from "@/models/crud";
 import { PlaceRead } from "@/models/schemas";
+import { closeAll, seedTestData } from "@/services";
 import { getImagePath } from "@/static";
 
 let adminToken: string = "";

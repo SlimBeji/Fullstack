@@ -1,8 +1,8 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { closeAll, seedTestData } from "@/config/setup";
 import { crudUser } from "@/models/crud";
+import { closeAll, seedTestData } from "@/services";
 
 const request = supertest(app);
 
