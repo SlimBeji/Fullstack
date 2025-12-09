@@ -20,7 +20,7 @@ async function sendNewsletterTask(job: Job<NewsletterData>): Promise<void> {
 // Tasks Router
 type emailTaskData = NewsletterData;
 
-async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
+async function emailTasksRouter(job: Job<emailTaskData>): Promise<void> {
     switch (job.name) {
         case TASK_NEWSLETTER:
             await sendNewsletterTask(job);
@@ -33,7 +33,7 @@ async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
 // Start Worker
 export const emailWorker = new Worker(
     Queues.EMAILS,
-    emailTasksProcessor,
+    emailTasksRouter,
     broker_config
 );
 emailWorker.on("failed", (job, err) => {

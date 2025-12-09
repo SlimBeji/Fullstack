@@ -29,7 +29,7 @@ async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
 // Tasks Router
 type AiTasksData = PlaceEmbeddingData;
 
-async function aiTasksProcessor(job: Job<AiTasksData>) {
+async function aiTasksRouter(job: Job<AiTasksData>) {
     switch (job.name) {
         case TASK_PLACE_EMBEDDING:
             await placeEmbeddingTask(job);
@@ -40,7 +40,7 @@ async function aiTasksProcessor(job: Job<AiTasksData>) {
 }
 
 // Start Worker
-export const aiWorker = new Worker(Queues.AI, aiTasksProcessor, broker_config);
+export const aiWorker = new Worker(Queues.AI, aiTasksRouter, broker_config);
 aiWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);
 });
