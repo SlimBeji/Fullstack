@@ -1,9 +1,7 @@
 import { Types } from "mongoose";
 import { ZodTypeAny } from "zod";
 
-import { env } from "@/config";
-import { ApiError, HttpStatus, MimeType } from "@/lib/express";
-
+import { ApiError, HttpStatus, MimeType } from "../express";
 import { zod } from "./base";
 
 export const zodObjectId = () => {
@@ -16,10 +14,7 @@ export const zodObjectId = () => {
         .transform((val) => new Types.ObjectId(val));
 };
 
-const _zodFile = (
-    acceptedMimetypes: string[] | null = null,
-    maxSize: number = env.FILEUPLOAD_MAX_SIZE
-) => {
+const _zodFile = (acceptedMimetypes: string[] | null, maxSize: number) => {
     acceptedMimetypes = acceptedMimetypes || [MimeType.JPEG, MimeType.PNG];
     return zod.object({
         fieldname: zod.string(),
@@ -35,8 +30,8 @@ const _zodFile = (
 
 export const zodFile = (
     description: string,
-    acceptedMimetypes: string[] | null = null,
-    maxSize: number = env.FILEUPLOAD_MAX_SIZE
+    maxSize: number,
+    acceptedMimetypes: string[] | null = null
 ) => {
     return zod
         .any()

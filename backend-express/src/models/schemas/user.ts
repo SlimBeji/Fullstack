@@ -1,3 +1,4 @@
+import { env } from "@/config";
 import { FindQuery } from "@/lib/types";
 import {
     filtersSchema,
@@ -70,7 +71,8 @@ export const UserFiltersSchema = filtersSchema(
         }).optional(),
     }),
     userSortableFields,
-    userSelectableFields
+    userSelectableFields,
+    env.MAX_ITEMS_PER_PAGE
 );
 
 export type UserFilters = ZodInfer<typeof UserFiltersSchema>;

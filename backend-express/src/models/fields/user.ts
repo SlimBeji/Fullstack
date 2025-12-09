@@ -1,3 +1,4 @@
+import { env } from "@/config";
 import { zod, zodFile, zodObjectId } from "@/lib/zod";
 
 //////// Types ///////
@@ -56,7 +57,7 @@ const imageUrl = zod.string().openapi({
     description: "local url on the storage",
 });
 
-const image = zodFile("User's profile image (JPEG)");
+const image = zodFile("User's profile image (JPEG)", env.FILEUPLOAD_MAX_SIZE);
 
 const isAdmin = zod.coerce.boolean().openapi({
     description: "Whether the user is an admin or not",

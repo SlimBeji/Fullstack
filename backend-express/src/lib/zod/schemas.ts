@@ -1,7 +1,6 @@
 import { AnyZodObject } from "zod";
 
-import { env } from "@/config";
-import { zod } from "@/lib/zod";
+import { zod } from "./base";
 
 export const paginatedSchema = (
     schema: AnyZodObject,
@@ -20,7 +19,8 @@ export const paginatedSchema = (
 export const filtersSchema = (
     baseSchema: AnyZodObject,
     sortables: string[],
-    selectables: string[]
+    selectables: string[],
+    maxItems: number = 100
 ): AnyZodObject => {
     const page = zod.coerce
         .number()
@@ -30,8 +30,8 @@ export const filtersSchema = (
     const size = zod.coerce
         .number()
         .int()
-        .max(env.MAX_ITEMS_PER_PAGE)
-        .default(env.MAX_ITEMS_PER_PAGE)
+        .max(maxItems)
+        .default(maxItems)
         .openapi("Items per page");
     const sort = zod
         .array(zod.enum(sortables as [string, ...string[]]))

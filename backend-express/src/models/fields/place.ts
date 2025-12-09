@@ -1,3 +1,4 @@
+import { env } from "@/config";
 import { zod, zodFile, zodObject, zodObjectId } from "@/lib/zod";
 
 //////// Types ///////
@@ -66,7 +67,7 @@ const imageUrl = zod.string().openapi({
     description: "local url on the storage",
 });
 
-const image = zodFile("Place Image (JPEG)");
+const image = zodFile("Place Image (JPEG)", env.FILEUPLOAD_MAX_SIZE);
 
 const address = zod.string().min(1).openapi({
     description: "The place address",
