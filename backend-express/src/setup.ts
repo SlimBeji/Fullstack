@@ -1,7 +1,6 @@
+import { db, redisClient } from "@/lib/clients";
 import { dumpDb, seedDb } from "@/models/examples";
 import { closeCrons } from "@/worker/crons";
-
-import { db, redisClient } from "../clients";
 
 export const connectDbs = async () => {
     await Promise.all([redisClient.connect(), db.connect()]);
