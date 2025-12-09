@@ -5,7 +5,7 @@ import {
 import { Application } from "express";
 import swaggerUi from "swagger-ui-express";
 
-import { env } from "@/config/env";
+import { env } from "@/config";
 
 const swaggerRegistery = new OpenAPIRegistry();
 

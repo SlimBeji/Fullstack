@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { env } from "@/config/env";
+import { env } from "@/config";
 
 export const cors = (req: Request, res: Response, next: NextFunction): void => {
     // Set CORS headers

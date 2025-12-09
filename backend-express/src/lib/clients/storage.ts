@@ -8,7 +8,7 @@ import { randomUUID } from "crypto";
 import { existsSync } from "fs";
 import path from "path";
 
-import { env } from "@/config/env";
+import { env } from "@/config";
 import { FileToUpload } from "@/lib/types";
 
 interface GCSConfig {

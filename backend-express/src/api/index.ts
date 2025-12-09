@@ -3,7 +3,7 @@ import "express-async-errors";
 import cookieSession from "cookie-session";
 import express from "express";
 
-import { env } from "@/config/env";
+import { env } from "@/config";
 
 import { registerSwaggger } from "./docs";
 import { cors, errorHandler, noRouteMatchHandler } from "./middlewares";

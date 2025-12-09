@@ -1,5 +1,5 @@
 import app from "@/api";
-import { env } from "@/config/env";
+import { env } from "@/config";
 import { startAll } from "@/services";
 
 // Connect Mongoose than run the app
