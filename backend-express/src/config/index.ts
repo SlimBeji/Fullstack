@@ -17,6 +17,7 @@ export const env = {
     API_URL: parseVar("API_URL", "http://localhost:5000/api"),
     APP_URL: parseVar("APP_URL"),
     SECRET_KEY: parseVar("SECRET_KEY"),
+    DEFAULT_HASH_SALT: Number(parseVar("DEFAULT_HASH_SALT", "12")),
     FILEUPLOAD_MAX_SIZE: Number(parseVar("FILEUPLOAD_MAX_SIZE", "100")),
     JSON_MAX_SIZE: Number(parseVar("JSON_MAX_SIZE", "10240")),
     MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),
