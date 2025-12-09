@@ -2,7 +2,7 @@ import { env } from "@/config";
 
 // Broker setup
 
-export const worker_config = {
+export const broker_config = {
     connection: { url: env.REDIS_URL },
     defaultJobOptions: {
         removeOnComplete: {

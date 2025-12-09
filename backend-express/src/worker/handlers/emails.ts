@@ -1,10 +1,10 @@
 import { Job, Worker } from "bullmq";
 
 import {
+    broker_config,
     NewsletterData,
     Queues,
     TASK_NEWSLETTER,
-    worker_config,
 } from "../config";
 
 // Create Tasks
@@ -34,7 +34,7 @@ async function emailTasksProcessor(job: Job<emailTaskData>): Promise<void> {
 export const emailWorker = new Worker(
     Queues.EMAILS,
     emailTasksProcessor,
-    worker_config
+    broker_config
 );
 emailWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);

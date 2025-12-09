@@ -4,10 +4,10 @@ import { huggingFace } from "@/lib/clients";
 import { crudPlace } from "@/models/crud";
 
 import {
+    broker_config,
     PlaceEmbeddingData,
     Queues,
     TASK_PLACE_EMBEDDING,
-    worker_config,
 } from "../config";
 
 // Create Tasks
@@ -40,7 +40,7 @@ async function aiTasksProcessor(job: Job<AiTasksData>) {
 }
 
 // Start Worker
-export const aiWorker = new Worker(Queues.AI, aiTasksProcessor, worker_config);
+export const aiWorker = new Worker(Queues.AI, aiTasksProcessor, broker_config);
 aiWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed with error ${err.message}`);
 });
