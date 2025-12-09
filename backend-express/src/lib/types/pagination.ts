@@ -1,5 +1,3 @@
-import { env } from "@/config";
-
 export interface PaginatedData<T> {
     page: number;
     totalPages: number;
@@ -9,8 +7,8 @@ export interface PaginatedData<T> {
 
 export class PaginationData {
     constructor(
-        public page: number = 1,
-        public size: number = env.MAX_ITEMS_PER_PAGE
+        public page: number,
+        public size: number
     ) {}
 
     public get skip(): number {

@@ -242,7 +242,10 @@ export class Crud<
         query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
         // Step 1: Parsing the FindQuery to Mongo language
-        const pagination = new PaginationData(query.page, query.size);
+        const pagination = new PaginationData(
+            query.page || 1,
+            query.size || env.MAX_ITEMS_PER_PAGE
+        );
         const projection = this.parseProjection(query.fields);
         const sort = this.parseSortData(query.sort);
         const filters = this.parseFilters(query.filters);
