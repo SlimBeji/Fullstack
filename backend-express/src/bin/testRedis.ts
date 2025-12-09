@@ -1,5 +1,4 @@
 import { redisClient } from "@/lib/clients";
-import { closeAll, startAll } from "@/lib/setup";
 
 async function test() {
     await redisClient.set("secret_number", 158);
@@ -9,5 +8,8 @@ async function test() {
 }
 
 if (require.main === module) {
-    startAll().then(test).finally(closeAll);
+    redisClient
+        .connect()
+        .then(test)
+        .finally(() => redisClient.close());
 }
