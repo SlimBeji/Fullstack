@@ -1,5 +1,11 @@
 import { FindQuery } from "@/lib/types";
-import { httpFilters, zod, ZodInfer } from "@/lib/zod";
+import {
+    filtersSchema,
+    httpFilters,
+    paginatedSchema,
+    zod,
+    ZodInfer,
+} from "@/lib/zod";
 
 import {
     PlaceFields,
@@ -9,7 +15,6 @@ import {
     placeSortableFields,
     PlaceSortableType,
 } from "../fields";
-import { filtersSchema, paginatedSchema } from "./base";
 
 // --- Base Schemas ----
 export const PlaceDBSchema = zod.object({
