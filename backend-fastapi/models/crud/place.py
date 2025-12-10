@@ -4,6 +4,7 @@ from typing import cast
 from beanie import PydanticObjectId
 
 from lib.clients import cloud_storage
+from lib.fastapi import ApiError
 from models.collections.place import Place
 from models.crud.base import CrudBase, CrudEvent
 from models.fields import (
@@ -21,7 +22,7 @@ from models.schemas import (
     PlaceUpdateSchema,
     UserReadSchema,
 )
-from types_ import ApiError, Filter
+from types_ import Filter
 from worker.tasks import place_embeddding
 
 

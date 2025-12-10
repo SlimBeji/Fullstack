@@ -9,9 +9,9 @@ from pydantic import BaseModel
 
 from config import settings
 from lib.clients import db
+from lib.fastapi import ApiError
 from models.schemas import UserReadSchema
 from types_ import (
-    ApiError,
     FindQuery,
     FindQueryFilters,
     MongoFieldFilters,

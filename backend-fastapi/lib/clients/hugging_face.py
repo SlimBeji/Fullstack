@@ -3,7 +3,7 @@ from http import HTTPStatus
 import httpx
 
 from config import settings
-from types_ import ApiError
+from lib.fastapi import ApiError
 
 HF_TIMEOUT = 30
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"

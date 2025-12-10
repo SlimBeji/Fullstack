@@ -7,6 +7,7 @@ from pymongo.errors import DuplicateKeyError
 from config import settings
 from lib.clients import cloud_storage
 from lib.encryption import create_token, hash_input, verify_hash
+from lib.fastapi import ApiError
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent
 from models.fields import (
@@ -26,7 +27,7 @@ from models.schemas import (
     UserReadSchema,
     UserUpdateSchema,
 )
-from types_ import ApiError, Filter, Projection
+from types_ import Filter, Projection
 
 
 class CrudUser(

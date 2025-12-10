@@ -1,7 +1,8 @@
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 
-from types_ import ApiError, CallNext
+from lib.fastapi import ApiError
+from types_ import CallNext
 
 
 async def catch_exceptions(request: Request, call_next: CallNext) -> Response:
