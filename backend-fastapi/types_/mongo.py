@@ -4,7 +4,6 @@ from beanie import Insert, Replace, Update
 from pydantic import BaseModel
 
 from config import settings
-from lib.types_ import PaginationData
 
 SaveEvent = [Insert, Replace, Update]
 
@@ -35,23 +34,3 @@ class FindQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
     sort: list[Sortables] | None = None
     fields: list[Selectables] | None = None
     filters: FindQueryFilters[Searchables] | None = None
-
-
-# ---- Internal Types for building Mongo queries ----
-
-type SortData = dict[str, Literal[-1, 1]]
-
-type Projection = dict[str, Literal[0, 1]]
-
-type MongoFieldFilters = dict[str, Any]
-
-type MongoFieldsFilters = dict[str, MongoFieldFilters]
-
-
-class MongoFindQuery(BaseModel):
-    pagination: PaginationData | None = PaginationData(
-        page=1, size=settings.MAX_ITEMS_PER_PAGE
-    )
-    sort: SortData = {}
-    filters: MongoFieldsFilters | None = {}
-    projection: Projection | None = {}

@@ -1,7 +1,7 @@
 import asyncio
 import math
 from http import HTTPStatus
-from typing import Generic, Literal, TypeVar, cast, get_args
+from typing import Any, Generic, Literal, TypeVar, cast, get_args
 
 from beanie import Document
 from bson import ObjectId
@@ -12,15 +12,27 @@ from lib.clients import db
 from lib.fastapi import ApiError
 from lib.types_ import PaginatedData, PaginationData
 from models.schemas import UserReadSchema
-from types_ import (
-    FindQuery,
-    FindQueryFilters,
-    MongoFieldFilters,
-    MongoFieldsFilters,
-    MongoFindQuery,
-    Projection,
-    SortData,
-)
+from types_ import FindQuery, FindQueryFilters
+
+type SortData = dict[str, Literal[-1, 1]]
+
+type Projection = dict[str, Literal[0, 1]]
+
+type MongoFieldFilters = dict[str, Any]
+
+type MongoFieldsFilters = dict[str, MongoFieldFilters]
+
+
+class MongoFindQuery(BaseModel):
+    pagination: PaginationData | None = PaginationData(
+        page=1, size=settings.MAX_ITEMS_PER_PAGE
+    )
+    sort: SortData = {}
+    filters: MongoFieldsFilters | None = {}
+    projection: Projection | None = {}
+
+
+CrudEvent = Literal["create", "read", "update", "delete"]
 
 ModelDocument = TypeVar("ModelDocument", bound=Document)
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
@@ -32,8 +44,6 @@ CreateSchema = TypeVar("CreateSchema", bound=BaseModel)
 PostSchema = TypeVar("PostSchema", bound=BaseModel)
 UpdateSchema = TypeVar("UpdateSchema", bound=BaseModel)
 PutSchema = TypeVar("PutSchema", bound=BaseModel)
-
-CrudEvent = Literal["create", "read", "update", "delete"]
 
 
 class CrudBase(
