@@ -9,8 +9,8 @@ export interface RedisClientConfig {
 }
 
 export class RedisClient {
-    private client: RedisClientType;
-    public url: string;
+    private readonly client: RedisClientType;
+    public readonly url: string;
 
     constructor(config: RedisClientConfig) {
         if (this.isTest) {

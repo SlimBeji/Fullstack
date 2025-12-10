@@ -7,8 +7,8 @@ export interface MongoClientConfig {
 }
 
 export class MongoClient {
-    public uri: string;
-    public dbName: string;
+    public readonly uri: string;
+    public readonly dbName: string;
 
     constructor(config: MongoClientConfig) {
         this.uri = config.uri;
