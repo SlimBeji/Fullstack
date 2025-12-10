@@ -8,16 +8,15 @@ import { randomUUID } from "crypto";
 import { existsSync } from "fs";
 import path from "path";
 
-import { env } from "@/config";
 import { FileToUpload } from "@/lib/types";
 
-interface GCSConfig {
-    GCP_PROJECT_ID: string;
-    GCS_BUCKET_NAME: string;
-    GCS_BLOB_ACCESS_EXPIRATION?: number;
-    GOOGLE_APPLICATION_CREDENTIALS?: string;
-    GCS_EMULATOR_PRIVATE_URL?: string;
-    GCS_EMULATOR_PUBLIC_URL?: string;
+export interface CloudStorageConfig {
+    projectId: string;
+    bucketName: string;
+    accessExpiration?: number;
+    credentialsFile?: string;
+    emulatorPublicUrl?: string;
+    emulatorPrivateUrl?: string;
 }
 
 export class CloudStorage {
@@ -31,14 +30,14 @@ export class CloudStorage {
     private readonly storage: Storage;
     private readonly bucket: Bucket;
 
-    constructor(config: GCSConfig) {
+    constructor(config: CloudStorageConfig) {
         // Setting base configuration
-        this.projectId = config.GCP_PROJECT_ID;
-        this.bucketName = config.GCS_BUCKET_NAME;
-        this.urlExpiration = config.GCS_BLOB_ACCESS_EXPIRATION || 3600;
-        this.emulatorPublicUrl = config.GCS_EMULATOR_PUBLIC_URL;
-        this.emulatorPrivateUrl = config.GCS_EMULATOR_PRIVATE_URL;
-        this.credentialsFile = config.GOOGLE_APPLICATION_CREDENTIALS;
+        this.projectId = config.projectId;
+        this.bucketName = config.bucketName;
+        this.urlExpiration = config.accessExpiration || 3600;
+        this.credentialsFile = config.credentialsFile;
+        this.emulatorPublicUrl = config.emulatorPublicUrl;
+        this.emulatorPrivateUrl = config.emulatorPrivateUrl;
 
         // Creating the storage object
         const options = this.getStorageOptions();
@@ -154,5 +153,3 @@ export class CloudStorage {
         }
     }
 }
-
-export const storage = new CloudStorage(env);

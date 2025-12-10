@@ -1,4 +1,4 @@
-import { storage } from "@/lib/clients";
+import { storage } from "@/services";
 import { getImagePath } from "@/static";
 
 async function test() {

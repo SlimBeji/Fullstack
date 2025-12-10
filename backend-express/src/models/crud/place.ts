@@ -1,7 +1,7 @@
 import { placeEmbedding } from "@/background/publishers";
-import { storage } from "@/lib/clients";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
+import { storage } from "@/services";
 
 import { PlaceDocument, PlaceModel } from "../collections";
 import {

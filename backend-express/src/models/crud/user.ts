@@ -1,8 +1,8 @@
 import { env } from "@/config";
-import { storage } from "@/lib/clients";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
+import { storage } from "@/services";
 
 import { UserDocument, UserModel } from "../collections";
 import {
