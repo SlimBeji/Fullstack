@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 
-import { validateBody } from "@/lib/express";
+import { fetchRequest, validateBody } from "@/lib/express";
 import { zod, zodObjectId } from "@/lib/zod";
 import { crudPlace } from "@/models/crud";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/models/schemas";
 
 import { swaggerRegistery } from "../docs";
-import { Authenticated, filter } from "../middlewares";
+import { Authenticated } from "../middlewares";
 
 export const placeRouter = Router();
 
@@ -25,7 +25,7 @@ async function getPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.get("/", filter(PlaceFiltersSchema, "query"), getPlaces);
+placeRouter.get("/", fetchRequest(PlaceFiltersSchema, "query"), getPlaces);
 
 swaggerRegistery.registerPath({
     method: "get",
@@ -55,7 +55,11 @@ async function queryPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.post("/query", filter(PlaceFiltersSchema, "body"), queryPlaces);
+placeRouter.post(
+    "/query",
+    fetchRequest(PlaceFiltersSchema, "body"),
+    queryPlaces
+);
 
 swaggerRegistery.registerPath({
     method: "post",

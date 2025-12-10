@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 
-import { validateBody } from "@/lib/express";
+import { fetchRequest, validateBody } from "@/lib/express";
 import { zod, zodObjectId } from "@/lib/zod";
 import { crudUser } from "@/models/crud";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/models/schemas";
 
 import { swaggerRegistery } from "../docs";
-import { Admin, Authenticated, filter } from "../middlewares";
+import { Admin, Authenticated } from "../middlewares";
 
 export const userRouter = Router();
 
@@ -28,7 +28,7 @@ async function getUsers(req: Request, res: Response) {
 userRouter.get(
     "/",
     Authenticated,
-    filter(UserFiltersSchema, "query"),
+    fetchRequest(UserFiltersSchema, "query"),
     getUsers
 );
 
@@ -61,7 +61,7 @@ async function queryUsers(req: Request, res: Response) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.post("/query", filter(UserFiltersSchema, "body"), queryUsers);
+userRouter.post("/query", fetchRequest(UserFiltersSchema, "body"), queryUsers);
 
 swaggerRegistery.registerPath({
     method: "post",
