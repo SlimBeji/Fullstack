@@ -2,7 +2,6 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParsedQs } from "qs";
 import { AnyZodObject } from "zod";
 
-import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
 
@@ -98,7 +97,7 @@ export const filter = (
         const data = parsing.data;
         req.filterQuery = {
             page: data.page || 1,
-            size: data.size || env.MAX_ITEMS_PER_PAGE,
+            size: data.size,
             sort: data.sort || [],
             fields: data.fields || [],
             filters: extractFilters(data),
