@@ -1,16 +1,17 @@
 import { createClient, RedisClientType } from "redis";
 
-import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
 
 export interface RedisClientConfig {
     url?: string;
     testUrl?: string;
+    expiration?: number;
 }
 
 export class RedisClient {
     private readonly client: RedisClientType;
     public readonly url: string;
+    public readonly defaultExpiration: number;
 
     constructor(config: RedisClientConfig) {
         if (this.isTest) {
@@ -28,6 +29,7 @@ export class RedisClient {
             }
             this.url = config.url;
         }
+        this.defaultExpiration = config.expiration || 3600;
         this.client = createClient({ url: this.url });
     }
 
@@ -74,7 +76,7 @@ export class RedisClient {
         expiration: number | null = null
     ): Promise<any> {
         let stringified;
-        expiration = expiration || env.REDIS_DEFAULT_EXPIRATION;
+        expiration = expiration || this.defaultExpiration;
         try {
             stringified = JSON.stringify(val);
         } catch {

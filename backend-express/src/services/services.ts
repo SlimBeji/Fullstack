@@ -20,6 +20,7 @@ export const db = new MongoClient(mongoConfig);
 const redisConfig: RedisClientConfig = {
     url: env.REDIS_URL,
     testUrl: env.REDIS_TEST_URL,
+    expiration: env.REDIS_DEFAULT_EXPIRATION,
 };
 export const redisClient = new RedisClient(redisConfig);
 
