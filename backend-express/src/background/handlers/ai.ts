@@ -3,7 +3,7 @@ import { Job } from "bullmq";
 import { crudPlace } from "@/models/crud";
 import { huggingFace } from "@/services";
 
-import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../config";
+import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
 
 // Create Tasks
 

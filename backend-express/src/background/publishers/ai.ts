@@ -1,4 +1,4 @@
-import { Queues, TASK_PLACE_EMBEDDING } from "../config";
+import { Queues, TASK_PLACE_EMBEDDING } from "../setup";
 import { publisher } from "./publisher";
 
 export const placeEmbedding = (placeId: string) => {

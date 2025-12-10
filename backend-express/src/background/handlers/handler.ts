@@ -1,6 +1,6 @@
 import { Job, Worker } from "bullmq";
 
-import { broker_config, Queues, QueueType } from "../config";
+import { broker_config, Queues, QueueType } from "../setup";
 import { aiTasksRouter } from "./ai";
 import { emailTasksRouter } from "./emails";
 

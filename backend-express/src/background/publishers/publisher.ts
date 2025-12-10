@@ -2,7 +2,7 @@ import { Queue } from "bullmq";
 
 import { ApiError, HttpStatus } from "@/lib/express";
 
-import { broker_config, Queues, QueueType } from "../config";
+import { broker_config, Queues, QueueType } from "../setup";
 
 export class TaskPublisher {
     private queues: Partial<Record<QueueType, Queue>> = {};

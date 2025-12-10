@@ -1,4 +1,4 @@
-import { Queues, TASK_NEWSLETTER } from "../config";
+import { Queues, TASK_NEWSLETTER } from "../setup";
 import { publisher } from "./publisher";
 
 export const sendNewsletter = (name: string, email: string) => {
