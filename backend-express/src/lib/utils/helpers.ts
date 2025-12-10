@@ -1,3 +1,11 @@
+export const getEnvVar = (varname: string, defaultValue?: string): string => {
+    const value = process.env[varname] || defaultValue;
+    if (!value && defaultValue === undefined) {
+        throw new Error(`${varname} must be set as environment variable`);
+    }
+    return value || "";
+};
+
 export const sleep = (seconds: number) => {
     return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 };

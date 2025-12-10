@@ -1,54 +1,47 @@
 import dotenv from "dotenv";
 
-dotenv.config();
+import { getEnvVar } from "@/lib/utils";
 
-// Checker
-const parseVar = (varname: string, defaultValue?: string): string => {
-    const value = process.env[varname] || defaultValue;
-    if (!value && defaultValue === undefined) {
-        throw new Error(`${varname} must be set as environment variable`);
-    }
-    return value || "";
-};
+dotenv.config();
 
 export const env = {
     // ENV config
-    PORT: parseVar("PORT", "5000"),
-    API_URL: parseVar("API_URL", "http://localhost:5000/api"),
-    APP_URL: parseVar("APP_URL"),
-    SECRET_KEY: parseVar("SECRET_KEY"),
-    DEFAULT_HASH_SALT: Number(parseVar("DEFAULT_HASH_SALT", "12")),
-    FILEUPLOAD_MAX_SIZE: Number(parseVar("FILEUPLOAD_MAX_SIZE", "100")),
-    JSON_MAX_SIZE: Number(parseVar("JSON_MAX_SIZE", "10240")),
-    MAX_ITEMS_PER_PAGE: Number(parseVar("MAX_ITEMS_PER_PAGE", "100")),
-    GOD_MODE_LOGIN: parseVar("GOD_MODE_LOGIN"),
-    JWT_EXPIRATION: Number(parseVar("JWT_EXPIRATION", "3600")),
-    DEFAULT_TIMEOUT: Number(parseVar("DEFAULT_TIMEOUT", "20")),
-    ENV: parseVar("ENV"),
+    PORT: getEnvVar("PORT", "5000"),
+    API_URL: getEnvVar("API_URL", "http://localhost:5000/api"),
+    APP_URL: getEnvVar("APP_URL"),
+    SECRET_KEY: getEnvVar("SECRET_KEY"),
+    DEFAULT_HASH_SALT: Number(getEnvVar("DEFAULT_HASH_SALT", "12")),
+    FILEUPLOAD_MAX_SIZE: Number(getEnvVar("FILEUPLOAD_MAX_SIZE", "100")),
+    JSON_MAX_SIZE: Number(getEnvVar("JSON_MAX_SIZE", "10240")),
+    MAX_ITEMS_PER_PAGE: Number(getEnvVar("MAX_ITEMS_PER_PAGE", "100")),
+    GOD_MODE_LOGIN: getEnvVar("GOD_MODE_LOGIN"),
+    JWT_EXPIRATION: Number(getEnvVar("JWT_EXPIRATION", "3600")),
+    DEFAULT_TIMEOUT: Number(getEnvVar("DEFAULT_TIMEOUT", "20")),
+    ENV: getEnvVar("ENV"),
 
     // DATABASE config
-    MONGO_URL: parseVar("MONGO_URL"),
-    MONGO_DBNAME: parseVar("MONGO_DBNAME"),
-    MONGO_TEST_DBNAME: parseVar("MONGO_TEST_DBNAME", "tests"),
-    REDIS_URL: parseVar("REDIS_URL"),
-    REDIS_TEST_URL: parseVar("REDIS_TEST_URL", ""),
+    MONGO_URL: getEnvVar("MONGO_URL"),
+    MONGO_DBNAME: getEnvVar("MONGO_DBNAME"),
+    MONGO_TEST_DBNAME: getEnvVar("MONGO_TEST_DBNAME", "tests"),
+    REDIS_URL: getEnvVar("REDIS_URL"),
+    REDIS_TEST_URL: getEnvVar("REDIS_TEST_URL", ""),
     REDIS_DEFAULT_EXPIRATION: Number(
-        parseVar("REDIS_DEFAULT_EXPIRATION", "3600")
+        getEnvVar("REDIS_DEFAULT_EXPIRATION", "3600")
     ),
 
     // HUGGING FACE config
-    HF_API_TOKEN: parseVar("HF_API_TOKEN"),
+    HF_API_TOKEN: getEnvVar("HF_API_TOKEN"),
 
     // GCP config
-    GOOGLE_APPLICATION_CREDENTIALS: parseVar(
+    GOOGLE_APPLICATION_CREDENTIALS: getEnvVar(
         "GOOGLE_APPLICATION_CREDENTIALS",
         ""
     ),
-    GCP_PROJECT_ID: parseVar("GCP_PROJECT_ID"),
-    GCS_BUCKET_NAME: parseVar("GCS_BUCKET_NAME"),
+    GCP_PROJECT_ID: getEnvVar("GCP_PROJECT_ID"),
+    GCS_BUCKET_NAME: getEnvVar("GCS_BUCKET_NAME"),
     GCS_BLOB_ACCESS_EXPIRATION: Number(
-        parseVar("GCS_BLOB_ACCESS_EXPIRATION", "3600")
+        getEnvVar("GCS_BLOB_ACCESS_EXPIRATION", "3600")
     ),
-    GCS_EMULATOR_PRIVATE_URL: parseVar("GCS_EMULATOR_PRIVATE_URL", ""),
-    GCS_EMULATOR_PUBLIC_URL: parseVar("GCS_EMULATOR_PUBLIC_URL", ""),
+    GCS_EMULATOR_PRIVATE_URL: getEnvVar("GCS_EMULATOR_PRIVATE_URL", ""),
+    GCS_EMULATOR_PUBLIC_URL: getEnvVar("GCS_EMULATOR_PUBLIC_URL", ""),
 };
