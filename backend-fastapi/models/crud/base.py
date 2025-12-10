@@ -10,9 +10,13 @@ from pydantic import BaseModel
 from config import settings
 from lib.clients import db
 from lib.fastapi import ApiError
-from lib.types_ import PaginatedData, PaginationData
+from lib.types_ import (
+    FindQuery,
+    FindQueryFilters,
+    PaginatedData,
+    PaginationData,
+)
 from models.schemas import UserReadSchema
-from types_ import FindQuery, FindQueryFilters
 
 type SortData = dict[str, Literal[-1, 1]]
 

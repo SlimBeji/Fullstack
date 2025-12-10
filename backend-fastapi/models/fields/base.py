@@ -17,8 +17,8 @@ from pydantic import BeforeValidator, EmailStr, Field, TypeAdapter
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticCustomError
 
+from lib.types_ import FilterOperation
 from lib.utils import str_to_bool
-from types_ import FilterOperation
 
 # FieldMeta
 

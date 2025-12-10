@@ -4,8 +4,8 @@ from functools import partial
 from beanie import Document, before_event
 from pydantic import Field
 
+from lib.types_ import SaveEvent
 from lib.utils import StrEnum
-from types_ import SaveEvent
 
 
 class CollectionEnum(StrEnum):

@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING, Awaitable, cast
 
 from beanie import Delete, Insert, PydanticObjectId, after_event, before_event
 
+from lib.types_ import ChangeEvent
 from models.collections.base import (
     BaseDocument,
     CollectionEnum,
     document_registry,
 )
 from models.fields import place as PlaceFields
-from types_ import ChangeEvent
 
 if TYPE_CHECKING:
     # Avoid Circular imports

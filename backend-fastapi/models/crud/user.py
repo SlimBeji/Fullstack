@@ -8,6 +8,7 @@ from config import settings
 from lib.clients import cloud_storage
 from lib.encryption import create_token, hash_input, verify_hash
 from lib.fastapi import ApiError
+from lib.types_ import Filter
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent, Projection
 from models.fields import (
@@ -27,7 +28,6 @@ from models.schemas import (
     UserReadSchema,
     UserUpdateSchema,
 )
-from types_ import Filter
 
 
 class CrudUser(
