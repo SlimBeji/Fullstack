@@ -4,9 +4,10 @@ import cookieSession from "cookie-session";
 import express from "express";
 
 import { env } from "@/config";
+import { errorHandler, noRouteMatchHandler } from "@/lib/express";
 
 import { registerSwaggger } from "./docs";
-import { cors, errorHandler, noRouteMatchHandler } from "./middlewares";
+import { cors } from "./middlewares";
 import { registerRoutes } from "./routes";
 
 const app = express();
