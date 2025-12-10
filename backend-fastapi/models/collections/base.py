@@ -4,11 +4,13 @@ from functools import partial
 from beanie import Document, before_event
 from pydantic import Field
 
+from lib.utils import StrEnum
 from types_ import SaveEvent
 
-PLACES_COLLECTION = "places"
-USERS_COLLECTION = "users"
-ALL_COLLECTIONS = [PLACES_COLLECTION, USERS_COLLECTION]
+
+class CollectionEnum(StrEnum):
+    PLACES = "places"
+    USERS = "users"
 
 
 class BaseDocument(Document):

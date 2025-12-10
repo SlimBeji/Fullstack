@@ -4,9 +4,8 @@ from beanie import Delete, PydanticObjectId, after_event
 from pymongo import ASCENDING, IndexModel
 
 from models.collections.base import (
-    PLACES_COLLECTION,
-    USERS_COLLECTION,
     BaseDocument,
+    CollectionEnum,
     document_registry,
 )
 from models.fields import user as UserFilds
@@ -28,7 +27,7 @@ class User(BaseDocument):
     places: list[PydanticObjectId] = []
 
     class Settings:
-        name = USERS_COLLECTION
+        name = CollectionEnum.USERS
         indexes = [
             IndexModel([("name", ASCENDING)], unique=True),
             IndexModel([("email", ASCENDING)], unique=True),
@@ -37,8 +36,8 @@ class User(BaseDocument):
 
     @after_event([Delete])
     async def remove_child_places(self) -> None:
-        Places = cast(type["Place"], document_registry[PLACES_COLLECTION])
+        Places = cast(type["Place"], document_registry[CollectionEnum.PLACES])
         await Places.find(Places.creatorId == self.id).delete()
 
 
-document_registry[USERS_COLLECTION] = User
+document_registry[CollectionEnum.USERS] = User

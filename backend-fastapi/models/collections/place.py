@@ -3,9 +3,8 @@ from typing import TYPE_CHECKING, Awaitable, cast
 from beanie import Delete, Insert, PydanticObjectId, after_event, before_event
 
 from models.collections.base import (
-    PLACES_COLLECTION,
-    USERS_COLLECTION,
     BaseDocument,
+    CollectionEnum,
     document_registry,
 )
 from models.fields import place as PlaceFields
@@ -29,18 +28,18 @@ class Place(BaseDocument):
     creatorId: PydanticObjectId
 
     class Settings:
-        name = PLACES_COLLECTION
+        name = CollectionEnum.PLACES
         indexes = ["createdAt"]
 
     @before_event(ChangeEvent)
     async def validate_creator_exists(self) -> None:
-        Users = cast(type["User"], document_registry[USERS_COLLECTION])
+        Users = cast(type["User"], document_registry[CollectionEnum.USERS])
         if not await Users.find_one(Users.id == self.creatorId):
             raise ValueError("Creator does not exist")
 
     @after_event([Insert])
     async def add_place_to_user(self) -> None:
-        Users = cast(type["User"], document_registry[USERS_COLLECTION])
+        Users = cast(type["User"], document_registry[CollectionEnum.USERS])
         query = Users.find_one(Users.id == self.creatorId).update(
             {"$addToSet": {"places": self.id}}
         )
@@ -48,11 +47,11 @@ class Place(BaseDocument):
 
     @before_event([Delete])
     async def remove_place_from_user(self) -> None:
-        Users = cast(type["User"], document_registry[USERS_COLLECTION])
+        Users = cast(type["User"], document_registry[CollectionEnum.USERS])
         query = Users.find_one(Users.id == self.creatorId).update(
             {"$pull": {"places": self.id}}
         )
         await cast(Awaitable, query)
 
 
-document_registry[PLACES_COLLECTION] = Place
+document_registry[CollectionEnum.PLACES] = Place

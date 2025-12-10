@@ -3,7 +3,7 @@ import asyncio
 from beanie.odm.fields import PydanticObjectId
 
 from lib.clients import cloud_storage, db, redis_client
-from models.collections import ALL_COLLECTIONS, document_models
+from models.collections import CollectionEnum, document_models
 from models.crud import crud_place, crud_user
 from models.examples.places import PLACES
 from models.examples.users import USERS
@@ -20,7 +20,7 @@ PLACE_REF_MAPPING: dict[int, str] = {}
 
 async def create_collections() -> None:
     coroutines = []
-    for name in ALL_COLLECTIONS:
+    for name in CollectionEnum.values():
         coroutines.append(db.create_collection(name))
     await asyncio.gather(*coroutines)
 
