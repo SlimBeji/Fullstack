@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 import { UserDB } from "../schemas";
-import { PLACES_COLLECTION, USERS_COLLECTION } from "./base";
+import { CollectionEnum } from "./base";
 
 // Schema creation
 const UserCollectionSchema = new Schema<UserDB>(
@@ -16,7 +16,7 @@ const UserCollectionSchema = new Schema<UserDB>(
         places: [
             {
                 type: Schema.ObjectId,
-                ref: PLACES_COLLECTION,
+                ref: CollectionEnum.PLACES,
             },
         ],
     },
@@ -36,6 +36,9 @@ UserCollectionSchema.pre("deleteOne", async function (next) {
 });
 
 // Model Creation
-export const UserModel = model<UserDB>(USERS_COLLECTION, UserCollectionSchema);
+export const UserModel = model<UserDB>(
+    CollectionEnum.USERS,
+    UserCollectionSchema
+);
 
 export type UserDocument = InstanceType<typeof UserModel>;
