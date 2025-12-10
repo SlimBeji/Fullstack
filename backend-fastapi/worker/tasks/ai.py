@@ -6,8 +6,9 @@ from bson import ObjectId
 
 from config import settings
 from lib.clients import hf_client
-from types_ import Queues, Tasks
 from worker.tasks.broker import dramatiq_task
+
+from ..params import Queues, Tasks
 
 
 class PlaceEmbbeddingData(TypedDict):

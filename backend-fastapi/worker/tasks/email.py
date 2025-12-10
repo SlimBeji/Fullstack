@@ -2,8 +2,9 @@ import time
 from typing import TypedDict
 
 from config import settings
-from types_ import Queues, Tasks
 from worker.tasks.broker import dramatiq_task
+
+from ..params import Queues, Tasks
 
 
 class NewsletterData(TypedDict):
