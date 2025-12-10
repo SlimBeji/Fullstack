@@ -4,7 +4,7 @@ from beanie import Insert, Replace, Update
 from pydantic import BaseModel
 
 from config import settings
-from types_.http import PaginationData
+from lib.types_ import PaginationData
 
 SaveEvent = [Insert, Replace, Update]
 

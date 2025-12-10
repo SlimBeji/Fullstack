@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
-from lib.types_ import FileToUpload
+from lib.types_ import FileToUpload, PaginatedData
 from models.fields import (
     HttpFilters,
     UserSearchableFields,
@@ -9,7 +9,7 @@ from models.fields import (
 )
 from models.fields import user as UserFields
 from models.schemas.base import BaseFiltersSchema
-from types_ import FindQuery, PaginatedData
+from types_ import FindQuery
 
 # --- Base Schemas ----
 

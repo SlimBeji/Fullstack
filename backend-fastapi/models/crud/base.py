@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from config import settings
 from lib.clients import db
 from lib.fastapi import ApiError
+from lib.types_ import PaginatedData, PaginationData
 from models.schemas import UserReadSchema
 from types_ import (
     FindQuery,
@@ -17,8 +18,6 @@ from types_ import (
     MongoFieldFilters,
     MongoFieldsFilters,
     MongoFindQuery,
-    PaginatedData,
-    PaginationData,
     Projection,
     SortData,
 )
