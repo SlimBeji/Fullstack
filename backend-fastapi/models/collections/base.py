@@ -6,6 +6,10 @@ from pydantic import Field
 
 from types_ import SaveEvent
 
+PLACES_COLLECTION = "places"
+USERS_COLLECTION = "users"
+ALL_COLLECTIONS = [PLACES_COLLECTION, USERS_COLLECTION]
+
 
 class BaseDocument(Document):
     createdAt: datetime = Field(default_factory=partial(datetime.now, UTC))

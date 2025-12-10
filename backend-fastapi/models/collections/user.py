@@ -3,9 +3,13 @@ from typing import TYPE_CHECKING, cast
 from beanie import Delete, PydanticObjectId, after_event
 from pymongo import ASCENDING, IndexModel
 
-from models.collections.base import BaseDocument, document_registry
+from models.collections.base import (
+    PLACES_COLLECTION,
+    USERS_COLLECTION,
+    BaseDocument,
+    document_registry,
+)
 from models.fields import user as UserFilds
-from types_ import Collections
 
 if TYPE_CHECKING:
     # Avoid Circular imports
@@ -24,7 +28,7 @@ class User(BaseDocument):
     places: list[PydanticObjectId] = []
 
     class Settings:
-        name = Collections.USERS
+        name = USERS_COLLECTION
         indexes = [
             IndexModel([("name", ASCENDING)], unique=True),
             IndexModel([("email", ASCENDING)], unique=True),
@@ -33,8 +37,8 @@ class User(BaseDocument):
 
     @after_event([Delete])
     async def remove_child_places(self) -> None:
-        Places = cast(type["Place"], document_registry[Collections.PLACES])
+        Places = cast(type["Place"], document_registry[PLACES_COLLECTION])
         await Places.find(Places.creatorId == self.id).delete()
 
 
-document_registry[Collections.USERS] = User
+document_registry[USERS_COLLECTION] = User
