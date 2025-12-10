@@ -2,6 +2,8 @@ import { env } from "@/config";
 import {
     CloudStorage,
     CloudStorageConfig,
+    HuggingFaceClient,
+    HuggingFaceClientConfig,
     MongoClient,
     MongoClientConfig,
     RedisClient,
@@ -30,3 +32,8 @@ const storageConfig: CloudStorageConfig = {
     emulatorPrivateUrl: env.GCS_EMULATOR_PRIVATE_URL,
 };
 export const storage = new CloudStorage(storageConfig);
+
+const huggingfaceConfig: HuggingFaceClientConfig = {
+    token: env.HF_API_TOKEN,
+};
+export const huggingFace = new HuggingFaceClient(huggingfaceConfig);
