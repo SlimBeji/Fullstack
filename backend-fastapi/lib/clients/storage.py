@@ -11,7 +11,8 @@ from google.oauth2 import service_account
 from starlette.datastructures import UploadFile
 
 from config import settings
-from types_ import FileToUpload
+
+from ..types_ import FileToUpload
 
 
 class CloudStorage:

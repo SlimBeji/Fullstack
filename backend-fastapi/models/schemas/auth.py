@@ -2,9 +2,9 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr
 
+from lib.types_ import FileToUpload
 from models.fields import auth as AuthFields
 from models.fields import user as UserFields
-from types_ import FileToUpload
 
 # --- Token ----
 

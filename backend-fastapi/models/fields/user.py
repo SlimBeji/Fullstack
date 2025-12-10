@@ -3,8 +3,8 @@ from typing import Annotated, Literal
 from beanie.odm.fields import PydanticObjectId
 from pydantic import EmailStr
 
+from lib.types_ import FileToUpload
 from models.fields.base import FieldMeta
-from types_ import FileToUpload
 
 #  Literals
 
