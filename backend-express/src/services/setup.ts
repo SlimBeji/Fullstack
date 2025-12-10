@@ -1,8 +1,10 @@
 import { scheduler } from "@/background/crons";
 import { handler } from "@/background/handlers";
 import { publisher } from "@/background/publishers";
-import { db, redisClient } from "@/lib/clients";
+import { db } from "@/lib/clients";
 import { dumpDb, seedDb } from "@/models/examples";
+
+import { redisClient } from "./services";
 
 export const connectDbs = async () => {
     await Promise.all([redisClient.connect(), db.connect()]);

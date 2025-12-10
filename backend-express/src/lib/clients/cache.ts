@@ -3,26 +3,40 @@ import { createClient, RedisClientType } from "redis";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
 
+export interface RedisClientConfig {
+    url?: string;
+    testUrl?: string;
+}
+
 export class RedisClient {
     private client: RedisClientType;
+    public url: string;
+
+    constructor(config: RedisClientConfig) {
+        if (this.isTest) {
+            if (!config.testUrl) {
+                throw new Error(
+                    "Cannot run redis client in test mode. No testing url provided"
+                );
+            }
+            this.url = config.testUrl;
+        } else {
+            if (!config.url) {
+                throw new Error(
+                    "Cannot run redis client in production mode. No production url provided"
+                );
+            }
+            this.url = config.url;
+        }
+        this.client = createClient({ url: this.url });
+    }
 
     public get isTest(): boolean {
         return !!process.env.JEST_WORKER_ID;
     }
 
-    public get url(): string {
-        if (this.isTest) {
-            return env.REDIS_TEST_URL;
-        }
-        return env.REDIS_URL;
-    }
-
     private get isReady(): boolean {
         return this.client.isReady;
-    }
-
-    constructor() {
-        this.client = createClient({ url: this.url });
     }
 
     public async connect(): Promise<void> {
@@ -81,5 +95,3 @@ export class RedisClient {
         await this.client.del([key]);
     }
 }
-
-export const redisClient = new RedisClient();
