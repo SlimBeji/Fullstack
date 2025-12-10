@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { AnyZodObject, ZodTypeAny } from "zod";
 
-import { isMultipartFormData } from "@/lib/express";
-import { ApiError, HttpStatus } from "@/lib/express";
+import { HttpStatus } from "../enums";
+import { ApiError } from "../error";
+import { isMultipartFormData } from "../helpers";
 
 const isFileField = (field: ZodTypeAny | any): boolean => {
     if (field._def?.openapi?.metadata?.format === "binary") {
@@ -54,18 +55,18 @@ export const validateBody = (schema: AnyZodObject) => {
             const multerMiddleware = multerObj.fields(config);
             multerMiddleware(req, resp, (mErr) => {
                 if (mErr) return next(mErr);
+                if (!req.files) {
+                    return next(
+                        new ApiError(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "something went wrong while parsing multipart form"
+                        )
+                    );
+                }
+                const files = req.files as any as {
+                    [fieldname: string]: File[];
+                };
                 fileFields.forEach((key) => {
-                    if (!req.files) {
-                        return next(
-                            new ApiError(
-                                HttpStatus.INTERNAL_SERVER_ERROR,
-                                "something went wrong while parsing multipart form"
-                            )
-                        );
-                    }
-                    const files = req.files as any as {
-                        [fieldname: string]: File[];
-                    };
                     if (files[key] && files[key].length > 0) {
                         req.body[key] = files[key][0];
                     } else {

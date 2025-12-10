@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 
+import { validateBody } from "@/lib/express";
 import { zod, zodObjectId } from "@/lib/zod";
 import { crudPlace } from "@/models/crud";
 import {
@@ -13,7 +14,7 @@ import {
 } from "@/models/schemas";
 
 import { swaggerRegistery } from "../docs";
-import { Authenticated, filter, validateBody } from "../middlewares";
+import { Authenticated, filter } from "../middlewares";
 
 export const placeRouter = Router();
 
