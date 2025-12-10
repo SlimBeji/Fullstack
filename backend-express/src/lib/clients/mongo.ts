@@ -1,24 +1,40 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
-import { env } from "@/config";
+export interface MongoClientConfig {
+    uri: string;
+    dbName?: string;
+    testDb?: string;
+}
 
 export class MongoClient {
-    public conn: Mongoose | null = null;
-    public uri: string = env.MONGO_URL;
+    public uri: string;
+    public dbName: string;
+
+    constructor(config: MongoClientConfig) {
+        this.uri = config.uri;
+        if (this.isTest) {
+            if (!config.testDb) {
+                throw new Error(
+                    "Cannot run mongo client in test mode. No testing db name provided"
+                );
+            }
+            this.dbName = config.testDb;
+        } else {
+            if (!config.dbName) {
+                throw new Error(
+                    "Cannot run mongo client in production mode. No production db name provided"
+                );
+            }
+            this.dbName = config.dbName;
+        }
+    }
 
     public get isTest(): boolean {
         return !!process.env.JEST_WORKER_ID;
     }
 
-    public get dbName(): string {
-        if (this.isTest) {
-            return env.MONGO_TEST_DBNAME;
-        }
-        return env.MONGO_DBNAME;
-    }
-
     public async connect(): Promise<void> {
-        this.conn = await mongoose.connect(this.uri, { dbName: this.dbName });
+        await mongoose.connect(this.uri, { dbName: this.dbName });
     }
 
     public async close(): Promise<void> {
@@ -37,5 +53,3 @@ export class MongoClient {
         await mongoose.connection.db!.dropCollection(name);
     }
 }
-
-export const db = new MongoClient();
