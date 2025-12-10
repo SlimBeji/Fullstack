@@ -8,7 +8,7 @@ from config import settings
 from lib.clients import hf_client
 from worker.tasks.broker import dramatiq_task
 
-from ..params import Queues, Tasks
+from ..setup import Queues, Tasks
 
 
 class PlaceEmbbeddingData(TypedDict):

@@ -4,7 +4,7 @@ from typing import TypedDict
 from config import settings
 from worker.tasks.broker import dramatiq_task
 
-from ..params import Queues, Tasks
+from ..setup import Queues, Tasks
 
 
 class NewsletterData(TypedDict):
