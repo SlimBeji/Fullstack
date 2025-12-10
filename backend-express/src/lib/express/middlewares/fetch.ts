@@ -75,7 +75,7 @@ const extractFilters = (
     return result;
 };
 
-export const filter = (
+export const fetchRequest = (
     zodSchema: AnyZodObject,
     location: "query" | "body"
 ): RequestHandler => {
