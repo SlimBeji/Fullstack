@@ -4,7 +4,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 
 from config import settings
-from types_ import CallNext
+from lib.fastapi import CallNext
 
 
 class RequestTooLarge(Exception):
