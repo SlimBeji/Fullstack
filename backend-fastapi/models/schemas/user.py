@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
+from config import settings
 from lib.pydantic import BaseFiltersSchema, HttpFilters
 from lib.types_ import FileToUpload, FindQuery, PaginatedData
 from models.fields import (
@@ -86,6 +87,8 @@ UsersPaginatedSchema = PaginatedData[UserReadSchema]
 class UserFiltersSchema(
     BaseFiltersSchema[UserSelectableFields, UserSortableFields]
 ):
+    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
+
     id: HttpFilters[UserFields.id_annot]
     name: HttpFilters[UserFields.name_annot]
     email: HttpFilters[UserFields.email_annot]

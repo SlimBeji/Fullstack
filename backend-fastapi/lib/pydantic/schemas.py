@@ -1,8 +1,7 @@
-from typing import Annotated, Generic, TypeVar
+from typing import Annotated, Generic, TypeVar, cast
 
 from pydantic import BaseModel, Field
-
-from config import settings
+from pydantic.fields import ModelPrivateAttr
 
 SortableFields = TypeVar("SortableFields")
 
@@ -10,10 +9,10 @@ SelectableFields = TypeVar("SelectableFields")
 
 
 class BaseFiltersSchema(BaseModel, Generic[SelectableFields, SortableFields]):
+    _MAX_SIZE: int = 100
+
     page: Annotated[int, Field(1, description="The page number")]
-    size: Annotated[
-        int, Field(settings.MAX_ITEMS_PER_PAGE, description="Items per page")
-    ]
+    size: Annotated[int, Field(_MAX_SIZE, description="Items per page")]
     sort: Annotated[
         list[SortableFields] | None,
         Field(
@@ -28,3 +27,9 @@ class BaseFiltersSchema(BaseModel, Generic[SelectableFields, SortableFields]):
             examples=[["-id"]],
         ),
     ] = None
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        private_field = cast(ModelPrivateAttr, cls._MAX_SIZE)
+        max_size = private_field.default
+        cls.model_fields["size"].default = max_size

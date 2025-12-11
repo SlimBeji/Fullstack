@@ -1,6 +1,7 @@
 from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
+from config import settings
 from lib.pydantic import BaseFiltersSchema, HttpFilters
 from lib.types_ import FileToUpload, FindQuery, PaginatedData
 from models.fields import (
@@ -99,6 +100,8 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
 class PlaceFiltersSchema(
     BaseFiltersSchema[PlaceSelectableFields, PlaceSortableFields]
 ):
+    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
+
     id: HttpFilters[PlaceFields.id_annot]
     title: HttpFilters[PlaceFields.title_annot]
     description: HttpFilters[PlaceFields.description_annot]
