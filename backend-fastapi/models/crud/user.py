@@ -6,9 +6,10 @@ from pymongo.errors import DuplicateKeyError
 
 from config import settings
 from lib.clients import cloud_storage
-from lib.encryption import create_token, hash_input, verify_hash
+from lib.encryption import create_token
 from lib.fastapi import ApiError
 from lib.types_ import Filter
+from lib.utils import hash_input, verify_hash
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent, Projection
 from models.fields import (

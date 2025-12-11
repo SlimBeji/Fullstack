@@ -1,7 +1,7 @@
 from jose import ExpiredSignatureError, JWTError
 
 from config import settings
-from lib.encryption.helpers import decode_payload, encode_payload
+from lib.utils import decode_payload, encode_payload
 from models.schemas import EncodedTokenSchema, TokenPayload, UserReadSchema
 
 
