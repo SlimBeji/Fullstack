@@ -5,9 +5,9 @@ import pytest
 from conftest import Helpers
 
 from lib.types_ import Filter, FindQueryFilters
-from lib.utils import get_image_path
 from models.crud import crud_place
 from models.schemas import PlaceFindQuery, PlaceReadSchema
+from static import get_image_path
 
 
 async def _get_place_id() -> str:

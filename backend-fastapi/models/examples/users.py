@@ -1,5 +1,5 @@
-from lib.utils import get_image_path
 from models.schemas import UserSeedSchema
+from static import get_image_path
 
 USERS: list[UserSeedSchema] = [
     UserSeedSchema(

@@ -1,5 +1,5 @@
-from lib.utils import get_image_path
 from models.schemas import PlaceFields, PlaceSeedSchema
+from static import get_image_path
 
 EMBEDDING_1 = [
     0.0236833356320858,

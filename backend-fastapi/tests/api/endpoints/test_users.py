@@ -3,7 +3,7 @@ from http import HTTPStatus
 import pytest
 from conftest import Helpers
 
-from lib.utils import get_image_path
+from static import get_image_path
 
 
 @pytest.mark.asyncio

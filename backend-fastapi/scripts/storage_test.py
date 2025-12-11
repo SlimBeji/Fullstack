@@ -3,7 +3,7 @@ from typing import Any
 
 from lib.clients import cloud_storage
 from lib.setup import close_all, start_all
-from lib.utils import get_image_path
+from static import get_image_path
 
 
 def echo(output: Any):

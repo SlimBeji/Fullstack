@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
-from lib.utils import get_image_path
+from static import get_image_path
 
 
 @pytest.mark.asyncio
