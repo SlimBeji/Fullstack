@@ -11,11 +11,10 @@ import {
     PlacePutSchema,
     PlaceReadSchema,
     PlacesPaginatedSchema,
-    UserRead,
 } from "@/models/schemas";
 
 import { swaggerRegistery } from "../docs";
-import { Authenticated } from "../middlewares";
+import { Authenticated, getCurrentUser } from "../middlewares";
 
 export const placeRouter = Router();
 
@@ -95,7 +94,7 @@ swaggerRegistery.registerPath({
 async function createPlace(req: Request, resp: Response) {
     // Use safeCreate to avoid a user posting a place for another user
     const parsed = req.parsed as PlacePost;
-    const currentUser = req.currentUser as UserRead;
+    const currentUser = getCurrentUser(req);
     const newPlace = await crudPlace.userCreate(currentUser, parsed);
     resp.status(200).json(newPlace);
 }
@@ -174,7 +173,7 @@ swaggerRegistery.registerPath({
 // Edit Places
 async function editPlace(req: Request, res: Response) {
     const parsed = req.parsed as PlacePut;
-    const currentUser = req.currentUser as UserRead;
+    const currentUser = getCurrentUser(req);
     const updatedPlace = await crudPlace.userUpdateById(
         currentUser,
         req.params.placeId,
@@ -227,7 +226,7 @@ swaggerRegistery.registerPath({
 
 // Delete Places
 async function deletePlace(req: Request, res: Response) {
-    const currentUser = req.currentUser as UserRead;
+    const currentUser = getCurrentUser(req);
     await crudPlace.userDelete(currentUser, req.params.placeId);
     res.status(200).json({
         message: `Deleted place ${req.params.placeId}`,

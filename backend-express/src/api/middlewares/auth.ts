@@ -71,3 +71,10 @@ export const Admin = async (
     next(await checkAuthToken(req, true));
     return;
 };
+
+export const getCurrentUser = (req: Request): UserRead => {
+    if (!req.currentUser) {
+        throw getError("No user loggged in");
+    }
+    return req.currentUser as UserRead;
+};
