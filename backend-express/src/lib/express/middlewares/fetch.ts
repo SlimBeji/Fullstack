@@ -95,7 +95,7 @@ export const fetchRequest = (
             );
         }
         const data = parsing.data;
-        req.filterQuery = {
+        req.parsed = {
             page: data.page || 1,
             size: data.size,
             sort: data.sort || [],

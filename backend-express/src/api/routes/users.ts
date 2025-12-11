@@ -5,6 +5,7 @@ import { zod, zodObjectId } from "@/lib/zod";
 import { crudUser } from "@/models/crud";
 import {
     UserFiltersSchema,
+    UserFindQuery,
     UserPost,
     UserPostSchema,
     UserPut,
@@ -21,7 +22,7 @@ export const userRouter = Router();
 // Get Users Endpoint
 async function getUsers(req: Request, res: Response) {
     // All users are public
-    const query = req.filterQuery!;
+    const query = req.parsed as UserFindQuery;
     res.status(200).json(await crudUser.fetch(query));
 }
 
@@ -57,7 +58,7 @@ swaggerRegistery.registerPath({
 
 async function queryUsers(req: Request, res: Response) {
     // All users are public
-    const query = req.filterQuery!;
+    const query = req.parsed as UserFindQuery;
     res.status(200).json(await crudUser.fetch(query));
 }
 

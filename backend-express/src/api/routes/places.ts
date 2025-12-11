@@ -5,6 +5,7 @@ import { zod, zodObjectId } from "@/lib/zod";
 import { crudPlace } from "@/models/crud";
 import {
     PlaceFiltersSchema,
+    PlaceFindQuery,
     PlacePost,
     PlacePostSchema,
     PlacePut,
@@ -21,7 +22,7 @@ export const placeRouter = Router();
 // Get Places Endpoint
 async function getPlaces(req: Request, resp: Response) {
     // All places are public
-    const query = req.filterQuery!;
+    const query = req.parsed as PlaceFindQuery;
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
@@ -51,7 +52,7 @@ swaggerRegistery.registerPath({
 // Post search
 async function queryPlaces(req: Request, resp: Response) {
     // All places are public
-    const query = req.filterQuery!;
+    const query = req.parsed as PlaceFindQuery;
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
