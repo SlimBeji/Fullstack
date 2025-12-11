@@ -1,7 +1,7 @@
 from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
-from lib.pydantic import HttpFilters
+from lib.pydantic import BaseFiltersSchema, HttpFilters
 from lib.types_ import FileToUpload, FindQuery, PaginatedData
 from models.fields import (
     PlaceSearchableFields,
@@ -9,7 +9,6 @@ from models.fields import (
     PlaceSortableFields,
 )
 from models.fields import place as PlaceFields
-from models.schemas.base import BaseFiltersSchema
 
 # --- Base Schemas ----
 
