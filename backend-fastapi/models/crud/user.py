@@ -118,7 +118,7 @@ class CrudUser(
         return f"Bearer {token.access_token}"
 
     async def create_document(self, form: UserCreateSchema) -> User:
-        form.password = hash_input(form.password)
+        form.password = hash_input(form.password, settings.DEFAULT_HASH_SALT)
         return await super().create_document(form)
 
     async def create(self, form: UserPostSchema) -> UserReadSchema:
@@ -162,7 +162,9 @@ class CrudUser(
 
     async def update(self, user: User, form: UserPutSchema) -> UserReadSchema:
         if form.password:
-            form.password = hash_input(form.password)
+            form.password = hash_input(
+                form.password, settings.DEFAULT_HASH_SALT
+            )
         update_form = UserUpdateSchema(
             **form.model_dump(exclude_none=True, exclude_unset=True)
         )
