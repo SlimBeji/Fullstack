@@ -99,16 +99,16 @@ fastapi-lint:
 	docker exec -it fastapi mypy .
 
 fastapi-script/%:
-	docker exec -it fastapi python /app/scripts/$*
+	docker exec -it fastapi python /app/bin/$*
 
 fastapi-debug:
-	docker exec -it fastapi python /app/scripts/debug.py
+	docker exec -it fastapi python /app/bin/debug.py
 
 fastapi-seed:
-	docker exec -it fastapi python /app/scripts/seed_db.py
+	docker exec -it fastapi python /app/bin/seed_db.py
 
 fastapi-dump:
-	docker exec -it fastapi python /app/scripts/dump_db.py
+	docker exec -it fastapi python /app/bin/dump_db.py
 
 # Gin commands
 gin-build:
