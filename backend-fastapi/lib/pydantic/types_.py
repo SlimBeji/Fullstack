@@ -4,8 +4,6 @@ from fastapi import File, Form
 from pydantic import Field
 from pydantic.fields import FieldInfo
 
-# FieldMeta
-
 
 class FieldMeta:
     def __init__(

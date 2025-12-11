@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from models.fields.base import FieldMeta
+from lib.pydantic import FieldMeta
 
 # username
 username_meta = FieldMeta(
