@@ -14,7 +14,7 @@ async def _get_place_id() -> str:
     filters = cast(
         FindQueryFilters, dict(title=[Filter(op="eq", val="Stamford Bridge")])
     )
-    query = PlaceFindQuery(filters=filters)
+    query = PlaceFindQuery(size=100, filters=filters)
     result = await crud_place.fetch(query)
     data = result.data
     place = cast(PlaceReadSchema, data[0])
