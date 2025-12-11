@@ -3,10 +3,14 @@ from http import HTTPStatus
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from lib.encryption import ExpiredToken, InvalidToken, decode_token
 from lib.fastapi import ApiError
 from models.crud import crud_user
-from models.schemas import UserReadSchema
+from models.schemas import (
+    ExpiredToken,
+    InvalidToken,
+    UserReadSchema,
+    decode_token,
+)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/signin")
 
