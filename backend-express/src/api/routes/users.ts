@@ -9,6 +9,7 @@ import {
     UserPostSchema,
     UserPut,
     UserPutSchema,
+    UserRead,
     UserReadSchema,
     UsersPaginatedSchema,
 } from "@/models/schemas";
@@ -94,7 +95,7 @@ swaggerRegistery.registerPath({
 
 // Post a User (admin only)
 async function createUser(req: Request, res: Response) {
-    const currentUser = req.currentUser!;
+    const currentUser = req.currentUser as UserRead;
     const parsed = req.parsed as UserPost;
     const newUser = await crudUser.userCreate(currentUser, parsed);
     res.status(200).json(newUser);
@@ -169,7 +170,7 @@ swaggerRegistery.registerPath({
 // Put User Endpoint
 async function editUser(req: Request, res: Response) {
     const parsed = req.parsed as UserPut;
-    const currentUser = req.currentUser!;
+    const currentUser = req.currentUser as UserRead;
     const updatedUser = await crudUser.userUpdateById(
         currentUser,
         req.params.userId,
@@ -222,7 +223,7 @@ swaggerRegistery.registerPath({
 
 // Delete User Endpoint
 async function deleteUser(req: Request, res: Response) {
-    const currentUser = req.currentUser!;
+    const currentUser = req.currentUser as UserRead;
     await crudUser.userDelete(currentUser, req.params.userId);
     res.status(200).json({
         message: `Deleted user ${req.params.userId}`,

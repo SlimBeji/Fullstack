@@ -1,12 +1,11 @@
 import "express";
 
 import { FindQuery } from "@/lib/types";
-import { UserRead } from "@/models/schemas";
 
 declare module "express-serve-static-core" {
     interface Request {
-        currentUser?: UserRead;
-        parsed?: unknown;
+        currentUser?: any;
+        parsed?: any;
         filterQuery?: FindQuery;
     }
 }
