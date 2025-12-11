@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     API_URL: str = "http://localhost:5001/api"
     APP_URL: str
     SECRET_KEY: str
+    DEFAULT_HASH_SALT: int = 12
     FILEUPLOAD_MAX_SIZE: int = 100
     JSON_MAX_SIZE: int
     MAX_ITEMS_PER_PAGE: int = 100
