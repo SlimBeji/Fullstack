@@ -1,8 +1,8 @@
 from pydantic import BaseModel, EmailStr
 
+from lib.pydantic import HttpFilters
 from lib.types_ import FileToUpload, FindQuery, PaginatedData
 from models.fields import (
-    HttpFilters,
     UserSearchableFields,
     UserSelectableFields,
     UserSortableFields,
