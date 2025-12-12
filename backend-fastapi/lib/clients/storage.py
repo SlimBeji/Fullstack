@@ -10,7 +10,7 @@ from google.cloud.storage import Client
 from google.oauth2 import service_account
 from starlette.datastructures import UploadFile
 
-from ..types_ import FileToUpload
+from lib.types_ import FileToUpload
 
 
 class CloudStorageConfig:
