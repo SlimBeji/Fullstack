@@ -1,8 +1,8 @@
 import asyncio
 from typing import Any
 
-from lib.clients import cloud_storage
 from lib.setup import close_all, start_all
+from services import cloud_storage
 from static import get_image_path
 
 

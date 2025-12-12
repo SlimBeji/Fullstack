@@ -5,7 +5,6 @@ from beanie import PydanticObjectId
 from pymongo.errors import DuplicateKeyError
 
 from config import settings
-from lib.clients import cloud_storage
 from lib.fastapi import ApiError
 from lib.types_ import Filter
 from lib.utils import hash_input, verify_hash
@@ -29,6 +28,7 @@ from models.schemas import (
     UserUpdateSchema,
     create_token,
 )
+from services import cloud_storage
 
 
 class CrudUser(

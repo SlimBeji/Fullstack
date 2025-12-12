@@ -10,20 +10,36 @@ from google.cloud.storage import Client
 from google.oauth2 import service_account
 from starlette.datastructures import UploadFile
 
-from config import settings
-
 from ..types_ import FileToUpload
 
 
+class CloudStorageConfig:
+    def __init__(
+        self,
+        project_id: str,
+        bucket_name: str,
+        access_expiration: int = 3600,
+        credentials_file: str = "",
+        emulator_public_url: str = "",
+        emulator_private_url: str = "",
+    ) -> None:
+        self.project_id = project_id
+        self.bucket_name = bucket_name
+        self.access_expiration = access_expiration
+        self.credentials_file = credentials_file
+        self.emulator_public_url = emulator_public_url
+        self.emulator_private_url = emulator_private_url
+
+
 class CloudStorage:
-    def __init__(self) -> None:
+    def __init__(self, config: CloudStorageConfig) -> None:
         # Parameters
-        self.project_id: str = settings.GCP_PROJECT_ID
-        self.bucket_name: str = settings.GCS_BUCKET_NAME
-        self.credentials_file: str = settings.GOOGLE_APPLICATION_CREDENTIALS
-        self.emulator_private_url: str = settings.GCS_EMULATOR_PRIVATE_URL
-        self.emulator_public_url: str = settings.GCS_EMULATOR_PUBLIC_URL
-        self.blob_access_expiration: int = settings.GCS_BLOB_ACCESS_EXPIRATION
+        self.project_id: str = config.project_id
+        self.bucket_name: str = config.bucket_name
+        self.blob_access_expiration: int = config.access_expiration
+        self.credentials_file: str = config.credentials_file
+        self.emulator_public_url: str = config.emulator_public_url
+        self.emulator_private_url: str = config.emulator_private_url
 
         # Storage client
         self.storage = Client(
@@ -123,6 +139,3 @@ class CloudStorage:
         except NotFound:
             # 404 error when the filename does not exist
             return False
-
-
-cloud_storage = CloudStorage()
