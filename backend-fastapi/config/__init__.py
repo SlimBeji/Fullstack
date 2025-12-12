@@ -3,6 +3,8 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from lib.utils import is_test_mode
+
 FILEDIR = os.path.dirname(__file__)
 
 
@@ -51,7 +53,7 @@ class Settings(BaseSettings):
 
     @property
     def is_test(self) -> bool:
-        return self.ENV == "test"
+        return is_test_mode()
 
 
 settings = Settings()  # type: ignore[call-arg]

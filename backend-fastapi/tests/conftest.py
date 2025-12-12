@@ -1,6 +1,6 @@
-import os
+from lib.utils import set_test_mode
 
-os.environ["ENV"] = "test"
+set_test_mode()
 
 
 import pytest
@@ -32,7 +32,7 @@ class Helpers:
 
 @pytest.fixture(autouse=True)
 def set_env_test():
-    os.environ["ENV"] = "test"
+    set_test_mode()
     settings.ENV = "test"
 
 
