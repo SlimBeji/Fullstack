@@ -49,7 +49,7 @@ def add_cors(app: FastAPI):
 
 def register_middlewares(app: FastAPI):
     app.middleware("http")(catch_exceptions)
-    app.middleware("http")(limit_json_size)
+    app.middleware("http")(limit_json_size(settings.JSON_MAX_SIZE))
     add_cors(app)
 
 
