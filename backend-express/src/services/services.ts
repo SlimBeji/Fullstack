@@ -36,5 +36,6 @@ export const storage = new CloudStorage(storageConfig);
 
 const huggingfaceConfig: HuggingFaceClientConfig = {
     token: env.HF_API_TOKEN,
+    timeout: env.DEFAULT_TIMEOUT,
 };
 export const huggingFace = new HuggingFaceClient(huggingfaceConfig);
