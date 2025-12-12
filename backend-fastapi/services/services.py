@@ -2,6 +2,8 @@ from config import settings
 from lib.clients import (
     CloudStorage,
     CloudStorageConfig,
+    HuggingFaceClient,
+    HuggingFaceClientConfig,
     MongoClient,
     MongoClientConfig,
     RedisClient,
@@ -35,3 +37,8 @@ storage_config = CloudStorageConfig(
     emulator_private_url=settings.GCS_EMULATOR_PRIVATE_URL,
 )
 cloud_storage = CloudStorage(storage_config)
+
+hf_config = HuggingFaceClientConfig(
+    token=settings.HF_API_TOKEN, timeout=settings.DEFAULT_TIMEOUT
+)
+hf_client = HuggingFaceClient(hf_config)
