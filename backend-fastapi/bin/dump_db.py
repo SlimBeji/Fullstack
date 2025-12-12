@@ -1,7 +1,7 @@
 import asyncio
 
 from models.examples import dump_db
-from services import close_all, start_all
+from services.setup import close_all, start_all
 
 
 async def main() -> None:

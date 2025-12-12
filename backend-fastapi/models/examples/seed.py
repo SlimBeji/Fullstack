@@ -12,7 +12,7 @@ from models.schemas import (
     UserCreateSchema,
     UserSeedSchema,
 )
-from services import cloud_storage, db, redis_client
+from services.instances import cloud_storage, db, redis_client
 
 USER_REF_MAPPING: dict[int, str] = {}
 PLACE_REF_MAPPING: dict[int, str] = {}

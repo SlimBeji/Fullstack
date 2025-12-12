@@ -28,7 +28,7 @@ from models.schemas import (
     UserUpdateSchema,
     create_token,
 )
-from services import cloud_storage
+from services.instances import cloud_storage
 
 
 class CrudUser(

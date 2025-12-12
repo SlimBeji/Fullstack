@@ -16,7 +16,7 @@ from lib.types_ import (
     PaginationData,
 )
 from models.schemas import UserReadSchema
-from services import db
+from services.instances import db
 
 type SortData = dict[str, Literal[-1, 1]]
 

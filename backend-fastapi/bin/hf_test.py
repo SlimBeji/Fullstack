@@ -1,7 +1,8 @@
 import asyncio
 from typing import Any
 
-from services import close_all, hf_client, start_all
+from services.instances import hf_client
+from services.setup import close_all, start_all
 
 
 def echo(output: Any):

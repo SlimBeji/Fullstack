@@ -22,7 +22,7 @@ from models.schemas import (
     PlaceUpdateSchema,
     UserReadSchema,
 )
-from services import cloud_storage
+from services.instances import cloud_storage
 from worker.tasks import place_embeddding
 
 

@@ -5,7 +5,7 @@ from beanie import PydanticObjectId
 from bson import ObjectId
 
 from config import settings
-from services import hf_client
+from services.instances import hf_client
 from worker.tasks.broker import dramatiq_task
 
 from ..setup import Queues, Tasks

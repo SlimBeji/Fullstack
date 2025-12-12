@@ -1,7 +1,7 @@
 import asyncio
 
 from models.examples import dump_db, seed_db
-from services import db, redis_client
+from services.instances import db, redis_client
 from worker.crons import close_crons
 from worker.tasks import close_workers
 

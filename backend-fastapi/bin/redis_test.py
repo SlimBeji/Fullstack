@@ -1,7 +1,8 @@
 import asyncio
 from typing import Any
 
-from services import close_all, redis_client, start_all
+from services.instances import redis_client
+from services.setup import close_all, start_all
 
 
 def echo(output: Any):

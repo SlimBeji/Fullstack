@@ -2,7 +2,7 @@ import asyncio
 from typing import Any
 
 from models.crud import crud_place
-from services import close_all, start_all
+from services.setup import close_all, start_all
 
 
 def echo(output: Any):
