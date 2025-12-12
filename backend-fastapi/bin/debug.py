@@ -1,8 +1,8 @@
 import asyncio
 from typing import Any
 
-from lib.setup import close_all, start_all
 from models.crud import crud_place
+from services import close_all, start_all
 
 
 def echo(output: Any):
