@@ -4,7 +4,7 @@ import app from "@/api";
 import { HttpStatus } from "@/lib/express";
 import { crudPlace, crudUser } from "@/models/crud";
 import { PlaceRead } from "@/models/schemas";
-import { closeAll, seedTestData } from "@/services";
+import { closeAll, seedTestData } from "@/services/setup";
 import { getImagePath } from "@/static";
 
 let adminToken: string = "";

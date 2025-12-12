@@ -1,4 +1,4 @@
-import { redisClient } from "@/services";
+import { redisClient } from "@/services/instances";
 
 async function test() {
     await redisClient.set("secret_number", 158);

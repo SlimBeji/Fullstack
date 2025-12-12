@@ -1,4 +1,4 @@
-import { closeDbs, connectDbs } from "@/services";
+import { closeDbs, connectDbs } from "@/services/setup";
 
 async function debug() {
     console.log("I was executed");

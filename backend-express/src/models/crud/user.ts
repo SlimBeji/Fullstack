@@ -2,7 +2,7 @@ import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express";
 import { Filter } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
-import { storage } from "@/services";
+import { storage } from "@/services/instances";
 
 import { UserDocument, UserModel } from "../collections";
 import {

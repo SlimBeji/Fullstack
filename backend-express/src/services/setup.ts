@@ -3,7 +3,7 @@ import { handler } from "@/background/handlers";
 import { publisher } from "@/background/publishers";
 import { dumpDb, seedDb } from "@/models/examples";
 
-import { db, redisClient } from "./services";
+import { db, redisClient } from "./instances";
 
 export const connectDbs = async () => {
     await Promise.all([redisClient.connect(), db.connect()]);

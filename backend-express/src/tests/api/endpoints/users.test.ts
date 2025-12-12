@@ -4,7 +4,7 @@ import app from "@/api";
 import { HttpStatus } from "@/lib/express";
 import { crudUser } from "@/models/crud";
 import { createToken, UserRead } from "@/models/schemas";
-import { closeAll, seedTestData } from "@/services";
+import { closeAll, seedTestData } from "@/services/setup";
 import { readImage } from "@/static";
 
 let adminExample: UserRead;

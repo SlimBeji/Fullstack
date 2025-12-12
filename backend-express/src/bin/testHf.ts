@@ -1,4 +1,4 @@
-import { huggingFace } from "@/services";
+import { huggingFace } from "@/services/instances";
 
 async function test() {
     const result = await huggingFace.embedText(

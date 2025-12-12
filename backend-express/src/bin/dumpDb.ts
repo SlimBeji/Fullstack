@@ -1,5 +1,5 @@
 import { dumpDb } from "@/models/examples";
-import { closeDbs, connectDbs } from "@/services";
+import { closeDbs, connectDbs } from "@/services/setup";
 
 if (require.main === module) {
     connectDbs()

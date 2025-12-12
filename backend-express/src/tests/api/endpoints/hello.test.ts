@@ -2,7 +2,7 @@ import supertest from "supertest";
 
 import app from "@/api";
 import { crudUser } from "@/models/crud";
-import { closeAll, seedTestData } from "@/services";
+import { closeAll, seedTestData } from "@/services/setup";
 
 const request = supertest(app);
 

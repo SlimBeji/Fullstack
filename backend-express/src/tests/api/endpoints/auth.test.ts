@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { closeAll, seedTestData } from "@/services";
+import { closeAll, seedTestData } from "@/services/setup";
 import { getImagePath } from "@/static";
 
 const request = supertest(app);

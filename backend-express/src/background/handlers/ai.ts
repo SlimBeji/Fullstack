@@ -1,7 +1,7 @@
 import { Job } from "bullmq";
 
 import { crudPlace } from "@/models/crud";
-import { huggingFace } from "@/services";
+import { huggingFace } from "@/services/instances";
 
 import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
 
