@@ -2,7 +2,7 @@ import asyncio
 
 from beanie.odm.fields import PydanticObjectId
 
-from lib.clients import cloud_storage, db, redis_client
+from lib.clients import cloud_storage, db
 from models.collections import CollectionEnum, document_models
 from models.crud import crud_place, crud_user
 from models.examples.places import PLACES
@@ -13,6 +13,7 @@ from models.schemas import (
     UserCreateSchema,
     UserSeedSchema,
 )
+from services import redis_client
 
 USER_REF_MAPPING: dict[int, str] = {}
 PLACE_REF_MAPPING: dict[int, str] = {}

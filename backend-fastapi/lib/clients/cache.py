@@ -4,7 +4,6 @@ from typing import Any, Literal, ParamSpec, TypeVar
 import redis.asyncio as async_redis
 from pydantic import BaseModel
 
-from config import settings
 from lib.utils.helpers import str_to_bool
 
 P = ParamSpec("P")
@@ -12,17 +11,17 @@ R = TypeVar("R")
 OutputFormat = Literal["json", "int", "float", "bool", ""] | type[BaseModel]
 
 
-class RedisClient:
-    def __init__(self) -> None:
-        self.default_expirartion: int = settings.REDIS_DEFAULT_EXPIRATION
-        self._client: async_redis.Redis | None = None
-        self.uri: str = settings.REDIS_URL
-        if self.is_test:
-            self.uri = settings.REDIS_TEST_URL
+class RedisClientConfig:
+    def __init__(self, uri: str, expiration: int = 3600):
+        self.uri = uri
+        self.expiration = expiration
 
-    @property
-    def is_test(self) -> bool:
-        return settings.is_test
+
+class RedisClient:
+    def __init__(self, config: RedisClientConfig) -> None:
+        self.uri: str = config.uri
+        self.default_expirartion: int = config.expiration
+        self._client: async_redis.Redis | None = None
 
     @property
     def client(self) -> async_redis.Redis:
@@ -82,6 +81,3 @@ class RedisClient:
 
     async def delete(self, key: str) -> None:
         return await self.client.delete(key)
-
-
-redis_client = RedisClient()

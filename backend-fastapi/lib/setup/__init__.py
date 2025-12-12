@@ -1,8 +1,8 @@
 import asyncio
 
-from lib.clients.cache import redis_client
 from lib.clients.mongo import db
 from models.examples import dump_db, seed_db
+from services import redis_client
 from worker.crons import close_crons
 from worker.tasks import close_workers
 
