@@ -10,22 +10,21 @@ from motor.motor_asyncio import (
 from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.errors import CollectionInvalid
 
-from config import settings
 from models.collections import document_models
 
 
+class MongoClientConfig:
+    def __init__(self, uri: str, db_name: str) -> None:
+        self.uri = uri
+        self.db_name = db_name
+
+
 class MongoClient:
-    def __init__(self) -> None:
-        self.uri: str = settings.MONGO_URL
+    def __init__(self, config: MongoClientConfig) -> None:
+        self.uri: str = config.uri
+        self.db_name: str = config.db_name
         self._client: AsyncIOMotorClient | None = None
         self._db: AsyncIOMotorDatabase | None = None
-        self.db_name: str = settings.MONGO_DBNAME
-        if self.is_test:
-            self.db_name = settings.MONGO_TEST_DBNAME
-
-    @property
-    def is_test(self) -> bool:
-        return settings.is_test
 
     @property
     def client(self) -> AsyncIOMotorClient:
@@ -89,6 +88,3 @@ class MongoClient:
         finally:
             if session:
                 await session.end_session()
-
-
-db = MongoClient()

@@ -8,7 +8,6 @@ from bson import ObjectId
 from pydantic import BaseModel
 
 from config import settings
-from lib.clients import db
 from lib.fastapi import ApiError
 from lib.types_ import (
     FindQuery,
@@ -17,6 +16,7 @@ from lib.types_ import (
     PaginationData,
 )
 from models.schemas import UserReadSchema
+from services import db
 
 type SortData = dict[str, Literal[-1, 1]]
 
