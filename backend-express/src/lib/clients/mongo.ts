@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 export interface MongoClientConfig {
     uri: string;
-    dbName?: string;
-    testDb?: string;
+    dbName: string;
 }
 
 export class MongoClient {
@@ -11,26 +10,13 @@ export class MongoClient {
     public readonly dbName: string;
 
     constructor(config: MongoClientConfig) {
-        this.uri = config.uri;
-        if (this.isTest) {
-            if (!config.testDb) {
-                throw new Error(
-                    "Cannot run mongo client in test mode. No testing db name provided"
-                );
-            }
-            this.dbName = config.testDb;
-        } else {
-            if (!config.dbName) {
-                throw new Error(
-                    "Cannot run mongo client in production mode. No production db name provided"
-                );
-            }
-            this.dbName = config.dbName;
+        if (!config.dbName || !config.uri) {
+            throw new Error(
+                "A valid uri and dbName must be provided to the mongo client"
+            );
         }
-    }
-
-    public get isTest(): boolean {
-        return !!process.env.JEST_WORKER_ID;
+        this.uri = config.uri;
+        this.dbName = config.dbName;
     }
 
     public async connect(): Promise<void> {

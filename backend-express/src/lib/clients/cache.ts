@@ -3,8 +3,7 @@ import { createClient, RedisClientType } from "redis";
 import { ApiError, HttpStatus } from "@/lib/express";
 
 export interface RedisClientConfig {
-    url?: string;
-    testUrl?: string;
+    url: string;
     expiration?: number;
 }
 
@@ -14,27 +13,12 @@ export class RedisClient {
     public readonly defaultExpiration: number;
 
     constructor(config: RedisClientConfig) {
-        if (this.isTest) {
-            if (!config.testUrl) {
-                throw new Error(
-                    "Cannot run redis client in test mode. No testing url provided"
-                );
-            }
-            this.url = config.testUrl;
-        } else {
-            if (!config.url) {
-                throw new Error(
-                    "Cannot run redis client in production mode. No production url provided"
-                );
-            }
-            this.url = config.url;
+        if (!config.url) {
+            throw new Error("A valid redis url must be provided");
         }
+        this.url = config.url;
         this.defaultExpiration = config.expiration || 3600;
         this.client = createClient({ url: this.url });
-    }
-
-    public get isTest(): boolean {
-        return !!process.env.JEST_WORKER_ID;
     }
 
     private get isReady(): boolean {

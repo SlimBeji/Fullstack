@@ -10,16 +10,16 @@ import {
     RedisClientConfig,
 } from "@/lib/clients";
 
+const IS_TEST = !!process.env.JEST_WORKER_ID;
+
 const mongoConfig: MongoClientConfig = {
     uri: env.MONGO_URL,
-    dbName: env.MONGO_DBNAME,
-    testDb: env.MONGO_TEST_DBNAME,
+    dbName: IS_TEST ? env.MONGO_TEST_DBNAME : env.MONGO_DBNAME,
 };
 export const db = new MongoClient(mongoConfig);
 
 const redisConfig: RedisClientConfig = {
-    url: env.REDIS_URL,
-    testUrl: env.REDIS_TEST_URL,
+    url: IS_TEST ? env.REDIS_TEST_URL : env.REDIS_URL,
     expiration: env.REDIS_DEFAULT_EXPIRATION,
 };
 export const redisClient = new RedisClient(redisConfig);
