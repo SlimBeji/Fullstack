@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from api.auth import get_current_admin, get_current_user
+from api.middlewares import get_current_admin, get_current_user
 from models.schemas import UserReadSchema
 from worker.tasks import send_newsletter
 

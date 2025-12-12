@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
-from api.auth import get_current_user
+from api.middlewares import get_current_user
 from models.crud import crud_place
 from models.schemas import (
     PlaceFiltersSchema,
