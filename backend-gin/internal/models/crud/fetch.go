@@ -2,6 +2,7 @@ package crud
 
 import (
 	"backend/internal/config"
+	"backend/internal/lib/gin_"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
 	"context"
@@ -359,7 +360,7 @@ func UserFetchBsonPage[Read any](
 	}
 	if user == nil {
 		var zero types_.RecordsPaginated[bson.M]
-		return zero, types_.NotAuthenticatedErr()
+		return zero, gin_.NotAuthenticatedErr()
 	}
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchBsonPage(df, findQuery, ctx)
@@ -376,7 +377,7 @@ func UserFetchPage[Read any](
 	}
 	if user == nil {
 		var zero types_.RecordsPaginated[Read]
-		return zero, types_.NotAuthenticatedErr()
+		return zero, gin_.NotAuthenticatedErr()
 	}
 	df.AddOwnershipFilters(user, findQuery)
 	return FetchPage(df, findQuery, ctx)

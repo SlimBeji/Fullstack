@@ -2,6 +2,7 @@ package collections
 
 import (
 	"backend/internal/lib/clients"
+	"backend/internal/lib/gin_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
 	"backend/internal/types_"
@@ -120,7 +121,7 @@ func (pc *PlaceCollection) AuthRead(
 	}
 
 	if user.Id != doc.CreatorID {
-		return types_.AccessDeiniedErr(pc.Name(), doc.ID)
+		return gin_.AccessDeiniedErr(pc.Name(), doc.ID)
 	}
 
 	return nil
@@ -304,7 +305,7 @@ func (pc *PlaceCollection) AuthCreate(
 	}
 
 	if user.Id != item.CreatorID {
-		return types_.AccessDeiniedErr(
+		return gin_.AccessDeiniedErr(
 			string(Users), item.CreatorID,
 		)
 	}
@@ -373,7 +374,7 @@ func (pc *PlaceCollection) AuthUpdate(
 		return nil
 	}
 
-	return types_.AccessDeiniedErr(
+	return gin_.AccessDeiniedErr(
 		string(Users), *creatorId,
 	)
 }

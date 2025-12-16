@@ -2,16 +2,16 @@ package auth
 
 import (
 	"backend/internal/lib/encryption"
+	"backend/internal/lib/gin_"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
 	"context"
 	"net/http"
 	"strings"
 )
 
 func GetUserFromToken(token string) (schemas.UserRead, error) {
-	badToken := types_.ApiError{
+	badToken := gin_.ApiError{
 		Code:    http.StatusUnauthorized,
 		Message: "Token Not Valid",
 	}
@@ -19,7 +19,7 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 	payload, err := encryption.DecodePayload(token)
 	if err != nil {
 		if strings.Contains(err.Error(), "token expired") {
-			return schemas.UserRead{}, types_.ApiError{
+			return schemas.UserRead{}, gin_.ApiError{
 				Code:    http.StatusUnauthorized,
 				Message: "Token Expired",
 			}
@@ -43,14 +43,14 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 	ctx := context.Background()
 	user, err := uc.GetById(userId, ctx)
 	if err != nil {
-		return schemas.UserRead{}, types_.ApiError{
+		return schemas.UserRead{}, gin_.ApiError{
 			Code:    http.StatusNotFound,
 			Message: "user not found",
 		}
 	}
 
 	if user.Email != email {
-		return schemas.UserRead{}, types_.ApiError{
+		return schemas.UserRead{}, gin_.ApiError{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid token, payload corrupted",
 		}

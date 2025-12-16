@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"backend/internal/api/auth"
+	"backend/internal/lib/gin_"
 	"backend/internal/lib/utils"
-	"backend/internal/types_"
 	"net/http"
 	"regexp"
 
@@ -14,7 +14,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			err := types_.ApiError{
+			err := gin_.ApiError{
 				Code:    http.StatusUnauthorized,
 				Message: "Not authenticated",
 			}
@@ -25,7 +25,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 		re := regexp.MustCompile(`^Bearer\s+(.+)$`)
 		match := re.FindStringSubmatch(token)
 		if len(match) < 2 {
-			err := types_.ApiError{
+			err := gin_.ApiError{
 				Code:    http.StatusUnauthorized,
 				Message: "No bearer token found",
 			}
@@ -40,7 +40,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 		}
 
 		if checkAdmin && !bool(user.IsAdmin) {
-			err := types_.ApiError{
+			err := gin_.ApiError{
 				Code:    http.StatusUnauthorized,
 				Message: "Not an admin",
 			}

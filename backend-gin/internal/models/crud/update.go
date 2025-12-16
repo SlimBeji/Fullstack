@@ -1,9 +1,9 @@
 package crud
 
 import (
+	"backend/internal/lib/gin_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
@@ -58,7 +58,7 @@ func UpdateDocument[Read any, Form any, Put any](
 	if du.ShouldValidate() {
 		errs := utils.ValidateStruct(form)
 		if len(errs) > 0 {
-			return result, types_.ValidationErrs(
+			return result, gin_.ValidationErrs(
 				fmt.Sprintf("update form for %s not valid", du.Name()), errs,
 			)
 		}
@@ -122,7 +122,7 @@ func UpdateDocumentById[Read any, Form any, Put any](
 ) (bson.Raw, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return bson.Raw{}, types_.UnprocessableErr(
+		return bson.Raw{}, gin_.UnprocessableErr(
 			fmt.Sprintf("invalid object ID %s", id), err,
 		)
 	}
@@ -147,7 +147,7 @@ func Update[Read any, Form any, Put any](
 	raw, err := UpdateDocument(du, filter, &form, ctx)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return result, types_.NotFoundErr(du.Name(), filter)
+			return result, gin_.NotFoundErr(du.Name(), filter)
 		} else {
 			return result, fmt.Errorf("update document failed: %w", err)
 		}
@@ -165,7 +165,7 @@ func UpdateById[Read any, Form any, Put any](
 	var zero Read
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return zero, types_.UnprocessableErr(
+		return zero, gin_.UnprocessableErr(
 			fmt.Sprintf("invalid object ID %s", id), err,
 		)
 	}
@@ -182,7 +182,7 @@ func UserUpdate[Read any, Form any, Put any](
 	var zero Read
 
 	if user == nil {
-		return zero, types_.NotAuthenticatedErr()
+		return zero, gin_.NotAuthenticatedErr()
 	}
 
 	if put == nil {
@@ -211,7 +211,7 @@ func UserUpdateById[Read any, Form any, Put any](
 	var zero Read
 
 	if user == nil {
-		return zero, types_.NotAuthenticatedErr()
+		return zero, gin_.NotAuthenticatedErr()
 	}
 
 	if put == nil {

@@ -2,7 +2,6 @@ package utils
 
 import (
 	"backend/internal/lib/gin_"
-	"backend/internal/types_"
 	"net/http"
 	"strings"
 
@@ -28,7 +27,7 @@ func GetBody[T any](c *gin.Context) (T, bool) {
 }
 
 func AbortWithStatusJSON(c *gin.Context, err error) {
-	apiError, ok := err.(types_.ApiError)
+	apiError, ok := err.(gin_.ApiError)
 	if !ok {
 		resp := gin.H{"error": true, "message": "Internal server error"}
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
