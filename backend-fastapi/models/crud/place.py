@@ -3,7 +3,7 @@ from typing import cast
 
 from beanie import PydanticObjectId
 
-from background.tasks import place_embeddding
+from background.publishers import place_embedding
 from lib.fastapi import ApiError
 from lib.types_ import Filter
 from models.collections.place import Place
@@ -92,7 +92,7 @@ class CrudPlace(
         data["imageUrl"] = cloud_storage.upload_file(image)
         create_form = PlaceCreateSchema(**data)
         document = await self.create_document(create_form)
-        place_embeddding(document.id)
+        place_embedding(document.id)
         result = await self.post_process(document)
         return cast(PlaceReadSchema, result)
 
@@ -109,7 +109,7 @@ class CrudPlace(
         )
         title_changed = form.title and form.title != document.title
         if description_changed or title_changed:
-            place_embeddding(document.id)
+            place_embedding(document.id)
 
         result = await self.post_process(document)
         return cast(PlaceReadSchema, result)

@@ -1,11 +1,7 @@
 import logging
 
-from beanie import PydanticObjectId
-from bson import ObjectId
-
 from background.setup import TASK_PLACE_EMBEDDING, PlaceEmbbeddingData, Queues
 from background.tasks.broker import dramatiq_task
-from config import settings
 from services.instances import hf_client
 
 
@@ -25,11 +21,3 @@ async def place_embedding_task(data: PlaceEmbbeddingData):
     place.embedding = result
     await crud_place.save_document(place)
     logging.info(result)
-
-
-def place_embeddding(
-    place_id: str | ObjectId | PydanticObjectId | None,
-) -> None:
-    if settings.is_test or place_id is None:
-        return
-    place_embedding_task.send(PlaceEmbbeddingData(place_id=str(place_id)))

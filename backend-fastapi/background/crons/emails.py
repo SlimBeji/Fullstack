@@ -1,5 +1,5 @@
 from background.crons.base import ScheduledTask
-from background.tasks import send_newsletter
+from background.publishers import send_newsletter
 
 newsletter_cron = ScheduledTask(
     send_newsletter, "0 * * * *", args=("Slim Beji", "mslimbjei@gmail.com")
