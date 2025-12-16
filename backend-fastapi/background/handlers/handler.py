@@ -75,7 +75,12 @@ class TaskHandler:
         self, name: str, queue_name: str = "default"
     ) -> Callable[[Callable], Actor]:
         def decorator(fn) -> Actor:
-            return actor(fn, actor_name=str(name), queue_name=str(queue_name))
+            return actor(
+                fn,
+                actor_name=str(name),
+                queue_name=str(queue_name),
+                store_results=True,
+            )
 
         return decorator
 
