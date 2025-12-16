@@ -3,10 +3,11 @@ package endpoints
 import (
 	"backend/internal/api/routes"
 	"backend/internal/lib/setup"
+	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
+	types__ "backend/internal/types_"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -23,8 +24,8 @@ import (
 
 func getPlaceExamples() ([]schemas.PlaceRead, error) {
 	pc := collections.GetPlaceCollection()
-	findQuery := types_.FindQuery{
-		Filters: types_.FindQueryFilters{
+	findQuery := types__.FindQuery{
+		Filters: types__.FindQueryFilters{
 			"title": {{Op: "eq", Val: "Stamford Bridge"}},
 		},
 	}
@@ -62,7 +63,7 @@ func TestGetPlaces(t *testing.T) {
 		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
 	}
 
-	var resp types_.RecordsPaginated[any]
+	var resp types_.PaginatedData[any]
 	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
@@ -117,7 +118,7 @@ func TestFetchPlaces(t *testing.T) {
 		t.Fatalf("expected JSON response, got %s", w.Header().Get("Content-Type"))
 	}
 
-	var resp types_.RecordsPaginated[map[string]any]
+	var resp types_.PaginatedData[map[string]any]
 	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
