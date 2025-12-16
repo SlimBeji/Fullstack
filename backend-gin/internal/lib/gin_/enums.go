@@ -1,4 +1,4 @@
-package types_
+package gin_
 
 type ContentType string
 

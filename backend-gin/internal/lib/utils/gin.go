@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"backend/internal/lib/gin_"
 	"backend/internal/types_"
 	"net/http"
 	"strings"
@@ -10,8 +11,8 @@ import (
 
 func IsMultipart(c *gin.Context) bool {
 	contentType := c.GetHeader("Content-Type")
-	xxxUrlEncoded := strings.HasPrefix(contentType, string(types_.ContentTypeFormUrlencoded))
-	formData := strings.HasPrefix(contentType, string(types_.ContentTypeMultipart))
+	xxxUrlEncoded := strings.HasPrefix(contentType, string(gin_.ContentTypeFormUrlencoded))
+	formData := strings.HasPrefix(contentType, string(gin_.ContentTypeMultipart))
 	return xxxUrlEncoded || formData
 }
 
