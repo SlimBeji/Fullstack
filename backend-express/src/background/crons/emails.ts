@@ -1,6 +1,7 @@
 import { sendNewsletter } from "../publishers";
+import { CronConfig } from "./utils";
 
-export const NewsletterCronConfig = {
+export const NewsletterCronConfig: CronConfig = {
     name: "Newsletter Job",
     expression: "0 * * * *",
     task: () => {

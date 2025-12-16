@@ -1,15 +1,6 @@
-import cron, { ScheduledTask, TaskFn, TaskOptions } from "node-cron";
+import cron, { ScheduledTask } from "node-cron";
 
-import { NewsletterCronConfig } from "./emails";
-
-interface CronConfig {
-    name: string;
-    expression: string;
-    task: TaskFn;
-    options: TaskOptions;
-}
-
-const ALL_CRONS: CronConfig[] = [NewsletterCronConfig];
+import { ALL_CRONS } from "./registery";
 
 export class TaskScheduler {
     private crons: Record<string, ScheduledTask> = {};
