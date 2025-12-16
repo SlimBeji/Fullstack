@@ -2,10 +2,12 @@ from typing import TypedDict
 
 from bson import ObjectId
 
+from config import settings
 from lib.utils import StrEnum
 
 # Broker setup
 
+REDIS_URL = settings.REDIS_URL
 MAX_AGE = 7 * 24 * 60 * 60 * 1000
 
 # Queues
