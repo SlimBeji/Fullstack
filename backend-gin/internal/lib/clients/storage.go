@@ -2,7 +2,7 @@ package clients
 
 import (
 	"backend/internal/config"
-	"backend/internal/types_"
+	"backend/internal/lib/types_"
 	"context"
 	"errors"
 	"fmt"

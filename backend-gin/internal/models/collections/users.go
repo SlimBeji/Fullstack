@@ -5,9 +5,10 @@ import (
 	"backend/internal/lib/clients"
 	"backend/internal/lib/encryption"
 	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
+	types__ "backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
@@ -223,44 +224,44 @@ func (uc *UserCollection) GetFiltersMapping() map[string]string {
 }
 
 func (uc *UserCollection) AddOwnershipFilters(
-	user *schemas.UserRead, findQuery *types_.FindQuery,
+	user *schemas.UserRead, findQuery *types__.FindQuery,
 ) {
 	if findQuery.Filters == nil {
-		findQuery.Filters = make(types_.FindQueryFilters)
+		findQuery.Filters = make(types__.FindQueryFilters)
 	}
 
 	// No need to convert id to primitive.ObjectId
-	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
+	ownershipFilter := types__.Filter{Op: types__.FilterEq, Val: user.Id}
 	findQuery.Filters["id"] = append(findQuery.Filters["id"], ownershipFilter)
 }
 
 func (uc *UserCollection) FetchDocuments(
-	query *types_.MongoFindQuery, ctx context.Context,
+	query *types__.MongoFindQuery, ctx context.Context,
 ) ([]bson.Raw, error) {
 	return crud.FetchDocuments(uc, query, ctx)
 }
 
 func (uc *UserCollection) FetchBsonPage(
-	findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[bson.M], error) {
+	findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[bson.M], error) {
 	return crud.FetchBsonPage(uc, findQuery, ctx)
 }
 
 func (uc *UserCollection) FetchPage(
-	findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[schemas.UserRead], error) {
+	findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[schemas.UserRead], error) {
 	return crud.FetchPage(uc, findQuery, ctx)
 }
 
 func (uc *UserCollection) UserFetchBsonPage(
-	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[bson.M], error) {
+	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[bson.M], error) {
 	return crud.UserFetchBsonPage(uc, user, findQuery, ctx)
 }
 
 func (uc *UserCollection) UserFetchPage(
-	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[schemas.UserRead], error) {
+	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[schemas.UserRead], error) {
 	return crud.UserFetchPage(uc, user, findQuery, ctx)
 }
 

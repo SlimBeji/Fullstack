@@ -3,9 +3,10 @@ package collections
 import (
 	"backend/internal/lib/clients"
 	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
+	types__ "backend/internal/types_"
 	"backend/internal/worker/tasks/publisher"
 	"context"
 	"errors"
@@ -163,16 +164,16 @@ func (pc *PlaceCollection) GetFiltersMapping() map[string]string {
 }
 
 func (pc *PlaceCollection) AddOwnershipFilters(
-	user *schemas.UserRead, findQuery *types_.FindQuery,
+	user *schemas.UserRead, findQuery *types__.FindQuery,
 ) {
 	if findQuery.Filters == nil {
-		findQuery.Filters = make(types_.FindQueryFilters)
+		findQuery.Filters = make(types__.FindQueryFilters)
 	}
 
-	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
+	ownershipFilter := types__.Filter{Op: types__.FilterEq, Val: user.Id}
 	userId, err := primitive.ObjectIDFromHex(user.Id)
 	if err == nil {
-		ownershipFilter = types_.Filter{Op: types_.FilterEq, Val: userId}
+		ownershipFilter = types__.Filter{Op: types__.FilterEq, Val: userId}
 	}
 
 	findQuery.Filters["creatorId"] = append(
@@ -181,32 +182,32 @@ func (pc *PlaceCollection) AddOwnershipFilters(
 }
 
 func (pc *PlaceCollection) FetchDocuments(
-	query *types_.MongoFindQuery, ctx context.Context,
+	query *types__.MongoFindQuery, ctx context.Context,
 ) ([]bson.Raw, error) {
 	return crud.FetchDocuments(pc, query, ctx)
 }
 
 func (pc *PlaceCollection) FetchBsonPage(
-	findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[bson.M], error) {
+	findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[bson.M], error) {
 	return crud.FetchBsonPage(pc, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) FetchPage(
-	findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[schemas.PlaceRead], error) {
+	findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[schemas.PlaceRead], error) {
 	return crud.FetchPage(pc, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) UserFetchBsonPage(
-	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[bson.M], error) {
+	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[bson.M], error) {
 	return crud.UserFetchBsonPage(pc, user, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) UserFetchPage(
-	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
-) (types_.RecordsPaginated[schemas.PlaceRead], error) {
+	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+) (types__.RecordsPaginated[schemas.PlaceRead], error) {
 	return crud.UserFetchPage(pc, user, findQuery, ctx)
 }
 
