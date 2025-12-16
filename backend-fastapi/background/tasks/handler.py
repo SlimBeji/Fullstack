@@ -11,9 +11,17 @@ from dramatiq.results.backend import ResultBackend
 from dramatiq.results.backends.redis import RedisBackend
 from dramatiq.results.backends.stub import StubBackend
 
-from background.setup import MAX_AGE
+from background.setup import (
+    MAX_AGE,
+    TASK_NEWSLETTER,
+    TASK_PLACE_EMBEDDING,
+    Queues,
+)
 from config import settings
 from services.instances import db, redis_client
+
+from .ai import place_embedding_task
+from .email import send_newsletter_task
 
 
 async def connect_dbs() -> None:
@@ -77,3 +85,5 @@ class TaskHandler:
 
 
 handler = TaskHandler()
+handler.register_task(TASK_NEWSLETTER, Queues.EMAILS)(send_newsletter_task)
+handler.register_task(TASK_PLACE_EMBEDDING, Queues.AI)(place_embedding_task)

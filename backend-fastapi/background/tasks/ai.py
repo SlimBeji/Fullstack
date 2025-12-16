@@ -1,16 +1,14 @@
 import logging
 
-from background.setup import TASK_PLACE_EMBEDDING, PlaceEmbbeddingData, Queues
-from background.tasks.handler import handler
+from background.setup import PlaceEmbbeddingData
 from services.instances import hf_client
 
 
-@handler.register_task(TASK_PLACE_EMBEDDING, Queues.AI)
-async def place_embedding_task(data: PlaceEmbbeddingData):
+async def place_embedding_task(payload: PlaceEmbbeddingData):
     # Lazy loading to avoid circular import issues
     from models.crud import crud_place
 
-    place_id = data["place_id"]
+    place_id = payload["place_id"]
     place = await crud_place.get_document(place_id)
     if place is None:
         logging.warning(f"No place with id {place_id} found in the database")
