@@ -3,7 +3,7 @@
 package raw
 
 import (
-	"backend/internal/types_"
+	"backend/internal/lib/types_"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -65,7 +65,7 @@ type UserRead struct {
 	Places   any `tag:"places"`
 }
 
-type UsersPaginated = types_.RecordsPaginated[PlaceRead]
+type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 /////// Query Schemas /////////////
 

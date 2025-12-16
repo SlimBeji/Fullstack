@@ -2,7 +2,7 @@ imports:
     - mime/multipart
     - time
     - go.mongodb.org/mongo-driver/bson/primitive
-    - backend/internal/types_
+    - backend/internal/lib/types_
 fields:
     id:
         type: 'string'

@@ -2,7 +2,7 @@
 package schemas
 
 import (
-	"backend/internal/types_"
+	"backend/internal/lib/types_"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"mime/multipart"
 	"time"
@@ -54,7 +54,7 @@ type UserRead struct {
 	Places   []string        `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"places"`               // The id of places belonging to the user, 24 characters
 }
 
-type UsersPaginated = types_.RecordsPaginated[PlaceRead]
+type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 type UserFilters struct {
 	Page   int      `json:"page" default:"1"`

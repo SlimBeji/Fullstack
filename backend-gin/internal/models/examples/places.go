@@ -1,9 +1,9 @@
 package examples
 
 import (
+	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
 )
 
 var embedding1 = []types_.FlexFloat{

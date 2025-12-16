@@ -189,25 +189,25 @@ func (pc *PlaceCollection) FetchDocuments(
 
 func (pc *PlaceCollection) FetchBsonPage(
 	findQuery *types__.FindQuery, ctx context.Context,
-) (types__.RecordsPaginated[bson.M], error) {
+) (types_.PaginatedData[bson.M], error) {
 	return crud.FetchBsonPage(pc, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) FetchPage(
 	findQuery *types__.FindQuery, ctx context.Context,
-) (types__.RecordsPaginated[schemas.PlaceRead], error) {
+) (types_.PaginatedData[schemas.PlaceRead], error) {
 	return crud.FetchPage(pc, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) UserFetchBsonPage(
 	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
-) (types__.RecordsPaginated[bson.M], error) {
+) (types_.PaginatedData[bson.M], error) {
 	return crud.UserFetchBsonPage(pc, user, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) UserFetchPage(
 	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
-) (types__.RecordsPaginated[schemas.PlaceRead], error) {
+) (types_.PaginatedData[schemas.PlaceRead], error) {
 	return crud.UserFetchPage(pc, user, findQuery, ctx)
 }
 

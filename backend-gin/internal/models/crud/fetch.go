@@ -3,8 +3,9 @@ package crud
 import (
 	"backend/internal/config"
 	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
+	types__ "backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
@@ -25,10 +26,10 @@ type DocumentFetcher[Read any] interface {
 	GetFiltersMapping() map[string]string
 	CountDocuments(context.Context, any, ...*options.CountOptions) (int64, error)
 	Find(context.Context, any, ...*options.FindOptions) (*mongo.Cursor, error)
-	AddOwnershipFilters(*schemas.UserRead, *types_.FindQuery)
+	AddOwnershipFilters(*schemas.UserRead, *types__.FindQuery)
 }
 
-func parsePagination(page int, size int) types_.Pagination {
+func parsePagination(page int, size int) types_.PaginationData {
 	if page == 0 {
 		page = 1
 	}
@@ -37,7 +38,7 @@ func parsePagination(page int, size int) types_.Pagination {
 		size = config.Env.MaxItemsPerPage
 	}
 
-	return types_.Pagination{Page: page, Size: size}
+	return types_.PaginationData{Page: page, Size: size}
 }
 
 func parseSortData(fields []string) bson.D {
@@ -71,7 +72,7 @@ func parseProjection(fields []string) bson.M {
 }
 
 func parseFilters(
-	filters types_.FindQueryFilters, nameMapping map[string]string,
+	filters types__.FindQueryFilters, nameMapping map[string]string,
 ) (bson.M, error) {
 	result := bson.M{}
 	if len(filters) == 0 {
@@ -91,7 +92,7 @@ func parseFilters(
 		for _, fieldFilter := range fieldFilters {
 			operator := "$" + string(fieldFilter.Op)
 
-			if fieldFilter.Op == types_.FilterText {
+			if fieldFilter.Op == types__.FilterText {
 				conditions[operator] = bson.M{"$search": fieldFilter.Val}
 			} else {
 				if field == "_id" || field == "creatorId" {
@@ -138,8 +139,8 @@ func sanitizeProjection[Read any](
 }
 
 func parseFindQuery[Read any](
-	df DocumentFetcher[Read], findQuery *types_.FindQuery,
-) (*types_.MongoFindQuery, error) {
+	df DocumentFetcher[Read], findQuery *types__.FindQuery,
+) (*types__.MongoFindQuery, error) {
 	// Step 1: Parse the pagination
 	pagination := parsePagination(findQuery.Page, findQuery.Size)
 
@@ -160,7 +161,7 @@ func parseFindQuery[Read any](
 	}
 
 	// Step 5: Return the MongoFindQuery
-	return &types_.MongoFindQuery{
+	return &types__.MongoFindQuery{
 		Pagination: &pagination,
 		Projection: &projection,
 		Sort:       &sort,
@@ -177,10 +178,10 @@ func CountDocuments[Read any](
 
 func FetchDocuments[Read any](
 	df DocumentFetcher[Read],
-	query *types_.MongoFindQuery,
+	query *types__.MongoFindQuery,
 	ctx context.Context,
 ) ([]bson.Raw, error) {
-	pagination := types_.Pagination{Page: 1, Size: config.Env.MaxItemsPerPage}
+	pagination := types_.PaginationData{Page: 1, Size: config.Env.MaxItemsPerPage}
 	if query.Pagination != nil {
 		pagination = *query.Pagination
 	}
@@ -223,10 +224,10 @@ func FetchDocuments[Read any](
 
 func fetchRawPage[Read any](
 	df DocumentFetcher[Read],
-	findQuery *types_.FindQuery,
+	findQuery *types__.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[bson.Raw], error) {
-	var result types_.RecordsPaginated[bson.Raw]
+) (types_.PaginatedData[bson.Raw], error) {
+	var result types_.PaginatedData[bson.Raw]
 
 	// Step 1: Parsing the FindQuery to Mongo language
 	query, err := parseFindQuery(df, findQuery)
@@ -307,10 +308,10 @@ func postProcessBsonBatch(
 
 func FetchBsonPage[Read any](
 	df DocumentFetcher[Read],
-	findQuery *types_.FindQuery,
+	findQuery *types__.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[bson.M], error) {
-	var result types_.RecordsPaginated[bson.M]
+) (types_.PaginatedData[bson.M], error) {
+	var result types_.PaginatedData[bson.M]
 
 	rawPage, err := fetchRawPage(df, findQuery, ctx)
 	if err != nil {
@@ -327,10 +328,10 @@ func FetchBsonPage[Read any](
 
 func FetchPage[Read any](
 	df DocumentFetcher[Read],
-	findQuery *types_.FindQuery,
+	findQuery *types__.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[Read], error) {
-	var result types_.RecordsPaginated[Read]
+) (types_.PaginatedData[Read], error) {
+	var result types_.PaginatedData[Read]
 	if len(findQuery.Fields) > 0 {
 		err := fmt.Errorf("fields projection detected. use FetchBsonPage isntead")
 		return result, err
@@ -352,14 +353,14 @@ func FetchPage[Read any](
 func UserFetchBsonPage[Read any](
 	df DocumentFetcher[Read],
 	user *schemas.UserRead,
-	findQuery *types_.FindQuery,
+	findQuery *types__.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[bson.M], error) {
+) (types_.PaginatedData[bson.M], error) {
 	if findQuery == nil {
-		findQuery = &types_.FindQuery{}
+		findQuery = &types__.FindQuery{}
 	}
 	if user == nil {
-		var zero types_.RecordsPaginated[bson.M]
+		var zero types_.PaginatedData[bson.M]
 		return zero, gin_.NotAuthenticatedErr()
 	}
 	df.AddOwnershipFilters(user, findQuery)
@@ -369,14 +370,14 @@ func UserFetchBsonPage[Read any](
 func UserFetchPage[Read any](
 	df DocumentFetcher[Read],
 	user *schemas.UserRead,
-	findQuery *types_.FindQuery,
+	findQuery *types__.FindQuery,
 	ctx context.Context,
-) (types_.RecordsPaginated[Read], error) {
+) (types_.PaginatedData[Read], error) {
 	if findQuery == nil {
-		findQuery = &types_.FindQuery{}
+		findQuery = &types__.FindQuery{}
 	}
 	if user == nil {
-		var zero types_.RecordsPaginated[Read]
+		var zero types_.PaginatedData[Read]
 		return zero, gin_.NotAuthenticatedErr()
 	}
 	df.AddOwnershipFilters(user, findQuery)

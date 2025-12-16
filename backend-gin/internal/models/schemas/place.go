@@ -2,7 +2,7 @@
 package schemas
 
 import (
-	"backend/internal/types_"
+	"backend/internal/lib/types_"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"mime/multipart"
 	"time"
@@ -67,7 +67,7 @@ type PlaceRead struct {
 	CreatorID   string   `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
 }
 
-type PlacesPaginated = types_.RecordsPaginated[PlaceRead]
+type PlacesPaginated = types_.PaginatedData[PlaceRead]
 
 type PlaceFilters struct {
 	Page        int      `json:"page" default:"1"`
