@@ -1,3 +1,3 @@
-from background.tasks.ai import *
-from background.tasks.email import *
-from background.tasks.handler import *
+from background.handlers.ai import *
+from background.handlers.email import *
+from background.handlers.handler import *
