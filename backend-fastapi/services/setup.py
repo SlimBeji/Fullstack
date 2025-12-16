@@ -1,7 +1,6 @@
 import asyncio
 
 from background.crons import close_crons
-from background.tasks import close_workers
 from models.examples import dump_db, seed_db
 from services.instances import db, redis_client
 
@@ -23,7 +22,6 @@ async def start_all() -> None:
 
 async def close_all() -> None:
     await close_dbs()
-    close_workers()
     close_crons()
 
 
