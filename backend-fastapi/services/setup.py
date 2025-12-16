@@ -2,7 +2,6 @@ import asyncio
 
 from background.crons import close_crons
 from background.publishers import publisher
-from config import settings
 from models.examples import dump_db, seed_db
 from services.instances import db, redis_client
 
@@ -20,7 +19,7 @@ async def close_dbs() -> None:
 
 async def start_all() -> None:
     await connect_dbs()
-    publisher.start(settings.REDIS_URL, settings.is_test)
+    publisher.start()
 
 
 async def close_all() -> None:
