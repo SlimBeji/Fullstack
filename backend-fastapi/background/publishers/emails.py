@@ -11,7 +11,7 @@ def send_newsletter(name: str, email: str) -> None:
 
     payload = NewsletterData(name=name, email=email)
     message = Message[None](
-        Queues.EMAILS.name,
+        str(Queues.EMAILS),
         actor_name=TASK_NEWSLETTER,
         args=(payload,),
         kwargs={},

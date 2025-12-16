@@ -15,7 +15,7 @@ def place_embedding(
 
     payload = PlaceEmbbeddingData(place_id=place_id)
     message = Message[None](
-        Queues.AI.value,
+        str(Queues.AI),
         actor_name=TASK_PLACE_EMBEDDING,
         args=(payload,),
         kwargs={},
