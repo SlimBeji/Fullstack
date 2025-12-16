@@ -1,11 +1,11 @@
 import logging
 
 from background.setup import TASK_PLACE_EMBEDDING, PlaceEmbbeddingData, Queues
-from background.tasks.broker import dramatiq_task
+from background.tasks.handler import handler
 from services.instances import hf_client
 
 
-@dramatiq_task(TASK_PLACE_EMBEDDING, Queues.AI)
+@handler.register_task(TASK_PLACE_EMBEDDING, Queues.AI)
 async def place_embedding_task(data: PlaceEmbbeddingData):
     # Lazy loading to avoid circular import issues
     from models.crud import crud_place
