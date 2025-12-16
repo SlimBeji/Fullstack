@@ -1,4 +1,10 @@
+from typing import TypedDict
+
+from bson import ObjectId
+
 from lib.utils import StrEnum
+
+# Queues
 
 
 class Queues(StrEnum):
@@ -6,6 +12,18 @@ class Queues(StrEnum):
     AI = "ai"
 
 
-class Tasks(StrEnum):
-    NEWSLETTER = "newsletter"
-    PLACE_EMBEDDING = "place_embedding"
+# Tasks & Payload
+
+TASK_PLACE_EMBEDDING = "place_embedding"
+
+
+class PlaceEmbbeddingData(TypedDict):
+    place_id: str | ObjectId
+
+
+TASK_NEWSLETTER = "newsletter"
+
+
+class NewsletterData(TypedDict):
+    name: str
+    email: str
