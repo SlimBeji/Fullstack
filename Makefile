@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach fastapi
+	docker-compose up --attach gin
 
 build:
 	docker-compose build
