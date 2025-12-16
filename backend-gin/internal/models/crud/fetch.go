@@ -5,7 +5,6 @@ import (
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/schemas"
-	types__ "backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
@@ -18,6 +17,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+type MongoFindQuery struct {
+	Pagination *types_.PaginationData
+	Filters    *bson.M
+	Sort       *bson.D
+	Projection *bson.M
+}
 
 type DocumentFetcher[Read any] interface {
 	DocumentReader[Read]
@@ -140,7 +146,7 @@ func sanitizeProjection[Read any](
 
 func parseFindQuery[Read any](
 	df DocumentFetcher[Read], findQuery *types_.FindQuery,
-) (*types__.MongoFindQuery, error) {
+) (*MongoFindQuery, error) {
 	// Step 1: Parse the pagination
 	pagination := parsePagination(findQuery.Page, findQuery.Size)
 
@@ -161,7 +167,7 @@ func parseFindQuery[Read any](
 	}
 
 	// Step 5: Return the MongoFindQuery
-	return &types__.MongoFindQuery{
+	return &MongoFindQuery{
 		Pagination: &pagination,
 		Projection: &projection,
 		Sort:       &sort,
@@ -178,7 +184,7 @@ func CountDocuments[Read any](
 
 func FetchDocuments[Read any](
 	df DocumentFetcher[Read],
-	query *types__.MongoFindQuery,
+	query *MongoFindQuery,
 	ctx context.Context,
 ) ([]bson.Raw, error) {
 	pagination := types_.PaginationData{Page: 1, Size: config.Env.MaxItemsPerPage}

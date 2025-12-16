@@ -8,7 +8,6 @@ import (
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
-	types__ "backend/internal/types_"
 	"context"
 	"errors"
 	"fmt"
@@ -236,7 +235,7 @@ func (uc *UserCollection) AddOwnershipFilters(
 }
 
 func (uc *UserCollection) FetchDocuments(
-	query *types__.MongoFindQuery, ctx context.Context,
+	query *crud.MongoFindQuery, ctx context.Context,
 ) ([]bson.Raw, error) {
 	return crud.FetchDocuments(uc, query, ctx)
 }

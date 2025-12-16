@@ -6,7 +6,6 @@ import (
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
-	types__ "backend/internal/types_"
 	"backend/internal/worker/tasks/publisher"
 	"context"
 	"errors"
@@ -182,7 +181,7 @@ func (pc *PlaceCollection) AddOwnershipFilters(
 }
 
 func (pc *PlaceCollection) FetchDocuments(
-	query *types__.MongoFindQuery, ctx context.Context,
+	query *crud.MongoFindQuery, ctx context.Context,
 ) ([]bson.Raw, error) {
 	return crud.FetchDocuments(pc, query, ctx)
 }
