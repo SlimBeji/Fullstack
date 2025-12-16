@@ -1,13 +1,11 @@
 import logging
 
 from background.setup import PlaceEmbbeddingData
+from models.crud import crud_place
 from services.instances import hf_client
 
 
 async def place_embedding_task(payload: PlaceEmbbeddingData):
-    # Lazy loading to avoid circular import issues
-    from models.crud import crud_place
-
     place_id = payload["place_id"]
     place = await crud_place.get_document(place_id)
     if place is None:
