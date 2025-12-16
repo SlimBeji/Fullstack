@@ -14,7 +14,7 @@ class TaskPublisher:
         return self._broker
 
     def start(self, url: str = "", is_test: bool = False) -> None:
-        if not is_test and not url == "":
+        if not is_test and not url:
             raise RuntimeError(
                 "A url must be provided when not running in test mode!"
             )

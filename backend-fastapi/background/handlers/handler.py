@@ -52,7 +52,7 @@ class TaskHandler:
         return self._broker
 
     def start(self, url: str = "", is_test: bool = False) -> None:
-        if not is_test and not url == "":
+        if not is_test and not url:
             raise RuntimeError(
                 "A url must be provided when not running in test mode!"
             )
@@ -62,8 +62,8 @@ class TaskHandler:
             self._backend = StubBackend()
             self._broker.emit_after("process_boot")
         else:
-            self._broker = RedisBroker(url=settings.REDIS_URL)
-            self._backend = RedisBackend(url=settings.REDIS_URL)
+            self._broker = RedisBroker(url=url)
+            self._backend = RedisBackend(url=url)
 
         self._broker.add_middleware(
             Results(backend=self._backend, result_ttl=MAX_AGE)
