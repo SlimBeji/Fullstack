@@ -1,8 +1,8 @@
 package middlewares
 
 import (
+	"backend/internal/lib/types_"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
 	"net/http"
 	"strings"
 

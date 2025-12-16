@@ -26,7 +26,7 @@ type DocumentFetcher[Read any] interface {
 	GetFiltersMapping() map[string]string
 	CountDocuments(context.Context, any, ...*options.CountOptions) (int64, error)
 	Find(context.Context, any, ...*options.FindOptions) (*mongo.Cursor, error)
-	AddOwnershipFilters(*schemas.UserRead, *types__.FindQuery)
+	AddOwnershipFilters(*schemas.UserRead, *types_.FindQuery)
 }
 
 func parsePagination(page int, size int) types_.PaginationData {
@@ -72,7 +72,7 @@ func parseProjection(fields []string) bson.M {
 }
 
 func parseFilters(
-	filters types__.FindQueryFilters, nameMapping map[string]string,
+	filters types_.FindQueryFilters, nameMapping map[string]string,
 ) (bson.M, error) {
 	result := bson.M{}
 	if len(filters) == 0 {
@@ -92,7 +92,7 @@ func parseFilters(
 		for _, fieldFilter := range fieldFilters {
 			operator := "$" + string(fieldFilter.Op)
 
-			if fieldFilter.Op == types__.FilterText {
+			if fieldFilter.Op == types_.FilterText {
 				conditions[operator] = bson.M{"$search": fieldFilter.Val}
 			} else {
 				if field == "_id" || field == "creatorId" {
@@ -139,7 +139,7 @@ func sanitizeProjection[Read any](
 }
 
 func parseFindQuery[Read any](
-	df DocumentFetcher[Read], findQuery *types__.FindQuery,
+	df DocumentFetcher[Read], findQuery *types_.FindQuery,
 ) (*types__.MongoFindQuery, error) {
 	// Step 1: Parse the pagination
 	pagination := parsePagination(findQuery.Page, findQuery.Size)
@@ -224,7 +224,7 @@ func FetchDocuments[Read any](
 
 func fetchRawPage[Read any](
 	df DocumentFetcher[Read],
-	findQuery *types__.FindQuery,
+	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.PaginatedData[bson.Raw], error) {
 	var result types_.PaginatedData[bson.Raw]
@@ -308,7 +308,7 @@ func postProcessBsonBatch(
 
 func FetchBsonPage[Read any](
 	df DocumentFetcher[Read],
-	findQuery *types__.FindQuery,
+	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
 	var result types_.PaginatedData[bson.M]
@@ -328,7 +328,7 @@ func FetchBsonPage[Read any](
 
 func FetchPage[Read any](
 	df DocumentFetcher[Read],
-	findQuery *types__.FindQuery,
+	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.PaginatedData[Read], error) {
 	var result types_.PaginatedData[Read]
@@ -353,11 +353,11 @@ func FetchPage[Read any](
 func UserFetchBsonPage[Read any](
 	df DocumentFetcher[Read],
 	user *schemas.UserRead,
-	findQuery *types__.FindQuery,
+	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
 	if findQuery == nil {
-		findQuery = &types__.FindQuery{}
+		findQuery = &types_.FindQuery{}
 	}
 	if user == nil {
 		var zero types_.PaginatedData[bson.M]
@@ -370,11 +370,11 @@ func UserFetchBsonPage[Read any](
 func UserFetchPage[Read any](
 	df DocumentFetcher[Read],
 	user *schemas.UserRead,
-	findQuery *types__.FindQuery,
+	findQuery *types_.FindQuery,
 	ctx context.Context,
 ) (types_.PaginatedData[Read], error) {
 	if findQuery == nil {
-		findQuery = &types__.FindQuery{}
+		findQuery = &types_.FindQuery{}
 	}
 	if user == nil {
 		var zero types_.PaginatedData[Read]

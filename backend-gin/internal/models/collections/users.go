@@ -224,14 +224,14 @@ func (uc *UserCollection) GetFiltersMapping() map[string]string {
 }
 
 func (uc *UserCollection) AddOwnershipFilters(
-	user *schemas.UserRead, findQuery *types__.FindQuery,
+	user *schemas.UserRead, findQuery *types_.FindQuery,
 ) {
 	if findQuery.Filters == nil {
-		findQuery.Filters = make(types__.FindQueryFilters)
+		findQuery.Filters = make(types_.FindQueryFilters)
 	}
 
 	// No need to convert id to primitive.ObjectId
-	ownershipFilter := types__.Filter{Op: types__.FilterEq, Val: user.Id}
+	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
 	findQuery.Filters["id"] = append(findQuery.Filters["id"], ownershipFilter)
 }
 
@@ -242,25 +242,25 @@ func (uc *UserCollection) FetchDocuments(
 }
 
 func (uc *UserCollection) FetchBsonPage(
-	findQuery *types__.FindQuery, ctx context.Context,
+	findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
 	return crud.FetchBsonPage(uc, findQuery, ctx)
 }
 
 func (uc *UserCollection) FetchPage(
-	findQuery *types__.FindQuery, ctx context.Context,
+	findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[schemas.UserRead], error) {
 	return crud.FetchPage(uc, findQuery, ctx)
 }
 
 func (uc *UserCollection) UserFetchBsonPage(
-	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
 	return crud.UserFetchBsonPage(uc, user, findQuery, ctx)
 }
 
 func (uc *UserCollection) UserFetchPage(
-	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[schemas.UserRead], error) {
 	return crud.UserFetchPage(uc, user, findQuery, ctx)
 }

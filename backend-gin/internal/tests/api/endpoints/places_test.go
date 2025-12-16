@@ -7,7 +7,6 @@ import (
 	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
-	types__ "backend/internal/types_"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -24,8 +23,8 @@ import (
 
 func getPlaceExamples() ([]schemas.PlaceRead, error) {
 	pc := collections.GetPlaceCollection()
-	findQuery := types__.FindQuery{
-		Filters: types__.FindQueryFilters{
+	findQuery := types_.FindQuery{
+		Filters: types_.FindQueryFilters{
 			"title": {{Op: "eq", Val: "Stamford Bridge"}},
 		},
 	}

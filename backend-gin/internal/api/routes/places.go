@@ -2,10 +2,10 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
-	"backend/internal/types_"
 	"fmt"
 	"net/http"
 

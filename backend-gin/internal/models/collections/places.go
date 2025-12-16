@@ -164,16 +164,16 @@ func (pc *PlaceCollection) GetFiltersMapping() map[string]string {
 }
 
 func (pc *PlaceCollection) AddOwnershipFilters(
-	user *schemas.UserRead, findQuery *types__.FindQuery,
+	user *schemas.UserRead, findQuery *types_.FindQuery,
 ) {
 	if findQuery.Filters == nil {
-		findQuery.Filters = make(types__.FindQueryFilters)
+		findQuery.Filters = make(types_.FindQueryFilters)
 	}
 
-	ownershipFilter := types__.Filter{Op: types__.FilterEq, Val: user.Id}
+	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
 	userId, err := primitive.ObjectIDFromHex(user.Id)
 	if err == nil {
-		ownershipFilter = types__.Filter{Op: types__.FilterEq, Val: userId}
+		ownershipFilter = types_.Filter{Op: types_.FilterEq, Val: userId}
 	}
 
 	findQuery.Filters["creatorId"] = append(
@@ -188,25 +188,25 @@ func (pc *PlaceCollection) FetchDocuments(
 }
 
 func (pc *PlaceCollection) FetchBsonPage(
-	findQuery *types__.FindQuery, ctx context.Context,
+	findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
 	return crud.FetchBsonPage(pc, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) FetchPage(
-	findQuery *types__.FindQuery, ctx context.Context,
+	findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[schemas.PlaceRead], error) {
 	return crud.FetchPage(pc, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) UserFetchBsonPage(
-	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
 	return crud.UserFetchBsonPage(pc, user, findQuery, ctx)
 }
 
 func (pc *PlaceCollection) UserFetchPage(
-	user *schemas.UserRead, findQuery *types__.FindQuery, ctx context.Context,
+	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
 ) (types_.PaginatedData[schemas.PlaceRead], error) {
 	return crud.UserFetchPage(pc, user, findQuery, ctx)
 }
