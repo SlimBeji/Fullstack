@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 
 from api.middlewares import get_current_admin, get_current_user
+from background.tasks import send_newsletter
 from models.schemas import UserReadSchema
-from worker.tasks import send_newsletter
 
 hello_world_router = APIRouter(prefix="/api/hello-world", tags=["Hello World"])
 

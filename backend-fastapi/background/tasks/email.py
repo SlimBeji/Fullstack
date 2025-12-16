@@ -1,9 +1,9 @@
 import time
 from typing import TypedDict
 
+from background.setup import Queues, Tasks
+from background.tasks.broker import dramatiq_task
 from config import settings
-from worker.setup import Queues, Tasks
-from worker.tasks.broker import dramatiq_task
 
 
 class NewsletterData(TypedDict):

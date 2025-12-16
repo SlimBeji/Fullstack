@@ -1,6 +1,6 @@
 from apscheduler.schedulers import SchedulerNotRunningError
 
-from worker.crons.scheduler import scheduler
+from background.crons.scheduler import scheduler
 
 
 def close_crons() -> None:

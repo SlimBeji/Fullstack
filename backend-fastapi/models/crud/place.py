@@ -3,6 +3,7 @@ from typing import cast
 
 from beanie import PydanticObjectId
 
+from background.tasks import place_embeddding
 from lib.fastapi import ApiError
 from lib.types_ import Filter
 from models.collections.place import Place
@@ -23,7 +24,6 @@ from models.schemas import (
     UserReadSchema,
 )
 from services.instances import cloud_storage
-from worker.tasks import place_embeddding
 
 
 class CrudPlace(

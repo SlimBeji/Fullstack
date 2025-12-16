@@ -1,7 +1,7 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from worker.crons.base import ScheduledTask
-from worker.crons.emails import email_crons
+from background.crons.base import ScheduledTask
+from background.crons.emails import email_crons
 
 
 def register_crons(

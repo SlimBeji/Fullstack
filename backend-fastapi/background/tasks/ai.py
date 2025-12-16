@@ -4,10 +4,10 @@ from typing import TypedDict
 from beanie import PydanticObjectId
 from bson import ObjectId
 
+from background.setup import Queues, Tasks
+from background.tasks.broker import dramatiq_task
 from config import settings
 from services.instances import hf_client
-from worker.setup import Queues, Tasks
-from worker.tasks.broker import dramatiq_task
 
 
 class PlaceEmbbeddingData(TypedDict):
