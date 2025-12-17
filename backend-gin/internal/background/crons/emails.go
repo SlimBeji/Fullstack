@@ -1,14 +1,14 @@
 package crons
 
 import (
-	"backend/internal/background/tasks/publisher"
+	"backend/internal/background/publishers"
 	"log"
 
 	"github.com/go-co-op/gocron/v2"
 )
 
 func sendNewsletter(name string, email string) {
-	_, err := publisher.SendNewsletter(name, email)
+	_, err := publishers.SendNewsletter(name, email)
 	if err != nil {
 		log.Printf("Following error occured while triggering the SendNewsletter task: %s/n", err.Error())
 	}

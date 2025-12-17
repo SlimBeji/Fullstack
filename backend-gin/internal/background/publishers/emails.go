@@ -1,4 +1,4 @@
-package publisher
+package publishers
 
 import (
 	"backend/internal/background/tasks/taskspec"

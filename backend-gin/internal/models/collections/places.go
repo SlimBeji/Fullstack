@@ -1,7 +1,7 @@
 package collections
 
 import (
-	"backend/internal/background/tasks/publisher"
+	"backend/internal/background/publishers"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
@@ -289,7 +289,7 @@ func (pc *PlaceCollection) PostCreate(
 	}
 
 	// Run embedding
-	_, err = publisher.PlaceEmbedding(placeId.Hex())
+	_, err = publishers.PlaceEmbedding(placeId.Hex())
 	if err != nil {
 		return errors.New("could not run embedding for newly created place")
 	}
@@ -404,7 +404,7 @@ func (pc *PlaceCollection) PostUpdate(
 	}
 
 	if pre.Description != post.Description || pre.Title != post.Title {
-		_, err := publisher.PlaceEmbedding(post.ID)
+		_, err := publishers.PlaceEmbedding(post.ID)
 		return err
 	}
 	return nil

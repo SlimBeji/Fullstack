@@ -2,8 +2,8 @@ package setup
 
 import (
 	"backend/internal/background/crons"
+	"backend/internal/background/publishers"
 	"backend/internal/background/tasks/handler"
-	"backend/internal/background/tasks/publisher"
 	"backend/internal/lib/clients"
 	"backend/internal/models/collections"
 	"backend/internal/models/examples"
@@ -16,7 +16,7 @@ type AppSetup struct {
 	Mongo         *clients.MongoClient
 	Redis         *clients.RedisClient
 	Storage       *clients.CloudStorage
-	TaskPublisher *publisher.TaskPublisher
+	TaskPublisher *publishers.TaskPublisher
 	TaskHandler   *handler.TaskHandler
 	TaskScheduler *crons.TaskScheduler
 }
@@ -47,7 +47,7 @@ func New() *AppSetup {
 		Mongo:         instances.GetMongo(),
 		Redis:         instances.GetRedisClient(),
 		Storage:       instances.GetStorage(),
-		TaskPublisher: publisher.GetPublisher(),
+		TaskPublisher: publishers.GetPublisher(),
 		TaskHandler:   handler.GetHandler(),
 		TaskScheduler: crons.GetScheduler(),
 	}
