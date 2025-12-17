@@ -16,7 +16,8 @@ type HuggingFaceClient struct {
 
 func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
 	requestBody := map[string]any{"inputs": []string{text}}
-	resp, err := utils.PostRequest(h.baseURL, requestBody, h.token)
+	timeout := config.Env.DefaultTimeout
+	resp, err := utils.PostRequest(h.baseURL, timeout, requestBody, h.token)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}

@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"backend/internal/config"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -9,7 +8,9 @@ import (
 	"time"
 )
 
-func PostRequest(url string, form map[string]any, auth ...string) (*http.Response, error) {
+func PostRequest(
+	url string, timeout int, form map[string]any, auth ...string,
+) (*http.Response, error) {
 	jsonData, err := json.Marshal(form)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request body: %w", err)
@@ -23,6 +24,6 @@ func PostRequest(url string, form map[string]any, auth ...string) (*http.Respons
 		req.Header.Set("Authorization", "Bearer "+auth[0])
 	}
 
-	client := &http.Client{Timeout: time.Duration(config.Env.DefaultTimeout) * time.Second}
+	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	return client.Do(req)
 }
