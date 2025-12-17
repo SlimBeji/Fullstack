@@ -1,23 +1,32 @@
 package clients
 
 import (
-	"backend/internal/config"
 	"backend/internal/lib/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
+type HuggingFaceClientConfig struct {
+	Token      string
+	EmbedModel string
+	Timeout    int
+}
+
 type HuggingFaceClient struct {
-	token      string
-	embedModel string
-	baseURL    string
+	config HuggingFaceClientConfig
+}
+
+func (h *HuggingFaceClient) BaseUrl() string {
+	return fmt.Sprintf("https://router.huggingface.co/hf-inference/models/%s/pipeline/feature-extraction", h.config.EmbedModel)
 }
 
 func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
 	requestBody := map[string]any{"inputs": []string{text}}
-	timeout := config.Env.DefaultTimeout
-	resp, err := utils.PostRequest(h.baseURL, timeout, requestBody, h.token)
+	url := h.BaseUrl()
+	resp, err := utils.PostRequest(
+		url, h.config.Timeout, requestBody, h.config.Token,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
@@ -38,15 +47,9 @@ func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
 	return embeddingResponse[0], nil
 }
 
-func NewHuggingFaceClient(embedModel ...string) *HuggingFaceClient {
-	model := "sentence-transformers/all-MiniLM-L6-v2"
-	if len(embedModel) > 0 && embedModel[0] != "" {
-		model = embedModel[0]
+func NewHuggingFaceClient(config HuggingFaceClientConfig) HuggingFaceClient {
+	if config.EmbedModel == "" {
+		config.EmbedModel = "sentence-transformers/all-MiniLM-L6-v2"
 	}
-
-	return &HuggingFaceClient{
-		token:      config.Env.HFAPIToken,
-		embedModel: model,
-		baseURL:    fmt.Sprintf("https://router.huggingface.co/hf-inference/models/%s/pipeline/feature-extraction", model),
-	}
+	return HuggingFaceClient{config: config}
 }

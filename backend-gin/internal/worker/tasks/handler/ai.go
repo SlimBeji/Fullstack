@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"backend/internal/lib/clients"
 	"backend/internal/models/collections"
+	"backend/internal/services/instances"
 	"backend/internal/worker/tasks/taskspec"
 	"context"
 	"encoding/json"
@@ -31,7 +31,7 @@ func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
 
 	}
 	text := fmt.Sprintf("%s - %s", place.Title, place.Description)
-	hf := clients.NewHuggingFaceClient()
+	hf := instances.GetHfClient()
 	result, err := hf.EmbedText(text)
 	if err != nil {
 		newErr := fmt.Errorf(

@@ -26,3 +26,14 @@ func GetStorage() *clients.CloudStorage {
 	storageOnce.Do(func() { gcsStorage = clients.NewCloudStorage(storageConfig) })
 	return gcsStorage
 }
+
+// HuggingFace
+
+var hfConfig = clients.HuggingFaceClientConfig{
+	Token:   config.Env.HFAPIToken,
+	Timeout: config.Env.DefaultTimeout,
+}
+
+func GetHfClient() clients.HuggingFaceClient {
+	return clients.NewHuggingFaceClient(hfConfig)
+}
