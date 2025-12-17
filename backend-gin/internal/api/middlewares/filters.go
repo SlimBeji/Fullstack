@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"backend/internal/config"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/validator_"
 	"net/http"
@@ -74,7 +75,7 @@ func Filter[T any](c *gin.Context) {
 	}
 
 	form := types_.FindQuery{}
-	errsMap := validator_.BuildFindQuery(body, &form)
+	errsMap := validator_.BuildFindQuery(body, &form, config.Env.MaxItemsPerPage)
 	if len(errsMap) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error":   "Invalid request",

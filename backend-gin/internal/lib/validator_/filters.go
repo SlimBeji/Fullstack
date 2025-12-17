@@ -1,7 +1,6 @@
 package validator_
 
 import (
-	"backend/internal/config"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"fmt"
@@ -12,7 +11,7 @@ import (
 )
 
 func BuildFindQuery(
-	filters any, findQuery *types_.FindQuery,
+	filters any, findQuery *types_.FindQuery, maxItems int,
 ) map[string][]string {
 	result := make(map[string][]string)
 	values := reflect.ValueOf(filters)
@@ -43,15 +42,15 @@ func BuildFindQuery(
 			findQuery.Page = val
 		case "Size":
 			if value.Kind() != reflect.Int {
-				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
+				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", maxItems)}
 			}
 			val := int(value.Int())
 			if val == 0 {
 				// zero value, probably was not set
-				val = config.Env.MaxItemsPerPage
+				val = maxItems
 			}
-			if val < 0 || val > config.Env.MaxItemsPerPage {
-				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", config.Env.MaxItemsPerPage)}
+			if val < 0 || val > maxItems {
+				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", maxItems)}
 			}
 			findQuery.Size = val
 		case "Sort":
