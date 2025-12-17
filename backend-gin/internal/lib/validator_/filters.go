@@ -88,7 +88,7 @@ func validateLists(v reflect.Value, tag string) ([]string, string) {
 	if !ok {
 		return val, "Fields value must be a list of strings"
 	}
-	msg := utils.ValidateVar(val, tag)
+	msg := ValidateVar(val, tag)
 	return val, msg
 }
 
@@ -208,7 +208,7 @@ func validateStringFilter(
 
 	// Validate the vals here
 	for _, val := range vals {
-		msg := utils.ValidateVar(val, params.validationTag)
+		msg := ValidateVar(val, params.validationTag)
 		if msg != "" {
 			msgs = append(msgs, msg)
 		}
@@ -257,7 +257,7 @@ func validateIntFilter(
 
 	// Validate the vals here
 	for _, val := range vals {
-		msg := utils.ValidateVar(val, params.validationTag)
+		msg := ValidateVar(val, params.validationTag)
 		if msg != "" {
 			msgs = append(msgs, msg)
 		}
@@ -306,7 +306,7 @@ func validateFloat64Filter(
 
 	// Validate the vals here
 	for _, val := range vals {
-		msg := utils.ValidateVar(val, params.validationTag)
+		msg := ValidateVar(val, params.validationTag)
 		if msg != "" {
 			msgs = append(msgs, msg)
 		}
@@ -373,7 +373,7 @@ func validateTimeFilter(
 
 	// Validate the vals here
 	for _, val := range vals {
-		msg := utils.ValidateVar(val, params.validationTag)
+		msg := ValidateVar(val, params.validationTag)
 		if msg != "" {
 			msgs = append(msgs, msg)
 		}

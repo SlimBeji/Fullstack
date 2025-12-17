@@ -2,7 +2,7 @@ package crud
 
 import (
 	"backend/internal/lib/gin_"
-	"backend/internal/lib/utils"
+	"backend/internal/lib/validator_"
 	"backend/internal/models/schemas"
 	"context"
 	"errors"
@@ -56,7 +56,7 @@ func UpdateDocument[Read any, Form any, Put any](
 	var result bson.Raw
 
 	if du.ShouldValidate() {
-		errs := utils.ValidateStruct(form)
+		errs := validator_.ValidateStruct(form)
 		if len(errs) > 0 {
 			return result, gin_.ValidationErrs(
 				fmt.Sprintf("update form for %s not valid", du.Name()), errs,

@@ -1,4 +1,4 @@
-package utils
+package validator_
 
 import (
 	"strings"
@@ -8,6 +8,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
+
+var ErrorTranslator ut.Translator
+var Validate *validator.Validate
 
 func GetBaseValidator() *validator.Validate {
 	validate := validator.New()
@@ -49,9 +52,6 @@ func ValidateVar(val any, tag string) string {
 	}
 	return strings.TrimSpace(translated[0])
 }
-
-var ErrorTranslator ut.Translator
-var Validate *validator.Validate
 
 func init() {
 	// Initialize the Error Translator

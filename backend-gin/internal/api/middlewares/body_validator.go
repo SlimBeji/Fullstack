@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"backend/internal/lib/gin_"
-	"backend/internal/lib/utils"
+	"backend/internal/lib/validator_"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ func extractBody[T any](c *gin.Context) (T, []string) {
 		return form, []string{err.Error()}
 	}
 
-	errs := utils.ValidateStruct(&form)
+	errs := validator_.ValidateStruct(&form)
 	return form, errs
 }
 

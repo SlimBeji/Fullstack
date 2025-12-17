@@ -2,7 +2,7 @@ package crud
 
 import (
 	"backend/internal/lib/gin_"
-	"backend/internal/lib/utils"
+	"backend/internal/lib/validator_"
 	"backend/internal/models/schemas"
 	"context"
 	"errors"
@@ -36,7 +36,7 @@ func InsertExample[Read any, Db any, Form any, Post any](
 	var result mongo.InsertOneResult
 
 	if dc.ShouldValidate() {
-		errs := utils.ValidateStruct(form)
+		errs := validator_.ValidateStruct(form)
 		if len(errs) > 0 {
 			return &result, gin_.ValidationErrs(
 				"wrong input for InsertExample", errs,
@@ -60,7 +60,7 @@ func CreateDocument[Read any, Db any, Form any, Post any](
 	var result bson.Raw
 
 	if dc.ShouldValidate() {
-		errs := utils.ValidateStruct(form)
+		errs := validator_.ValidateStruct(form)
 		if len(errs) > 0 {
 			return result, gin_.ValidationErrs(
 				fmt.Sprintf("create form for %s not valid", dc.Name()), errs,
