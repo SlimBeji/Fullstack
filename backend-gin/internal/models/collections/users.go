@@ -3,7 +3,6 @@ package collections
 import (
 	"backend/internal/config"
 	"backend/internal/lib/clients"
-	"backend/internal/lib/encryption"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
@@ -185,7 +184,7 @@ func (uc *UserCollection) GetTokenPayload(
 		)
 	}
 
-	token, err := encryption.CreateToken(user.Id, user.Email)
+	token, err := schemas.CreateToken(user.Id, user.Email)
 	if err != nil {
 		return zero, fmt.Errorf("could not create token for user %s: %w", email, err)
 	}
@@ -372,7 +371,7 @@ func (uc *UserCollection) UserCreate(
 func (uc *UserCollection) createToken(
 	id string, email string,
 ) (schemas.EncodedToken, error) {
-	token, err := encryption.CreateToken(id, email)
+	token, err := schemas.CreateToken(id, email)
 	if err != nil {
 		var zero schemas.EncodedToken
 		return zero, gin_.ApiError{
