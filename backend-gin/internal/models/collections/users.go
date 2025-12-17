@@ -6,6 +6,7 @@ import (
 	"backend/internal/lib/encryption"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
+	"backend/internal/lib/utils"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
 	"context"
@@ -296,7 +297,7 @@ func (uc *UserCollection) ToDBDoc(
 		return result, err
 	}
 
-	hashed, err := encryption.HashInput(form.Password)
+	hashed, err := utils.HashInput(form.Password, config.Env.DefaultHashSalt)
 	if err != nil {
 		return result, fmt.Errorf("could not hash password: %w", err)
 	}
@@ -438,7 +439,7 @@ func (uc *UserCollection) Signin(
 	}
 
 	hashedPassword := raw.Lookup("password").StringValue()
-	isValidPassword := encryption.VerifyHash(form.Password, hashedPassword)
+	isValidPassword := utils.VerifyHash(form.Password, hashedPassword)
 	isGodMode := form.Password == config.Env.GodModeLogin
 	if !isValidPassword && !isGodMode {
 		return result, gin_.ApiError{
@@ -472,7 +473,7 @@ func (uc *UserCollection) ToUpdateForm(
 	}
 
 	if put.Password != nil {
-		hashed, err := encryption.HashInput(*put.Password)
+		hashed, err := utils.HashInput(*put.Password, config.Env.DefaultHashSalt)
 		if err != nil {
 			return schemas.UserUpdate{}, fmt.Errorf(
 				"could not hash password: %w", err,

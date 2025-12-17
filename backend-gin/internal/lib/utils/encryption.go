@@ -1,7 +1,6 @@
-package encryption
+package utils
 
 import (
-	"backend/internal/config"
 	"errors"
 	"strings"
 	"time"
@@ -10,12 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const DEFAULT_HASH_SALT = 12
-
-func HashInput(input string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword(
-		[]byte(input), DEFAULT_HASH_SALT,
-	)
+func HashInput(input string, salt int) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(input), salt)
 	return string(bytes), err
 }
 
@@ -36,21 +31,17 @@ func IsHashed(input string) bool {
 }
 
 func EncodePayload(
-	payload map[string]any, expiration ...time.Duration,
+	payload map[string]any, secret string, expiration time.Duration,
 ) (string, error) {
-	tokenExp := time.Duration(config.Env.JWTExpiration) * time.Second
-	if len(expiration) > 0 {
-		tokenExp = expiration[0]
-	}
 	claims := jwt.MapClaims(payload)
-	claims["exp"] = time.Now().Add(tokenExp).Unix()
+	claims["exp"] = time.Now().Add(expiration).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.Env.SecretKey))
+	return token.SignedString([]byte(secret))
 }
 
-func DecodePayload(encoded string) (jwt.MapClaims, error) {
+func DecodePayload(encoded string, secret string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(encoded, func(token *jwt.Token) (any, error) {
-		return []byte(config.Env.SecretKey), nil
+		return []byte(secret), nil
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "token is expired") {

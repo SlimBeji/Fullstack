@@ -2,14 +2,16 @@ package encryption
 
 import (
 	"backend/internal/config"
+	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
 	"fmt"
+	"time"
 )
 
 func DecodeEncodedToken(encoded string) (schemas.TokenPayload, error) {
 	var zero schemas.TokenPayload
 
-	decoded, err := DecodePayload(encoded)
+	decoded, err := utils.DecodePayload(encoded, config.Env.SecretKey)
 	if err != nil {
 		return zero, fmt.Errorf(
 			"token %s not valid, could not decode it: %w", encoded, err,
@@ -45,7 +47,9 @@ func DecodeEncodedToken(encoded string) (schemas.TokenPayload, error) {
 
 func CreateToken(id string, email string) (schemas.EncodedToken, error) {
 	payload := map[string]any{"userId": id, "email": email}
-	acccessToken, err := EncodePayload(payload)
+	acccessToken, err := utils.EncodePayload(
+		payload, config.Env.SecretKey, time.Duration(config.Env.JWTExpiration)*time.Second,
+	)
 	if err != nil {
 		var zero schemas.EncodedToken
 		return zero, fmt.Errorf("could not encode payload for user %s", id)

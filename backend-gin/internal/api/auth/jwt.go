@@ -1,8 +1,9 @@
 package auth
 
 import (
-	"backend/internal/lib/encryption"
+	"backend/internal/config"
 	"backend/internal/lib/gin_"
+	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"context"
@@ -16,7 +17,7 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 		Message: "Token Not Valid",
 	}
 
-	payload, err := encryption.DecodePayload(token)
+	payload, err := utils.DecodePayload(token, config.Env.SecretKey)
 	if err != nil {
 		if strings.Contains(err.Error(), "token expired") {
 			return schemas.UserRead{}, gin_.ApiError{
