@@ -3,7 +3,7 @@ package scripts
 import (
 	"backend/internal/lib/clients"
 	"backend/internal/lib/setup"
-	"backend/internal/lib/utils"
+	"backend/internal/static"
 	"fmt"
 )
 
@@ -11,7 +11,7 @@ func TestStorage() {
 	setup := setup.New()
 	defer setup.CloseSerives()
 
-	path := utils.GetImagePath("avatar1.jpg")
+	path := static.GetImagePath("avatar1.jpg")
 	storage := clients.GetStorage()
 	defer storage.Close()
 	destination, err := storage.UploadFile(path)

@@ -3,7 +3,7 @@ package endpoints
 import (
 	"backend/internal/api/routes"
 	"backend/internal/lib/setup"
-	"backend/internal/lib/utils"
+	"backend/internal/static"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -28,7 +28,7 @@ func TestSignup(t *testing.T) {
 	writer.WriteField("password", "very_secret")
 
 	// attaching file
-	file, err := os.Open(utils.GetImagePath("avatar1.jpg"))
+	file, err := os.Open(static.GetImagePath("avatar1.jpg"))
 	if err != nil {
 		t.Fatalf("failed opening image: %v", err)
 	}

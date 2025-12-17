@@ -4,9 +4,9 @@ import (
 	"backend/internal/api/routes"
 	"backend/internal/lib/setup"
 	"backend/internal/lib/types_"
-	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
+	"backend/internal/static"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -172,7 +172,7 @@ func TestCreatePlace(t *testing.T) {
 	writer.WriteField("lng", "2.0")
 
 	// attaching file
-	file, err := os.Open(utils.GetImagePath("place1.jpg"))
+	file, err := os.Open(static.GetImagePath("place1.jpg"))
 	if err != nil {
 		t.Fatalf("failed opening image: %v", err)
 	}
@@ -253,7 +253,7 @@ func TestCreatePlaceForOthers(t *testing.T) {
 	writer.WriteField("lng", "2.0")
 
 	// attaching file
-	file, err := os.Open(utils.GetImagePath("place1.jpg"))
+	file, err := os.Open(static.GetImagePath("place1.jpg"))
 	if err != nil {
 		t.Fatalf("failed opening image: %v", err)
 	}

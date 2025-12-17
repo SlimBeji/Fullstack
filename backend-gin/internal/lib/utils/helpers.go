@@ -86,7 +86,3 @@ func ParseTime(str string) (time.Time, error) {
 
 	return time.Time{}, fmt.Errorf("invalid time format: %s", str)
 }
-
-func GetImagePath(p string) string {
-	return fmt.Sprintf("/app/internal/static/images/%s", p)
-}

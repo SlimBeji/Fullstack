@@ -4,8 +4,8 @@ import (
 	"backend/internal/api/routes"
 	"backend/internal/lib/setup"
 	"backend/internal/lib/types_"
-	"backend/internal/lib/utils"
 	"backend/internal/models/schemas"
+	"backend/internal/static"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -145,7 +145,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	writer.WriteField("isAdmin", "true")
 
 	// attaching file
-	file, err := os.Open(utils.GetImagePath("avatar1.jpg"))
+	file, err := os.Open(static.GetImagePath("avatar1.jpg"))
 	if err != nil {
 		t.Fatalf("failed opening image: %v", err)
 	}
@@ -208,7 +208,7 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 	writer.WriteField("isAdmin", "true")
 
 	// attaching file
-	file, err := os.Open(utils.GetImagePath("avatar1.jpg"))
+	file, err := os.Open(static.GetImagePath("avatar1.jpg"))
 	if err != nil {
 		t.Fatalf("failed opening image: %v", err)
 	}
