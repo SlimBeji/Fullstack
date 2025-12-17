@@ -12,6 +12,7 @@ type Settings struct {
 	APIURL            string `envconfig:"API_URL" default:"http://localhost:5002/api"`
 	AppURL            string `envconfig:"APP_URL" required:"true"`
 	SecretKey         string `envconfig:"SECRET_KEY" required:"true"`
+	DefaultHashSalt   int    `envconfig:"DEFAULT_HASH_SALT" default:"12"`
 	FileUploadMaxSize int    `envconfig:"FILEUPLOAD_MAX_SIZE" default:"100"`
 	JSONMaxSize       int    `envconfig:"JSON_MAX_SIZE" default:"10240"`
 	MaxItemsPerPage   int    `envconfig:"MAX_ITEMS_PER_PAGE" default:"100"`
