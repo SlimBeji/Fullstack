@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/background/tasks/taskspec"
+	"backend/internal/background"
 	"backend/internal/config"
 	"fmt"
 	"strings"
@@ -29,7 +29,7 @@ func NewHandler(registery TasksRegisteryType) *TaskHandler {
 
 	// server
 	queues := make(map[string]int)
-	for _, name := range taskspec.AllQueues {
+	for _, name := range background.AllQueues {
 		queues[string(name)] = 1
 	}
 	config := asynq.Config{Queues: queues, Concurrency: 10}

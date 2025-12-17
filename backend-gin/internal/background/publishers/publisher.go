@@ -2,7 +2,6 @@ package publishers
 
 import (
 	"backend/internal/background"
-	"backend/internal/background/tasks/taskspec"
 	"backend/internal/config"
 	"strings"
 	"sync"
@@ -27,7 +26,7 @@ func (tp *TaskPublisher) Close() {
 }
 
 func (tm *TaskPublisher) NewTask(
-	name taskspec.TaskType, payload []byte, opts ...asynq.Option,
+	name background.TaskType, payload []byte, opts ...asynq.Option,
 ) (*asynq.TaskInfo, error) {
 	task := asynq.NewTask(string(name), payload)
 	opts = append(opts, asynq.Retention(background.MAX_AGE))

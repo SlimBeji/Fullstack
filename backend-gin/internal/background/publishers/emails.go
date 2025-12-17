@@ -1,7 +1,7 @@
 package publishers
 
 import (
-	"backend/internal/background/tasks/taskspec"
+	"backend/internal/background"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -16,13 +16,13 @@ func SendNewsletter(
 		return nil, nil
 	}
 
-	data := taskspec.NewsletterData{Name: name, Email: email}
+	data := background.NewsletterData{Name: name, Email: email}
 	payload, err := json.Marshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal newsletter data: %w", err)
 	}
 
-	opts = append(opts, asynq.Queue(string(taskspec.QueueeEmails)))
+	opts = append(opts, asynq.Queue(string(background.QueueeEmails)))
 	tp := GetPublisher()
-	return tp.NewTask(taskspec.TaskNewsletter, payload, opts...)
+	return tp.NewTask(background.TaskNewsletter, payload, opts...)
 }

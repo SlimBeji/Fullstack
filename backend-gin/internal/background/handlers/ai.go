@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/background/tasks/taskspec"
+	"backend/internal/background"
 	"backend/internal/models/collections"
 	"backend/internal/services/instances"
 	"context"
@@ -15,7 +15,7 @@ import (
 )
 
 func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
-	var data taskspec.PlaceEmbeddingData
+	var data background.PlaceEmbeddingData
 	if err := json.Unmarshal(t.Payload(), &data); err != nil {
 		newErr := fmt.Errorf("could not unmarshal data for place embedding task: %w", err)
 		log.Println(newErr.Error())

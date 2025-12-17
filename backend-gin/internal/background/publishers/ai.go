@@ -1,7 +1,7 @@
 package publishers
 
 import (
-	"backend/internal/background/tasks/taskspec"
+	"backend/internal/background"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -16,13 +16,13 @@ func PlaceEmbedding(
 		return nil, nil
 	}
 
-	data := taskspec.PlaceEmbeddingData{PlaceId: placeId}
+	data := background.PlaceEmbeddingData{PlaceId: placeId}
 	payloadData, err := json.Marshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal place embedding data: %w", err)
 	}
 
-	opts = append(opts, asynq.Queue(string(taskspec.QueuesAI)))
+	opts = append(opts, asynq.Queue(string(background.QueuesAI)))
 	tp := GetPublisher()
-	return tp.NewTask(taskspec.TaskPlaceEmbedding, payloadData, opts...)
+	return tp.NewTask(background.TaskPlaceEmbedding, payloadData, opts...)
 }
