@@ -1,4 +1,4 @@
-package scripts
+package bin
 
 import (
 	"backend/internal/lib/clients"
