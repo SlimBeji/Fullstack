@@ -1,6 +1,6 @@
 package main
 
-import "backend/internal/models/schemas/raw/astparser"
+import "backend/internal/models/raw/astparser"
 
 func main() {
 	astparser.ParseSchemaFile()
