@@ -1,7 +1,6 @@
 package clients
 
 import (
-	"backend/internal/config"
 	"backend/internal/lib/types_"
 	"context"
 	"errors"
@@ -10,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -20,20 +18,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type CloudStorageConfig struct {
+	ProjectId          string
+	BucketName         string
+	AccessExpiration   int
+	CredentialsFile    string
+	EmulatorPublicUrl  string
+	EmulatorPrivateUrl string
+}
+
 type CloudStorage struct {
-	projectID          string
-	bucketName         string
-	urlExpiration      time.Duration
-	emulatorPublicURL  string
-	emulatorPrivateURL string
-	credentialsFile    string
-	storageClient      *storage.Client
-	bucket             *storage.BucketHandle
-	ctx                context.Context
+	Config        CloudStorageConfig
+	storageClient *storage.Client
+	bucket        *storage.BucketHandle
+	ctx           context.Context
 }
 
 func (cs *CloudStorage) IsEmulator() bool {
-	return cs.emulatorPrivateURL != "" && cs.emulatorPublicURL != ""
+	return cs.Config.EmulatorPrivateUrl != "" && cs.Config.EmulatorPublicUrl != ""
 }
 
 func (cs *CloudStorage) getStorageClient() *storage.Client {
@@ -41,14 +43,14 @@ func (cs *CloudStorage) getStorageClient() *storage.Client {
 
 	if cs.IsEmulator() {
 		// For emulator, use the custom endpoint without authentication
-		opts = append(opts, option.WithEndpoint(cs.emulatorPrivateURL))
+		opts = append(opts, option.WithEndpoint(cs.Config.EmulatorPrivateUrl))
 		opts = append(opts, option.WithoutAuthentication())
-	} else if cs.credentialsFile != "" {
+	} else if cs.Config.CredentialsFile != "" {
 		// Check if credentials file exists
-		if _, err := os.Stat(cs.credentialsFile); err != nil {
-			panic(fmt.Sprintf("Failed to create a GCS client from credential file %s", cs.credentialsFile))
+		if _, err := os.Stat(cs.Config.CredentialsFile); err != nil {
+			panic(fmt.Sprintf("Failed to create a GCS client from credential file %s", cs.Config.CredentialsFile))
 		}
-		opts = append(opts, option.WithCredentialsFile(cs.credentialsFile))
+		opts = append(opts, option.WithCredentialsFile(cs.Config.CredentialsFile))
 	}
 
 	client, err := storage.NewClient(cs.ctx, opts...)
@@ -66,29 +68,34 @@ func (cs *CloudStorage) initEmulator() {
 	}
 
 	// Create only if it truly doesn't exist
-	if err = cs.bucket.Create(cs.ctx, cs.projectID, &storage.BucketAttrs{}); err != nil {
+	if err = cs.bucket.Create(
+		cs.ctx, cs.Config.ProjectId,
+		&storage.BucketAttrs{Name: cs.Config.BucketName},
+	); err != nil {
 		if status.Code(err) != codes.AlreadyExists {
 			panic(fmt.Sprintf("failed to create bucket: %s", err))
 		}
 	}
 
-	fmt.Printf("Created bucket %s in emulator\n", cs.bucketName)
+	fmt.Printf("Created bucket %s in emulator\n", cs.Config.BucketName)
 }
 
 func (cs *CloudStorage) getEmulatorFileUrl(filename string) string {
 	encodedFilename := url.PathEscape(filename)
 	return fmt.Sprintf(
 		"%s/download/storage/v1/b/%s/o/%s?alt=media",
-		cs.emulatorPublicURL, cs.bucketName, encodedFilename,
+		cs.Config.EmulatorPublicUrl, cs.Config.BucketName, encodedFilename,
 	)
 }
 
-func (cs *CloudStorage) GetSignedUrl(filename string, expiration ...time.Duration) (string, error) {
+func (cs *CloudStorage) GetSignedUrl(
+	filename string, expiration ...time.Duration,
+) (string, error) {
 	if cs.IsEmulator() {
 		return cs.getEmulatorFileUrl(filename), nil
 	}
 
-	expireDuration := cs.urlExpiration
+	expireDuration := time.Duration(cs.Config.AccessExpiration) * time.Second
 	if len(expiration) > 0 {
 		expireDuration = expiration[0]
 	}
@@ -173,22 +180,16 @@ func (cs *CloudStorage) Close() error {
 	return nil
 }
 
-func newCloudStorage() *CloudStorage {
+func NewCloudStorage(config CloudStorageConfig) *CloudStorage {
 	ctx := context.Background()
 
-	cs := &CloudStorage{
-		projectID:          config.Env.GCPProjectID,
-		bucketName:         config.Env.GCSBucketName,
-		urlExpiration:      time.Duration(config.Env.GCSBlobExpiration) * time.Second,
-		emulatorPublicURL:  config.Env.GCSEmulatorPub,
-		emulatorPrivateURL: config.Env.GCSEmulatorPriv + "/storage/v1/",
-		credentialsFile:    config.Env.GoogleCredentials,
-		ctx:                ctx,
-	}
+	config.EmulatorPrivateUrl = config.EmulatorPrivateUrl + "/storage/v1/"
+
+	cs := &CloudStorage{Config: config, ctx: ctx}
 
 	// Create storage client
 	cs.storageClient = cs.getStorageClient()
-	cs.bucket = cs.storageClient.Bucket(cs.bucketName)
+	cs.bucket = cs.storageClient.Bucket(cs.Config.BucketName)
 
 	// Initialize emulator if needed
 	if cs.IsEmulator() {
@@ -196,16 +197,4 @@ func newCloudStorage() *CloudStorage {
 	}
 
 	return cs
-}
-
-// Singleteon pattern
-
-var (
-	storageOnce sync.Once
-	gcsStorage  *CloudStorage
-)
-
-func GetStorage() *CloudStorage {
-	storageOnce.Do(func() { gcsStorage = newCloudStorage() })
-	return gcsStorage
 }

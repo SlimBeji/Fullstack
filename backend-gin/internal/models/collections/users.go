@@ -8,6 +8,7 @@ import (
 	"backend/internal/lib/utils"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
+	"backend/internal/services/instances"
 	"context"
 	"errors"
 	"fmt"
@@ -72,7 +73,7 @@ func (uc *UserCollection) PostProcess(
 		return result, nil
 	}
 
-	storage := clients.GetStorage()
+	storage := instances.GetStorage()
 	signedUrl, err := storage.GetSignedUrl(result.ImageUrl)
 	if err != nil {
 		return result, err
@@ -100,7 +101,7 @@ func (uc *UserCollection) PostProcessBson(
 		return result, nil
 	}
 
-	storage := clients.GetStorage()
+	storage := instances.GetStorage()
 	signedUrl, err := storage.GetSignedUrl(imageUrl.(string))
 	if err != nil {
 		return result, err
@@ -278,7 +279,7 @@ func (uc *UserCollection) ToCreateForm(
 	if post.Image != nil {
 		var f types_.FileToUpload
 		f.FromMultipartHeader(post.Image)
-		storage := clients.GetStorage()
+		storage := instances.GetStorage()
 		form.ImageUrl, err = storage.UploadFile(&f)
 		if err != nil {
 			return form, fmt.Errorf("could not upload image: %w", err)
@@ -554,7 +555,7 @@ func (uc *UserCollection) PostDelete(
 	if !imageUrlVal.IsZero() {
 		// Not handling errors, file might still exists
 		imageUrl, _ := imageUrlVal.StringValueOK()
-		storage := clients.GetStorage()
+		storage := instances.GetStorage()
 		storage.DeleteFile(imageUrl)
 	}
 

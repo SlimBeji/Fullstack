@@ -1,8 +1,8 @@
 package bin
 
 import (
-	"backend/internal/lib/clients"
 	"backend/internal/lib/setup"
+	"backend/internal/services/instances"
 	"backend/internal/static"
 	"fmt"
 )
@@ -12,7 +12,7 @@ func TestStorage() {
 	defer setup.CloseSerives()
 
 	path := static.GetImagePath("avatar1.jpg")
-	storage := clients.GetStorage()
+	storage := instances.GetStorage()
 	defer storage.Close()
 	destination, err := storage.UploadFile(path)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"backend/internal/lib/clients"
 	"backend/internal/models/collections"
 	"backend/internal/models/examples"
+	"backend/internal/services/instances"
 	"backend/internal/worker/crons"
 	"backend/internal/worker/tasks/handler"
 	"backend/internal/worker/tasks/publisher"
@@ -45,7 +46,7 @@ func New() *AppSetup {
 	return &AppSetup{
 		Mongo:         clients.GetMongo(),
 		Redis:         clients.GetRedisClient(),
-		Storage:       clients.GetStorage(),
+		Storage:       instances.GetStorage(),
 		TaskPublisher: publisher.GetPublisher(),
 		TaskHandler:   handler.GetHandler(),
 		TaskScheduler: crons.GetScheduler(),

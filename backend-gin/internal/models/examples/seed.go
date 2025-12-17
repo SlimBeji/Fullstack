@@ -5,6 +5,7 @@ import (
 	"backend/internal/models/collections"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
+	"backend/internal/services/instances"
 	"context"
 	"errors"
 	"fmt"
@@ -42,7 +43,7 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 	userRefs := make(map[int]primitive.ObjectID)
 	refs[collections.Users] = userRefs
 	uc := collections.GetUserCollection()
-	storage := clients.GetStorage()
+	storage := instances.GetStorage()
 	ctx := context.Background()
 
 	handleError := func(err error, isVerbose bool) error {
@@ -90,7 +91,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 	refs[collections.Places] = placeRefs
 	uc := collections.GetUserCollection()
 	pc := collections.GetPlaceCollection()
-	storage := clients.GetStorage()
+	storage := instances.GetStorage()
 	ctx := context.Background()
 
 	handleError := func(err error, isVerbose bool) error {
