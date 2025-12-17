@@ -1,8 +1,8 @@
 package bin
 
 import (
-	"backend/internal/lib/setup"
 	"backend/internal/services/instances"
+	"backend/internal/services/setup"
 	"backend/internal/static"
 	"fmt"
 )

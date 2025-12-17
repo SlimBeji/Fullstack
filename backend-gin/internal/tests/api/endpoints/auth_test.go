@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/lib/setup"
+	"backend/internal/services/setup"
 	"backend/internal/static"
 	"bytes"
 	"encoding/json"

@@ -2,8 +2,8 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
+	"backend/internal/services/setup"
 	"context"
 	"encoding/json"
 	"net/http"

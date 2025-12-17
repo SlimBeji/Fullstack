@@ -3,8 +3,8 @@ package main
 import (
 	"backend/internal/api/routes"
 	"backend/internal/config"
-	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
+	"backend/internal/services/setup"
 	"fmt"
 
 	_ "backend/internal/api/docs"

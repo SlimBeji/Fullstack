@@ -1,9 +1,9 @@
 package bin
 
 import (
-	"backend/internal/lib/setup"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
+	"backend/internal/services/setup"
 	"context"
 	"fmt"
 
