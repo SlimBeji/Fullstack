@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"backend/internal/background/tasks/taskspec"

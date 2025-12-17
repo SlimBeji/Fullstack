@@ -1,9 +1,8 @@
-package handler
+package handlers
 
 import (
 	"backend/internal/background/tasks/taskspec"
 	"backend/internal/config"
-	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -11,20 +10,12 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-type taskHandler = func(ctx context.Context, t *asynq.Task) error
-type tasksRegisteryType = map[taskspec.TaskType]taskHandler
-
-var TasksRegistery = tasksRegisteryType{
-	taskspec.TaskNewsletter:     HandleSendingNewsletter,
-	taskspec.TaskPlaceEmbedding: HandlePlaceEmbedding,
-}
-
 type TaskHandler struct {
 	mux    *asynq.ServeMux
 	server *asynq.Server
 }
 
-func new() *TaskHandler {
+func NewHandler(registery TasksRegisteryType) *TaskHandler {
 	// redis config
 	url := strings.TrimPrefix(config.Env.RedisURL, "redis://")
 	url = strings.SplitN(url, "/", 2)[0]
@@ -32,7 +23,7 @@ func new() *TaskHandler {
 
 	// mux server
 	mux := asynq.NewServeMux()
-	for name, handler := range TasksRegistery {
+	for name, handler := range registery {
 		mux.HandleFunc(string(name), handler)
 	}
 
@@ -68,6 +59,6 @@ var (
 )
 
 func GetHandler() *TaskHandler {
-	once.Do(func() { handler = new() })
+	once.Do(func() { handler = NewHandler(TASKS_REGISTERY) })
 	return handler
 }
