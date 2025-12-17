@@ -1,4 +1,4 @@
-package schemas
+package validator_
 
 import (
 	"backend/internal/config"

@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"backend/internal/lib/types_"
-	"backend/internal/models/schemas"
+	"backend/internal/lib/validator_"
 	"net/http"
 	"strings"
 
@@ -74,7 +74,7 @@ func Filter[T any](c *gin.Context) {
 	}
 
 	form := types_.FindQuery{}
-	errsMap := schemas.BuildFindQuery(body, &form)
+	errsMap := validator_.BuildFindQuery(body, &form)
 	if len(errsMap) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error":   "Invalid request",
