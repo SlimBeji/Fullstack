@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"backend/internal/background/tasks/taskspec"
 	"backend/internal/config"
-	"backend/internal/worker/tasks/taskspec"
 	"context"
 	"fmt"
 	"strings"

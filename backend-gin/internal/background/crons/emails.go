@@ -1,7 +1,7 @@
 package crons
 
 import (
-	"backend/internal/worker/tasks/publisher"
+	"backend/internal/background/tasks/publisher"
 	"log"
 
 	"github.com/go-co-op/gocron/v2"

@@ -1,8 +1,8 @@
 package publisher
 
 import (
+	"backend/internal/background/tasks/taskspec"
 	"backend/internal/config"
-	"backend/internal/worker/tasks/taskspec"
 	"strings"
 	"sync"
 	"time"

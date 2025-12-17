@@ -2,9 +2,9 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/background/tasks/publisher"
 	"backend/internal/lib/gin_"
 	"backend/internal/models/schemas"
-	"backend/internal/worker/tasks/publisher"
 	"fmt"
 	"net/http"
 

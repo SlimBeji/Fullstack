@@ -1,12 +1,12 @@
 package collections
 
 import (
+	"backend/internal/background/tasks/publisher"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
-	"backend/internal/worker/tasks/publisher"
 	"context"
 	"errors"
 	"fmt"

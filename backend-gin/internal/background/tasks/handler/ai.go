@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"backend/internal/background/tasks/taskspec"
 	"backend/internal/models/collections"
 	"backend/internal/services/instances"
-	"backend/internal/worker/tasks/taskspec"
 	"context"
 	"encoding/json"
 	"fmt"

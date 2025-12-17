@@ -1,7 +1,7 @@
 package publisher
 
 import (
-	"backend/internal/worker/tasks/taskspec"
+	"backend/internal/background/tasks/taskspec"
 	"encoding/json"
 	"fmt"
 	"testing"

@@ -1,13 +1,13 @@
 package setup
 
 import (
+	"backend/internal/background/crons"
+	"backend/internal/background/tasks/handler"
+	"backend/internal/background/tasks/publisher"
 	"backend/internal/lib/clients"
 	"backend/internal/models/collections"
 	"backend/internal/models/examples"
 	"backend/internal/services/instances"
-	"backend/internal/worker/crons"
-	"backend/internal/worker/tasks/handler"
-	"backend/internal/worker/tasks/publisher"
 	"context"
 	"fmt"
 )
