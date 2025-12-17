@@ -2,7 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
-	"backend/internal/lib/utils"
+	"backend/internal/lib/gin_"
 	"backend/internal/models/schemas"
 	"backend/internal/worker/tasks/publisher"
 	"fmt"
@@ -23,7 +23,7 @@ type ResponseExample struct {
 func hello(c *gin.Context) {
 	_, err := publisher.SendNewsletter("Slim", "mslimbeji@gmail.com")
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 

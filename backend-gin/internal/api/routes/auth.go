@@ -2,7 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
-	"backend/internal/lib/utils"
+	"backend/internal/lib/gin_"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"context"
@@ -20,12 +20,12 @@ import (
 // @Success      200  {object}  schemas.EncodedToken
 // @Router       /api/auth/signup [post]
 func signup(c *gin.Context) {
-	body, _ := utils.GetBody[schemas.SignupForm](c)
+	body, _ := gin_.GetBody[schemas.SignupForm](c)
 	uc := collections.GetUserCollection()
 	ctx := context.Background()
 	resp, err := uc.Signup(&body, ctx)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, resp)
@@ -39,12 +39,12 @@ func signup(c *gin.Context) {
 // @Success      200  {object}  schemas.EncodedToken
 // @Router       /api/auth/signin [post]
 func signin(c *gin.Context) {
-	body, _ := utils.GetBody[schemas.SigninForm](c)
+	body, _ := gin_.GetBody[schemas.SigninForm](c)
 	uc := collections.GetUserCollection()
 	ctx := context.Background()
 	resp, err := uc.Signin(&body, ctx)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, resp)

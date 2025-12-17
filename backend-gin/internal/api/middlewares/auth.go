@@ -3,7 +3,6 @@ package middlewares
 import (
 	"backend/internal/api/auth"
 	"backend/internal/lib/gin_"
-	"backend/internal/lib/utils"
 	"net/http"
 	"regexp"
 
@@ -18,7 +17,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 				Code:    http.StatusUnauthorized,
 				Message: "Not authenticated",
 			}
-			utils.AbortWithStatusJSON(c, err)
+			gin_.AbortWithStatusJSON(c, err)
 			return
 		}
 
@@ -29,13 +28,13 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 				Code:    http.StatusUnauthorized,
 				Message: "No bearer token found",
 			}
-			utils.AbortWithStatusJSON(c, err)
+			gin_.AbortWithStatusJSON(c, err)
 			return
 		}
 		authtoken := match[1]
 		user, err := auth.GetUserFromToken(authtoken)
 		if err != nil {
-			utils.AbortWithStatusJSON(c, err)
+			gin_.AbortWithStatusJSON(c, err)
 			return
 		}
 
@@ -44,7 +43,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 				Code:    http.StatusUnauthorized,
 				Message: "Not an admin",
 			}
-			utils.AbortWithStatusJSON(c, err)
+			gin_.AbortWithStatusJSON(c, err)
 			return
 		}
 

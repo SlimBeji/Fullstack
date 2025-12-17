@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"backend/internal/lib/gin_"
 	"backend/internal/lib/utils"
 	"net/http"
 
@@ -11,7 +12,7 @@ func extractBody[T any](c *gin.Context) (T, []string) {
 	var form T
 	var err error
 
-	if utils.IsMultipart(c) {
+	if gin_.IsMultipart(c) {
 		err = c.ShouldBind(&form)
 	} else {
 		err = c.ShouldBindJSON(&form)

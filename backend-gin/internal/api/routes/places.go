@@ -2,8 +2,8 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
-	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"fmt"
@@ -21,11 +21,11 @@ import (
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/ [get]
 func getPlaces(c *gin.Context) {
-	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
 	pc := collections.GetPlaceCollection()
 	data, err := pc.FetchBsonPage(&findQuery, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, data)
@@ -40,11 +40,11 @@ func getPlaces(c *gin.Context) {
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/query [post]
 func queryPlaces(c *gin.Context) {
-	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
 	pc := collections.GetPlaceCollection()
 	data, err := pc.FetchBsonPage(&findQuery, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, data)
@@ -60,12 +60,12 @@ func queryPlaces(c *gin.Context) {
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places [post]
 func createPlace(c *gin.Context) {
-	body, _ := utils.GetBody[schemas.PlacePost](c)
+	body, _ := gin_.GetBody[schemas.PlacePost](c)
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
 	pc := collections.GetPlaceCollection()
 	place, err := pc.UserCreate(&currentUser, &body, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, place)
@@ -84,7 +84,7 @@ func getPlace(c *gin.Context) {
 	placeId := c.Param("placeId")
 	place, err := pc.GetById(placeId, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, place)
@@ -103,10 +103,10 @@ func updatePlace(c *gin.Context) {
 	placeId := c.Param("placeId")
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
 	pc := collections.GetPlaceCollection()
-	body, _ := utils.GetBody[schemas.PlacePut](c)
+	body, _ := gin_.GetBody[schemas.PlacePut](c)
 	place, err := pc.UserUpdateById(&currentUser, placeId, &body, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, place)
@@ -130,7 +130,7 @@ func deletePlace(c *gin.Context) {
 	pc := collections.GetPlaceCollection()
 	err := pc.UserDelete(&currentUser, placeId, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	message := fmt.Sprintf("Deleted place %s", placeId)

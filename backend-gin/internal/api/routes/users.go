@@ -2,8 +2,8 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
-	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"fmt"
@@ -21,11 +21,11 @@ import (
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/ [get]
 func getUsers(c *gin.Context) {
-	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
 	uc := collections.GetUserCollection()
 	data, err := uc.FetchBsonPage(&findQuery, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, data)
@@ -40,11 +40,11 @@ func getUsers(c *gin.Context) {
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/query [post]
 func queryUsers(c *gin.Context) {
-	findQuery, _ := utils.GetBody[types_.FindQuery](c)
+	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
 	uc := collections.GetUserCollection()
 	data, err := uc.FetchBsonPage(&findQuery, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, data)
@@ -60,12 +60,12 @@ func queryUsers(c *gin.Context) {
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users [post]
 func createUser(c *gin.Context) {
-	body, _ := utils.GetBody[schemas.UserPost](c)
+	body, _ := gin_.GetBody[schemas.UserPost](c)
 	uc := collections.GetUserCollection()
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
 	newUser, err := uc.UserCreate(&currentUser, &body, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, newUser)
@@ -84,7 +84,7 @@ func getUser(c *gin.Context) {
 	userId := c.Param("userId")
 	user, err := uc.GetById(userId, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, user)
@@ -103,10 +103,10 @@ func updateUser(c *gin.Context) {
 	userId := c.Param("userId")
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
 	uc := collections.GetUserCollection()
-	body, _ := utils.GetBody[schemas.UserPut](c)
+	body, _ := gin_.GetBody[schemas.UserPut](c)
 	user, err := uc.UserUpdateById(&currentUser, userId, &body, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, user)
@@ -130,7 +130,7 @@ func deleteUser(c *gin.Context) {
 	uc := collections.GetUserCollection()
 	err := uc.UserDelete(&currentUser, userId, c)
 	if err != nil {
-		utils.AbortWithStatusJSON(c, err)
+		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
 	message := fmt.Sprintf("Deleted user %s", userId)
