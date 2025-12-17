@@ -228,7 +228,7 @@ func DumpDb(verbose ...bool) error {
 		}
 	}
 
-	rc := clients.GetRedisClient()
+	rc := instances.GetRedisClient()
 	rc.FlushAll()
 
 	if isVerbose {

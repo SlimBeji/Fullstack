@@ -1,8 +1,8 @@
 package bin
 
 import (
-	"backend/internal/lib/clients"
 	"backend/internal/lib/setup"
+	"backend/internal/services/instances"
 	"fmt"
 )
 
@@ -11,7 +11,7 @@ func TestRedis() {
 	setup := setup.New()
 	defer setup.CloseSerives()
 
-	redis := clients.GetRedisClient()
+	redis := instances.GetRedisClient()
 	defer redis.Close()
 	redis.Set("secret_number", 158)
 	result, _ := redis.Get("secret_number")

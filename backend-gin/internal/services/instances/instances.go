@@ -40,6 +40,30 @@ func GetMongoDB(client *mongo.Client) *mongo.Database {
 	return client.Database(dbName)
 }
 
+// Redis
+
+var (
+	cacheOnce   sync.Once
+	redisClient *clients.RedisClient
+)
+
+func GetRedisUrl() string {
+	if testing.Testing() {
+		return config.Env.RedisTestURL
+	}
+	return config.Env.RedisURL
+}
+
+var redisConfig = clients.RedisClientConfig{
+	Url:        GetRedisUrl(),
+	Expiration: config.Env.RedisExpiration,
+}
+
+func GetRedisClient() *clients.RedisClient {
+	cacheOnce.Do(func() { redisClient = clients.NewRedisClient(redisConfig) })
+	return redisClient
+}
+
 // Cloud Storage
 
 var (

@@ -1,18 +1,21 @@
 package clients
 
 import (
-	"backend/internal/config"
 	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
-	"testing"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 )
 
+type RedisClientConfig struct {
+	Url        string
+	Expiration int
+}
+
 type RedisClient struct {
+	config RedisClientConfig
 	client *redis.Client
 	ctx    context.Context
 }
@@ -33,53 +36,31 @@ func (r *RedisClient) Get(key string) (string, error) {
 	return val, err
 }
 
-func (r *RedisClient) Set(key string, val any, expirationSeconds ...int) error {
+func (r *RedisClient) Set(key string, val any) error {
 	data, err := json.Marshal(val)
 	if err != nil {
 		return fmt.Errorf("could not store value in redis: %v", err)
 	}
-	exp := getDuration(expirationSeconds...)
-	return r.client.Set(r.ctx, key, data, exp).Err()
+	return r.client.Set(r.ctx, key, data, r.getDuration()).Err()
 }
 
 func (r *RedisClient) Delete(key string) error {
 	return r.client.Del(r.ctx, key).Err()
 }
 
-func getDuration(expirationSeconds ...int) time.Duration {
-	duration := config.Env.RedisExpiration
-	if len(expirationSeconds) > 0 {
-		duration = expirationSeconds[0]
-	}
-
-	exp := time.Duration(duration) * time.Second
-	return exp
+func (r *RedisClient) getDuration() time.Duration {
+	return time.Duration(r.config.Expiration) * time.Second
 }
 
-func newRedisClient() *RedisClient {
-	url := config.Env.RedisURL
-	if testing.Testing() {
-		url = config.Env.RedisTestURL
-	}
-	opt, err := redis.ParseURL(url)
+func NewRedisClient(config RedisClientConfig) *RedisClient {
+	opt, err := redis.ParseURL(config.Url)
 	if err != nil {
 		panic(fmt.Sprintf("Invalid Redis URL: %v", err))
 	}
 
 	return &RedisClient{
+		config: config,
 		client: redis.NewClient(opt),
 		ctx:    context.Background(),
 	}
-}
-
-// Singleteon pattern
-
-var (
-	cacheOnce   sync.Once
-	redisClient *RedisClient
-)
-
-func GetRedisClient() *RedisClient {
-	cacheOnce.Do(func() { redisClient = newRedisClient() })
-	return redisClient
 }
