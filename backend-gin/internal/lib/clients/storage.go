@@ -28,14 +28,14 @@ type CloudStorageConfig struct {
 }
 
 type CloudStorage struct {
-	Config        CloudStorageConfig
+	config        CloudStorageConfig
 	storageClient *storage.Client
 	bucket        *storage.BucketHandle
 	ctx           context.Context
 }
 
 func (cs *CloudStorage) IsEmulator() bool {
-	return cs.Config.EmulatorPrivateUrl != "" && cs.Config.EmulatorPublicUrl != ""
+	return cs.config.EmulatorPrivateUrl != "" && cs.config.EmulatorPublicUrl != ""
 }
 
 func (cs *CloudStorage) getStorageClient() *storage.Client {
@@ -43,14 +43,14 @@ func (cs *CloudStorage) getStorageClient() *storage.Client {
 
 	if cs.IsEmulator() {
 		// For emulator, use the custom endpoint without authentication
-		opts = append(opts, option.WithEndpoint(cs.Config.EmulatorPrivateUrl))
+		opts = append(opts, option.WithEndpoint(cs.config.EmulatorPrivateUrl))
 		opts = append(opts, option.WithoutAuthentication())
-	} else if cs.Config.CredentialsFile != "" {
+	} else if cs.config.CredentialsFile != "" {
 		// Check if credentials file exists
-		if _, err := os.Stat(cs.Config.CredentialsFile); err != nil {
-			panic(fmt.Sprintf("Failed to create a GCS client from credential file %s", cs.Config.CredentialsFile))
+		if _, err := os.Stat(cs.config.CredentialsFile); err != nil {
+			panic(fmt.Sprintf("Failed to create a GCS client from credential file %s", cs.config.CredentialsFile))
 		}
-		opts = append(opts, option.WithCredentialsFile(cs.Config.CredentialsFile))
+		opts = append(opts, option.WithCredentialsFile(cs.config.CredentialsFile))
 	}
 
 	client, err := storage.NewClient(cs.ctx, opts...)
@@ -69,22 +69,22 @@ func (cs *CloudStorage) initEmulator() {
 
 	// Create only if it truly doesn't exist
 	if err = cs.bucket.Create(
-		cs.ctx, cs.Config.ProjectId,
-		&storage.BucketAttrs{Name: cs.Config.BucketName},
+		cs.ctx, cs.config.ProjectId,
+		&storage.BucketAttrs{Name: cs.config.BucketName},
 	); err != nil {
 		if status.Code(err) != codes.AlreadyExists {
 			panic(fmt.Sprintf("failed to create bucket: %s", err))
 		}
 	}
 
-	fmt.Printf("Created bucket %s in emulator\n", cs.Config.BucketName)
+	fmt.Printf("Created bucket %s in emulator\n", cs.config.BucketName)
 }
 
 func (cs *CloudStorage) getEmulatorFileUrl(filename string) string {
 	encodedFilename := url.PathEscape(filename)
 	return fmt.Sprintf(
 		"%s/download/storage/v1/b/%s/o/%s?alt=media",
-		cs.Config.EmulatorPublicUrl, cs.Config.BucketName, encodedFilename,
+		cs.config.EmulatorPublicUrl, cs.config.BucketName, encodedFilename,
 	)
 }
 
@@ -95,7 +95,7 @@ func (cs *CloudStorage) GetSignedUrl(
 		return cs.getEmulatorFileUrl(filename), nil
 	}
 
-	expireDuration := time.Duration(cs.Config.AccessExpiration) * time.Second
+	expireDuration := time.Duration(cs.config.AccessExpiration) * time.Second
 	if len(expiration) > 0 {
 		expireDuration = expiration[0]
 	}
@@ -185,11 +185,11 @@ func NewCloudStorage(config CloudStorageConfig) *CloudStorage {
 
 	config.EmulatorPrivateUrl = config.EmulatorPrivateUrl + "/storage/v1/"
 
-	cs := &CloudStorage{Config: config, ctx: ctx}
+	cs := &CloudStorage{config: config, ctx: ctx}
 
 	// Create storage client
 	cs.storageClient = cs.getStorageClient()
-	cs.bucket = cs.storageClient.Bucket(cs.Config.BucketName)
+	cs.bucket = cs.storageClient.Bucket(cs.config.BucketName)
 
 	// Initialize emulator if needed
 	if cs.IsEmulator() {
