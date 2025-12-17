@@ -1,11 +1,8 @@
 package clients
 
 import (
-	"backend/internal/config"
 	"context"
 	"fmt"
-	"sync"
-	"testing"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,9 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type MongoClientConfig struct {
+	Uri    string
+	DbName string
+}
+
 type MongoClient struct {
-	Conn *mongo.Client
-	DB   *mongo.Database
+	config MongoClientConfig
+	Conn   *mongo.Client
+	DB     *mongo.Database
 }
 
 func (mc *MongoClient) Close() {
@@ -34,49 +37,21 @@ func (m *MongoClient) DropCollection(name string) error {
 	return m.DB.Collection(name).Drop(context.Background())
 }
 
-func getConnection() (*mongo.Client, error) {
-	uri := config.Env.MongoURL
-
-	// Add connection pool options and timeouts for better reliability
+func createConnection(uri string) (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(uri)
 	clientOptions.SetMaxPoolSize(100)
 	clientOptions.SetMinPoolSize(10)
 	clientOptions.SetMaxConnIdleTime(30 * time.Second)
 	clientOptions.SetServerSelectionTimeout(10 * time.Second)
-
 	return mongo.Connect(context.Background(), clientOptions)
 }
 
-func GetMongoDB(client *mongo.Client) *mongo.Database {
-	dbName := config.Env.MongoDBName
-	if testing.Testing() {
-		dbName = config.Env.MongoTestDBName
-	}
-
-	return client.Database(dbName)
-}
-
-func newMongoClient() *MongoClient {
+func NewMongoClient(config MongoClientConfig) *MongoClient {
 	// Get connection to Database
-	conn, err := getConnection()
+	conn, err := createConnection(config.Uri)
 	if err != nil {
 		panic(fmt.Sprintf("Could not establish mongo connection: %s", err.Error()))
 	}
-
-	// Get database
-	db := GetMongoDB(conn)
-
-	return &MongoClient{Conn: conn, DB: db}
-}
-
-// Singleteon pattern
-
-var (
-	mongoOnce   sync.Once
-	mongoClient *MongoClient
-)
-
-func GetMongo() *MongoClient {
-	mongoOnce.Do(func() { mongoClient = newMongoClient() })
-	return mongoClient
+	db := conn.Database(config.DbName)
+	return &MongoClient{Conn: conn, DB: db, config: config}
 }

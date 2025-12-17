@@ -2,7 +2,6 @@ package collections
 
 import (
 	"backend/internal/config"
-	"backend/internal/lib/clients"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
@@ -53,7 +52,7 @@ func GetUserCollection(validate ...bool) *UserCollection {
 	if len(validate) > 0 {
 		validateStructs = validate[0]
 	}
-	client := clients.GetMongo()
+	client := instances.GetMongo()
 	name := string(Users)
 	collection := client.DB.Collection(name)
 	return &UserCollection{collection, validateStructs}
@@ -571,7 +570,7 @@ func (uc *UserCollection) PostDelete(
 		}
 
 		// Get the place collection
-		db := clients.GetMongoDB(sc.Client())
+		db := instances.GetMongoDB(sc.Client())
 		collection := db.Collection(string(Places))
 		filters := bson.M{"_id": bson.M{"$in": result}}
 		if _, err := collection.DeleteMany(sc, filters); err != nil {

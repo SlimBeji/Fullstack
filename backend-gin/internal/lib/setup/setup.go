@@ -44,7 +44,7 @@ func (a *AppSetup) IndexCollections(mapping collections.IndexMapping) {
 
 func New() *AppSetup {
 	return &AppSetup{
-		Mongo:         clients.GetMongo(),
+		Mongo:         instances.GetMongo(),
 		Redis:         clients.GetRedisClient(),
 		Storage:       instances.GetStorage(),
 		TaskPublisher: publisher.GetPublisher(),

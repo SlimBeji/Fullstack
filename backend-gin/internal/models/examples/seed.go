@@ -159,7 +159,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 type RefMappings map[collections.CollectionName]map[int]primitive.ObjectID
 
 func SeedDb(verbose ...bool) error {
-	mc := clients.GetMongo()
+	mc := instances.GetMongo()
 	refs := make(RefMappings)
 
 	isVerbose := false
@@ -205,7 +205,7 @@ func DumpDb(verbose ...bool) error {
 		isVerbose = verbose[0]
 	}
 
-	mc := clients.GetMongo()
+	mc := instances.GetMongo()
 	collections, err := mc.ListCollections()
 	if err != nil {
 		message := "could not extract list of collecions"

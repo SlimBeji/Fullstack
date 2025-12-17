@@ -1,7 +1,6 @@
 package collections
 
 import (
-	"backend/internal/lib/clients"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
@@ -42,7 +41,7 @@ func GetPlaceCollection(validate ...bool) *PlaceCollection {
 	if len(validate) > 0 {
 		validateStructs = validate[0]
 	}
-	client := clients.GetMongo()
+	client := instances.GetMongo()
 	name := string(Places)
 	collection := client.DB.Collection(name)
 	return &PlaceCollection{collection, validateStructs}
@@ -54,7 +53,7 @@ func checkCreator(
 	sc mongo.SessionContext, creatorId primitive.ObjectID,
 ) bool {
 	filter := bson.M{"_id": creatorId}
-	db := clients.GetMongoDB(sc.Client())
+	db := instances.GetMongoDB(sc.Client())
 	collection := db.Collection(string(Users))
 	count, _ := collection.CountDocuments(sc, filter, options.Count().SetLimit(1))
 	return count > 0
@@ -282,7 +281,7 @@ func (pc *PlaceCollection) PostCreate(
 
 	update := bson.M{"$addToSet": bson.M{"places": placeId}}
 	userFilter := bson.M{"_id": doc.CreatorID}
-	db := clients.GetMongoDB(sc.Client())
+	db := instances.GetMongoDB(sc.Client())
 	collection := db.Collection(string(Users))
 	_, err := collection.FindOneAndUpdate(sc, userFilter, update).Raw()
 	if err != nil {
@@ -477,7 +476,7 @@ func (pc *PlaceCollection) PostDelete(
 	}
 	filter := bson.M{"_id": creatorId}
 	update := bson.M{"$pull": bson.M{"places": placeId}}
-	db := clients.GetMongoDB(sc.Client())
+	db := instances.GetMongoDB(sc.Client())
 	collection := db.Collection(string(Users))
 	res := collection.FindOneAndUpdate(sc, filter, update)
 	if err := res.Err(); err != nil {
