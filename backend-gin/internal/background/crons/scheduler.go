@@ -7,19 +7,11 @@ import (
 	"github.com/go-co-op/gocron/v2"
 )
 
-type JobConfig struct {
-	Name  string
-	Timer gocron.JobDefinition
-	Task  gocron.Task
-}
-
-var AllJobs []JobConfig = []JobConfig{SendNewsletterCron}
-
 type TaskScheduler struct {
 	scheduler gocron.Scheduler
 }
 
-func new() *TaskScheduler {
+func NewScheduler(crons []JobConfig) *TaskScheduler {
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
 		panic(fmt.Errorf(
@@ -27,7 +19,7 @@ func new() *TaskScheduler {
 		))
 	}
 
-	for _, jc := range AllJobs {
+	for _, jc := range crons {
 		if _, err := scheduler.NewJob(jc.Timer, jc.Task); err != nil {
 			panic(fmt.Errorf(
 				"could not register job %s to scheduler: %w", jc.Name, err,
@@ -50,6 +42,6 @@ var (
 )
 
 func GetScheduler() *TaskScheduler {
-	once.Do(func() { scheduler = new() })
+	once.Do(func() { scheduler = NewScheduler(AllJobs) })
 	return scheduler
 }
