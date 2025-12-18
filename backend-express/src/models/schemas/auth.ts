@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { decodePayload, encodePayload } from "@/lib/utils";
-import { zod, ZodInfer } from "@/lib/zod";
+import { zod, ZodInfer } from "@/lib/zod_";
 
 import { AuthFields, UserFields } from "../fields";
 import { UserRead } from "./user";

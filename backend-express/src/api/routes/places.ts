@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import { fetchRequest, validateBody } from "@/lib/express_";
-import { zod, zodObjectId } from "@/lib/zod";
+import { zod, zodObjectId } from "@/lib/zod_";
 import { crudPlace } from "@/models/crud";
 import {
     PlaceFiltersSchema,

@@ -1,4 +1,4 @@
-import { zod } from "@/lib/zod";
+import { zod } from "@/lib/zod_";
 
 const username = zod.string().email().openapi({
     description: "The user email (We use username here because of OAuth spec)",

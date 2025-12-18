@@ -6,7 +6,7 @@ import {
     paginatedSchema,
     zod,
     ZodInfer,
-} from "@/lib/zod";
+} from "@/lib/zod_";
 
 import {
     PlaceFields,
