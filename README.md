@@ -13,6 +13,7 @@ This setup allows for:
 -   Comparing **code structure**, **developer experience**, and **performance**
 -   Experimenting with new technologies in a real-world scenario
 -   Understanding how to build scalable, interchangeable services
+-   Identify a solid and abstracted folders structure for building REST APIs
 
 ## 🧱 Technology Stack
 
@@ -81,163 +82,6 @@ Prefixes `backend-` and `frontend-` are used so that the folders of the backend 
 -   **Fake GCS Server**: A local emulator for Google Cloud Storage, using [`fsouza/fake-gcs-server`](https://github.com/fsouza/fake-gcs-server).
 -   **Redis**: In-memory database used for caching and as a message broker.
 -   **RedisInsight**: Web UI for inspecting and managing Redis data.
-
-## 📐 Frontend Strcuture
-
-### 📁 `/src` Folder
-
-Each framework has its own specifics and terminology, but a common structure can be identified.
-
-#### 📁📁 Entrypoints
-
-Entry files that initialize the application (`main`) and define the root component (`App`):
-
--   **React** → `main.tsx` + `App.tsx`
--   **Vue** → `main.ts` + `App.vue`
--   **Svelte** → `main.ts` + `App.svelte`
--   **Angular** → `main.ts` + `app.component.ts` (via `AppModule`)
-
-#### 📁📁 Pages
-
-Top-level components that represent whole pages
-
-#### 📁📁 Components
-
-Reusable UI components and layout building blocks. This convention is shared across all frameworks.
-
-#### 📁📁 Store
-
-Holds application state management logic.
-
-#### 📁📁 Lib
-
-Contains general-purpose TypeScript utilities and framework specific logic such as **hooks** for React and **composables** for Vue.
-
-#### 📁📁 Types
-
-Shared type definitions such as `Enums`, `Interfaces`, and reusable `Types`. Centralizes consumed data models and contracts.
-
-#### 📁📁 Assets
-
-Static files such as images, icons, and fonts.
-
-### 🎨 Theme Colors
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) with a custom naming system for design tokens.  
-The goal is consistency, clarity, and avoiding clashes with Tailwind’s built-in keywords.
-
-#### 🖼️ Surface
-
-`surface-*` represents the **main app background layer**.
-The term **surface** is preferred over `background` and `bg` to avoid naming collisions with Tailwind utilities and base CSS properties.
-
-Variations:
-
--   `surface` → page/app background (primary canvas)
--   `surface-alt` → alternative/raised surfaces (e.g. cards)
--   `surface-on` → hover/focus/highlight used on top of the surface
-
-```css
---color-surface: var(--color-white);
---color-surface-alt: var(--color-stone-50);
---color-surface-on: var(--color-stone-100);
-```
-
-#### 📋 Panel
-
-`panel-*` represents the **complementary surface layer** — usually opposite in brightness to the main `surface`.  
-This allows for clear contrast zones, such as side panels, headers/footers, or sticky overlays.  
-`surface`/`panel` is conceptually similar to Bootstrap’s `light`/`dark` themes.
-
-Variations:
-
--   `panel` → primary complementary surface
--   `panel-alt` → alternative/raised complementary surface
--   `panel-on` → hover/focus/highlight used on top of the panel
-
-```css
---color-panel: var(--color-stone-700);
---color-panel-alt: var(--color-stone-600);
---color-panel-on: var(--color-stone-500);
-```
-
-#### ✒️ Pen
-
-`pen-*` methaphorically represents things written or drawn by a pen such as text, lines and borders.  
-The term avoids collisions with Tailwind utilities like `text-*` or `border-*`.
-
-Variations:
-
--   `pen` → default text/ink color
--   `pen-muted` → secondary/less prominent text
--   `pen-ruler` → borders, dividers, or lines (as if drawn with a ruler)
--   `pen-inverse` → text/ink used on dark panels
-
-```css
---color-pen: var(--color-stone-700);
---color-pen-muted: var(--color-stone-500);
---color-pen-ruler: var(--color-stone-300);
---color-pen-inverse: var(--color-stone-50);
-```
-
-#### 🎨 Primary / Secondary / Success / Warning / Danger
-
-These groups follow a similar convention to **Bootstrap’s contextual colors**.  
-They serve both **theming** (primary/secondary) and **functional roles** (success/warning/danger).
-
--   `primary-*` and `secondary-*` → define the main theme colors of the dashboard along with `surface-*` and `panel-*`.
--   `success-*`, `warning-*`, `danger-*` → used for conveying functional meaning (feedback, alerts, validation).
--   Each group provides consistent variations:
-    -   `-on` → used for hover, focus, or active states
-    -   `-surface` → inverted version, aligned with the main `surface` brightness
-
-```css
---color-primary: var(--color-sky-400);
---color-primary-on: var(--color-sky-600);
---color-primary-surface: var(--color-sky-50);
-
---color-secondary: var(--color-pink-500);
---color-secondary-on: var(--color-pink-600);
---color-secondary-surface: var(--color-pink-50);
-
---color-success: var(--color-teal-500);
---color-success-on: var(--color-teal-600);
---color-success-surface: var(--color-teal-50);
-
---color-warning: var(--color-orange-500);
---color-warning-on: var(--color-orange-600);
---color-warning-surface: var(--color-orange-50);
-
---color-danger: var(--color-red-500);
---color-danger-on: var(--color-red-600);
---color-danger-surface: var(--color-red-50);
-```
-
-#### 🚫 Disabled
-
-The `disabled-*` group defines styles for **inactive or disabled form inputs**.  
-It ensures consistency across backgrounds, text, and borders.
-
-Variations:
-
--   `disabled-surface` → background of a disabled input
--   `disabled-pen` → text color of a disabled input
--   `disabled-ruler` → border/outline color of a disabled input
-
-```css
---color-disabled-surface: var(--color-gray-300);
---color-disabled-pen: var(--color-gray-500);
---color-disabled-ruler: var(--color-gray-300);
-```
-
-#### 🎭 Backdrop
-
-The `backdrop` color is used for **overlay layers** behind modals, dialogs, or drawers.  
-It helps separate focus areas from the rest of the UI.
-
-```css
---color-backdrop: var(--color-stone-300);
-```
 
 ## 📐 Backend Building
 
@@ -603,6 +447,163 @@ Includes one-off or reusable scripts for **data migration**, **debugging**, or *
 ### 📁 Static
 
 Stores **static assets** like images or files that may be served by the backend or used for documentation/testing.
+
+## 📐 Frontend Strcuture
+
+### 📁 `/src` Folder
+
+Each framework has its own specifics and terminology, but a common structure can be identified.
+
+#### 📁📁 Entrypoints
+
+Entry files that initialize the application (`main`) and define the root component (`App`):
+
+-   **React** → `main.tsx` + `App.tsx`
+-   **Vue** → `main.ts` + `App.vue`
+-   **Svelte** → `main.ts` + `App.svelte`
+-   **Angular** → `main.ts` + `app.component.ts` (via `AppModule`)
+
+#### 📁📁 Pages
+
+Top-level components that represent whole pages
+
+#### 📁📁 Components
+
+Reusable UI components and layout building blocks. This convention is shared across all frameworks.
+
+#### 📁📁 Store
+
+Holds application state management logic.
+
+#### 📁📁 Lib
+
+Contains general-purpose TypeScript utilities and framework specific logic such as **hooks** for React and **composables** for Vue.
+
+#### 📁📁 Types
+
+Shared type definitions such as `Enums`, `Interfaces`, and reusable `Types`. Centralizes consumed data models and contracts.
+
+#### 📁📁 Assets
+
+Static files such as images, icons, and fonts.
+
+### 🎨 Theme Colors
+
+This project uses [Tailwind CSS](https://tailwindcss.com/) with a custom naming system for design tokens.  
+The goal is consistency, clarity, and avoiding clashes with Tailwind’s built-in keywords.
+
+#### 🖼️ Surface
+
+`surface-*` represents the **main app background layer**.
+The term **surface** is preferred over `background` and `bg` to avoid naming collisions with Tailwind utilities and base CSS properties.
+
+Variations:
+
+-   `surface` → page/app background (primary canvas)
+-   `surface-alt` → alternative/raised surfaces (e.g. cards)
+-   `surface-on` → hover/focus/highlight used on top of the surface
+
+```css
+--color-surface: var(--color-white);
+--color-surface-alt: var(--color-stone-50);
+--color-surface-on: var(--color-stone-100);
+```
+
+#### 📋 Panel
+
+`panel-*` represents the **complementary surface layer** — usually opposite in brightness to the main `surface`.  
+This allows for clear contrast zones, such as side panels, headers/footers, or sticky overlays.  
+`surface`/`panel` is conceptually similar to Bootstrap’s `light`/`dark` themes.
+
+Variations:
+
+-   `panel` → primary complementary surface
+-   `panel-alt` → alternative/raised complementary surface
+-   `panel-on` → hover/focus/highlight used on top of the panel
+
+```css
+--color-panel: var(--color-stone-700);
+--color-panel-alt: var(--color-stone-600);
+--color-panel-on: var(--color-stone-500);
+```
+
+#### ✒️ Pen
+
+`pen-*` methaphorically represents things written or drawn by a pen such as text, lines and borders.  
+The term avoids collisions with Tailwind utilities like `text-*` or `border-*`.
+
+Variations:
+
+-   `pen` → default text/ink color
+-   `pen-muted` → secondary/less prominent text
+-   `pen-ruler` → borders, dividers, or lines (as if drawn with a ruler)
+-   `pen-inverse` → text/ink used on dark panels
+
+```css
+--color-pen: var(--color-stone-700);
+--color-pen-muted: var(--color-stone-500);
+--color-pen-ruler: var(--color-stone-300);
+--color-pen-inverse: var(--color-stone-50);
+```
+
+#### 🎨 Primary / Secondary / Success / Warning / Danger
+
+These groups follow a similar convention to **Bootstrap’s contextual colors**.  
+They serve both **theming** (primary/secondary) and **functional roles** (success/warning/danger).
+
+-   `primary-*` and `secondary-*` → define the main theme colors of the dashboard along with `surface-*` and `panel-*`.
+-   `success-*`, `warning-*`, `danger-*` → used for conveying functional meaning (feedback, alerts, validation).
+-   Each group provides consistent variations:
+    -   `-on` → used for hover, focus, or active states
+    -   `-surface` → inverted version, aligned with the main `surface` brightness
+
+```css
+--color-primary: var(--color-sky-400);
+--color-primary-on: var(--color-sky-600);
+--color-primary-surface: var(--color-sky-50);
+
+--color-secondary: var(--color-pink-500);
+--color-secondary-on: var(--color-pink-600);
+--color-secondary-surface: var(--color-pink-50);
+
+--color-success: var(--color-teal-500);
+--color-success-on: var(--color-teal-600);
+--color-success-surface: var(--color-teal-50);
+
+--color-warning: var(--color-orange-500);
+--color-warning-on: var(--color-orange-600);
+--color-warning-surface: var(--color-orange-50);
+
+--color-danger: var(--color-red-500);
+--color-danger-on: var(--color-red-600);
+--color-danger-surface: var(--color-red-50);
+```
+
+#### 🚫 Disabled
+
+The `disabled-*` group defines styles for **inactive or disabled form inputs**.  
+It ensures consistency across backgrounds, text, and borders.
+
+Variations:
+
+-   `disabled-surface` → background of a disabled input
+-   `disabled-pen` → text color of a disabled input
+-   `disabled-ruler` → border/outline color of a disabled input
+
+```css
+--color-disabled-surface: var(--color-gray-300);
+--color-disabled-pen: var(--color-gray-500);
+--color-disabled-ruler: var(--color-gray-300);
+```
+
+#### 🎭 Backdrop
+
+The `backdrop` color is used for **overlay layers** behind modals, dialogs, or drawers.  
+It helps separate focus areas from the rest of the UI.
+
+```css
+--color-backdrop: var(--color-stone-300);
+```
 
 ## 🚀 Next Steps
 
