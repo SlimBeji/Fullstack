@@ -154,14 +154,14 @@ func RegisterUsers(r *gin.Engine) {
 	router.POST(
 		"",
 		middlewares.Admin,
-		middlewares.BodyValidator[schemas.UserPost],
+		gin_.BodyValidator[schemas.UserPost],
 		createUser,
 	)
 	router.GET("/:userId", middlewares.Authenticated, getUser)
 	router.PUT(
 		"/:userId",
 		middlewares.Authenticated,
-		middlewares.BodyValidator[schemas.UserPut],
+		gin_.BodyValidator[schemas.UserPut],
 		updateUser,
 	)
 	router.DELETE("/:userId", middlewares.Admin, deleteUser)

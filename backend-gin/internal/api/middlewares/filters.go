@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"backend/internal/config"
+	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/validator_"
 	"net/http"
@@ -62,7 +63,7 @@ func Filter[T any](c *gin.Context) {
 	if c.Request.Method == http.MethodGet {
 		body, errs = queryParamsToBody[T](c)
 	} else {
-		body, errs = extractBody[T](c)
+		body, errs = gin_.ExtractBody[T](c)
 	}
 
 	if len(errs) > 0 {

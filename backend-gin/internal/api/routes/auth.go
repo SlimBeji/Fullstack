@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"backend/internal/api/middlewares"
 	"backend/internal/lib/gin_"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
@@ -53,9 +52,9 @@ func signin(c *gin.Context) {
 func RegisterAuth(r *gin.Engine) {
 	router := r.Group("/api/auth")
 	router.POST(
-		"/signup", middlewares.BodyValidator[schemas.SignupForm], signup,
+		"/signup", gin_.BodyValidator[schemas.SignupForm], signup,
 	)
 	router.POST(
-		"/signin", middlewares.BodyValidator[schemas.SigninForm], signin,
+		"/signin", gin_.BodyValidator[schemas.SigninForm], signin,
 	)
 }

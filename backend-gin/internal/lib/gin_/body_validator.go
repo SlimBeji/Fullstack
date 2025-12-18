@@ -1,18 +1,17 @@
-package middlewares
+package gin_
 
 import (
-	"backend/internal/lib/gin_"
 	"backend/internal/lib/validator_"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func extractBody[T any](c *gin.Context) (T, []string) {
+func ExtractBody[T any](c *gin.Context) (T, []string) {
 	var form T
 	var err error
 
-	if gin_.IsMultipart(c) {
+	if IsMultipart(c) {
 		err = c.ShouldBind(&form)
 	} else {
 		err = c.ShouldBindJSON(&form)
@@ -26,7 +25,7 @@ func extractBody[T any](c *gin.Context) (T, []string) {
 }
 
 func BodyValidator[T any](c *gin.Context) {
-	form, errs := extractBody[T](c)
+	form, errs := ExtractBody[T](c)
 	if len(errs) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error":   "Invalid request body",
