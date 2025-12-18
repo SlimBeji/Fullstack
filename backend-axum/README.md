@@ -56,22 +56,6 @@ GCS_BLOB_ACCESS_EXPIRATION=3600
 
 The official rust `rustfmt` package is used for code formatting. No additional utility for linting. The parameters are set in a **rustfmt.toml** file.
 
-## 📁 Key Directories
-
--   `config/` – Environment variables and global parameters setup
--   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
--   `api/` – Axum server setup: auth, middlewares, swagger config and REST routes
--   `types/` – Shared types and data contracts.
--   `lib/` – Core business logic, utility functions, and third-party service clients
--   `worker/` – Background processing (e.g., tasks and scheduled crons)
--   `tests/` – Unit tests.
--   `bin/` – CLI scripts (e.g., migrations, debugging utilities, seeding and dumping developement database ...)
--   `static/` – Static assets (e.g., images, public files)
-
-> The idiomatic way in **Rust** is to have the `/tests` folder next to the `/src` folder but for the sake of consistency with the other backends, the `/tests` folder was placed inside the `/src` folder.
-
-> `/bin` was prefered to `/scripts` (like in the other backend projects) because of the native cargo support for running: `cargo run --bin script_name`.
-
 ## 🛠️ Makefile Commands
 
 The following `make` commands help manage the Axum backend:
@@ -86,3 +70,7 @@ The following `make` commands help manage the Axum backend:
 | `make axum-debug`         | Run `debug.rs` inside /bin. Used to debug in development              |
 | `make axum-seed`          | Run `seed.rs` inside /bin. Used to seed the DB in development         |
 | `make axum-dump`          | Run `dump.rs` inside /bin. Used to dump the DB in development         |
+
+## 📌 Notes
+
+-   The idiomatic way in **Rust** is to have the `/tests` folder next to the `/src`. For the other backends, the `/tests` folder was placed inside the **source** folder.

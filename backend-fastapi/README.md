@@ -71,18 +71,6 @@ This backend uses the following tools to ensure clean and consistent Python code
 In Python, the standard for variables and fields is **snake_case** (e.g., `creator_id`).  
 However, since all backends are designed to be interchangeable, **camelCase** will be used for JSON responses (e.g., `creatorId`) to maintain consistency across different backends.
 
-## 📁 Key Directories
-
--   `config/` – Environment variables and global parameters setup
--   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
--   `api/` – FastAPI server setup: auth, middlewares, OpenAPI Swagger metadata, and REST routes
--   `types_/` – Shared types, enums, annotations and data contracts. An underscore was added as suffix to avoid conflicts with the `types` package used by the `enum` module
--   `lib/` – Core business logic, utility functions, third-party service clients and app setup utilities
--   `worker/` – Background processing (e.g., tasks and scheduled crons)
--   `tests/` – Unit tests
--   `scripts/` – One-off scripts (e.g., migrations, debugging utilities)
--   `static/` – Static assets (e.g., images, public files)
-
 ## 🛠️ Makefile Commands
 
 The following `make` commands help manage the FastAPI backend:

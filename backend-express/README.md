@@ -84,18 +84,6 @@ Prettier is used for formatting with the following config:
 }
 ```
 
-## 📁 Key Directories
-
-- `config/` – Environment variables and global parameters setup
-- `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
-- `api/` – Express server setup: auth, middlewares, OpenAPI docs, and REST routes
-- `types/` – Shared types, enums, interfaces, and module extensions (e.g., `express.d.ts`)
-- `lib/` – Core business logic, utility functions, third-party service clients and app setup utilities
-- `worker/` – Background processing (e.g., tasks and scheduled crons)
-- `tests/` – Unit tests
-- `scripts/` – One-off scripts (e.g., migrations, debugging utilities)
-- `static/` – Static assets (e.g., images, public files)
-
 ## 🛠️ Makefile Commands
 
 The following shortcuts are available for managing the Express backend via `make`:
@@ -114,5 +102,3 @@ The following shortcuts are available for managing the Express backend via `make
 ## 📌 Notes
 
 - Swagger documentation is auto-generated from Zod schemas using `zod-to-openapi` and served via `swagger-ui-express`.
-- Background jobs are processed via BullMQ with Redis as the broker.
-- Scheduled tasks (cron jobs) are powered by `node-cron`.

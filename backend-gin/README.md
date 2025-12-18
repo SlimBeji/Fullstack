@@ -61,22 +61,10 @@ The official go `fmt` package is used for code formatting. No additional utility
 The root directory contains the following key directories and files:
 
 -   `internal/` – Contains the main application source code, following the structure defined in the root **README.md**.
--   `cmd/` – Contains entrypoints for running scripts, schedulers, and background task handlers.
+-   `cmd/` – Contains entrypoints for running scripts.
 -   `app.go` – The API server entrypoint.
 
 > For a better development experience, hot reload is enabled in development using [air](https://github.com/air-verse/air). However, **air** does not work well if the entrypoint is placed in the `cmd/` folder. For this reason, the API server entrypoint (`app.go`) is kept separate from other `cmd` entries.
-
-### 📁📁 Internals
-
--   `config/` – Environment variables and global parameters setup
--   `models/` – Data modeling: schemas, collections, CRUD logic, and example seed data
--   `api/` – Gin server setup: auth, middlewares, swagger config and REST routes
--   `types_/` – Shared types and data contracts. An underscore `_` suffix was added to avoid conflict with go types
--   `lib/` – Core business logic, utility functions, and third-party service clients
--   `worker/` – Background processing (e.g., tasks and scheduled crons)
--   `tests/` – Unit tests
--   `scripts/` – One-off scripts (e.g., migrations, debugging utilities)
--   `static/` – Static assets (e.g., images, public files)
 
 ## 🛠️ Makefile Commands
 
@@ -111,7 +99,11 @@ The AST parsing logic is implemented in `/internal/models/raw/astparser`.
 
 Unlike the **FastAPI** and **Express** backends, the `models/collections` and `models/crud` packages are structured differently.
 
-The `models/crud` folder contains five files — `create.go`, `read.go`, `fetch.go`, `update.go`, and `delete.go`.
-Each file defines an interface that a **collection struct** must implement to use the corresponding CRUD methods.
+**Go** does not support traditional object-oriented programming like **Python** or **TypeScript**, and it also lacks advanced trait-like abstractions with reusable behavior (as found in **Rust**). Go interfaces define only method signatures, without shared implementations, which makes certain forms of code abstraction more difficult.
+
+For this reason, a slightly different approach was taken.
+
+The `models/crud` folder contains five files—`create.go`, `read.go`, `fetch.go`, `update.go`, and `delete.go`.  
+Each file defines an interface that a **collection struct** must implement to support the corresponding CRUD operation.
 
 The `models/collections` folder provides the concrete implementations of these interfaces, along with additional helper methods specific to each model.
