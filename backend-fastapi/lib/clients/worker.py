@@ -1,7 +1,7 @@
 import asyncio
 from typing import Callable
 
-from dramatiq import Broker, actor, set_broker
+from dramatiq import Broker, Message, actor, set_broker
 from dramatiq.asyncio import EventLoopThread, set_event_loop_thread
 from dramatiq.brokers.redis import RedisBroker
 from dramatiq.brokers.stub import StubBroker
@@ -10,6 +10,43 @@ from dramatiq.results import Results
 from dramatiq.results.backend import ResultBackend
 from dramatiq.results.backends.redis import RedisBackend
 from dramatiq.results.backends.stub import StubBackend
+
+# Publisher
+
+
+class TaskPublisher:
+    def __init__(self, url: str = "", is_test: bool = False) -> None:
+        if not is_test and not url:
+            raise RuntimeError(
+                "A url must be provided when not running in test mode!"
+            )
+
+        self._url: str = url
+        self._is_test: bool = is_test
+        self._broker: Broker | None = None
+
+    @property
+    def broker(self) -> Broker:
+        if self._broker is None:
+            raise RuntimeError("TaskPublisher broker was not initialized!")
+        return self._broker
+
+    def start(self) -> None:
+        if self._is_test:
+            self._broker = StubBroker()
+            self._broker.emit_after("process_boot")
+        else:
+            self._broker = RedisBroker(url=self._url)
+
+        set_broker(self._broker)
+
+    def send(self, message: Message) -> None:
+        self.broker.enqueue(message)
+
+    def close(self):
+        self.broker.close()
+        self._broker = None
+
 
 # Handler
 
