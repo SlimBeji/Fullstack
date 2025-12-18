@@ -18,7 +18,7 @@ type AppSetup struct {
 	Storage       *clients.CloudStorage
 	TaskPublisher *publishers.TaskPublisher
 	TaskHandler   *handlers.TaskHandler
-	TaskScheduler *crons.TaskScheduler
+	TaskScheduler *clients.TaskScheduler
 }
 
 func (a *AppSetup) CloseSerives() {

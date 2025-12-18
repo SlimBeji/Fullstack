@@ -2,6 +2,7 @@ package crons
 
 import (
 	"backend/internal/background/publishers"
+	"backend/internal/lib/clients"
 	"log"
 
 	"github.com/go-co-op/gocron/v2"
@@ -14,7 +15,7 @@ func sendNewsletter(name string, email string) {
 	}
 }
 
-var SendNewsletterCron = JobConfig{
+var SendNewsletterCron = clients.JobConfig{
 	Name:  "SendNewsletterCron",
 	Timer: gocron.CronJob("0 * * * *", false),
 	Task: gocron.NewTask(
