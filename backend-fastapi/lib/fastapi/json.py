@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from ..types import CallNext, HttpMiddleware
+from .types import CallNext, HttpMiddleware
 
 
 class RequestTooLarge(Exception):
