@@ -1,28 +1,14 @@
-import { Worker } from "bullmq";
+import { Job } from "bullmq";
 
-import { broker_config, QueueType } from "../setup";
-import { TASKS } from "./registery";
+import { TaskHanlder } from "@/lib/clients";
 
-export class TaskHanlder {
-    private workers: Partial<Record<QueueType, Worker>> = {};
+import { broker_config, Queues, QueueType } from "../setup";
+import { aiTasksRouter } from "./ai";
+import { emailTasksRouter } from "./emails";
 
-    public start(): void {
-        for (const [queue, router] of Object.entries(TASKS)) {
-            const worker = new Worker(queue, router, broker_config);
-            worker.on("failed", (job, err) => {
-                console.error(
-                    `Job ${job?.id} failed with error ${err.message}`
-                );
-            });
-            this.workers[queue as QueueType] = worker;
-        }
-    }
+export const TASKS: Record<QueueType, (job: Job) => Promise<void>> = {
+    [Queues.AI]: aiTasksRouter,
+    [Queues.EMAILS]: emailTasksRouter,
+};
 
-    public async close(): Promise<void> {
-        await Promise.all(
-            Object.values(this.workers).map((worker) => worker.close())
-        );
-    }
-}
-
-export const handler = new TaskHanlder();
+export const handler = new TaskHanlder(TASKS, broker_config);
