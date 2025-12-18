@@ -1,4 +1,46 @@
-import { Job, Worker, WorkerOptions } from "bullmq";
+import { Job, Queue, QueueOptions, Worker, WorkerOptions } from "bullmq";
+
+import { ApiError, HttpStatus } from "@/lib/express";
+
+// Publisher
+
+export class TaskPublisher {
+    private queues: Partial<Record<string, Queue>> = {};
+
+    constructor(
+        private names: string[],
+        private options: QueueOptions
+    ) {}
+
+    public getQueue(name: string): Queue {
+        let queue = this.queues[name];
+        if (!queue) {
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                `Queue ${name} was not registered`
+            );
+        }
+        return queue;
+    }
+
+    public start(): void {
+        this.names.forEach((name) => {
+            this.queues[name] = new Queue(name, this.options);
+        });
+    }
+
+    public async close(): Promise<void> {
+        await Promise.all(
+            Object.values(this.queues).map((queue) => {
+                if (queue) {
+                    queue.close();
+                }
+            })
+        );
+    }
+}
+
+// Handler
 
 export type TaskRegistery = Record<string, (job: Job) => Promise<void>>;
 
