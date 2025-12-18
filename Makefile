@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach fastapi
+	docker-compose up --attach axum
 
 build:
 	docker-compose build
