@@ -16,7 +16,7 @@ type AppSetup struct {
 	Mongo         *clients.MongoClient
 	Redis         *clients.RedisClient
 	Storage       *clients.CloudStorage
-	TaskPublisher *publishers.TaskPublisher
+	TaskPublisher *clients.TaskPublisher
 	TaskHandler   *clients.TaskHandler
 	TaskScheduler *clients.TaskScheduler
 }
