@@ -17,7 +17,7 @@ type AppSetup struct {
 	Redis         *clients.RedisClient
 	Storage       *clients.CloudStorage
 	TaskPublisher *publishers.TaskPublisher
-	TaskHandler   *handlers.TaskHandler
+	TaskHandler   *clients.TaskHandler
 	TaskScheduler *clients.TaskScheduler
 }
 
