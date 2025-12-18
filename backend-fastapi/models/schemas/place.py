@@ -2,7 +2,7 @@ from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
 from config import settings
-from lib.pydantic import BaseFiltersSchema, HttpFilters
+from lib.pydantic_ import BaseFiltersSchema, HttpFilters
 from lib.types_ import FileToUpload, FindQuery, PaginatedData
 from models.fields import (
     PlaceSearchableFields,
