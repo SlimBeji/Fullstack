@@ -1,29 +1,9 @@
-from apscheduler.schedulers.blocking import BlockingScheduler
-
-from background.crons.registery import CRONS
-from background.crons.utils import ScheduledTask
+from background.crons.emails import newsletter_cron
 from background.publishers import publisher
+from lib.clients import ScheduledTask, TaskScheduler
 
-
-class TaskScheduler:
-    def __init__(self) -> None:
-        self.scheduler = BlockingScheduler()
-        self._register_crons(CRONS)
-
-    def _register_crons(self, crons: list[ScheduledTask]) -> None:
-        for cron in crons:
-            self.scheduler.add_job(
-                cron.fn, cron.trigger, cron.args, cron.kwargs
-            )
-
-    def start(self) -> None:
-        self.scheduler.start()
-
-    def close(self) -> None:
-        self.scheduler.shutdown()
-
-
-scheduler = TaskScheduler()
+CRONS: list[ScheduledTask] = [newsletter_cron]
+scheduler = TaskScheduler(CRONS)
 
 
 if __name__ == "__main__":
