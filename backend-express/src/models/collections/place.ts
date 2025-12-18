@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-import { ApiError, HttpStatus } from "@/lib/express";
+import { ApiError, HttpStatus } from "@/lib/express_";
 
 import { PlaceDB } from "../schemas";
 import { CollectionEnum } from "./base";

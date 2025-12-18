@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { HttpStatus } from "@/lib/express";
+import { HttpStatus } from "@/lib/express_";
 import { crudPlace, crudUser } from "@/models/crud";
 import { PlaceRead } from "@/models/schemas";
 import { closeAll, seedTestData } from "@/services/setup";

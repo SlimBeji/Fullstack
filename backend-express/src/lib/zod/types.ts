@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { ZodTypeAny } from "zod";
 
-import { ApiError, HttpStatus, MimeType } from "../express";
+import { ApiError, HttpStatus, MimeType } from "../express_";
 import { zod } from "./base";
 
 export const zodObjectId = () => {

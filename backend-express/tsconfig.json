@@ -14,7 +14,7 @@
             "@/*": ["./src/*"]
         }
     },
-    "files": ["src/lib/express/express.d.ts"],
+    "files": ["src/lib/express_/express.d.ts"],
     "include": ["src/**/*.ts", "src/**/*.d.ts"],
     "exclude": ["node_modules", "build"]
 }

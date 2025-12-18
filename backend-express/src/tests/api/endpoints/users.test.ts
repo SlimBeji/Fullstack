@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { HttpStatus } from "@/lib/express";
+import { HttpStatus } from "@/lib/express_";
 import { crudUser } from "@/models/crud";
 import { createToken, UserRead } from "@/models/schemas";
 import { closeAll, seedTestData } from "@/services/setup";

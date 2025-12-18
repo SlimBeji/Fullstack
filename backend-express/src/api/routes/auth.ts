@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 
-import { validateBody } from "@/lib/express";
+import { validateBody } from "@/lib/express_";
 import { crudUser } from "@/models/crud";
 import {
     EncodedTokenSchema,
