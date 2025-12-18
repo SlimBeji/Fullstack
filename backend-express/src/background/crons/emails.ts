@@ -1,5 +1,6 @@
+import { CronConfig } from "@/lib/clients";
+
 import { sendNewsletter } from "../publishers";
-import { CronConfig } from "./utils";
 
 export const NewsletterCronConfig: CronConfig = {
     name: "Newsletter Job",

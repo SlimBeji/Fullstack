@@ -1,23 +1,7 @@
-import cron, { ScheduledTask } from "node-cron";
+import { CronConfig, TaskScheduler } from "@/lib/clients";
 
-import { ALL_CRONS } from "./registery";
+import { NewsletterCronConfig } from "./emails";
 
-export class TaskScheduler {
-    private crons: Record<string, ScheduledTask> = {};
+export const ALL_CRONS: CronConfig[] = [NewsletterCronConfig];
 
-    public start(): void {
-        ALL_CRONS.forEach((config) => {
-            this.crons[config.name] = cron.schedule(
-                config.expression,
-                config.task,
-                config.options
-            );
-        });
-    }
-
-    public async close(): Promise<void> {
-        await Promise.all(Object.values(this.crons).map((cron) => cron.stop()));
-    }
-}
-
-export const scheduler = new TaskScheduler();
+export const scheduler = new TaskScheduler(ALL_CRONS);
