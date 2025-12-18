@@ -489,7 +489,7 @@ Static files such as images, icons, and fonts.
 
 ### 🎨 Theme Colors
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) with a custom naming system for design tokens.  
+This project uses [Tailwind CSS](https://tailwindcss.com/) with a custom naming system.  
 The goal is consistency, clarity, and avoiding clashes with Tailwind’s built-in keywords.
 
 #### 🖼️ Surface
