@@ -85,19 +85,49 @@ Prefixes `backend-` and `frontend-` are used so that the folders of the backend 
 
 ## 📐 Backend Building
 
-### 💡 Demo App Concept
+This demo project features two models: Users and Places. Users can create accounts and add their favorite places to their profiles, while other users can browse and view these places.
 
-This demo project features two models: **Users** and **Places**. Users can create accounts and add their favorite places to their profiles. Other users can browse and view these favorite places.
+Defining a clear folder structure is essential for building scalable applications. Poor folder organization can quickly lead to issues such as circular import errors.
+
+Below is the folder structure shown from bottom to top (import order), used across all backend apps, independent of the programming language or web framework:
+
+### 📁 Lib
+
+Reusable and abstracted modules. No imports from sibling modules are allowed, placing `lib` at the bottom of the import order.
+
+The `/lib` folder may contain layers built on top of the web and data validation/serialization libraries used. By convention, an underscore suffix is used to distinguish the underlying library from the project-specific layer (e.g. `pydantic_` and `fastapi_` for **Python**, or `zod_` and `express_` for **TypeScript**).
+
+-   **/framework\_** – Layer on top of the web framework (e.g. `fastapi_`, `express_`, `gin_`, `axum_`)
+-   **/serialization\_** – Layer on top of the validation/serialization framework (e.g. `pydantic_`, `zod_`, `validator_`, `serde_`)
+-   **/clients** – Wrappers around third-party APIs or service interfaces (e.g. MongoDB, Redis, Google Cloud Storage, task scheduling)
+-   **/utils** – Generic helper functions (e.g. date/string formatting, file and I/O operations, encryption)
+-   **/types** – Reusable shared type definitions used across the project (e.g. pagination, file upload)
 
 ### 📁 Config
 
-Config module used to setup environment variables and global parameters.
+Config module used to setup environment variables and global parameters, placing `config` at the bottom just above `lib` in the import order
+
+### 📁 Static
+
+Stores **static assets** such as images or files that may be served by the backend or used for documentation or testing. It may also contain helper functions for loading these assets.  
+`/static` is considered near the bottom of the import order, just above `lib` and `config`.
+
+### 📁 Services
+
+Services used by the application, such as third-party APIs or databases. These modules import clients from `lib` and instantiate them.
+
+The `services` folder is split into:
+
+-   **instances** – Contains instantiated services consumed by the API (e.g. databases, third-party APIs, task publishers)
+-   **setup** – Contains helpers to orchestrate connection and shutdown logic for the service instances
+
+> **instances** is placed near the bottom of the import order, while **setup** sits at the top, as it is intended to be used just before the application starts. This split helps avoid circular imports.
 
 ### 📁 Models
 
-The first step in building a backend is to **design the data layer**—defining how data is structured, validated, and manipulated. A well-thought-out model setup is critical not only for development but also for testing, seeding, and consistency across different backend implementations.
+Contains the **data layer**. Well-thought-out data models are critical not only for development, but also for testing, seeding, and consistency across different backend implementations.
 
-Each backend will include a `models/` folder containing several key subfolders:
+Each backend includes a `models/` folder with several key subfolders:
 
 #### 📁 📁 Fields
 
@@ -204,7 +234,6 @@ Below the operations breakdown
 -   `deleteDocument`: Deletes a record using a Mongo transaction.
 -   `delete`: Delete a record by id.
 -   `userDelete`: Ensures the user is authorized to delete the object.
--   `deleteCleanup`: Optional cleanup logic after deletion (e.g., removing related files from cloud storage).
 
 #### 📁📁 Examples
 
@@ -212,34 +241,58 @@ This folder contains **example documents** for each model, along with utility me
 
 Each example is structured using the `SeedSchema` defined in the `schemas/` folder.
 
+### 📁 Core
+
+In a SaaS application, the data is used to **perform actions** and **deliver services** for each user—this is the role of the `/core` layer.  
+It contains the **core business logic** that defines how the application uses data to fulfill its purpose.
+
+> This project does not include a `/core` folder, as it is just a basic CRUD API.
+
+### 📁 Background
+
+The `/background` folder contains code responsible for **executing background jobs**—tasks that run **outside the scope of an API request**.
+
+These jobs often **manipulate data** defined in `/models` and apply **business logic** from `/core` or `/lib`.
+
+For this reason, `/background` should sit higher in the import order than the other modules.
+
+Some models or core logic may trigger background jobs (e.g. updating an embedding vector after a CRUD operation). To avoid circular imports, **publishers** (functions that enqueue tasks) and **handlers** (functions that process tasks) are separated into two modules that do not import each other.
+
+A model can import a publisher to trigger a task, while a handler can import the same model to process that task.
+
+**publishers** and **handlers** may share common parameters (e.g. broker URLs, task names, queue names, execution order). A third **setup** module is used to store these shared parameters, which both **publishers** and **handlers** import.
+
+**crons** is the fourth submodule of `/background`. It contains tasks that periodically trigger jobs by calling a **publisher**.
+
+The import order within `/background` is as follows:
+
+-   **crons**
+-   **publishers**
+-   **handlers**
+-   **setup**
+
 ### 📁 API
 
-Next after defining the model layer, we take care of the api layer.
+The `/api` folder contains all logic related to **HTTP request handling**, **authentication**, **middleware**, and **API documentation**.
 
-The `/api` folder contains all the logic for handling **HTTP requests**, **authentication**, **middleware**, and **API documentation**. It acts as the main entry point for routing requests to the proper backend logic.
+It acts as the main entry point for routing requests to the appropriate backend logic and sits in the upper tier of the import order.
 
-It has the following subfolders:
-
-#### 📁📁 Auth
-
-Handles authentication logic.  
-Responsible for issuing **JWT tokens** used to authenticate and authorize users across the app.
+It includes the following subfolders:
 
 #### 📁📁 Middlewares
 
 Contains middleware functions that apply logic **before or after route handling**, including:
 
--   **CORS policies**
--   **Error handling**
 -   **Authentication & Authorization**
+-   **CORS policies**
 -   **Data validation**
+-   **Error handling**
 
 > ⚠️ Some frameworks (like FastAPI) use dependency injection for middleware-like behavior. However, the **concept maps closely to route-level middleware** in frameworks like Express or Gin.
 
-#### 📁📁 Openapi
+#### 📁📁 Docs
 
-This may be a single file to set up the **OpenAPI specification** for the backend.  
-It is used to **auto-generate Swagger UI documentation** from the defined routes and schemas.
+Contains code responsible for setting up the **Swagger UI**
 
 > ⚠️ Depending on the framework:
 >
@@ -248,18 +301,18 @@ It is used to **auto-generate Swagger UI documentation** from the defined routes
 
 #### 📁📁 Routes
 
-Defines the actual **REST API endpoints** for each resource.
+Defines the actual **REST API endpoints** for each resource / data model.
 
 Each model exposes a standardized set of **6 CRUD endpoints**, ensuring consistency across all backends:
 
-| Method | Path                    | Purpose                                  | Input Schema   | Output Schema       | CRUD Function  |
-| ------ | ----------------------- | ---------------------------------------- | -------------- | ------------------- | -------------- |
-| GET    | `/model-name/`          | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `userFetch()`  |
-| POST   | `/model-name/query`     | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `userFetch()`  |
-| POST   | `/model-name/`          | Create a new record                      | PostSchema     | ReadSchema          | `userCreate()` |
-| GET    | `/model-name/:objectId` | Retrieve a single record by ID           | –              | ReadSchema          | `userGet()`    |
-| PUT    | `/model-name/:objectId` | Update an existing record                | PutSchema      | ReadSchema          | `userUpdate()` |
-| DELETE | `/model-name/:objectId` | Delete a record by ID                    | –              | –                   | `userDelete()` |
+| Method | Path                    | Purpose                                  | Input Schema   | Output Schema       | CRUD Function |
+| ------ | ----------------------- | ---------------------------------------- | -------------- | ------------------- | ------------- |
+| GET    | `/model-name/`          | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `*Fetch()`    |
+| POST   | `/model-name/query`     | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `*Fetch()`    |
+| POST   | `/model-name/`          | Create a new record                      | PostSchema     | ReadSchema          | `*Create()`   |
+| GET    | `/model-name/:objectId` | Retrieve a single record by ID           | –              | ReadSchema          | `*Get()`      |
+| PUT    | `/model-name/:objectId` | Update an existing record                | PutSchema      | ReadSchema          | `*Update()`   |
+| DELETE | `/model-name/:objectId` | Delete a record by ID                    | –              | –                   | `*Delete()`   |
 
 Each route is tied to a corresponding method in the related CRUD module for consistent error handling and logic reuse.
 
@@ -385,68 +438,23 @@ db.users
     .limit(100);
 ```
 
-### 📁 Types
+### 📁 Bin
 
-Contains reusable and shared type definitions used across the project, including:
+Includes scripts for **data migration**, **debugging**, or **manual testing**.
 
--   **Enums**: Predefined sets of constant values
--   **Interfaces / Types**: Common type definitions for data structures
--   **Custom Errors**: Standardized error classes or types
--   **Utility Types**: Generic helpers for type manipulation
+> This folder was initially named **scripts**. It was renamed to **bin** because **Rust** provides special support for executing code placed in this directory.
 
-### 📁 Lib
+### 📁 Entrypoint
 
-Reusable modules including:
+A single file responsible for starting the HTTP server and running the REST API (e.g. `index.ts`, `app.py`, `app.go`, `main.rs`).
 
--   **/clients** – Wrappers around third-party APIs or service interfaces (e.g., MongoDB, Redis)
--   **/encryption** – Encryption and Authentication utilities
--   **/utils** – Generic helper functions (e.g., date/string formatting, file and I/O operations)
--   **/sync** – Syncing helper to connect various clients with workers and schedulers
-
-### 📁 Core
-
-The `models/`, `lib`, `api/` layers are responsible for **storing, retrieving, and updating data**.
-
-In a SaaS application, this stored data is used to **perform actions** and **deliver services** — that's where the `core/` layer comes in.  
-It contains the **core business logic** that defines how the application uses the data to fulfill its purpose.
-
-Corresponding endpoints can then be added to the `/api` layer — not just for data access, but also to trigger actions and expose services powered by this business logic.
-
-> This project does not include a `/core` folder since it is just a very basic CRUD API
-
-### 📁 Worker
-
-The `worker/` layer is responsible for **executing background jobs** — tasks that should run **outside the scope of an API request**.
-
-These jobs often apply the **business logic** defined in the `lib/` layer to perform asynchronous or scheduled operations.
-
-> This layer is essential for building scalable SaaS applications, as it offloads work that shouldn't block real-time user interactions.
-
-The `/worker` layer has two main subfolders:
-
-#### 📁📁 Cron
-
-Scheduled jobs (e.g., daily reports, cleanup tasks, notification dispatch).  
-Triggered by a **cron-like scheduler**.
-
-#### 📁📁 Tasks
-
-Asynchronous jobs triggered by the application (e.g., sending emails, processing images, syncing data, AI model inference).  
-Usually dispatched via a **message queue** or **job broker** like Redis.
-
-> In this backend, a simple example task will be used: embedding the concatenation of two text fields (`title` + `description`) for a given model. This task is asynchronous because it may take some time to complete. The idea is to later on be able to perform smart queries using text query sent by the user and a cosine similarity lookup
+Located at the top of the import order, it imports the endpoints defined in the `/api` folder, sets up application dependencies by calling `/services/setup`, and starts the server.
 
 ### 📁 Tests
 
-Contains **unit tests** and other automated tests to validate the application logic.
+Contains **unit tests** and other automated tests used to validate the application logic.
 
-### 📁 Scripts
-
-Includes one-off or reusable scripts for **data migration**, **debugging**, or **manual testing**.
-
-### 📁 Static
-
-Stores **static assets** like images or files that may be served by the backend or used for documentation/testing.
+`/tests` naturally sits at the top of the import order, allowing it to import all other modules.
 
 ## 📐 Frontend Strcuture
 
