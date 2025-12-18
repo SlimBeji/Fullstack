@@ -1,8 +1,6 @@
-package middlewares
+package gin_
 
 import (
-	"backend/internal/config"
-	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/validator_"
 	"net/http"
@@ -56,37 +54,39 @@ func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 	return body, nil
 }
 
-func Filter[T any](c *gin.Context) {
-	var body T
-	var errs []string
+func Filter[T any](maxItems int) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var body T
+		var errs []string
 
-	if c.Request.Method == http.MethodGet {
-		body, errs = queryParamsToBody[T](c)
-	} else {
-		body, errs = gin_.ExtractBody[T](c)
+		if c.Request.Method == http.MethodGet {
+			body, errs = queryParamsToBody[T](c)
+		} else {
+			body, errs = ExtractBody[T](c)
+		}
+
+		if len(errs) > 0 {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error":   "Invalid request body",
+				"details": errs,
+			})
+			c.Abort()
+			return
+		}
+
+		form := types_.FindQuery{}
+		errsMap := validator_.BuildFindQuery(body, &form, maxItems)
+		if len(errsMap) > 0 {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error":   "Invalid request",
+				"details": errsMap,
+			})
+			c.Abort()
+			return
+		}
+
+		// Store the parsed form in context for later use
+		c.Set("requestBody", form)
+		c.Next()
 	}
-
-	if len(errs) > 0 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error":   "Invalid request body",
-			"details": errs,
-		})
-		c.Abort()
-		return
-	}
-
-	form := types_.FindQuery{}
-	errsMap := validator_.BuildFindQuery(body, &form, config.Env.MaxItemsPerPage)
-	if len(errsMap) > 0 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error":   "Invalid request",
-			"details": errsMap,
-		})
-		c.Abort()
-		return
-	}
-
-	// Store the parsed form in context for later use
-	c.Set("requestBody", form)
-	c.Next()
 }

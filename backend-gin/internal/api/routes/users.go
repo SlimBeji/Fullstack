@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/config"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/collections"
@@ -142,13 +143,13 @@ func RegisterUsers(r *gin.Engine) {
 	router.GET(
 		"/",
 		middlewares.Authenticated,
-		middlewares.Filter[schemas.UserFilters],
+		gin_.Filter[schemas.UserFilters](config.Env.MaxItemsPerPage),
 		getUsers,
 	)
 	router.POST(
 		"/query",
 		middlewares.Authenticated,
-		middlewares.Filter[schemas.UserFilters],
+		gin_.Filter[schemas.UserFilters](config.Env.MaxItemsPerPage),
 		queryUsers,
 	)
 	router.POST(

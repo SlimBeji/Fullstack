@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
+	"backend/internal/config"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/collections"
@@ -142,13 +143,13 @@ func RegisterPlaces(r *gin.Engine) {
 	router.GET(
 		"/",
 		middlewares.Authenticated,
-		middlewares.Filter[schemas.PlaceFilters],
+		gin_.Filter[schemas.PlaceFilters](config.Env.MaxItemsPerPage),
 		getPlaces,
 	)
 	router.POST(
 		"/query",
 		middlewares.Authenticated,
-		middlewares.Filter[schemas.PlaceFilters],
+		gin_.Filter[schemas.PlaceFilters](config.Env.MaxItemsPerPage),
 		queryPlaces,
 	)
 	router.POST(
