@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import httpx
 
-from lib.fastapi import ApiError
+from lib.fastapi_ import ApiError
 
 
 class HuggingFaceClientConfig:

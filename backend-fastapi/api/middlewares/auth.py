@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from lib.fastapi import ApiError
+from lib.fastapi_ import ApiError
 from models.crud import crud_user
 from models.schemas import (
     ExpiredToken,

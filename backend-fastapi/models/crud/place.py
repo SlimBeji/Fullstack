@@ -4,7 +4,7 @@ from typing import cast
 from beanie import PydanticObjectId
 
 from background.publishers import place_embedding
-from lib.fastapi import ApiError
+from lib.fastapi_ import ApiError
 from lib.types_ import Filter
 from models.collections.place import Place
 from models.crud.base import CrudBase, CrudEvent

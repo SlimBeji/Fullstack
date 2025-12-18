@@ -5,7 +5,7 @@ from beanie import PydanticObjectId
 from pymongo.errors import DuplicateKeyError
 
 from config import settings
-from lib.fastapi import ApiError
+from lib.fastapi_ import ApiError
 from lib.types_ import Filter
 from lib.utils import hash_input, verify_hash
 from models.collections.user import User

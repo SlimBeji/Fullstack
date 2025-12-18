@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from api.docs import OPENAPI_METADATA
 from api.routes import routers
 from config import settings
-from lib.fastapi import catch_exceptions, limit_json_size
+from lib.fastapi_ import catch_exceptions, limit_json_size
 from services.setup import close_all, start_all
 
 

@@ -8,7 +8,7 @@ from bson import ObjectId
 from pydantic import BaseModel
 
 from config import settings
-from lib.fastapi import ApiError
+from lib.fastapi_ import ApiError
 from lib.types_ import (
     FindQuery,
     FindQueryFilters,
