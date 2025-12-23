@@ -74,3 +74,4 @@ The following `make` commands help manage the Axum backend:
 ## 📌 Notes
 
 -   The idiomatic way in **Rust** is to have integration tests in a `/tests` folder next to the `/src` and have unit tests in the same file as the code tested but in order to keep the same foler structure as the other backends, a `/tests` folder containing all tests was placed inside the `/src` folder.
+-   In Rust, `lib` is a special name userved for library crates. To keep a similar folder structure and avoid collision with this special name, we will be using `lib_` instead;
