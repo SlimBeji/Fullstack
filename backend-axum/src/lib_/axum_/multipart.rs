@@ -5,8 +5,8 @@ use axum::http::StatusCode;
 use axum::{Json, extract::Request};
 use serde_json::{Value, json};
 
-use crate::lib_::types_::upload::FileToUpload;
-use crate::lib_::utils::helpers;
+use crate::lib_::types_::FileToUpload;
+use crate::lib_::utils;
 
 pub enum MultipartField {
     Text(String),
@@ -170,9 +170,8 @@ impl MultipartForm {
     ) -> Result<bool, (StatusCode, Json<Value>)> {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => {
-                let result = match helpers::parse_bool(
-                    s.to_lowercase().as_str(),
-                ) {
+                let result = match utils::parse_bool(s.to_lowercase().as_str())
+                {
                     Ok(b) => Ok(b),
                     _ => Err((
                         StatusCode::UNPROCESSABLE_ENTITY,
@@ -198,9 +197,8 @@ impl MultipartForm {
     ) -> Result<Option<bool>, (StatusCode, Json<Value>)> {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => {
-                let result = match helpers::parse_bool(
-                    s.to_lowercase().as_str(),
-                ) {
+                let result = match utils::parse_bool(s.to_lowercase().as_str())
+                {
                     Ok(b) => Ok(b),
                     _ => Err((
                         StatusCode::UNPROCESSABLE_ENTITY,
