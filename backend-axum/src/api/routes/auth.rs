@@ -4,7 +4,7 @@ use axum::{Json, http::StatusCode};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::models::schemas::auth::{
+use crate::models::schemas::{
     EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
 };
 
