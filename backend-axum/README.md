@@ -73,4 +73,4 @@ The following `make` commands help manage the Axum backend:
 
 ## 📌 Notes
 
--   The idiomatic way in **Rust** is to have the `/tests` folder next to the `/src`. For the other backends, the `/tests` folder was placed inside the **source** folder.
+-   The idiomatic way in **Rust** is to have integration tests in a `/tests` folder next to the `/src` and have unit tests in the same file as the code tested but in order to keep the same foler structure as the other backends, a `/tests` folder containing all tests was placed inside the `/src` folder.
