@@ -6,7 +6,7 @@ use axum::{Json, extract::Request};
 use serde_json::{Value, json};
 
 use super::helpers;
-use crate::types::http::FileToUpload;
+use crate::lib_::types_::upload::FileToUpload;
 
 pub enum MultipartField {
     Text(String),

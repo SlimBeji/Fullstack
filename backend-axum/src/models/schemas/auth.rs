@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use utoipa::ToSchema;
 
-use crate::lib::utils::axum::MultipartForm;
-use crate::types::http::FileToUpload;
+use crate::lib_::types_::upload::FileToUpload;
+use crate::lib_::utils::axum::MultipartForm;
 
 // --- Signup Schemas ----
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
