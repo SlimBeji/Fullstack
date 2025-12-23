@@ -150,7 +150,7 @@ axum-bash:
 	docker exec -it axum bash
 
 axum-test:
-	docker exec -it axum cargo test
+	docker exec -it axum cargo test -- --test-threads=1
 
 axum-lint:
 	docker exec -it axum cargo fmt
