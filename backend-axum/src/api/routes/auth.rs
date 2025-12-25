@@ -1,6 +1,4 @@
-use axum::extract::Form;
-use axum::response::IntoResponse;
-use axum::{Json, http::StatusCode};
+use axum::{Json, extract::Form, http::StatusCode, response::IntoResponse};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 

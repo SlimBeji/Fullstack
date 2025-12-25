@@ -1,15 +1,16 @@
-use axum::Json;
-use axum::extract::{FromRequest, Request};
-use axum::http::StatusCode;
+use axum::{
+    Json,
+    extract::{FromRequest, Request},
+    http::StatusCode,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use utoipa::ToSchema;
 
-use crate::lib_::axum_::MultipartForm;
-use crate::lib_::types_::FileToUpload;
+use crate::lib_::{axum_::MultipartForm, types_::FileToUpload};
 
 // --- Signup Schemas ----
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, ToSchema)]
 pub struct SignupSchemaSwagger {
     pub name: String,
     pub email: String,

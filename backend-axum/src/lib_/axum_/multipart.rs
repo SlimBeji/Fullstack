@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
-use axum::extract::{FromRequest, multipart};
-use axum::http::StatusCode;
-use axum::{Json, extract::Request};
+use axum::{
+    Json,
+    extract::{FromRequest, Request, multipart},
+    http::StatusCode,
+};
 use serde_json::{Value, json};
 
-use crate::lib_::types_::FileToUpload;
-use crate::lib_::utils;
+use crate::lib_::{types_::FileToUpload, utils};
 
 pub enum MultipartField {
     Text(String),
