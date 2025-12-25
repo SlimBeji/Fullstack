@@ -13,7 +13,7 @@ pub struct ApiError {
     pub code: StatusCode,
     pub message: String,
     pub details: Option<Value>,
-    pub err: Option<Box<dyn Error>>,
+    pub err: Option<Box<dyn Error + Send + Sync>>,
 }
 
 impl IntoResponse for ApiError {
@@ -47,7 +47,9 @@ impl fmt::Debug for ApiError {
 
 impl Error for ApiError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        self.err.as_ref().map(|e| e.as_ref())
+        self.err
+            .as_ref()
+            .map(|e| e.as_ref() as &(dyn Error + 'static))
     }
 }
 
@@ -74,7 +76,7 @@ impl ApiError {
         }
     }
 
-    pub fn internal_error<E: Error + 'static>(
+    pub fn internal_error<E: Error + Send + Sync + 'static>(
         message: impl Into<String>,
         e: Option<E>,
     ) -> Self {
@@ -82,7 +84,7 @@ impl ApiError {
             code: StatusCode::INTERNAL_SERVER_ERROR,
             message: message.into(),
             details: None,
-            err: e.map(|err| Box::new(err) as Box<dyn Error>),
+            err: e.map(|err| Box::new(err) as Box<dyn Error + Send + Sync>),
         }
     }
 }

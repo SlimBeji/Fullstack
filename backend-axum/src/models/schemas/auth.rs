@@ -1,13 +1,11 @@
-use axum::{
-    Json,
-    extract::{FromRequest, Request},
-    http::StatusCode,
-};
+use axum::extract::{FromRequest, Request};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use utoipa::ToSchema;
 
-use crate::lib_::{axum_::MultipartForm, types_::FileToUpload};
+use crate::lib_::{
+    axum_::{ApiError, MultipartForm},
+    types_::FileToUpload,
+};
 
 // --- Signup Schemas ----
 #[derive(Serialize, ToSchema)]
@@ -31,7 +29,7 @@ impl<S> FromRequest<S> for SignupSchema
 where
     S: Send + Sync,
 {
-    type Rejection = (StatusCode, Json<Value>);
+    type Rejection = ApiError;
 
     async fn from_request(
         req: Request,
