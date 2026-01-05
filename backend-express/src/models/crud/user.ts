@@ -6,11 +6,6 @@ import { storage } from "@/services/instances";
 
 import { UserDocument, UserModel } from "../collections";
 import {
-    UserSearchableType,
-    UserSelectableType,
-    UserSortableType,
-} from "../fields";
-import {
     createToken,
     EncodedToken,
     Signin,
@@ -22,6 +17,9 @@ import {
     UserPost,
     UserPut,
     UserRead,
+    UserSearchableType,
+    UserSelectableType,
+    UserSortableType,
     UserUpdate,
 } from "../schemas";
 import { Crud, CrudEvent } from "./base";

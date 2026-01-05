@@ -5,11 +5,6 @@ import { storage } from "@/services/instances";
 
 import { PlaceDocument, PlaceModel } from "../collections";
 import {
-    PlaceSearchableType,
-    PlaceSelectableType,
-    PlaceSortableType,
-} from "../fields";
-import {
     PlaceCreate,
     PlaceDB,
     PlaceFilters,
@@ -17,6 +12,9 @@ import {
     PlacePost,
     PlacePut,
     PlaceRead,
+    PlaceSearchableType,
+    PlaceSelectableType,
+    PlaceSortableType,
     PlaceUpdate,
     UserRead,
 } from "../schemas";
