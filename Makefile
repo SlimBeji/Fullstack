@@ -123,10 +123,7 @@ gin-test:
 gin-swagger:
 	docker exec -it gin swag init -g ./app.go -o internal/api/docs
 
-gin-generate:
-	docker exec -it gin go generate ./...
-
-gin-lint: gin-generate gin-swagger
+gin-lint: gin-swagger
 	docker exec -it gin go fmt .
 	docker exec -it gin go build .
 
