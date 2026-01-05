@@ -8,11 +8,6 @@ from lib.fastapi_ import ApiError
 from lib.types_ import Filter
 from models.collections.place import Place
 from models.crud.base import CrudBase, CrudEvent
-from models.fields import (
-    PlaceSearchableFields,
-    PlaceSelectableFields,
-    PlaceSortableFields,
-)
 from models.schemas import (
     PlaceCreateSchema,
     PlaceFiltersSchema,
@@ -20,6 +15,9 @@ from models.schemas import (
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
+    PlaceSearchableFields,
+    PlaceSelectableFields,
+    PlaceSortableFields,
     PlaceUpdateSchema,
     UserReadSchema,
 )

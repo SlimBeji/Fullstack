@@ -8,7 +8,8 @@ from models.collections.base import (
     CollectionEnum,
     document_registry,
 )
-from models.fields import place as PlaceFields
+
+from ..schemas import place
 
 if TYPE_CHECKING:
     # Avoid Circular imports
@@ -17,12 +18,12 @@ if TYPE_CHECKING:
 
 class Place(BaseDocument):
     # Fields
-    title: PlaceFields.title_annot
-    description: PlaceFields.description_annot
-    imageUrl: PlaceFields.imageUrl_annot | None = None
-    address: PlaceFields.address_annot
-    location: PlaceFields.Location | None = None
-    embedding: PlaceFields.embedding_annot | None = None
+    title: place.title_annot
+    description: place.description_annot
+    imageUrl: place.imageUrl_annot | None = None
+    address: place.address_annot
+    location: place.Location | None = None
+    embedding: place.embedding_annot | None = None
 
     # Relations
     creatorId: PydanticObjectId

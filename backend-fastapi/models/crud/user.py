@@ -10,11 +10,6 @@ from lib.types_ import Filter
 from lib.utils import hash_input, verify_hash
 from models.collections.user import User
 from models.crud.base import CrudBase, CrudEvent, Projection
-from models.fields import (
-    UserSearchableFields,
-    UserSelectableFields,
-    UserSortableFields,
-)
 from models.schemas import (
     EncodedTokenSchema,
     SigninForm,
@@ -25,6 +20,9 @@ from models.schemas import (
     UserPostSchema,
     UserPutSchema,
     UserReadSchema,
+    UserSearchableFields,
+    UserSelectableFields,
+    UserSortableFields,
     UserUpdateSchema,
     create_token,
 )

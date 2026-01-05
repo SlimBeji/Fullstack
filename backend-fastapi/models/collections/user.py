@@ -8,7 +8,8 @@ from models.collections.base import (
     CollectionEnum,
     document_registry,
 )
-from models.fields import user as UserFilds
+
+from ..schemas import user
 
 if TYPE_CHECKING:
     # Avoid Circular imports
@@ -17,11 +18,11 @@ if TYPE_CHECKING:
 
 class User(BaseDocument):
     # Fields
-    name: UserFilds.name_annot
-    email: UserFilds.email_annot
-    password: UserFilds.password_annot
-    imageUrl: UserFilds.imageUrl_annot | None = None
-    isAdmin: UserFilds.isAdmin_annot
+    name: user.name_annot
+    email: user.email_annot
+    password: user.password_annot
+    imageUrl: user.imageUrl_annot | None = None
+    isAdmin: user.isAdmin_annot
 
     # Relations
     places: list[PydanticObjectId] = []
