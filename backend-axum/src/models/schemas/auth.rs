@@ -1,27 +1,45 @@
 use axum::extract::{FromRequest, Request};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use validator::Validate;
 
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
     types_::FileToUpload,
+    validator_::{OBJECT_ID_REGEX, TOKEN_TYPE_REGEX},
 };
 
 // --- Signup Schemas ----
 #[derive(Serialize, ToSchema)]
 pub struct SignupSchemaSwagger {
+    /// The user name, two characters at least
+    #[schema(example = "Slim Beji")]
     pub name: String,
+
+    /// The user email
+    #[schema(example = "mslimbeji@gmail.com")]
     pub email: String,
+
+    /// The user password, 10 characters at least
+    #[schema(example = "very_secret")]
     pub password: String,
+
+    /// User's profile image (JPEG)
     #[schema(format = "binary", required = false)]
     pub image: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Validate)]
 pub struct SignupSchema {
+    #[validate(length(min = 2))]
     pub name: String,
+
+    #[validate(email)]
     pub email: String,
+
+    #[validate(length(min = 10))]
     pub password: String,
+
     pub image: Option<FileToUpload>,
 }
 
@@ -53,19 +71,45 @@ where
 }
 
 // --- Signin Schemas ----
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
 pub struct SigninSchema {
+    /// The user email (We use username here because of OAuth spec)
+    #[schema(example = "mslimbeji@gmail.com")]
+    #[validate(email)]
     pub username: String,
+
+    /// The user password, 10 characters at least
+    #[schema(example = "very_secret")]
+    #[validate(length(min = 10))]
     pub password: String,
 }
 
 // Response Schemas
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Validate)]
 pub struct EncodedTokenSchema {
+    /// A generated web token. The 'Bearer ' prefix needs to be added for authentication
+    #[schema(
+        example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"
+    )]
     pub access_token: String,
+
+    /// The type of token. Only 'bearer' is supported.
+    #[schema(example = "bearer")]
+    #[validate(regex(path = "*TOKEN_TYPE_REGEX"))]
     pub token_type: String,
+
+    /// The user ID, 24 characters
+    #[schema(example = "683b21134e2e5d46978daf1f")]
+    #[validate(regex(path = "*OBJECT_ID_REGEX"))]
     pub user_id: String,
+
+    /// The user email
+    #[schema(example = "mslimbeji@gmail.com")]
+    #[validate(email)]
     pub email: String,
+
+    /// The UNIX timestamp the token expires at    
+    #[schema(example = "1751879562")]
     pub expires_in: u16,
 }
 
