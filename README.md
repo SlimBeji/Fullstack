@@ -129,10 +129,6 @@ Contains the **data layer**. Well-thought-out data models are critical not only 
 
 Each backend includes a `models/` folder with several key subfolders:
 
-#### 📁 📁 Fields
-
-Each model should define a file with the fields associated to it containing metatdata for documentation/Swagger and defining the validator each field should define.
-
 #### 📁 📁 Schemas
 
 We break down schema definitions based on their **specific purpose** in the application lifecycle: creation, seeding, reading, editing, querying...
