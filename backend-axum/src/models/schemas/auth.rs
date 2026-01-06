@@ -6,7 +6,7 @@ use validator::Validate;
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
     types_::FileToUpload,
-    validator_::{OBJECT_ID_REGEX, TOKEN_TYPE_REGEX},
+    validator_::{email_strict, object_id, token_type},
 };
 
 // --- Signup Schemas ----
@@ -34,7 +34,7 @@ pub struct SignupSchema {
     #[validate(length(min = 2))]
     pub name: String,
 
-    #[validate(email)]
+    #[validate(custom(function = "email_strict"))]
     pub email: String,
 
     #[validate(length(min = 10))]
@@ -75,7 +75,7 @@ where
 pub struct SigninSchema {
     /// The user email (We use username here because of OAuth spec)
     #[schema(example = "mslimbeji@gmail.com")]
-    #[validate(email)]
+    #[validate(custom(function = "email_strict"))]
     pub username: String,
 
     /// The user password, 10 characters at least
@@ -95,17 +95,17 @@ pub struct EncodedTokenSchema {
 
     /// The type of token. Only 'bearer' is supported.
     #[schema(example = "bearer")]
-    #[validate(regex(path = "*TOKEN_TYPE_REGEX"))]
+    #[validate(custom(function = "token_type"))]
     pub token_type: String,
 
     /// The user ID, 24 characters
     #[schema(example = "683b21134e2e5d46978daf1f")]
-    #[validate(regex(path = "*OBJECT_ID_REGEX"))]
+    #[validate(custom(function = "object_id"))]
     pub user_id: String,
 
     /// The user email
     #[schema(example = "mslimbeji@gmail.com")]
-    #[validate(email)]
+    #[validate(custom(function = "email_strict"))]
     pub email: String,
 
     /// The UNIX timestamp the token expires at    
