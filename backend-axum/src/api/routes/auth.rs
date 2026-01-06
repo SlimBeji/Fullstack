@@ -1,7 +1,8 @@
-use axum::{Json, extract::Form, http::StatusCode, response::IntoResponse};
+use axum::{Json, http::StatusCode, response::IntoResponse};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use crate::lib_::axum_::{Validated, ValidatedForm};
 use crate::models::schemas::{
     EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
 };
@@ -36,7 +37,9 @@ pub fn routes() -> OpenApiRouter {
         content_type = "application/json"
     ))
 )]
-async fn signup_route(payload: SignupSchema) -> impl IntoResponse {
+async fn signup_route(
+    Validated(payload): Validated<SignupSchema>,
+) -> impl IntoResponse {
     println!("{:?}", payload.name);
     println!("{:?}", payload.email);
     println!("{:?}", payload.password);
@@ -67,7 +70,9 @@ async fn signup_route(payload: SignupSchema) -> impl IntoResponse {
         content_type = "application/json"
     ))
 )]
-async fn signin_route(Form(payload): Form<SigninSchema>) -> impl IntoResponse {
+async fn signin_route(
+    ValidatedForm(payload): ValidatedForm<SigninSchema>,
+) -> impl IntoResponse {
     println!("{:?}", payload);
     let response = EncodedTokenSchema::example();
     (StatusCode::OK, Json(response))
