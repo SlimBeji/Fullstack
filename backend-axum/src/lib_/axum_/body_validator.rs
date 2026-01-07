@@ -1,4 +1,4 @@
-use axum::extract::{Form, FromRequest, Request};
+use axum::extract::{Form, FromRequest, Json, Request};
 use serde::de::DeserializeOwned;
 use serde_json::{Value, json};
 use validator::{Validate, ValidationError, ValidationErrors};
@@ -20,6 +20,38 @@ where
         state: &S,
     ) -> Result<Self, Self::Rejection> {
         let inner = T::from_request(req, state).await?;
+        validate(&inner)?;
+        Ok(Self(inner))
+    }
+}
+
+// ValidatedJson for simple structs that implements only Validated trait
+pub struct ValidatedJson<T>(pub T);
+
+impl<S, T> FromRequest<S> for ValidatedJson<T>
+where
+    S: Send + Sync,
+    T: DeserializeOwned + Validate,
+{
+    type Rejection = ApiError;
+
+    async fn from_request(
+        req: Request,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        // need to undersatnd the internal error for a better bad request message ??
+
+        let inner = Json::<T>::from_request(req, state)
+            .await
+            .map_err(|rejection| {
+                // Check the error by its Display or Debug output
+                let error_msg = rejection.to_string();
+                ApiError::bad_request(&format!(
+                    "Invalid json data: {}",
+                    error_msg
+                ))
+            })?
+            .0;
         validate(&inner)?;
         Ok(Self(inner))
     }
