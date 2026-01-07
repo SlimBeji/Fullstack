@@ -8,14 +8,6 @@ use super::error::ApiError;
 // Validated for types that impelments FromRequest with ApiError rejection
 pub struct Validated<T>(pub T);
 
-impl<T> std::ops::Deref for Validated<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 impl<S, T> FromRequest<S> for Validated<T>
 where
     S: Send + Sync,
@@ -35,14 +27,6 @@ where
 
 // ValidatedForm for simple structs that implements only Validated trait
 pub struct ValidatedForm<T>(pub T);
-
-impl<T> std::ops::Deref for ValidatedForm<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
 
 impl<S, T> FromRequest<S> for ValidatedForm<T>
 where
