@@ -17,6 +17,14 @@ tracing-subscriber = "0.3"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["trace"] }
 
+# Rust Tools
+time = { version = "0.3", features = ["serde", "serde-human-readable", "macros", "formatting", "parsing"] }
+once_cell = { version = "1.21.3" }
+regex = { version = "1.12.2" }
+
+# Database
+mongodb = { version = "3" }
+
 # Schemas
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -24,7 +32,3 @@ validator = { version = "0.18", features = ["derive"] }
 utoipa = { version = "5", features = ["macros"] }
 utoipa-swagger-ui = { version = "9", features = ["axum", "vendored"] }
 utoipa-axum = "0.2"
-
-# Rust Tools
-once_cell = { version = "1.21.3" }
-regex = { version = "1.12.2" }
