@@ -108,7 +108,7 @@ pub struct EncodedTokenSchema {
     #[validate(custom(function = "email_strict"))]
     pub email: String,
 
-    /// The UNIX timestamp the token expires at    
+    /// The UNIX timestamp the token expires at
     #[schema(example = "1751879562")]
     pub expires_in: u16,
 }
