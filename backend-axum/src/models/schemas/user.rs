@@ -57,7 +57,6 @@ pub struct UserCreate {
 }
 
 // --- Post Schema ---
-#[allow(dead_code)] // to be removed
 #[derive(Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserPostSwagger {
@@ -82,25 +81,15 @@ pub struct UserPostSwagger {
     pub image: String,
 }
 
-#[allow(dead_code)] // to be removed
 #[derive(Debug, Validate)]
 pub struct UserPost {
-    /// The user name, two characters at least
     #[validate(length(min = 2))]
     pub name: String,
-
-    /// The user email
     #[validate(custom(function = "email_strict"))]
     pub email: String,
-
-    /// Whether the user is an admin or not
     pub is_admin: bool,
-
-    /// The user password, 10 characters at least
     #[validate(length(min = 10))]
     pub password: String,
-
-    /// User's profile image (JPEG)
     pub image: Option<FileToUpload>,
 }
 
@@ -131,7 +120,6 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
 }
 
 // --- Read Schema ---
-#[allow(dead_code)] // to be removed
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UserRead {
@@ -179,7 +167,6 @@ impl UserRead {
 }
 
 // --- Update Schema ---
-#[allow(dead_code)] // to be removed
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
 pub struct UserUpdate {
     /// The user name, two characters at least
@@ -202,5 +189,4 @@ pub struct UserUpdate {
 }
 
 // --- Put Schema ---
-#[allow(dead_code)] // to be removed
 pub type UserPut = UserUpdate;
