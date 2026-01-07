@@ -53,7 +53,7 @@ impl Error for ApiError {
     }
 }
 
-#[allow(dead_code)]
+#[allow(dead_code)] // to be removed
 impl ApiError {
     pub fn unprocessable(
         message: impl Into<String>,
