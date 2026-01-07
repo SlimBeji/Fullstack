@@ -121,33 +121,35 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
 
 // --- Read Schema ---
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
+#[schema(example = json!({
+    "id": "683b21134e2e5d46978daf1f",
+    "name": "Slim Beji",
+    "email": "mslimbeji@gmail.com",
+    "isAdmin": false,
+    "imageUrl": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+    "places": ["683b21134e2e5d46978daf1f"]
+}))]
 #[serde(rename_all = "camelCase")]
 pub struct UserRead {
     /// The user ID, 24 characters
-    #[schema(example = "683b21134e2e5d46978daf1f")]
     #[validate(custom(function = "object_id"))]
     pub id: String,
 
     /// The user name, two characters at least
-    #[schema(example = "Slim Beji")]
     #[validate(length(min = 2))]
     pub name: String,
 
     /// The user email
-    #[schema(example = "mslimbeji@gmail.com")]
     #[validate(custom(function = "email_strict"))]
     pub email: String,
 
     /// Whether the user is an admin or not
-    #[schema(example = false)]
     pub is_admin: bool,
 
     /// Local url on the storage
-    #[schema(example = "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg")]
     pub image_url: Option<String>,
 
     /// The id of places belonging to the user, 24 characters
-    #[schema(example = json!(["683b21134e2e5d46978daf1f"]))]
     pub places: Vec<String>,
 }
 
@@ -168,21 +170,23 @@ impl UserRead {
 
 // --- Update Schema ---
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
+#[schema(example = json!({
+    "name": "Slim Beji",
+    "email": "mslimbeji@gmail.com",
+    "password": "very_secret"
+}))]
 pub struct UserUpdate {
     /// The user name, two characters at least
-    #[schema(example = "Slim Beji")]
     #[validate(length(min = 2))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 
     /// The user email
-    #[schema(example = "mslimbeji@gmail.com")]
     #[validate(custom(function = "email_strict"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
 
     /// The user password, 10 characters at least
-    #[schema(example = "very_secret")]
     #[validate(length(min = 10))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
