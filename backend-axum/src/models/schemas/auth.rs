@@ -10,7 +10,8 @@ use crate::lib_::{
 };
 
 // --- Signup Schemas ----
-#[derive(Serialize, ToSchema)]
+#[allow(dead_code)]
+#[derive(ToSchema)]
 pub struct SignupSchemaSwagger {
     /// The user name, two characters at least
     #[schema(example = "Slim Beji")]
