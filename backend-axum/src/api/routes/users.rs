@@ -1,7 +1,12 @@
-use axum::{Json, extract::Path};
-use serde_json::Value;
+use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
+use serde_json::{Value, json};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
+
+use crate::{
+    lib_::axum_::{Validated, ValidatedJson},
+    models::schemas::{UserPost, UserPostSwagger, UserPut, UserRead},
+};
 
 pub const PATH: &str = "/users";
 
@@ -45,13 +50,36 @@ async fn query_users(Json(body): Json<Value>) -> Json<Value> {
 
 #[utoipa::path(
     post,
-    path = "/", 
-    tag = "User", 
-    summary = "User Creation", 
-    responses((status = 200, content_type = "application/json"))
+    path = "/",
+    tag = "User",
+    summary = "User Creation",
+    request_body(
+        content = UserPostSwagger,
+        content_type = "multipart/form-data"
+    ),
+    responses((
+        status = 200,
+        body = UserRead,
+        content_type = "application/json"
+    ))
 )]
-async fn create_user(Json(body): Json<Value>) -> Json<Value> {
-    Json(body)
+async fn create_user(
+    Validated(payload): Validated<UserPost>,
+) -> impl IntoResponse {
+    println!("{:?}", payload.name);
+    println!("{:?}", payload.email);
+    println!("{:?}", payload.is_admin);
+    println!("{:?}", payload.password);
+    match payload.image {
+        Some(image) => {
+            println!("{}", image.originalname);
+            println!("{}", image.mimetype);
+            println!("{}", image.data.len());
+        }
+        _ => (),
+    }
+    let response = UserRead::example();
+    (StatusCode::OK, Json(response))
 }
 
 #[utoipa::path(
@@ -59,10 +87,12 @@ async fn create_user(Json(body): Json<Value>) -> Json<Value> {
     path = "/{id}",
     tag = "User",
     summary = "Search and Retrieve user by id",
-    responses((status = 200, content_type = "application/json"))
+    params(("id" = String, Path, description = "User ID")),
+    responses((status = 200, body = UserRead, content_type = "application/json"))
 )]
-async fn get_user(Path(id): Path<String>) -> String {
-    format!("returning user {}", id)
+async fn get_user(Path(id): Path<String>) -> impl IntoResponse {
+    println!("returning user {}", id);
+    (StatusCode::OK, Json(UserRead::example()))
 }
 
 #[utoipa::path(
@@ -70,14 +100,23 @@ async fn get_user(Path(id): Path<String>) -> String {
     path = "/{id}",
     tag = "User",
     summary = "Update users",
-    responses((status = 200, content_type = "application/json"))
+    params(("id" = String, Path, description = "User ID")),
+    request_body(
+        content = UserPut,
+        content_type = "application/json"
+    ),
+    responses((status = 200, body = UserRead, content_type = "application/json"))
 )]
 async fn update_user(
     Path(id): Path<String>,
-    Json(body): Json<Value>,
-) -> Json<Value> {
+    ValidatedJson(payload): ValidatedJson<UserPut>,
+) -> impl IntoResponse {
     println!("{}", id);
-    Json(body)
+    println!("{:?}", payload.name);
+    println!("{:?}", payload.email);
+    println!("{:?}", payload.password);
+    let response = UserRead::example();
+    (StatusCode::OK, Json(response))
 }
 
 #[utoipa::path(
@@ -85,8 +124,18 @@ async fn update_user(
     path = "/{id}",
     tag = "User",
     summary = "Delete user by id",
-    responses((status = 200, content_type = "application/json"))
+    params(("id" = String, Path, description = "User ID")),
+    responses((
+        status = 200,
+        content_type = "application/json",
+        example = json!({
+            "message": "Deleted user 683b21134e2e5d46978daf1f"
+        })
+    ))
 )]
-async fn delete_user(Path(id): Path<String>) -> String {
-    format!("Deleted user {}", id)
+async fn delete_user(Path(id): Path<String>) -> impl IntoResponse {
+    (
+        StatusCode::OK,
+        Json(json!({"message": format!("Deleted user {}", id)})),
+    )
 }
