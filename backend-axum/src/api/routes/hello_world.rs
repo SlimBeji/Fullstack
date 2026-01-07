@@ -24,7 +24,7 @@ pub fn routes() -> OpenApiRouter {
     tag = "Hello World",
     summary = "Hello World Endpoint",
     responses((
-        status = 200, 
+        status = 200,
         content_type = "application/json",
         example = json!({
             "message": "Hello World!"
@@ -43,7 +43,7 @@ async fn hello() -> impl IntoResponse {
     tag = "Hello World",
     summary = "Hello World Endpoint for authenticated users",
     responses((
-        status = 200, 
+        status = 200,
         content_type = "application/json",
         example = json!({
             "message": "Hello Slim Beji!"
@@ -62,7 +62,7 @@ async fn hello_user() -> impl IntoResponse {
     tag = "Hello World",
     summary = "Hello World Endpoint for admins only",
     responses((
-        status = 200, 
+        status = 200,
         content_type = "application/json",
         example = json!({
             "message": "Hello Slim Beji!"
