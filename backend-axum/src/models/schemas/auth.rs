@@ -44,10 +44,7 @@ pub struct SignupSchema {
     pub image: Option<FileToUpload>,
 }
 
-impl<S> FromRequest<S> for SignupSchema
-where
-    S: Send + Sync,
-{
+impl<S: Send + Sync> FromRequest<S> for SignupSchema {
     type Rejection = ApiError;
 
     async fn from_request(

@@ -67,8 +67,8 @@ async fn get_user(Path(id): Path<String>) -> String {
 
 #[utoipa::path(
     put,
-    path = "/{id}", 
-    tag = "User", 
+    path = "/{id}",
+    tag = "User",
     summary = "Update users",
     responses((status = 200, content_type = "application/json"))
 )]
