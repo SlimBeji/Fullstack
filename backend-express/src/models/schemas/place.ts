@@ -11,6 +11,8 @@ import {
     zodObjectId,
 } from "@/lib/zod_";
 
+import { createdAt, updatedAt } from "./common";
+
 // --- Fields ----
 
 export const placeSelectableFields = [
@@ -157,7 +159,10 @@ export type PlacePost = ZodInfer<typeof PlacePostSchema>;
 
 // ---  Read Schemas ----
 
-export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true });
+export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true }).extend({
+    createdAt,
+    updatedAt,
+});
 
 export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
 

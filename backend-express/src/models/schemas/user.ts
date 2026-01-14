@@ -10,6 +10,8 @@ import {
     zodObjectId,
 } from "@/lib/zod_";
 
+import { createdAt, updatedAt } from "./common";
+
 // --- Fields ----
 
 export const userSelectableFields = [
@@ -120,7 +122,10 @@ export type UserPost = ZodInfer<typeof UserPostSchema>;
 
 // ---  Read Schemas ----
 
-export const UserReadSchema = UserDBSchema.omit({ password: true });
+export const UserReadSchema = UserDBSchema.omit({ password: true }).extend({
+    createdAt,
+    updatedAt,
+});
 
 export type UserRead = ZodInfer<typeof UserReadSchema>;
 
