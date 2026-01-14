@@ -1,5 +1,8 @@
 use axum::Router;
 use utoipa::openapi::InfoBuilder;
+use utoipa::openapi::security::{
+    Flow, OAuth2, Password, Scopes, SecurityScheme,
+};
 use utoipa::openapi::server::ServerBuilder;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
@@ -22,6 +25,14 @@ pub fn add_swagger_ui(app: OpenApiRouter) -> Router {
             .description(Some("Swagger documentation"))
             .build(),
     ]);
+
+    openapi.components.as_mut().unwrap().add_security_scheme(
+        "OAuth2Password",
+        SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
+            "/api/auth/signin",
+            Scopes::new(),
+        ))])),
+    );
 
     Router::new()
         .merge(router)
