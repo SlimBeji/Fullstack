@@ -18,4 +18,4 @@ class PaginatedData(BaseModel, Generic[ReadSchema]):
     page: int
     totalPages: int
     totalCount: int
-    data: list[dict] | list[ReadSchema]
+    data: list[ReadSchema] | list[dict]
