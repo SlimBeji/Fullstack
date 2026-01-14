@@ -46,14 +46,14 @@ type UserPost struct {
 }
 
 type UserRead struct {
-	Id        string          `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The user ID, 24 characters
-	Name      string          `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
-	Email     string          `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                        // The user email
-	IsAdmin   types_.FlexBool `json:"isAdmin" example:"false" bson:"isAdmin"`                                                                   // Whether the user is an admin or not
-	ImageUrl  string          `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	Places    []string        `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"places"`               // The id of places belonging to the user, 24 characters
-	CreatedAt time.Time       `json:"createdAt" bson:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                            // creation datetime
-	UpdatedAt time.Time       `json:"updatedAt" bson:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                            // last update datetime
+	Id        primitive.ObjectID   `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The user ID, 24 characters
+	Name      string               `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
+	Email     string               `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                        // The user email
+	IsAdmin   types_.FlexBool      `json:"isAdmin" example:"false" bson:"isAdmin"`                                                                   // Whether the user is an admin or not
+	ImageUrl  string               `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
+	Places    []primitive.ObjectID `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"places"`               // The id of places belonging to the user, 24 characters
+	CreatedAt time.Time            `json:"createdAt" bson:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                            // creation datetime
+	UpdatedAt time.Time            `json:"updatedAt" bson:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                            // last update datetime
 }
 
 type UsersPaginated = types_.PaginatedData[PlaceRead]

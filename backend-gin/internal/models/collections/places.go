@@ -122,7 +122,7 @@ func (pc *PlaceCollection) AuthRead(
 	}
 
 	if user.Id != doc.CreatorID {
-		return gin_.AccessDeiniedErr(pc.Name(), doc.ID)
+		return gin_.AccessDeiniedErr(pc.Name(), doc.ID.Hex())
 	}
 
 	return nil
@@ -171,11 +171,6 @@ func (pc *PlaceCollection) AddOwnershipFilters(
 	}
 
 	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
-	userId, err := primitive.ObjectIDFromHex(user.Id)
-	if err == nil {
-		ownershipFilter = types_.Filter{Op: types_.FilterEq, Val: userId}
-	}
-
 	findQuery.Filters["creatorId"] = append(
 		findQuery.Filters["creatorId"], ownershipFilter,
 	)
@@ -305,7 +300,7 @@ func (pc *PlaceCollection) AuthCreate(
 		return nil
 	}
 
-	if user.Id != item.CreatorID {
+	if user.Id.Hex() != item.CreatorID {
 		return gin_.AccessDeiniedErr(
 			string(Users), item.CreatorID,
 		)
@@ -371,7 +366,7 @@ func (pc *PlaceCollection) AuthUpdate(
 		return nil
 	}
 
-	if user.Id == *creatorId {
+	if user.Id.Hex() == *creatorId {
 		return nil
 	}
 
@@ -405,7 +400,7 @@ func (pc *PlaceCollection) PostUpdate(
 	}
 
 	if pre.Description != post.Description || pre.Title != post.Title {
-		_, err := publishers.PlaceEmbedding(post.ID)
+		_, err := publishers.PlaceEmbedding(post.ID.Hex())
 		return err
 	}
 	return nil

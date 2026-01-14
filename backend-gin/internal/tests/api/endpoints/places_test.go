@@ -204,7 +204,7 @@ func TestCreatePlace(t *testing.T) {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 
-	if resp.CreatorID != token.UserId {
+	if resp.CreatorID.Hex() != token.UserId {
 		t.Fatalf(
 			"expected creatorId to be %s, got %s", token.UserId, resp.CreatorID,
 		)
@@ -245,7 +245,7 @@ func TestCreatePlaceForOthers(t *testing.T) {
 	// creating form
 	buffer := &bytes.Buffer{}
 	writer := multipart.NewWriter(buffer)
-	writer.WriteField("creatorId", admin.Id)
+	writer.WriteField("creatorId", admin.Id.Hex())
 	writer.WriteField("description", "A brand new place")
 	writer.WriteField("title", "Brand New Place")
 	writer.WriteField("address", "Somewhere over the rainbow")
@@ -295,7 +295,7 @@ func TestGetPlaceById(t *testing.T) {
 	}
 
 	// sending the request
-	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID.Hex())
 	req := httptest.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -350,7 +350,7 @@ func TestUpdatePlaceById(t *testing.T) {
 		t.Fatal("could not marshal data for TestUpdatePlaceById")
 	}
 	formReader := bytes.NewReader(body)
-	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID.Hex())
 	req := httptest.NewRequest(http.MethodPut, url, formReader)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -405,7 +405,7 @@ func TestUpdatePlaceForOthers(t *testing.T) {
 		t.Fatal("could not marshal data for TestUpdatePlaceById")
 	}
 	formReader := bytes.NewReader(body)
-	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID.Hex())
 	req := httptest.NewRequest(http.MethodPut, url, formReader)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -435,7 +435,7 @@ func TestDeletePlaceForOthers(t *testing.T) {
 	}
 
 	// sending the request
-	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID.Hex())
 	req := httptest.NewRequest(http.MethodDelete, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -465,7 +465,7 @@ func TestDeletePlace(t *testing.T) {
 	}
 
 	// sending the request
-	url := fmt.Sprintf("/api/places/%s", examples[0].ID)
+	url := fmt.Sprintf("/api/places/%s", examples[0].ID.Hex())
 	req := httptest.NewRequest(http.MethodDelete, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -485,7 +485,7 @@ func TestDeletePlace(t *testing.T) {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 
-	expected := fmt.Sprintf("Deleted place %s", examples[0].ID)
+	expected := fmt.Sprintf("Deleted place %s", examples[0].ID.Hex())
 	if resp.Message != expected {
 		t.Fatalf("expected %s, got %s", expected, resp.Message)
 	}

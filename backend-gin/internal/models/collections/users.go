@@ -121,7 +121,7 @@ func (uc *UserCollection) AuthRead(
 	}
 
 	if user.Id != doc.Id {
-		return gin_.AccessDeiniedErr(uc.Name(), doc.Id)
+		return gin_.AccessDeiniedErr(uc.Name(), doc.Id.Hex())
 	}
 
 	return nil
@@ -185,7 +185,7 @@ func (uc *UserCollection) GetTokenPayload(
 		)
 	}
 
-	token, err := schemas.CreateToken(user.Id, user.Email)
+	token, err := schemas.CreateToken(user.Id.Hex(), user.Email)
 	if err != nil {
 		return zero, fmt.Errorf("could not create token for user %s: %w", email, err)
 	}
@@ -422,7 +422,7 @@ func (uc *UserCollection) Signup(
 		}
 	}
 
-	return uc.createToken(user.Id, user.Email)
+	return uc.createToken(user.Id.Hex(), user.Email)
 }
 
 func (uc *UserCollection) Signin(

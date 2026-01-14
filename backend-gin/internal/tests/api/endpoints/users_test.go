@@ -336,7 +336,7 @@ func TestUpdateOtherUsers(t *testing.T) {
 		t.Fatal("could not marshal data for TestUpdateUser")
 	}
 	formReader := bytes.NewReader(body)
-	url := fmt.Sprintf("/api/users/%s", admin.Id)
+	url := fmt.Sprintf("/api/users/%s", admin.Id.Hex())
 	req := httptest.NewRequest(http.MethodPut, url, formReader)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
