@@ -5,12 +5,14 @@ use tower_http::trace::TraceLayer;
 use crate::config;
 
 mod docs;
+mod middlewares;
 mod routes;
 
 pub fn get_app() -> Router {
     let router = routes::create_router("/api");
     let app = docs::add_swagger_ui(router);
-    add_trace_layer(app)
+    let app = add_trace_layer(app);
+    app.layer(middlewares::cors::cors_layer())
 }
 
 fn add_trace_layer(router: Router) -> Router {

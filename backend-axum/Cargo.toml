@@ -15,7 +15,7 @@ axum = { version = "0.8", features = ["multipart"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
 tower = "0.4"
-tower-http = { version = "0.5", features = ["trace"] }
+tower-http = { version = "0.5", features = ["trace", "cors"] }
 
 # Rust Tools
 time = { version = "0.3", features = ["serde", "serde-human-readable", "macros", "formatting", "parsing"] }
