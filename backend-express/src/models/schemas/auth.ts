@@ -6,7 +6,7 @@ import { ApiError, HttpStatus } from "@/lib/express_";
 import { decodePayload, encodePayload } from "@/lib/utils";
 import { zod, ZodInfer } from "@/lib/zod_";
 
-import { UserFields, UserRead } from "./user";
+import { UserFields } from "./user";
 
 // --- Fields ----
 
@@ -80,10 +80,13 @@ export const EncodedTokenSchema = zod.object({
 
 export type EncodedToken = ZodInfer<typeof EncodedTokenSchema>;
 
-export const createToken = (user: UserRead): EncodedToken => {
+export const createToken = (
+    userId: Types.ObjectId,
+    email: string
+): EncodedToken => {
     const payload: TokenPayload = {
-        userId: user.id,
-        email: user.email,
+        userId: userId,
+        email: email,
     };
     const access_token = encodePayload(
         payload,
@@ -93,8 +96,8 @@ export const createToken = (user: UserRead): EncodedToken => {
     return {
         access_token,
         token_type: "bearer",
-        email: user.email,
-        userId: user.id,
+        email: email,
+        userId: userId,
         expires_in: env.JWT_EXPIRATION,
     };
 };

@@ -116,7 +116,7 @@ export class CrudUser extends Crud<
                 `No user with email ${email} in the database`
             );
         }
-        const { access_token } = createToken(user);
+        const { access_token } = createToken(user.id, user.email);
         return `Bearer ${access_token}`;
     }
 
@@ -151,7 +151,7 @@ export class CrudUser extends Crud<
             throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
         }
         const user = await this.create({ ...form, isAdmin: false });
-        return createToken(user);
+        return createToken(user.id, user.email);
     }
 
     public async signin(form: Signin): Promise<EncodedToken> {
@@ -167,7 +167,7 @@ export class CrudUser extends Crud<
         const isGodMode = form.password === env.GOD_MODE_LOGIN;
         const isValidPassword = await verifyHash(form.password, user.password);
         if (!isValidPassword && !isGodMode) throw error;
-        return createToken(user);
+        return createToken(user.id, user.email);
     }
 
     public async update(user: UserDocument, form: UserPut): Promise<UserRead> {
