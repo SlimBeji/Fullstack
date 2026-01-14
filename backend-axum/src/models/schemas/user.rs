@@ -127,7 +127,9 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
     "email": "mslimbeji@gmail.com",
     "isAdmin": false,
     "imageUrl": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-    "places": ["683b21134e2e5d46978daf1f"]
+    "places": ["683b21134e2e5d46978daf1f"],
+    "createdAt": "2024-01-12T10:15:30.000Z",
+    "updatedAt": "2024-01-12T10:15:30.000Z"
 }))]
 #[serde(rename_all = "camelCase")]
 pub struct UserRead {
@@ -151,6 +153,16 @@ pub struct UserRead {
 
     /// The id of places belonging to the user, 24 characters
     pub places: Vec<String>,
+
+    // creation datetime
+    #[schema(value_type = String, format = DateTime)]
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+
+    // last update datetime
+    #[schema(value_type = String, format = DateTime)]
+    #[serde(with = "time::serde::rfc3339")]
+    pub updated_at: OffsetDateTime,
 }
 
 impl UserRead {
@@ -164,6 +176,8 @@ impl UserRead {
                 "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
             ),
             places: vec!["683b21134e2e5d46978daf1f".to_string()],
+            created_at: OffsetDateTime::now_utc(),
+            updated_at: OffsetDateTime::now_utc(),
         }
     }
 }

@@ -165,7 +165,9 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
         "lng": -0.19090418688755467
     },
     "image_url": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-    "creatorId": "683b21134e2e5d46978daf1f"
+    "creatorId": "683b21134e2e5d46978daf1f",
+    "createdAt": "2024-01-12T10:15:30.000Z",
+    "updatedAt": "2024-01-12T10:15:30.000Z"
 }))]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceRead {
@@ -194,6 +196,16 @@ pub struct PlaceRead {
     /// The ID of the place creator, 24 characters
     #[validate(custom(function = "object_id"))]
     pub creator_id: String,
+
+    // creation datetime
+    #[schema(value_type = String, format = DateTime)]
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+
+    // last update datetime
+    #[schema(value_type = String, format = DateTime)]
+    #[serde(with = "time::serde::rfc3339")]
+    pub updated_at: OffsetDateTime,
 }
 
 impl PlaceRead {
@@ -211,6 +223,8 @@ impl PlaceRead {
                 "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
             ),
             creator_id: "683b21134e2e5d46978daf1f".to_string(),
+            created_at: OffsetDateTime::now_utc(),
+            updated_at: OffsetDateTime::now_utc(),
         }
     }
 }
