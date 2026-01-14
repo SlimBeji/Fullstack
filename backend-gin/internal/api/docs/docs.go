@@ -1137,6 +1137,11 @@ const docTemplate = `{
                     "minLength": 10,
                     "example": "Fulham road"
                 },
+                "createdAt": {
+                    "description": "creation datetime",
+                    "type": "string",
+                    "example": "2024-01-12T10:15:30.000Z"
+                },
                 "creatorId": {
                     "description": "The ID of the place creator, 24 characters",
                     "type": "string",
@@ -1171,6 +1176,11 @@ const docTemplate = `{
                     "type": "string",
                     "minLength": 10,
                     "example": "Stamford Bridge"
+                },
+                "updatedAt": {
+                    "description": "last update datetime",
+                    "type": "string",
+                    "example": "2024-01-12T10:15:30.000Z"
                 }
             }
         },
@@ -1281,6 +1291,11 @@ const docTemplate = `{
         "schemas.UserRead": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "description": "creation datetime",
+                    "type": "string",
+                    "example": "2024-01-12T10:15:30.000Z"
+                },
                 "email": {
                     "description": "The user email",
                     "type": "string",
@@ -1316,6 +1331,11 @@ const docTemplate = `{
                     "example": [
                         "683b21134e2e5d46978daf1f"
                     ]
+                },
+                "updatedAt": {
+                    "description": "last update datetime",
+                    "type": "string",
+                    "example": "2024-01-12T10:15:30.000Z"
                 }
             }
         },

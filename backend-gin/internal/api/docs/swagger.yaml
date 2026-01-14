@@ -157,6 +157,10 @@ definitions:
         example: Fulham road
         minLength: 10
         type: string
+      createdAt:
+        description: creation datetime
+        example: "2024-01-12T10:15:30.000Z"
+        type: string
       creatorId:
         description: The ID of the place creator, 24 characters
         example: 683b21134e2e5d46978daf1f
@@ -182,6 +186,10 @@ definitions:
         description: The place title/name, 10 characters minimum
         example: Stamford Bridge
         minLength: 10
+        type: string
+      updatedAt:
+        description: last update datetime
+        example: "2024-01-12T10:15:30.000Z"
         type: string
     type: object
   schemas.PlacesPaginated:
@@ -259,6 +267,10 @@ definitions:
     type: object
   schemas.UserRead:
     properties:
+      createdAt:
+        description: creation datetime
+        example: "2024-01-12T10:15:30.000Z"
+        type: string
       email:
         description: The user email
         example: mslimbeji@gmail.com
@@ -287,6 +299,10 @@ definitions:
         items:
           type: string
         type: array
+      updatedAt:
+        description: last update datetime
+        example: "2024-01-12T10:15:30.000Z"
+        type: string
     type: object
   schemas.UsersPaginated:
     properties:
