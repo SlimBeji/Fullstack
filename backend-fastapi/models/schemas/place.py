@@ -7,6 +7,8 @@ from config import settings
 from lib.pydantic_ import BaseFiltersSchema, FieldMeta, HttpFilters
 from lib.types_ import FileToUpload, FindQuery, PaginatedData
 
+from .common import created_at_annot, updated_at_annot
+
 # --- Fields ----
 
 type PlaceSelectableFields = Literal[
@@ -196,6 +198,8 @@ class PlaceReadSchema(BaseModel):
     location: Location | None = None
     imageUrl: imageUrl_annot | None = None
     creatorId: creatorId_annot
+    updatedAt: updated_at_annot
+    createdAt: created_at_annot
 
 
 PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
