@@ -143,6 +143,9 @@ gin-dump:
 axum-build:
 	docker-compose build axum
 
+axum-doc:
+	cd backend-axum; cargo doc --open
+
 axum-bash:
 	docker exec -it axum bash
 
