@@ -91,6 +91,7 @@ func (pc *PlaceCollection) PostProcessBson(
 		return result, errors.New("decoding of place documenet failed")
 	}
 
+	delete(result, "__v")
 	if id, exists := result["_id"]; exists {
 		result["id"] = id
 		delete(result, "_id")

@@ -90,6 +90,7 @@ func (uc *UserCollection) PostProcessBson(
 		return result, errors.New("decoding of user documenet failed")
 	}
 
+	delete(result, "__v")
 	if id, exists := result["_id"]; exists {
 		result["id"] = id
 		delete(result, "_id")
