@@ -3,6 +3,8 @@ use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use crate::api::middlewares::Auth;
+
 pub const PATH: &str = "/hello-world";
 
 pub fn routes() -> OpenApiRouter {
@@ -51,9 +53,9 @@ async fn hello() -> impl IntoResponse {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn hello_user() -> impl IntoResponse {
+async fn hello_user(Auth(user): Auth) -> impl IntoResponse {
     Json(json!({
-        "message": "Hello Slim Beji!"
+        "message": format!("Hello {}!", user.name)
     }))
 }
 
@@ -71,8 +73,8 @@ async fn hello_user() -> impl IntoResponse {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn hello_admin() -> impl IntoResponse {
+async fn hello_admin(Auth(user): Auth) -> impl IntoResponse {
     Json(json!({
-        "message": "Hello Admin Slim Beji!"
+        "message": format!("Hello Admin {}!", user.name)
     }))
 }
