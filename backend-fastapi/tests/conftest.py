@@ -60,9 +60,11 @@ async def helpers(seeded_db):
         await start_all()
         admin = await crud_user.get_by_email("mslimbeji@gmail.com")
         assert admin is not None
-        admin_token = f"Bearer {create_token(admin).access_token}"
+        admin_token = (
+            f"Bearer {create_token(admin.id, admin.email).access_token}"
+        )
         user = await crud_user.get_by_email("beji.slim@yahoo.fr")
         assert user is not None
-        user_token = f"Bearer {create_token(user).access_token}"
+        user_token = f"Bearer {create_token(user.id, user.email).access_token}"
         yield Helpers(ac, admin, admin_token, user, user_token)
         await close_all()

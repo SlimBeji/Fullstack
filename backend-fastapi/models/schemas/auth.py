@@ -1,5 +1,6 @@
 from typing import Annotated, Literal
 
+from beanie.odm.fields import PydanticObjectId
 from jose import ExpiredSignatureError, JWTError
 from pydantic import BaseModel, EmailStr
 
@@ -109,8 +110,8 @@ class EncodedTokenSchema(BaseModel):
     expires_in: expires_in_annot
 
 
-def create_token(user: user.UserReadSchema) -> EncodedTokenSchema:
-    payload = TokenPayload(userId=user.id, email=user.email)
+def create_token(user_id: PydanticObjectId, email: str) -> EncodedTokenSchema:
+    payload = TokenPayload(userId=user_id, email=email)
     expires_in = settings.JWT_EXPIRATION
     access_token = encode_payload(
         payload.model_dump(fallback=str), settings.SECRET_KEY, expires_in
@@ -118,7 +119,7 @@ def create_token(user: user.UserReadSchema) -> EncodedTokenSchema:
     return EncodedTokenSchema(
         access_token=access_token,
         token_type="bearer",
-        userId=user.id,
-        email=user.email,
+        userId=user_id,
+        email=email,
         expires_in=expires_in,
     )
