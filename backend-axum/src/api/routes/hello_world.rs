@@ -48,7 +48,8 @@ async fn hello() -> impl IntoResponse {
         example = json!({
             "message": "Hello Slim Beji!"
         })
-    ))
+    )),
+    security(("OAuth2Password" = []))
 )]
 async fn hello_user() -> impl IntoResponse {
     Json(json!({
@@ -67,7 +68,8 @@ async fn hello_user() -> impl IntoResponse {
         example = json!({
             "message": "Hello Slim Beji!"
         })
-    ))
+    )),
+    security(("OAuth2Password" = []))
 )]
 async fn hello_admin() -> impl IntoResponse {
     Json(json!({

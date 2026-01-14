@@ -31,7 +31,8 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "User",
     summary = "Search and Retrieve users",
-    responses((status = 200, content_type = "application/json"))
+    responses((status = 200, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn get_users() -> String {
     "Get Users".to_string()
@@ -42,7 +43,8 @@ async fn get_users() -> String {
     path = "/query",
     tag = "User",
     summary = "Search and Retrieve users",
-    responses((status = 200, content_type = "application/json"))
+    responses((status = 200, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn query_users(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
@@ -61,7 +63,8 @@ async fn query_users(Json(body): Json<Value>) -> Json<Value> {
         status = 200,
         body = UserRead,
         content_type = "application/json"
-    ))
+    )),
+    security(("OAuth2Password" = []))
 )]
 async fn create_user(
     Validated(payload): Validated<UserPost>,
@@ -88,7 +91,8 @@ async fn create_user(
     tag = "User",
     summary = "Search and Retrieve user by id",
     params(("id" = String, Path, description = "User ID")),
-    responses((status = 200, body = UserRead, content_type = "application/json"))
+    responses((status = 200, body = UserRead, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn get_user(Path(id): Path<String>) -> impl IntoResponse {
     println!("returning user {}", id);
@@ -105,7 +109,8 @@ async fn get_user(Path(id): Path<String>) -> impl IntoResponse {
         content = UserPut,
         content_type = "application/json"
     ),
-    responses((status = 200, body = UserRead, content_type = "application/json"))
+    responses((status = 200, body = UserRead, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn update_user(
     Path(id): Path<String>,
@@ -131,7 +136,8 @@ async fn update_user(
         example = json!({
             "message": "Deleted user 683b21134e2e5d46978daf1f"
         })
-    ))
+    )),
+    security(("OAuth2Password" = []))
 )]
 async fn delete_user(Path(id): Path<String>) -> impl IntoResponse {
     (

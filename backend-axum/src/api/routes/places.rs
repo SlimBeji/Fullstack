@@ -33,7 +33,8 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "Place",
     summary = "Search and Retrieve places",
-    responses((status = 200, content_type = "application/json"))
+    responses((status = 200, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn get_places() -> String {
     "Get Places".to_string()
@@ -44,7 +45,8 @@ async fn get_places() -> String {
     path = "/query",
     tag = "Place",
     summary = "Search and Retrieve places",
-    responses((status = 200, content_type = "application/json"))
+    responses((status = 200, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn query_places(Json(body): Json<Value>) -> Json<Value> {
     Json(body)
@@ -63,7 +65,8 @@ async fn query_places(Json(body): Json<Value>) -> Json<Value> {
         status = 200,
         body = PlaceRead,
         content_type = "application/json"
-    ))
+    )),
+    security(("OAuth2Password" = []))
 )]
 async fn create_place(
     Validated(payload): Validated<PlacePost>,
@@ -92,7 +95,8 @@ async fn create_place(
     tag = "Place",
     summary = "Search and Retrieve place by id",
     params(("id" = String, Path, description = "Place ID")),
-    responses((status = 200, body = PlaceRead, content_type = "application/json"))
+    responses((status = 200, body = PlaceRead, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn get_place(Path(id): Path<String>) -> impl IntoResponse {
     println!("returning place {}", id);
@@ -109,7 +113,8 @@ async fn get_place(Path(id): Path<String>) -> impl IntoResponse {
         content = PlacePut,
         content_type = "application/json"
     ),
-    responses((status = 200, body = PlaceRead, content_type = "application/json"))
+    responses((status = 200, body = PlaceRead, content_type = "application/json")),
+    security(("OAuth2Password" = []))
 )]
 async fn update_place(
     Path(id): Path<String>,
@@ -136,7 +141,8 @@ async fn update_place(
         example = json!({
             "message": "Deleted place 683b21134e2e5d46978daf1f"
         })
-    ))
+    )),
+    security(("OAuth2Password" = []))
 )]
 async fn delete_place(Path(id): Path<String>) -> impl IntoResponse {
     (
