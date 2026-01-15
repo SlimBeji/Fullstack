@@ -2,7 +2,7 @@ use axum::extract::FromRequest;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
-use utoipa::ToSchema;
+use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::lib_::{
@@ -230,6 +230,18 @@ impl PlaceRead {
 }
 
 pub type PlacesPaginated = PaginatedData<PlaceRead>;
+
+// --- Filters Schema ---
+#[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct PlaceFilters {
+    #[param(example = 1)]
+    #[schema(example = 1)]
+    pub page: Option<u32>,
+    #[param(example = 100)]
+    #[schema(example = 100)]
+    pub size: Option<u32>,
+}
 
 // --- Update Schema ---
 #[allow(dead_code)] // to be removed
