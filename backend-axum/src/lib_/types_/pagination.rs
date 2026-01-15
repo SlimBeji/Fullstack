@@ -11,5 +11,5 @@ pub struct PaginatedData<T: Debug + Serialize + ToSchema> {
     pub total_pages: u32,
     #[schema(example = "197")]
     pub total_count: u32,
-    pub data: [T],
+    pub data: Vec<T>,
 }
