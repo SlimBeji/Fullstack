@@ -7,7 +7,7 @@ use validator::Validate;
 
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
-    types_::FileToUpload,
+    types_::{FileToUpload, PaginatedData},
     validator_::{email_strict, object_id},
 };
 
@@ -181,6 +181,8 @@ impl UserRead {
         }
     }
 }
+
+pub type UsersPaginated = PaginatedData<UserRead>;
 
 // --- Update Schema ---
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]

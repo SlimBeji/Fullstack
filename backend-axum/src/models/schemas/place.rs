@@ -7,7 +7,7 @@ use validator::Validate;
 
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
-    types_::FileToUpload,
+    types_::{FileToUpload, PaginatedData},
     validator_::object_id,
 };
 
@@ -228,6 +228,8 @@ impl PlaceRead {
         }
     }
 }
+
+pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 // --- Update Schema ---
 #[allow(dead_code)] // to be removed
