@@ -1,5 +1,10 @@
-use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use serde_json::{Value, json};
+use axum::{
+    Json,
+    extract::{Path, Query},
+    http::StatusCode,
+    response::IntoResponse,
+};
+use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -7,8 +12,8 @@ use crate::{
     api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
     models::schemas::{
-        PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlacesPaginated,
-        UserRead,
+        PlaceFilters, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
+        PlacesPaginated, UserRead,
     },
 };
 
@@ -35,6 +40,7 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "Place",
     summary = "Search and Retrieve places",
+    params(PlaceFilters),
     responses((
         status = 200,
         body = PlacesPaginated,
@@ -42,9 +48,18 @@ pub fn routes() -> OpenApiRouter {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn get_places(Auth(user): Auth) -> impl IntoResponse {
+async fn get_places(
+    Query(filters): Query<PlaceFilters>,
+    Auth(user): Auth,
+) -> impl IntoResponse {
     println!("{}", user.name);
-    "Get Places".to_string()
+    let data = PlacesPaginated {
+        page: filters.page.unwrap_or(1),
+        total_count: filters.size.unwrap_or(100),
+        total_pages: 1,
+        data: vec![PlaceRead::example()],
+    };
+    (StatusCode::OK, Json(data))
 }
 
 #[utoipa::path(
@@ -52,6 +67,10 @@ async fn get_places(Auth(user): Auth) -> impl IntoResponse {
     path = "/query",
     tag = "Place",
     summary = "Search and Retrieve places",
+    request_body(
+        content = PlaceFilters,
+        content_type = "application/json"
+    ),
     responses((
         status = 200,
         body = PlacesPaginated,
@@ -61,10 +80,16 @@ async fn get_places(Auth(user): Auth) -> impl IntoResponse {
 )]
 async fn query_places(
     Auth(user): Auth,
-    Json(body): Json<Value>,
+    Json(filters): Json<PlaceFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    Json(body)
+    let data = PlacesPaginated {
+        page: filters.page.unwrap_or(1),
+        total_count: filters.size.unwrap_or(100),
+        total_pages: 1,
+        data: vec![PlaceRead::example()],
+    };
+    (StatusCode::OK, Json(data))
 }
 
 #[utoipa::path(

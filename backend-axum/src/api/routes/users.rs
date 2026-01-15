@@ -1,5 +1,10 @@
-use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use serde_json::{Value, json};
+use axum::{
+    Json,
+    extract::{Path, Query},
+    http::StatusCode,
+    response::IntoResponse,
+};
+use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -7,7 +12,8 @@ use crate::{
     api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
     models::schemas::{
-        UserPost, UserPostSwagger, UserPut, UserRead, UsersPaginated,
+        UserFilters, UserPost, UserPostSwagger, UserPut, UserRead,
+        UsersPaginated,
     },
 };
 
@@ -34,6 +40,7 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "User",
     summary = "Search and Retrieve users",
+    params(UserFilters),
     responses((
         status = 200,
         body = UsersPaginated,
@@ -41,9 +48,18 @@ pub fn routes() -> OpenApiRouter {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn get_users(Auth(user): Auth) -> impl IntoResponse {
+async fn get_users(
+    Auth(user): Auth,
+    Query(filters): Query<UserFilters>,
+) -> impl IntoResponse {
     println!("{}", user.name);
-    "Get Users".to_string()
+    let data = UsersPaginated {
+        page: filters.page.unwrap_or(1),
+        total_count: filters.size.unwrap_or(100),
+        total_pages: 1,
+        data: vec![UserRead::example()],
+    };
+    (StatusCode::OK, Json(data))
 }
 
 #[utoipa::path(
@@ -51,6 +67,10 @@ async fn get_users(Auth(user): Auth) -> impl IntoResponse {
     path = "/query",
     tag = "User",
     summary = "Search and Retrieve users",
+    request_body(
+        content = UserFilters,
+        content_type = "application/json"
+    ),
     responses((
         status = 200,
         body = UsersPaginated,
@@ -60,10 +80,16 @@ async fn get_users(Auth(user): Auth) -> impl IntoResponse {
 )]
 async fn query_users(
     Auth(user): Auth,
-    Json(body): Json<Value>,
+    Json(filters): Json<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    Json(body)
+    let data = UsersPaginated {
+        page: filters.page.unwrap_or(1),
+        total_count: filters.size.unwrap_or(100),
+        total_pages: 1,
+        data: vec![UserRead::example()],
+    };
+    (StatusCode::OK, Json(data))
 }
 
 #[utoipa::path(
