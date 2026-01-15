@@ -6,7 +6,9 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
-    models::schemas::{UserPost, UserPostSwagger, UserPut, UserRead},
+    models::schemas::{
+        UserPost, UserPostSwagger, UserPut, UserRead, UsersPaginated,
+    },
 };
 
 pub const PATH: &str = "/users";
@@ -32,7 +34,11 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "User",
     summary = "Search and Retrieve users",
-    responses((status = 200, content_type = "application/json")),
+    responses((
+        status = 200,
+        body = UsersPaginated,
+        content_type = "application/json"
+    )),
     security(("OAuth2Password" = []))
 )]
 async fn get_users(Auth(user): Auth) -> impl IntoResponse {
@@ -45,7 +51,11 @@ async fn get_users(Auth(user): Auth) -> impl IntoResponse {
     path = "/query",
     tag = "User",
     summary = "Search and Retrieve users",
-    responses((status = 200, content_type = "application/json")),
+    responses((
+        status = 200,
+        body = UsersPaginated,
+        content_type = "application/json"
+    )),
     security(("OAuth2Password" = []))
 )]
 async fn query_users(

@@ -7,7 +7,8 @@ use crate::{
     api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
     models::schemas::{
-        PlacePost, PlacePostSwagger, PlacePut, PlaceRead, UserRead,
+        PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlacesPaginated,
+        UserRead,
     },
 };
 
@@ -34,7 +35,11 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "Place",
     summary = "Search and Retrieve places",
-    responses((status = 200, content_type = "application/json")),
+    responses((
+        status = 200,
+        body = PlacesPaginated,
+        content_type = "application/json"
+    )),
     security(("OAuth2Password" = []))
 )]
 async fn get_places(Auth(user): Auth) -> impl IntoResponse {
@@ -47,7 +52,11 @@ async fn get_places(Auth(user): Auth) -> impl IntoResponse {
     path = "/query",
     tag = "Place",
     summary = "Search and Retrieve places",
-    responses((status = 200, content_type = "application/json")),
+    responses((
+        status = 200,
+        body = PlacesPaginated,
+        content_type = "application/json"
+    )),
     security(("OAuth2Password" = []))
 )]
 async fn query_places(
