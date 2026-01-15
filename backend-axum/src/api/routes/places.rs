@@ -4,6 +4,7 @@ use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
+    api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
     models::schemas::{
         PlacePost, PlacePostSwagger, PlacePut, PlaceRead, UserRead,
@@ -36,7 +37,8 @@ pub fn routes() -> OpenApiRouter {
     responses((status = 200, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
-async fn get_places() -> String {
+async fn get_places(Auth(user): Auth) -> impl IntoResponse {
+    println!("{}", user.name);
     "Get Places".to_string()
 }
 
@@ -48,7 +50,11 @@ async fn get_places() -> String {
     responses((status = 200, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
-async fn query_places(Json(body): Json<Value>) -> Json<Value> {
+async fn query_places(
+    Auth(user): Auth,
+    Json(body): Json<Value>,
+) -> impl IntoResponse {
+    println!("{}", user.name);
     Json(body)
 }
 
@@ -69,8 +75,10 @@ async fn query_places(Json(body): Json<Value>) -> Json<Value> {
     security(("OAuth2Password" = []))
 )]
 async fn create_place(
+    Auth(user): Auth,
     Validated(payload): Validated<PlacePost>,
 ) -> impl IntoResponse {
+    println!("{}", user.name);
     println!("{:?}", payload.title);
     println!("{:?}", payload.description);
     println!("{:?}", payload.address);
@@ -98,7 +106,11 @@ async fn create_place(
     responses((status = 200, body = PlaceRead, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
-async fn get_place(Path(id): Path<String>) -> impl IntoResponse {
+async fn get_place(
+    Auth(user): Auth,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    println!("{}", user.name);
     println!("returning place {}", id);
     (StatusCode::OK, Json(PlaceRead::example()))
 }
@@ -117,9 +129,11 @@ async fn get_place(Path(id): Path<String>) -> impl IntoResponse {
     security(("OAuth2Password" = []))
 )]
 async fn update_place(
+    Auth(user): Auth,
     Path(id): Path<String>,
     ValidatedJson(payload): ValidatedJson<PlacePut>,
 ) -> impl IntoResponse {
+    println!("{}", user.name);
     println!("{}", id);
     println!("{:?}", payload.title);
     println!("{:?}", payload.description);
@@ -144,7 +158,11 @@ async fn update_place(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn delete_place(Path(id): Path<String>) -> impl IntoResponse {
+async fn delete_place(
+    Auth(user): Auth,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    println!("{}", user.name);
     (
         StatusCode::OK,
         Json(json!({"message": format!("Deleted place {}", id)})),

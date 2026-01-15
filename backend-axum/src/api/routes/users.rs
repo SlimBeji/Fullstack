@@ -4,6 +4,7 @@ use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
+    api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
     models::schemas::{UserPost, UserPostSwagger, UserPut, UserRead},
 };
@@ -34,7 +35,8 @@ pub fn routes() -> OpenApiRouter {
     responses((status = 200, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
-async fn get_users() -> String {
+async fn get_users(Auth(user): Auth) -> impl IntoResponse {
+    println!("{}", user.name);
     "Get Users".to_string()
 }
 
@@ -46,7 +48,11 @@ async fn get_users() -> String {
     responses((status = 200, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
-async fn query_users(Json(body): Json<Value>) -> Json<Value> {
+async fn query_users(
+    Auth(user): Auth,
+    Json(body): Json<Value>,
+) -> impl IntoResponse {
+    println!("{}", user.name);
     Json(body)
 }
 
@@ -67,8 +73,10 @@ async fn query_users(Json(body): Json<Value>) -> Json<Value> {
     security(("OAuth2Password" = []))
 )]
 async fn create_user(
+    Auth(user): Auth,
     Validated(payload): Validated<UserPost>,
 ) -> impl IntoResponse {
+    println!("{}", user.name);
     println!("{:?}", payload.name);
     println!("{:?}", payload.email);
     println!("{:?}", payload.is_admin);
@@ -94,7 +102,11 @@ async fn create_user(
     responses((status = 200, body = UserRead, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
-async fn get_user(Path(id): Path<String>) -> impl IntoResponse {
+async fn get_user(
+    Auth(user): Auth,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    println!("{}", user.name);
     println!("returning user {}", id);
     (StatusCode::OK, Json(UserRead::example()))
 }
@@ -113,9 +125,11 @@ async fn get_user(Path(id): Path<String>) -> impl IntoResponse {
     security(("OAuth2Password" = []))
 )]
 async fn update_user(
+    Auth(user): Auth,
     Path(id): Path<String>,
     ValidatedJson(payload): ValidatedJson<UserPut>,
 ) -> impl IntoResponse {
+    println!("{}", user.name);
     println!("{}", id);
     println!("{:?}", payload.name);
     println!("{:?}", payload.email);
@@ -139,7 +153,11 @@ async fn update_user(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn delete_user(Path(id): Path<String>) -> impl IntoResponse {
+async fn delete_user(
+    Auth(user): Auth,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    println!("{}", user.name);
     (
         StatusCode::OK,
         Json(json!({"message": format!("Deleted user {}", id)})),
