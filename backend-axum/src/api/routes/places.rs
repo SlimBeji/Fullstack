@@ -1,9 +1,5 @@
-use axum::{
-    Json,
-    extract::{Path, Query},
-    http::StatusCode,
-    response::IntoResponse,
-};
+use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
+use axum_extra::extract::Query;
 use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
