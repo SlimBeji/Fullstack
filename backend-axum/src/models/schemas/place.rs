@@ -8,7 +8,7 @@ use validator::Validate;
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
     types_::{FileToUpload, PaginatedData},
-    validator_::object_id,
+    validator_::{array_length, object_id, string_length},
 };
 
 // --- Fields ---
@@ -61,14 +61,14 @@ pub struct PlaceSeed {
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Deserialize, Validate)]
 pub struct PlaceCreate {
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub title: String,
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub description: String,
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub address: String,
     pub location: Location,
-    #[validate(length(equal = 384))]
+    #[validate(custom(function = "array_length::<f64, 384, 384>"))]
     pub embedding: Option<Vec<f64>>,
     pub image_url: String,
     #[validate(custom(function = "object_id"))]
@@ -110,11 +110,11 @@ pub struct PlacePostSwagger {
 
 #[derive(Debug, Validate)]
 pub struct PlacePost {
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub title: String,
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub description: String,
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub address: String,
     pub lat: f64,
     pub lng: f64,
@@ -176,15 +176,15 @@ pub struct PlaceRead {
     pub id: String,
 
     /// The place title/name, 10 characters minimum
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub title: String,
 
     /// The place description, 10 characters minimum
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub description: String,
 
     /// The place address
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub address: String,
 
     /// Location object (can be sent as JSON string)
@@ -248,15 +248,15 @@ pub struct PlaceFilters {
 #[derive(Debug, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceUpdate {
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
 
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,
 
@@ -284,17 +284,17 @@ pub struct PlaceUpdate {
 pub struct PlacePut {
     /// The place title/name, 10 characters minimum
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub title: Option<String>,
 
     /// The place description, 10 characters minimum
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub description: Option<String>,
 
     /// The place address
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub address: Option<String>,
 
     /// Location object (can be sent as JSON string)

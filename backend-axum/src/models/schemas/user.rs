@@ -8,7 +8,7 @@ use validator::Validate;
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
     types_::{FileToUpload, PaginatedData},
-    validator_::{email_strict, object_id},
+    validator_::{email_strict, object_id, string_length},
 };
 
 // --- Database Schema ---
@@ -46,12 +46,12 @@ pub struct UserSeed {
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Deserialize, Validate)]
 pub struct UserCreate {
-    #[validate(length(min = 2))]
+    #[validate(custom(function = "string_length::<2, 0>"))]
     pub name: String,
     #[validate(custom(function = "email_strict"))]
     pub email: String,
     pub is_admin: bool,
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub password: String,
     pub image_url: Option<String>,
 }
@@ -83,12 +83,12 @@ pub struct UserPostSwagger {
 
 #[derive(Debug, Validate)]
 pub struct UserPost {
-    #[validate(length(min = 2))]
+    #[validate(custom(function = "string_length::<2, 2>"))]
     pub name: String,
     #[validate(custom(function = "email_strict"))]
     pub email: String,
     pub is_admin: bool,
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub password: String,
     pub image: Option<FileToUpload>,
 }
@@ -138,7 +138,7 @@ pub struct UserRead {
     pub id: String,
 
     /// The user name, two characters at least
-    #[validate(length(min = 2))]
+    #[validate(custom(function = "string_length::<2, 0>"))]
     pub name: String,
 
     /// The user email
@@ -205,7 +205,7 @@ pub struct UserFilters {
 }))]
 pub struct UserUpdate {
     /// The user name, two characters at least
-    #[validate(length(min = 2))]
+    #[validate(custom(function = "string_length::<2, 0>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 
@@ -215,7 +215,7 @@ pub struct UserUpdate {
     pub email: Option<String>,
 
     /// The user password, 10 characters at least
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
 }

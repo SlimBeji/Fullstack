@@ -6,7 +6,7 @@ use validator::Validate;
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
     types_::FileToUpload,
-    validator_::{email_strict, object_id, token_type},
+    validator_::{email_strict, object_id, string_length, token_type},
 };
 
 // --- Signup Schemas ----
@@ -32,13 +32,13 @@ pub struct SignupSchemaSwagger {
 
 #[derive(Debug, Validate)]
 pub struct SignupSchema {
-    #[validate(length(min = 2))]
+    #[validate(custom(function = "string_length::<2, 0>"))]
     pub name: String,
 
     #[validate(custom(function = "email_strict"))]
     pub email: String,
 
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub password: String,
 
     pub image: Option<FileToUpload>,
@@ -78,7 +78,7 @@ pub struct SigninSchema {
 
     /// The user password, 10 characters at least
     #[schema(example = "very_secret")]
-    #[validate(length(min = 10))]
+    #[validate(custom(function = "string_length::<10, 0>"))]
     pub password: String,
 }
 
