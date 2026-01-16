@@ -104,12 +104,3 @@ pub fn email_strict(email: &str) -> Result<(), ValidationError> {
 
     Ok(())
 }
-
-pub fn token_type(t: &str) -> Result<(), ValidationError> {
-    if t != "bearer" {
-        let mut err = ValidationError::new("invalid_token_type");
-        err.message = Some("Token type must be 'bearer'".into());
-        return Err(err);
-    }
-    Ok(())
-}

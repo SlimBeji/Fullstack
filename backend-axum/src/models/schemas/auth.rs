@@ -1,13 +1,23 @@
 use axum::extract::{FromRequest, Request};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
     types_::FileToUpload,
-    validator_::{email_strict, object_id, string_length, token_type},
+    validator_::{email_strict, object_id, string_length},
 };
+
+// --- Custom Validators ----
+pub fn validate_token(t: &str) -> Result<(), ValidationError> {
+    if t != "bearer" {
+        let mut err = ValidationError::new("invalid_token_type");
+        err.message = Some("Token type must be 'bearer'".into());
+        return Err(err);
+    }
+    Ok(())
+}
 
 // --- Signup Schemas ----
 #[allow(dead_code)]
@@ -93,7 +103,7 @@ pub struct EncodedTokenSchema {
 
     /// The type of token. Only 'bearer' is supported.
     #[schema(example = "bearer")]
-    #[validate(custom(function = "token_type"))]
+    #[validate(custom(function = "validate_token"))]
     pub token_type: String,
 
     /// The user ID, 24 characters
