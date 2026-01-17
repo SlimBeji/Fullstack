@@ -13,13 +13,11 @@ impl<S: Send + Sync> FromRequestParts<S> for Auth {
         let token = parts
             .headers
             .get("Authorization")
-            .ok_or(ApiError::bad_request("missing Authorization header"))?
+            .ok_or(ApiError::bad_auth_header("header missing"))?
             .to_str()
-            .map_err(|_| ApiError::bad_request("bad Authorization header"))?
+            .map_err(|_| ApiError::bad_auth_header("bad value"))?
             .strip_prefix("Bearer ")
-            .ok_or(ApiError::bad_request(
-                "bad Authorization header - not a Bearer token",
-            ))?;
+            .ok_or(ApiError::bad_auth_header("not a Bearer token"))?;
 
         Ok(Self(get_user_from_token(token)))
     }

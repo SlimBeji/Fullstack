@@ -11,24 +11,27 @@ pub enum MultipartField {
 
 impl MultipartField {
     async fn file_from_field(
+        name: &str,
         field: multipart::Field<'_>,
     ) -> Result<Self, ApiError> {
         let originalname = field
             .file_name()
-            .ok_or(ApiError::bad_request(
-                "could not read filename of the uploaded file",
+            .ok_or(ApiError::bad_multipart_field(
+                name,
+                "could not read filename",
             ))?
             .to_string();
         let mimetype = field
             .content_type()
-            .ok_or(ApiError::bad_request(
-                "did not find uploaded file mimetype",
+            .ok_or(ApiError::bad_multipart_field(
+                name,
+                "could not guess file mimetype",
             ))?
             .to_string();
         let data = field
             .bytes()
             .await
-            .map_err(|e| ApiError::bad_request(e.to_string()))?
+            .map_err(|e| ApiError::bad_multipart_field(name, e.to_string()))?
             .to_vec();
 
         Ok(Self::File(FileToUpload {
@@ -39,24 +42,26 @@ impl MultipartField {
     }
 
     async fn text_from_field(
+        name: &str,
         field: multipart::Field<'_>,
     ) -> Result<Self, ApiError> {
-        let text = field.text().await.map_err(|e| {
-            ApiError::bad_request(format!(
-                "error in parsing multipart request: {}",
-                e.to_string()
-            ))
-        })?;
+        let text = field
+            .text()
+            .await
+            .map_err(|e| ApiError::bad_multipart_field(name, e.to_string()))?;
         Ok(Self::Text(text))
     }
 
-    async fn from_field(field: multipart::Field<'_>) -> Result<Self, ApiError> {
+    async fn from_field(
+        name: &str,
+        field: multipart::Field<'_>,
+    ) -> Result<Self, ApiError> {
         if field.file_name().is_some() {
             // File variant
-            Self::file_from_field(field).await
+            Self::file_from_field(name, field).await
         } else {
             // Text variant
-            Self::text_from_field(field).await
+            Self::text_from_field(name, field).await
         }
     }
 }
@@ -74,9 +79,9 @@ impl MultipartForm {
     pub fn get_text(&self, key: &str) -> Result<String, ApiError> {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => Ok(s.clone()),
-            _ => Err(ApiError::unprocessable(
-                format!("could not extract text field {}", key),
-                None,
+            _ => Err(ApiError::bad_multipart_field(
+                key,
+                "could not extract text",
             )),
         }
     }
@@ -88,10 +93,9 @@ impl MultipartForm {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => Ok(Some(s.clone())),
             None => Ok(None),
-            _ => Err(ApiError::unprocessable(
-                format!("could not read field {}", key),
-                None,
-            )),
+            _ => {
+                Err(ApiError::bad_multipart_field(key, "could not read field"))
+            }
         }
     }
 
@@ -103,16 +107,16 @@ impl MultipartForm {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => {
                 let number = s.parse::<T>().map_err(|e| {
-                    ApiError::unprocessable(
-                        format!("Invalid number for field {}: {}", key, e),
-                        None,
+                    ApiError::bad_multipart_field(
+                        key,
+                        format!("invalid numeric value: {}", e),
                     )
                 })?;
                 Ok(number)
             }
-            _ => Err(ApiError::unprocessable(
-                format!("could not extract numeric field {}", key),
-                None,
+            _ => Err(ApiError::bad_multipart_field(
+                key,
+                "could not extract numeric value",
             )),
         }
     }
@@ -128,17 +132,17 @@ impl MultipartForm {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => {
                 let number = s.parse::<T>().map_err(|e| {
-                    ApiError::unprocessable(
-                        format!("Invalid number for field {}: {}", key, e),
-                        None,
+                    ApiError::bad_multipart_field(
+                        key,
+                        format!("Invalid number: {}", e),
                     )
                 })?;
                 Ok(Some(number))
             }
             None => Ok(None),
-            _ => Err(ApiError::unprocessable(
-                format!("could not extract numeric field {}", key),
-                None,
+            _ => Err(ApiError::bad_multipart_field(
+                key,
+                "could not extract numeric value",
             )),
         }
     }
@@ -149,16 +153,16 @@ impl MultipartForm {
                 let result = match utils::parse_bool(s.to_lowercase().as_str())
                 {
                     Ok(b) => Ok(b),
-                    _ => Err(ApiError::unprocessable(
-                        format!("field {} is not a valid boolean: {}", key, s),
-                        None,
+                    _ => Err(ApiError::bad_multipart_field(
+                        key,
+                        format!("{} is not a valid boolean", s),
                     )),
                 };
                 result
             }
-            _ => Err(ApiError::unprocessable(
-                format!("could not read boolean field {}", key),
-                None,
+            _ => Err(ApiError::bad_multipart_field(
+                key,
+                "could not extract boolean value",
             )),
         }
     }
@@ -172,17 +176,17 @@ impl MultipartForm {
                 let result = match utils::parse_bool(s.to_lowercase().as_str())
                 {
                     Ok(b) => Ok(b),
-                    _ => Err(ApiError::unprocessable(
-                        format!("field {} is not a valid boolean: {}", key, s),
-                        None,
+                    _ => Err(ApiError::bad_multipart_field(
+                        key,
+                        format!("{} is not a valid boolean", s),
                     )),
                 };
                 Ok(Some(result?))
             }
             None => Ok(None),
-            _ => Err(ApiError::unprocessable(
-                format!("could not read boolean field {}", key),
-                None,
+            _ => Err(ApiError::bad_multipart_field(
+                key,
+                format!("could not extract boolean value"),
             )),
         }
     }
@@ -190,9 +194,9 @@ impl MultipartForm {
     pub fn get_file(&self, key: &str) -> Result<FileToUpload, ApiError> {
         match self.inner.get(key) {
             Some(MultipartField::File(f)) => Ok(f.clone()),
-            _ => Err(ApiError::unprocessable(
-                format!("Could not extract file for field {}", key),
-                None,
+            _ => Err(ApiError::bad_multipart_field(
+                key,
+                "Could not extract file",
             )),
         }
     }
@@ -204,10 +208,7 @@ impl MultipartForm {
         match self.inner.get(key) {
             Some(MultipartField::File(f)) => Ok(Some(f.clone())),
             None => Ok(None),
-            _ => Err(ApiError::unprocessable(
-                format!("Could not read file for field {}", key),
-                None,
-            )),
+            _ => Err(ApiError::bad_multipart_field(key, "Could not read file")),
         }
     }
 
@@ -221,26 +222,25 @@ impl MultipartForm {
         let mut multipart = multipart::Multipart::from_request(req, state)
             .await
             .map_err(|e| {
-                ApiError::bad_request(format!(
-                    "Could not parse multipart request: {}",
-                    e
-                ))
+                ApiError::multipart_parsing_error(
+                    "Could not parse multipart request",
+                    Box::new(e),
+                )
             })?;
         let mut map = HashMap::new();
 
         while let Some(field) = multipart.next_field().await.map_err(|e| {
-            ApiError::bad_request(format!(
-                "Could not process multipart request: {}",
-                e
-            ))
+            ApiError::multipart_parsing_error(
+                "Could not process multipart request",
+                Box::new(e),
+            )
         })? {
-            let name = field.name().unwrap_or("");
-            if name == "" {
+            let Some(name) = field.name().map(|s| s.to_string()) else {
                 continue;
-            }
+            };
             map.insert(
-                name.to_string(),
-                MultipartField::from_field(field).await?,
+                name.clone(),
+                MultipartField::from_field(&name, field).await?,
             );
         }
         Ok(MultipartForm::new(map))

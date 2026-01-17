@@ -5,6 +5,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use validator::{Validate, ValidationError};
 
 use serde_json::{Error as SerdeErr, Value, error::Category, json};
 use std::error::Error;
@@ -74,36 +75,99 @@ impl From<SerdeErr> for ApiError {
 
 #[allow(dead_code)] // to be removed
 impl ApiError {
-    pub fn unprocessable(
-        message: impl Into<String>,
-        details: Option<Value>,
+    pub fn validate<T: Validate>(inner: &T) -> Result<(), Self> {
+        inner.validate().map_err(|e| {
+            let mut map = serde_json::Map::new();
+            for (field, errors) in e.field_errors() {
+                let arr: Vec<Value> = errors
+                    .iter()
+                    .map(|err: &ValidationError| {
+                        json!({
+                            "code": err.code,
+                            "message": err.message.clone().map(|m| m.to_string()),
+                            "params": err.params,
+                        })
+                    })
+                    .collect();
+                map.insert(field.to_string(), Value::Array(arr));
+            }
+            Self {
+               code: StatusCode::UNPROCESSABLE_ENTITY,
+               message: "invalid data".to_string(),
+               details: Some(Value::Object(map)),
+               err: Some(Box::new(e))
+            }
+        })?;
+        Ok(())
+    }
+
+    pub fn serialization_err(
+        detail: impl Into<String>,
+        err: Box<dyn Error + Send + Sync>,
     ) -> Self {
+        let message = detail.into();
+        let (msg, info) = message
+            .split_once(":")
+            .unwrap_or(("Failed to deserialize form body", message.as_str()));
         Self {
             code: StatusCode::UNPROCESSABLE_ENTITY,
-            message: message.into(),
-            details,
+            message: msg.to_string(),
+            details: Some(Value::String(info.to_string())),
+            err: Some(err),
+        }
+    }
+
+    pub fn bad_auth_header(detail: impl Into<String>) -> Self {
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: "bad Authorization header".to_string(),
+            details: Some(Value::String(detail.into())),
             err: None,
         }
     }
 
-    pub fn bad_request(message: impl Into<String>) -> Self {
+    pub fn bad_request(
+        message: impl Into<String>,
+        err: Box<dyn Error + Send + Sync>,
+    ) -> Self {
         Self {
             code: StatusCode::BAD_REQUEST,
             message: message.into(),
-            details: None,
+            details: Some(Value::String(err.to_string())),
+            err: Some(err),
+        }
+    }
+
+    pub fn bad_multipart_field(field: &str, detail: impl Into<String>) -> Self {
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: format!("bad field {}", field),
+            details: Some(Value::String(detail.into())),
             err: None,
+        }
+    }
+
+    pub fn multipart_parsing_error(
+        message: impl Into<String>,
+        err: Box<dyn Error + Send + Sync>,
+    ) -> Self {
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: message.into(),
+            details: Some(Value::String(err.to_string())),
+            err: Some(err),
         }
     }
 
     pub fn internal_error<E: Error + Send + Sync + 'static>(
         message: impl Into<String>,
-        e: Option<E>,
+        err: Box<dyn Error + Send + Sync>,
     ) -> Self {
         Self {
             code: StatusCode::INTERNAL_SERVER_ERROR,
             message: message.into(),
-            details: None,
-            err: e.map(|err| Box::new(err) as Box<dyn Error + Send + Sync>),
+            details: Some(Value::String(err.to_string())),
+            err: Some(err),
         }
     }
 }

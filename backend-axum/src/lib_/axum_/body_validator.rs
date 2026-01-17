@@ -1,7 +1,6 @@
 use axum::extract::{Form, FromRequest, Json, Request};
 use serde::de::DeserializeOwned;
-use serde_json::{Value, json};
-use validator::{Validate, ValidationError, ValidationErrors};
+use validator::Validate;
 
 use super::error::ApiError;
 
@@ -20,7 +19,7 @@ where
         state: &S,
     ) -> Result<Self, Self::Rejection> {
         let inner = T::from_request(req, state).await?;
-        validate(&inner)?;
+        ApiError::validate(&inner)?;
         Ok(Self(inner))
     }
 }
@@ -43,14 +42,10 @@ where
             .await
             .map_err(|rejection| {
                 // Check the error by its Display or Debug output
-                let error_msg = rejection.to_string();
-                ApiError::bad_request(&format!(
-                    "Invalid json data: {}",
-                    error_msg
-                ))
+                ApiError::bad_request("Invalid json data", Box::new(rejection))
             })?
             .0;
-        validate(&inner)?;
+        ApiError::validate(&inner)?;
         Ok(Self(inner))
     }
 }
@@ -80,44 +75,16 @@ where
                 if error_msg.contains("missing field")
                     || error_msg.contains("Failed to deserialize")
                 {
-                    ApiError::unprocessable(&error_msg, None)
+                    ApiError::serialization_err(error_msg, Box::new(rejection))
                 } else {
-                    ApiError::bad_request(&format!(
-                        "Invalid form data: {}",
-                        error_msg
-                    ))
+                    ApiError::bad_request(
+                        "Invalid form data",
+                        Box::new(rejection),
+                    )
                 }
             })?
             .0;
-        validate(&inner)?;
+        ApiError::validate(&inner)?;
         Ok(Self(inner))
     }
-}
-
-// Common Helpers
-
-fn validate<T: Validate>(inner: &T) -> Result<(), ApiError> {
-    inner.validate().map_err(|e| {
-        ApiError::unprocessable("invalid form", Some(field_errors_to_json(&e)))
-    })
-}
-
-fn field_errors_to_json(e: &ValidationErrors) -> Value {
-    let mut map = serde_json::Map::new();
-
-    for (field, errors) in e.field_errors() {
-        let arr: Vec<Value> = errors
-            .iter()
-            .map(|err: &ValidationError| {
-                json!({
-                    "code": err.code,
-                    "message": err.message.clone().map(|m| m.to_string()),
-                    "params": err.params,
-                })
-            })
-            .collect();
-        map.insert(field.to_string(), Value::Array(arr));
-    }
-
-    Value::Object(map)
 }
