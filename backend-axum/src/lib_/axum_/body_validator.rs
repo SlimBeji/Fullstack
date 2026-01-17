@@ -71,7 +71,7 @@ where
                 if error_msg.contains("missing field")
                     || error_msg.contains("Failed to deserialize")
                 {
-                    ApiError::serialization_err(error_msg, Box::new(rejection))
+                    ApiError::bad_form_data(error_msg, Box::new(rejection))
                 } else {
                     ApiError::bad_request(
                         "Invalid form data",

@@ -101,14 +101,14 @@ impl ApiError {
         Ok(())
     }
 
-    pub fn serialization_err(
+    pub fn bad_form_data(
         detail: impl Into<String>,
         err: Box<dyn Error + Send + Sync>,
     ) -> Self {
         let message = detail.into();
         let (msg, info) = message
             .split_once(":")
-            .unwrap_or(("Failed to deserialize form body", message.as_str()));
+            .unwrap_or(("bad form data", message.as_str()));
         Self {
             code: StatusCode::UNPROCESSABLE_ENTITY,
             message: msg.to_string(),
