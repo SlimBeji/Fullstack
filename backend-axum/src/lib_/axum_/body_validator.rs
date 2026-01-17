@@ -2,7 +2,7 @@ use axum::extract::{Form, FromRequest, Json, Request};
 use serde::de::DeserializeOwned;
 use validator::Validate;
 
-use super::error::ApiError;
+use super::ApiError;
 
 // Validated for types that impelments FromRequest with ApiError rejection
 pub struct Validated<T>(pub T);
