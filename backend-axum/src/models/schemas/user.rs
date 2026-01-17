@@ -185,6 +185,34 @@ impl UserRead {
 pub type UsersPaginated = PaginatedData<UserRead>;
 
 // --- Filters Schema ---
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum UserSelectableFields {
+    Id,
+    Name,
+    Email,
+    IsAdmin,
+    ImageUrl,
+    Places,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum UserSortableFields {
+    #[serde(rename = "createdAt")]
+    CreatedAtAsc,
+    #[serde(rename = "-createdAt")]
+    CreatedAtDesc,
+    #[serde(rename = "name")]
+    NameAsc,
+    #[serde(rename = "-name")]
+    NameDesc,
+    #[serde(rename = "email")]
+    EmailAsc,
+    #[serde(rename = "-email")]
+    EmailDesc,
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct UserFilters {
@@ -194,6 +222,8 @@ pub struct UserFilters {
     #[param(example = 100)]
     #[schema(example = 100)]
     pub size: Option<u32>,
+    pub sort: Option<Vec<UserSortableFields>>,
+    pub fields: Option<Vec<UserSelectableFields>>,
 }
 
 // --- Update Schema ---

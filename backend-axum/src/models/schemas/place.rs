@@ -232,6 +232,43 @@ impl PlaceRead {
 pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 // --- Filters Schema ---
+// --- Filters Schema ---
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum PlaceSelectableFields {
+    Id,
+    Title,
+    Description,
+    Address,
+    #[serde(rename = "location.lat")]
+    LocationLat,
+    #[serde(rename = "location.lng")]
+    LocationLng,
+    ImageUrl,
+    CreatorId,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum PlaceSortableFields {
+    #[serde(rename = "createdAt")]
+    CreatedAtAsc,
+    #[serde(rename = "-createdAt")]
+    CreatedAtDesc,
+    #[serde(rename = "title")]
+    TitleAsc,
+    #[serde(rename = "-title")]
+    TitleDesc,
+    #[serde(rename = "description")]
+    DescriptionAsc,
+    #[serde(rename = "-description")]
+    DescriptionDesc,
+    #[serde(rename = "address")]
+    AddressAsc,
+    #[serde(rename = "-address")]
+    AddressDesc,
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct PlaceFilters {
@@ -241,6 +278,8 @@ pub struct PlaceFilters {
     #[param(example = 100)]
     #[schema(example = 100)]
     pub size: Option<u32>,
+    pub sort: Option<Vec<PlaceSortableFields>>,
+    pub fields: Option<Vec<PlaceSelectableFields>>,
 }
 
 // --- Update Schema ---

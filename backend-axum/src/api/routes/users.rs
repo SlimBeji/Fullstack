@@ -7,6 +7,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     lib_::axum_::{Validated, ValidatedJson},
+    lib_::utils::parse_enum_array,
     models::schemas::{
         UserFilters, UserPost, UserPostSwagger, UserPut, UserRead,
         UsersPaginated,
@@ -49,6 +50,8 @@ async fn get_users(
     Query(filters): Query<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
+    println!("{:?}", parse_enum_array(filters.fields));
+    println!("{:?}", parse_enum_array(filters.sort));
     let data = UsersPaginated {
         page: filters.page.unwrap_or(1),
         total_count: filters.size.unwrap_or(100),
@@ -79,6 +82,8 @@ async fn query_users(
     Json(filters): Json<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
+    println!("{:?}", parse_enum_array(filters.fields));
+    println!("{:?}", parse_enum_array(filters.sort));
     let data = UsersPaginated {
         page: filters.page.unwrap_or(1),
         total_count: filters.size.unwrap_or(100),
