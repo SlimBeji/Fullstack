@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 
-import { fetchRequest, validateBody } from "@/lib/express_";
+import { extractFindQuery, validateBody } from "@/lib/express_";
 import { zod, zodObjectId } from "@/lib/zod_";
 import { crudUser } from "@/models/crud";
 import {
@@ -29,7 +29,7 @@ async function getUsers(req: Request, res: Response) {
 userRouter.get(
     "/",
     Authenticated,
-    fetchRequest(UserFiltersSchema, "query"),
+    extractFindQuery(UserFiltersSchema, "query"),
     getUsers
 );
 
@@ -62,7 +62,11 @@ async function queryUsers(req: Request, res: Response) {
     res.status(200).json(await crudUser.fetch(query));
 }
 
-userRouter.post("/query", fetchRequest(UserFiltersSchema, "body"), queryUsers);
+userRouter.post(
+    "/query",
+    extractFindQuery(UserFiltersSchema, "body"),
+    queryUsers
+);
 
 swaggerRegistery.registerPath({
     method: "post",

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 
-import { fetchRequest, validateBody } from "@/lib/express_";
+import { extractFindQuery, validateBody } from "@/lib/express_";
 import { zod, zodObjectId } from "@/lib/zod_";
 import { crudPlace } from "@/models/crud";
 import {
@@ -26,7 +26,7 @@ async function getPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudPlace.fetch(query));
 }
 
-placeRouter.get("/", fetchRequest(PlaceFiltersSchema, "query"), getPlaces);
+placeRouter.get("/", extractFindQuery(PlaceFiltersSchema, "query"), getPlaces);
 
 swaggerRegistery.registerPath({
     method: "get",
@@ -58,7 +58,7 @@ async function queryPlaces(req: Request, resp: Response) {
 
 placeRouter.post(
     "/query",
-    fetchRequest(PlaceFiltersSchema, "body"),
+    extractFindQuery(PlaceFiltersSchema, "body"),
     queryPlaces
 );
 
