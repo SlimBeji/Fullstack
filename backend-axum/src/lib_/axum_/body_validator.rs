@@ -41,7 +41,6 @@ where
         let inner = Json::<T>::from_request(req, state)
             .await
             .map_err(|rejection| {
-                // Check the error by its Display or Debug output
                 ApiError::bad_request("Invalid json data", Box::new(rejection))
             })?
             .0;
@@ -64,12 +63,9 @@ where
         req: Request,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        // need to undersatnd the internal error for a better bad request message ??
-
         let inner = Form::<T>::from_request(req, state)
             .await
             .map_err(|rejection| {
-                // Check the error by its Display or Debug output
                 let error_msg = rejection.to_string();
 
                 if error_msg.contains("missing field")
