@@ -1,12 +1,11 @@
 use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use axum_extra::extract::Query;
 use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     api::middlewares::Auth,
-    lib_::axum_::{Validated, ValidatedJson},
+    lib_::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson},
     lib_::utils::parse_enum_array,
     models::schemas::{
         PlaceFilters, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
@@ -46,8 +45,8 @@ pub fn routes() -> OpenApiRouter {
     security(("OAuth2Password" = []))
 )]
 async fn get_places(
-    Query(filters): Query<PlaceFilters>,
     Auth(user): Auth,
+    QueryFilters(filters): QueryFilters<PlaceFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", parse_enum_array(filters.fields));
@@ -79,7 +78,7 @@ async fn get_places(
 )]
 async fn query_places(
     Auth(user): Auth,
-    Json(filters): Json<PlaceFilters>,
+    BodyFilters(filters): BodyFilters<PlaceFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", parse_enum_array(filters.fields));

@@ -1,12 +1,11 @@
 use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use axum_extra::extract::Query;
 use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     api::middlewares::Auth,
-    lib_::axum_::{Validated, ValidatedJson},
+    lib_::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson},
     lib_::utils::parse_enum_array,
     models::schemas::{
         UserFilters, UserPost, UserPostSwagger, UserPut, UserRead,
@@ -47,7 +46,7 @@ pub fn routes() -> OpenApiRouter {
 )]
 async fn get_users(
     Auth(user): Auth,
-    Query(filters): Query<UserFilters>,
+    QueryFilters(filters): QueryFilters<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", parse_enum_array(filters.fields));
@@ -79,7 +78,7 @@ async fn get_users(
 )]
 async fn query_users(
     Auth(user): Auth,
-    Json(filters): Json<UserFilters>,
+    BodyFilters(filters): BodyFilters<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", parse_enum_array(filters.fields));
