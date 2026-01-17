@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
-use serde_json::{Value, json};
+use serde_json::{Error as SerdeErr, Value, error::Category, json};
 use std::error::Error;
 
 pub struct ApiError {
@@ -50,6 +50,25 @@ impl Error for ApiError {
         self.err
             .as_ref()
             .map(|e| e.as_ref() as &(dyn Error + 'static))
+    }
+}
+
+impl From<SerdeErr> for ApiError {
+    fn from(raw: SerdeErr) -> Self {
+        match raw.classify() {
+            Category::Data => Self {
+                code: StatusCode::UNPROCESSABLE_ENTITY,
+                message: "Invalid JSON data".to_string(),
+                details: Some(Value::String(raw.to_string())),
+                err: Some(Box::new(raw)),
+            },
+            _ => Self {
+                code: StatusCode::BAD_REQUEST,
+                message: "JSON could not be parsed".to_string(),
+                details: Some(Value::String(raw.to_string())),
+                err: Some(Box::new(raw)),
+            },
+        }
     }
 }
 
