@@ -219,10 +219,10 @@ pub enum UserSortableFields {
 pub struct UserFilters {
     #[param(example = 1)]
     #[schema(example = 1)]
-    pub page: Option<u32>,
+    pub page: Option<usize>,
     #[param(example = 100)]
     #[schema(example = 100)]
-    pub size: Option<u32>,
+    pub size: Option<usize>,
     pub sort: Option<Vec<UserSortableFields>>,
     pub fields: Option<Vec<UserSelectableFields>>,
     #[param(example = json!(["683b21134e2e5d46978daf1f"]))]

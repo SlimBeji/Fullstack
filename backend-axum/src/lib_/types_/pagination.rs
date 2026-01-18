@@ -6,10 +6,10 @@ use utoipa::ToSchema;
 #[serde(rename_all = "camelCase")]
 pub struct PaginatedData<T: Debug + Serialize + ToSchema> {
     #[schema(example = "2")]
-    pub page: u32,
+    pub page: usize,
     #[schema(example = "10")]
-    pub total_pages: u32,
+    pub total_pages: usize,
     #[schema(example = "197")]
-    pub total_count: u32,
+    pub total_count: usize,
     pub data: Vec<T>,
 }

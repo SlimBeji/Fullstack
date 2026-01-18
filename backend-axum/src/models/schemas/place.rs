@@ -275,10 +275,10 @@ pub enum PlaceSortableFields {
 pub struct PlaceFilters {
     #[param(example = 1)]
     #[schema(example = 1)]
-    pub page: Option<u32>,
+    pub page: Option<usize>,
     #[param(example = 100)]
     #[schema(example = 100)]
-    pub size: Option<u32>,
+    pub size: Option<usize>,
     pub sort: Option<Vec<PlaceSortableFields>>,
     pub fields: Option<Vec<PlaceSelectableFields>>,
     #[param(example = json!(["683b21134e2e5d46978daf1f"]))]
