@@ -215,6 +215,7 @@ pub enum UserSortableFields {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
+#[serde(rename_all = "snake_case")]
 pub struct UserFilters {
     #[param(example = 1)]
     #[schema(example = 1)]
@@ -224,6 +225,15 @@ pub struct UserFilters {
     pub size: Option<u32>,
     pub sort: Option<Vec<UserSortableFields>>,
     pub fields: Option<Vec<UserSelectableFields>>,
+    #[param(example = json!(["683b21134e2e5d46978daf1f"]))]
+    #[schema(example = json!(["683b21134e2e5d46978daf1f"]))]
+    pub id: Option<Vec<String>>,
+    #[param(example = json!(["eq:Slim Beji"]))]
+    #[schema(example = json!(["eq:Slim Beji"]))]
+    pub name: Option<Vec<String>>,
+    #[param(example = json!(["eq:mslimbeji@gmail.com"]))]
+    #[schema(example = json!(["eq:mslimbeji@gmail.com"]))]
+    pub email: Option<Vec<String>>,
 }
 
 // --- Update Schema ---

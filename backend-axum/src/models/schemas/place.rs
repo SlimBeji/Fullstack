@@ -271,6 +271,7 @@ pub enum PlaceSortableFields {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
+#[serde(rename_all = "snake_case")]
 pub struct PlaceFilters {
     #[param(example = 1)]
     #[schema(example = 1)]
@@ -280,6 +281,27 @@ pub struct PlaceFilters {
     pub size: Option<u32>,
     pub sort: Option<Vec<PlaceSortableFields>>,
     pub fields: Option<Vec<PlaceSelectableFields>>,
+    #[param(example = json!(["683b21134e2e5d46978daf1f"]))]
+    #[schema(example = json!(["683b21134e2e5d46978daf1f"]))]
+    pub id: Option<Vec<String>>,
+    #[param(example = json!(["eq:Some Place"]))]
+    #[schema(example = json!(["eq:Some Place"]))]
+    pub title: Option<Vec<String>>,
+    #[param(example = json!(["regex:football"]))]
+    #[schema(example = json!(["regex:football"]))]
+    pub description: Option<Vec<String>>,
+    #[param(example = json!(["regex:d{1,2} Boulevard"]))]
+    #[schema(example = json!(["regex:d{1,2} Boulevard"]))]
+    pub address: Option<Vec<String>>,
+    #[param(example = json!(["eq:683b21134e2e5d46978daf1f"]))]
+    #[schema(example = json!(["eq:683b21134e2e5d46978daf1f"]))]
+    pub creator_id: Option<Vec<String>>,
+    #[param(example = json!(["gt:3.5"]))]
+    #[schema(example = json!(["gt:3.5"]))]
+    pub location_lat: Option<Vec<String>>,
+    #[param(example = json!(["lt:4.5"]))]
+    #[schema(example = json!(["lt:4.5"]))]
+    pub location_lng: Option<Vec<String>>,
 }
 
 // --- Update Schema ---
