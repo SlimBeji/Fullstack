@@ -101,6 +101,22 @@ impl ApiError {
         Ok(())
     }
 
+    pub fn unprocessable(
+        message: impl Into<String>,
+        details: Option<Value>,
+        err: Option<Box<dyn Error + Send + Sync>>,
+    ) -> Self {
+        let details =
+            details.or(err.as_ref().map(|e| Value::String(e.to_string())));
+
+        Self {
+            code: StatusCode::UNPROCESSABLE_ENTITY,
+            message: message.into(),
+            details,
+            err,
+        }
+    }
+
     pub fn bad_form_data(
         detail: impl Into<String>,
         err: Box<dyn Error + Send + Sync>,
