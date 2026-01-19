@@ -11,12 +11,12 @@ pub struct Settings {
     pub api_url: String,
     pub app_url: String,
     pub secret_key: String,
-    pub file_upload_max_size: u64,
-    pub json_max_size: u64,
-    pub max_items_per_page: u64,
+    pub file_upload_max_size: usize,
+    pub json_max_size: usize,
+    pub max_items_per_page: usize,
     pub god_mode_login: String,
-    pub jwt_expiration: u64,
-    pub default_timeout: u64,
+    pub jwt_expiration: usize,
+    pub default_timeout: usize,
     pub env: String,
 
     // DATABASE config
@@ -25,7 +25,7 @@ pub struct Settings {
     pub mongo_test_db_name: String,
     pub redis_url: String,
     pub redis_test_url: String,
-    pub redis_expiration: u64,
+    pub redis_expiration: usize,
 
     // HUGGING FACE config
     pub hf_api_token: String,
@@ -34,7 +34,7 @@ pub struct Settings {
     pub google_credentials: String,
     pub gcp_project_id: String,
     pub gcs_bucket_name: String,
-    pub gcs_blob_expiration: u64,
+    pub gcs_blob_expiration: usize,
     pub gcs_emulator_priv: String,
     pub gcs_emulator_pub: String,
 }
