@@ -5,10 +5,12 @@ use time::OffsetDateTime;
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
+use crate::config::ENV;
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
-    types_::{FileToUpload, PaginatedData},
-    validator_::{email_strict, object_id, string_length},
+    types_::{FileToUpload, FindQuery, PaginatedData, ToFindQuery},
+    utils::parse_enum_array,
+    validator_::{FiltersReader, email_strict, object_id, string_length},
 };
 
 // --- Database Schema ---
@@ -234,6 +236,30 @@ pub struct UserFilters {
     #[param(example = json!(["eq:mslimbeji@gmail.com"]))]
     #[schema(example = json!(["eq:mslimbeji@gmail.com"]))]
     pub email: Option<Vec<String>>,
+}
+
+impl ToFindQuery for UserFilters {
+    fn to_find_query(self) -> Result<FindQuery, validator::ValidationErrors> {
+        let page = self.page.unwrap_or(1);
+        let size = self.size.unwrap_or(ENV.max_items_per_page);
+        let fields = parse_enum_array(self.fields);
+        let sort = parse_enum_array(self.sort);
+
+        let mut filter_reader = FiltersReader::new();
+        filter_reader.read_object_id_filters("id", &self.id);
+        filter_reader.read_string_filters("name", &self.name, &vec![], false);
+        filter_reader.read_string_filters("email", &self.email, &vec![], false);
+        match filter_reader.eval() {
+            Ok(filters) => Ok(FindQuery {
+                page,
+                size,
+                sort,
+                fields,
+                filters,
+            }),
+            Err(errors) => Err(errors),
+        }
+    }
 }
 
 // --- Update Schema ---

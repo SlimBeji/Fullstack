@@ -5,10 +5,12 @@ use time::OffsetDateTime;
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
+use crate::config::ENV;
 use crate::lib_::{
     axum_::{ApiError, MultipartForm},
-    types_::{FileToUpload, PaginatedData},
-    validator_::{array_length, object_id, string_length},
+    types_::{FileToUpload, FindQuery, PaginatedData, ToFindQuery},
+    utils::parse_enum_array,
+    validator_::{FiltersReader, array_length, object_id, string_length},
 };
 
 // --- Fields ---
@@ -302,6 +304,52 @@ pub struct PlaceFilters {
     #[param(example = json!(["lt:4.5"]))]
     #[schema(example = json!(["lt:4.5"]))]
     pub location_lng: Option<Vec<String>>,
+}
+
+impl ToFindQuery for PlaceFilters {
+    fn to_find_query(self) -> Result<FindQuery, validator::ValidationErrors> {
+        let page = self.page.unwrap_or(1);
+        let size = self.size.unwrap_or(ENV.max_items_per_page);
+        let fields = parse_enum_array(self.fields);
+        let sort = parse_enum_array(self.sort);
+
+        let mut filter_reader = FiltersReader::new();
+        filter_reader.read_object_id_filters("id", &self.id);
+        filter_reader.read_string_filters("title", &self.title, &vec![], false);
+        filter_reader.read_string_filters(
+            "description",
+            &self.description,
+            &vec![],
+            false,
+        );
+        filter_reader.read_string_filters(
+            "address",
+            &self.address,
+            &vec![],
+            false,
+        );
+        filter_reader.read_object_id_filters("creatorId", &self.creator_id);
+        filter_reader.read_numeric_filters(
+            "locationLat",
+            &self.location_lat,
+            &vec![],
+        );
+        filter_reader.read_numeric_filters(
+            "locationLng",
+            &self.location_lng,
+            &vec![],
+        );
+        match filter_reader.eval() {
+            Ok(filters) => Ok(FindQuery {
+                page,
+                size,
+                sort,
+                fields,
+                filters,
+            }),
+            Err(errors) => Err(errors),
+        }
+    }
 }
 
 // --- Update Schema ---
