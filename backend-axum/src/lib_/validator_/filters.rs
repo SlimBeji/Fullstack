@@ -18,10 +18,36 @@ fn apply_rules<T>(
     Ok(())
 }
 
-fn apply_rules_to_vec<T>(
+fn apply_rules_to_slice<T>(
     vals: &[T],
     rules: &Validators<T>,
 ) -> Result<(), ValidationError> {
+    for val in vals {
+        for rule in rules {
+            rule(val)?
+        }
+    }
+    Ok(())
+}
+
+fn apply_str_rules(
+    val: &String,
+    rules: &Validators<str>,
+) -> Result<(), ValidationError> {
+    // validator crate wants &str even when validating String
+    // apply_rules works with only one generic type not (&str, &String)
+    for rule in rules {
+        rule(val)?
+    }
+    Ok(())
+}
+
+fn apply_str_rules_to_slice(
+    vals: &[String],
+    rules: &Validators<str>,
+) -> Result<(), ValidationError> {
+    // validator crate wants &str even when validating String
+    // apply_rules_to_slice works with only one generic type not (&str, &String)
     for val in vals {
         for rule in rules {
             rule(val)?
@@ -129,7 +155,7 @@ pub struct StringFilters {
 impl StringFilters {
     pub fn from_list(
         filters: &[String],
-        rules: &Validators<String>,
+        rules: &Validators<str>,
         is_indexed: bool,
     ) -> Result<Self, ValidationError> {
         let mut result = Self {
@@ -148,27 +174,27 @@ impl StringFilters {
                 "eq" => {
                     is_set("eq", &result.eq)?;
                     let converted = val.to_string();
-                    apply_rules(&converted, rules)?;
+                    apply_str_rules(&converted, rules)?;
                     result.eq = Some(converted);
                 }
                 "ne" => {
                     is_set("ne", &result.ne)?;
                     let converted = val.to_string();
-                    apply_rules(&converted, rules)?;
+                    apply_str_rules(&converted, rules)?;
                     result.ne = Some(converted);
                 }
                 "in" => {
                     is_set("in", &result.in_)?;
                     let converted: Vec<String> =
                         val.split(',').map(|e| e.to_string()).collect();
-                    apply_rules_to_vec(&converted, &rules)?;
+                    apply_str_rules_to_slice(&converted, &rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
                     is_set("nin", &result.nin)?;
                     let converted: Vec<String> =
                         val.split(',').map(|e| e.to_string()).collect();
-                    apply_rules_to_vec(&converted, &rules)?;
+                    apply_str_rules_to_slice(&converted, &rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
@@ -284,13 +310,13 @@ impl NumericFilters {
                 "in" => {
                     is_set("in", &result.in_)?;
                     let converted = parse_numbers(val)?;
-                    apply_rules_to_vec(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, &rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
                     is_set("nin", &result.nin)?;
                     let converted = parse_numbers(val)?;
-                    apply_rules_to_vec(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, &rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
@@ -506,13 +532,13 @@ impl DatetimeFilters {
                 "in" => {
                     is_set("in", &result.in_)?;
                     let converted = parse_datetimes(val)?;
-                    apply_rules_to_vec(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, &rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
                     is_set("nin", &result.nin)?;
                     let converted = parse_datetimes(val)?;
-                    apply_rules_to_vec(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, &rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
@@ -574,7 +600,7 @@ impl FiltersReader {
         &mut self,
         key: &'static str,
         query_params: &Option<Vec<String>>,
-        rules: &Validators<String>,
+        rules: &Validators<str>,
         is_indexed: bool,
     ) {
         let Some(query_params) = query_params else {
