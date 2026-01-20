@@ -6,7 +6,6 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     lib_::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson},
-    lib_::utils::parse_enum_array,
     models::schemas::{
         UserFilters, UserPost, UserPostSwagger, UserPut, UserRead,
         UsersPaginated,
@@ -46,18 +45,19 @@ pub fn routes() -> OpenApiRouter {
 )]
 async fn get_users(
     Auth(user): Auth,
-    QueryFilters(filters): QueryFilters<UserFilters>,
+    data: QueryFilters<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    println!("{:?}", parse_enum_array(filters.fields));
-    println!("{:?}", parse_enum_array(filters.sort));
-    let data = UsersPaginated {
-        page: filters.page.unwrap_or(1),
-        total_count: filters.size.unwrap_or(100),
+    println!("{:?}", data.query.fields);
+    println!("{:?}", data.query.sort);
+    println!("{:?}", data.query.filters);
+    let result = UsersPaginated {
+        page: data.query.page,
+        total_count: data.query.size,
         total_pages: 1,
         data: vec![UserRead::example()],
     };
-    (StatusCode::OK, Json(data))
+    (StatusCode::OK, Json(result))
 }
 
 #[utoipa::path(
@@ -78,18 +78,19 @@ async fn get_users(
 )]
 async fn query_users(
     Auth(user): Auth,
-    BodyFilters(filters): BodyFilters<UserFilters>,
+    data: BodyFilters<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    println!("{:?}", parse_enum_array(filters.fields));
-    println!("{:?}", parse_enum_array(filters.sort));
-    let data = UsersPaginated {
-        page: filters.page.unwrap_or(1),
-        total_count: filters.size.unwrap_or(100),
+    println!("{:?}", data.query.fields);
+    println!("{:?}", data.query.sort);
+    println!("{:?}", data.query.filters);
+    let result = UsersPaginated {
+        page: data.query.page,
+        total_count: data.query.size,
         total_pages: 1,
         data: vec![UserRead::example()],
     };
-    (StatusCode::OK, Json(data))
+    (StatusCode::OK, Json(result))
 }
 
 #[utoipa::path(

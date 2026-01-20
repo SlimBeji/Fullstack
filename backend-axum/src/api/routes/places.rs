@@ -6,7 +6,6 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     lib_::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson},
-    lib_::utils::parse_enum_array,
     models::schemas::{
         PlaceFilters, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
         PlacesPaginated, UserRead,
@@ -46,18 +45,19 @@ pub fn routes() -> OpenApiRouter {
 )]
 async fn get_places(
     Auth(user): Auth,
-    QueryFilters(filters): QueryFilters<PlaceFilters>,
+    data: QueryFilters<PlaceFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    println!("{:?}", parse_enum_array(filters.fields));
-    println!("{:?}", parse_enum_array(filters.sort));
-    let data = PlacesPaginated {
-        page: filters.page.unwrap_or(1),
-        total_count: filters.size.unwrap_or(100),
+    println!("{:?}", data.query.fields);
+    println!("{:?}", data.query.sort);
+    println!("{:?}", data.query.filters);
+    let result = PlacesPaginated {
+        page: data.query.page,
+        total_count: data.query.size,
         total_pages: 1,
         data: vec![PlaceRead::example()],
     };
-    (StatusCode::OK, Json(data))
+    (StatusCode::OK, Json(result))
 }
 
 #[utoipa::path(
@@ -78,18 +78,19 @@ async fn get_places(
 )]
 async fn query_places(
     Auth(user): Auth,
-    BodyFilters(filters): BodyFilters<PlaceFilters>,
+    data: BodyFilters<PlaceFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    println!("{:?}", parse_enum_array(filters.fields));
-    println!("{:?}", parse_enum_array(filters.sort));
-    let data = PlacesPaginated {
-        page: filters.page.unwrap_or(1),
-        total_count: filters.size.unwrap_or(100),
+    println!("{:?}", data.query.fields);
+    println!("{:?}", data.query.sort);
+    println!("{:?}", data.query.filters);
+    let result = PlacesPaginated {
+        page: data.query.page,
+        total_count: data.query.size,
         total_pages: 1,
         data: vec![PlaceRead::example()],
     };
-    (StatusCode::OK, Json(data))
+    (StatusCode::OK, Json(result))
 }
 
 #[utoipa::path(
