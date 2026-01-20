@@ -1,16 +1,22 @@
+use std::marker::PhantomData;
+
 use axum::extract::{FromRequest, Json};
 use axum_extra::extract::Query;
 use serde::de::DeserializeOwned;
 
+use super::super::types_::{FindQuery, ToFindQuery};
 use super::ApiError;
 
 // Filters from Query parameters
-pub struct QueryFilters<T>(pub T);
+pub struct QueryFilters<T> {
+    pub query: FindQuery,
+    _marker: PhantomData<T>,
+}
 
 impl<S, T> FromRequest<S> for QueryFilters<T>
 where
     S: Send + Sync,
-    T: DeserializeOwned,
+    T: DeserializeOwned + ToFindQuery,
 {
     type Rejection = ApiError;
 
@@ -22,22 +28,31 @@ where
             .await
             .map_err(|rejection| {
                 ApiError::bad_request(
-                    "bad query parameter",
+                    "bad query parameters",
                     Box::new(rejection),
                 )
             })?
             .0;
-        Ok(Self(inner))
+        let find_query = inner.to_find_query().map_err(|errors| {
+            ApiError::from_validation_errors("bad query parameters", errors)
+        })?;
+        Ok(Self {
+            query: find_query,
+            _marker: PhantomData,
+        })
     }
 }
 
 // Filters from JSON Body
-pub struct BodyFilters<T>(pub T);
+pub struct BodyFilters<T> {
+    pub query: FindQuery,
+    _marker: PhantomData<T>,
+}
 
 impl<S, T> FromRequest<S> for BodyFilters<T>
 where
     S: Send + Sync,
-    T: DeserializeOwned,
+    T: DeserializeOwned + ToFindQuery,
 {
     type Rejection = ApiError;
 
@@ -54,6 +69,12 @@ where
                 )
             })?
             .0;
-        Ok(Self(inner))
+        let find_query = inner.to_find_query().map_err(|errors| {
+            ApiError::from_validation_errors("bad query parameters", errors)
+        })?;
+        Ok(Self {
+            query: find_query,
+            _marker: PhantomData,
+        })
     }
 }
