@@ -5,10 +5,12 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use validator::{Validate, ValidationError};
+use validator::{Validate, ValidationErrors};
 
 use serde_json::{Error as SerdeErr, Value, error::Category, json};
 use std::error::Error;
+
+use super::super::validator_::errors_to_serde_map;
 
 pub struct ApiError {
     pub code: StatusCode,
@@ -76,29 +78,25 @@ impl From<SerdeErr> for ApiError {
 #[allow(dead_code)] // to be removed
 impl ApiError {
     pub fn validate<T: Validate>(inner: &T) -> Result<(), Self> {
-        inner.validate().map_err(|e| {
-            let mut map = serde_json::Map::new();
-            for (field, errors) in e.field_errors() {
-                let arr: Vec<Value> = errors
-                    .iter()
-                    .map(|err: &ValidationError| {
-                        json!({
-                            "code": err.code,
-                            "message": err.message.clone().map(|m| m.to_string()),
-                            "params": err.params,
-                        })
-                    })
-                    .collect();
-                map.insert(field.to_string(), Value::Array(arr));
-            }
-            Self {
-               code: StatusCode::UNPROCESSABLE_ENTITY,
-               message: "invalid data".to_string(),
-               details: Some(Value::Object(map)),
-               err: Some(Box::new(e))
-            }
+        inner.validate().map_err(|e| Self {
+            code: StatusCode::UNPROCESSABLE_ENTITY,
+            message: "invalid data".to_string(),
+            details: Some(Value::Object(errors_to_serde_map(&e))),
+            err: Some(Box::new(e)),
         })?;
         Ok(())
+    }
+
+    pub fn from_validation_errors(
+        message: impl Into<String>,
+        errors: ValidationErrors,
+    ) -> Self {
+        Self {
+            code: StatusCode::UNPROCESSABLE_ENTITY,
+            message: message.into(),
+            details: Some(Value::Object(errors_to_serde_map(&errors))),
+            err: Some(Box::new(errors)),
+        }
     }
 
     pub fn unprocessable(
