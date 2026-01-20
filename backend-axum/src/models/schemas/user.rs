@@ -85,7 +85,7 @@ pub struct UserPostSwagger {
 
 #[derive(Debug, Validate)]
 pub struct UserPost {
-    #[validate(custom(function = "string_length::<2, 2>"))]
+    #[validate(custom(function = "string_length::<2, 0>"))]
     pub name: String,
     #[validate(custom(function = "email_strict"))]
     pub email: String,
@@ -247,8 +247,18 @@ impl ToFindQuery for UserFilters {
 
         let mut filter_reader = FiltersReader::new();
         filter_reader.read_object_id_filters("id", &self.id);
-        filter_reader.read_string_filters("name", &self.name, &vec![], false);
-        filter_reader.read_string_filters("email", &self.email, &vec![], false);
+        filter_reader.read_string_filters(
+            "name",
+            &self.name,
+            &vec![string_length::<2, 0>],
+            false,
+        );
+        filter_reader.read_string_filters(
+            "email",
+            &self.email,
+            &vec![email_strict],
+            false,
+        );
         match filter_reader.eval() {
             Ok(filters) => Ok(FindQuery {
                 page,

@@ -315,17 +315,22 @@ impl ToFindQuery for PlaceFilters {
 
         let mut filter_reader = FiltersReader::new();
         filter_reader.read_object_id_filters("id", &self.id);
-        filter_reader.read_string_filters("title", &self.title, &vec![], false);
+        filter_reader.read_string_filters(
+            "title",
+            &self.title,
+            &vec![string_length::<10, 0>],
+            false,
+        );
         filter_reader.read_string_filters(
             "description",
             &self.description,
-            &vec![],
+            &vec![string_length::<10, 0>],
             false,
         );
         filter_reader.read_string_filters(
             "address",
             &self.address,
-            &vec![],
+            &vec![string_length::<10, 0>],
             false,
         );
         filter_reader.read_object_id_filters("creatorId", &self.creator_id);
