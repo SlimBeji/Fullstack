@@ -13,6 +13,7 @@ from lib.types_ import (
     FindQuery,
     FindQueryFilters,
     PaginatedData,
+    PaginatedDict,
     PaginationData,
 )
 from models.schemas import UserReadSchema
@@ -120,37 +121,25 @@ class CrudBase(
 
     # Serialization
 
-    async def _post_process_dict(self, item: dict) -> dict:
+    async def _post_process_raw(self, item: dict) -> dict:
+        """Post processing of the fetched Data - one time"""
         if "_id" in item:
             item["id"] = str(item.pop("_id"))
         return item
 
-    async def _post_process_dicts(self, data: list[dict]) -> list[dict]:
-        coroutines = [self._post_process_dict(i) for i in data]
+    async def _post_process_raws(self, data: list[dict]) -> list[dict]:
+        """Post processing of the fetched Data - multiple items"""
+        coroutines = [self._post_process_raw(i) for i in data]
         return await asyncio.gather(*coroutines)
 
-    async def post_process_results(
-        self, results: list[dict] | list[ModelDocument], to_dict: bool = False
-    ) -> list[dict] | list[ReadSchema]:
-        if not results:
+    async def post_process_dicts(self, data: list[dict]) -> list[ReadSchema]:
+        if not data:
             return []
-
-        if not isinstance(results[0], dict):
-            data = [i.model_dump() for i in cast(list[ModelDocument], results)]
-        else:
-            data = cast(list[dict], results)
-
-        data = await self._post_process_dicts(data)
-        if to_dict:
-            return data
-
+        data = await self._post_process_raws(data)
         return [self.read_schema(**i) for i in data]
 
-    async def post_process(
-        self, result: ModelDocument | dict, to_dict: bool = False
-    ) -> ReadSchema | dict:
-        items = cast(list[ModelDocument] | list[dict], [result])
-        output = await self.post_process_results(items, to_dict=to_dict)
+    async def post_process(self, result: ModelDocument) -> ReadSchema:
+        output = await self.post_process_dicts([result.model_dump()])
         return output[0]
 
     # Read
@@ -274,7 +263,7 @@ class CrudBase(
     async def fetch(
         self,
         query: FindQuery[Selectables, Sortables, Searchables] | FiltersSchema,
-    ) -> PaginatedData[ReadSchema]:
+    ) -> PaginatedData[ReadSchema] | PaginatedDict:
         # Step 1: If the input is a FiltersSchema, convert to FindQuery object
         query = self._to_find_query(query)
 
@@ -297,19 +286,30 @@ class CrudBase(
         # Step 4: Fetching results and returning response
         convrt_to_dict = bool(query.fields)
         raw = await self.fetch_documents(parsed)
-        data = await self.post_process_results(raw, to_dict=convrt_to_dict)
-        return PaginatedData(
-            page=pagination.page,
-            totalPages=total_pages,
-            totalCount=total_count,
-            data=data,
-        )
+        if convrt_to_dict:
+            # Returning dicts
+            data = await self._post_process_raws(raw)
+            return PaginatedDict(
+                page=pagination.page,
+                totalPages=total_pages,
+                totalCount=total_count,
+                data=data,
+            )
+        else:
+            # Returning Pydantic Schemas
+            dicts = await self.post_process_dicts(raw)
+            return PaginatedData[ReadSchema](
+                page=pagination.page,
+                totalPages=total_pages,
+                totalCount=total_count,
+                data=dicts,
+            )
 
     async def user_fetch(
         self,
         user: UserReadSchema,
         query: FindQuery[Selectables, Sortables, Searchables] | FiltersSchema,
-    ) -> PaginatedData[ReadSchema]:
+    ) -> PaginatedData[ReadSchema] | PaginatedDict:
         query = self._to_find_query(query)
         query = self.add_ownership_filters(user, query)
         return await self.fetch(query)

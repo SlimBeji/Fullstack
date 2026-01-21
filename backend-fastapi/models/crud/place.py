@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import cast
 
 from beanie import PydanticObjectId
 
@@ -73,8 +72,8 @@ class CrudPlace(
         query.filters["creatorId"] = creatorId_filters
         return query
 
-    async def _post_process_dict(self, item: dict) -> dict:
-        item = await super()._post_process_dict(item)
+    async def _post_process_raw(self, item: dict) -> dict:
+        item = await super()._post_process_raw(item)
         item.pop("embedding", None)
         image_url: str | None = item.get("imageUrl", None)
         if image_url is not None:
@@ -91,8 +90,7 @@ class CrudPlace(
         create_form = PlaceCreateSchema(**data)
         document = await self.create_document(create_form)
         place_embedding(document.id)
-        result = await self.post_process(document)
-        return cast(PlaceReadSchema, result)
+        return await self.post_process(document)
 
     async def update(
         self, document: Place, form: PlacePutSchema
@@ -109,8 +107,7 @@ class CrudPlace(
         if description_changed or title_changed:
             place_embedding(document.id)
 
-        result = await self.post_process(document)
-        return cast(PlaceReadSchema, result)
+        return await self.post_process(document)
 
     async def delete_cleanup(self, document: Place):
         if document.imageUrl:

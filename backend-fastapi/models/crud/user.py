@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import cast
 
 from beanie import PydanticObjectId
 from pymongo.errors import DuplicateKeyError
@@ -78,8 +77,8 @@ class CrudUser(
         query.filters["id"] = id_filters
         return query
 
-    async def _post_process_dict(self, item: dict) -> dict:
-        item = await super()._post_process_dict(item)
+    async def _post_process_raw(self, item: dict) -> dict:
+        item = await super()._post_process_raw(item)
         item.pop("password", None)
         image_url: str | None = item.get("imageUrl", None)
         if image_url:
@@ -103,8 +102,7 @@ class CrudUser(
         user = await self.model.find_one(dict(email=email))
         if user is None:
             return None
-        result = await self.post_process(user)
-        return cast(UserReadSchema, result)
+        return await self.post_process(user)
 
     async def get_bearer(self, email: str) -> str:
         user = await self.get_by_email(email)
@@ -127,8 +125,7 @@ class CrudUser(
         create_form = UserCreateSchema(**data)
         try:
             document = await self.create_document(create_form)
-            result = await self.post_process(document)
-            return cast(UserReadSchema, result)
+            return await self.post_process(document)
         except DuplicateKeyError:
             raise ApiError(
                 HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -168,8 +165,7 @@ class CrudUser(
             **form.model_dump(exclude_none=True, exclude_unset=True)
         )
         document = await super().update_document(user, update_form)
-        result = await self.post_process(document)
-        return cast(UserReadSchema, result)
+        return await self.post_process(document)
 
     async def delete_cleanup(self, document: User):
         if document.imageUrl:
