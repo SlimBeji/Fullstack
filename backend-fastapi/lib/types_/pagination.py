@@ -14,8 +14,15 @@ class PaginationData(BaseModel):
         return (self.page - 1) * self.size
 
 
+class PaginatedDict(BaseModel):
+    page: int
+    totalPages: int
+    totalCount: int
+    data: list[dict]
+
+
 class PaginatedData(BaseModel, Generic[ReadSchema]):
     page: int
     totalPages: int
     totalCount: int
-    data: list[ReadSchema] | list[dict]
+    data: list[ReadSchema]

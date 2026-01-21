@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr
 
 from config import settings
 from lib.pydantic_ import BaseFiltersSchema, FieldMeta, HttpFilters
-from lib.types_ import FileToUpload, FindQuery, PaginatedData
+from lib.types_ import FileToUpload, FindQuery, PaginatedData, PaginatedDict
 
 from .common import created_at_annot, updated_at_annot
 
@@ -151,7 +151,7 @@ class UserReadSchema(BaseModel):
     createdAt: created_at_annot
 
 
-UsersPaginatedSchema = PaginatedData[UserReadSchema]
+UsersPaginatedSchema = PaginatedData[UserReadSchema] | PaginatedDict
 
 
 # --- Query Schemas ---

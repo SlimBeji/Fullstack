@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from config import settings
 from lib.pydantic_ import BaseFiltersSchema, FieldMeta, HttpFilters
-from lib.types_ import FileToUpload, FindQuery, PaginatedData
+from lib.types_ import FileToUpload, FindQuery, PaginatedData, PaginatedDict
 
 from .common import created_at_annot, updated_at_annot
 
@@ -202,7 +202,7 @@ class PlaceReadSchema(BaseModel):
     createdAt: created_at_annot
 
 
-PlacesPaginatedSchema = PaginatedData[PlaceReadSchema]
+PlacesPaginatedSchema = PaginatedData[PlaceReadSchema] | PaginatedDict
 
 # --- Query Schemas ---
 
