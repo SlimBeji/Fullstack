@@ -243,12 +243,21 @@ class HttpFilters(Generic[T]):
         field_info = _get_field_info(item)
         description = getattr(field_info, "description", "")
         extra = getattr(field_info, "json_schema_extra", None) or {}
+        examples = extra.get("filter_examples", None)
+        if examples is None:
+            field_info = _get_field_info(item)
+            if field_info is not None:
+                examples = field_info.examples
+            else:
+                examples = []
+
         return Annotated[
             Optional[list[HttpFilter[item]]],
             Field(
                 None,
                 description=description,
                 json_schema_extra=extra,
+                examples=examples,
             ),
             AfterValidator(_field_filters_validator),
         ]
