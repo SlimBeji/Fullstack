@@ -24,7 +24,7 @@ class BaseFiltersSchema(BaseModel, Generic[SelectableFields, SortableFields]):
         list[SelectableFields] | None,
         Field(
             description="Fields to include in the response; omit for full document",
-            examples=[["-id"]],
+            examples=[["id"]],
         ),
     ] = None
 
