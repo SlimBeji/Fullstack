@@ -1,6 +1,6 @@
 import { RefinementCtx, ZodNever, ZodTypeAny } from "zod";
 
-import { FilterOperation } from "../types";
+import { Filter, FilterOperation } from "../types";
 import { zod } from "./base";
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
@@ -300,6 +300,29 @@ const guessType = (field: ZodTypeAny): QueryParamTypes => {
     }
 };
 
+const has_duplicate_operators = (
+    filters: Filter[],
+    ctx: RefinementCtx
+): any => {
+    const usedOperators: FilterOperation[] = [];
+    filters.forEach((filter) => {
+        if (usedOperators.includes(filter.op)) {
+            ctx.addIssue({
+                code: zod.ZodIssueCode.custom,
+                message: `cannot use an operator twice for the same field. ${filter.op} used multiple times`,
+            });
+        }
+        usedOperators.push(filter.op);
+        if (usedOperators.length >= 2 && usedOperators.includes("eq")) {
+            ctx.addIssue({
+                code: zod.ZodIssueCode.custom,
+                message: `cannot combine eq operator with other operators. ${usedOperators} used at the same time`,
+            });
+        }
+    });
+    return filters;
+};
+
 export const httpFilter = (
     field: ZodTypeAny,
     doc?: OpenapiDoc,
@@ -337,5 +360,7 @@ export const httpFilters = (
     doc?: OpenapiDoc,
     options?: TransformOption
 ): ZodTypeAny => {
-    return zod.array(httpFilter(field, doc, options));
+    return zod
+        .array(httpFilter(field, doc, options))
+        .transform(has_duplicate_operators);
 };
