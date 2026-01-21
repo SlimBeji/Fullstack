@@ -316,7 +316,7 @@ const has_duplicate_operators = (
         if (usedOperators.length >= 2 && usedOperators.includes("eq")) {
             ctx.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `cannot combine eq operator with other operators. ${usedOperators} used at the same time`,
+                message: `eq can only be used exclusively. ${usedOperators} used at the same time`,
             });
         }
     });
