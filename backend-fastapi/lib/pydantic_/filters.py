@@ -12,7 +12,13 @@ from typing import (
 )
 
 from beanie.odm.fields import PydanticObjectId
-from pydantic import BeforeValidator, EmailStr, Field, TypeAdapter
+from pydantic import (
+    AfterValidator,
+    BeforeValidator,
+    EmailStr,
+    Field,
+    TypeAdapter,
+)
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticCustomError
 
@@ -215,6 +221,23 @@ class HttpFilter(Generic[T]):
         ]
 
 
+def _field_filters_validator(filters: list[FieldFilter]):
+    used_operators: list[FilterOperation] = []
+    for filter in filters:
+        op = filter["op"]
+        if op in used_operators:
+            raise ValueError(
+                f"cannot use an operator twice for the same field. {op} used multiple times"
+            )
+        used_operators.append(op)
+        if "eq" in used_operators and len(used_operators) >= 2:
+            raise ValueError(
+                f"eq can only be used exclusively. {used_operators} used at the same time"
+            )
+
+    return filters
+
+
 class HttpFilters(Generic[T]):
     def __class_getitem__(cls, item):
         field_info = _get_field_info(item)
@@ -227,4 +250,5 @@ class HttpFilters(Generic[T]):
                 description=description,
                 json_schema_extra=extra,
             ),
+            AfterValidator(_field_filters_validator),
         ]
