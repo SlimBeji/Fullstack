@@ -60,11 +60,26 @@ fn parse_str_filter(filter: &str) -> (&str, &str) {
     filter.split_once(':').unwrap_or(("eq", filter))
 }
 
-fn is_set<T>(key: &str, field: &Option<T>) -> Result<(), ValidationError> {
-    if field.is_some() {
+fn is_usable<'a, 'b>(
+    key: &'a str,
+    operators: &'b mut Vec<&'a str>,
+) -> Result<(), ValidationError> {
+    if operators.contains(&key) {
         let mut err = ValidationError::new("duplicate_operator");
         err.message =
             Some(format!("cannot use {} operator multiple times", key).into());
+        return Err(err);
+    }
+    operators.push(key);
+    if key != "eq" && operators.contains(&"eq") {
+        let mut err = ValidationError::new("incompatible_operators");
+        err.message = Some(
+            format!(
+                "eq can only be used exclusively. {} used at the same time",
+                format!("{}", operators.join(", "))
+            )
+            .into(),
+        );
         return Err(err);
     }
     Ok(())
@@ -168,43 +183,44 @@ impl StringFilters {
             text: None,
         };
 
+        let mut operators = vec![];
         for filter in filters {
             let (op, val) = parse_str_filter(filter);
             match op {
                 "eq" => {
-                    is_set("eq", &result.eq)?;
+                    is_usable("eq", &mut operators)?;
                     let converted = val.to_string();
                     apply_str_rules(&converted, rules)?;
                     result.eq = Some(converted);
                 }
                 "ne" => {
-                    is_set("ne", &result.ne)?;
+                    is_usable("ne", &mut operators)?;
                     let converted = val.to_string();
                     apply_str_rules(&converted, rules)?;
                     result.ne = Some(converted);
                 }
                 "in" => {
-                    is_set("in", &result.in_)?;
+                    is_usable("in", &mut operators)?;
                     let converted: Vec<String> =
                         val.split(',').map(|e| e.to_string()).collect();
                     apply_str_rules_to_slice(&converted, &rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
-                    is_set("nin", &result.nin)?;
+                    is_usable("nin", &mut operators)?;
                     let converted: Vec<String> =
                         val.split(',').map(|e| e.to_string()).collect();
                     apply_str_rules_to_slice(&converted, &rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
-                    is_set("exists", &result.exists)?;
+                    is_usable("exists", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.exists = Some(converted);
                 }
                 "regex" => {
-                    is_set("regex", &result.regex)?;
+                    is_usable("regex", &mut operators)?;
                     let converted = val.to_string();
                     // No validation
                     result.regex = Some(converted);
@@ -218,7 +234,7 @@ impl StringFilters {
                         );
                         return Err(err);
                     }
-                    is_set("text", &result.text)?;
+                    is_usable("text", &mut operators)?;
                     let converted = val.to_string();
                     // No validation
                     result.text = Some(converted);
@@ -268,59 +284,60 @@ impl NumericFilters {
             exists: None,
         };
 
+        let mut operators = vec![];
         for filter in filters {
             let (op, val) = parse_str_filter(filter);
             match op {
                 "eq" => {
-                    is_set("eq", &result.eq)?;
+                    is_usable("eq", &mut operators)?;
                     let converted = parse_number(val)?;
                     apply_rules(&converted, rules)?;
                     result.eq = Some(converted);
                 }
                 "ne" => {
-                    is_set("ne", &result.ne)?;
+                    is_usable("ne", &mut operators)?;
                     let converted = parse_number(val)?;
                     apply_rules(&converted, rules)?;
                     result.ne = Some(converted);
                 }
                 "gt" => {
-                    is_set("gt", &result.gt)?;
+                    is_usable("gt", &mut operators)?;
                     let converted = parse_number(val)?;
                     apply_rules(&converted, rules)?;
                     result.gt = Some(converted);
                 }
                 "gte" => {
-                    is_set("gte", &result.gte)?;
+                    is_usable("gte", &mut operators)?;
                     let converted = parse_number(val)?;
                     apply_rules(&converted, rules)?;
                     result.gte = Some(converted);
                 }
                 "lt" => {
-                    is_set("lt", &result.lt)?;
+                    is_usable("lt", &mut operators)?;
                     let converted = parse_number(val)?;
                     apply_rules(&converted, rules)?;
                     result.lt = Some(converted);
                 }
                 "lte" => {
-                    is_set("lte", &result.lte)?;
+                    is_usable("lte", &mut operators)?;
                     let converted = parse_number(val)?;
                     apply_rules(&converted, rules)?;
                     result.lte = Some(converted);
                 }
                 "in" => {
-                    is_set("in", &result.in_)?;
+                    is_usable("in", &mut operators)?;
                     let converted = parse_numbers(val)?;
                     apply_rules_to_slice(&converted, &rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
-                    is_set("nin", &result.nin)?;
+                    is_usable("nin", &mut operators)?;
                     let converted = parse_numbers(val)?;
                     apply_rules_to_slice(&converted, &rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
-                    is_set("exists", &result.exists)?;
+                    is_usable("exists", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.exists = Some(converted);
@@ -355,23 +372,24 @@ impl BooleanFilters {
             exists: None,
         };
 
+        let mut operators = vec![];
         for filter in filters {
             let (op, val) = parse_str_filter(filter);
             match op {
                 "eq" => {
-                    is_set("eq", &result.eq)?;
+                    is_usable("eq", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.eq = Some(converted);
                 }
                 "ne" => {
-                    is_set("ne", &result.ne)?;
+                    is_usable("ne", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.ne = Some(converted);
                 }
                 "exists" => {
-                    is_set("exists", &result.exists)?;
+                    is_usable("exists", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.exists = Some(converted);
@@ -409,35 +427,36 @@ impl ObjectIdFilters {
             exists: None,
         };
 
+        let mut operators = vec![];
         for filter in filters {
             let (op, val) = parse_str_filter(filter);
             match op {
                 "eq" => {
-                    is_set("eq", &result.eq)?;
+                    is_usable("eq", &mut operators)?;
                     let converted = parse_object_id(val)?;
                     // No validation
                     result.eq = Some(converted);
                 }
                 "ne" => {
-                    is_set("ne", &result.ne)?;
+                    is_usable("ne", &mut operators)?;
                     let converted = parse_object_id(val)?;
                     // No validation
                     result.ne = Some(converted);
                 }
                 "in" => {
-                    is_set("in", &result.in_)?;
+                    is_usable("in", &mut operators)?;
                     let converted = parse_objects_id(val)?;
                     // No validation
                     result.in_ = Some(converted);
                 }
                 "nin" => {
-                    is_set("nin", &result.nin)?;
+                    is_usable("nin", &mut operators)?;
                     let converted = parse_objects_id(val)?;
                     // No validation
                     result.nin = Some(converted);
                 }
                 "exists" => {
-                    is_set("exists", &result.exists)?;
+                    is_usable("exists", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.exists = Some(converted);
@@ -490,59 +509,60 @@ impl DatetimeFilters {
             exists: None,
         };
 
+        let mut operators = vec![];
         for filter in filters {
             let (op, val) = parse_str_filter(filter);
             match op {
                 "eq" => {
-                    is_set("eq", &result.eq)?;
+                    is_usable("eq", &mut operators)?;
                     let converted = parse_datetime(val)?;
                     apply_rules(&converted, rules)?;
                     result.eq = Some(converted);
                 }
                 "ne" => {
-                    is_set("ne", &result.ne)?;
+                    is_usable("ne", &mut operators)?;
                     let converted = parse_datetime(val)?;
                     apply_rules(&converted, rules)?;
                     result.ne = Some(converted);
                 }
                 "gt" => {
-                    is_set("gt", &result.gt)?;
+                    is_usable("gt", &mut operators)?;
                     let converted = parse_datetime(val)?;
                     apply_rules(&converted, rules)?;
                     result.gt = Some(converted);
                 }
                 "gte" => {
-                    is_set("gte", &result.gte)?;
+                    is_usable("gte", &mut operators)?;
                     let converted = parse_datetime(val)?;
                     apply_rules(&converted, rules)?;
                     result.gte = Some(converted);
                 }
                 "lt" => {
-                    is_set("lt", &result.lt)?;
+                    is_usable("lt", &mut operators)?;
                     let converted = parse_datetime(val)?;
                     apply_rules(&converted, rules)?;
                     result.lt = Some(converted);
                 }
                 "lte" => {
-                    is_set("lte", &result.lte)?;
+                    is_usable("lte", &mut operators)?;
                     let converted = parse_datetime(val)?;
                     apply_rules(&converted, rules)?;
                     result.lte = Some(converted);
                 }
                 "in" => {
-                    is_set("in", &result.in_)?;
+                    is_usable("in", &mut operators)?;
                     let converted = parse_datetimes(val)?;
                     apply_rules_to_slice(&converted, &rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
-                    is_set("nin", &result.nin)?;
+                    is_usable("nin", &mut operators)?;
                     let converted = parse_datetimes(val)?;
                     apply_rules_to_slice(&converted, &rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
-                    is_set("exists", &result.exists)?;
+                    is_usable("exists", &mut operators)?;
                     let converted = parse_bool(val)?;
                     // No validation
                     result.exists = Some(converted);
