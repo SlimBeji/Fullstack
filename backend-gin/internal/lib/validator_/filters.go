@@ -5,6 +5,7 @@ import (
 	"backend/internal/lib/utils"
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -101,7 +102,7 @@ type filterValidationParams struct {
 func validateFilters(
 	name string, v reflect.Value, tag string,
 ) ([]types_.Filter, []string) {
-	var msgs []string
+	var strErrors []string
 	var filters []types_.Filter
 	var params filterValidationParams
 	params.fieldName = name
@@ -114,7 +115,7 @@ func validateFilters(
 
 	// Returns nothing if no strFilters
 	if len(strFilters) == 0 {
-		return filters, msgs
+		return filters, strErrors
 	}
 
 	// Parse the tags
@@ -128,16 +129,34 @@ func validateFilters(
 	params.validationTag = strings.Join(tagParts, ",")
 
 	// Iterate over each str filter and convert it to Filter with validation
+	var usedFilters []types_.FilterOp
 	for _, strFilter := range strFilters {
-		filter, filterMsgs := validateFilter(strFilter, params)
-		if len(filterMsgs) > 0 {
-			msgs = append(msgs, filterMsgs...)
+		filter, fieldErrors := validateFilter(strFilter, params)
+
+		if slices.Contains(usedFilters, filter.Op) {
+			fieldErrors = append(
+				fieldErrors,
+				fmt.Sprintf("cannot use an operator twice for the same field. %s used multiple times", filter.Op),
+			)
+		} else {
+			usedFilters = append(usedFilters, filter.Op)
+		}
+
+		if slices.Contains(usedFilters, types_.FilterEq) && len(usedFilters) >= 2 {
+			fieldErrors = append(
+				fieldErrors,
+				fmt.Sprintf("eq can only be used exclusively. %s used at the same time", usedFilters),
+			)
+		}
+
+		if len(fieldErrors) > 0 {
+			strErrors = append(strErrors, fieldErrors...)
 		} else {
 			filters = append(filters, filter)
 		}
 	}
 
-	return filters, msgs
+	return filters, strErrors
 }
 
 func validateFilter(
