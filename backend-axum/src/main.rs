@@ -2,7 +2,6 @@ use tokio::net::TcpListener;
 
 mod api;
 mod config;
-mod lib_;
 mod models;
 
 #[cfg(test)]

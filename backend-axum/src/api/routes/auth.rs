@@ -2,10 +2,10 @@ use axum::{Json, http::StatusCode, response::IntoResponse};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::lib_::axum_::{Validated, ValidatedForm};
 use crate::models::schemas::{
     EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
 };
+use backend::axum_::{Validated, ValidatedForm};
 
 pub const PATH: &str = "/auth";
 

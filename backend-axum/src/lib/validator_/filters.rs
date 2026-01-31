@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use time::OffsetDateTime;
 use validator::{ValidationError, ValidationErrors};
 
-use crate::lib_::utils::parse_bool as parse_bool_utils;
+use super::super::utils::parse_bool as parse_bool_utils;
 
 // General helpers methods
 pub type Validators<T> = Vec<fn(&T) -> Result<(), ValidationError>>;

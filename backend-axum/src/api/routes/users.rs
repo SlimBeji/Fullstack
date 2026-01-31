@@ -5,12 +5,12 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     api::middlewares::Auth,
-    lib_::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson},
     models::schemas::{
         UserFilters, UserPost, UserPostSwagger, UserPut, UserRead,
         UsersPaginated,
     },
 };
+use backend::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson};
 
 pub const PATH: &str = "/users";
 

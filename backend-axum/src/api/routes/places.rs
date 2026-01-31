@@ -5,12 +5,12 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     api::middlewares::Auth,
-    lib_::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson},
     models::schemas::{
         PlaceFilters, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
         PlacesPaginated, UserRead,
     },
 };
+use backend::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson};
 
 pub const PATH: &str = "/places";
 

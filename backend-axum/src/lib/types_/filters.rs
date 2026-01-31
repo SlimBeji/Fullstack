@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use validator::ValidationErrors;
 
-use crate::lib_::validator_::FieldFilters;
+use super::super::validator_::FieldFilters;
 
 #[derive(Debug)]
 pub struct FindQuery {

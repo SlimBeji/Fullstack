@@ -1,35 +1,39 @@
 [package]
 default-run = "backend-axum"
+edition = "2024"
 name = "backend-axum"
 version = "0.1.0"
-edition = "2024"
 
 [[bin]]
 name = "backend-axum"
 path = "src/main.rs"
 
+[lib]
+name = "backend"
+path = "src/lib/mod.rs"
+
 [dependencies]
 # Axum
-tokio = { version = "1", features = ["full"] }
-axum = { version = "0.8", features = ["multipart"] }
-axum-extra = { version = "0.10", features = ["query"] }
+axum = {version = "0.8", features = ["multipart"]}
+axum-extra = {version = "0.10", features = ["query"]}
+tokio = {version = "1", features = ["full"]}
+tower = "0.4"
+tower-http = {version = "0.5", features = ["trace", "cors"]}
 tracing = "0.1"
 tracing-subscriber = "0.3"
-tower = "0.4"
-tower-http = { version = "0.5", features = ["trace", "cors"] }
 
 # Rust Tools
-time = { version = "0.3", features = ["serde", "serde-human-readable", "macros", "formatting", "parsing"] }
-once_cell = { version = "1.21.3" }
-regex = { version = "1.12.2" }
+once_cell = {version = "1.21.3"}
+regex = {version = "1.12.2"}
+time = {version = "0.3", features = ["serde", "serde-human-readable", "macros", "formatting", "parsing"]}
 
 # Database
-mongodb = { version = "3" }
+mongodb = {version = "3"}
 
 # Schemas
-serde = { version = "1.0", features = ["derive"] }
+serde = {version = "1.0", features = ["derive"]}
 serde_json = "1.0"
-validator = { version = "0.18", features = ["derive"] }
-utoipa = { version = "5", features = ["macros"] }
-utoipa-swagger-ui = { version = "9", features = ["axum", "vendored"] }
+utoipa = {version = "5", features = ["macros"]}
 utoipa-axum = "0.2"
+utoipa-swagger-ui = {version = "9", features = ["axum", "vendored"]}
+validator = {version = "0.18", features = ["derive"]}
