@@ -154,7 +154,7 @@ axum-test:
 
 axum-lint:
 	docker exec -it axum cargo fmt
-	docker exec -it axum cargo check
+	docker exec -it axum cargo clippy
 
 axum-script/%:
 	docker exec -it axum cargo run --bin $*
