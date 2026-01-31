@@ -150,15 +150,13 @@ impl MultipartForm {
     pub fn get_boolean(&self, key: &str) -> Result<bool, ApiError> {
         match self.inner.get(key) {
             Some(MultipartField::Text(s)) => {
-                let result = match utils::parse_bool(s.to_lowercase().as_str())
-                {
+                match utils::parse_bool(s.to_lowercase().as_str()) {
                     Ok(b) => Ok(b),
                     _ => Err(ApiError::bad_multipart_field(
                         key,
                         format!("{} is not a valid boolean", s),
                     )),
-                };
-                result
+                }
             }
             _ => Err(ApiError::bad_multipart_field(
                 key,
@@ -186,7 +184,7 @@ impl MultipartForm {
             None => Ok(None),
             _ => Err(ApiError::bad_multipart_field(
                 key,
-                format!("could not extract boolean value"),
+                "could not extract boolean value",
             )),
         }
     }

@@ -118,13 +118,10 @@ async fn create_user(
     println!("{:?}", payload.email);
     println!("{:?}", payload.is_admin);
     println!("{:?}", payload.password);
-    match payload.image {
-        Some(image) => {
-            println!("{}", image.originalname);
-            println!("{}", image.mimetype);
-            println!("{}", image.data.len());
-        }
-        _ => (),
+    if let Some(image) = payload.image {
+        println!("{}", image.originalname);
+        println!("{}", image.mimetype);
+        println!("{}", image.data.len());
     }
     let response = UserRead::example();
     (StatusCode::OK, Json(response))

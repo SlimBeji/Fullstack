@@ -31,7 +31,7 @@ fn apply_rules_to_slice<T>(
 }
 
 fn apply_str_rules(
-    val: &String,
+    val: &str,
     rules: &Validators<str>,
 ) -> Result<(), ValidationError> {
     // validator crate wants &str even when validating String
@@ -60,9 +60,9 @@ fn parse_str_filter(filter: &str) -> (&str, &str) {
     filter.split_once(':').unwrap_or(("eq", filter))
 }
 
-fn is_usable<'a, 'b>(
+fn is_usable<'a>(
     key: &'a str,
-    operators: &'b mut Vec<&'a str>,
+    operators: &mut Vec<&'a str>,
 ) -> Result<(), ValidationError> {
     if operators.contains(&key) {
         let mut err = ValidationError::new("duplicate_operator");
@@ -76,7 +76,7 @@ fn is_usable<'a, 'b>(
         err.message = Some(
             format!(
                 "eq can only be used exclusively. {} used at the same time",
-                format!("{}", operators.join(", "))
+                operators.join(", ")
             )
             .into(),
         );
@@ -203,14 +203,14 @@ impl StringFilters {
                     is_usable("in", &mut operators)?;
                     let converted: Vec<String> =
                         val.split(',').map(|e| e.to_string()).collect();
-                    apply_str_rules_to_slice(&converted, &rules)?;
+                    apply_str_rules_to_slice(&converted, rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
                     is_usable("nin", &mut operators)?;
                     let converted: Vec<String> =
                         val.split(',').map(|e| e.to_string()).collect();
-                    apply_str_rules_to_slice(&converted, &rules)?;
+                    apply_str_rules_to_slice(&converted, rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
@@ -327,13 +327,13 @@ impl NumericFilters {
                 "in" => {
                     is_usable("in", &mut operators)?;
                     let converted = parse_numbers(val)?;
-                    apply_rules_to_slice(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
                     is_usable("nin", &mut operators)?;
                     let converted = parse_numbers(val)?;
-                    apply_rules_to_slice(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {
@@ -552,13 +552,13 @@ impl DatetimeFilters {
                 "in" => {
                     is_usable("in", &mut operators)?;
                     let converted = parse_datetimes(val)?;
-                    apply_rules_to_slice(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, rules)?;
                     result.in_ = Some(converted);
                 }
                 "nin" => {
                     is_usable("nin", &mut operators)?;
                     let converted = parse_datetimes(val)?;
-                    apply_rules_to_slice(&converted, &rules)?;
+                    apply_rules_to_slice(&converted, rules)?;
                     result.nin = Some(converted);
                 }
                 "exists" => {

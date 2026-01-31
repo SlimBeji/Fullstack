@@ -29,11 +29,7 @@ impl IntoResponse for ApiError {
 
 impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            format!("Error {} - {}", self.code.as_str(), self.message)
-        )
+        write!(f, "Error {} - {}", self.code.as_str(), self.message)
     }
 }
 
@@ -173,7 +169,7 @@ impl ApiError {
         }
     }
 
-    pub fn internal_error<E: Error + Send + Sync + 'static>(
+    pub fn internal_error(
         message: impl Into<String>,
         err: Box<dyn Error + Send + Sync>,
     ) -> Self {

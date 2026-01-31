@@ -120,13 +120,10 @@ async fn create_place(
     println!("{:?}", payload.lat);
     println!("{:?}", payload.lng);
     println!("{:?}", payload.creator_id);
-    match payload.image {
-        Some(image) => {
-            println!("{}", image.originalname);
-            println!("{}", image.mimetype);
-            println!("{}", image.data.len());
-        }
-        _ => (),
+    if let Some(image) = payload.image {
+        println!("{}", image.originalname);
+        println!("{}", image.mimetype);
+        println!("{}", image.data.len());
     }
     let response = PlaceRead::example();
     (StatusCode::OK, Json(response))

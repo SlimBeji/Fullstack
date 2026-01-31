@@ -43,13 +43,10 @@ async fn signup_route(
     println!("{:?}", payload.name);
     println!("{:?}", payload.email);
     println!("{:?}", payload.password);
-    match payload.image {
-        Some(image) => {
-            println!("{}", image.originalname);
-            println!("{}", image.mimetype);
-            println!("{}", image.data.len());
-        }
-        _ => (),
+    if let Some(image) = payload.image {
+        println!("{}", image.originalname);
+        println!("{}", image.mimetype);
+        println!("{}", image.data.len());
     }
     let response = EncodedTokenSchema::example();
     (StatusCode::OK, Json(response))
