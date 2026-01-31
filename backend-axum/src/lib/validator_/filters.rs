@@ -592,6 +592,7 @@ pub enum FieldFilters {
     DateTime(DatetimeFilters),
 }
 
+#[derive(Default)]
 pub struct FiltersReader {
     filters: HashMap<String, FieldFilters>,
     errors: ValidationErrors,
