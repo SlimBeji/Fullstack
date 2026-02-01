@@ -1,11 +1,12 @@
 datasource db {
-    provider   = "postgresql"
-    extensions = [vector]
+    provider = "postgresql"
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["postgresqlExtensions"]
+    provider   = "prisma-client"
+    engineType = "client"
+    output     = "../../../node_modules/@prisma/client"
+    extensions = [vector]
 }
 
 model User {
