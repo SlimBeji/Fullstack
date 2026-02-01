@@ -126,8 +126,10 @@ services:
         restart: on-failure
 
     pgsql:
+        build:
+            context: .
+            dockerfile: ./pgsql.Dockerfile
         container_name: pgsql
-        image: postgres:18
         ports:
             - 5432:5432
         volumes:
@@ -138,8 +140,10 @@ services:
             POSTGRES_DB: dev
 
     test-pgsql:
+        build:
+            context: .
+            dockerfile: ./pgsql.Dockerfile
         container_name: test-pgsql
-        image: postgres:18
         ports:
             - 5433:5432
         environment:
