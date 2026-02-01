@@ -84,7 +84,7 @@ express-lint:
 	docker exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
 
 express-script/%:
-	docker exec -it express npx ts-node -r tsconfig-paths/register src/bin/$*
+	docker exec -it express npx tsx -r tsconfig-paths/register src/bin/$*
 
 express-debug:
 	docker exec -it express npx ts-node -r tsconfig-paths/register src/bin/debug.ts
