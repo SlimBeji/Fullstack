@@ -21,6 +21,7 @@ todo.txt
 **/axum.env
 
 # Docker local images
+pgsql
 mongo
 mongo-express
 gcs
