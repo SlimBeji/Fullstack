@@ -101,3 +101,4 @@ The following shortcuts are available for managing the Express backend via `make
 ## 📌 Notes
 
 - Swagger documentation is auto-generated from Zod schemas using `zod-to-openapi` and served via `swagger-ui-express`.
+- A `_generated` folder exists under `src` because Prisma 7 requires a custom output path for its code generation step (`npx prisma generate`). The generated `PrismaClient` is then imported as a third-party package.
