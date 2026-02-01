@@ -1,0 +1,45 @@
+datasource db {
+    provider   = "postgresql"
+    extensions = [vector]
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["postgresqlExtensions"]
+}
+
+model User {
+    id       Int     @id @default(autoincrement())
+    name     String
+    email    String
+    password String
+    imageUrl String?
+    isAdmin  Boolean @default(false)
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    places Place[] @relation("UserPlaces")
+}
+
+model Place {
+    id          Int     @id @default(autoincrement())
+    title       String
+    description String
+    address     String
+    imageUrl    String?
+    location    Json
+
+    // AI
+    embedding Unsupported("vector(384)")?
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    creator   User @relation(fields: [creatorId], references: [id], name: "UserPlaces")
+    creatorId Int
+}
