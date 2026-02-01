@@ -1,6 +1,7 @@
 export * from "./cache";
 export * from "./huggingFace";
 export * from "./mongo";
+export * from "./pgsql";
 export * from "./scheduler";
 export * from "./storage";
 export * from "./worker";

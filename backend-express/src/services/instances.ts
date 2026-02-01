@@ -6,6 +6,8 @@ import {
     HuggingFaceClientConfig,
     MongoClient,
     MongoClientConfig,
+    PgClient,
+    PgClientConfig,
     RedisClient,
     RedisClientConfig,
 } from "@/lib/clients";
@@ -17,6 +19,11 @@ const mongoConfig: MongoClientConfig = {
     dbName: IS_TEST ? env.MONGO_TEST_DBNAME : env.MONGO_DBNAME,
 };
 export const db = new MongoClient(mongoConfig);
+
+const pgsqlConfig: PgClientConfig = {
+    uri: IS_TEST ? env.DATABASE_TEST_URL : env.DATABASE_URL,
+};
+export const pgClient = new PgClient(pgsqlConfig);
 
 const redisConfig: RedisClientConfig = {
     url: IS_TEST ? env.REDIS_TEST_URL : env.REDIS_URL,
