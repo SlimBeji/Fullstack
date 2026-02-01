@@ -6,7 +6,7 @@ import pluginImportSort from "eslint-plugin-simple-import-sort";
 
 export default [
     {
-        ignores: ["build/**"],
+        ignores: ["build/**", "src/_generated"],
         files: ["**/*.ts"],
         languageOptions: {
             parser: parser,
