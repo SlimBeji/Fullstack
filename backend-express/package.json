@@ -48,7 +48,7 @@
     "dependencies": {
         "@asteasolutions/zod-to-openapi": "^7.3.2",
         "@google-cloud/storage": "^7.16.0",
-        "@prisma/client": "^7.3.0",
+        "@prisma/adapter-pg": "^7.3.0",
         "axios": "^1.10.0",
         "bcryptjs": "^3.0.2",
         "bullmq": "^5.54.3",
