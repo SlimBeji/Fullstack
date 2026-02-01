@@ -33,3 +33,18 @@ CREATE TABLE "Place" (
 
 -- AddForeignKey
 ALTER TABLE "Place" ADD CONSTRAINT "Place_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddConstraints
+ALTER TABLE "Place"
+ADD CONSTRAINT embedding_length CHECK (vector_dims(embedding) = 384 OR embedding IS NULL);
+
+-- AddConstraints
+ALTER TABLE "Place"
+ADD CONSTRAINT location_structure CHECK (
+  location IS NULL OR (
+    location ? 'lat' AND
+    location ? 'lng' AND
+    jsonb_typeof(location->'lat') = 'number' AND
+    jsonb_typeof(location->'lng') = 'number'
+  )
+);
