@@ -57,6 +57,8 @@ services:
         env_file:
             - ./backend-express/express.env
         depends_on:
+            - pgsql
+            - test-pgsql
             - mongo1
             - mongo2
             - gcs
@@ -75,6 +77,8 @@ services:
         env_file:
             - ./backend-fastapi/fastapi.env
         depends_on:
+            - pgsql
+            - test-pgsql
             - mongo1
             - mongo2
             - gcs
@@ -93,6 +97,8 @@ services:
         env_file:
             - ./backend-gin/gin.env
         depends_on:
+            - pgsql
+            - test-pgsql
             - mongo1
             - mongo2
             - gcs
@@ -111,11 +117,51 @@ services:
         env_file:
             - ./backend-axum/axum.env
         depends_on:
+            - pgsql
+            - test-pgsql
             - mongo1
             - mongo2
             - gcs
         command: cargo watch -x run
         restart: on-failure
+
+    pgsql:
+        container_name: pgsql
+        image: postgres:18
+        ports:
+            - 5432:5432
+        volumes:
+            - ./pgsql:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: dev
+            POSTGRES_USER: dev
+            POSTGRES_DB: dev
+
+    test-pgsql:
+        container_name: test-pgsql
+        image: postgres:18
+        ports:
+            - 5433:5432
+        environment:
+            POSTGRES_PASSWORD: test
+            POSTGRES_USER: test
+            POSTGRES_DB: test
+
+    pgadmin:
+        container_name: pgadmin
+        image: dpage/pgadmin4
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@admin.com
+            PGADMIN_DEFAULT_PASSWORD: root
+            user: ${UID}:${GID}
+        depends_on:
+            - pgsql
+        volumes:
+            - ./pgadmin:/var/lib/pgadmin
+        ports:
+            - 5050:80
+        logging:
+            driver: 'none'
 
     mongo1:
         image: mongo:latest
