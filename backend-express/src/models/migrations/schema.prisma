@@ -5,7 +5,7 @@ datasource db {
 generator client {
     provider   = "prisma-client"
     engineType = "client"
-    output     = "../../../node_modules/@prisma/client"
+    output     = "../../_generated/prisma"
     extensions = [vector]
 }
 
