@@ -8,7 +8,6 @@ import {
     zodFile,
     ZodInfer,
     zodObject,
-    zodObjectId,
 } from "@/lib/zod_";
 
 import { createdAt, updatedAt } from "./common";
@@ -53,9 +52,9 @@ export const placeSortableFields = [
 
 export type PlaceSortableType = (typeof placeSortableFields)[number];
 
-const id = zodObjectId().openapi({
+const id = zod.number().openapi({
     description: "The ID of the place 24 characters",
-    example: "683b21134e2e5d46978daf1f",
+    example: 123456,
 });
 
 const title = zod.string().min(10).openapi({
@@ -85,9 +84,9 @@ const address = zod.string().min(1).openapi({
     example: "Fulham road",
 });
 
-const creatorId = zodObjectId().openapi({
+const creatorId = zod.number().openapi({
     description: "The ID of the place creator, 24 characters",
-    example: "683b21134e2e5d46978daf1f",
+    example: 123456,
 });
 
 const lat = zod.coerce.number().openapi({

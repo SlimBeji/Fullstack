@@ -1,5 +1,4 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Types } from "mongoose";
 
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
@@ -36,7 +35,7 @@ export const AuthFields = { username, accessToken, tokenType, expiresIn };
 
 // --- Access Token ----
 export interface TokenPayload {
-    userId: Types.ObjectId;
+    userId: number;
     email: string;
 }
 
@@ -80,14 +79,8 @@ export const EncodedTokenSchema = zod.object({
 
 export type EncodedToken = ZodInfer<typeof EncodedTokenSchema>;
 
-export const createToken = (
-    userId: Types.ObjectId,
-    email: string
-): EncodedToken => {
-    const payload: TokenPayload = {
-        userId: userId,
-        email: email,
-    };
+export const createToken = (userId: number, email: string): EncodedToken => {
+    const payload: TokenPayload = { userId, email };
     const access_token = encodePayload(
         payload,
         env.SECRET_KEY,
@@ -96,8 +89,8 @@ export const createToken = (
     return {
         access_token,
         token_type: "bearer",
-        email: email,
-        userId: userId,
+        email,
+        userId,
         expires_in: env.JWT_EXPIRATION,
     };
 };

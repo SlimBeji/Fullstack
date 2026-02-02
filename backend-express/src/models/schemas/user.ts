@@ -40,9 +40,9 @@ export const userSortableFields = [
 
 export type UserSortableType = (typeof userSortableFields)[number];
 
-const id = zodObjectId().openapi({
+const id = zod.number().openapi({
     description: "The user ID, 24 characters",
-    example: "683b21134e2e5d46978daf1f",
+    example: 123456,
 });
 
 const name = zod.string().min(2).openapi({
