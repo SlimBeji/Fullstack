@@ -1,18 +1,7 @@
-import { Types } from "mongoose";
 import { ZodTypeAny } from "zod";
 
 import { ApiError, HttpStatus, MimeType } from "../express_";
 import { zod } from "./base";
-
-export const zodObjectId = () => {
-    return zod
-        .string()
-        .min(24)
-        .refine((val) => Types.ObjectId.isValid(val), {
-            message: "Must be a valid ObjectId",
-        })
-        .transform((val) => new Types.ObjectId(val));
-};
 
 const _zodFile = (acceptedMimetypes: string[] | null, maxSize: number) => {
     acceptedMimetypes = acceptedMimetypes || [MimeType.JPEG, MimeType.PNG];

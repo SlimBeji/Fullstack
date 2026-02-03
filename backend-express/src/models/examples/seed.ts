@@ -1,5 +1,3 @@
-import { Types } from "mongoose";
-
 import { db, redisClient, storage } from "@/services/instances";
 
 import { CollectionEnum } from "../collections/base";
