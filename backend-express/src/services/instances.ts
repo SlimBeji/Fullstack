@@ -4,8 +4,6 @@ import {
     CloudStorageConfig,
     HuggingFaceClient,
     HuggingFaceClientConfig,
-    MongoClient,
-    MongoClientConfig,
     PgClient,
     PgClientConfig,
     RedisClient,
@@ -13,12 +11,6 @@ import {
 } from "@/lib/clients";
 
 const IS_TEST = !!process.env.JEST_WORKER_ID;
-
-const mongoConfig: MongoClientConfig = {
-    uri: env.MONGO_URL,
-    dbName: IS_TEST ? env.MONGO_TEST_DBNAME : env.MONGO_DBNAME,
-};
-export const db = new MongoClient(mongoConfig);
 
 const pgsqlConfig: PgClientConfig = {
     uri: IS_TEST ? env.DATABASE_TEST_URL : env.DATABASE_URL,

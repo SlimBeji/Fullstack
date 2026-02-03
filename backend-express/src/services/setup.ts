@@ -3,18 +3,14 @@ import { handler } from "@/background/handlers";
 import { publisher } from "@/background/publishers";
 import { dumpDb, seedDb } from "@/models/examples";
 
-import { db, pgClient, redisClient } from "./instances";
+import { pgClient, redisClient } from "./instances";
 
 export const connectDbs = async () => {
-    await Promise.all([
-        redisClient.connect(),
-        pgClient.connect(),
-        db.connect(),
-    ]);
+    await Promise.all([redisClient.connect(), pgClient.connect()]);
 };
 
 export const closeDbs = async () => {
-    await Promise.all([redisClient.close(), pgClient.close(), db.close()]);
+    await Promise.all([redisClient.close(), pgClient.close()]);
 };
 
 export const startBackgroundProcessing = async () => {
