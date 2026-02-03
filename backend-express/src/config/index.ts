@@ -22,9 +22,6 @@ export const env = {
     // DATABASE config
     DATABASE_URL: getEnvVar("DATABASE_URL"),
     DATABASE_TEST_URL: getEnvVar("DATABASE_TEST_URL"),
-    MONGO_URL: getEnvVar("MONGO_URL"),
-    MONGO_DBNAME: getEnvVar("MONGO_DBNAME"),
-    MONGO_TEST_DBNAME: getEnvVar("MONGO_TEST_DBNAME", "tests"),
     REDIS_URL: getEnvVar("REDIS_URL"),
     REDIS_TEST_URL: getEnvVar("REDIS_TEST_URL", ""),
     REDIS_DEFAULT_EXPIRATION: Number(
