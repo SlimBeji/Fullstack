@@ -1,19 +1,37 @@
 export type FilterOperation =
     | "eq"
     | "ne"
-    | "gt"
-    | "gte"
-    | "lt"
-    | "lte"
     | "in"
     | "nin"
-    | "regex"
-    | "text"
-    | "exists";
+    | "lt"
+    | "lte"
+    | "gt"
+    | "gte"
+    | "like"
+    | "start"
+    | "end"
+    | "mode";
 
 export type Filter = { op: FilterOperation; val: any };
 
-export type FindQueryFilters<T extends string> = { [K in T]?: Filter[] };
+export interface FieldFilter {
+    eq?: any | null;
+    ne?: any | null;
+    in?: any[];
+    nin?: any[];
+    lt?: any;
+    lte?: any;
+    gt?: any;
+    gte?: any;
+    like?: string;
+    start?: string;
+    end?: string;
+    mode?: "default" | "insensitive";
+}
+
+export type FindQueryFilters<T extends string> = {
+    [K in T]?: FieldFilter;
+};
 
 export interface FindQuery<
     Selectables extends string,
