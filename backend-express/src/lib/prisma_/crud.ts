@@ -40,12 +40,12 @@ export class CrudClass<
     MAX_ITEMS_PER_PAGE = 100;
 
     constructor(
-        private model: Delegate,
+        public model: Delegate,
         public modelName: string,
         public defaultSelect: Select
     ) {}
 
-    public toId(d: number | DbModel | Read): number {
+    toId(d: number | DbModel | Read): number {
         if (typeof d === "number") {
             return d;
         } else {
@@ -53,11 +53,11 @@ export class CrudClass<
         }
     }
 
-    public whereId(id: number): WhereUnique {
+    whereId(id: number): WhereUnique {
         return { id } as WhereUnique;
     }
 
-    public notFoundError(id: number): ApiError {
+    notFoundError(id: number): ApiError {
         return new ApiError(
             HttpStatus.NOT_FOUND,
             `No document with id ${id} found in ${this.modelName}s`
@@ -66,7 +66,7 @@ export class CrudClass<
 
     // Authorization
 
-    public authCheck(
+    authCheck(
         _user: User,
         _doc: DbModel | Read | Post | Put,
         _event: CrudEvent
@@ -74,7 +74,7 @@ export class CrudClass<
         // Raises an ApiError if user lacks authorization
     }
 
-    public addOwnershipFilters(_user: User, _where: Where | undefined): Where {
+    addOwnershipFilters(_user: User, _where: Where | undefined): Where {
         throw new Error(
             `addOwnershipFilters not implemented for ${this.modelName}`
         );
@@ -188,22 +188,22 @@ export class CrudClass<
 
     // Search
 
-    private toOrderBy(fields: Sortables[]): OrderBy[] {
+    toOrderBy(fields: Sortables[]): OrderBy[] {
         // overide this method when subclassing for custom behavior
         return toOrderBy(fields, [{ createdAt: "desc" }] as OrderBy[]);
     }
 
-    private toSelect(fields: Selectables[]): Select {
+    toSelect(fields: Selectables[]): Select {
         // overide this method when subclassing for custom behavior
         return toSelect(fields, this.defaultSelect);
     }
 
-    private toWhere(filters: FindQueryFilters<Searchables>): Where {
+    toWhere(filters: FindQueryFilters<Searchables>): Where {
         // overide this method when subclassing for custom behavior
         return toWhere(filters);
     }
 
-    private toPrismaFindQuery(
+    toPrismaFindQuery(
         query: FindQuery<Selectables, Sortables, Searchables>
     ): PrismaFindQuery<Select, OrderBy, Where> {
         // convert a query to Prisma objects
