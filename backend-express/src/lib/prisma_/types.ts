@@ -60,6 +60,10 @@ export interface PrismaFieldFilter {
     mode?: "default" | "insensitive";
 }
 
+export interface PrismaJsonFilter extends PrismaFieldFilter {
+    path: string[];
+}
+
 export interface PrismaFindQuery<Select, OrderBy, Where> {
     where?: Where;
     take?: number;

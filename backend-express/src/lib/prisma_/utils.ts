@@ -1,5 +1,5 @@
 import { FieldFilter, FindQueryFilters } from "../types";
-import { PrismaFieldFilter } from "./types";
+import { PrismaFieldFilter, PrismaJsonFilter } from "./types";
 
 export const toOrderBy = <T extends string, K>(
     fields: T[],
@@ -26,7 +26,7 @@ export const toSelect = <T, K>(fields: T[], default_: K): K => {
     return result as K;
 };
 
-const toPrismaFilter = (d: FieldFilter): PrismaFieldFilter => {
+export const toPrismaFilter = (d: FieldFilter): PrismaFieldFilter => {
     const result = {} as PrismaFieldFilter;
     Object.keys(d).forEach((k) => {
         switch (k) {
@@ -71,6 +71,13 @@ const toPrismaFilter = (d: FieldFilter): PrismaFieldFilter => {
         }
     });
     return result;
+};
+
+export const toPrismaJsonFilter = (
+    d: FieldFilter,
+    path: string[]
+): PrismaJsonFilter => {
+    return { ...toPrismaFilter(d), path };
 };
 
 export const toWhere = <S extends string, T>(f: FindQueryFilters<S>): T => {
