@@ -165,6 +165,18 @@ export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true }).extend({
 
 export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
 
+export const PLACE_DEFAULT_SELECT = {
+    id: true,
+    title: true,
+    description: true,
+    address: true,
+    location: true,
+    imageUrl: true,
+    creatorId: true,
+    createdAt: true,
+    updatedAt: true,
+};
+
 export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
 export type PlacesPaginated = ZodInfer<typeof PlacesPaginatedSchema>;

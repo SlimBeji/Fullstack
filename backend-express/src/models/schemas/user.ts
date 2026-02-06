@@ -129,6 +129,17 @@ export const UserReadSchema = UserDBSchema.omit({ password: true }).extend({
 
 export type UserRead = ZodInfer<typeof UserReadSchema>;
 
+export const USER_DEFAULT_SELECT = {
+    id: true,
+    name: true,
+    email: true,
+    isAdmin: true,
+    imageUrl: true,
+    places: true,
+    createdAt: true,
+    updatedAt: true,
+};
+
 export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
 
 export type UsersPaginated = ZodInfer<typeof UsersPaginatedSchema>;
