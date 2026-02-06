@@ -82,18 +82,19 @@ export class CrudClass<
 
     // Serialization
 
-    async postProcess(raw: Partial<Read>): Promise<Partial<Read>> {
+    async postProcess<
+        T extends Partial<Read> | Read | Partial<DbModel> | DbModel,
+    >(raw: T): Promise<T> {
         // Override this when subclassing
         return raw;
     }
 
-    async postProcessBatch(
-        raw: Partial<Read>[],
-        batchSize = 50
-    ): Promise<Partial<Read>[]> {
+    async postProcessBatch<
+        T extends Partial<Read> | Read | Partial<DbModel> | DbModel,
+    >(raw: T[], batchSize = 50): Promise<T[]> {
         // Post process a batch asynchronously
         // Process in chunks to avoid rate limits
-        const results: Partial<Read>[] = [];
+        const results: T[] = [];
         for (let i = 0; i < raw.length; i += batchSize) {
             const chunk = raw.slice(i, i + batchSize);
             const processed = await Promise.all(
@@ -114,7 +115,7 @@ export class CrudClass<
                 select: this.defaultSelect,
             })) as Read;
             if (process) {
-                result = (await this.postProcess(result)) as Read;
+                result = await this.postProcess(result);
             }
             return result;
         } catch (err) {
@@ -158,7 +159,7 @@ export class CrudClass<
         })) as Read;
         if (!result) return null;
         if (process) {
-            result = (await this.postProcess(result)) as Read;
+            result = await this.postProcess(result);
         }
         return result as Read;
     }
@@ -299,8 +300,7 @@ export class CrudClass<
                 select: this.defaultSelect,
             })) as Read;
             if (process) {
-                const processed = await this.postProcess(result);
-                return processed as Read;
+                return await this.postProcess(result);
             }
             return result;
         } catch (err) {
