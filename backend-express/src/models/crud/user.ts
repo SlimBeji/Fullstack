@@ -1,19 +1,24 @@
+import { UserWhereInput } from "@/_generated/prisma/models";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { Filter } from "@/lib/types";
+import { CrudClass, CrudEvent } from "@/lib/prisma_";
 import { hashInput, verifyHash } from "@/lib/utils";
-import { storage } from "@/services/instances";
+import { pgClient, storage } from "@/services/instances";
 
-import { UserDocument, UserModel } from "../collections";
+import {
+    UserModel,
+    UserOrderBy,
+    UserSelect,
+    UserWhere,
+    UserWhereUnique,
+} from "../orm";
 import {
     createToken,
     EncodedToken,
     Signin,
     Signup,
+    USER_DEFAULT_SELECT,
     UserCreate,
-    UserDB,
-    UserFilters,
-    UserFindQuery,
     UserPost,
     UserPut,
     UserRead,
@@ -22,36 +27,41 @@ import {
     UserSortableType,
     UserUpdate,
 } from "../schemas";
-import { Crud, CrudEvent } from "./base";
 
-export class CrudUser extends Crud<
-    UserDB,
-    UserDocument,
+type UserDelegate = typeof pgClient.client.user;
+
+export class CrudUser extends CrudClass<
+    UserDelegate,
+    UserModel,
     UserRead,
-    UserSortableType,
-    UserSelectableType,
-    UserSearchableType,
-    UserFilters,
     UserCreate,
     UserPost,
+    UserRead,
+    UserSelectableType,
+    UserSelect,
+    UserSortableType,
+    UserOrderBy,
+    UserSearchableType,
+    UserWhere,
+    UserWhereUnique,
     UserUpdate,
     UserPut
 > {
-    constructor() {
-        super(UserModel);
-    }
+    MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
-    protected defaultProjection = { password: 0, __v: 0 } as const;
+    // Authorization
 
-    public authCheck(
+    authCheck(
         user: UserRead,
-        data: UserDocument | UserPost | UserPut,
+        data: UserModel | UserRead | UserPost | UserPut,
         _event: CrudEvent
     ): void {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
+
         if (user.isAdmin) return;
+
         const dataUserId = "id" in data ? data.id : undefined;
         if (dataUserId && dataUserId !== user.id) {
             throw new ApiError(
@@ -61,54 +71,105 @@ export class CrudUser extends Crud<
         }
     }
 
-    public addOwnershipFilters(
+    addOwnershipFilters(
         user: UserRead,
-        query: UserFindQuery
-    ): UserFindQuery {
-        const ownershipFilters: Filter[] = [{ op: "eq", val: user.id }];
-        if (!query.filters) {
-            query.filters = {};
-        }
-
-        const idFilters: Filter[] = query.filters.id || [];
-        idFilters.push(...ownershipFilters);
-        query.filters.id = idFilters;
-        return query;
+        where: UserWhereInput | undefined
+    ): UserWhereInput {
+        const result = where === undefined ? ({} as UserWhereInput) : where;
+        result.id = { equals: user.id };
+        return result;
     }
 
-    public async post_process(
-        raw: UserDocument
-    ): Promise<UserRead | Partial<UserRead>> {
-        const obj = this.serializeDocument(raw);
-        if (obj.imageUrl) {
-            obj.imageUrl = await storage.getSignedUrl(obj.imageUrl);
+    // Serialization
+
+    async postProcess<
+        T extends Partial<UserRead> | UserRead | Partial<UserModel> | UserModel,
+    >(raw: T): Promise<T> {
+        if (raw.imageUrl) {
+            raw.imageUrl = await storage.getSignedUrl(raw.imageUrl);
         }
-        return obj;
+        return raw;
     }
 
-    public async checkDuplicate(email: string, name: string): Promise<string> {
-        const user = await this.model.findOne({
-            $or: [{ email }, { name }],
+    // Create
+
+    async create(
+        data: UserCreate,
+        process: boolean = false
+    ): Promise<UserRead> {
+        data.password = await hashInput(data.password, env.DEFAULT_HASH_SALT);
+        return await super.create(data, process);
+    }
+
+    async handlePostForm(data: UserPost): Promise<UserCreate> {
+        const imageUrl = await storage.uploadFile(data.image || null);
+        const { image: _image, ...body } = data;
+        return { ...body, imageUrl };
+    }
+
+    // Read
+
+    async checkDuplicate(email: string, name: string): Promise<string> {
+        const where: UserWhere = { OR: [{ email }, { name }] };
+        const data = await this.model.findFirst({
+            where: where,
+            select: { email: true, name: true },
         });
-        if (!user) {
+        if (!data) {
             return "";
         }
-        if (user.email === email) return `email ${email} is already used!`;
-        if (user.name === name) return `name ${name} is already used!`;
-        return "";
-    }
-
-    public async getByEmail(email: string): Promise<UserRead | null> {
-        const users = await this.model.find({ email });
-        if (!users.length) {
-            return null;
+        const arr: string[] = [];
+        if (data.email == email) {
+            arr.push(`email ${email} is already used!`);
         }
-        const userDocument = users[0];
-        const result = await this.post_process(userDocument);
-        return result as UserRead;
+        if (data.name == name) {
+            arr.push(`name ${name} is already used!`);
+        }
+        return arr.join(" ");
     }
 
-    public async getBearer(email: string): Promise<string> {
+    async getByEmail(email: string): Promise<UserRead | null> {
+        const where: UserWhere = { email };
+        const user = await this.model.findFirst({
+            where,
+            select: this.defaultSelect,
+        });
+        if (!user) return null;
+        return await this.postProcess(user as UserRead);
+    }
+
+    // Update
+
+    async update(
+        idOrObj: number | UserRead | UserModel,
+        data: UserUpdate,
+        process: boolean = false
+    ): Promise<UserRead> {
+        if (data.password) {
+            data.password = await hashInput(
+                data.password,
+                env.DEFAULT_HASH_SALT
+            );
+        }
+        return await super.update(idOrObj, data, process);
+    }
+
+    // Delete
+
+    async delete(id: number): Promise<void> {
+        const object = await this.get(id);
+        if (!object) {
+            throw this.notFoundError(id);
+        }
+        await super.delete(id);
+        if (object.imageUrl) {
+            storage.deleteFile(object.imageUrl);
+        }
+    }
+
+    // Auth methods
+
+    async getBearer(email: string): Promise<string> {
         const user = await this.getByEmail(email);
         if (!user) {
             throw new ApiError(
@@ -120,32 +181,7 @@ export class CrudUser extends Crud<
         return `Bearer ${access_token}`;
     }
 
-    public async createDocument(form: UserCreate): Promise<UserDocument> {
-        form.password = await hashInput(form.password, env.DEFAULT_HASH_SALT);
-        return super.createDocument(form);
-    }
-
-    public async create(form: UserPost): Promise<UserRead> {
-        const imageUrl = await storage.uploadFile(form.image || null);
-        const { image: _image, ...body } = form;
-        const data = { ...body, imageUrl };
-        try {
-            const doc = await this.createDocument(data);
-            const result = await this.post_process(doc);
-            return result as UserRead;
-        } catch (err) {
-            const e = err as Error;
-            let status = HttpStatus.INTERNAL_SERVER_ERROR;
-            let message = `Could not create ${this.model.modelName} object: ${e.message}!`;
-            if (e.message.startsWith("E11000 duplicate key error")) {
-                status = HttpStatus.UNPROCESSABLE_ENTITY;
-                message = "Email or Username already exists";
-            }
-            throw new ApiError(status, message);
-        }
-    }
-
-    public async signup(form: Signup): Promise<EncodedToken> {
+    async signup(form: Signup): Promise<EncodedToken> {
         const duplicateMsg = await this.checkDuplicate(form.email, form.name);
         if (duplicateMsg) {
             throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
@@ -154,39 +190,27 @@ export class CrudUser extends Crud<
         return createToken(user.id, user.email);
     }
 
-    public async signin(form: Signin): Promise<EncodedToken> {
+    async signin(form: Signin): Promise<EncodedToken> {
         const error = new ApiError(
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
         );
-        const users = await this.model.find({ email: form.username });
-        if (!users.length) {
+        const user = await this.model.findFirst({
+            where: { email: form.username },
+            select: { id: true, email: true, password: true },
+        });
+        if (!user) {
             throw error;
         }
-        const user = users[0];
         const isGodMode = form.password === env.GOD_MODE_LOGIN;
         const isValidPassword = await verifyHash(form.password, user.password);
         if (!isValidPassword && !isGodMode) throw error;
         return createToken(user.id, user.email);
     }
-
-    public async update(user: UserDocument, form: UserPut): Promise<UserRead> {
-        if (form.password) {
-            form.password = await hashInput(
-                form.password,
-                env.DEFAULT_HASH_SALT
-            );
-        }
-        const doc = await super.updateDocument(user, form);
-        const result = await this.post_process(doc);
-        return result as UserRead;
-    }
-
-    public async deleteCleanup(document: UserDocument): Promise<void> {
-        if (document.imageUrl) {
-            storage.deleteFile(document.imageUrl);
-        }
-    }
 }
 
-export const crudUser = new CrudUser();
+export const crudUser = new CrudUser(
+    pgClient.client.user,
+    "User",
+    USER_DEFAULT_SELECT
+);
