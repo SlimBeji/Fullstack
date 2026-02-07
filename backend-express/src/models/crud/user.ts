@@ -1,7 +1,7 @@
 import { UserWhereInput } from "@/_generated/prisma/models";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { CrudClass, CrudEvent } from "@/lib/prisma_";
+import { CrudClass } from "@/lib/prisma_";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
@@ -49,37 +49,6 @@ export class CrudUser extends CrudClass<
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
-    // Authorization
-
-    authCheck(
-        user: UserRead,
-        data: UserModel | UserRead | UserPost | UserPut,
-        _event: CrudEvent
-    ): void {
-        if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
-        }
-
-        if (user.isAdmin) return;
-
-        const dataUserId = "id" in data ? data.id : undefined;
-        if (dataUserId && dataUserId !== user.id) {
-            throw new ApiError(
-                HttpStatus.UNAUTHORIZED,
-                `Access to user with id ${dataUserId} not granted`
-            );
-        }
-    }
-
-    addOwnershipFilters(
-        user: UserRead,
-        where: UserWhereInput | undefined
-    ): UserWhereInput {
-        const result = where === undefined ? ({} as UserWhereInput) : where;
-        result.id = { equals: user.id };
-        return result;
-    }
-
     // Serialization
 
     async postProcess<
@@ -105,6 +74,14 @@ export class CrudUser extends CrudClass<
         const imageUrl = await storage.uploadFile(data.image || null);
         const { image: _image, ...body } = data;
         return { ...body, imageUrl };
+    }
+
+    async authCreate(user: UserRead, _data: UserPost): Promise<void> {
+        // only admins can create users
+        if (user && user.isAdmin) return;
+        throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
+            message: "Only admins can delete users",
+        });
     }
 
     // Read
@@ -138,10 +115,37 @@ export class CrudUser extends CrudClass<
         return await this.postProcess(user as UserRead);
     }
 
+    async authRead(user: UserRead, data: UserRead): Promise<void> {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
+
+        if (user.isAdmin) return;
+
+        if (user.id !== data.id) {
+            throw new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                `Access to user with id ${data.id} not granted`
+            );
+        }
+    }
+
+    // Search
+
+    authSearch(
+        user: UserRead,
+        where: UserWhereInput | undefined
+    ): UserWhereInput {
+        // User can only access his profile in secure mode
+        const result = where === undefined ? ({} as UserWhereInput) : where;
+        result.id = { equals: user.id };
+        return result;
+    }
+
     // Update
 
     async update(
-        idOrObj: number | UserRead | UserModel,
+        id: number,
         data: UserUpdate,
         process: boolean = false
     ): Promise<UserRead> {
@@ -151,7 +155,27 @@ export class CrudUser extends CrudClass<
                 env.DEFAULT_HASH_SALT
             );
         }
-        return await super.update(idOrObj, data, process);
+        return await super.update(id, data, process);
+    }
+
+    async authUpdate(
+        user: UserRead,
+        id: number,
+        _form: UserPut
+    ): Promise<void> {
+        // Only the user and admins can update their informations
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
+
+        if (user.isAdmin) return;
+
+        if (user.id !== id) {
+            throw new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                `Access to user with id ${id} not granted`
+            );
+        }
     }
 
     // Delete
@@ -165,6 +189,16 @@ export class CrudUser extends CrudClass<
         if (object.imageUrl) {
             storage.deleteFile(object.imageUrl);
         }
+    }
+
+    async authCheck(user: UserRead, _id: number): Promise<void> {
+        if (user && user.isAdmin) {
+            return;
+        }
+
+        throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
+            message: "Only admins can delete users",
+        });
     }
 
     // Auth methods

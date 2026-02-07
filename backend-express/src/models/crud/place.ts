@@ -2,7 +2,7 @@ import { PlaceWhereInput } from "@/_generated/prisma/models";
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { CrudClass, CrudEvent, toPrismaJsonFilter } from "@/lib/prisma_";
+import { CrudClass, toPrismaJsonFilter } from "@/lib/prisma_";
 import { FieldFilter, FindQueryFilters } from "@/lib/types";
 import { pgClient, storage } from "@/services/instances";
 
@@ -49,35 +49,6 @@ export class CrudPlace extends CrudClass<
 
     // Authorization
 
-    authCheck(
-        user: UserRead,
-        data: PlaceModel | UserRead | PlacePost | PlacePut,
-        _event: CrudEvent
-    ): void {
-        if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
-        }
-
-        if (user.isAdmin) return;
-
-        const creatorId = "creatorId" in data ? data.creatorId : undefined;
-        if (creatorId && creatorId !== user.id) {
-            throw new ApiError(
-                HttpStatus.UNAUTHORIZED,
-                `Cannot set creatorId to ${creatorId}. Access denied`
-            );
-        }
-    }
-
-    addOwnershipFilters(
-        user: UserRead,
-        where: PlaceWhereInput | undefined
-    ): PlaceWhereInput {
-        const result = where === undefined ? ({} as PlaceWhereInput) : where;
-        result.creatorId = { equals: user.id };
-        return result;
-    }
-
     // Serialization
 
     async postProcess<
@@ -107,6 +78,36 @@ export class CrudPlace extends CrudClass<
         return { ...body, imageUrl, location: { lat, lng } };
     }
 
+    async authCreate(user: UserRead, data: PlacePost): Promise<void> {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
+
+        if (user.isAdmin) return;
+
+        if (user.id != data.creatorId) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
+                message: `Cannot add places to user ${data.creatorId}`,
+            });
+        }
+    }
+
+    // Read
+
+    async authRead(user: UserRead, data: PlaceRead): Promise<void> {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
+
+        if (user.isAdmin) return;
+
+        if (user.id != data.creatorId) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
+                message: `Cannot access user ${data.creatorId} places`,
+            });
+        }
+    }
+
     // Search
 
     toWhere(filters: FindQueryFilters<PlaceSearchableType>): PlaceWhere {
@@ -130,35 +131,61 @@ export class CrudPlace extends CrudClass<
         return where;
     }
 
+    authSearch(
+        user: UserRead,
+        where: PlaceWhereInput | undefined
+    ): PlaceWhereInput {
+        const result = where === undefined ? ({} as PlaceWhereInput) : where;
+        result.creatorId = { equals: user.id };
+        return result;
+    }
+
     // Update
 
-    async update(
-        idOrObj: number | PlaceRead | PlaceModel,
-        data: PlaceUpdate,
-        process: boolean = false
-    ) {
-        let obj: Partial<PlaceModel>;
-        if (typeof idOrObj === "number") {
-            const result = await this.model.findFirst({
-                where: { id: idOrObj },
-                select: { id: true, title: true, description: true },
-            });
-            if (!result) {
-                throw this.notFoundError(idOrObj);
-            }
-            obj = result;
-        } else {
-            obj = idOrObj;
+    async update(id: number, data: PlaceUpdate, process: boolean = false) {
+        const verification = await this.model.findFirst({
+            where: { id: id },
+            select: { title: true, description: true },
+        });
+        if (!verification) {
+            throw this.notFoundError(id);
         }
 
         const descriptionChanged =
-            !!data.description && data.description !== obj.description;
-        const titleChanged = !!data.title && data.title !== obj.title;
-        const updated = await super.update(obj.id as number, data, process);
+            !!data.description && data.description !== verification.description;
+        const titleChanged = !!data.title && data.title !== verification.title;
+        const updated = await super.update(id, data, process);
         if (descriptionChanged || titleChanged) {
-            placeEmbedding(obj.id as number);
+            placeEmbedding(id);
         }
         return updated;
+    }
+
+    async authUpdate(
+        user: UserRead,
+        id: number,
+        data: PlacePut
+    ): Promise<void> {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
+
+        if (user.isAdmin) return;
+
+        const count = await this.model.count({
+            where: { id: id, creatorId: user.id },
+        });
+        if (count === 0) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
+                message: `Cannot not access place ${id}`,
+            });
+        }
+
+        if (data.creatorId && data.creatorId != user.id) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
+                message: `Cannot set creatorId to ${data.creatorId}`,
+            });
+        }
     }
 
     // Delete
@@ -171,6 +198,23 @@ export class CrudPlace extends CrudClass<
         await super.delete(id);
         if (object.imageUrl) {
             storage.deleteFile(object.imageUrl);
+        }
+    }
+
+    async authDelete(user: UserRead, id: number): Promise<void> {
+        if (!user) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+        }
+
+        if (user.isAdmin) return;
+
+        const count = await this.model.count({
+            where: { id: id, creatorId: user.id },
+        });
+        if (count === 0) {
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
+                message: `Cannot not access place ${id}`,
+            });
         }
     }
 }

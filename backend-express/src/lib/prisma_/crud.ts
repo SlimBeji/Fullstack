@@ -8,8 +8,6 @@ import {
 import { ModelDelegate, Prisma, PrismaFindQuery } from "./types";
 import { toOrderBy, toSelect, toWhere } from "./utils";
 
-export type CrudEvent = "create" | "read" | "update" | "delete";
-
 export class CrudClass<
     Delegate extends ModelDelegate<
         DbModel,
@@ -45,14 +43,6 @@ export class CrudClass<
         public defaultSelect: Select
     ) {}
 
-    toId(d: number | DbModel | Read): number {
-        if (typeof d === "number") {
-            return d;
-        } else {
-            return (d as { id: number }).id;
-        }
-    }
-
     whereId(id: number): WhereUnique {
         return { id } as WhereUnique;
     }
@@ -61,22 +51,6 @@ export class CrudClass<
         return new ApiError(
             HttpStatus.NOT_FOUND,
             `No document with id ${id} found in ${this.modelName}s`
-        );
-    }
-
-    // Authorization
-
-    authCheck(
-        _user: User,
-        _doc: DbModel | Read | Post | Put,
-        _event: CrudEvent
-    ): void {
-        // Raises an ApiError if user lacks authorization
-    }
-
-    addOwnershipFilters(_user: User, _where: Where | undefined): Where {
-        throw new Error(
-            `addOwnershipFilters not implemented for ${this.modelName}`
         );
     }
 
@@ -128,15 +102,19 @@ export class CrudClass<
         }
     }
 
+    async post(form: Post, process: boolean = false): Promise<Read> {
+        // create from a post form
+        const data = await this.handlePostForm(form);
+        return await this.create(data, process);
+    }
+
     async handlePostForm(data: Post): Promise<Create> {
         // Update this when sublcassing
         return data as any as Create;
     }
 
-    async post(form: Post, process: boolean = false): Promise<Read> {
-        // create from a post form
-        const data = await this.handlePostForm(form);
-        return await this.create(data, process);
+    async authCreate(_user: User, _form: Post): Promise<void> {
+        // Raise an ApiError if user lacks authorization
     }
 
     async userPost(
@@ -145,7 +123,7 @@ export class CrudClass<
         process: boolean = false
     ): Promise<Read> {
         // check user authoriation with respect to the data before the post
-        this.authCheck(user, form, "create");
+        this.authCreate(user, form);
         return this.post(form, process);
     }
 
@@ -173,13 +151,17 @@ export class CrudClass<
         return result;
     }
 
+    async authRead(_user: User, _data: Read): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+    }
+
     async userRetrieve(
         user: User,
         id: number,
         process: boolean = false
     ): Promise<Read> {
         const obj = await this.retrieve(id);
-        this.authCheck(user, obj, "read");
+        this.authRead(user, obj);
         if (process) {
             const processed = await this.postProcess(obj);
             return processed as Read;
@@ -225,6 +207,10 @@ export class CrudClass<
         };
     }
 
+    authSearch(_user: User, _where: Where | undefined): Where {
+        throw new Error(`authSearch not implemented for ${this.modelName}`);
+    }
+
     async count(where: Where | undefined): Promise<number> {
         // count the number of rows
         return await this.model.count({ where });
@@ -243,7 +229,7 @@ export class CrudClass<
         prismaQuery: PrismaFindQuery<Select, OrderBy, Where>
     ): Promise<Partial<Read>[]> {
         // search records accessible by the user
-        prismaQuery.where = this.addOwnershipFilters(user, prismaQuery.where);
+        prismaQuery.where = this.authSearch(user, prismaQuery.where);
         const data = await this.model.findMany(prismaQuery);
         return await this.postProcessBatch(data as any as Partial<Read>[]);
     }
@@ -271,7 +257,7 @@ export class CrudClass<
     ): Promise<PaginatedData<Partial<Read>>> {
         // Step 1: parsing the query
         const prismaQuery = this.toPrismaFindQuery(query);
-        prismaQuery.where = this.addOwnershipFilters(user, prismaQuery.where);
+        prismaQuery.where = this.authSearch(user, prismaQuery.where);
 
         // Step 2: counting the output
         const totalCount = await this.count(prismaQuery.where);
@@ -287,11 +273,10 @@ export class CrudClass<
     // Update
 
     async update(
-        idOrObj: number | Read | DbModel,
+        id: number,
         data: Update,
         process: boolean = false
     ): Promise<Read> {
-        const id = this.toId(idOrObj);
         // Use transactions when executing pre and post hooks
         try {
             let result = (await this.model.update({
@@ -323,39 +308,27 @@ export class CrudClass<
         return data as any as Update;
     }
 
-    async put(
-        idOrObj: number | Read | DbModel,
-        form: Put,
-        process: boolean = false
-    ): Promise<Read> {
+    async put(id: number, form: Put, process: boolean = false): Promise<Read> {
         // update from a put form
         const data = await this.handlePutForm(form);
-        return await this.update(idOrObj, data, process);
+        return await this.update(id, data, process);
+    }
+
+    async authUpdate(_user: User, _id: number, _form: Put): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+        // Must have access to the records
+        // Data updates must be allowed
     }
 
     async userPut(
-        user: User,
-        obj: Read | DbModel,
-        form: Put,
-        process: boolean = false
-    ): Promise<Read> {
-        // check user authoriation with respect to the data before the put
-        this.authCheck(user, obj, "read");
-        this.authCheck(user, form, "update");
-        return this.put(obj, form, process);
-    }
-
-    async userPutById(
         user: User,
         id: number,
         form: Put,
         process: boolean = false
     ): Promise<Read> {
-        // fetch the obj first, check if user is authorized to update it
-        // check if user is authorized to use the data in the form
-        const obj = await this.userRetrieve(user, id);
-        this.authCheck(user, obj, "update");
-        return await this.put(obj, form, process);
+        // check user authoriation with respect to the data before the put
+        this.authUpdate(user, id, form);
+        return this.put(id, form, process);
     }
 
     // Delete
@@ -380,10 +353,13 @@ export class CrudClass<
         }
     }
 
+    async authDelete(_user: User, _id: number): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+    }
+
     async userDelete(user: User, id: number): Promise<void> {
         // check if user is authorized to delete the object
-        const obj = await this.userRetrieve(user, id);
-        this.authCheck(user, obj, "delete");
+        this.authDelete(user, id);
         await this.delete(id);
     }
 }
