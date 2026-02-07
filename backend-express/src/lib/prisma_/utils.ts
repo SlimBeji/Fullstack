@@ -63,8 +63,9 @@ export const toPrismaFilter = (d: FieldFilter): PrismaFieldFilter => {
             case "end":
                 result.endsWith = d[k];
                 break;
-            case "mode":
-                result.mode = d[k];
+            case "case":
+                const val = (d[k] as boolean) || false;
+                result.mode = val ? "insensitive" : "default";
                 break;
             default:
                 throw new Error(`unknown field filter operator ${k}`);

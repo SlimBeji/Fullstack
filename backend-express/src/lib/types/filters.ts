@@ -10,7 +10,7 @@ export type FilterOperation =
     | "like"
     | "start"
     | "end"
-    | "mode";
+    | "case";
 
 export type Filter = { op: FilterOperation; val: any };
 
@@ -26,7 +26,7 @@ export interface FieldFilter {
     like?: string;
     start?: string;
     end?: string;
-    mode?: "default" | "insensitive";
+    case?: boolean;
 }
 
 export type FindQueryFilters<T extends string> = {
