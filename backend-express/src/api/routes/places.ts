@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import { extractFindQuery, validateBody } from "@/lib/express_";
-import { zod, zodObjectId } from "@/lib/zod_";
+import { zod } from "@/lib/zod_";
 import { crudPlace } from "@/models/crud";
 import {
     PlaceFiltersSchema,
@@ -23,7 +23,7 @@ export const placeRouter = Router();
 async function getPlaces(req: Request, resp: Response) {
     // All places are public
     const query = req.parsed as PlaceFindQuery;
-    resp.status(200).json(await crudPlace.fetch(query));
+    resp.status(200).json(await crudPlace.paginate(query));
 }
 
 placeRouter.get("/", extractFindQuery(PlaceFiltersSchema, "query"), getPlaces);
@@ -53,7 +53,7 @@ swaggerRegistery.registerPath({
 async function queryPlaces(req: Request, resp: Response) {
     // All places are public
     const query = req.parsed as PlaceFindQuery;
-    resp.status(200).json(await crudPlace.fetch(query));
+    resp.status(200).json(await crudPlace.paginate(query));
 }
 
 placeRouter.post(
@@ -96,7 +96,7 @@ async function createPlace(req: Request, resp: Response) {
     // Use safeCreate to avoid a user posting a place for another user
     const parsed = req.parsed as PlacePost;
     const currentUser = getCurrentUser(req);
-    const newPlace = await crudPlace.userCreate(currentUser, parsed);
+    const newPlace = await crudPlace.userPost(currentUser, parsed, true);
     resp.status(200).json(newPlace);
 }
 
@@ -139,7 +139,7 @@ swaggerRegistery.registerPath({
 // Get a place by ID
 async function getPlace(req: Request, res: Response) {
     // All places are public
-    const place = await crudPlace.get(req.params.placeId);
+    const place = await crudPlace.retrieve(req.params.placeId, true);
     res.status(200).json(place);
 }
 
@@ -150,8 +150,8 @@ swaggerRegistery.registerPath({
     path: "/places/{placeId}",
     request: {
         params: zod.object({
-            placeId: zodObjectId().openapi({
-                example: "507f1f77bcf86cd799439011",
+            placeId: zod.number().openapi({
+                example: 123456789,
                 description: "Place Id",
             }),
         }),
@@ -175,10 +175,11 @@ swaggerRegistery.registerPath({
 async function editPlace(req: Request, res: Response) {
     const parsed = req.parsed as PlacePut;
     const currentUser = getCurrentUser(req);
-    const updatedPlace = await crudPlace.userUpdateById(
+    const updatedPlace = await crudPlace.userPut(
         currentUser,
         req.params.placeId,
-        parsed
+        parsed,
+        true
     );
     res.status(200).json(updatedPlace);
 }
@@ -195,8 +196,8 @@ swaggerRegistery.registerPath({
     path: "/places/{placeId}",
     request: {
         params: zod.object({
-            placeId: zodObjectId().openapi({
-                example: "507f1f77bcf86cd799439011",
+            placeId: zod.number().openapi({
+                example: 123456789,
                 description: "Place id",
             }),
         }),
@@ -241,8 +242,8 @@ swaggerRegistery.registerPath({
     path: "/places/{placeId}",
     request: {
         params: zod.object({
-            placeId: zodObjectId().openapi({
-                example: "507f1f77bcf86cd799439011",
+            placeId: zod.number().openapi({
+                example: 123456789,
                 description: "Place Id",
             }),
         }),

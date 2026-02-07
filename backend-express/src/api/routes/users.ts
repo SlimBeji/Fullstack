@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import { extractFindQuery, validateBody } from "@/lib/express_";
-import { zod, zodObjectId } from "@/lib/zod_";
+import { zod } from "@/lib/zod_";
 import { crudUser } from "@/models/crud";
 import {
     UserFiltersSchema,
@@ -23,7 +23,7 @@ export const userRouter = Router();
 async function getUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsed as UserFindQuery;
-    res.status(200).json(await crudUser.fetch(query));
+    res.status(200).json(await crudUser.paginate(query));
 }
 
 userRouter.get(
@@ -59,7 +59,7 @@ swaggerRegistery.registerPath({
 async function queryUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsed as UserFindQuery;
-    res.status(200).json(await crudUser.fetch(query));
+    res.status(200).json(await crudUser.paginate(query));
 }
 
 userRouter.post(
@@ -101,7 +101,7 @@ swaggerRegistery.registerPath({
 async function createUser(req: Request, res: Response) {
     const currentUser = getCurrentUser(req);
     const parsed = req.parsed as UserPost;
-    const newUser = await crudUser.userCreate(currentUser, parsed);
+    const newUser = await crudUser.userPost(currentUser, parsed, true);
     res.status(200).json(newUser);
 }
 
@@ -139,7 +139,7 @@ swaggerRegistery.registerPath({
 // Get User Endpoint
 async function getUser(req: Request, res: Response) {
     // All users are public
-    const user = await crudUser.get(req.params.userId);
+    const user = await crudUser.retrieve(req.params.userId, true);
     res.status(200).json(user);
 }
 
@@ -150,8 +150,8 @@ swaggerRegistery.registerPath({
     path: "/users/{userId}",
     request: {
         params: zod.object({
-            userId: zodObjectId().openapi({
-                example: "507f1f77bcf86cd799439011",
+            userId: zod.number().openapi({
+                example: 123456789,
                 description: "MongoDB ObjectId",
             }),
         }),
@@ -175,10 +175,11 @@ swaggerRegistery.registerPath({
 async function editUser(req: Request, res: Response) {
     const parsed = req.parsed as UserPut;
     const currentUser = getCurrentUser(req);
-    const updatedUser = await crudUser.userUpdateById(
+    const updatedUser = await crudUser.userPut(
         currentUser,
         req.params.userId,
-        parsed
+        parsed,
+        true
     );
     res.status(200).json(updatedUser);
 }
@@ -195,8 +196,8 @@ swaggerRegistery.registerPath({
     path: "/users/{userId}",
     request: {
         params: zod.object({
-            userId: zodObjectId().openapi({
-                example: "507f1f77bcf86cd799439011",
+            userId: zod.number().openapi({
+                example: 123456789,
                 description: "MongoDB ObjectId",
             }),
         }),
@@ -241,8 +242,8 @@ swaggerRegistery.registerPath({
     path: "/users/{userId}",
     request: {
         params: zod.object({
-            userId: zodObjectId().openapi({
-                example: "507f1f77bcf86cd799439011",
+            userId: zod.number().openapi({
+                example: 123456789,
                 description: "MongoDB ObjectId",
             }),
         }),
