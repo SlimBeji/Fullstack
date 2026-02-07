@@ -28,7 +28,7 @@ export type QueueType = (typeof Queues)[keyof typeof Queues];
 export const TASK_PLACE_EMBEDDING = "place_embedding";
 
 export interface PlaceEmbeddingData {
-    placeId: string;
+    placeId: number;
 }
 
 export const TASK_NEWSLETTER = "newsletter";
