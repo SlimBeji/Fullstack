@@ -2,7 +2,7 @@ import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudClass, PrismaFindQuery, toPrismaJsonFilter } from "@/lib/prisma_";
-import { FieldFilter, FindQueryFilters } from "@/lib/types";
+import { FieldFilter, FindQueryFilters, PaginatedData } from "@/lib/types";
 import { pgClient, storage } from "@/services/instances";
 
 import {
@@ -46,9 +46,7 @@ export class CrudPlace extends CrudClass<
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
-    // Authorization
-
-    // Serialization
+    // Post-Processing
 
     async postProcess<T extends Partial<PlaceRead> | PlaceRead>(
         raw: T
@@ -87,6 +85,16 @@ export class CrudPlace extends CrudClass<
         }
     }
 
+    async userPost(
+        user: UserRead,
+        form: PlacePost,
+        process: boolean = false
+    ): Promise<PlaceRead> {
+        const result = await this.userPost(user, form);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     // Read
 
     async authRead(user: UserRead, data: PlaceRead): Promise<void> {
@@ -101,6 +109,16 @@ export class CrudPlace extends CrudClass<
                 message: `Cannot access user ${data.creatorId} places`,
             });
         }
+    }
+
+    async userRetrieve(
+        user: UserRead,
+        id: number,
+        process: boolean = false
+    ): Promise<PlaceRead> {
+        const result = await this.userRetrieve(user, id);
+        if (process) return await this.postProcess(result);
+        return result;
     }
 
     // Search
@@ -133,6 +151,14 @@ export class CrudPlace extends CrudClass<
         if (!query.where) query.where = {} as PlaceWhere;
         query.where.creatorId = { equals: user.id };
         return query;
+    }
+
+    async _paginate(
+        prismaQuery: PrismaFindQuery<PlaceSelect, PlaceOrderBy, PlaceWhere>
+    ): Promise<PaginatedData<Partial<PlaceRead>>> {
+        const result = await super._paginate(prismaQuery);
+        const data = await this.postProcessBatch(result.data);
+        return { ...result, data };
     }
 
     // Update
@@ -181,6 +207,17 @@ export class CrudPlace extends CrudClass<
                 message: `Cannot set creatorId to ${data.creatorId}`,
             });
         }
+    }
+
+    async userPut(
+        user: UserRead,
+        id: number,
+        form: PlacePut,
+        process: boolean = false
+    ): Promise<PlaceRead> {
+        const result = await this.userPut(user, id, form);
+        if (process) return await this.postProcess(result);
+        return result;
     }
 
     // Delete

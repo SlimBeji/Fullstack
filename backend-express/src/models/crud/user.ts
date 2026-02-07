@@ -1,6 +1,7 @@
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudClass, PrismaFindQuery } from "@/lib/prisma_";
+import { PaginatedData } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
@@ -80,6 +81,16 @@ export class CrudUser extends CrudClass<
         });
     }
 
+    async userPost(
+        user: UserRead,
+        form: UserPost,
+        process: boolean = false
+    ): Promise<UserRead> {
+        const result = await super.userPost(user, form);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     // Read
 
     async checkDuplicate(email: string, name: string): Promise<string> {
@@ -126,6 +137,16 @@ export class CrudUser extends CrudClass<
         }
     }
 
+    async userRetrieve(
+        user: UserRead,
+        id: number,
+        process: boolean = false
+    ): Promise<UserRead> {
+        const result = await this.userRetrieve(user, id);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     // Search
 
     authSearch(
@@ -136,6 +157,14 @@ export class CrudUser extends CrudClass<
         if (!query.where) query.where = {} as UserWhere;
         query.where.id = { equals: user.id };
         return query;
+    }
+
+    async _paginate(
+        prismaQuery: PrismaFindQuery<UserSelect, UserOrderBy, UserWhere>
+    ): Promise<PaginatedData<Partial<UserRead>>> {
+        const result = await super._paginate(prismaQuery);
+        const data = await this.postProcessBatch(result.data);
+        return { ...result, data };
     }
 
     // Update
@@ -168,6 +197,17 @@ export class CrudUser extends CrudClass<
                 `Access to user with id ${id} not granted`
             );
         }
+    }
+
+    async userPut(
+        user: UserRead,
+        id: number,
+        form: UserPut,
+        process: boolean = false
+    ): Promise<UserRead> {
+        const result = await this.userPut(user, id, form);
+        if (process) return await this.postProcess(result);
+        return result;
     }
 
     // Delete

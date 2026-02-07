@@ -93,14 +93,10 @@ export class CrudClass<
         }
     }
 
-    async post(form: Post, process: boolean = false): Promise<Read> {
+    async post(form: Post): Promise<Read> {
         // create from a post form
         const data = await this.handlePostForm(form);
-        let result = await this.create(data);
-        if (process) {
-            result = await this.postProcess(result);
-        }
-        return result;
+        return await this.create(data);
     }
 
     async handlePostForm(data: Post): Promise<Create> {
@@ -112,14 +108,10 @@ export class CrudClass<
         // Raise an ApiError if user lacks authorization
     }
 
-    async userPost(
-        user: User,
-        form: Post,
-        process: boolean = false
-    ): Promise<Read> {
+    async userPost(user: User, form: Post): Promise<Read> {
         // check user authoriation with respect to the data before the post
         this.authCreate(user, form);
-        return this.post(form, process);
+        return this.post(form);
     }
 
     // Read
@@ -132,14 +124,11 @@ export class CrudClass<
         })) as Read | null;
     }
 
-    async retrieve(id: number, process: boolean = false): Promise<Read> {
+    async retrieve(id: number): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
-        let result = await this.get(id);
+        const result = await this.get(id);
         if (!result) {
             throw this.notFoundError(id);
-        }
-        if (process) {
-            result = await this.postProcess(result);
         }
         return result;
     }
@@ -148,17 +137,9 @@ export class CrudClass<
         // Raise an ApiError if user lacks authorization
     }
 
-    async userRetrieve(
-        user: User,
-        id: number,
-        process: boolean = false
-    ): Promise<Read> {
+    async userRetrieve(user: User, id: number): Promise<Read> {
         const obj = await this.retrieve(id);
         this.authRead(user, obj);
-        if (process) {
-            const processed = await this.postProcess(obj);
-            return processed as Read;
-        }
         return obj;
     }
 
@@ -231,9 +212,8 @@ export class CrudClass<
     }
 
     async _paginate(
-        prismaQuery: PrismaFindQuery<Select, OrderBy, Where>,
-        process: boolean = true
-    ) {
+        prismaQuery: PrismaFindQuery<Select, OrderBy, Where>
+    ): Promise<PaginatedData<Partial<Read>>> {
         // internal method to avoid code duplication for
         // paginate and userPaginate
 
@@ -248,36 +228,29 @@ export class CrudClass<
         const normalized = { ...prismaQuery, take, skip };
 
         // Step 3: fetching results
-        let data = (await this.search(normalized)) as any as Partial<Read>[];
+        const data = (await this.search(normalized)) as any as Partial<Read>[];
 
-        // Step 4: post processing
-        if (process) {
-            data = await this.postProcessBatch(data);
-        }
-
-        // Step 5: return paginated result
+        // Step 4: return paginated result
         return { page, totalPages, totalCount, data };
     }
 
     async paginate(
-        query: FindQuery<Selectables, Sortables, Searchables>,
-        process: boolean = true
+        query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
         // The inputs should be validated in the HTTP layer
         // The selectable fields should include only fields
         // part of the Read Schema
         const prismaQuery = this.toPrismaFindQuery(query);
-        return await this._paginate(prismaQuery, process);
+        return await this._paginate(prismaQuery);
     }
 
     async userPaginate(
         user: User,
-        query: FindQuery<Selectables, Sortables, Searchables>,
-        process: boolean = true
+        query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
         let prismaQuery = this.toPrismaFindQuery(query);
         prismaQuery = this.authSearch(user, prismaQuery);
-        return await this._paginate(prismaQuery, process);
+        return await this._paginate(prismaQuery);
     }
 
     // Update
@@ -310,14 +283,10 @@ export class CrudClass<
         return data as any as Update;
     }
 
-    async put(id: number, form: Put, process: boolean = false): Promise<Read> {
+    async put(id: number, form: Put): Promise<Read> {
         // update from a put form
         const data = await this.handlePutForm(form);
-        let result = await this.update(id, data);
-        if (process) {
-            result = await this.postProcess(result);
-        }
-        return result;
+        return await this.update(id, data);
     }
 
     async authUpdate(_user: User, _id: number, _form: Put): Promise<void> {
@@ -326,15 +295,10 @@ export class CrudClass<
         // Data updates must be allowed
     }
 
-    async userPut(
-        user: User,
-        id: number,
-        form: Put,
-        process: boolean = false
-    ): Promise<Read> {
+    async userPut(user: User, id: number, form: Put): Promise<Read> {
         // check user authoriation with respect to the data before the put
         this.authUpdate(user, id, form);
-        return this.put(id, form, process);
+        return this.put(id, form);
     }
 
     // Delete
