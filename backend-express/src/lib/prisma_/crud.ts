@@ -43,10 +43,6 @@ export class CrudClass<
         public defaultSelect: Select
     ) {}
 
-    whereId(id: number): WhereUnique {
-        return { id } as WhereUnique;
-    }
-
     notFoundError(id: number): ApiError {
         return new ApiError(
             HttpStatus.NOT_FOUND,
@@ -54,18 +50,17 @@ export class CrudClass<
         );
     }
 
-    // Serialization
+    // Post-Processing
 
-    async postProcess<
-        T extends Partial<Read> | Read | Partial<DbModel> | DbModel,
-    >(raw: T): Promise<T> {
+    async postProcess<T extends Partial<Read> | Read>(raw: T): Promise<T> {
         // Override this when subclassing
         return raw;
     }
 
-    async postProcessBatch<
-        T extends Partial<Read> | Read | Partial<DbModel> | DbModel,
-    >(raw: T[], batchSize = 50): Promise<T[]> {
+    async postProcessBatch<T extends Partial<Read> | Read>(
+        raw: T[],
+        batchSize = 50
+    ): Promise<T[]> {
         // Post process a batch asynchronously
         // Process in chunks to avoid rate limits
         const results: T[] = [];
@@ -81,17 +76,13 @@ export class CrudClass<
 
     // Create
 
-    async create(data: Create, process: boolean = false): Promise<Read> {
+    async create(data: Create): Promise<Read> {
         // Use transactions when executing pre and post hooks
         try {
-            let result = (await this.model.create({
+            return (await this.model.create({
                 data,
                 select: this.defaultSelect,
             })) as Read;
-            if (process) {
-                result = await this.postProcess(result);
-            }
-            return result;
         } catch (err) {
             if (err instanceof Error) {
                 const status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -105,7 +96,11 @@ export class CrudClass<
     async post(form: Post, process: boolean = false): Promise<Read> {
         // create from a post form
         const data = await this.handlePostForm(form);
-        return await this.create(data, process);
+        let result = await this.create(data);
+        if (process) {
+            result = await this.postProcess(result);
+        }
+        return result;
     }
 
     async handlePostForm(data: Post): Promise<Create> {
@@ -129,24 +124,22 @@ export class CrudClass<
 
     // Read
 
-    async get(id: number, process: boolean = false): Promise<Read | null> {
+    async get(id: number): Promise<Read | null> {
         // Return null if record not found
-        let result = (await this.model.findUnique({
-            where: this.whereId(id),
+        return (await this.model.findFirst({
+            where: { id } as Where,
             select: this.defaultSelect,
-        })) as Read;
-        if (!result) return null;
-        if (process) {
-            result = await this.postProcess(result);
-        }
-        return result as Read;
+        })) as Read | null;
     }
 
     async retrieve(id: number, process: boolean = false): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
-        let result = await this.get(id, process);
+        let result = await this.get(id);
         if (!result) {
             throw this.notFoundError(id);
+        }
+        if (process) {
+            result = await this.postProcess(result);
         }
         return result;
     }
@@ -207,7 +200,12 @@ export class CrudClass<
         };
     }
 
-    authSearch(_user: User, _where: Where | undefined): Where {
+    authSearch(
+        _user: User,
+        _query: PrismaFindQuery<Select, OrderBy, Where>
+    ): PrismaFindQuery<Select, OrderBy, Where> {
+        // Update the where statement to add ownership filters
+        // check the select clause to see if some fields are accessible or not by the user
         throw new Error(`authSearch not implemented for ${this.modelName}`);
     }
 
@@ -218,76 +216,80 @@ export class CrudClass<
 
     async search(
         prismaQuery: PrismaFindQuery<Select, OrderBy, Where>
-    ): Promise<Partial<Read>[]> {
+    ): Promise<Partial<DbModel>[]> {
         // search records
-        const data = await this.model.findMany(prismaQuery);
-        return await this.postProcessBatch(data as any as Partial<Read>[]);
+        return await this.model.findMany(prismaQuery);
     }
 
     async userSearch(
         user: User,
         prismaQuery: PrismaFindQuery<Select, OrderBy, Where>
-    ): Promise<Partial<Read>[]> {
+    ): Promise<Partial<DbModel>[]> {
         // search records accessible by the user
-        prismaQuery.where = this.authSearch(user, prismaQuery.where);
-        const data = await this.model.findMany(prismaQuery);
-        return await this.postProcessBatch(data as any as Partial<Read>[]);
+        prismaQuery = await this.authSearch(user, prismaQuery);
+        return await this.model.findMany(prismaQuery);
+    }
+
+    async _paginate(
+        prismaQuery: PrismaFindQuery<Select, OrderBy, Where>,
+        process: boolean = true
+    ) {
+        // internal method to avoid code duplication for
+        // paginate and userPaginate
+
+        // Step 1: counting the output
+        const take = prismaQuery.take || this.MAX_ITEMS_PER_PAGE;
+        const skip = prismaQuery.skip || 0;
+        const totalCount = await this.count(prismaQuery.where);
+        const page = Math.floor(skip / take) + 1;
+        const totalPages = Math.ceil(totalCount / take);
+
+        // Step 2: normalizing the quey
+        const normalized = { ...prismaQuery, take, skip };
+
+        // Step 3: fetching results
+        let data = (await this.search(normalized)) as any as Partial<Read>[];
+
+        // Step 4: post processing
+        if (process) {
+            data = await this.postProcessBatch(data);
+        }
+
+        // Step 5: return paginated result
+        return { page, totalPages, totalCount, data };
     }
 
     async paginate(
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: FindQuery<Selectables, Sortables, Searchables>,
+        process: boolean = true
     ): Promise<PaginatedData<Partial<Read>>> {
-        // Step 1: parsing the query
+        // The inputs should be validated in the HTTP layer
+        // The selectable fields should include only fields
+        // part of the Read Schema
         const prismaQuery = this.toPrismaFindQuery(query);
-
-        // Step 2: counting the output
-        const totalCount = await this.count(prismaQuery.where);
-        const totalPages = Math.ceil(
-            totalCount / (prismaQuery.take || this.MAX_ITEMS_PER_PAGE)
-        );
-
-        // Step 3: fetching results
-        const data = await this.search(prismaQuery);
-        return { page: query.page || 1, totalPages, totalCount, data };
+        return await this._paginate(prismaQuery, process);
     }
 
     async userPaginate(
         user: User,
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: FindQuery<Selectables, Sortables, Searchables>,
+        process: boolean = true
     ): Promise<PaginatedData<Partial<Read>>> {
-        // Step 1: parsing the query
-        const prismaQuery = this.toPrismaFindQuery(query);
-        prismaQuery.where = this.authSearch(user, prismaQuery.where);
-
-        // Step 2: counting the output
-        const totalCount = await this.count(prismaQuery.where);
-        const totalPages = Math.ceil(
-            totalCount / (prismaQuery.take || this.MAX_ITEMS_PER_PAGE)
-        );
-
-        // Step 3: fetching results
-        const data = await this.search(prismaQuery);
-        return { page: query.page || 1, totalPages, totalCount, data };
+        let prismaQuery = this.toPrismaFindQuery(query);
+        prismaQuery = this.authSearch(user, prismaQuery);
+        return await this._paginate(prismaQuery, process);
     }
 
     // Update
 
-    async update(
-        id: number,
-        data: Update,
-        process: boolean = false
-    ): Promise<Read> {
+    async update(id: number, data: Update): Promise<Read> {
         // Use transactions when executing pre and post hooks
         try {
-            let result = (await this.model.update({
-                where: this.whereId(id),
+            return (await this.model.update({
+                where: { id } as WhereUnique,
                 data,
                 select: this.defaultSelect,
             })) as Read;
-            if (process) {
-                return await this.postProcess(result);
-            }
-            return result;
         } catch (err) {
             if (
                 err instanceof Prisma.PrismaClientKnownRequestError &&
@@ -311,7 +313,11 @@ export class CrudClass<
     async put(id: number, form: Put, process: boolean = false): Promise<Read> {
         // update from a put form
         const data = await this.handlePutForm(form);
-        return await this.update(id, data, process);
+        let result = await this.update(id, data);
+        if (process) {
+            result = await this.postProcess(result);
+        }
+        return result;
     }
 
     async authUpdate(_user: User, _id: number, _form: Put): Promise<void> {
@@ -336,7 +342,7 @@ export class CrudClass<
     async delete(id: number): Promise<void> {
         // delete object by id
         try {
-            await this.model.delete({ where: this.whereId(id) });
+            await this.model.delete({ where: { id } as WhereUnique });
         } catch (err) {
             if (
                 err instanceof Prisma.PrismaClientKnownRequestError &&
