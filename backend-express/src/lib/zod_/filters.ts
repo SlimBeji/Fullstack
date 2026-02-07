@@ -5,7 +5,7 @@ import { zod } from "./base";
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
 
-type TransformOption = { isIndexed?: boolean; isObjectId?: boolean };
+type TransformOption = { isIndex?: boolean };
 
 type OpenapiDoc = { description?: string; example?: any };
 
@@ -28,8 +28,13 @@ const updateContextFromError = (
 const numericQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
-    context: RefinementCtx
+    context: RefinementCtx,
+    options?: TransformOption
 ): { op: FilterOperation; val: number | number[] | boolean } | ZodNever => {
+    if (options?.isIndex) {
+        return indexQueryParamTransform(field, value, context);
+    }
+
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(Number(value)) };
@@ -73,14 +78,63 @@ const numericQueryParamTransform = (
                 );
             }
 
-        case "exists":
-            const boolValue = zod.coerce.boolean().parse(val);
-            return { op, val: boolValue };
+        default:
+            context.addIssue({
+                code: zod.ZodIssueCode.custom,
+                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin`,
+            });
+            return zod.NEVER;
+    }
+};
+
+const indexQueryParamTransform = (
+    field: ZodTypeAny,
+    value: any,
+    context: RefinementCtx
+): { op: FilterOperation; val: number | number[] | boolean } | ZodNever => {
+    if (!value.includes(":")) {
+        try {
+            return { op: "eq", val: field.parse(Number(value)) };
+        } catch (err) {
+            return updateContextFromError(
+                context,
+                err,
+                "Invalid index format - should be a number"
+            );
+        }
+    }
+    const [op, val] = value.split(":");
+
+    switch (op) {
+        case "eq":
+        case "ne":
+            try {
+                return { op, val: field.parse(Number(val)) };
+            } catch (err) {
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid index for ${op} operator`
+                );
+            }
+
+        case "in":
+        case "nin":
+            try {
+                const vals = val.split(",");
+                return { op, val: zod.array(field).parse(vals) };
+            } catch (err) {
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid index options for ${op} operator`
+                );
+            }
 
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,exists`,
+                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin`,
             });
             return zod.NEVER;
     }
@@ -89,8 +143,7 @@ const numericQueryParamTransform = (
 const stringQueryParamTransform = (
     field: ZodTypeAny,
     value: any,
-    context: RefinementCtx,
-    options?: TransformOption
+    context: RefinementCtx
 ): { op: FilterOperation; val: string | string[] | boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
@@ -131,38 +184,19 @@ const stringQueryParamTransform = (
                 );
             }
 
-        case "exists":
-            const boolValue = zod.coerce.boolean().parse(val);
-            return { op, val: boolValue };
-
-        case "regex":
-            if (options?.isObjectId) {
-                context.addIssue({
-                    code: zod.ZodIssueCode.custom,
-                    message: "regex search is not enabled objectId fields",
-                });
-                return zod.NEVER;
-            }
-            try {
-                new RegExp(val);
-                return { op, val };
-            } catch {
-                context.addIssue({
-                    code: zod.ZodIssueCode.custom,
-                    message: "Invalid regular expression",
-                });
-                return zod.NEVER;
-            }
-
-        case "text":
-            if (!options?.isIndexed) {
-                context.addIssue({
-                    code: zod.ZodIssueCode.custom,
-                    message: "Text search is not enabled for this field",
-                });
-                return zod.NEVER;
-            }
+        case "like":
+        case "start":
+        case "end":
             return { op, val };
+
+        case "case":
+            try {
+                const boolValue = zod.coerce.boolean().parse(val);
+                field.parse(boolValue);
+                return { op, val: boolValue };
+            } catch (err) {
+                return updateContextFromError(context, err, "Invalid boolean");
+            }
 
         default:
             context.addIssue({
@@ -194,7 +228,6 @@ const booleanQueryParamTransform = (
     switch (op) {
         case "eq":
         case "ne":
-        case "exists":
             try {
                 const boolValue = zod.coerce.boolean().parse(val);
                 field.parse(boolValue);
@@ -206,7 +239,7 @@ const booleanQueryParamTransform = (
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,exists`,
+                message: `Unknown operator "${op}". Valid: eq,ne`,
             });
             return zod.NEVER;
     }
@@ -262,21 +295,10 @@ const dateQueryParamTransform = (
                 );
             }
 
-        case "exists":
-            try {
-                return { op, val: zod.coerce.boolean().parse(val) };
-            } catch (err) {
-                return updateContextFromError(
-                    context,
-                    err,
-                    "Invalid boolean value for exists operator"
-                );
-            }
-
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,exists`,
+                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin`,
             });
             return zod.NEVER;
     }
@@ -332,10 +354,10 @@ export const httpFilter = (
     const baseType = guessType(field);
     if (baseType === "numeric") {
         transformFunction = (val, ctx) =>
-            numericQueryParamTransform(field, val, ctx);
+            numericQueryParamTransform(field, val, ctx, options);
     } else if (baseType === "string") {
         transformFunction = (val, ctx) =>
-            stringQueryParamTransform(field, val, ctx, options);
+            stringQueryParamTransform(field, val, ctx);
     } else if (baseType === "boolean") {
         transformFunction = (val, ctx) =>
             booleanQueryParamTransform(field, val, ctx);
