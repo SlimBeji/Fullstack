@@ -111,7 +111,10 @@ export class CrudPlace extends CrudClass<
         }
     }
 
-    async retrieve(id: number, process: boolean = false): Promise<PlaceRead> {
+    async retrieve(
+        id: number | string,
+        process: boolean = false
+    ): Promise<PlaceRead> {
         const result = await super.retrieve(id);
         if (process) return await this.postProcess(result);
         return result;
@@ -119,7 +122,7 @@ export class CrudPlace extends CrudClass<
 
     async userRetrieve(
         user: UserRead,
-        id: number,
+        id: number | string,
         process: boolean = false
     ): Promise<PlaceRead> {
         const result = await this.userRetrieve(user, id);
@@ -169,9 +172,10 @@ export class CrudPlace extends CrudClass<
 
     // Update
 
-    async update(id: number, data: PlaceUpdate) {
+    async update(id: number | string, data: PlaceUpdate) {
+        const index = this.parseId(id);
         const verification = await this.model.findFirst({
-            where: { id: id },
+            where: { id: index },
             select: { title: true, description: true },
         });
         if (!verification) {
@@ -183,14 +187,14 @@ export class CrudPlace extends CrudClass<
         const titleChanged = !!data.title && data.title !== verification.title;
         const updated = await super.update(id, data);
         if (descriptionChanged || titleChanged) {
-            placeEmbedding(id);
+            placeEmbedding(index);
         }
         return updated;
     }
 
     async authUpdate(
         user: UserRead,
-        id: number,
+        id: number | string,
         data: PlacePut
     ): Promise<void> {
         if (!user) {
@@ -200,7 +204,7 @@ export class CrudPlace extends CrudClass<
         if (user.isAdmin) return;
 
         const count = await this.model.count({
-            where: { id: id, creatorId: user.id },
+            where: { id: this.parseId(id), creatorId: user.id },
         });
         if (count === 0) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
@@ -217,7 +221,7 @@ export class CrudPlace extends CrudClass<
 
     async userPut(
         user: UserRead,
-        id: number,
+        id: number | string,
         form: PlacePut,
         process: boolean = false
     ): Promise<PlaceRead> {
@@ -228,7 +232,7 @@ export class CrudPlace extends CrudClass<
 
     // Delete
 
-    async delete(id: number): Promise<void> {
+    async delete(id: number | string): Promise<void> {
         const object = await this.get(id);
         if (!object) {
             throw this.notFoundError(id);
@@ -239,7 +243,7 @@ export class CrudPlace extends CrudClass<
         }
     }
 
-    async authDelete(user: UserRead, id: number): Promise<void> {
+    async authDelete(user: UserRead, id: number | string): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
@@ -247,7 +251,7 @@ export class CrudPlace extends CrudClass<
         if (user.isAdmin) return;
 
         const count = await this.model.count({
-            where: { id: id, creatorId: user.id },
+            where: { id: this.parseId(id), creatorId: user.id },
         });
         if (count === 0) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {

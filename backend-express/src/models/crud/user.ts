@@ -137,7 +137,10 @@ export class CrudUser extends CrudClass<
         }
     }
 
-    async retrieve(id: number, process: boolean = false): Promise<UserRead> {
+    async retrieve(
+        id: number | string,
+        process: boolean = false
+    ): Promise<UserRead> {
         const result = await super.retrieve(id);
         if (process) return await this.postProcess(result);
         return result;
@@ -145,7 +148,7 @@ export class CrudUser extends CrudClass<
 
     async userRetrieve(
         user: UserRead,
-        id: number,
+        id: number | string,
         process: boolean = false
     ): Promise<UserRead> {
         const result = await this.userRetrieve(user, id);
@@ -175,7 +178,7 @@ export class CrudUser extends CrudClass<
 
     // Update
 
-    async update(id: number, data: UserUpdate): Promise<UserRead> {
+    async update(id: number | string, data: UserUpdate): Promise<UserRead> {
         if (data.password) {
             data.password = await hashInput(
                 data.password,
@@ -187,7 +190,7 @@ export class CrudUser extends CrudClass<
 
     async authUpdate(
         user: UserRead,
-        id: number,
+        id: number | string,
         _form: UserPut
     ): Promise<void> {
         // Only the user and admins can update their informations
@@ -197,7 +200,7 @@ export class CrudUser extends CrudClass<
 
         if (user.isAdmin) return;
 
-        if (user.id !== id) {
+        if (user.id !== this.parseId(id)) {
             throw new ApiError(
                 HttpStatus.UNAUTHORIZED,
                 `Access to user with id ${id} not granted`
@@ -207,7 +210,7 @@ export class CrudUser extends CrudClass<
 
     async userPut(
         user: UserRead,
-        id: number,
+        id: number | string,
         form: UserPut,
         process: boolean = false
     ): Promise<UserRead> {
@@ -218,7 +221,7 @@ export class CrudUser extends CrudClass<
 
     // Delete
 
-    async delete(id: number): Promise<void> {
+    async delete(id: number | string): Promise<void> {
         const object = await this.get(id);
         if (!object) {
             throw this.notFoundError(id);
@@ -229,7 +232,7 @@ export class CrudUser extends CrudClass<
         }
     }
 
-    async authCheck(user: UserRead, _id: number): Promise<void> {
+    async authDelete(user: UserRead, _id: number | string): Promise<void> {
         if (user && user.isAdmin) {
             return;
         }

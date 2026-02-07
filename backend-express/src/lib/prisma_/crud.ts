@@ -43,7 +43,20 @@ export class CrudClass<
         public defaultSelect: Select
     ) {}
 
-    notFoundError(id: number): ApiError {
+    parseId(id: number | string): number {
+        // Convert the id to number or throw error
+        if (typeof id === "number") return id;
+        const parsed = parseInt(id, 10);
+        if (isNaN(parsed)) {
+            throw new ApiError(
+                HttpStatus.BAD_REQUEST,
+                `Invalid ID: "${id}" is not a valid number`
+            );
+        }
+        return parsed;
+    }
+
+    notFoundError(id: number | string): ApiError {
         return new ApiError(
             HttpStatus.NOT_FOUND,
             `No document with id ${id} found in ${this.modelName}s`
@@ -116,15 +129,15 @@ export class CrudClass<
 
     // Read
 
-    async get(id: number): Promise<Read | null> {
+    async get(id: number | string): Promise<Read | null> {
         // Return null if record not found
         return (await this.model.findFirst({
-            where: { id } as Where,
+            where: { id: this.parseId(id) } as Where,
             select: this.defaultSelect,
         })) as Read | null;
     }
 
-    async retrieve(id: number): Promise<Read> {
+    async retrieve(id: number | string): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
         const result = await this.get(id);
         if (!result) {
@@ -137,7 +150,7 @@ export class CrudClass<
         // Raise an ApiError if user lacks authorization
     }
 
-    async userRetrieve(user: User, id: number): Promise<Read> {
+    async userRetrieve(user: User, id: number | string): Promise<Read> {
         const obj = await this.retrieve(id);
         this.authRead(user, obj);
         return obj;
@@ -255,11 +268,11 @@ export class CrudClass<
 
     // Update
 
-    async update(id: number, data: Update): Promise<Read> {
+    async update(id: number | string, data: Update): Promise<Read> {
         // Use transactions when executing pre and post hooks
         try {
             return (await this.model.update({
-                where: { id } as WhereUnique,
+                where: { id: this.parseId(id) } as WhereUnique,
                 data,
                 select: this.defaultSelect,
             })) as Read;
@@ -283,19 +296,23 @@ export class CrudClass<
         return data as any as Update;
     }
 
-    async put(id: number, form: Put): Promise<Read> {
+    async put(id: number | string, form: Put): Promise<Read> {
         // update from a put form
         const data = await this.handlePutForm(form);
         return await this.update(id, data);
     }
 
-    async authUpdate(_user: User, _id: number, _form: Put): Promise<void> {
+    async authUpdate(
+        _user: User,
+        _id: number | string,
+        _form: Put
+    ): Promise<void> {
         // Raise an ApiError if user lacks authorization
         // Must have access to the records
         // Data updates must be allowed
     }
 
-    async userPut(user: User, id: number, form: Put): Promise<Read> {
+    async userPut(user: User, id: number | string, form: Put): Promise<Read> {
         // check user authoriation with respect to the data before the put
         this.authUpdate(user, id, form);
         return this.put(id, form);
@@ -303,10 +320,12 @@ export class CrudClass<
 
     // Delete
 
-    async delete(id: number): Promise<void> {
+    async delete(id: number | string): Promise<void> {
         // delete object by id
         try {
-            await this.model.delete({ where: { id } as WhereUnique });
+            await this.model.delete({
+                where: { id: this.parseId(id) } as WhereUnique,
+            });
         } catch (err) {
             if (
                 err instanceof Prisma.PrismaClientKnownRequestError &&
@@ -323,11 +342,11 @@ export class CrudClass<
         }
     }
 
-    async authDelete(_user: User, _id: number): Promise<void> {
+    async authDelete(_user: User, _id: number | string): Promise<void> {
         // Raise an ApiError if user lacks authorization
     }
 
-    async userDelete(user: User, id: number): Promise<void> {
+    async userDelete(user: User, id: number | string): Promise<void> {
         // check if user is authorized to delete the object
         this.authDelete(user, id);
         await this.delete(id);
