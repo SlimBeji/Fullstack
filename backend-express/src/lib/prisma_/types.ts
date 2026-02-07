@@ -85,10 +85,6 @@ export interface ModelDelegate<
     findMany(
         args?: PrismaFindQuery<Select, OrderBy, Where>
     ): Promise<Partial<DbModel>[]>;
-    findUnique(args: {
-        where: WhereUnique;
-        select?: Select;
-    }): Promise<Partial<DbModel> | null>;
     findFirst(args?: {
         where?: Where;
         orderBy?: OrderBy[];
