@@ -1,8 +1,7 @@
-import { PlaceWhereInput } from "@/_generated/prisma/models";
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { CrudClass, toPrismaJsonFilter } from "@/lib/prisma_";
+import { CrudClass, PrismaFindQuery, toPrismaJsonFilter } from "@/lib/prisma_";
 import { FieldFilter, FindQueryFilters } from "@/lib/types";
 import { pgClient, storage } from "@/services/instances";
 
@@ -51,13 +50,9 @@ export class CrudPlace extends CrudClass<
 
     // Serialization
 
-    async postProcess<
-        T extends
-            | Partial<PlaceRead>
-            | PlaceRead
-            | Partial<PlaceModel>
-            | PlaceModel,
-    >(raw: T): Promise<T> {
+    async postProcess<T extends Partial<PlaceRead> | PlaceRead>(
+        raw: T
+    ): Promise<T> {
         if (raw.imageUrl) {
             raw.imageUrl = await storage.getSignedUrl(raw.imageUrl);
         }
@@ -66,8 +61,8 @@ export class CrudPlace extends CrudClass<
 
     // Create
 
-    async create(data: PlaceCreate, process: boolean = false) {
-        const result = await super.create(data, process);
+    async create(data: PlaceCreate) {
+        const result = await super.create(data);
         placeEmbedding(result.id);
         return result;
     }
@@ -133,16 +128,16 @@ export class CrudPlace extends CrudClass<
 
     authSearch(
         user: UserRead,
-        where: PlaceWhereInput | undefined
-    ): PlaceWhereInput {
-        const result = where === undefined ? ({} as PlaceWhereInput) : where;
-        result.creatorId = { equals: user.id };
-        return result;
+        query: PrismaFindQuery<PlaceSelect, PlaceOrderBy, PlaceWhere>
+    ): PrismaFindQuery<PlaceSelect, PlaceOrderBy, PlaceWhere> {
+        if (!query.where) query.where = {} as PlaceWhere;
+        query.where.creatorId = { equals: user.id };
+        return query;
     }
 
     // Update
 
-    async update(id: number, data: PlaceUpdate, process: boolean = false) {
+    async update(id: number, data: PlaceUpdate) {
         const verification = await this.model.findFirst({
             where: { id: id },
             select: { title: true, description: true },
@@ -154,7 +149,7 @@ export class CrudPlace extends CrudClass<
         const descriptionChanged =
             !!data.description && data.description !== verification.description;
         const titleChanged = !!data.title && data.title !== verification.title;
-        const updated = await super.update(id, data, process);
+        const updated = await super.update(id, data);
         if (descriptionChanged || titleChanged) {
             placeEmbedding(id);
         }

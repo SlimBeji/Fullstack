@@ -1,7 +1,6 @@
-import { UserWhereInput } from "@/_generated/prisma/models";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { CrudClass } from "@/lib/prisma_";
+import { CrudClass, PrismaFindQuery } from "@/lib/prisma_";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
@@ -49,11 +48,11 @@ export class CrudUser extends CrudClass<
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
-    // Serialization
+    // Post-Processing
 
-    async postProcess<
-        T extends Partial<UserRead> | UserRead | Partial<UserModel> | UserModel,
-    >(raw: T): Promise<T> {
+    async postProcess<T extends Partial<UserRead> | UserRead>(
+        raw: T
+    ): Promise<T> {
         if (raw.imageUrl) {
             raw.imageUrl = await storage.getSignedUrl(raw.imageUrl);
         }
@@ -62,12 +61,9 @@ export class CrudUser extends CrudClass<
 
     // Create
 
-    async create(
-        data: UserCreate,
-        process: boolean = false
-    ): Promise<UserRead> {
+    async create(data: UserCreate): Promise<UserRead> {
         data.password = await hashInput(data.password, env.DEFAULT_HASH_SALT);
-        return await super.create(data, process);
+        return await super.create(data);
     }
 
     async handlePostForm(data: UserPost): Promise<UserCreate> {
@@ -134,28 +130,24 @@ export class CrudUser extends CrudClass<
 
     authSearch(
         user: UserRead,
-        where: UserWhereInput | undefined
-    ): UserWhereInput {
+        query: PrismaFindQuery<UserSelect, UserOrderBy, UserWhere>
+    ): PrismaFindQuery<UserSelect, UserOrderBy, UserWhere> {
         // User can only access his profile in secure mode
-        const result = where === undefined ? ({} as UserWhereInput) : where;
-        result.id = { equals: user.id };
-        return result;
+        if (!query.where) query.where = {} as UserWhere;
+        query.where.id = { equals: user.id };
+        return query;
     }
 
     // Update
 
-    async update(
-        id: number,
-        data: UserUpdate,
-        process: boolean = false
-    ): Promise<UserRead> {
+    async update(id: number, data: UserUpdate): Promise<UserRead> {
         if (data.password) {
             data.password = await hashInput(
                 data.password,
                 env.DEFAULT_HASH_SALT
             );
         }
-        return await super.update(id, data, process);
+        return await super.update(id, data);
     }
 
     async authUpdate(
