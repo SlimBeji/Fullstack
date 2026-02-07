@@ -16,10 +16,10 @@ beforeAll(async () => {
     await seedTestData();
     adminToken = await crudUser.getBearer("mslimbeji@gmail.com");
     token = await crudUser.getBearer("beji.slim@yahoo.fr");
-    const examples = await crudPlace.fetch({
-        filters: { title: [{ op: "eq", val: "Stamford Bridge" }] },
+    const examples = await crudPlace.search({
+        where: { title: "Stamford Bridge" },
     });
-    example = examples.data[0] as PlaceRead;
+    example = examples[0] as PlaceRead;
 });
 
 afterAll(async () => {
