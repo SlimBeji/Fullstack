@@ -137,6 +137,12 @@ export class CrudUser extends CrudClass<
         }
     }
 
+    async retrieve(id: number, process: boolean = false): Promise<UserRead> {
+        const result = await super.retrieve(id);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     async userRetrieve(
         user: UserRead,
         id: number,

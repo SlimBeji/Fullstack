@@ -111,6 +111,12 @@ export class CrudPlace extends CrudClass<
         }
     }
 
+    async retrieve(id: number, process: boolean = false): Promise<PlaceRead> {
+        const result = await super.retrieve(id);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     async userRetrieve(
         user: UserRead,
         id: number,
