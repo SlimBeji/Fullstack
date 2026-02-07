@@ -1,7 +1,6 @@
 import { Job } from "bullmq";
 
 import { crudPlace } from "@/models/crud";
-import { huggingFace } from "@/services/instances";
 
 import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
 
@@ -9,15 +8,7 @@ import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
 
 async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
     const { placeId } = job.data;
-    const place = await crudPlace.getDocument(placeId);
-    if (!place) {
-        console.log(`No place with id ${placeId} found in the database`);
-        return;
-    }
-    const text = `${place.title} - ${place.description}`;
-    const result = await huggingFace.embedText(text);
-    place.set({ embedding: result });
-    crudPlace.saveDocument(place);
+    const result = await crudPlace.embed(placeId);
     console.log(result);
 }
 

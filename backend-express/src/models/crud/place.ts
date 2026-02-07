@@ -3,7 +3,7 @@ import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudClass, PrismaFindQuery, toPrismaJsonFilter } from "@/lib/prisma_";
 import { FieldFilter, FindQueryFilters, PaginatedData } from "@/lib/types";
-import { pgClient, storage } from "@/services/instances";
+import { huggingFace, pgClient, storage } from "@/services/instances";
 
 import {
     PlaceModel,
@@ -227,6 +227,39 @@ export class CrudPlace extends CrudClass<
     ): Promise<PlaceRead> {
         const result = await this.userPut(user, id, form);
         if (process) return await this.postProcess(result);
+        return result;
+    }
+
+    async embed(id: number): Promise<number[]> {
+        const data = await this.model.findFirst({
+            where: { id },
+            select: { title: true, description: true },
+        });
+        if (!data) {
+            throw new ApiError(
+                HttpStatus.NOT_FOUND,
+                `No place with id ${id} found in the database`
+            );
+        }
+        const text = `${data.title} - ${data.description}`;
+        const result = await huggingFace.embedText(text);
+        const sqlVector = JSON.stringify(result);
+        try {
+            // vector are not supported by prisma
+            await pgClient.client.$executeRaw`
+                UPDATE "Place"
+                SET embedding = ${sqlVector}::vector
+                WHERE id = ${id}
+            `;
+        } catch (err) {
+            if (err instanceof Error) {
+                const status = HttpStatus.INTERNAL_SERVER_ERROR;
+                const message = "embeddding failed";
+                const details = { placeId: id, message: err.message };
+                throw new ApiError(status, message, details);
+            }
+            throw err;
+        }
         return result;
     }
 
