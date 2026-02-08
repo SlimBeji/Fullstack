@@ -123,7 +123,7 @@ export class CrudClass<
 
     async userPost(user: User, form: Post): Promise<Read> {
         // check user authoriation with respect to the data before the post
-        this.authCreate(user, form);
+        await this.authCreate(user, form);
         return this.post(form);
     }
 
@@ -152,7 +152,7 @@ export class CrudClass<
 
     async userRetrieve(user: User, id: number | string): Promise<Read> {
         const obj = await this.retrieve(id);
-        this.authRead(user, obj);
+        await this.authRead(user, obj);
         return obj;
     }
 
@@ -314,7 +314,7 @@ export class CrudClass<
 
     async userPut(user: User, id: number | string, form: Put): Promise<Read> {
         // check user authoriation with respect to the data before the put
-        this.authUpdate(user, id, form);
+        await this.authUpdate(user, id, form);
         return this.put(id, form);
     }
 
@@ -348,7 +348,7 @@ export class CrudClass<
 
     async userDelete(user: User, id: number | string): Promise<void> {
         // check if user is authorized to delete the object
-        this.authDelete(user, id);
+        await this.authDelete(user, id);
         await this.delete(id);
     }
 }
