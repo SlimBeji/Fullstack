@@ -31,7 +31,7 @@ export const errorHandler = (
             error: true,
             message: error.message,
         };
-        if (Object.keys(error.details).length > 0) {
+        if (error.details && Object.keys(error.details).length > 0) {
             jsonResp["details"] = error.details;
         }
         if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
