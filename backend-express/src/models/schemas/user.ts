@@ -7,7 +7,7 @@ import {
     zod,
     zodFile,
     ZodInfer,
-    zodObjectId,
+    zodObject,
 } from "@/lib/zod_";
 
 import { createdAt, updatedAt } from "./common";
@@ -42,7 +42,7 @@ export type UserSortableType = (typeof userSortableFields)[number];
 
 const id = zod.number().openapi({
     description: "The user ID, 24 characters",
-    example: 123456,
+    example: 123456789,
 });
 
 const name = zod.string().min(2).openapi({
@@ -74,7 +74,19 @@ const isAdmin = zod.coerce.boolean().openapi({
 });
 
 const places = zod.array(
-    zodObjectId().openapi({
+    zodObject({
+        id: zod
+            .number()
+            .openapi({ example: 123456789, description: "The user place id" }),
+        title: zod.string().min(10).openapi({
+            example: "Stamford Bridge",
+            description: "The place title/name, 10 characters minimum",
+        }),
+        address: zod.string().min(1).openapi({
+            example: "Fulham road",
+            description: "The place address",
+        }),
+    }).openapi({
         description: "The id of places belonging to the user, 24 characters",
         example: "683b21134e2e5d46978daf1f",
     })

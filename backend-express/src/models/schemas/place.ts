@@ -54,7 +54,7 @@ export type PlaceSortableType = (typeof placeSortableFields)[number];
 
 const id = zod.number().openapi({
     description: "The ID of the place 24 characters",
-    example: 123456,
+    example: 123456789,
 });
 
 const title = zod.string().min(10).openapi({
@@ -208,7 +208,7 @@ export const PlaceFiltersSchema = filtersSchema(
             {
                 example: "eq:683b21134e2e5d46978daf1f",
             },
-            { isObjectId: true }
+            { isIndex: true }
         ).optional(),
     }),
     placeSortableFields,
