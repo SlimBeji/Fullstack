@@ -237,7 +237,7 @@ export class CrudPlace extends CrudClass<
         form: PlacePut,
         process: boolean = false
     ): Promise<PlaceRead> {
-        const result = await this.userPut(user, id, form);
+        const result = await super.userPut(user, id, form);
         if (process) return await this.postProcess(result);
         return result;
     }
