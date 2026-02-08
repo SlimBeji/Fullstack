@@ -42,7 +42,7 @@ export class PgClient {
 
         const tableNames = tables.map((t) => `"public"."${t}"`).join(", ");
         await this.client.$executeRawUnsafe(
-            `TRUNCATE TABLE ${tableNames} CASCADE RESTART IDENTITY`
+            `TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE`
         );
     }
 }
