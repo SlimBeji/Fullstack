@@ -62,20 +62,16 @@ express-build:
 express-bash:
 	docker exec -it express bash
 
-express-init:
-	docker exec -it -w /app/src/models/migrations express npx prisma migrate reset --config prisma.dev.config.ts
-	docker exec -it -w /app/src/models/migrations express npx prisma migrate reset --config prisma.test.config.ts
-
 express-diff/%:
-	docker exec -it -w /app/src/models/migrations express npx prisma migrate dev --create-only --name $* --config prisma.dev.config.ts
-
-express-prisma:
-	docker exec -it -w /app/src/models/migrations express npx prisma generate
+	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:generate $* -d ../orm/data-source.ts
 
 express-migrate:
-	docker exec -it -w /app/src/models/migrations express npx prisma migrate dev --config prisma.dev.config.ts
-	docker exec -it -w /app/src/models/migrations express npx prisma migrate dev --config prisma.test.config.ts
-	$(MAKE) express-prisma
+	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source.ts
+	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source-test.ts
+
+express-revert:
+	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source.ts
+	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source-test.ts
 
 express-test:
 	docker exec -it express npm test
