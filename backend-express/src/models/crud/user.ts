@@ -214,7 +214,7 @@ export class CrudUser extends CrudClass<
         form: UserPut,
         process: boolean = false
     ): Promise<UserRead> {
-        const result = await this.userPut(user, id, form);
+        const result = await super.userPut(user, id, form);
         if (process) return await this.postProcess(result);
         return result;
     }
