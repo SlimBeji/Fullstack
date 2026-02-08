@@ -261,7 +261,14 @@ export class CrudUser extends CrudClass<
         if (duplicateMsg) {
             throw new ApiError(HttpStatus.BAD_REQUEST, duplicateMsg);
         }
-        const user = await this.create({ ...form, isAdmin: false });
+        const data = {
+            name: form.name,
+            email: form.email,
+            password: form.password,
+            isAdmin: false,
+            image: form.image,
+        };
+        const user = await this.post(data);
         return createToken(user.id, user.email);
     }
 
