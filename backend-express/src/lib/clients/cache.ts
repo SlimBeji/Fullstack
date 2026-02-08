@@ -5,6 +5,7 @@ import { ApiError, HttpStatus } from "@/lib/express_";
 export interface RedisClientConfig {
     url: string;
     expiration?: number;
+    persist?: boolean;
 }
 
 export class RedisClient {
@@ -19,6 +20,21 @@ export class RedisClient {
         this.url = config.url;
         this.defaultExpiration = config.expiration || 3600;
         this.client = createClient({ url: this.url });
+
+        if (!config.persist) {
+            this.client.on("connect", async () => {
+                try {
+                    await this.client.configSet(
+                        "stop-writes-on-bgsave-error",
+                        "no"
+                    );
+                    await this.client.configSet("save", "");
+                    await this.client.configSet("appendonly", "no");
+                } catch (error) {
+                    console.warn("Failed to disable Redis persistence:", error);
+                }
+            });
+        }
     }
 
     private get isReady(): boolean {

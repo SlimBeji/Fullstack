@@ -20,6 +20,7 @@ export const pgClient = new PgClient(pgsqlConfig);
 const redisConfig: RedisClientConfig = {
     url: IS_TEST ? env.REDIS_TEST_URL : env.REDIS_URL,
     expiration: env.REDIS_DEFAULT_EXPIRATION,
+    persist: IS_TEST ? false : true,
 };
 export const redisClient = new RedisClient(redisConfig);
 
