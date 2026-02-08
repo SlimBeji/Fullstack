@@ -59,6 +59,18 @@ export class CrudPlace extends CrudClass<
 
     // Create
 
+    async seed(data: PlaceCreate, embedding: number[]): Promise<PlaceRead> {
+        // Used when seeding the dev/test database
+        // Avoid triggering the place embedding
+        const result = await super.create(data);
+        await pgClient.client.$executeRaw`
+                UPDATE "Place"
+                SET embedding = ${JSON.stringify(embedding)}::vector
+                WHERE id = ${result.id}
+            `;
+        return result;
+    }
+
     async create(data: PlaceCreate) {
         const result = await super.create(data);
         placeEmbedding(result.id);
