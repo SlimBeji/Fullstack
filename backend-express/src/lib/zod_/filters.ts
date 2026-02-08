@@ -1,6 +1,6 @@
 import { RefinementCtx, ZodNever, ZodTypeAny } from "zod";
 
-import { Filter, FilterOperation } from "../types";
+import { FieldFilter, Filter, FilterOperation } from "../types";
 import { zod } from "./base";
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
@@ -322,29 +322,6 @@ const guessType = (field: ZodTypeAny): QueryParamTypes => {
     }
 };
 
-const has_duplicate_operators = (
-    filters: Filter[],
-    ctx: RefinementCtx
-): any => {
-    const usedOperators: FilterOperation[] = [];
-    filters.forEach((filter) => {
-        if (usedOperators.includes(filter.op)) {
-            ctx.addIssue({
-                code: zod.ZodIssueCode.custom,
-                message: `cannot use an operator twice for the same field. ${filter.op} used multiple times`,
-            });
-        }
-        usedOperators.push(filter.op);
-        if (usedOperators.length >= 2 && usedOperators.includes("eq")) {
-            ctx.addIssue({
-                code: zod.ZodIssueCode.custom,
-                message: `eq can only be used exclusively. ${usedOperators} used at the same time`,
-            });
-        }
-    });
-    return filters;
-};
-
 export const httpFilter = (
     field: ZodTypeAny,
     doc?: OpenapiDoc,
@@ -377,12 +354,44 @@ export const httpFilter = (
         .transform(transformFunction);
 };
 
+const toFieldFilter = (
+    val: Filter[],
+    ctx: RefinementCtx
+): FieldFilter | ZodNever => {
+    const result = {} as FieldFilter;
+    const usedOperators: FilterOperation[] = [];
+    val.forEach(({ op, val }) => {
+        if (usedOperators.includes(op)) {
+            ctx.addIssue({
+                code: zod.ZodIssueCode.custom,
+                message: `cannot use an operator twice for the same field. ${op} used multiple times`,
+            });
+            return zod.ZodNever;
+        }
+        usedOperators.push(op);
+        if (usedOperators.length >= 2 && usedOperators.includes("eq")) {
+            ctx.addIssue({
+                code: zod.ZodIssueCode.custom,
+                message: `eq can only be used exclusively. ${usedOperators} used at the same time`,
+            });
+            return zod.ZodNever;
+        }
+        if (usedOperators.length >= 2 && usedOperators.includes("in")) {
+            ctx.addIssue({
+                code: zod.ZodIssueCode.custom,
+                message: `in can only be used exclusively. ${usedOperators} used at the same time`,
+            });
+            return zod.ZodNever;
+        }
+        result[op] = val;
+    });
+    return result;
+};
+
 export const httpFilters = (
     field: ZodTypeAny,
     doc?: OpenapiDoc,
     options?: TransformOption
 ): ZodTypeAny => {
-    return zod
-        .array(httpFilter(field, doc, options))
-        .transform(has_duplicate_operators);
+    return zod.array(httpFilter(field, doc, options)).transform(toFieldFilter);
 };
