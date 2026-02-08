@@ -44,7 +44,7 @@ describe("GET /api/users", () => {
 describe("POST /api/users/query", () => {
     it("Fetches users", async () => {
         const data = {
-            email: ["regex:@gmail.com"],
+            email: ["like:@gmail.com"],
             fields: ["email", "name"],
         };
         const response = await request
