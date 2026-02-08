@@ -2,6 +2,8 @@
     "compilerOptions": {
         "target": "es2024",
         "module": "commonjs",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "esModuleInterop": true,
         "rootDir": "./src",
         "outDir": "./build",
