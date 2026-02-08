@@ -12,7 +12,8 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newUserIn) => {
             newUserIn.imageUrl = await storage.uploadFile(newUserIn.imageUrl!);
-            const user = await crudUser.create(newUserIn);
+            const { _ref, ...form } = newUserIn;
+            const user = await crudUser.create(form);
             userRefMapping.set(newUserIn._ref, user.id);
         })
     );
@@ -24,11 +25,12 @@ const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
             newPlaceIn.imageUrl = await storage.uploadFile(
                 newPlaceIn.imageUrl!
             );
+            const { _ref, _createorRef, embedding, ...form } = newPlaceIn;
             const data = {
-                ...newPlaceIn,
-                creatorId: userRefMapping.get(newPlaceIn._createorRef)!,
+                ...form,
+                creatorId: userRefMapping.get(_createorRef)!,
             };
-            const place = await crudPlace.create(data);
+            const place = await crudPlace.seed(data, embedding!);
             placeRefMapping.set(newPlaceIn._ref, place.id);
         })
     );
