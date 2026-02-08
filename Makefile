@@ -64,6 +64,7 @@ express-bash:
 
 express-init:
 	docker exec -it -w /app/src/models/migrations express npx prisma migrate reset --config prisma.dev.config.ts
+	docker exec -it -w /app/src/models/migrations express npx prisma migrate reset --config prisma.test.config.ts
 
 express-diff/%:
 	docker exec -it -w /app/src/models/migrations express npx prisma migrate dev --create-only --name $* --config prisma.dev.config.ts
@@ -73,6 +74,7 @@ express-prisma:
 
 express-migrate:
 	docker exec -it -w /app/src/models/migrations express npx prisma migrate dev --config prisma.dev.config.ts
+	docker exec -it -w /app/src/models/migrations express npx prisma migrate dev --config prisma.test.config.ts
 	$(MAKE) express-prisma
 
 express-test:
