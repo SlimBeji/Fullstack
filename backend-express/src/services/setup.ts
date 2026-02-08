@@ -32,7 +32,11 @@ export const closeAll = async () => {
 };
 
 export const seedTestData = async () => {
-    await connectDbs();
-    await dumpDb();
-    await seedDb();
+    try {
+        await connectDbs();
+        await dumpDb();
+        await seedDb();
+    } catch (err) {
+        console.log(err);
+    }
 };
