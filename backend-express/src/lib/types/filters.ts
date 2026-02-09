@@ -14,23 +14,8 @@ export type FilterOperation =
 
 export type Filter = { op: FilterOperation; val: any };
 
-export interface FieldFilter {
-    eq?: any | null;
-    ne?: any | null;
-    in?: any[];
-    nin?: any[];
-    lt?: any;
-    lte?: any;
-    gt?: any;
-    gte?: any;
-    like?: string;
-    start?: string;
-    end?: string;
-    case?: boolean;
-}
-
 export type FindQueryFilters<T extends string> = {
-    [K in T]?: FieldFilter;
+    [K in T]?: Filter[];
 };
 
 export interface FindQuery<
@@ -40,7 +25,7 @@ export interface FindQuery<
 > {
     page?: number;
     size?: number;
-    sort?: Sortables[];
-    fields?: Selectables[];
-    filters?: FindQueryFilters<Searchables>;
+    orderby?: Sortables[];
+    select?: Selectables[];
+    where?: FindQueryFilters<Searchables>;
 }
