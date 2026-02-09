@@ -100,9 +100,9 @@ export const extractFindQuery = (
         req.parsed = {
             page: data.page || 1,
             size: data.size,
-            sort: data.sort || [],
-            fields: data.fields || [],
-            filters: extractFilters(data),
+            orderby: data.sort || [],
+            select: data.fields || [],
+            where: extractFilters(data),
         };
         next();
     };
