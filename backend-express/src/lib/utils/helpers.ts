@@ -1,3 +1,11 @@
+export const camelToSnake = (str: string): string => {
+    return str
+        .replace(/\./g, "_") // user.email -> user_email
+        .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2") // Handle HTTPResponse -> HTTP_Response
+        .replace(/([a-z\d])([A-Z])/g, "$1_$2") // Handle camelCase -> camel_Case
+        .toLowerCase();
+};
+
 export const getEnvVar = (varname: string, defaultValue?: string): string => {
     const value = process.env[varname] || defaultValue;
     if (!value && defaultValue === undefined) {
