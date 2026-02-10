@@ -1,6 +1,7 @@
 export type FilterOperation =
     | "eq"
     | "ne"
+    | "null"
     | "in"
     | "nin"
     | "lt"
@@ -8,9 +9,7 @@ export type FilterOperation =
     | "gt"
     | "gte"
     | "like"
-    | "start"
-    | "end"
-    | "case";
+    | "ilike";
 
 export type Filter = { op: FilterOperation; val: any };
 
