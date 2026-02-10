@@ -20,26 +20,25 @@ export class User {
     @Column("varchar")
     name!: string;
 
-    @Index()
     @Column({ type: "varchar", unique: true })
     email!: string;
 
-    @Column("varchar")
+    @Column({ type: "varchar", select: false })
     password!: string;
 
-    @Column({ type: "varchar", nullable: true })
+    @Column({ name: "image_url", type: "varchar", nullable: true })
     imageUrl?: string;
 
-    @Column({ type: "bool", default: false })
+    @Column({ name: "is_admin", type: "bool", default: false })
     isAdmin!: boolean;
 
     // Timestamp
 
     @Index()
-    @CreateDateColumn({ type: "timestamptz" })
+    @CreateDateColumn({ name: "created_at", type: "timestamptz" })
     createdAt!: Date;
 
-    @UpdateDateColumn({ type: "timestamptz" })
+    @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
     updatedAt!: Date;
 
     // Relationships

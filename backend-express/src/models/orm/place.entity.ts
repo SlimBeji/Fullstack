@@ -27,7 +27,7 @@ export class Place {
     @Column("varchar")
     address!: string;
 
-    @Column({ type: "varchar", nullable: true })
+    @Column({ name: "image_url", type: "varchar", nullable: true })
     imageUrl?: string;
 
     @Column("jsonb")
@@ -44,16 +44,19 @@ export class Place {
     // Timestamp
 
     @Index()
-    @CreateDateColumn({ type: "timestamptz" })
+    @CreateDateColumn({ name: "created_at", type: "timestamptz" })
     createdAt!: Date;
 
-    @UpdateDateColumn({ type: "timestamptz" })
+    @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
     updatedAt!: Date;
 
     // Relationships
 
     @Index("idx_place_creator")
     @ManyToOne(() => User, (user) => user.places, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "creatorId" })
+    @JoinColumn({ name: "creator_id" })
     creator!: User;
+
+    @Column({ name: "creator_id", type: "int" })
+    creatorId!: number;
 }
