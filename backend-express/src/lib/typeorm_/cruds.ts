@@ -17,7 +17,7 @@ import {
 import { AbstractEntity, SelectField } from "./types";
 import { applyOrderBy, applySelect, applyWhere } from "./utils";
 
-export class CrudClass<
+export class CrudsClass<
     ModelRepositroy extends Repository<DbModel>,
     DbModel extends AbstractEntity, // The Database model interface
     User extends object, // The User model used for authorization
@@ -183,6 +183,104 @@ export class CrudClass<
         return this.toRead(result);
     }
 
+    // Update
+
+    async update(id: number | string, data: Update): Promise<DbModel> {
+        // Use transactions when executing pre and post hooks
+        const key = this.parseId(id);
+        let result: UpdateResult;
+        try {
+            result = await this.repository
+                .createQueryBuilder()
+                .update()
+                .set(data as any)
+                .where("id = :id", { id: key })
+                .returning("*")
+                .execute();
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    `Could not update ${this.modelName} object: ${err.message}!`
+                );
+            }
+            throw err;
+        }
+
+        if (result.affected === 0) {
+            throw this.notFoundError(id);
+        }
+
+        if (Array.isArray(result.raw) && result.raw.length === 1) {
+            return result.raw[0];
+        }
+
+        throw new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            `Could not update ${this.modelName} object: unexpected result`
+        );
+    }
+
+    putToUpdate(data: Put): Update {
+        // Update this when sublcassing
+        return data as any as Update;
+    }
+
+    async put(id: number | string, form: Put): Promise<Read> {
+        // update from a put form
+        const data = this.putToUpdate(form);
+        const result = await this.update(id, data);
+        return this.toRead(result);
+    }
+
+    async authUpdate(
+        _user: User,
+        _id: number | string,
+        _form: Put
+    ): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+        // Must have access to the records
+        // Data updates must be allowed
+    }
+
+    async userPut(user: User, id: number | string, form: Put): Promise<Read> {
+        // check user authoriation with respect to the data before the put
+        await this.authUpdate(user, id, form);
+        return this.put(id, form);
+    }
+
+    // Delete
+
+    async delete(id: number | string): Promise<void> {
+        // delete object by id
+        const key = this.parseId(id);
+        let result: DeleteResult;
+        try {
+            result = await this.repository.delete({ id: key } as any);
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    `Could not delete ${this.modelName} object: ${err.message}!`
+                );
+            }
+            throw err;
+        }
+        if (result.affected === 0) {
+            throw this.notFoundError(id);
+        }
+    }
+
+    async authDelete(_user: User, _id: number | string): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+    }
+
+    async userDelete(user: User, id: number | string): Promise<void> {
+        // check if user is authorized to delete the object
+        await this.authDelete(user, id);
+        await this.delete(id);
+    }
+
     // Search
 
     mapOrderBy(field: string): string {
@@ -303,103 +401,5 @@ export class CrudClass<
     ): Promise<PaginatedData<Partial<Read>>> {
         query = this.authSearch(user, query);
         return await this.paginate(query);
-    }
-
-    // Update
-
-    async update(id: number | string, data: Update): Promise<DbModel> {
-        // Use transactions when executing pre and post hooks
-        const key = this.parseId(id);
-        let result: UpdateResult;
-        try {
-            result = await this.repository
-                .createQueryBuilder()
-                .update()
-                .set(data as any)
-                .where("id = :id", { id: key })
-                .returning("*")
-                .execute();
-        } catch (err) {
-            if (err instanceof Error) {
-                throw new ApiError(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    `Could not update ${this.modelName} object: ${err.message}!`
-                );
-            }
-            throw err;
-        }
-
-        if (result.affected === 0) {
-            throw this.notFoundError(id);
-        }
-
-        if (Array.isArray(result.raw) && result.raw.length === 1) {
-            return result.raw[0];
-        }
-
-        throw new ApiError(
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            `Could not update ${this.modelName} object: unexpected result`
-        );
-    }
-
-    putToUpdate(data: Put): Update {
-        // Update this when sublcassing
-        return data as any as Update;
-    }
-
-    async put(id: number | string, form: Put): Promise<Read> {
-        // update from a put form
-        const data = this.putToUpdate(form);
-        const result = await this.update(id, data);
-        return this.toRead(result);
-    }
-
-    async authUpdate(
-        _user: User,
-        _id: number | string,
-        _form: Put
-    ): Promise<void> {
-        // Raise an ApiError if user lacks authorization
-        // Must have access to the records
-        // Data updates must be allowed
-    }
-
-    async userPut(user: User, id: number | string, form: Put): Promise<Read> {
-        // check user authoriation with respect to the data before the put
-        await this.authUpdate(user, id, form);
-        return this.put(id, form);
-    }
-
-    // Delete
-
-    async delete(id: number | string): Promise<void> {
-        // delete object by id
-        const key = this.parseId(id);
-        let result: DeleteResult;
-        try {
-            result = await this.repository.delete({ id: key } as any);
-        } catch (err) {
-            if (err instanceof Error) {
-                throw new ApiError(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    `Could not delete ${this.modelName} object: ${err.message}!`
-                );
-            }
-            throw err;
-        }
-        if (result.affected === 0) {
-            throw this.notFoundError(id);
-        }
-    }
-
-    async authDelete(_user: User, _id: number | string): Promise<void> {
-        // Raise an ApiError if user lacks authorization
-    }
-
-    async userDelete(user: User, id: number | string): Promise<void> {
-        // check if user is authorized to delete the object
-        await this.authDelete(user, id);
-        await this.delete(id);
     }
 }

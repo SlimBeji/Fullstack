@@ -1,3 +1,3 @@
-export * from "./crud";
+export * from "./cruds";
 export * from "./types";
 export * from "./utils";
