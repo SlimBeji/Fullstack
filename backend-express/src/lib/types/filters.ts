@@ -9,7 +9,8 @@ export type FilterOperation =
     | "gt"
     | "gte"
     | "like"
-    | "ilike";
+    | "ilike"
+    | "regex";
 
 export type Filter = { op: FilterOperation; val: any };
 

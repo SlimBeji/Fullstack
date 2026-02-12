@@ -143,6 +143,11 @@ const applySingleWhere = <Entity extends ObjectLiteral>(
             whereQuery = `${path} ILIKE :${varname}`;
             params = { [varname]: `%${filter.val}%` };
             break;
+        case "regex":
+            varname = `${field}_regex`;
+            whereQuery = `${path} ~* :${varname}`;
+            params = { [varname]: filter.val };
+            break;
         default:
             throw new Error(`Unknown field filter operator ${filter.op}`);
     }

@@ -1,6 +1,6 @@
 import { RefinementCtx, ZodNever, ZodTypeAny } from "zod";
 
-import { FieldFilter, Filter, FilterOperation } from "../types";
+import { Filter, FilterOperation } from "../types";
 import { zod } from "./base";
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
@@ -78,10 +78,23 @@ const numericQueryParamTransform = (
                 );
             }
 
+        case "null":
+            try {
+                const boolValue = zod.coerce.boolean().parse(val);
+                field.parse(boolValue);
+                return { op, val: boolValue };
+            } catch (err) {
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid boolean: ${val}`
+                );
+            }
+
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin`,
+                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,null`,
             });
             return zod.NEVER;
     }
@@ -131,10 +144,23 @@ const indexQueryParamTransform = (
                 );
             }
 
+        case "null":
+            try {
+                const boolValue = zod.coerce.boolean().parse(val);
+                field.parse(boolValue);
+                return { op, val: boolValue };
+            } catch (err) {
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid boolean: ${val}`
+                );
+            }
+
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin`,
+                message: `Unknown operator "${op}". Valid: eq,ne,null,in,nin`,
             });
             return zod.NEVER;
     }
@@ -184,24 +210,39 @@ const stringQueryParamTransform = (
                 );
             }
 
-        case "like":
-        case "start":
-        case "end":
-            return { op, val };
-
-        case "case":
+        case "null":
             try {
                 const boolValue = zod.coerce.boolean().parse(val);
                 field.parse(boolValue);
                 return { op, val: boolValue };
             } catch (err) {
-                return updateContextFromError(context, err, "Invalid boolean");
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid boolean: ${val}`
+                );
+            }
+
+        case "like":
+        case "ilike":
+            return { op, val };
+
+        case "regex":
+            try {
+                new RegExp(val);
+                return { op, val };
+            } catch (err) {
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid regex pattern: ${val}`
+                );
             }
 
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,in,nin,exists,regex,text`,
+                message: `Unknown operator "${op}". Valid: eq,ne,in,nin,null,like,ilike,regex`,
             });
             return zod.NEVER;
     }
@@ -228,18 +269,23 @@ const booleanQueryParamTransform = (
     switch (op) {
         case "eq":
         case "ne":
+        case "null":
             try {
                 const boolValue = zod.coerce.boolean().parse(val);
                 field.parse(boolValue);
                 return { op, val: boolValue };
             } catch (err) {
-                return updateContextFromError(context, err, "Invalid boolean");
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid boolean: ${val}`
+                );
             }
 
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne`,
+                message: `Unknown operator "${op}". Valid: eq,ne,null`,
             });
             return zod.NEVER;
     }
@@ -295,10 +341,23 @@ const dateQueryParamTransform = (
                 );
             }
 
+        case "null":
+            try {
+                const boolValue = zod.coerce.boolean().parse(val);
+                field.parse(boolValue);
+                return { op, val: boolValue };
+            } catch (err) {
+                return updateContextFromError(
+                    context,
+                    err,
+                    `Invalid boolean: ${val}`
+                );
+            }
+
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin`,
+                message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,null`,
             });
             return zod.NEVER;
     }
@@ -354,38 +413,82 @@ export const httpFilter = (
         .transform(transformFunction);
 };
 
-const toFieldFilter = (
-    val: Filter[],
-    ctx: RefinementCtx
-): FieldFilter | ZodNever => {
-    const result = {} as FieldFilter;
+const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     const usedOperators: FilterOperation[] = [];
-    val.forEach(({ op, val }) => {
-        if (usedOperators.includes(op)) {
+    filters.forEach((f) => {
+        // make sure no operator is used twice
+        if (usedOperators.includes(f.op)) {
             ctx.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `cannot use an operator twice for the same field. ${op} used multiple times`,
+                message: `cannot use an operator twice for the same field. ${f.op} used multiple times`,
             });
-            return zod.ZodNever;
         }
-        usedOperators.push(op);
-        if (usedOperators.length >= 2 && usedOperators.includes("eq")) {
-            ctx.addIssue({
-                code: zod.ZodIssueCode.custom,
-                message: `eq can only be used exclusively. ${usedOperators} used at the same time`,
-            });
-            return zod.ZodNever;
-        }
-        if (usedOperators.length >= 2 && usedOperators.includes("in")) {
-            ctx.addIssue({
-                code: zod.ZodIssueCode.custom,
-                message: `in can only be used exclusively. ${usedOperators} used at the same time`,
-            });
-            return zod.ZodNever;
-        }
-        result[op] = val;
+        usedOperators.push(f.op);
     });
-    return result;
+
+    const length = usedOperators.length;
+    const eqUsed = usedOperators.includes("eq");
+
+    // Rule 1: eq should be used exclusively
+    if (length >= 2 && eqUsed) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `eq can only be used exclusively. ${usedOperators} used at the same time`,
+        });
+    }
+
+    // Rule 2: if eq not used than null should be used exclusively
+    if (!eqUsed && usedOperators.includes("null") && length >= 2) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `null operator should be used exclusively. ${usedOperators} used at the same time`,
+        });
+    }
+
+    // Rule 3: if eq not used than in should be used exclusively
+    if (!eqUsed && usedOperators.includes("in") && length >= 2) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `in operator should be used exclusively. ${usedOperators} used at the same time`,
+        });
+    }
+
+    // Rule 4: gt/gte cannot be used together
+    if (usedOperators.includes("gt") && usedOperators.includes("gte")) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `gt and gte operators should not be used together. ${usedOperators} used at the same time`,
+        });
+    }
+
+    // Rule 5: lt/lte cannot be used together
+    if (usedOperators.includes("lt") && usedOperators.includes("lte")) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `lt and lte operators should not be used together. ${usedOperators} used at the same time`,
+        });
+    }
+
+    // Rule 6: like/ilike cannot be used together
+    if (usedOperators.includes("like") && usedOperators.includes("ilike")) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `like and ilike operators should not be used together. ${usedOperators} used at the same time`,
+        });
+    }
+
+    // Rule 7: regex cannot be used with like/ilike
+    if (
+        usedOperators.includes("regex") &&
+        (usedOperators.includes("ilike") || usedOperators.includes("ilike"))
+    ) {
+        ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
+            message: `regex should not be used along like or ilike operators. ${usedOperators} used at the same time`,
+        });
+    }
+
+    return filters;
 };
 
 export const httpFilters = (
