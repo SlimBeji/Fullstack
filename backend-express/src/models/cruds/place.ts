@@ -108,7 +108,7 @@ export class CrudsPlace extends CrudsClass<
         form: PlacePost,
         process: boolean = false
     ): Promise<PlaceRead> {
-        const result = await this.userPost(user, form);
+        const result = await super.userPost(user, form);
         if (process) return await this.postProcess(result);
         return result;
     }
