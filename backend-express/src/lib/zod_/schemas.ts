@@ -20,33 +20,41 @@ export const filtersSchema = (
     baseSchema: AnyZodObject,
     sortables: readonly string[],
     selectables: readonly string[],
-    maxItems: number = 100
+    maxItems: number = 100,
+    defaultSort: string[] | null = null,
+    defaultFields: string[] | null = null
 ): AnyZodObject => {
+    defaultSort = defaultSort || ["-createdAt"];
+    defaultFields = defaultFields || ["id"];
+
     const page = zod.coerce
         .number()
         .int()
+        .min(1)
         .default(1)
         .openapi("The page number");
     const size = zod.coerce
         .number()
         .int()
+        .min(1)
         .max(maxItems)
         .default(maxItems)
         .openapi("Items per page");
     const sort = zod
         .array(zod.enum(sortables as [string, ...string[]]))
-        .default(["-createdAt"])
+        .default(defaultSort)
         .openapi({
             description:
                 "Fields to use for sorting. Use the '-' for descending sorting",
-            example: ["-createdAt"],
-        });
+            example: defaultSort,
+        })
+        .optional();
     const fields = zod
         .array(zod.enum(selectables as [string, ...string[]]))
         .openapi({
             description:
                 "Fields to include in the response; omit for full document",
-            example: ["id"],
+            example: defaultFields,
         })
         .optional();
 
