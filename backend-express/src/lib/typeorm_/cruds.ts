@@ -3,12 +3,13 @@ import {
     DeleteResult,
     QueryFailedError,
     Repository,
+    SelectQueryBuilder,
     UpdateResult,
 } from "typeorm";
-import { SelectQueryBuilder } from "typeorm/browser";
 
 import { ApiError, HttpStatus } from "../express_";
 import {
+    Filter,
     FindQuery,
     FindQueryFilters,
     PaginatedData,
@@ -37,8 +38,8 @@ export class CrudsClass<
     constructor(
         public repository: ModelRepositroy,
         public modelName: string,
-        public defaultSelect: Selectables[],
-        public defaultOrderby: Sortables[]
+        public defaultSelect: readonly Selectables[],
+        public defaultOrderby: readonly Sortables[]
     ) {}
 
     get tablename(): string {
@@ -71,14 +72,18 @@ export class CrudsClass<
 
     // Post-Processing
 
-    toRead(_entity: DbModel): Read {
-        // convert a DbModel to a read schema - remove protected/private fields
-        throw new Error(`toRead not implemented for model ${this.modelName}`);
+    toRead(entity: DbModel): Read {
+        // remove protected/private fields
+        // overload this for edge cases
+        return this.toPartialRead(entity) as Read;
     }
 
-    toPartialRead(partialEntity: DeepPartial<DbModel>): Partial<Read> {
+    toPartialRead(_partialEntity: DeepPartial<DbModel>): Partial<Read> {
+        // remove protected/private fields
         // overload this for edge cases
-        return partialEntity as any as Partial<Read>;
+        throw new Error(
+            `toPartialRead is not implemented for model ${this.modelName}`
+        );
     }
 
     async postProcess<T extends Partial<Read> | Read>(raw: T): Promise<T> {
@@ -101,6 +106,72 @@ export class CrudsClass<
             results.push(...processed);
         }
         return results;
+    }
+
+    // Query Building
+
+    mapOrderBy(field: string): string {
+        // overide this method when subclassing for custom behavior
+        // some fields maybe attributes in a JSONB column
+        // e.g. "(user.personal->>'age')::float"
+        return `"${this.tablename}"."${field}"`;
+    }
+
+    mapSelect(field: string): SelectField {
+        // overide this method when subclassing for custom behavior
+        // some fields may require joins
+        return { select: `"${this.tablename}"."${field}"` };
+    }
+
+    mapWhere(field: string): string {
+        // overide this method when subclassing for custom behavior
+        // somefields maybe attributes in a JSONB column
+        // e.g. "(user.personal->>'age')::float"
+        return `"${this.tablename}"."${field}"`;
+    }
+
+    eq(val: any): Filter[] {
+        return [{ op: "eq", val }];
+    }
+
+    buildSelectQuery(
+        query: FindQuery<Selectables, Sortables, Searchables>
+    ): SelectQueryBuilder<DbModel> {
+        let ormQuery = this.repository.createQueryBuilder(this.tablename);
+
+        // Apply select
+        const select = query.select || [...this.defaultSelect];
+        ormQuery = applySelect(ormQuery, select, (item) =>
+            this.mapSelect(item)
+        );
+
+        // Apply where
+        let where = query.where || ({} as FindQueryFilters<Searchables>);
+        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
+
+        // Apply order by
+        let orderby = query.orderby || [...this.defaultOrderby];
+        ormQuery = applyOrderBy(ormQuery, orderby, (item) =>
+            this.mapOrderBy(item)
+        );
+
+        // Apply pagination
+        const pagination = new PaginationData(
+            query.page || 1,
+            query.size || this.MAX_ITEMS_PER_PAGE
+        );
+        ormQuery = ormQuery.take(pagination.size).skip(pagination.skip);
+
+        // Return query before executing
+        return ormQuery;
+    }
+
+    async exists(where: FindQueryFilters<Searchables>): Promise<boolean> {
+        let ormQuery = this.repository.createQueryBuilder(this.tablename);
+        ormQuery = applySelect(ormQuery, ["1"], (item) => this.mapSelect(item));
+        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
+        const result = await ormQuery.getRawOne();
+        return result?.length > 0;
     }
 
     // Create
@@ -132,14 +203,14 @@ export class CrudsClass<
         }
     }
 
-    postToCreate(data: Post): Create {
+    async postToCreate(data: Post): Promise<Create> {
         // Update this when sublcassing
         return data as any as Create;
     }
 
     async post(form: Post): Promise<Read> {
         // create from a post form
-        const data = this.postToCreate(form);
+        const data = await this.postToCreate(form);
         const obj = await this.create(data);
         return this.toRead(obj);
     }
@@ -221,14 +292,14 @@ export class CrudsClass<
         );
     }
 
-    putToUpdate(data: Put): Update {
+    async putToUpdate(data: Put): Promise<Update> {
         // Update this when sublcassing
         return data as any as Update;
     }
 
     async put(id: number | string, form: Put): Promise<Read> {
         // update from a put form
-        const data = this.putToUpdate(form);
+        const data = await this.putToUpdate(form);
         const result = await this.update(id, data);
         return this.toRead(result);
     }
@@ -282,58 +353,6 @@ export class CrudsClass<
     }
 
     // Search
-
-    mapOrderBy(field: string): string {
-        // overide this method when subclassing for custom behavior
-        // some fields maybe attributes in a JSONB column
-        // e.g. "(user.personal->>'age')::float"
-        return `"${this.tablename}"."${field}"`;
-    }
-
-    mapSelect(field: string): SelectField {
-        // overide this method when subclassing for custom behavior
-        // some fields may require joins
-        return { select: `"${this.tablename}"."${field}"` };
-    }
-
-    mapWhere(field: string): string {
-        // overide this method when subclassing for custom behavior
-        // somefields maybe attributes in a JSONB column
-        // e.g. "(user.personal->>'age')::float"
-        return `"${this.tablename}"."${field}"`;
-    }
-
-    buildSelectQuery(
-        query: FindQuery<Selectables, Sortables, Searchables>
-    ): SelectQueryBuilder<DbModel> {
-        let ormQuery = this.repository.createQueryBuilder(this.tablename);
-
-        // Apply select
-        const select = query.select || this.defaultSelect;
-        ormQuery = applySelect(ormQuery, select, (item) =>
-            this.mapSelect(item)
-        );
-
-        // Apply where
-        let where = query.where || ({} as FindQueryFilters<Searchables>);
-        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
-
-        // Apply order by
-        let orderby = query.orderby || this.defaultOrderby;
-        ormQuery = applyOrderBy(ormQuery, orderby, (item) =>
-            this.mapOrderBy(item)
-        );
-
-        // Apply pagination
-        const pagination = new PaginationData(
-            query.page || 1,
-            query.size || this.MAX_ITEMS_PER_PAGE
-        );
-        ormQuery = ormQuery.take(pagination.size).skip(pagination.skip);
-
-        // Return query before executing
-        return ormQuery;
-    }
 
     authSearch(
         _user: User,
