@@ -1,6 +1,7 @@
 import { pgClient, redisClient, storage } from "@/services/instances";
 
-import { crudPlace, crudUser } from "../crud";
+import { crudsPlace, crudsUser } from "../cruds";
+import { Tables } from "../orm";
 import { PlaceSeed, UserSeed } from "../schemas";
 import { places } from "./places";
 import { users } from "./users";
@@ -13,7 +14,7 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
         raw.map(async (newUserIn) => {
             newUserIn.imageUrl = await storage.uploadFile(newUserIn.imageUrl!);
             const { _ref, ...form } = newUserIn;
-            const user = await crudUser.create(form);
+            const user = await crudsUser.create(form);
             userRefMapping.set(newUserIn._ref, user.id);
         })
     );
@@ -30,7 +31,7 @@ const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
                 ...form,
                 creatorId: userRefMapping.get(_createorRef)!,
             };
-            const place = await crudPlace.seed(data, embedding!);
+            const place = await crudsPlace.seed(data, embedding!);
             placeRefMapping.set(newPlaceIn._ref, place.id);
         })
     );
@@ -45,7 +46,9 @@ export const seedDb = async (verbose: boolean = false): Promise<void> => {
 };
 
 export const dumpDb = async (verbose: boolean = false): Promise<void> => {
-    await pgClient.resetTables();
+    for (const tablename of Object.values(Tables)) {
+        await pgClient.resetTable(tablename);
+    }
     if (verbose) console.log("✅ All Tables reset");
     await redisClient.flushAll();
     if (verbose) console.log("✅ Cache DB flushed");
