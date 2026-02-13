@@ -19,8 +19,7 @@ export const placeSelectableFields = [
     "title",
     "description",
     "address",
-    "location.lat",
-    "location.lng",
+    "location",
     "imageUrl",
     "creatorId",
 ] as const;
