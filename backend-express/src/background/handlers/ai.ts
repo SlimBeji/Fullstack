@@ -2,7 +2,7 @@ import { Job } from "bullmq";
 
 import { crudsPlace } from "@/models/cruds";
 
-import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
+import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../bgconfig";
 
 // Create Tasks
 

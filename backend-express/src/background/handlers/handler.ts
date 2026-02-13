@@ -2,7 +2,7 @@ import { Job } from "bullmq";
 
 import { TaskHanlder } from "@/lib/clients";
 
-import { broker_config, Queues, QueueType } from "../setup";
+import { broker_config, Queues, QueueType } from "../bgconfig";
 import { aiTasksRouter } from "./ai";
 import { emailTasksRouter } from "./emails";
 

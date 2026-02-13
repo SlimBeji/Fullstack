@@ -1,4 +1,4 @@
-import { Queues, TASK_PLACE_EMBEDDING } from "../setup";
+import { Queues, TASK_PLACE_EMBEDDING } from "../bgconfig";
 import { publisher } from "./publisher";
 
 export const placeEmbedding = (placeId: number) => {

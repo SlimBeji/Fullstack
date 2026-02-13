@@ -1,6 +1,6 @@
 import { Job } from "bullmq";
 
-import { NewsletterData, TASK_NEWSLETTER } from "../setup";
+import { NewsletterData, TASK_NEWSLETTER } from "../bgconfig";
 
 // Create Tasks
 
