@@ -2,12 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { crudUser } from "@/models/crud";
+import { crudsUser } from "@/models/cruds";
 import { decodeToken, UserRead } from "@/models/schemas";
 
 const getUserFromToken = async (token: string): Promise<UserRead> => {
     const payload = decodeToken(token);
-    const user = await crudUser.get(payload.userId);
+    const user = await crudsUser.get(payload.userId);
     if (!user) {
         throw new ApiError(HttpStatus.NOT_FOUND, "User not found");
     }

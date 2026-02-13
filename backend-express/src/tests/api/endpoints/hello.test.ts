@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import app from "@/api";
-import { crudUser } from "@/models/crud";
+import { crudsUser } from "@/models/cruds";
 import { closeAll, seedTestData } from "@/services/setup";
 
 const request = supertest(app);
@@ -27,7 +27,7 @@ describe("GET /api/hello-world/", () => {
 
 describe("GET /api/hello-world/user", () => {
     it("responds with json", async () => {
-        const token = await crudUser.getBearer("mslimbeji@gmail.com");
+        const token = await crudsUser.getBearer("mslimbeji@gmail.com");
         const response = await request
             .get("/api/hello-world/user")
             .set("Authorization", token)
@@ -40,7 +40,7 @@ describe("GET /api/hello-world/user", () => {
 
 describe("GET /api/hello-world/admin", () => {
     it("responds with json", async () => {
-        const token = await crudUser.getBearer("mslimbeji@gmail.com");
+        const token = await crudsUser.getBearer("mslimbeji@gmail.com");
         const response = await request
             .get("/api/hello-world/admin")
             .set("Authorization", token)

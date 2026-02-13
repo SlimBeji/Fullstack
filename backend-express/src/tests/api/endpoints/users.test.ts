@@ -2,7 +2,7 @@ import supertest from "supertest";
 
 import app from "@/api";
 import { HttpStatus } from "@/lib/express_";
-import { crudUser } from "@/models/crud";
+import { crudsUser } from "@/models/cruds";
 import { createToken, UserRead } from "@/models/schemas";
 import { closeAll, seedTestData } from "@/services/setup";
 import { readImage } from "@/static";
@@ -15,9 +15,9 @@ const request = supertest(app);
 
 beforeAll(async () => {
     await seedTestData();
-    adminExample = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
+    adminExample = (await crudsUser.getByEmail("mslimbeji@gmail.com"))!;
     adminToken = `Bearer ${createToken(adminExample.id, adminExample.email).access_token}`;
-    example = (await crudUser.getByEmail("beji.slim@yahoo.fr"))!;
+    example = (await crudsUser.getByEmail("beji.slim@yahoo.fr"))!;
     token = `Bearer ${createToken(example.id, example.email).access_token}`;
 });
 

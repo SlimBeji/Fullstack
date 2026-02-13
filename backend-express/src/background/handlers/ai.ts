@@ -1,6 +1,6 @@
 import { Job } from "bullmq";
 
-import { crudPlace } from "@/models/crud";
+import { crudsPlace } from "@/models/cruds";
 
 import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
 
@@ -8,7 +8,7 @@ import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../setup";
 
 async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
     const { placeId } = job.data;
-    const result = await crudPlace.embed(placeId);
+    const result = await crudsPlace.embed(placeId);
     console.log(result);
 }
 

@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 
 import { extractFindQuery, validateBody } from "@/lib/express_";
 import { zod } from "@/lib/zod_";
-import { crudUser } from "@/models/crud";
+import { crudsUser } from "@/models/cruds";
 import {
     UserFiltersSchema,
     UserFindQuery,
@@ -23,7 +23,7 @@ export const userRouter = Router();
 async function getUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsed as UserFindQuery;
-    res.status(200).json(await crudUser.paginate(query));
+    res.status(200).json(await crudsUser.paginate(query));
 }
 
 userRouter.get(
@@ -59,7 +59,7 @@ swaggerRegistery.registerPath({
 async function queryUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsed as UserFindQuery;
-    res.status(200).json(await crudUser.paginate(query));
+    res.status(200).json(await crudsUser.paginate(query));
 }
 
 userRouter.post(
@@ -101,7 +101,7 @@ swaggerRegistery.registerPath({
 async function createUser(req: Request, res: Response) {
     const currentUser = getCurrentUser(req);
     const parsed = req.parsed as UserPost;
-    const newUser = await crudUser.userPost(currentUser, parsed, true);
+    const newUser = await crudsUser.userPost(currentUser, parsed, true);
     res.status(200).json(newUser);
 }
 
@@ -139,7 +139,7 @@ swaggerRegistery.registerPath({
 // Get User Endpoint
 async function getUser(req: Request, res: Response) {
     // All users are public
-    const user = await crudUser.retrieve(req.params.userId, true);
+    const user = await crudsUser.get(req.params.userId, true);
     res.status(200).json(user);
 }
 
@@ -175,7 +175,7 @@ swaggerRegistery.registerPath({
 async function editUser(req: Request, res: Response) {
     const parsed = req.parsed as UserPut;
     const currentUser = getCurrentUser(req);
-    const updatedUser = await crudUser.userPut(
+    const updatedUser = await crudsUser.userPut(
         currentUser,
         req.params.userId,
         parsed,
@@ -229,7 +229,7 @@ swaggerRegistery.registerPath({
 // Delete User Endpoint
 async function deleteUser(req: Request, res: Response) {
     const currentUser = getCurrentUser(req);
-    await crudUser.userDelete(currentUser, req.params.userId);
+    await crudsUser.userDelete(currentUser, req.params.userId);
     res.status(200).json({
         message: `Deleted user ${req.params.userId}`,
     });

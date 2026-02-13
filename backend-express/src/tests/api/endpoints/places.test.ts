@@ -2,7 +2,7 @@ import supertest from "supertest";
 
 import app from "@/api";
 import { HttpStatus } from "@/lib/express_";
-import { crudPlace, crudUser } from "@/models/crud";
+import { crudsPlace, crudsUser } from "@/models/cruds";
 import { PlaceRead } from "@/models/schemas";
 import { closeAll, seedTestData } from "@/services/setup";
 import { getImagePath } from "@/static";
@@ -14,10 +14,10 @@ const request = supertest(app);
 
 beforeAll(async () => {
     await seedTestData();
-    adminToken = await crudUser.getBearer("mslimbeji@gmail.com");
-    token = await crudUser.getBearer("beji.slim@yahoo.fr");
-    const examples = await crudPlace.search({
-        where: { title: "Stamford Bridge" },
+    adminToken = await crudsUser.getBearer("mslimbeji@gmail.com");
+    token = await crudsUser.getBearer("beji.slim@yahoo.fr");
+    const examples = await crudsPlace.search({
+        where: { title: [{ op: "eq", val: "Stamford Bridge" }] },
     });
     example = examples[0] as PlaceRead;
 });
@@ -68,7 +68,7 @@ describe("POST /api/places/query", () => {
 
 describe("POST /api/places", () => {
     it("Create Places", async () => {
-        const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
+        const user = (await crudsUser.getByEmail("mslimbeji@gmail.com"))!;
         const response = await request
             .post("/api/places")
             .field("creatorId", user.id.toString())
@@ -94,7 +94,7 @@ describe("POST /api/places", () => {
     });
 
     it("Someone cannot post on others behalf", async () => {
-        const user = (await crudUser.getByEmail("mslimbeji@gmail.com"))!;
+        const user = (await crudsUser.getByEmail("mslimbeji@gmail.com"))!;
         await request
             .post("/api/places")
             .field("creatorId", user.id.toString())

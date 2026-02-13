@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import { validateBody } from "@/lib/express_";
-import { crudUser } from "@/models/crud";
+import { crudsUser } from "@/models/cruds";
 import {
     EncodedTokenSchema,
     Signin,
@@ -17,7 +17,7 @@ export const authRouter = Router();
 // Signup route
 async function signup(req: Request, res: Response) {
     const parsed = req.parsed as Signup;
-    const tokenData = await crudUser.signup(parsed);
+    const tokenData = await crudsUser.signup(parsed);
     res.status(200).json(tokenData);
 }
 
@@ -54,7 +54,7 @@ swaggerRegistery.registerPath({
 // Signin in route
 async function signin(req: Request, res: Response) {
     const parsed = req.parsed as Signin;
-    const tokenData = await crudUser.signin(parsed);
+    const tokenData = await crudsUser.signin(parsed);
     res.status(200).json(tokenData);
 }
 
