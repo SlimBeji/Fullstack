@@ -93,7 +93,7 @@ export const extractFindQuery = (
             throw new ApiError(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 "Invalid query request",
-                { details: parsing.error }
+                { details: parsing.error.format() }
             );
         }
         const data = parsing.data;
