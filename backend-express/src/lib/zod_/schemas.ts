@@ -18,8 +18,8 @@ export const paginatedSchema = (
 
 export const filtersSchema = (
     baseSchema: AnyZodObject,
-    sortables: string[],
-    selectables: string[],
+    sortables: readonly string[],
+    selectables: readonly string[],
     maxItems: number = 100
 ): AnyZodObject => {
     const page = zod.coerce

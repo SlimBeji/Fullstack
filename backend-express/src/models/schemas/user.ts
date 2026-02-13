@@ -21,11 +21,11 @@ export const userSelectableFields = [
     "isAdmin",
     "imageUrl",
     "places",
-];
+] as const;
 
 export type UserSelectableType = (typeof userSelectableFields)[number];
 
-export const userSearchableFields = ["id", "name", "email"];
+export const userSearchableFields = ["id", "name", "email"] as const;
 
 export type UserSearchableType = (typeof userSearchableFields)[number];
 
@@ -36,7 +36,7 @@ export const userSortableFields = [
     "-name",
     "email",
     "-email",
-];
+] as const;
 
 export type UserSortableType = (typeof userSortableFields)[number];
 
@@ -73,24 +73,26 @@ const isAdmin = zod.coerce.boolean().openapi({
     example: false,
 });
 
-const places = zod.array(
-    zodObject({
-        id: zod
-            .number()
-            .openapi({ example: 123456789, description: "The user place id" }),
-        title: zod.string().min(10).openapi({
-            example: "Stamford Bridge",
-            description: "The place title/name, 10 characters minimum",
-        }),
-        address: zod.string().min(1).openapi({
-            example: "Fulham road",
-            description: "The place address",
-        }),
-    }).openapi({
-        description: "The id of places belonging to the user, 24 characters",
-        example: "683b21134e2e5d46978daf1f",
-    })
-);
+const userPlace = zodObject({
+    id: zod
+        .number()
+        .openapi({ example: 123456789, description: "The user place id" }),
+    title: zod.string().min(10).openapi({
+        example: "Stamford Bridge",
+        description: "The place title/name, 10 characters minimum",
+    }),
+    address: zod.string().min(1).openapi({
+        example: "Fulham road",
+        description: "The place address",
+    }),
+}).openapi({
+    description: "The id of places belonging to the user, 24 characters",
+    example: "683b21134e2e5d46978daf1f",
+});
+
+export type UserPlaceType = ZodInfer<typeof userPlace>;
+
+const places = zod.array(userPlace);
 
 export const UserFields = {
     id,
@@ -140,17 +142,6 @@ export const UserReadSchema = UserDBSchema.omit({ password: true }).extend({
 });
 
 export type UserRead = ZodInfer<typeof UserReadSchema>;
-
-export const USER_DEFAULT_SELECT = {
-    id: true,
-    name: true,
-    email: true,
-    isAdmin: true,
-    imageUrl: true,
-    places: true,
-    createdAt: true,
-    updatedAt: true,
-};
 
 export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
 

@@ -23,7 +23,7 @@ export const placeSelectableFields = [
     "location.lng",
     "imageUrl",
     "creatorId",
-];
+] as const;
 
 export type PlaceSelectableType = (typeof placeSelectableFields)[number];
 
@@ -35,7 +35,7 @@ export const placeSearchableFields = [
     "creatorId",
     "locationLat",
     "locationLng",
-];
+] as const;
 
 export type PlaceSearchableType = (typeof placeSearchableFields)[number];
 
@@ -48,7 +48,7 @@ export const placeSortableFields = [
     "-description",
     "address",
     "-address",
-];
+] as const;
 
 export type PlaceSortableType = (typeof placeSortableFields)[number];
 
@@ -164,18 +164,6 @@ export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true }).extend({
 });
 
 export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
-
-export const PLACE_DEFAULT_SELECT = {
-    id: true,
-    title: true,
-    description: true,
-    address: true,
-    location: true,
-    imageUrl: true,
-    creatorId: true,
-    createdAt: true,
-    updatedAt: true,
-};
 
 export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
