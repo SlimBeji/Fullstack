@@ -25,7 +25,11 @@ export const errorHandler = (
 
     // An error occured
     if (error) {
-        const statusCode = error.code || 500;
+        let statusCode = 500;
+        if (error instanceof ApiError) {
+            statusCode = error.code;
+        }
+
         res.status(statusCode);
         const jsonResp: Record<string, any> = {
             error: true,
