@@ -1,23 +1,12 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    Index,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 
+import { BaseEntity } from "./entity";
 import { Tables } from "./tables";
 import { User } from "./user.entity";
 
 @Entity(Tables.places)
-export class Place {
+export class Place extends BaseEntity {
     // Fields
-
-    @PrimaryGeneratedColumn()
-    id!: number;
 
     @Column("varchar")
     title!: string;
@@ -41,15 +30,6 @@ export class Place {
 
     @Column("vector", { nullable: true, length: 384 })
     embedding?: number[];
-
-    // Timestamp
-
-    @Index()
-    @CreateDateColumn({ name: "created_at", type: "timestamptz" })
-    createdAt!: Date;
-
-    @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-    updatedAt!: Date;
 
     // Relationships
 

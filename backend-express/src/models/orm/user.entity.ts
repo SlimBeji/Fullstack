@@ -1,22 +1,12 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    Index,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 
+import { BaseEntity } from "./entity";
 import { Place } from "./place.entity";
 import { Tables } from "./tables";
 
 @Entity(Tables.users)
-export class User {
+export class User extends BaseEntity {
     // Fields
-
-    @PrimaryGeneratedColumn()
-    id!: number;
 
     @Column("varchar")
     name!: string;
@@ -32,15 +22,6 @@ export class User {
 
     @Column({ name: "is_admin", type: "bool", default: false })
     isAdmin!: boolean;
-
-    // Timestamp
-
-    @Index()
-    @CreateDateColumn({ name: "created_at", type: "timestamptz" })
-    createdAt!: Date;
-
-    @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-    updatedAt!: Date;
 
     // Relationships
 
