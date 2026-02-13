@@ -1,8 +1,9 @@
+import "reflect-metadata";
+
 import app from "@/api";
 import { env } from "@/config";
 import { startAll } from "@/services/setup";
 
-// Connect Mongoose than run the app
 if (require.main === module) {
     startAll()
         .then(() => {
@@ -10,7 +11,8 @@ if (require.main === module) {
                 console.log(`Listening on port ${env.PORT}`);
             });
         })
-        .catch(() => {
-            console.log("Could not stablish connection to database");
+        .catch((err) => {
+            console.log("Could not start the app");
+            throw err;
         });
 }

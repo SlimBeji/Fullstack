@@ -4,9 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start:build": "tsc-watch --onSuccess \"tsc-alias\"",
-        "start:run": "nodemon -- build/index.js",
-        "start": "concurrently npm:start:*",
+        "start": "tsx watch --tsconfig tsconfig.json src/index.ts",
         "test": "npx jest --config src/tests/jest.config.ts --runInBand"
     },
     "author": "",
