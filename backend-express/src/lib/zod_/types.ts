@@ -9,7 +9,11 @@ const _zodFile = (acceptedMimetypes: string[] | null, maxSize: number) => {
         fieldname: zod.string(),
         originalname: zod.string(),
         encoding: zod.string(),
-        mimetype: zod.string().refine((val) => acceptedMimetypes.includes(val)),
+        mimetype: zod
+            .string()
+            .refine((val) => acceptedMimetypes.includes(val), {
+                message: `File type must be one of: ${acceptedMimetypes.join(", ")}`,
+            }),
         size: zod
             .number()
             .max(maxSize * 1024 * 1024, `File must be ≤${maxSize}MB`),
@@ -30,7 +34,8 @@ export const zodFile = (
             if (!result.success) {
                 throw new ApiError(
                     HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Invalid file upload"
+                    "Invalid file upload",
+                    result.error.format()
                 );
             }
             return result.data;
