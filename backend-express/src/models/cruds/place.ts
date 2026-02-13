@@ -79,10 +79,7 @@ export class CrudsPlace extends CrudsClass<
         // Used when seeding the dev/test database
         // Avoid triggering the place embedding
         const result = await super.create(data);
-        await this.repository.query(
-            `UPDATE ${this.tablename} SET embedding = $1::vector WHERE id = $2`,
-            [JSON.stringify(embedding), result.id]
-        );
+        await this.updateEmbedding(result.id, embedding);
         return this.toRead(result);
     }
 
@@ -209,6 +206,20 @@ export class CrudsPlace extends CrudsClass<
         return result;
     }
 
+    async updateEmbedding(
+        id: number | string,
+        vector: number[]
+    ): Promise<void> {
+        await this.repository
+            .createQueryBuilder()
+            .update()
+            .set({
+                embedding: () => `'${JSON.stringify(vector)}'::vector`,
+            })
+            .where("id = :id", { id })
+            .execute();
+    }
+
     async embed(id: number): Promise<number[]> {
         const data = (await this.repository.findOne({
             where: { id },
@@ -222,12 +233,8 @@ export class CrudsPlace extends CrudsClass<
         }
         const text = `${data.title} - ${data.description}`;
         const result = await huggingFace.embedText(text);
-        const sqlVector = JSON.stringify(result);
         try {
-            await this.repository.query(
-                `UPDATE ${this.tablename} SET embedding = $1::vector WHERE id = $2`,
-                [sqlVector, id]
-            );
+            await this.updateEmbedding(id, result);
         } catch (err) {
             if (err instanceof Error) {
                 const status = HttpStatus.INTERNAL_SERVER_ERROR;
