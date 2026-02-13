@@ -9,8 +9,9 @@ import {
 } from "typeorm";
 
 import { Place } from "./place.entity";
+import { Tables } from "./tables";
 
-@Entity("users")
+@Entity(Tables.users)
 export class User {
     // Fields
 

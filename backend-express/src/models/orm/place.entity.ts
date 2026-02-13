@@ -9,9 +9,10 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 
+import { Tables } from "./tables";
 import { User } from "./user.entity";
 
-@Entity("places")
+@Entity(Tables.places)
 export class Place {
     // Fields
 
