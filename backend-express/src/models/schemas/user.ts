@@ -40,7 +40,7 @@ export const userSortableFields = [
 
 export type UserSortableType = (typeof userSortableFields)[number];
 
-const id = zod.number().openapi({
+const id = zod.coerce.number().openapi({
     description: "The user ID, 24 characters",
     example: 123456789,
 });
@@ -74,7 +74,7 @@ const isAdmin = zod.coerce.boolean().openapi({
 });
 
 const userPlace = zodObject({
-    id: zod
+    id: zod.coerce
         .number()
         .openapi({ example: 123456789, description: "The user place id" }),
     title: zod.string().min(10).openapi({

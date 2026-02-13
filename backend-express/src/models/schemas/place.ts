@@ -52,7 +52,7 @@ export const placeSortableFields = [
 
 export type PlaceSortableType = (typeof placeSortableFields)[number];
 
-const id = zod.number().openapi({
+const id = zod.coerce.number().openapi({
     description: "The ID of the place 24 characters",
     example: 123456789,
 });
@@ -84,7 +84,7 @@ const address = zod.string().min(1).openapi({
     example: "Fulham road",
 });
 
-const creatorId = zod.number().openapi({
+const creatorId = zod.coerce.number().openapi({
     description: "The ID of the place creator, 24 characters",
     example: 123456,
 });
