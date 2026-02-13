@@ -1,4 +1,4 @@
-import { DeepPartial, Repository } from "typeorm";
+import { DeepPartial } from "typeorm";
 
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
@@ -24,7 +24,6 @@ import {
 } from "../schemas";
 
 export class CrudsPlace extends CrudsClass<
-    Repository<Place>,
     Place,
     UserRead,
     PlaceCreate,
@@ -307,7 +306,7 @@ export class CrudsPlace extends CrudsClass<
 }
 
 export const crudsPlace = new CrudsPlace(
-    pgClient.client.getRepository(Place),
+    pgClient.client,
     "Place",
     placeSelectableFields,
     placeSortableFields

@@ -1,4 +1,5 @@
 import {
+    DataSource,
     DeepPartial,
     DeleteResult,
     QueryFailedError,
@@ -19,7 +20,6 @@ import { AbstractEntity, SelectField } from "./types";
 import { applyOrderBy, applySelect, applyWhere } from "./utils";
 
 export class CrudsClass<
-    ModelRepositroy extends Repository<DbModel>,
     DbModel extends AbstractEntity, // The Database model interface
     User extends object, // The User model used for authorization
     Create extends object, // Creation Interface
@@ -35,12 +35,16 @@ export class CrudsClass<
 
     MAX_ITEMS_PER_PAGE = 100;
 
+    repository: Repository<DbModel>;
+
     constructor(
-        public repository: ModelRepositroy,
+        private datasource: DataSource,
         public modelName: string,
         public defaultSelect: readonly Selectables[],
         public defaultOrderby: readonly Sortables[]
-    ) {}
+    ) {
+        this.repository = this.datasource.getRepository(this.modelName);
+    }
 
     get tablename(): string {
         return this.repository.metadata.tableName;

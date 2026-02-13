@@ -1,4 +1,4 @@
-import { DeepPartial, Repository } from "typeorm";
+import { DeepPartial } from "typeorm";
 
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
@@ -26,7 +26,6 @@ import {
 } from "../schemas";
 
 export class CrudsUser extends CrudsClass<
-    Repository<User>,
     User,
     UserRead,
     UserCreate,
@@ -296,7 +295,7 @@ export class CrudsUser extends CrudsClass<
 }
 
 export const crudsUser = new CrudsUser(
-    pgClient.client.getRepository(User),
+    pgClient.client,
     "User",
     userSelectableFields,
     userSortableFields
