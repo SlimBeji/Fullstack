@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 
 export interface PgClientConfig {
     uri: string;
+    entities: string[];
 }
 
 export class PgClient {
@@ -16,6 +17,7 @@ export class PgClient {
         this.client = new DataSource({
             type: "postgres",
             url: this.uri,
+            entities: config.entities,
             synchronize: false,
         });
     }

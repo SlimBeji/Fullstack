@@ -14,6 +14,7 @@ const IS_TEST = !!process.env.JEST_WORKER_ID;
 
 const pgsqlConfig: PgClientConfig = {
     uri: IS_TEST ? env.DATABASE_TEST_URL : env.DATABASE_URL,
+    entities: ["src/models/orm/*.entity.ts"],
 };
 export const pgClient = new PgClient(pgsqlConfig);
 
