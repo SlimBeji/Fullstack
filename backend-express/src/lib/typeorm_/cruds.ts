@@ -171,11 +171,28 @@ export class CrudsClass<
     }
 
     async exists(where: FindQueryFilters<Searchables>): Promise<boolean> {
-        let ormQuery = this.repository.createQueryBuilder(this.tablename);
-        ormQuery = applySelect(ormQuery, ["1"], (item) => this.mapSelect(item));
-        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
-        const result = await ormQuery.getRawOne();
-        return result?.length > 0;
+        try {
+            let ormQuery = this.repository.createQueryBuilder(this.tablename);
+            ormQuery = applySelect(ormQuery, ["id"], (item) =>
+                this.mapSelect(item)
+            );
+            ormQuery = applyWhere(ormQuery, where, (item) =>
+                this.mapWhere(item)
+            );
+            const result = await ormQuery.getRawOne();
+            return result?.length > 0;
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    err.message
+                );
+            }
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Something went wrong"
+            );
+        }
     }
 
     // Create
