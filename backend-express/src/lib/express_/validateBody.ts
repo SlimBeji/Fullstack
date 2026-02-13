@@ -25,7 +25,7 @@ const getFileFields = (schema: AnyZodObject): string[] => {
 
 const checkBody = (req: Request, schema: AnyZodObject): ApiError | void => {
     const body = req.body;
-    if (!body || Object.keys(body).length === 0) {
+    if (!body) {
         return new ApiError(
             HttpStatus.UNPROCESSABLE_ENTITY,
             "Bad request. No Body attached!"
@@ -36,7 +36,7 @@ const checkBody = (req: Request, schema: AnyZodObject): ApiError | void => {
         return new ApiError(
             HttpStatus.UNPROCESSABLE_ENTITY,
             "request not valid",
-            result.error
+            result.error.format()
         );
     }
     req.parsed = result.data;
@@ -54,7 +54,14 @@ export const validateBody = (schema: AnyZodObject) => {
             });
             const multerMiddleware = multerObj.fields(config);
             multerMiddleware(req, resp, (mErr) => {
-                if (mErr) return next(mErr);
+                if (mErr) {
+                    const err = new ApiError(
+                        HttpStatus.BAD_REQUEST,
+                        "Could not upload file",
+                        { message: mErr.message }
+                    );
+                    return next(err);
+                }
                 if (!req.files) {
                     return next(
                         new ApiError(
