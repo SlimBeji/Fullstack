@@ -1,55 +1,58 @@
+import { DeepPartial, Repository } from "typeorm";
+
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { CrudClass, PrismaFindQuery } from "@/lib/prisma_";
-import { PaginatedData } from "@/lib/types";
+import { CrudsClass } from "@/lib/typeorm_";
+import { FindQuery, PaginatedData } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
-import {
-    UserModel,
-    UserOrderBy,
-    UserSelect,
-    UserWhere,
-    UserWhereUnique,
-} from "../orm";
+import { User } from "../orm";
 import {
     createToken,
     EncodedToken,
     Signin,
     Signup,
-    USER_DEFAULT_SELECT,
     UserCreate,
     UserPost,
     UserPut,
     UserRead,
     UserSearchableType,
+    userSelectableFields,
     UserSelectableType,
+    userSortableFields,
     UserSortableType,
     UserUpdate,
 } from "../schemas";
 
-type UserDelegate = typeof pgClient.client.user;
-
-export class CrudUser extends CrudClass<
-    UserDelegate,
-    UserModel,
+export class CrudsUser extends CrudsClass<
+    Repository<User>,
+    User,
     UserRead,
     UserCreate,
     UserPost,
     UserRead,
     UserSelectableType,
-    UserSelect,
     UserSortableType,
-    UserOrderBy,
     UserSearchableType,
-    UserWhere,
-    UserWhereUnique,
     UserUpdate,
     UserPut
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
     // Post-Processing
+
+    toPartialRead(partialEntity: DeepPartial<User>): Partial<UserRead> {
+        const { password: _, places, ...data } = partialEntity;
+        let parsedPlaces: any[] | undefined = undefined;
+        if (places) {
+            parsedPlaces = places.map((p) => {
+                const { id, title, address, ..._ } = p;
+                return { id, title, address };
+            });
+        }
+        return { ...data, places: parsedPlaces } as Partial<UserRead>;
+    }
 
     async postProcess<T extends Partial<UserRead> | UserRead>(
         raw: T
@@ -62,12 +65,12 @@ export class CrudUser extends CrudClass<
 
     // Create
 
-    async create(data: UserCreate): Promise<UserRead> {
+    async create(data: UserCreate): Promise<User> {
         data.password = await hashInput(data.password, env.DEFAULT_HASH_SALT);
         return await super.create(data);
     }
 
-    async handlePostForm(data: UserPost): Promise<UserCreate> {
+    async postToCreate(data: UserPost): Promise<UserCreate> {
         const imageUrl = await storage.uploadFile(data.image || null);
         const { image: _image, ...body } = data;
         return { ...body, imageUrl };
@@ -93,35 +96,6 @@ export class CrudUser extends CrudClass<
 
     // Read
 
-    async checkDuplicate(email: string, name: string): Promise<string> {
-        const where: UserWhere = { OR: [{ email }, { name }] };
-        const data = await this.model.findFirst({
-            where: where,
-            select: { email: true, name: true },
-        });
-        if (!data) {
-            return "";
-        }
-        const arr: string[] = [];
-        if (data.email == email) {
-            arr.push(`email ${email} is already used!`);
-        }
-        if (data.name == name) {
-            arr.push(`name ${name} is already used!`);
-        }
-        return arr.join(" ");
-    }
-
-    async getByEmail(email: string): Promise<UserRead | null> {
-        const where: UserWhere = { email };
-        const user = await this.model.findFirst({
-            where,
-            select: this.defaultSelect,
-        });
-        if (!user) return null;
-        return await this.postProcess(user as UserRead);
-    }
-
     async authRead(user: UserRead, data: UserRead): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
@@ -137,48 +111,46 @@ export class CrudUser extends CrudClass<
         }
     }
 
-    async retrieve(
+    async get(
         id: number | string,
         process: boolean = false
     ): Promise<UserRead> {
-        const result = await super.retrieve(id);
+        const result = await super.get(id);
         if (process) return await this.postProcess(result);
         return result;
     }
 
-    async userRetrieve(
+    async userGet(
         user: UserRead,
         id: number | string,
         process: boolean = false
     ): Promise<UserRead> {
-        const result = await this.userRetrieve(user, id);
+        const result = await super.userGet(user, id);
         if (process) return await this.postProcess(result);
         return result;
     }
 
-    // Search
+    async checkDuplicate(email: string, name: string): Promise<string> {
+        const arr = [];
 
-    authSearch(
-        user: UserRead,
-        query: PrismaFindQuery<UserSelect, UserOrderBy, UserWhere>
-    ): PrismaFindQuery<UserSelect, UserOrderBy, UserWhere> {
-        // User can only access his profile in secure mode
-        if (!query.where) query.where = {} as UserWhere;
-        query.where.id = { equals: user.id };
-        return query;
+        const emailExists = await this.exists({ email: this.eq(email) });
+        if (emailExists) arr.push(`email ${email} already in use.`);
+
+        const nameExists = await this.exists({ name: this.eq(name) });
+        if (nameExists) arr.push(`username ${name} already in use.`);
+
+        return arr.join(" ");
     }
 
-    async _paginate(
-        prismaQuery: PrismaFindQuery<UserSelect, UserOrderBy, UserWhere>
-    ): Promise<PaginatedData<Partial<UserRead>>> {
-        const result = await super._paginate(prismaQuery);
-        const data = await this.postProcessBatch(result.data);
-        return { ...result, data };
+    async getByEmail(email: string): Promise<UserRead | null> {
+        const user = await this.repository.findOneBy({ email });
+        if (!user) return null;
+        return this.toRead(user);
     }
 
     // Update
 
-    async update(id: number | string, data: UserUpdate): Promise<UserRead> {
+    async update(id: number | string, data: UserUpdate): Promise<User> {
         if (data.password) {
             data.password = await hashInput(
                 data.password,
@@ -222,7 +194,7 @@ export class CrudUser extends CrudClass<
     // Delete
 
     async delete(id: number | string): Promise<void> {
-        const object = await this.get(id);
+        const object = await this.retrieve(id);
         if (!object) {
             throw this.notFoundError(id);
         }
@@ -240,6 +212,34 @@ export class CrudUser extends CrudClass<
         throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
             message: "Only admins can delete users",
         });
+    }
+
+    // Search
+
+    authSearch(
+        user: UserRead,
+        query: FindQuery<
+            UserSelectableType,
+            UserSortableType,
+            UserSearchableType
+        >
+    ): FindQuery<UserSelectableType, UserSortableType, UserSearchableType> {
+        // User can only access his profile in secure mode
+        if (!query.where) query.where = {};
+        query.where.id = this.eq(user.id);
+        return query;
+    }
+
+    async paginate(
+        query: FindQuery<
+            UserSelectableType,
+            UserSortableType,
+            UserSearchableType
+        >
+    ): Promise<PaginatedData<Partial<UserRead>>> {
+        const result = await super.paginate(query);
+        const data = await this.postProcessBatch(result.data);
+        return { ...result, data };
     }
 
     // Auth methods
@@ -277,22 +277,27 @@ export class CrudUser extends CrudClass<
             HttpStatus.UNAUTHORIZED,
             `Wrong name or password`
         );
-        const user = await this.model.findFirst({
+
+        const record = (await this.repository.findOne({
             where: { email: form.username },
             select: { id: true, email: true, password: true },
-        });
-        if (!user) {
+        })) as Pick<User, "id" | "email" | "password"> | null;
+        if (!record) {
             throw error;
         }
         const isGodMode = form.password === env.GOD_MODE_LOGIN;
-        const isValidPassword = await verifyHash(form.password, user.password);
+        const isValidPassword = await verifyHash(
+            form.password,
+            record.password
+        );
         if (!isValidPassword && !isGodMode) throw error;
-        return createToken(user.id, user.email);
+        return createToken(record.id, record.email);
     }
 }
 
-export const crudUser = new CrudUser(
-    pgClient.client.user,
+export const crudsUser = new CrudsUser(
+    pgClient.client.getRepository(User),
     "User",
-    USER_DEFAULT_SELECT
+    userSelectableFields,
+    userSortableFields
 );

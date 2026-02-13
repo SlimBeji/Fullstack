@@ -1,52 +1,49 @@
+import { DeepPartial, Repository } from "typeorm";
+
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
-import { CrudClass, PrismaFindQuery, toPrismaJsonFilter } from "@/lib/prisma_";
-import { FieldFilter, FindQueryFilters, PaginatedData } from "@/lib/types";
+import { CrudsClass } from "@/lib/typeorm_";
+import { FindQuery, PaginatedData } from "@/lib/types";
 import { huggingFace, pgClient, storage } from "@/services/instances";
 
+import {} from "../orm";
+import { Place } from "../orm";
 import {
-    PlaceModel,
-    PlaceOrderBy,
-    PlaceSelect,
-    PlaceWhere,
-    PlaceWhereUnique,
-} from "../orm";
-import {
-    PLACE_DEFAULT_SELECT,
     PlaceCreate,
     PlacePost,
     PlacePut,
     PlaceRead,
     PlaceSearchableType,
+    placeSelectableFields,
     PlaceSelectableType,
+    placeSortableFields,
     PlaceSortableType,
     PlaceUpdate,
     UserRead,
 } from "../schemas";
 
-type PlaceDelegate = typeof pgClient.client.place;
-
-export class CrudPlace extends CrudClass<
-    PlaceDelegate,
-    PlaceModel,
+export class CrudsPlace extends CrudsClass<
+    Repository<Place>,
+    Place,
     UserRead,
     PlaceCreate,
     PlacePost,
     PlaceRead,
     PlaceSelectableType,
-    PlaceSelect,
     PlaceSortableType,
-    PlaceOrderBy,
     PlaceSearchableType,
-    PlaceWhere,
-    PlaceWhereUnique,
     PlaceUpdate,
     PlacePut
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
     // Post-Processing
+
+    toPartialRead(partialEntity: DeepPartial<Place>): Partial<PlaceRead> {
+        const { embedding: _, ...data } = partialEntity;
+        return data as Partial<PlaceRead>;
+    }
 
     async postProcess<T extends Partial<PlaceRead> | PlaceRead>(
         raw: T
@@ -57,19 +54,20 @@ export class CrudPlace extends CrudClass<
         return raw;
     }
 
-    // Create
+    // Query Building
 
-    async seed(data: PlaceCreate, embedding: number[]): Promise<PlaceRead> {
-        // Used when seeding the dev/test database
-        // Avoid triggering the place embedding
-        const result = await super.create(data);
-        await pgClient.client.$executeRaw`
-                UPDATE "Place"
-                SET embedding = ${JSON.stringify(embedding)}::vector
-                WHERE id = ${result.id}
-            `;
-        return result;
+    mapWhere(field: string): string {
+        switch (field) {
+            case "locationLat":
+                return `("${this.tablename}".location->>'lat')::float`;
+            case "locationLng":
+                return `("${this.tablename}".location->>'lng')::float`;
+            default:
+                return `"${this.tablename}"."${field}"`;
+        }
     }
+
+    // Create
 
     async create(data: PlaceCreate) {
         const result = await super.create(data);
@@ -77,7 +75,18 @@ export class CrudPlace extends CrudClass<
         return result;
     }
 
-    async handlePostForm(form: PlacePost): Promise<PlaceCreate> {
+    async seed(data: PlaceCreate, embedding: number[]): Promise<PlaceRead> {
+        // Used when seeding the dev/test database
+        // Avoid triggering the place embedding
+        const result = await super.create(data);
+        await this.repository.query(
+            `UPDATE ${this.tablename} SET embedding = $1::vector WHERE id = $2`,
+            [JSON.stringify(embedding), result.id]
+        );
+        return this.toRead(result);
+    }
+
+    async postToCreate(form: PlacePost): Promise<PlaceCreate> {
         const imageUrl = await storage.uploadFile(form.image || null);
         const { image: _image, lat, lng, ...body } = form;
         return { ...body, imageUrl, location: { lat, lng } };
@@ -123,80 +132,37 @@ export class CrudPlace extends CrudClass<
         }
     }
 
-    async retrieve(
+    async get(
         id: number | string,
         process: boolean = false
     ): Promise<PlaceRead> {
-        const result = await super.retrieve(id);
+        const result = await super.get(id);
         if (process) return await this.postProcess(result);
         return result;
     }
 
-    async userRetrieve(
+    async userGet(
         user: UserRead,
         id: number | string,
         process: boolean = false
     ): Promise<PlaceRead> {
-        const result = await this.userRetrieve(user, id);
+        const result = await super.userGet(user, id);
         if (process) return await this.postProcess(result);
         return result;
-    }
-
-    // Search
-
-    toWhere(filters: FindQueryFilters<PlaceSearchableType>): PlaceWhere {
-        const where = super.toWhere(filters);
-        const andClause = [];
-        if ("locationLat" in filters) {
-            const latFilter = toPrismaJsonFilter(
-                filters["locationLat"] as FieldFilter,
-                ["lat"]
-            );
-            andClause.push(latFilter);
-        }
-        if ("locationLng" in filters) {
-            const lngFilter = toPrismaJsonFilter(
-                filters["locationLng"] as FieldFilter,
-                ["lng"]
-            );
-            andClause.push(lngFilter);
-        }
-        where["location"] = { AND: andClause } as any;
-        return where;
-    }
-
-    authSearch(
-        user: UserRead,
-        query: PrismaFindQuery<PlaceSelect, PlaceOrderBy, PlaceWhere>
-    ): PrismaFindQuery<PlaceSelect, PlaceOrderBy, PlaceWhere> {
-        if (!query.where) query.where = {} as PlaceWhere;
-        query.where.creatorId = { equals: user.id };
-        return query;
-    }
-
-    async _paginate(
-        prismaQuery: PrismaFindQuery<PlaceSelect, PlaceOrderBy, PlaceWhere>
-    ): Promise<PaginatedData<Partial<PlaceRead>>> {
-        const result = await super._paginate(prismaQuery);
-        const data = await this.postProcessBatch(result.data);
-        return { ...result, data };
     }
 
     // Update
 
     async update(id: number | string, data: PlaceUpdate) {
         const index = this.parseId(id);
-        const verification = await this.model.findFirst({
-            where: { id: index },
-            select: { title: true, description: true },
-        });
-        if (!verification) {
+        const record = await this.retrieve(id);
+        if (!record) {
             throw this.notFoundError(id);
         }
 
         const descriptionChanged =
-            !!data.description && data.description !== verification.description;
-        const titleChanged = !!data.title && data.title !== verification.title;
+            !!data.description && data.description !== record.description;
+        const titleChanged = !!data.title && data.title !== record.title;
         const updated = await super.update(id, data);
         if (descriptionChanged || titleChanged) {
             placeEmbedding(index);
@@ -215,16 +181,17 @@ export class CrudPlace extends CrudClass<
 
         if (user.isAdmin) return;
 
-        const count = await this.model.count({
-            where: { id: this.parseId(id), creatorId: user.id },
+        const check = await this.exists({
+            id: this.eq(id),
+            creatorId: this.eq(user.id),
         });
-        if (count === 0) {
+        if (!check) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
                 message: `Cannot not access place ${id}`,
             });
         }
 
-        if (data.creatorId && data.creatorId != user.id) {
+        if (data.creatorId) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
                 message: `Cannot set creatorId to ${data.creatorId}`,
             });
@@ -243,10 +210,10 @@ export class CrudPlace extends CrudClass<
     }
 
     async embed(id: number): Promise<number[]> {
-        const data = await this.model.findFirst({
+        const data = (await this.repository.findOne({
             where: { id },
             select: { title: true, description: true },
-        });
+        })) as Pick<Place, "title" | "description">;
         if (!data) {
             throw new ApiError(
                 HttpStatus.NOT_FOUND,
@@ -257,12 +224,10 @@ export class CrudPlace extends CrudClass<
         const result = await huggingFace.embedText(text);
         const sqlVector = JSON.stringify(result);
         try {
-            // vector are not supported by prisma
-            await pgClient.client.$executeRaw`
-                UPDATE "Place"
-                SET embedding = ${sqlVector}::vector
-                WHERE id = ${id}
-            `;
+            await this.repository.query(
+                `UPDATE ${this.tablename} SET embedding = $1::vector WHERE id = $2`,
+                [sqlVector, id]
+            );
         } catch (err) {
             if (err instanceof Error) {
                 const status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -295,19 +260,48 @@ export class CrudPlace extends CrudClass<
 
         if (user.isAdmin) return;
 
-        const count = await this.model.count({
-            where: { id: this.parseId(id), creatorId: user.id },
+        const check = await this.exists({
+            id: this.eq(id),
+            creatorId: this.eq(user.id),
         });
-        if (count === 0) {
+        if (!check) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
                 message: `Cannot not access place ${id}`,
             });
         }
     }
+
+    // Search
+
+    authSearch(
+        user: UserRead,
+        query: FindQuery<
+            PlaceSelectableType,
+            PlaceSortableType,
+            PlaceSearchableType
+        >
+    ): FindQuery<PlaceSelectableType, PlaceSortableType, PlaceSearchableType> {
+        if (!query.where) query.where = {};
+        query.where.creatorId = this.eq(user.id);
+        return query;
+    }
+
+    async paginate(
+        query: FindQuery<
+            PlaceSelectableType,
+            PlaceSortableType,
+            PlaceSearchableType
+        >
+    ): Promise<PaginatedData<Partial<PlaceRead>>> {
+        const result = await super.paginate(query);
+        const data = await this.postProcessBatch(result.data);
+        return { ...result, data };
+    }
 }
 
-export const crudPlace = new CrudPlace(
-    pgClient.client.place,
+export const crudsPlace = new CrudsPlace(
+    pgClient.client.getRepository(Place),
     "Place",
-    PLACE_DEFAULT_SELECT
+    placeSelectableFields,
+    placeSortableFields
 );
