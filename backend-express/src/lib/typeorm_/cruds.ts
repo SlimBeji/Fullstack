@@ -390,7 +390,7 @@ export class CrudsClass<
     ): Promise<DeepPartial<DbModel>[]> {
         // search records
         const ormQuery = this.buildSelectQuery(query);
-        return await ormQuery.getMany();
+        return await ormQuery.getRawMany();
     }
 
     async userSearch(
