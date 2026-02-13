@@ -10,9 +10,9 @@ export interface HuggingFaceClientConfig {
 
 export class HuggingFaceClient {
     private readonly token: string;
-    public readonly embedModel: string;
+    readonly embedModel: string;
     private readonly embedApi: AxiosInstance;
-    public readonly defaultTimeout: number;
+    readonly defaultTimeout: number;
 
     constructor(config: HuggingFaceClientConfig) {
         this.token = config.token;
@@ -29,7 +29,7 @@ export class HuggingFaceClient {
         });
     }
 
-    public async embedText(text: string): Promise<number[]> {
+    async embedText(text: string): Promise<number[]> {
         const response = await this.embedApi.post<EmbeddingResponse>("", {
             inputs: [text],
         });

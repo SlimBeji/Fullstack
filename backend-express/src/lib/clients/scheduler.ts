@@ -12,7 +12,7 @@ export class TaskScheduler {
 
     constructor(private tasks: CronConfig[]) {}
 
-    public start(): void {
+    start(): void {
         this.tasks.forEach((config) => {
             this.crons[config.name] = cron.schedule(
                 config.expression,
@@ -22,7 +22,7 @@ export class TaskScheduler {
         });
     }
 
-    public async close(): Promise<void> {
+    async close(): Promise<void> {
         await Promise.all(Object.values(this.crons).map((cron) => cron.stop()));
     }
 }

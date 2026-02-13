@@ -12,7 +12,7 @@ export class TaskPublisher {
         private options: QueueOptions
     ) {}
 
-    public getQueue(name: string): Queue {
+    getQueue(name: string): Queue {
         let queue = this.queues[name];
         if (!queue) {
             throw new ApiError(
@@ -23,13 +23,13 @@ export class TaskPublisher {
         return queue;
     }
 
-    public start(): void {
+    start(): void {
         this.names.forEach((name) => {
             this.queues[name] = new Queue(name, this.options);
         });
     }
 
-    public async close(): Promise<void> {
+    async close(): Promise<void> {
         await Promise.all(
             Object.values(this.queues).map((queue) => {
                 if (queue) {
@@ -52,7 +52,7 @@ export class TaskHanlder {
         private options: WorkerOptions
     ) {}
 
-    public start(): void {
+    start(): void {
         for (const [queue, router] of Object.entries(this.tasks)) {
             const worker = new Worker(queue, router, this.options);
             worker.on("failed", (job, err) => {
@@ -64,7 +64,7 @@ export class TaskHanlder {
         }
     }
 
-    public async close(): Promise<void> {
+    async close(): Promise<void> {
         await Promise.all(
             Object.values(this.workers).map((worker) => {
                 if (worker) {

@@ -94,10 +94,7 @@ export class CloudStorage {
         }/o/${encodeURIComponent(filename)}?alt=media`;
     }
 
-    public async getSignedUrl(
-        filename: string,
-        expiration?: number
-    ): Promise<string> {
+    async getSignedUrl(filename: string, expiration?: number): Promise<string> {
         if (this.isEmulator) {
             return this.getEmulatorFileUrl(filename);
         }
@@ -112,7 +109,7 @@ export class CloudStorage {
         return url;
     }
 
-    public async uploadFile(
+    async uploadFile(
         file: FileToUpload | string | null,
         destination?: string
     ): Promise<string> {
@@ -139,7 +136,7 @@ export class CloudStorage {
         return blob.name;
     }
 
-    public async deleteFile(filename: string): Promise<boolean> {
+    async deleteFile(filename: string): Promise<boolean> {
         try {
             const blob = this.bucket.file(filename);
             await blob.delete();

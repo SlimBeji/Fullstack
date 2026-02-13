@@ -6,8 +6,8 @@ export interface PgClientConfig {
 }
 
 export class PgClient {
-    public readonly uri: string;
-    public readonly client: DataSource;
+    readonly uri: string;
+    readonly client: DataSource;
 
     constructor(config: PgClientConfig) {
         if (!config.uri) {
@@ -22,22 +22,22 @@ export class PgClient {
         });
     }
 
-    public async connect(): Promise<void> {
+    async connect(): Promise<void> {
         await this.client.initialize();
     }
 
-    public async close(): Promise<void> {
+    async close(): Promise<void> {
         await this.client.destroy();
     }
 
-    public async listTables(): Promise<string[]> {
+    async listTables(): Promise<string[]> {
         const tables = await this.client.query(
             `SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename != 'migrations'`
         );
         return tables.map((row: { tablename: string }) => row.tablename);
     }
 
-    public async resetTable(table: string): Promise<void> {
+    async resetTable(table: string): Promise<void> {
         // private method for development and unit tests
         // no sql injection risk!
         await this.client.query(

@@ -10,8 +10,8 @@ export interface RedisClientConfig {
 
 export class RedisClient {
     private readonly client: RedisClientType;
-    public readonly url: string;
-    public readonly defaultExpiration: number;
+    readonly url: string;
+    readonly defaultExpiration: number;
 
     constructor(config: RedisClientConfig) {
         if (!config.url) {
@@ -41,7 +41,7 @@ export class RedisClient {
         return this.client.isReady;
     }
 
-    public async connect(): Promise<void> {
+    async connect(): Promise<void> {
         if (!this.isReady) {
             try {
                 await this.client.connect();
@@ -51,17 +51,17 @@ export class RedisClient {
         }
     }
 
-    public async flushAll(): Promise<void> {
+    async flushAll(): Promise<void> {
         await this.client.flushAll();
     }
 
-    public async close(): Promise<void> {
+    async close(): Promise<void> {
         if (this.isReady) {
             await this.client.quit();
         }
     }
 
-    public async get(key: string): Promise<any> {
+    async get(key: string): Promise<any> {
         await this.connect();
         const stored = await this.client.get(key);
         if (!stored) {
@@ -70,7 +70,7 @@ export class RedisClient {
         return JSON.parse(stored);
     }
 
-    public async set(
+    async set(
         key: string,
         val: any,
         expiration: number | null = null
@@ -92,7 +92,7 @@ export class RedisClient {
         return stringified;
     }
 
-    public async delete(key: string): Promise<void> {
+    async delete(key: string): Promise<void> {
         await this.connect();
         await this.client.del([key]);
     }
