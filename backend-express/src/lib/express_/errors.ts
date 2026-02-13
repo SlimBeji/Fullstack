@@ -10,10 +10,21 @@ export class ApiError extends Error {
     ) {
         super(message);
     }
+
+    toJson(): Record<string, any> {
+        const resp: Record<string, any> = {
+            error: true,
+            message: this.message,
+        };
+        if (this.details && Object.keys(this.details).length > 0) {
+            resp["details"] = this.details;
+        }
+        return resp;
+    }
 }
 
 export const errorHandler = (
-    error: ApiError,
+    error: Error,
     req: Request,
     res: Response,
     next: NextFunction
@@ -23,27 +34,29 @@ export const errorHandler = (
         return next(error);
     }
 
-    // An error occured
-    if (error) {
-        let statusCode = 500;
-        if (error instanceof ApiError) {
-            statusCode = error.code;
-        }
+    // Return if no error
+    if (!error) return;
 
-        res.status(statusCode);
-        const jsonResp: Record<string, any> = {
-            error: true,
-            message: error.message,
-        };
-        if (error.details && Object.keys(error.details).length > 0) {
-            jsonResp["details"] = error.details;
-        }
-        if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
-            console.error(error);
-        }
-        res.json(jsonResp);
-        return;
+    // Convert to ApiError
+    let apiError: ApiError;
+    if (error instanceof ApiError) {
+        apiError = error;
+    } else {
+        apiError = new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Something went wrong"
+        );
     }
+
+    // Log the server errors
+    if (apiError.code === HttpStatus.INTERNAL_SERVER_ERROR) {
+        console.error(error);
+    }
+
+    // Handling Response
+    res.status(apiError.code);
+    res.json(apiError.toJson());
+    return;
 };
 
 export const noRouteMatchHandler = (
@@ -52,7 +65,7 @@ export const noRouteMatchHandler = (
     next: NextFunction
 ) => {
     next(
-        new ApiError(HttpStatus.BAD_REQUEST, "Wrong endpoint", {
+        new ApiError(HttpStatus.NOT_FOUND, "Wrong endpoint", {
             url: req.url,
         })
     );
