@@ -61,11 +61,11 @@ export class CrudsPlace extends CrudsClass<
     mapWhere(field: string): string {
         switch (field) {
             case "locationLat":
-                return `("${this.tablename}".location->>'lat')::float`;
+                return `(location->>'lat')::float`;
             case "locationLng":
-                return `("${this.tablename}".location->>'lng')::float`;
+                return `(location->>'lng')::float`;
             default:
-                return `"${this.tablename}"."${camelToSnake(field)}"`;
+                return camelToSnake(field);
         }
     }
 

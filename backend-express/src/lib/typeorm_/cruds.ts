@@ -121,20 +121,20 @@ export class CrudsClass<
         // overide this method when subclassing for custom behavior
         // some fields maybe attributes in a JSONB column
         // e.g. "(user.personal->>'age')::float"
-        return `"${this.tablename}"."${camelToSnake(field)}"`;
+        return camelToSnake(field);
     }
 
     mapSelect(field: string): SelectField {
         // overide this method when subclassing for custom behavior
         // some fields may require joins
-        return { select: `"${this.tablename}"."${camelToSnake(field)}"` };
+        return { select: camelToSnake(field) };
     }
 
     mapWhere(field: string): string {
         // overide this method when subclassing for custom behavior
         // somefields maybe attributes in a JSONB column
         // e.g. "(user.personal->>'age')::float"
-        return `"${this.tablename}"."${camelToSnake(field)}"`;
+        return camelToSnake(field);
     }
 
     eq(val: any): Filter[] {
