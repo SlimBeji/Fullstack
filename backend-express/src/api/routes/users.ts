@@ -4,6 +4,7 @@ import { extractFindQuery, validateBody } from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsUser } from "@/models/cruds";
 import {
+    userFieldsSchema,
     UserFiltersSchema,
     UserFindQuery,
     UserPost,
@@ -155,6 +156,7 @@ swaggerRegistery.registerPath({
                 description: "MongoDB ObjectId",
             }),
         }),
+        query: zod.object({ fields: userFieldsSchema as any }),
     },
     responses: {
         200: {

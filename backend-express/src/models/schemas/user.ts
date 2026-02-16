@@ -2,6 +2,7 @@ import { env } from "@/config";
 import { FindQuery } from "@/lib/types";
 import {
     filtersSchema,
+    getFieldsSectionSchema,
     httpFilters,
     paginatedSchema,
     zod,
@@ -174,6 +175,11 @@ export type UserFindQuery = FindQuery<
     UserSortableType,
     UserSearchableType
 >;
+
+export const userFieldsSchema = getFieldsSectionSchema(userSelectableFields, [
+    "id",
+    "places",
+]);
 
 // --- Update Schemas ---
 export const UserUpdateSchema = zod.object({

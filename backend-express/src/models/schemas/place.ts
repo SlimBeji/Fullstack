@@ -2,6 +2,7 @@ import { env } from "@/config";
 import { FindQuery } from "@/lib/types";
 import {
     filtersSchema,
+    getFieldsSectionSchema,
     httpFilters,
     paginatedSchema,
     zod,
@@ -211,6 +212,11 @@ export type PlaceFindQuery = FindQuery<
     PlaceSortableType,
     PlaceSearchableType
 >;
+
+export const placeFieldsSchema = getFieldsSectionSchema(placeSelectableFields, [
+    "id",
+    "location",
+]);
 
 // --- Update Schemas ---
 

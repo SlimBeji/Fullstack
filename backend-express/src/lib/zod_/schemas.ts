@@ -1,4 +1,4 @@
-import { AnyZodObject } from "zod";
+import { AnyZodObject, ZodArray, ZodOptional } from "zod";
 
 import { zod } from "./base";
 
@@ -14,6 +14,20 @@ export const paginatedSchema = (
             .openapi("Total number of items in the database"),
         data: zod.array(schema).openapi(description),
     });
+};
+
+export const getFieldsSectionSchema = (
+    fields: readonly string[],
+    defaut: string[]
+): ZodOptional<ZodArray<any>> => {
+    return zod
+        .array(zod.enum([...fields] as [string, ...string[]]))
+        .openapi({
+            description:
+                "Fields to include in the response; omit for full document",
+            example: [...defaut],
+        })
+        .optional();
 };
 
 export const filtersSchema = (
@@ -49,14 +63,6 @@ export const filtersSchema = (
             example: defaultSort,
         })
         .optional();
-    const fields = zod
-        .array(zod.enum(selectables as [string, ...string[]]))
-        .openapi({
-            description:
-                "Fields to include in the response; omit for full document",
-            example: defaultFields,
-        })
-        .optional();
-
+    const fields = getFieldsSectionSchema(selectables, defaultFields);
     return baseSchema.extend({ page, size, sort, fields });
 };

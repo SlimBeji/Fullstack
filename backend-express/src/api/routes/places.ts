@@ -4,6 +4,7 @@ import { extractFindQuery, validateBody } from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsPlace } from "@/models/cruds";
 import {
+    placeFieldsSchema,
     PlaceFiltersSchema,
     PlaceFindQuery,
     PlacePost,
@@ -155,6 +156,7 @@ swaggerRegistery.registerPath({
                 description: "Place Id",
             }),
         }),
+        query: zod.object({ fields: placeFieldsSchema as any }),
     },
     responses: {
         200: {
