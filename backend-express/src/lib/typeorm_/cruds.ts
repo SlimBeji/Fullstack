@@ -76,22 +76,6 @@ export class CrudsClass<
 
     // Post-Processing
 
-    async toRead(fetched: any): Promise<Read> {
-        // remove protected/private fields
-        // may fetch extra fields to get the full Read schema
-        // overload this for edge cases
-        return (await this.toPartialRead(fetched)) as Read;
-    }
-
-    async toPartialRead(_fetched: DeepPartial<any>): Promise<Partial<Read>> {
-        // remove protected/private fields
-        // does not fetch extra fields
-        // overload this for edge cases
-        throw new Error(
-            `toPartialRead is not implemented for model ${this.modelName}`
-        );
-    }
-
     async postProcess<T extends Partial<Read> | Read>(raw: T): Promise<T> {
         // Override this when subclassing
         return raw;
@@ -117,6 +101,7 @@ export class CrudsClass<
     // Query Building
 
     fieldAlias(field: string): string {
+        // shortcut to a column alias for the select clause
         return `${this.tablename}.${field}`;
     }
 
@@ -195,31 +180,6 @@ export class CrudsClass<
         return ormQuery;
     }
 
-    async exists(where: WhereFilters<Searchables>): Promise<boolean> {
-        try {
-            let ormQuery = this.repository.createQueryBuilder(this.tablename);
-            ormQuery = applySelect(ormQuery, ["id"], (item) =>
-                this.mapSelect(item)
-            );
-            ormQuery = applyWhere(ormQuery, where, (item) =>
-                this.mapWhere(item)
-            );
-            const result = await ormQuery.getRawOne();
-            return !!result;
-        } catch (err) {
-            if (err instanceof Error) {
-                throw new ApiError(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    err.message
-                );
-            }
-            throw new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Something went wrong"
-            );
-        }
-    }
-
     // Create
 
     createEntity(data: Create): DeepPartial<DbModel> {
@@ -227,10 +187,13 @@ export class CrudsClass<
         return data as any as DeepPartial<DbModel>;
     }
 
-    async create(data: Create): Promise<DbModel> {
+    async create(data: Create): Promise<number> {
         // Use transactions when executing pre and post hooks
         try {
-            return await this.repository.save(this.createEntity(data));
+            const result = await this.repository.insert(
+                this.createEntity(data)
+            );
+            return result.identifiers[0].id;
         } catch (err) {
             if (
                 err instanceof QueryFailedError &&
@@ -257,8 +220,8 @@ export class CrudsClass<
     async post(form: Post): Promise<Read> {
         // create from a post form
         const data = await this.postToCreate(form);
-        const obj = await this.create(data);
-        return await this.toRead(obj);
+        const id = await this.create(data);
+        return await this.get(id);
     }
 
     async authPost(_user: User, _form: Post): Promise<void> {
@@ -273,16 +236,42 @@ export class CrudsClass<
 
     // Read
 
+    async exists(where: WhereFilters<Searchables>): Promise<boolean> {
+        // A utility function to quickly check if a record exists
+        // May be useful for auth methods
+        try {
+            let ormQuery = this.repository.createQueryBuilder(this.tablename);
+            ormQuery = applySelect(ormQuery, ["id"], (item) =>
+                this.mapSelect(item)
+            );
+            ormQuery = applyWhere(ormQuery, where, (item) =>
+                this.mapWhere(item)
+            );
+            const result = await ormQuery.getRawOne();
+            return !!result;
+        } catch (err) {
+            if (err instanceof Error) {
+                throw new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    err.message
+                );
+            }
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Something went wrong"
+            );
+        }
+    }
+
     async find(id: number | string): Promise<DbModel | null> {
-        // Return the DbModel if ound
-        // Return null if not found
+        // Return the DbModel if found else null
         return await this.repository.findOneBy({ id: this.parseId(id) } as any);
     }
 
     async get(id: number | string): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
         const query = {
-            select: this.defaultSelect as Selectables[],
+            select: [...this.defaultSelect],
             where: { id: this.eq(id) },
         };
         const ormQuery = this.buildSelectQuery(query);
@@ -294,22 +283,22 @@ export class CrudsClass<
         return result as any as Read;
     }
 
-    async authGet(_user: User, _data: DbModel): Promise<void> {
+    async authGet(_user: User, _data: Read): Promise<void> {
         // Raise an ApiError if user lacks authorization
     }
 
     async userGet(user: User, id: number | string): Promise<Read> {
-        const result = await this.find(id);
+        const result = await this.get(id);
         if (!result) {
             throw this.notFoundError(id);
         }
         await this.authGet(user, result);
-        return await this.toRead(result);
+        return result;
     }
 
     // Update
 
-    async update(id: number | string, data: Update): Promise<DbModel> {
+    async update(id: number | string, data: Update): Promise<void> {
         // Use transactions when executing pre and post hooks
         const key = this.parseId(id);
         let result: UpdateResult;
@@ -319,7 +308,7 @@ export class CrudsClass<
                 .update()
                 .set(data as any)
                 .where("id = :id", { id: key })
-                .returning("*")
+                .returning("id")
                 .execute();
         } catch (err) {
             if (err instanceof Error) {
@@ -336,7 +325,7 @@ export class CrudsClass<
         }
 
         if (Array.isArray(result.raw) && result.raw.length === 1) {
-            return result.raw[0];
+            return;
         }
 
         throw new ApiError(
@@ -353,8 +342,8 @@ export class CrudsClass<
     async put(id: number | string, form: Put): Promise<Read> {
         // update from a put form
         const data = await this.putToUpdate(form);
-        const result = await this.update(id, data);
-        return await this.toRead(result);
+        await this.update(id, data);
+        return await this.get(id);
     }
 
     async authPut(
@@ -418,7 +407,7 @@ export class CrudsClass<
 
     async search(
         query: FindQuery<Selectables, Sortables, Searchables>
-    ): Promise<any[]> {
+    ): Promise<Partial<Read>[]> {
         // search records
         // Setting default values
         if (!query.select || query.select.length === 0) {
@@ -437,13 +426,14 @@ export class CrudsClass<
             query.size = this.MAX_ITEMS_PER_PAGE;
         }
         const ormQuery = this.buildSelectQuery(query);
-        return await ormQuery.getMany();
+        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        return (await ormQuery.getMany()) as any as Partial<Read>[];
     }
 
     async userSearch(
         user: User,
         query: FindQuery<Selectables, Sortables, Searchables>
-    ): Promise<any[]> {
+    ): Promise<Partial<Read>[]> {
         // search records accessible by the user
         query = await this.authSearch(user, query);
         return await this.search(query);
@@ -476,10 +466,7 @@ export class CrudsClass<
         const normalized = { ...query, page, size };
 
         // Step 3: fetching results
-        const result = await this.search(normalized);
-        const data = await Promise.all(
-            result.map((item) => this.toPartialRead(item))
-        );
+        const data = await this.search(normalized);
 
         // Step 4: return paginated result
         return { page, totalPages, totalCount, data };

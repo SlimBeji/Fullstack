@@ -1,5 +1,3 @@
-import { DeepPartial } from "typeorm";
-
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass, SelectField } from "@/lib/typeorm_";
@@ -40,13 +38,6 @@ export class CrudsUser extends CrudsClass<
 
     // Post-Processing
 
-    async toPartialRead(
-        partialEntity: DeepPartial<User>
-    ): Promise<Partial<UserRead>> {
-        const { password: _, ...data } = partialEntity;
-        return data as Partial<UserRead>;
-    }
-
     async postProcess<T extends Partial<UserRead> | UserRead>(
         raw: T
     ): Promise<T> {
@@ -76,7 +67,7 @@ export class CrudsUser extends CrudsClass<
 
     // Create
 
-    async create(data: UserCreate): Promise<User> {
+    async create(data: UserCreate): Promise<number> {
         data.password = await hashInput(data.password, env.DEFAULT_HASH_SALT);
         return await super.create(data);
     }
@@ -107,6 +98,15 @@ export class CrudsUser extends CrudsClass<
 
     // Read
 
+    async get(
+        id: number | string,
+        process: boolean = false
+    ): Promise<UserRead> {
+        const result = await super.get(id);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     async authGet(user: UserRead, data: UserRead): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
@@ -120,15 +120,6 @@ export class CrudsUser extends CrudsClass<
                 `Access to user with id ${data.id} not granted`
             );
         }
-    }
-
-    async get(
-        id: number | string,
-        process: boolean = false
-    ): Promise<UserRead> {
-        const result = await super.get(id);
-        if (process) return await this.postProcess(result);
-        return result;
     }
 
     async userGet(
@@ -154,14 +145,20 @@ export class CrudsUser extends CrudsClass<
     }
 
     async getByEmail(email: string): Promise<UserRead | null> {
-        const user = await this.repository.findOneBy({ email });
-        if (!user) return null;
-        return await this.toRead(user);
+        const query = {
+            select: [...this.defaultSelect],
+            where: { email: this.eq(email) },
+        };
+        const ormQuery = this.buildSelectQuery(query);
+        const result = await ormQuery.getOne();
+        if (!result) return null;
+        // Using this.defaultSelect as select should gives a Read schema
+        return result as any as UserRead;
     }
 
     // Update
 
-    async update(id: number | string, data: UserUpdate): Promise<User> {
+    async update(id: number | string, data: UserUpdate): Promise<void> {
         if (data.password) {
             data.password = await hashInput(
                 data.password,

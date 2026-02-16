@@ -1,5 +1,3 @@
-import { DeepPartial } from "typeorm";
-
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
@@ -38,13 +36,6 @@ export class CrudsPlace extends CrudsClass<
 
     // Post-Processing
 
-    async toPartialRead(
-        partialEntity: DeepPartial<Place>
-    ): Promise<Partial<PlaceRead>> {
-        const { embedding: _, ...data } = partialEntity;
-        return data as Partial<PlaceRead>;
-    }
-
     async postProcess<T extends Partial<PlaceRead> | PlaceRead>(
         raw: T
     ): Promise<T> {
@@ -70,17 +61,17 @@ export class CrudsPlace extends CrudsClass<
     // Create
 
     async create(data: PlaceCreate) {
-        const result = await super.create(data);
-        placeEmbedding(result.id);
-        return result;
+        const id = await super.create(data);
+        placeEmbedding(id);
+        return id;
     }
 
     async seed(data: PlaceCreate, embedding: number[]): Promise<PlaceRead> {
         // Used when seeding the dev/test database
         // Avoid triggering the place embedding
-        const result = await super.create(data);
-        await this.updateEmbedding(result.id, embedding);
-        return await this.toRead(result);
+        const id = await super.create(data);
+        await this.updateEmbedding(id, embedding);
+        return await this.get(id);
     }
 
     async postToCreate(form: PlacePost): Promise<PlaceCreate> {
@@ -122,6 +113,15 @@ export class CrudsPlace extends CrudsClass<
 
     // Read
 
+    async get(
+        id: number | string,
+        process: boolean = false
+    ): Promise<PlaceRead> {
+        const result = await super.get(id);
+        if (process) return await this.postProcess(result);
+        return result;
+    }
+
     async authGet(user: UserRead, data: PlaceRead): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
@@ -136,15 +136,6 @@ export class CrudsPlace extends CrudsClass<
         }
     }
 
-    async get(
-        id: number | string,
-        process: boolean = false
-    ): Promise<PlaceRead> {
-        const result = await super.get(id);
-        if (process) return await this.postProcess(result);
-        return result;
-    }
-
     async userGet(
         user: UserRead,
         id: number | string,
@@ -157,7 +148,7 @@ export class CrudsPlace extends CrudsClass<
 
     // Update
 
-    async update(id: number | string, data: PlaceUpdate): Promise<Place> {
+    async update(id: number | string, data: PlaceUpdate): Promise<void> {
         const index = this.parseId(id);
         const record = await this.find(id);
         if (!record) {
