@@ -16,7 +16,7 @@ export const authRouter = Router();
 
 // Signup route
 async function signup(req: Request, res: Response) {
-    const parsed = req.parsed as Signup;
+    const parsed = req.parsedBody as Signup;
     const tokenData = await crudsUser.signup(parsed);
     res.status(200).json(tokenData);
 }
@@ -53,7 +53,7 @@ swaggerRegistery.registerPath({
 
 // Signin in route
 async function signin(req: Request, res: Response) {
-    const parsed = req.parsed as Signin;
+    const parsed = req.parsedBody as Signin;
     const tokenData = await crudsUser.signin(parsed);
     res.status(200).json(tokenData);
 }

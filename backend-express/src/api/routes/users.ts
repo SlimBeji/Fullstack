@@ -1,12 +1,12 @@
 import { Request, Response, Router } from "express";
 
-import { extractFindQuery, validateBody } from "@/lib/express_";
+import { extractFindQuery, validateBody, validateQuery } from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsUser } from "@/models/cruds";
 import {
-    userFieldsSchema,
     UserFiltersSchema,
     UserFindQuery,
+    UserGetSchema,
     UserPost,
     UserPostSchema,
     UserPut,
@@ -23,7 +23,7 @@ export const userRouter = Router();
 // Get Users Endpoint
 async function getUsers(req: Request, res: Response) {
     // All users are public
-    const query = req.parsed as UserFindQuery;
+    const query = req.parsedBody as UserFindQuery;
     res.status(200).json(await crudsUser.paginate(query));
 }
 
@@ -59,7 +59,7 @@ swaggerRegistery.registerPath({
 
 async function queryUsers(req: Request, res: Response) {
     // All users are public
-    const query = req.parsed as UserFindQuery;
+    const query = req.parsedBody as UserFindQuery;
     res.status(200).json(await crudsUser.paginate(query));
 }
 
@@ -101,8 +101,10 @@ swaggerRegistery.registerPath({
 // Post a User (admin only)
 async function createUser(req: Request, res: Response) {
     const currentUser = getCurrentUser(req);
-    const parsed = req.parsed as UserPost;
-    const newUser = await crudsUser.userPost(currentUser, parsed, true);
+    const parsed = req.parsedBody as UserPost;
+    const newUser = await crudsUser.userPost(currentUser, parsed, {
+        process: true,
+    });
     res.status(200).json(newUser);
 }
 
@@ -140,11 +142,14 @@ swaggerRegistery.registerPath({
 // Get User Endpoint
 async function getUser(req: Request, res: Response) {
     // All users are public
-    const user = await crudsUser.get(req.params.userId, true);
+    const user = await crudsUser.get(req.params.userId, {
+        fields: req.parsedQuery.fields,
+        process: true,
+    });
     res.status(200).json(user);
 }
 
-userRouter.get("/:userId", getUser);
+userRouter.get("/:userId", validateQuery(UserGetSchema), getUser);
 
 swaggerRegistery.registerPath({
     method: "get",
@@ -156,7 +161,7 @@ swaggerRegistery.registerPath({
                 description: "MongoDB ObjectId",
             }),
         }),
-        query: zod.object({ fields: userFieldsSchema as any }),
+        query: UserGetSchema,
     },
     responses: {
         200: {
@@ -175,13 +180,13 @@ swaggerRegistery.registerPath({
 
 // Put User Endpoint
 async function editUser(req: Request, res: Response) {
-    const parsed = req.parsed as UserPut;
+    const parsed = req.parsedBody as UserPut;
     const currentUser = getCurrentUser(req);
     const updatedUser = await crudsUser.userPut(
         currentUser,
         req.params.userId,
         parsed,
-        true
+        { process: true }
     );
     res.status(200).json(updatedUser);
 }
