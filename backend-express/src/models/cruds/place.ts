@@ -8,8 +8,7 @@ import { FindQuery, PaginatedData } from "@/lib/types";
 import { camelToSnake } from "@/lib/utils";
 import { huggingFace, pgClient, storage } from "@/services/instances";
 
-import {} from "../orm";
-import { Place } from "../orm";
+import { Models, Place } from "../orm";
 import {
     PlaceCreate,
     PlacePost,
@@ -308,7 +307,7 @@ export class CrudsPlace extends CrudsClass<
 
 export const crudsPlace = new CrudsPlace(
     pgClient.client,
-    "Place",
+    Models.place,
     placeSelectableFields,
     placeSortableFields
 );

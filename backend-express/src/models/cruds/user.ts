@@ -7,7 +7,7 @@ import { FindQuery, PaginatedData } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
-import { User } from "../orm";
+import { Models, User } from "../orm";
 import {
     createToken,
     EncodedToken,
@@ -296,7 +296,7 @@ export class CrudsUser extends CrudsClass<
 
 export const crudsUser = new CrudsUser(
     pgClient.client,
-    "User",
+    Models.user,
     userSelectableFields,
     userSortableFields
 );
