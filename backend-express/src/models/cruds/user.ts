@@ -44,15 +44,8 @@ export class CrudsUser extends CrudsClass<
     async toPartialRead(
         partialEntity: DeepPartial<User>
     ): Promise<Partial<UserRead>> {
-        const { password: _, places, ...data } = partialEntity;
-        let parsedPlaces: any[] | undefined = undefined;
-        if (places) {
-            parsedPlaces = places.map((p) => {
-                const { id, title, address, ..._ } = p;
-                return { id, title, address };
-            });
-        }
-        return { ...data, places: parsedPlaces } as Partial<UserRead>;
+        const { password: _, ...data } = partialEntity;
+        return data as Partial<UserRead>;
     }
 
     async postProcess<T extends Partial<UserRead> | UserRead>(
