@@ -150,27 +150,46 @@ export class CrudsClass<
         let ormQuery = this.repository.createQueryBuilder(this.tablename);
 
         // Apply select
-        const select = query.select || [...this.defaultSelect];
-        ormQuery = applySelect(ormQuery, select, (item) =>
+        if (!query.select || query.select.length === 0) {
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "CRUDS error",
+                {
+                    error: `No fields provided for the select statement for ${this.modelName} query`,
+                }
+            );
+        }
+        ormQuery = applySelect(ormQuery, query.select, (item) =>
             this.mapSelect(item)
         );
 
         // Apply where
-        let where = query.where || ({} as WhereFilters<Searchables>);
-        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
+        if (query.where && Object.keys(query.where).length > 0) {
+            ormQuery = applyWhere(ormQuery, query.where, (item) =>
+                this.mapWhere(item)
+            );
+        }
 
-        // Apply order by
-        let orderby = query.orderby || [...this.defaultOrderby];
-        ormQuery = applyOrderBy(ormQuery, orderby, (item) =>
-            this.mapOrderBy(item)
-        );
+        // Apply orderby
+        if (query.orderby && query.orderby.length > 0) {
+            ormQuery = applyOrderBy(ormQuery, query.orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
 
-        // Apply pagination
-        const pagination = new PaginationData(
-            query.page || 1,
-            query.size || this.MAX_ITEMS_PER_PAGE
-        );
-        ormQuery = ormQuery.take(pagination.size).skip(pagination.skip);
+        // Apply limit
+        if (query.size) {
+            ormQuery = ormQuery.take(query.size);
+        }
+
+        // Apply skip
+        if (query.page) {
+            const pagination = new PaginationData(
+                query.page || 1,
+                query.size || this.MAX_ITEMS_PER_PAGE
+            );
+            ormQuery = ormQuery.skip(pagination.skip);
+        }
 
         // Return query before executing
         return ormQuery;
@@ -262,12 +281,17 @@ export class CrudsClass<
 
     async get(id: number | string): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
-        // Overload this to fetch relations
-        const result = await this.find(id);
+        const query = {
+            select: this.defaultSelect as Selectables[],
+            where: { id: this.eq(id) },
+        };
+        const ormQuery = this.buildSelectQuery(query);
+        const result = await ormQuery.getOne();
         if (!result) {
             throw this.notFoundError(id);
         }
-        return await this.toRead(result);
+        // Using this.defaultSelect as select should gives a Read schema
+        return result as any as Read;
     }
 
     async authGet(_user: User, _data: DbModel): Promise<void> {
@@ -396,6 +420,12 @@ export class CrudsClass<
         query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<any[]> {
         // search records
+        // Setting default values
+        query.select = query.select || [...this.defaultSelect];
+        query.orderby = query.orderby || [...this.defaultOrderby];
+        query.where = query.where || {};
+        query.page = query.page || 1;
+        query.size = query.size || this.MAX_ITEMS_PER_PAGE;
         const ormQuery = this.buildSelectQuery(query);
         return await ormQuery.getRawMany();
     }
