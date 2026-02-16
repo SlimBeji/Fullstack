@@ -77,14 +77,16 @@ export class CrudsClass<
 
     // Post-Processing
 
-    toRead(entity: DbModel): Read {
+    async toRead(fetched: any): Promise<Read> {
         // remove protected/private fields
+        // may fetch extra fields to get the full Read schema
         // overload this for edge cases
-        return this.toPartialRead(entity) as Read;
+        return (await this.toPartialRead(fetched)) as Read;
     }
 
-    toPartialRead(_partialEntity: DeepPartial<DbModel>): Partial<Read> {
+    async toPartialRead(_fetched: DeepPartial<any>): Promise<Partial<Read>> {
         // remove protected/private fields
+        // does not fetch extra fields
         // overload this for edge cases
         throw new Error(
             `toPartialRead is not implemented for model ${this.modelName}`
@@ -234,7 +236,7 @@ export class CrudsClass<
         // create from a post form
         const data = await this.postToCreate(form);
         const obj = await this.create(data);
-        return this.toRead(obj);
+        return await this.toRead(obj);
     }
 
     async authCreate(_user: User, _form: Post): Promise<void> {
@@ -260,7 +262,7 @@ export class CrudsClass<
         if (!result) {
             throw this.notFoundError(id);
         }
-        return this.toRead(result);
+        return await this.toRead(result);
     }
 
     async authRead(_user: User, _data: DbModel): Promise<void> {
@@ -273,7 +275,7 @@ export class CrudsClass<
             throw this.notFoundError(id);
         }
         await this.authRead(user, result);
-        return this.toRead(result);
+        return await this.toRead(result);
     }
 
     // Update
@@ -323,7 +325,7 @@ export class CrudsClass<
         // update from a put form
         const data = await this.putToUpdate(form);
         const result = await this.update(id, data);
-        return this.toRead(result);
+        return await this.toRead(result);
     }
 
     async authUpdate(
@@ -387,7 +389,7 @@ export class CrudsClass<
 
     async search(
         query: FindQuery<Selectables, Sortables, Searchables>
-    ): Promise<DeepPartial<DbModel>[]> {
+    ): Promise<any[]> {
         // search records
         const ormQuery = this.buildSelectQuery(query);
         return await ormQuery.getRawMany();
@@ -396,7 +398,7 @@ export class CrudsClass<
     async userSearch(
         user: User,
         query: FindQuery<Selectables, Sortables, Searchables>
-    ): Promise<DeepPartial<DbModel>[]> {
+    ): Promise<any[]> {
         // search records accessible by the user
         query = await this.authSearch(user, query);
         return await this.search(query);
@@ -430,7 +432,9 @@ export class CrudsClass<
 
         // Step 3: fetching results
         const result = await this.search(normalized);
-        const data = result.map((item) => this.toPartialRead(item));
+        const data = await Promise.all(
+            result.map((item) => this.toPartialRead(item))
+        );
 
         // Step 4: return paginated result
         return { page, totalPages, totalCount, data };

@@ -41,7 +41,9 @@ export class CrudsUser extends CrudsClass<
 
     // Post-Processing
 
-    toPartialRead(partialEntity: DeepPartial<User>): Partial<UserRead> {
+    async toPartialRead(
+        partialEntity: DeepPartial<User>
+    ): Promise<Partial<UserRead>> {
         const { password: _, places, ...data } = partialEntity;
         let parsedPlaces: any[] | undefined = undefined;
         if (places) {
@@ -144,7 +146,7 @@ export class CrudsUser extends CrudsClass<
     async getByEmail(email: string): Promise<UserRead | null> {
         const user = await this.repository.findOneBy({ email });
         if (!user) return null;
-        return this.toRead(user);
+        return await this.toRead(user);
     }
 
     // Update

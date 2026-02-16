@@ -40,7 +40,9 @@ export class CrudsPlace extends CrudsClass<
 
     // Post-Processing
 
-    toPartialRead(partialEntity: DeepPartial<Place>): Partial<PlaceRead> {
+    async toPartialRead(
+        partialEntity: DeepPartial<Place>
+    ): Promise<Partial<PlaceRead>> {
         const { embedding: _, ...data } = partialEntity;
         return data as Partial<PlaceRead>;
     }
@@ -80,7 +82,7 @@ export class CrudsPlace extends CrudsClass<
         // Avoid triggering the place embedding
         const result = await super.create(data);
         await this.updateEmbedding(result.id, embedding);
-        return this.toRead(result);
+        return await this.toRead(result);
     }
 
     async postToCreate(form: PlacePost): Promise<PlaceCreate> {
