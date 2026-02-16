@@ -21,6 +21,7 @@ export const userSelectableFields = [
     "isAdmin",
     "imageUrl",
     "places",
+    "createdAt",
 ] as const;
 
 export type UserSelectableType = (typeof userSelectableFields)[number];

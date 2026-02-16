@@ -22,6 +22,7 @@ export const placeSelectableFields = [
     "location",
     "imageUrl",
     "creatorId",
+    "createdAt",
 ] as const;
 
 export type PlaceSelectableType = (typeof placeSelectableFields)[number];
