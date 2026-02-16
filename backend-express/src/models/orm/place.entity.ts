@@ -1,6 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 
-import { BaseEntity } from "./entity";
+import { BaseEntity } from "@/lib/typeorm_";
+
 import { Tables } from "./tables";
 import { User } from "./user.entity";
 

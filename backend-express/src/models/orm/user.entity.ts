@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany } from "typeorm";
 
-import { BaseEntity } from "./entity";
+import { BaseEntity } from "@/lib/typeorm_";
+
 import { Place } from "./place.entity";
 import { Tables } from "./tables";
 
