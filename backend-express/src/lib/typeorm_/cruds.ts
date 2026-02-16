@@ -39,7 +39,7 @@ export class CrudsClass<
     repository: Repository<DbModel>;
 
     constructor(
-        private datasource: DataSource,
+        public datasource: DataSource,
         public modelName: string,
         public defaultSelect: readonly Selectables[],
         public defaultOrderby: readonly Sortables[]

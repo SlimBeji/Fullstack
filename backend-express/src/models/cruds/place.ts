@@ -22,6 +22,7 @@ import {
     PlaceUpdate,
     UserRead,
 } from "../schemas";
+import { userExists } from "./utils";
 
 export class CrudsPlace extends CrudsClass<
     Place,
@@ -93,7 +94,14 @@ export class CrudsPlace extends CrudsClass<
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
 
-        if (user.isAdmin) return;
+        if (user.isAdmin) {
+            const exists = await userExists(this.datasource, data.creatorId);
+            if (!exists) {
+                throw new ApiError(HttpStatus.NOT_FOUND, "User not found", {
+                    message: `Cannot set creatorId to ${data.creatorId}, No user with id ${data.creatorId} found in the database`,
+                });
+            }
+        }
 
         if (user.id != data.creatorId) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
