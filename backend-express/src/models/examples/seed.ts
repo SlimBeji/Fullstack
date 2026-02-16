@@ -14,8 +14,8 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
         raw.map(async (newUserIn) => {
             newUserIn.imageUrl = await storage.uploadFile(newUserIn.imageUrl!);
             const { _ref, ...form } = newUserIn;
-            const user = await crudsUser.create(form);
-            userRefMapping.set(newUserIn._ref, user.id);
+            const id = await crudsUser.create(form);
+            userRefMapping.set(newUserIn._ref, id);
         })
     );
 };
@@ -31,6 +31,7 @@ const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
                 ...form,
                 creatorId: userRefMapping.get(_createorRef)!,
             };
+            // using seed instead of create to be able to set the embedding
             const place = await crudsPlace.seed(data, embedding!);
             placeRefMapping.set(newPlaceIn._ref, place.id);
         })
