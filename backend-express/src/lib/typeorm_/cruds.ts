@@ -251,14 +251,15 @@ export class CrudsClass<
 
     // Read
 
-    async retrieve(id: number | string): Promise<DbModel | null> {
+    async find(id: number | string): Promise<DbModel | null> {
         // Return null if record not found
         return await this.repository.findOneBy({ id: this.parseId(id) } as any);
     }
 
     async get(id: number | string): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
-        const result = await this.retrieve(id);
+        // Overload this to fetch relations
+        const result = await this.find(id);
         if (!result) {
             throw this.notFoundError(id);
         }
@@ -270,7 +271,7 @@ export class CrudsClass<
     }
 
     async userGet(user: User, id: number | string): Promise<Read> {
-        const result = await this.retrieve(id);
+        const result = await this.find(id);
         if (!result) {
             throw this.notFoundError(id);
         }
