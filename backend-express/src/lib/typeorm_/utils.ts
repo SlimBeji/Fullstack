@@ -2,7 +2,7 @@ import { ObjectLiteral, SelectQueryBuilder } from "typeorm";
 
 import { Filter, FindQueryFilters } from "../types";
 import { camelToSnake } from "../utils";
-import { OrderBy, SelectField } from "./types";
+import { Join, OrderBy, SelectField } from "./types";
 
 const parseOrderBy = (input: string): OrderBy => {
     const order = input.startsWith("-") ? "DESC" : "ASC";
@@ -38,36 +38,37 @@ export const applySelect = <Entity extends ObjectLiteral>(
 ): SelectQueryBuilder<Entity> => {
     if (clauses.length === 0) return query;
 
-    // Process the clauses
-    const processed = clauses.map(mapFunc);
+    // Convert to SelectField[] and deduplicate
+    const selectSet = new Set<string>();
+    const joinMap = new Map<string, Join>();
+    clauses.flatMap(mapFunc).forEach((selectField) => {
+        // extracting the fields to select
+        if (!selectSet.has(selectField.select)) {
+            selectSet.add(selectField.select);
+        }
 
-    // Get the list of joins - use Map to deduplicate
-    const joinMap = new Map<string, SelectField>();
-    processed
-        .filter(
-            (i) =>
-                i.relation !== undefined &&
-                i.table !== undefined &&
-                i.level !== undefined
-        )
-        .forEach((i) => {
-            if (!joinMap.has(i.table!)) {
-                joinMap.set(i.table!, i);
-            }
-        });
+        // extracting the joins to perform
+        if (selectField.joins && selectField.joins.length > 0) {
+            selectField.joins.forEach((join) => {
+                if (!joinMap.has(join.table)) {
+                    joinMap.set(join.table, join);
+                }
+            });
+        }
+    });
 
-    // Sorting the joins
+    // Sort joins by level (parent before child)
     const sortedJoins = Array.from(joinMap.values()).sort(
-        (a, b) => (a.level ?? 0) - (b.level ?? 0)
+        (a, b) => a.level - b.level
     );
 
     // Apply joins in order
-    sortedJoins.forEach((i) => {
-        query = query.leftJoinAndSelect(i.relation!, i.table!);
+    sortedJoins.forEach((join) => {
+        query = query.leftJoinAndSelect(join.relation, join.table);
     });
 
     // Apply the select
-    query = query.select(processed.map((i) => i.select));
+    query = query.select(Array.from(selectSet));
 
     // Return query
     return query;
