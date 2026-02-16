@@ -97,7 +97,7 @@ export const extractFindQuery = (
             );
         }
         const data = parsing.data;
-        req.parsed = {
+        req.parsedBody = {
             page: data.page || 1,
             size: data.size,
             orderby: data.sort || [],

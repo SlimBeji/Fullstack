@@ -39,7 +39,7 @@ const checkBody = (req: Request, schema: AnyZodObject): ApiError | void => {
             result.error.format()
         );
     }
-    req.parsed = result.data;
+    req.parsedBody = result.data;
 };
 
 export const validateBody = (schema: AnyZodObject) => {
@@ -86,5 +86,21 @@ export const validateBody = (schema: AnyZodObject) => {
             // Simple json post
             return next(checkBody(req, schema));
         }
+    };
+};
+
+export const validateQuery = (schema: AnyZodObject) => {
+    return async function (req: Request, _resp: Response, next: NextFunction) {
+        const result = schema.safeParse(req.query);
+        if (!result.success) {
+            const err = new ApiError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "request not valid",
+                result.error.format()
+            );
+            return next(err);
+        }
+        req.parsedQuery = result.data;
+        return next();
     };
 };
