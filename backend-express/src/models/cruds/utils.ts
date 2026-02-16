@@ -15,5 +15,5 @@ export const userExists = async (
         .select(["id"])
         .andWhere("id = :id_eq", { id_eq: id })
         .getRawOne();
-    return result?.length > 0;
+    return !!result;
 };

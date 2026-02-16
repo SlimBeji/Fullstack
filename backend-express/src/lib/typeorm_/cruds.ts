@@ -181,7 +181,7 @@ export class CrudsClass<
                 this.mapWhere(item)
             );
             const result = await ormQuery.getRawOne();
-            return result?.length > 0;
+            return !!result;
         } catch (err) {
             if (err instanceof Error) {
                 throw new ApiError(
