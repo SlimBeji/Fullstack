@@ -30,6 +30,7 @@ export class CrudsClass<
     Searchables extends string, // List of keys we can search on
     Update extends object, // Update Interface
     Put extends object, // HTTP Put Interface
+    Options extends { fields?: Selectables[] }, // General options for HTTP methods/actions
 > {
     // Constructor, Properties & Helpers
 
@@ -217,21 +218,25 @@ export class CrudsClass<
         return data as any as Create;
     }
 
-    async post(form: Post): Promise<Read> {
+    async post(form: Post, options: Options = {} as Options): Promise<Read> {
         // create from a post form
         const data = await this.postToCreate(form);
         const id = await this.create(data);
-        return await this.get(id);
+        return await this.get(id, options);
     }
 
     async authPost(_user: User, _form: Post): Promise<void> {
         // Raise an ApiError if user lacks authorization
     }
 
-    async userPost(user: User, form: Post): Promise<Read> {
+    async userPost(
+        user: User,
+        form: Post,
+        options: Options = {} as Options
+    ): Promise<Read> {
         // check user authoriation with respect to the data before the post
         await this.authPost(user, form);
-        return this.post(form);
+        return this.post(form, options);
     }
 
     // Read
@@ -268,10 +273,18 @@ export class CrudsClass<
         return await this.repository.findOneBy({ id: this.parseId(id) } as any);
     }
 
-    async get(id: number | string): Promise<Read> {
+    async get(
+        id: number | string,
+        options: Options = {} as Options
+    ): Promise<Read> {
         // Raise a 404 Not Found ApiError if not found
+        let fields = [...this.defaultSelect];
+        if (options.fields && options.fields.length > 0) {
+            fields = options.fields;
+        }
+
         const query = {
-            select: [...this.defaultSelect],
+            select: fields,
             where: { id: this.eq(id) },
         };
         const ormQuery = this.buildSelectQuery(query);
@@ -287,8 +300,12 @@ export class CrudsClass<
         // Raise an ApiError if user lacks authorization
     }
 
-    async userGet(user: User, id: number | string): Promise<Read> {
-        const result = await this.get(id);
+    async userGet(
+        user: User,
+        id: number | string,
+        options: Options = {} as Options
+    ): Promise<Read> {
+        const result = await this.get(id, options);
         if (!result) {
             throw this.notFoundError(id);
         }
@@ -339,11 +356,15 @@ export class CrudsClass<
         return data as any as Update;
     }
 
-    async put(id: number | string, form: Put): Promise<Read> {
+    async put(
+        id: number | string,
+        form: Put,
+        options: Options = {} as Options
+    ): Promise<Read> {
         // update from a put form
         const data = await this.putToUpdate(form);
         await this.update(id, data);
-        return await this.get(id);
+        return await this.get(id, options);
     }
 
     async authPut(
@@ -356,10 +377,15 @@ export class CrudsClass<
         // Data updates must be allowed
     }
 
-    async userPut(user: User, id: number | string, form: Put): Promise<Read> {
+    async userPut(
+        user: User,
+        id: number | string,
+        form: Put,
+        options: Options = {} as Options
+    ): Promise<Read> {
         // check user authoriation with respect to the data before the put
         await this.authPut(user, id, form);
-        return this.put(id, form);
+        return this.put(id, form, options);
     }
 
     // Delete

@@ -22,6 +22,11 @@ import {
     UserUpdate,
 } from "../schemas";
 
+export type UserOptions = {
+    process?: boolean;
+    fields?: UserSelectableType[];
+};
+
 export class CrudsUser extends CrudsClass<
     User,
     UserRead,
@@ -32,7 +37,8 @@ export class CrudsUser extends CrudsClass<
     UserSortableType,
     UserSearchableType,
     UserUpdate,
-    UserPut
+    UserPut,
+    UserOptions
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
@@ -86,24 +92,14 @@ export class CrudsUser extends CrudsClass<
         });
     }
 
-    async userPost(
-        user: UserRead,
-        form: UserPost,
-        process: boolean = false
-    ): Promise<UserRead> {
-        const result = await super.userPost(user, form);
-        if (process) return await this.postProcess(result);
-        return result;
-    }
-
     // Read
 
     async get(
         id: number | string,
-        process: boolean = false
+        options: UserOptions = {} as UserOptions
     ): Promise<UserRead> {
-        const result = await super.get(id);
-        if (process) return await this.postProcess(result);
+        const result = await super.get(id, options);
+        if (options?.process) return await this.postProcess(result);
         return result;
     }
 
@@ -120,16 +116,6 @@ export class CrudsUser extends CrudsClass<
                 `Access to user with id ${data.id} not granted`
             );
         }
-    }
-
-    async userGet(
-        user: UserRead,
-        id: number | string,
-        process: boolean = false
-    ): Promise<UserRead> {
-        const result = await super.userGet(user, id);
-        if (process) return await this.postProcess(result);
-        return result;
     }
 
     async checkDuplicate(email: string, name: string): Promise<string> {
@@ -186,17 +172,6 @@ export class CrudsUser extends CrudsClass<
                 `Access to user with id ${id} not granted`
             );
         }
-    }
-
-    async userPut(
-        user: UserRead,
-        id: number | string,
-        form: UserPut,
-        process: boolean = false
-    ): Promise<UserRead> {
-        const result = await super.userPut(user, id, form);
-        if (process) return await this.postProcess(result);
-        return result;
     }
 
     // Delete

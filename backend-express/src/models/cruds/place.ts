@@ -20,6 +20,11 @@ import {
 } from "../schemas";
 import { userExists } from "./utils";
 
+export type PlaceOptions = {
+    process?: boolean;
+    fields?: PlaceSelectableType[];
+};
+
 export class CrudsPlace extends CrudsClass<
     Place,
     UserRead,
@@ -30,7 +35,8 @@ export class CrudsPlace extends CrudsClass<
     PlaceSortableType,
     PlaceSearchableType,
     PlaceUpdate,
-    PlacePut
+    PlacePut,
+    PlaceOptions
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
@@ -101,24 +107,14 @@ export class CrudsPlace extends CrudsClass<
         }
     }
 
-    async userPost(
-        user: UserRead,
-        form: PlacePost,
-        process: boolean = false
-    ): Promise<PlaceRead> {
-        const result = await super.userPost(user, form);
-        if (process) return await this.postProcess(result);
-        return result;
-    }
-
     // Read
 
     async get(
         id: number | string,
-        process: boolean = false
+        options: PlaceOptions = {} as PlaceOptions
     ): Promise<PlaceRead> {
-        const result = await super.get(id);
-        if (process) return await this.postProcess(result);
+        const result = await super.get(id, options);
+        if (options?.process) return await this.postProcess(result);
         return result;
     }
 
@@ -134,16 +130,6 @@ export class CrudsPlace extends CrudsClass<
                 message: `Cannot access user ${data.creatorId} places`,
             });
         }
-    }
-
-    async userGet(
-        user: UserRead,
-        id: number | string,
-        process: boolean = false
-    ): Promise<PlaceRead> {
-        const result = await super.userGet(user, id);
-        if (process) return await this.postProcess(result);
-        return result;
     }
 
     // Update
@@ -191,17 +177,6 @@ export class CrudsPlace extends CrudsClass<
                 message: `Cannot set creatorId to ${data.creatorId}`,
             });
         }
-    }
-
-    async userPut(
-        user: UserRead,
-        id: number | string,
-        form: PlacePut,
-        process: boolean = false
-    ): Promise<PlaceRead> {
-        const result = await super.userPut(user, id, form);
-        if (process) return await this.postProcess(result);
-        return result;
     }
 
     async updateEmbedding(
