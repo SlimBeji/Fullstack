@@ -1,6 +1,6 @@
 import { ObjectLiteral, SelectQueryBuilder } from "typeorm";
 
-import { Filter, FindQueryFilters } from "../types";
+import { Filter, WhereFilters } from "../types";
 import { camelToSnake } from "../utils";
 import { Join, OrderBy, SelectField } from "./types";
 
@@ -166,7 +166,7 @@ export const applyWhere = <
     Searchables extends string,
 >(
     query: SelectQueryBuilder<Entity>,
-    clauses: FindQueryFilters<Searchables>,
+    clauses: WhereFilters<Searchables>,
     mapFunc: (f: string) => string
 ): SelectQueryBuilder<Entity> => {
     let isFirst = true;

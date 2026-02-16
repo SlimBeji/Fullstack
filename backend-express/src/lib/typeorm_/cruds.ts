@@ -12,9 +12,9 @@ import { ApiError, HttpStatus } from "../express_";
 import {
     Filter,
     FindQuery,
-    FindQueryFilters,
     PaginatedData,
     PaginationData,
+    WhereFilters,
 } from "../types";
 import { AbstractEntity, SelectField } from "./types";
 import { applyOrderBy, applySelect, applyWhere } from "./utils";
@@ -156,7 +156,7 @@ export class CrudsClass<
         );
 
         // Apply where
-        let where = query.where || ({} as FindQueryFilters<Searchables>);
+        let where = query.where || ({} as WhereFilters<Searchables>);
         ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
 
         // Apply order by
@@ -176,7 +176,7 @@ export class CrudsClass<
         return ormQuery;
     }
 
-    async exists(where: FindQueryFilters<Searchables>): Promise<boolean> {
+    async exists(where: WhereFilters<Searchables>): Promise<boolean> {
         try {
             let ormQuery = this.repository.createQueryBuilder(this.tablename);
             ormQuery = applySelect(ormQuery, ["id"], (item) =>
@@ -413,7 +413,7 @@ export class CrudsClass<
         query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<number> {
         // count the number of rows
-        const where = query.where || ({} as FindQueryFilters<Searchables>);
+        const where = query.where || ({} as WhereFilters<Searchables>);
         let ormQuery = this.repository.createQueryBuilder(this.tablename);
         ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
         return await ormQuery.getCount();
