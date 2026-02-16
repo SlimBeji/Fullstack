@@ -145,6 +145,10 @@ export const UserReadSchema = UserDBSchema.omit({ password: true }).extend({
 
 export type UserRead = ZodInfer<typeof UserReadSchema>;
 
+export const UserGetSchema = zod.object({
+    fields: getFieldsSectionSchema(userSelectableFields, ["id", "places"]),
+});
+
 export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
 
 export type UsersPaginated = ZodInfer<typeof UsersPaginatedSchema>;
@@ -175,11 +179,6 @@ export type UserFindQuery = FindQuery<
     UserSortableType,
     UserSearchableType
 >;
-
-export const userFieldsSchema = getFieldsSectionSchema(userSelectableFields, [
-    "id",
-    "places",
-]);
 
 // --- Update Schemas ---
 export const UserUpdateSchema = zod.object({

@@ -166,6 +166,10 @@ export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true }).extend({
 
 export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
 
+export const PlaceGetSchema = zod.object({
+    fields: getFieldsSectionSchema(placeSelectableFields, ["id", "location"]),
+});
+
 export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
 export type PlacesPaginated = ZodInfer<typeof PlacesPaginatedSchema>;
@@ -212,11 +216,6 @@ export type PlaceFindQuery = FindQuery<
     PlaceSortableType,
     PlaceSearchableType
 >;
-
-export const placeFieldsSchema = getFieldsSectionSchema(placeSelectableFields, [
-    "id",
-    "location",
-]);
 
 // --- Update Schemas ---
 
