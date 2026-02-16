@@ -64,6 +64,24 @@ export class CrudsUser extends CrudsClass<
         return raw;
     }
 
+    // Query Building
+
+    mapSelect(field: string): SelectField[] {
+        switch (field) {
+            case "places":
+                const userPlaceJoins = [
+                    { table: "places", relation: "users.places", level: 1 },
+                ];
+                return [
+                    { select: "places.id", joins: userPlaceJoins },
+                    { select: "places.title", joins: userPlaceJoins },
+                    { select: "places.address", joins: userPlaceJoins },
+                ];
+            default:
+                return super.mapSelect(field);
+        }
+    }
+
     // Create
 
     async create(data: UserCreate): Promise<User> {
