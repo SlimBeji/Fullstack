@@ -421,13 +421,23 @@ export class CrudsClass<
     ): Promise<any[]> {
         // search records
         // Setting default values
-        query.select = query.select || [...this.defaultSelect];
-        query.orderby = query.orderby || [...this.defaultOrderby];
-        query.where = query.where || {};
-        query.page = query.page || 1;
-        query.size = query.size || this.MAX_ITEMS_PER_PAGE;
+        if (!query.select || query.select.length === 0) {
+            query.select = [...this.defaultSelect];
+        }
+        if (!query.orderby || query.orderby.length === 0) {
+            query.orderby = [...this.defaultOrderby];
+        }
+        if (!query.where || Object.keys(query.where).length === 0) {
+            query.where = {};
+        }
+        if (!query.page) {
+            query.page = 1;
+        }
+        if (!query.size) {
+            query.size = this.MAX_ITEMS_PER_PAGE;
+        }
         const ormQuery = this.buildSelectQuery(query);
-        return await ormQuery.getRawMany();
+        return await ormQuery.getMany();
     }
 
     async userSearch(
