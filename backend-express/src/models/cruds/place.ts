@@ -5,7 +5,6 @@ import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass } from "@/lib/typeorm_";
 import { FindQuery, PaginatedData } from "@/lib/types";
-import { camelToSnake } from "@/lib/utils";
 import { huggingFace, pgClient, storage } from "@/services/instances";
 
 import { Models, Place } from "../orm";
@@ -17,7 +16,6 @@ import {
     PlaceSearchableType,
     placeSelectableFields,
     PlaceSelectableType,
-    placeSortableFields,
     PlaceSortableType,
     PlaceUpdate,
     UserRead,
@@ -65,7 +63,7 @@ export class CrudsPlace extends CrudsClass<
             case "locationLng":
                 return `(location->>'lng')::float`;
             default:
-                return camelToSnake(field);
+                return this.fieldAlias(field);
         }
     }
 

@@ -16,7 +16,6 @@ import {
     PaginatedData,
     PaginationData,
 } from "../types";
-import { camelToSnake } from "../utils";
 import { AbstractEntity, SelectField } from "./types";
 import { applyOrderBy, applySelect, applyWhere } from "./utils";
 
@@ -117,24 +116,28 @@ export class CrudsClass<
 
     // Query Building
 
+    fieldAlias(field: string): string {
+        return `${this.tablename}.${field}`;
+    }
+
     mapOrderBy(field: string): string {
         // overide this method when subclassing for custom behavior
         // some fields maybe attributes in a JSONB column
         // e.g. "(user.personal->>'age')::float"
-        return camelToSnake(field);
+        return this.fieldAlias(field);
     }
 
-    mapSelect(field: string): SelectField {
+    mapSelect(field: string): SelectField[] {
         // overide this method when subclassing for custom behavior
         // some fields may require joins
-        return { select: camelToSnake(field) };
+        return [{ select: this.fieldAlias(field) }];
     }
 
     mapWhere(field: string): string {
         // overide this method when subclassing for custom behavior
         // somefields maybe attributes in a JSONB column
         // e.g. "(user.personal->>'age')::float"
-        return camelToSnake(field);
+        return this.fieldAlias(field);
     }
 
     eq(val: any): Filter[] {
