@@ -300,5 +300,5 @@ export const crudsUser = new CrudsUser(
     pgClient.client,
     Models.user,
     userSelectableFields,
-    userSortableFields
+    ["createdAt"]
 );

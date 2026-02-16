@@ -319,5 +319,5 @@ export const crudsPlace = new CrudsPlace(
     pgClient.client,
     Models.place,
     placeSelectableFields,
-    placeSortableFields
+    ["createdAt"]
 );
