@@ -34,7 +34,7 @@ export const applyOrderBy = <Entity extends ObjectLiteral>(
 export const applySelect = <Entity extends ObjectLiteral>(
     query: SelectQueryBuilder<Entity>,
     clauses: string[],
-    mapFunc: (f: string) => SelectField
+    mapFunc: (f: string) => SelectField[]
 ): SelectQueryBuilder<Entity> => {
     if (clauses.length === 0) return query;
 
