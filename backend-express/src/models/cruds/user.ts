@@ -77,7 +77,7 @@ export class CrudsUser extends CrudsClass<
         return { ...body, imageUrl };
     }
 
-    async authCreate(user: UserRead, _data: UserPost): Promise<void> {
+    async authPost(user: UserRead, _data: UserPost): Promise<void> {
         // only admins can create users
         if (user && user.isAdmin) return;
         throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
@@ -97,7 +97,7 @@ export class CrudsUser extends CrudsClass<
 
     // Read
 
-    async authRead(user: UserRead, data: UserRead): Promise<void> {
+    async authGet(user: UserRead, data: UserRead): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
@@ -161,7 +161,7 @@ export class CrudsUser extends CrudsClass<
         return await super.update(id, data);
     }
 
-    async authUpdate(
+    async authPut(
         user: UserRead,
         id: number | string,
         _form: UserPut

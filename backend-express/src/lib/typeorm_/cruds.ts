@@ -239,13 +239,13 @@ export class CrudsClass<
         return await this.toRead(obj);
     }
 
-    async authCreate(_user: User, _form: Post): Promise<void> {
+    async authPost(_user: User, _form: Post): Promise<void> {
         // Raise an ApiError if user lacks authorization
     }
 
     async userPost(user: User, form: Post): Promise<Read> {
         // check user authoriation with respect to the data before the post
-        await this.authCreate(user, form);
+        await this.authPost(user, form);
         return this.post(form);
     }
 
@@ -267,7 +267,7 @@ export class CrudsClass<
         return await this.toRead(result);
     }
 
-    async authRead(_user: User, _data: DbModel): Promise<void> {
+    async authGet(_user: User, _data: DbModel): Promise<void> {
         // Raise an ApiError if user lacks authorization
     }
 
@@ -276,7 +276,7 @@ export class CrudsClass<
         if (!result) {
             throw this.notFoundError(id);
         }
-        await this.authRead(user, result);
+        await this.authGet(user, result);
         return await this.toRead(result);
     }
 
@@ -330,7 +330,7 @@ export class CrudsClass<
         return await this.toRead(result);
     }
 
-    async authUpdate(
+    async authPut(
         _user: User,
         _id: number | string,
         _form: Put
@@ -342,7 +342,7 @@ export class CrudsClass<
 
     async userPut(user: User, id: number | string, form: Put): Promise<Read> {
         // check user authoriation with respect to the data before the put
-        await this.authUpdate(user, id, form);
+        await this.authPut(user, id, form);
         return this.put(id, form);
     }
 

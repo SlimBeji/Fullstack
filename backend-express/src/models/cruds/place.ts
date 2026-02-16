@@ -91,7 +91,7 @@ export class CrudsPlace extends CrudsClass<
         return { ...body, imageUrl, location: { lat, lng } };
     }
 
-    async authCreate(user: UserRead, data: PlacePost): Promise<void> {
+    async authPost(user: UserRead, data: PlacePost): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
@@ -124,7 +124,7 @@ export class CrudsPlace extends CrudsClass<
 
     // Read
 
-    async authRead(user: UserRead, data: PlaceRead): Promise<void> {
+    async authGet(user: UserRead, data: PlaceRead): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
@@ -176,7 +176,7 @@ export class CrudsPlace extends CrudsClass<
         return updated;
     }
 
-    async authUpdate(
+    async authPut(
         user: UserRead,
         id: number | string,
         data: PlacePut
