@@ -62,6 +62,7 @@ export class CrudsUser extends CrudsClass<
                     { table: "places", relation: "users.places", level: 1 },
                 ];
                 return [
+                    { select: "users.id" },
                     { select: "places.id", joins: userPlaceJoins },
                     { select: "places.title", joins: userPlaceJoins },
                     { select: "places.address", joins: userPlaceJoins },
