@@ -27,7 +27,12 @@ async function getPlaces(req: Request, resp: Response) {
     resp.status(200).json(await crudsPlace.paginate(query));
 }
 
-placeRouter.get("/", extractFindQuery(PlaceFiltersSchema, "query"), getPlaces);
+placeRouter.get(
+    "/",
+    Authenticated,
+    extractFindQuery(PlaceFiltersSchema, "query"),
+    getPlaces
+);
 
 swaggerRegistery.registerPath({
     method: "get",
@@ -59,6 +64,7 @@ async function queryPlaces(req: Request, resp: Response) {
 
 placeRouter.post(
     "/query",
+    Authenticated,
     extractFindQuery(PlaceFiltersSchema, "body"),
     queryPlaces
 );
@@ -149,7 +155,12 @@ async function getPlace(req: Request, res: Response) {
     res.status(200).json(place);
 }
 
-placeRouter.get("/:placeId", validateQuery(PlaceGetSchema), getPlace);
+placeRouter.get(
+    "/:placeId",
+    Authenticated,
+    validateQuery(PlaceGetSchema),
+    getPlace
+);
 
 swaggerRegistery.registerPath({
     method: "get",

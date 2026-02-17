@@ -65,6 +65,7 @@ async function queryUsers(req: Request, res: Response) {
 
 userRouter.post(
     "/query",
+    Authenticated,
     extractFindQuery(UserFiltersSchema, "body"),
     queryUsers
 );
@@ -149,7 +150,12 @@ async function getUser(req: Request, res: Response) {
     res.status(200).json(user);
 }
 
-userRouter.get("/:userId", validateQuery(UserGetSchema), getUser);
+userRouter.get(
+    "/:userId",
+    Authenticated,
+    validateQuery(UserGetSchema),
+    getUser
+);
 
 swaggerRegistery.registerPath({
     method: "get",
