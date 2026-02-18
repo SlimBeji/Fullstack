@@ -56,22 +56,22 @@ swaggerRegistery.registerPath({
 });
 
 // Post search
-async function queryPlaces(req: Request, resp: Response) {
+async function searchPlaces(req: Request, resp: Response) {
     // All places are public
     const query = req.parsedBody as PlaceFindQuery;
     resp.status(200).json(await crudsPlace.paginate(query));
 }
 
 placeRouter.post(
-    "/query",
+    "/search",
     Authenticated,
     extractFindQuery(PlaceFiltersSchema, "body"),
-    queryPlaces
+    searchPlaces
 );
 
 swaggerRegistery.registerPath({
     method: "post",
-    path: "/places/query",
+    path: "/places/search",
     request: {
         body: {
             content: {
@@ -79,7 +79,7 @@ swaggerRegistery.registerPath({
                     schema: PlaceFiltersSchema,
                 },
             },
-            description: "Place advanced query",
+            description: "Place advanced search",
             required: true,
         },
     },

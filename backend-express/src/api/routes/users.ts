@@ -57,22 +57,22 @@ swaggerRegistery.registerPath({
 
 // Post Search
 
-async function queryUsers(req: Request, res: Response) {
+async function searchUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsedBody as UserFindQuery;
     res.status(200).json(await crudsUser.paginate(query));
 }
 
 userRouter.post(
-    "/query",
+    "/search",
     Authenticated,
     extractFindQuery(UserFiltersSchema, "body"),
-    queryUsers
+    searchUsers
 );
 
 swaggerRegistery.registerPath({
     method: "post",
-    path: "/users/query",
+    path: "/users/search",
     request: {
         body: {
             content: {

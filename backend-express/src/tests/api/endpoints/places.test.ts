@@ -42,14 +42,14 @@ describe("GET /api/places", () => {
     });
 });
 
-describe("POST /api/places/query", () => {
+describe("POST /api/places/search", () => {
     it("Fetches Places", async () => {
         const data = {
             title: ["Stamford Bridge"],
             fields: ["location"],
         };
         const response = await request
-            .post("/api/places/query")
+            .post("/api/places/search")
             .send(data)
             .set("Authorization", token)
             .expect("Content-Type", /json/)

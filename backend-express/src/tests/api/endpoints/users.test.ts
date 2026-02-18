@@ -41,14 +41,14 @@ describe("GET /api/users", () => {
     });
 });
 
-describe("POST /api/users/query", () => {
+describe("POST /api/users/search", () => {
     it("Fetches users", async () => {
         const data = {
             email: ["like:@gmail.com"],
             fields: ["email", "name"],
         };
         const response = await request
-            .post("/api/users/query")
+            .post("/api/users/search")
             .send(data)
             .set("Authorization", token)
             .expect("Content-Type", /json/)
