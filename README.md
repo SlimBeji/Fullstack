@@ -186,6 +186,10 @@ Represents the **internal structure** of a new record before insertion. Typicall
 
 Defines the **API request body** for `HTTP POST` endpoints. May differ from the Create Schema when transformation is needed (e.g., accepting a file upload that becomes an `imageUrl` string in storage).
 
+##### 📄 Read Schema
+
+Used when **returning data to clients**. Excludes sensitive or internal fields (e.g., password hashes, internal IDs) for security.
+
 ##### 🔧 Update Schema
 
 Describes **partial updates** to existing records. All fields are typically optional to allow flexible modifications.
@@ -196,21 +200,26 @@ Defines the **API request body** for `HTTP PUT` endpoints. May differ from the U
 
 > **Note:** REST conventions suggest using `PATCH` for partial updates, but `PUT` is used here due to its wider adoption and familiarity.
 
-##### 📄 Read Schema
+##### 🔍 Search Schema
 
-Used when **returning data to clients**. Excludes sensitive or internal fields (e.g., password hashes, internal IDs) for security.
+Defines the **complete search API structure**, combining filters, field selection, sorting, and pagination into a single schema.
 
-##### 🔍 Filter Schema
+**Components of the Search Schema:**
 
-Defines **which fields and operations are available for filtering** data (e.g., `age=gte:30` for `age >= 30`, `name=like:John` for `name contains "John"`).
+- **Filters** – Field-level filtering with operators (e.g., `age=gte:30`, `name=like:John`)
+- **Fields** – Field projection to select which fields are returned
+- **Sort** – Sorting order with direction prefix (e.g., `-age` for descending, `age` for ascending)
+- **Pagination** – Page number and size parameters
 
-> **Implementation detail:** In addition to the Filter Schema, **type literals** are defined to specify:
->
-> - **Selectable fields** – Which fields can be returned in responses (e.g., `placeSelectableFields`)
-> - **Searchable fields** – Which fields can be filtered on (e.g., `placeSearchableFields`)
-> - **Sortable fields** – Which fields can be used for sorting, including direction (e.g., `placeSortableFields: ["createdAt", "-createdAt"]`)
->
-> These literals provide type safety and are used to construct the complete search API.
+**Type literals for validation:**
+
+Each model defines type literals to enforce which operations are allowed:
+
+- **Selectable fields** – Allowed fields in responses (e.g., `placeSelectableFields = ["id", "title", "address"]`)
+- **Searchable fields** – Allowed fields for filtering (e.g., `placeSearchableFields = ["title", "creatorId"]`)
+- **Sortable fields** – Allowed sort fields with directions (e.g., `placeSortableFields = ["createdAt", "-createdAt", "title", "-title"]`)
+
+These literals provide type safety and runtime validation for the Search Schema.
 
 ##### 📃 Paginated Data Schema
 
