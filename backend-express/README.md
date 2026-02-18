@@ -7,7 +7,8 @@ This backend is written in **TypeScript** and follows the architecture and princ
 | Purpose         | Library Used                                                                                                                               |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | HTTP Server     | [Express](https://expressjs.com/)                                                                                                          |
-| Database ORM    | [Mongoose](https://mongoosejs.com/)                                                                                                        |
+| ORM             | [TypeORM](https://typeorm.io/)                                                                                                             |
+| Migrations      | [TypeORM](https://typeorm.io/)                                                                                                             |
 | Data Validation | [Zod](https://zod.dev/)                                                                                                                    |
 | OpenAPI Docs    | [zod-to-openapi](https://github.com/asteasolutions/zod-to-openapi), [swagger-ui-express](https://www.npmjs.com/package/swagger-ui-express) |
 | Background Jobs | [BullMQ](https://docs.bullmq.io/)                                                                                                          |
@@ -85,18 +86,21 @@ Prettier is used for formatting with the following config:
 
 ## 🛠️ Makefile Commands
 
-The following shortcuts are available for managing the Express backend via `make`:
+The following shortcuts are available for managing the Express backend via `make` in the projectroot folder:
 
-| Command                             | Description                                                           |
-| ----------------------------------- | --------------------------------------------------------------------- |
-| `make express-build`                | Build the Docker container for the Express app.                       |
-| `make express-bash`                 | Open an interactive shell inside the running Express container.       |
-| `make express-test`                 | Run the unit tests using the configured test runner.                  |
-| `make express-lint`                 | Lint and auto-format the codebase using ESLint, Prettier, and TSC.    |
-| `make express-script/⟨filename⟩.ts` | Execute a one-off script inside `src/scripts/`. Replace `⟨filename⟩`. |
-| `make express-debug`                | Run `debug.ts` for debugging or manual testing.                       |
-| `make express-seed`                 | Run `seedDb.ts` to populate the database with initial/sample data.    |
-| `make express-dump`                 | Run `dumpDb.ts` to export the current database state to a file.       |
+| Command                             | Description                                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------------------- |
+| `make express-build`                | Build the Docker container and install npm dependencies.                           |
+| `make express-bash`                 | Open an interactive shell inside the running Express container.                    |
+| `make express-diff/⟨MigrationName⟩` | Generate a new migration file by comparing current entities with the database.     |
+| `make express-migrate`              | Run pending migrations on both dev and test databases.                             |
+| `make express-revert`               | Revert the last migration on both dev and test databases.                          |
+| `make express-test`                 | Run the unit tests using the configured test runner.                               |
+| `make express-lint`                 | Lint and auto-format the codebase using TypeScript compiler, ESLint, and Prettier. |
+| `make express-script/⟨filename⟩`    | Execute a one-off script inside `src/bin/`. Replace `⟨filename⟩` (without .ts).    |
+| `make express-debug`                | Run `debug.ts` for debugging or manual testing.                                    |
+| `make express-seed`                 | Run `seedDb.ts` to populate the database with initial/sample data.                 |
+| `make express-dump`                 | Run `dumpDb.ts` to export the current database state to a file.                    |
 
 ## 📌 Notes
 
