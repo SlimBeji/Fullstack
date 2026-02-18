@@ -1,5 +1,5 @@
 // This module is used to avoid circular imports
-// with crud classes importing each others
+// with cruds classes importing each others
 
 import { DataSource } from "typeorm";
 

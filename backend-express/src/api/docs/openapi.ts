@@ -46,11 +46,11 @@ const registerSwaggger = (app: Application, path: string): void => {
             },
             {
                 name: "User",
-                description: "User crud endpoints",
+                description: "User cruds endpoints",
             },
             {
                 name: "Place",
-                description: "Place crud endpoints",
+                description: "Place cruds endpoints",
             },
         ],
     });
