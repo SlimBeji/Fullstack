@@ -2,7 +2,7 @@ import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass } from "@/lib/typeorm_";
-import { FindQuery, PaginatedData } from "@/lib/types";
+import { PaginatedData } from "@/lib/types";
 import { huggingFace, pgClient, storage } from "@/services/instances";
 
 import { Models, Place } from "../orm";
@@ -12,6 +12,7 @@ import {
     PlacePut,
     PlaceRead,
     PlaceSearchableType,
+    PlaceSearchQuery,
     placeSelectableFields,
     PlaceSelectableType,
     PlaceSortableType,
@@ -253,25 +254,14 @@ export class CrudsPlace extends CrudsClass<
 
     // Search
 
-    authSearch(
-        user: UserRead,
-        query: FindQuery<
-            PlaceSelectableType,
-            PlaceSortableType,
-            PlaceSearchableType
-        >
-    ): FindQuery<PlaceSelectableType, PlaceSortableType, PlaceSearchableType> {
+    authSearch(user: UserRead, query: PlaceSearchQuery): PlaceSearchQuery {
         if (!query.where) query.where = {};
         query.where.creatorId = this.eq(user.id);
         return query;
     }
 
     async paginate(
-        query: FindQuery<
-            PlaceSelectableType,
-            PlaceSortableType,
-            PlaceSearchableType
-        >
+        query: PlaceSearchQuery
     ): Promise<PaginatedData<Partial<PlaceRead>>> {
         const result = await super.paginate(query);
         const data = await this.postProcessBatch(result.data);

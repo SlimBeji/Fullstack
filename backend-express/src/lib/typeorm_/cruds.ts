@@ -11,9 +11,9 @@ import {
 import { ApiError, HttpStatus } from "../express_";
 import {
     Filter,
-    FindQuery,
     PaginatedData,
     PaginationData,
+    SearchQuery,
     WhereFilters,
 } from "../types";
 import { AbstractEntity, SelectField } from "./types";
@@ -135,7 +135,7 @@ export class CrudsClass<
     }
 
     buildSelectQuery(
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>
     ): SelectQueryBuilder<DbModel> {
         let ormQuery = this.repository.createQueryBuilder(this.tablename);
 
@@ -428,15 +428,15 @@ export class CrudsClass<
 
     authSearch(
         _user: User,
-        _query: FindQuery<Selectables, Sortables, Searchables>
-    ): FindQuery<Selectables, Sortables, Searchables> {
+        _query: SearchQuery<Selectables, Sortables, Searchables>
+    ): SearchQuery<Selectables, Sortables, Searchables> {
         // Update the where statement to add ownership filters
         // check the select clause to see if some fields are accessible or not by the user
         throw new Error(`authSearch not implemented for ${this.modelName}`);
     }
 
     async search(
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>
     ): Promise<Partial<Read>[]> {
         // search records
 
@@ -479,7 +479,7 @@ export class CrudsClass<
 
     async userSearch(
         user: User,
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>
     ): Promise<Partial<Read>[]> {
         // search records accessible by the user
         query = await this.authSearch(user, query);
@@ -487,7 +487,7 @@ export class CrudsClass<
     }
 
     async count(
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>
     ): Promise<number> {
         // count the number of rows
         const where = query.where || ({} as WhereFilters<Searchables>);
@@ -497,7 +497,7 @@ export class CrudsClass<
     }
 
     async paginate(
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
         // The inputs should be validated in the HTTP layer
         // The selectable fields should include only fields
@@ -521,7 +521,7 @@ export class CrudsClass<
 
     async userPaginate(
         user: User,
-        query: FindQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
         query = this.authSearch(user, query);
         return await this.paginate(query);

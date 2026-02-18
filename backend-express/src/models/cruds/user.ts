@@ -1,7 +1,7 @@
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass, SelectField } from "@/lib/typeorm_";
-import { FindQuery, PaginatedData } from "@/lib/types";
+import { PaginatedData } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
@@ -16,6 +16,7 @@ import {
     UserPut,
     UserRead,
     UserSearchableType,
+    UserSearchQuery,
     userSelectableFields,
     UserSelectableType,
     UserSortableType,
@@ -200,14 +201,7 @@ export class CrudsUser extends CrudsClass<
 
     // Search
 
-    authSearch(
-        user: UserRead,
-        query: FindQuery<
-            UserSelectableType,
-            UserSortableType,
-            UserSearchableType
-        >
-    ): FindQuery<UserSelectableType, UserSortableType, UserSearchableType> {
+    authSearch(user: UserRead, query: UserSearchQuery): UserSearchQuery {
         // User can only access his profile in secure mode
         if (!query.where) query.where = {};
         query.where.id = this.eq(user.id);
@@ -215,11 +209,7 @@ export class CrudsUser extends CrudsClass<
     }
 
     async paginate(
-        query: FindQuery<
-            UserSelectableType,
-            UserSortableType,
-            UserSearchableType
-        >
+        query: UserSearchQuery
     ): Promise<PaginatedData<Partial<UserRead>>> {
         const result = await super.paginate(query);
         const data = await this.postProcessBatch(result.data);
