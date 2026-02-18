@@ -57,5 +57,17 @@ class Settings(BaseSettings):
     def is_test(self) -> bool:
         return is_test_mode()
 
+    @property
+    def async_db_url(self) -> str:
+        return self.DATABASE_URL.replace(
+            "postgresql://", "postgresql+asyncpg://"
+        )
+
+    @property
+    def async_db_test_url(self) -> str:
+        return self.DATABASE_TEST_URL.replace(
+            "postgresql://", "postgresql+asyncpg://"
+        )
+
 
 settings = Settings()  # type: ignore[call-arg]
