@@ -14,6 +14,7 @@ bcrypt
 # PostgreSQL & Redis
 sqlalchemy[asyncio]
 asyncpg
+pgvector
 alembic
 redis
 
