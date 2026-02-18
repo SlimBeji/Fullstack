@@ -130,6 +130,10 @@ export class CrudsClass<
         return [{ op: "eq", val }];
     }
 
+    in(val: any[]): Filter[] {
+        return [{ op: "in", val }];
+    }
+
     buildSelectQuery(
         query: FindQuery<Selectables, Sortables, Searchables>
     ): SelectQueryBuilder<DbModel> {
@@ -435,6 +439,7 @@ export class CrudsClass<
         query: FindQuery<Selectables, Sortables, Searchables>
     ): Promise<Partial<Read>[]> {
         // search records
+
         // Setting default values
         if (!query.select || query.select.length === 0) {
             query.select = [...this.defaultSelect];
@@ -451,9 +456,24 @@ export class CrudsClass<
         if (!query.size) {
             query.size = this.MAX_ITEMS_PER_PAGE;
         }
-        const ormQuery = this.buildSelectQuery(query);
+
+        // Because TypeOrm .getMany() is broken with pagination
+        // We first fetch the ids with pagination, then we fetch the data
+        // by removing the pagination
+        const filterQuery = { ...query, select: ["id"] as Selectables[] };
+        const ids = (await this.buildSelectQuery(filterQuery).getRawMany()).map(
+            (row) => Object.values(row)[0] // avoid naming the attribute
+        );
+
+        // Fetching the records with the id in ids, no need for pagination here
+        const fetchQuery = {
+            select: query.select,
+            where: { id: this.in(ids) },
+            orderby: query.orderby,
+        };
+        const result = await this.buildSelectQuery(fetchQuery).getMany();
         // By selecting only Selectables, we are guarenteed to have Partial<Read>
-        return (await ormQuery.getMany()) as any as Partial<Read>[];
+        return result as any as Partial<Read>[];
     }
 
     async userSearch(
