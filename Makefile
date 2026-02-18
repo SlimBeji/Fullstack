@@ -1,6 +1,6 @@
 # Dev commands
 fix-permission:
-	sudo chown -R $$USER:$$USER ./
+	sudo chown -R $$USER:$$USER --exclude='./pgsql' ./
 
 # Docker commands
 run:
@@ -99,6 +99,20 @@ fastapi-build:
 
 fastapi-bash:
 	docker exec -it fastapi bash
+
+fastapi-alembic:
+	docker exec -it -w /app/models/migrations fastapi alembic init alembic
+
+fastapi-diff/%:
+	docker exec -it -w /app/models/migrations fastapi alembic revision --autogenerate -m $*
+
+fastapi-migrate:
+	docker exec -it -w /app/models/migrations fastapi alembic upgrade head
+	docker exec -it -w /app/models/migrations fastapi sh -c "ALEMBICENV=test alembic upgrade head"
+
+fastapi-revert:
+	docker exec -it -w /app/models/migrations fastapi alembic downgrade -1
+	docker exec -it -w /app/models/migrations fastapi sh -c "ALEMBICENV=test alembic downgrade -1"
 
 fastapi-test:
 	docker exec -it fastapi pytest /app/tests
