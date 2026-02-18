@@ -79,6 +79,10 @@ The following `make` commands help manage the FastAPI backend:
 | ---------------------------- | ------------------------------------------------------------------------------- |
 | `make fastapi-build`         | Build the Docker container for the FastAPI service.                             |
 | `make fastapi-bash`          | Open an interactive shell inside the running FastAPI container.                 |
+| `make fastapi-diff/⟨name⟩`   | Generate a new Alembic migration (e.g. `make fastapi-diff/add_users`).          |
+| `make fastapi-alembic`       | Initialize the alembic configuration.                                           |
+| `make fastapi-migrate`       | Apply pending migrations to both dev and test databases.                        |
+| `make fastapi-revert`        | Rollback the last migration on both dev and test databases.                     |
 | `make fastapi-test`          | Run unit tests using `pytest`.                                                  |
 | `make fastapi-lint`          | Run all linting tools: `autoflake`, `isort`, `black`, and `mypy`.               |
 | `make fastapi-script/⟨name⟩` | Execute a script from `scripts/` directory (e.g. `make fastapi-script/foo.py`). |
