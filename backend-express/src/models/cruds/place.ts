@@ -136,7 +136,7 @@ export class CrudsPlace extends CrudsClass<
 
     async update(id: number | string, data: PlaceUpdate): Promise<void> {
         const index = this.parseId(id);
-        const record = await this.find(id);
+        const record = await this.read(id);
         if (!record) {
             throw this.notFoundError(id);
         }

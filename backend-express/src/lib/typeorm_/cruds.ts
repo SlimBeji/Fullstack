@@ -272,7 +272,7 @@ export class CrudsClass<
         }
     }
 
-    async find(id: number | string): Promise<DbModel | null> {
+    async read(id: number | string): Promise<DbModel | null> {
         // Return the DbModel if found else null
         return await this.repository.findOneBy({ id: this.parseId(id) } as any);
     }

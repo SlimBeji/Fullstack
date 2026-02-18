@@ -178,7 +178,7 @@ export class CrudsUser extends CrudsClass<
     // Delete
 
     async delete(id: number | string): Promise<void> {
-        const object = await this.find(id);
+        const object = await this.read(id);
         if (!object) {
             throw this.notFoundError(id);
         }
