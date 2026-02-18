@@ -5,7 +5,7 @@ fix-permission:
 # Docker commands
 run:
 	docker-compose down
-	docker-compose up --attach express
+	docker-compose up --attach fastapi
 
 build:
 	docker-compose build
