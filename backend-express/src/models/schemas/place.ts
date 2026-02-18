@@ -1,5 +1,5 @@
 import { env } from "@/config";
-import { FindQuery } from "@/lib/types";
+import { SearchQuery } from "@/lib/types";
 import {
     filtersSchema,
     getFieldsSectionSchema,
@@ -14,44 +14,6 @@ import {
 import { createdAt, updatedAt } from "./common";
 
 // --- Fields ----
-
-export const placeSelectableFields = [
-    "id",
-    "title",
-    "description",
-    "address",
-    "location",
-    "imageUrl",
-    "creatorId",
-    "createdAt",
-] as const;
-
-export type PlaceSelectableType = (typeof placeSelectableFields)[number];
-
-export const placeSearchableFields = [
-    "id",
-    "title",
-    "description",
-    "address",
-    "creatorId",
-    "locationLat",
-    "locationLng",
-] as const;
-
-export type PlaceSearchableType = (typeof placeSearchableFields)[number];
-
-export const placeSortableFields = [
-    "createdAt",
-    "-createdAt",
-    "title",
-    "-title",
-    "description",
-    "-description",
-    "address",
-    "-address",
-] as const;
-
-export type PlaceSortableType = (typeof placeSortableFields)[number];
 
 const id = zod.coerce.number().openapi({
     description: "The ID of the place 24 characters",
@@ -118,7 +80,48 @@ export const PlaceFields = {
     location,
 };
 
+// --- Selectables, Serchables, Sortables ----
+
+export const placeSelectableFields = [
+    "id",
+    "title",
+    "description",
+    "address",
+    "location",
+    "imageUrl",
+    "creatorId",
+    "createdAt",
+] as const;
+
+export type PlaceSelectableType = (typeof placeSelectableFields)[number];
+
+export const placeSearchableFields = [
+    "id",
+    "title",
+    "description",
+    "address",
+    "creatorId",
+    "locationLat",
+    "locationLng",
+] as const;
+
+export type PlaceSearchableType = (typeof placeSearchableFields)[number];
+
+export const placeSortableFields = [
+    "createdAt",
+    "-createdAt",
+    "title",
+    "-title",
+    "description",
+    "-description",
+    "address",
+    "-address",
+] as const;
+
+export type PlaceSortableType = (typeof placeSortableFields)[number];
+
 // --- Base Schemas ----
+
 export const PlaceDBSchema = zod.object({
     id: PlaceFields.id,
     title: PlaceFields.title,
@@ -170,13 +173,29 @@ export const PlaceGetSchema = zod.object({
     fields: getFieldsSectionSchema(placeSelectableFields, ["id", "location"]),
 });
 
+// --- Update Schemas ---
+
+export const PlaceUpdateSchema = zod.object({
+    title: PlaceFields.title.optional(),
+    description: PlaceFields.description.optional(),
+    address: PlaceFields.address.optional(),
+    location: PlaceFields.location.optional(),
+    creatorId: PlaceFields.creatorId.optional(),
+});
+
+export type PlaceUpdate = ZodInfer<typeof PlaceUpdateSchema>;
+
+export const PlacePutSchema = PlaceUpdateSchema.extend({});
+
+export type PlacePut = ZodInfer<typeof PlacePutSchema>;
+
+// ---  Search Schemas ----
+
 export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
 export type PlacesPaginated = ZodInfer<typeof PlacesPaginatedSchema>;
 
-// ---  Quey Schemas ----
-
-export const PlaceFiltersSchema = filtersSchema(
+export const PlaceSearchSchema = filtersSchema(
     zod.object({
         id: httpFilters(PlaceFields.id, {
             example: "683b21134e2e5d46978daf1f",
@@ -209,26 +228,10 @@ export const PlaceFiltersSchema = filtersSchema(
     env.MAX_ITEMS_PER_PAGE
 );
 
-export type PlaceFilters = ZodInfer<typeof PlaceFiltersSchema>;
+export type PlaceSearch = ZodInfer<typeof PlaceSearchSchema>;
 
-export type PlaceFindQuery = FindQuery<
+export type PlaceSearchQuery = SearchQuery<
     PlaceSelectableType,
     PlaceSortableType,
     PlaceSearchableType
 >;
-
-// --- Update Schemas ---
-
-export const PlaceUpdateSchema = zod.object({
-    title: PlaceFields.title.optional(),
-    description: PlaceFields.description.optional(),
-    address: PlaceFields.address.optional(),
-    location: PlaceFields.location.optional(),
-    creatorId: PlaceFields.creatorId.optional(),
-});
-
-export type PlaceUpdate = ZodInfer<typeof PlaceUpdateSchema>;
-
-export const PlacePutSchema = PlaceUpdateSchema.extend({});
-
-export type PlacePut = ZodInfer<typeof PlacePutSchema>;

@@ -18,7 +18,7 @@ export type WhereFilters<T extends string> = {
     [K in T]?: Filter[];
 };
 
-export interface FindQuery<
+export interface SearchQuery<
     Selectables extends string,
     Sortables extends string,
     Searchables extends string,

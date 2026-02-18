@@ -1,5 +1,5 @@
 import { env } from "@/config";
-import { FindQuery } from "@/lib/types";
+import { SearchQuery } from "@/lib/types";
 import {
     filtersSchema,
     getFieldsSectionSchema,
@@ -14,33 +14,6 @@ import {
 import { createdAt, updatedAt } from "./common";
 
 // --- Fields ----
-
-export const userSelectableFields = [
-    "id",
-    "name",
-    "email",
-    "isAdmin",
-    "imageUrl",
-    "places",
-    "createdAt",
-] as const;
-
-export type UserSelectableType = (typeof userSelectableFields)[number];
-
-export const userSearchableFields = ["id", "name", "email"] as const;
-
-export type UserSearchableType = (typeof userSearchableFields)[number];
-
-export const userSortableFields = [
-    "createdAt",
-    "-createdAt",
-    "name",
-    "-name",
-    "email",
-    "-email",
-] as const;
-
-export type UserSortableType = (typeof userSortableFields)[number];
 
 const id = zod.coerce.number().openapi({
     description: "The user ID, 24 characters",
@@ -107,6 +80,35 @@ export const UserFields = {
     places,
 };
 
+// --- Selectables, Serchables, Sortables ----
+
+export const userSelectableFields = [
+    "id",
+    "name",
+    "email",
+    "isAdmin",
+    "imageUrl",
+    "places",
+    "createdAt",
+] as const;
+
+export type UserSelectableType = (typeof userSelectableFields)[number];
+
+export const userSearchableFields = ["id", "name", "email"] as const;
+
+export type UserSearchableType = (typeof userSearchableFields)[number];
+
+export const userSortableFields = [
+    "createdAt",
+    "-createdAt",
+    "name",
+    "-name",
+    "email",
+    "-email",
+] as const;
+
+export type UserSortableType = (typeof userSortableFields)[number];
+
 // --- Base Schemas ----
 export const UserDBSchema = zod.object({
     id: UserFields.id,
@@ -149,13 +151,26 @@ export const UserGetSchema = zod.object({
     fields: getFieldsSectionSchema(userSelectableFields, ["id", "places"]),
 });
 
+// --- Update Schemas ---
+export const UserUpdateSchema = zod.object({
+    name: UserFields.name.optional(),
+    email: UserFields.email.optional(),
+    password: UserFields.password.optional(),
+});
+
+export type UserUpdate = ZodInfer<typeof UserUpdateSchema>;
+
+export const UserPutSchema = UserUpdateSchema.extend({});
+
+export type UserPut = ZodInfer<typeof UserPutSchema>;
+
+// ---  Search Schemas ----
+
 export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
 
 export type UsersPaginated = ZodInfer<typeof UsersPaginatedSchema>;
 
-// ---  Quey Schemas ----
-
-export const UserFiltersSchema = filtersSchema(
+export const UserSearchSchema = filtersSchema(
     zod.object({
         id: httpFilters(UserFields.id, {
             example: "683b21134e2e5d46978daf1f",
@@ -172,23 +187,10 @@ export const UserFiltersSchema = filtersSchema(
     env.MAX_ITEMS_PER_PAGE
 );
 
-export type UserFilters = ZodInfer<typeof UserFiltersSchema>;
+export type UserSearch = ZodInfer<typeof UserSearchSchema>;
 
-export type UserFindQuery = FindQuery<
+export type UserSearchQuery = SearchQuery<
     UserSelectableType,
     UserSortableType,
     UserSearchableType
 >;
-
-// --- Update Schemas ---
-export const UserUpdateSchema = zod.object({
-    name: UserFields.name.optional(),
-    email: UserFields.email.optional(),
-    password: UserFields.password.optional(),
-});
-
-export type UserUpdate = ZodInfer<typeof UserUpdateSchema>;
-
-export const UserPutSchema = UserUpdateSchema.extend({});
-
-export type UserPut = ZodInfer<typeof UserPutSchema>;
