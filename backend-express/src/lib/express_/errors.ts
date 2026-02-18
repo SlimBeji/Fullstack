@@ -41,6 +41,10 @@ export const errorHandler = (
     let apiError: ApiError;
     if (error instanceof ApiError) {
         apiError = error;
+    } else if (error instanceof SyntaxError) {
+        apiError = new ApiError(HttpStatus.BAD_REQUEST, "Bad Request Syntax", {
+            info: "if you are sending a json, check if it is valid",
+        });
     } else {
         apiError = new ApiError(
             HttpStatus.INTERNAL_SERVER_ERROR,
