@@ -4,14 +4,15 @@ This backend is written in **Python** and follows the architecture and principle
 
 ## 🛠️ Tech Stack
 
-| Purpose         | Library Used                                                                             |
-| --------------- | ---------------------------------------------------------------------------------------- |
-| HTTP Server     | [FastAPI](https://fastapi.tiangolo.com/)                                                 |
-| Database ORM    | [Beanie](https://github.com/roman-right/beanie) + [Motor](https://motor.readthedocs.io/) |
-| Data Validation | [Pydantic](https://docs.pydantic.dev/)                                                   |
-| OpenAPI Docs    | \*Built-in via FastAPI                                                                   |
-| Background Jobs | [Dramatiq](https://dramatiq.io/)                                                         |
-| Task Scheduling | [apscheduler](https://apscheduler.readthedocs.io/en/3.x/index.html)                      |
+| Purpose         | Library Used                                                        |
+| --------------- | ------------------------------------------------------------------- |
+| HTTP Server     | [FastAPI](https://fastapi.tiangolo.com/)                            |
+| ORM             | [SQLAlchemy](https://www.sqlalchemy.org/)                           |
+| Migrations      | [Alembic](https://alembic.sqlalchemy.org/en/latest/)                |
+| Data Validation | [Pydantic](https://docs.pydantic.dev/)                              |
+| OpenAPI Docs    | \*Built-in via FastAPI                                              |
+| Background Jobs | [Dramatiq](https://dramatiq.io/)                                    |
+| Task Scheduling | [apscheduler](https://apscheduler.readthedocs.io/en/3.x/index.html) |
 
 ## 🔐 Environment Variables
 
@@ -36,9 +37,8 @@ DEFAULT_TIMEOUT=20
 ENV=dev
 
 # DATABASE
-MONGO_URL=mongodb://mongo1:27017,mongo2:27017/myapp?replicaSet=rs0
-MONGO_DBNAME=myapp
-MONGO_TEST_DBNAME=tests
+DATABASE_URL=postgresql://dev:dev@pgsql:5432/dev
+DATABASE_TEST_URL=postgresql://test:test@test-pgsql:5432/test
 REDIS_URL=redis://redis:6379/0
 REDIS_TEST_URL=redis://redis:6379/1
 REDIS_DEFAULT_EXPIRATION=3600
@@ -59,16 +59,16 @@ GCS_BLOB_ACCESS_EXPIRATION=3600
 
 This backend uses the following tools to ensure clean and consistent Python code:
 
--   **[mypy](https://mypy-lang.org/):** Static type checker for Python. It analyzes type hints and ensures functions, variables, and class attributes follow the expected types.  
-    This is especially useful in larger codebases and when using tools like **Pydantic** or **FastAPI** where typing is essential.
--   **[autoflake](https://pypi.org/project/autoflake/):** Removes unused imports and variables.
--   **[isort](https://pycqa.github.io/isort/):** Automatically sorts imports.  
-    Configured to work with `black` formatting (see `.isort.cfg`).
--   **[black](https://black.readthedocs.io/):** Opinionated code formatter for Python.
+- **[mypy](https://mypy-lang.org/):** Static type checker for Python. It analyzes type hints and ensures functions, variables, and class attributes follow the expected types.
+  This is especially useful in larger codebases and when using tools like **Pydantic** or **FastAPI** where typing is essential.
+- **[autoflake](https://pypi.org/project/autoflake/):** Removes unused imports and variables.
+- **[isort](https://pycqa.github.io/isort/):** Automatically sorts imports.
+  Configured to work with `black` formatting (see `.isort.cfg`).
+- **[black](https://black.readthedocs.io/):** Opinionated code formatter for Python.
 
 ## 🔠 Casing
 
-In Python, the standard for variables and fields is **snake_case** (e.g., `creator_id`).  
+In Python, the standard for variables and fields is **snake_case** (e.g., `creator_id`).
 However, since all backends are designed to be interchangeable, **camelCase** will be used for JSON responses (e.g., `creatorId`) to maintain consistency across different backends.
 
 ## 🛠️ Makefile Commands
@@ -88,8 +88,7 @@ The following `make` commands help manage the FastAPI backend:
 
 ## 📌 Notes
 
-All tools were selected to be **compatible with Python's async ecosystem**, taking full advantage of **FastAPI’s ASGI architecture**. This ensures better scalability and performance by allowing concurrent processing of I/O-bound operations like DB access, API calls, and background jobs.
+All tools were selected to be **compatible with Python's async ecosystem**, taking full advantage of **FastAPI's ASGI architecture**. This ensures better scalability and performance by allowing concurrent processing of I/O-bound operations like DB access, API calls, and background jobs.
 
--   **Beanie + Motor** were chosen for interacting with MongoDB in an async-friendly manner.
--   **Dramatiq** handles background jobs and scheduled tasks. It integrates well with async workflows and message brokers like Redis or RabbitMQ.
--   **FastAPI** automatically generates Swagger and ReDoc documentation from Pydantic models and endpoint definitions.
+- **SQLAlchemy (async) + asyncpg** were chosen for interacting with PostgreSQL in an async-friendly manner, providing robust ORM capabilities with full async/await support.
+- **Dramatiq** handles background jobs and scheduled tasks. It integrates well with async workflows and message brokers like Redis or RabbitMQ.
