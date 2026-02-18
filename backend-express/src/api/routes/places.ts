@@ -4,14 +4,14 @@ import { extractFindQuery, validateBody, validateQuery } from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsPlace } from "@/models/cruds";
 import {
-    PlaceFiltersSchema,
-    PlaceFindQuery,
     PlaceGetSchema,
     PlacePost,
     PlacePostSchema,
     PlacePut,
     PlacePutSchema,
     PlaceReadSchema,
+    PlaceSearchQuery,
+    PlaceSearchSchema,
     PlacesPaginatedSchema,
 } from "@/models/schemas";
 
@@ -23,14 +23,14 @@ export const placeRouter = Router();
 // Get Places Endpoint
 async function getPlaces(req: Request, resp: Response) {
     // All places are public
-    const query = req.parsedBody as PlaceFindQuery;
+    const query = req.parsedBody as PlaceSearchQuery;
     resp.status(200).json(await crudsPlace.paginate(query));
 }
 
 placeRouter.get(
     "/",
     Authenticated,
-    extractFindQuery(PlaceFiltersSchema, "query"),
+    extractFindQuery(PlaceSearchSchema, "query"),
     getPlaces
 );
 
@@ -38,7 +38,7 @@ swaggerRegistery.registerPath({
     method: "get",
     path: "/places/",
     request: {
-        query: PlaceFiltersSchema,
+        query: PlaceSearchSchema,
     },
     responses: {
         200: {
@@ -58,14 +58,14 @@ swaggerRegistery.registerPath({
 // Post search
 async function searchPlaces(req: Request, resp: Response) {
     // All places are public
-    const query = req.parsedBody as PlaceFindQuery;
+    const query = req.parsedBody as PlaceSearchQuery;
     resp.status(200).json(await crudsPlace.paginate(query));
 }
 
 placeRouter.post(
     "/search",
     Authenticated,
-    extractFindQuery(PlaceFiltersSchema, "body"),
+    extractFindQuery(PlaceSearchSchema, "body"),
     searchPlaces
 );
 
@@ -76,7 +76,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: PlaceFiltersSchema,
+                    schema: PlaceSearchSchema,
                 },
             },
             description: "Place advanced search",

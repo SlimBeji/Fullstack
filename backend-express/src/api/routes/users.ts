@@ -4,14 +4,14 @@ import { extractFindQuery, validateBody, validateQuery } from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsUser } from "@/models/cruds";
 import {
-    UserFiltersSchema,
-    UserFindQuery,
     UserGetSchema,
     UserPost,
     UserPostSchema,
     UserPut,
     UserPutSchema,
     UserReadSchema,
+    UserSearchQuery,
+    UserSearchSchema,
     UsersPaginatedSchema,
 } from "@/models/schemas";
 
@@ -23,14 +23,14 @@ export const userRouter = Router();
 // Get Users Endpoint
 async function getUsers(req: Request, res: Response) {
     // All users are public
-    const query = req.parsedBody as UserFindQuery;
+    const query = req.parsedBody as UserSearchQuery;
     res.status(200).json(await crudsUser.paginate(query));
 }
 
 userRouter.get(
     "/",
     Authenticated,
-    extractFindQuery(UserFiltersSchema, "query"),
+    extractFindQuery(UserSearchSchema, "query"),
     getUsers
 );
 
@@ -38,7 +38,7 @@ swaggerRegistery.registerPath({
     method: "get",
     path: "/users/",
     request: {
-        query: UserFiltersSchema,
+        query: UserSearchSchema,
     },
     responses: {
         200: {
@@ -59,14 +59,14 @@ swaggerRegistery.registerPath({
 
 async function searchUsers(req: Request, res: Response) {
     // All users are public
-    const query = req.parsedBody as UserFindQuery;
+    const query = req.parsedBody as UserSearchQuery;
     res.status(200).json(await crudsUser.paginate(query));
 }
 
 userRouter.post(
     "/search",
     Authenticated,
-    extractFindQuery(UserFiltersSchema, "body"),
+    extractFindQuery(UserSearchSchema, "body"),
     searchUsers
 );
 
@@ -77,7 +77,7 @@ swaggerRegistery.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: UserFiltersSchema,
+                    schema: UserSearchSchema,
                 },
             },
             description: "user advanced Search",
