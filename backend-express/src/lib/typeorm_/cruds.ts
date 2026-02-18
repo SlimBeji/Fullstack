@@ -464,6 +464,7 @@ export class CrudsClass<
         const ids = (await this.buildSelectQuery(filterQuery).getRawMany()).map(
             (row) => Object.values(row)[0] // avoid naming the attribute
         );
+        if (ids.length === 0) return [];
 
         // Fetching the records with the id in ids, no need for pagination here
         const fetchQuery = {
