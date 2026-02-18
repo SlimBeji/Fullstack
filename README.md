@@ -10,22 +10,44 @@ All backends expose **identical endpoints**, and all frontends consume the same 
 
 This setup allows for:
 
--   Comparing **code structure**, **developer experience**, and **performance**
--   Experimenting with new technologies in a real-world scenario
--   Understanding how to build scalable, interchangeable services
--   Identify a solid and abstracted folders structure for building REST APIs
+- Comparing **developer experience** across different tech stacks
+- Identifying a solid and abstracted **code structure** for building REST APIs
+- Experimenting with new technologies in a real-world scenario
+- Understanding how to build scalable, interchangeable services
+
+## 🐳 Dockerized Setup
+
+Each application (frontend/backend) is **containerized using Docker** and organized in its own dedicated folder:
+
+- Backend apps: `/backend-express`, `/backend-fastapi`, `/backend-gin`, `/backend-axum`
+- Frontend apps: `/frontend-react`, `/frontend-vue`, `/frontend-svelte`, `/frontend-angular`
+
+The `backend-` and `frontend-` prefixes group related applications together for easier navigation.
+
+### 🔗 Shared Services
+
+The `docker-compose.yaml` file orchestrates the following shared services:
+
+- **PostgreSQL**: Primary relational database with replication support
+- **pgAdmin**: Web-based PostgreSQL administration interface
+- **Redis**: In-memory data store for caching and message brokering
+- **RedisInsight**: Web UI for monitoring and managing Redis
+- **Fake GCS Server**: Local emulator for Google Cloud Storage ([`fsouza/fake-gcs-server`](https://github.com/fsouza/fake-gcs-server))
 
 ## 🧱 Technology Stack
 
-### 🗄️ Database: Why MongoDB over PostgreSQL?
+### 🗄️ Database: PostgreSQL
 
-While PostgreSQL is a powerful and mature relational database, this project opts for **MongoDB** — a NoSQL, document-oriented database — for the following reasons:
+This project uses **PostgreSQL** as its primary database. While earlier iterations explored MongoDB for its document-oriented model, the project has migrated to PostgreSQL for its industry-standard adoption, superior performance, and robust feature set.
 
--   **Natural Data Modeling**: API responses and application data often involve deeply nested object structures. MongoDB’s document model aligns directly with this, reducing the need for complex relational mapping.
--   **Simplified Queries**: In PostgreSQL, deeply related data requires multiple tables and joins (e.g., grandchild → child → parent). In MongoDB, such structures can often be embedded within a single collection, improving readability and performance.
--   **JSON Support in PostgreSQL is Limited**: While PostgreSQL supports JSON columns, querying and manipulating nested JSON fields in SQL can become verbose and less intuitive. MongoDB was designed around JSON-style documents, making these operations more seamless.
+- **Industry Standard**: Widely adopted across enterprises, with extensive tooling, community support, and proven scalability
+- **Superior Performance**: Optimized query execution with advanced indexing (B-tree, GiST, GIN) and query planning
+- **JSONB Support**: Native support for semi-structured data with efficient indexing and querying of JSON documents
+- **ACID Compliance**: Strong consistency guarantees and transaction support for reliable data integrity
+- **Mature Ecosystem**: Rich extension ecosystem (PostGIS, pg_vector, TimescaleDB) and compatibility with all major ORMs
+- **Cost-Effective Hosting**: More affordable hosting options compared to managed MongoDB services, with numerous providers offering competitive pricing
 
-> For projects involving hierarchical data, flexible schemas, or nested documents, MongoDB provides a more natural and efficient approach.
+> PostgreSQL combines the flexibility needed for modern application development with the reliability and performance required for production systems.
 
 ### 🔙 Backends
 
@@ -38,9 +60,9 @@ Each backend implements the **same logic**, **routes**, and **data models**:
 | Go         | [Gin](https://gin-gonic.com/)            | http://localhost:5002/api |
 | Rust       | [Axum](https://github.com/tokio-rs/axum) | http://localhost:5003/api |
 
-Each backend connects to a shared set of services (e.g., MongoDB, Redis).
+Each backend connects to a shared set of services (e.g., PostgreSQL, Redis).
 
-### 🔜 Frontends
+### 🖼️ Frontends
 
 Each frontend is a modern **Single Page Application (SPA)** built using popular frameworks:
 
@@ -69,203 +91,269 @@ or
 VITE_BACKEND_URL=http://localhost:5001/api   # FastAPI
 ```
 
-## 🐳 Dockerized Setup
+## 📐 Backend Architecture
 
-Each app (frontend/backend) lives in its own folder (e.g., `/backend-express`, `/backend-fastapi` `/frontend-react`, etc.) and is containerized using Docker.
+This demo project features two models: **Users** and **Places**. Users can create accounts and add their favorite places to their profiles, while other users can browse and view these places.
 
-Prefixes `backend-` and `frontend-` are used so that the folders of the backend apps are next to each others and the folders of the frontend apps are next to each others.
+Defining a clear folder structure is essential for building scalable applications. Poor organization quickly leads to issues such as circular import errors and difficult maintenance.
 
-### 🔗 Shared Services (via `docker-compose.yaml`)
-
--   **MongoDB**: A MongoDB replica set with `mongo1`, `mongo2`, and a `mongo-setup` container to initialize the replica configuration.
--   **Mongo Express**: Web-based UI for browsing and managing MongoDB data.
--   **Fake GCS Server**: A local emulator for Google Cloud Storage, using [`fsouza/fake-gcs-server`](https://github.com/fsouza/fake-gcs-server).
--   **Redis**: In-memory database used for caching and as a message broker.
--   **RedisInsight**: Web UI for inspecting and managing Redis data.
-
-## 📐 Backend Building
-
-This demo project features two models: Users and Places. Users can create accounts and add their favorite places to their profiles, while other users can browse and view these places.
-
-Defining a clear folder structure is essential for building scalable applications. Poor folder organization can quickly lead to issues such as circular import errors.
-
-Below is the folder structure shown from bottom to top (import order), used across all backend apps, independent of the programming language or web framework:
+Below is the folder structure used across **all backend implementations**, shown from bottom to top (import order), independent of the programming language or web framework
 
 ### 📁 Lib
 
-Reusable and abstracted modules. No imports from sibling modules are allowed, placing `lib` at the bottom of the import order.
+Reusable and abstracted modules that serve as the **foundation layer** of the application. No imports from sibling modules are allowed, placing `/lib` at the bottom of the import order.
 
-The `/lib` folder may contain layers built on top of the web and data validation/serialization libraries used. By convention, an underscore suffix is used to distinguish the underlying library from the project-specific layer (e.g. `pydantic_` and `fastapi_` for **Python**, or `zod_` and `express_` for **TypeScript**).
+The `/lib` folder acts as the **glue layer** between the application logic and external dependencies — providing consistent interfaces for HTTP frameworks, data validation libraries, PostgreSQL ORMs, and third-party services.
 
--   **/framework\_** – Layer on top of the web framework (e.g. `fastapi_`, `express_`, `gin_`, `axum_`)
--   **/serialization\_** – Layer on top of the validation/serialization framework (e.g. `pydantic_`, `zod_`, `validator_`, `serde_`)
--   **/clients** – Wrappers around third-party APIs or service interfaces (e.g. MongoDB, Redis, Google Cloud Storage, task scheduling)
--   **/utils** – Generic helper functions (e.g. date/string formatting, file and I/O operations, encryption)
--   **/types** – Reusable shared type definitions used across the project (e.g. pagination, file upload)
+- **/utils** – Generic helper functions independent of any framework (e.g., date/string formatting, file I/O, encryption, hashing)
+- **/types** – Reusable type definitions shared across the project (e.g., pagination parameters, file upload schemas, error responses)
+- **/clients** – Wrappers around external services and APIs (e.g., Redis, Google Cloud Storage, task queues, HuggingFace, third-party APIs)
+- **/framework\_** – Abstraction layer over web frameworks to normalize routing, middleware, and request handling (e.g., `fastapi_`, `express_`, `gin_`, `axum_`)
+- **/validation\_** – Abstraction layer over validation/serialization libraries to provide consistent schema definitions (e.g., `pydantic_`, `zod_`, `validator_` (go), `validator_` (Rust))
+- **/orm\_** – Abstraction layer over ORMs to provide consistent database interaction patterns (e.g., `sqlalchemy_`, `typeorm_`, `gorm_`, `seaorm_`)
+
+> **Note:** The naming convention follows Rust's `/lib` folder structure, which is used for reusable library code separate from application-specific logic. The underscore suffix (e.g., `express_`, `pydantic_`) distinguishes these abstraction layers from the underlying libraries they wrap.
 
 ### 📁 Config
 
-Config module used to setup environment variables and global parameters, placing `config` at the bottom just above `lib` in the import order
+Centralized configuration module for loading and managing **environment variables** and **global parameters**. The `/config` folder sits just above `/lib` in the import order.
+
+This module may import utilities from `/lib` (e.g., for parsing, validating, or transforming environment variables) but does not import from any higher-level modules.
+
+**Typical contents:**
+
+- Database connection strings
+- API keys and secrets
+- Service URLs and ports
+- Feature flags
+- Application-wide constants
 
 ### 📁 Static
 
-Stores **static assets** such as images or files that may be served by the backend or used for documentation or testing. It may also contain helper functions for loading these assets.  
+Stores **static assets** such as images or files that may be served by the backend or used for documentation or testing. It may also contain helper functions for loading these assets.
+
 `/static` is considered near the bottom of the import order, just above `lib` and `config`.
 
 ### 📁 Services
 
-Services used by the application, such as third-party APIs or databases. These modules import clients from `lib` and instantiate them.
+Manages **application services** such as database connections, third-party APIs, caching layers, and message queues. These modules import clients from `/lib` and instantiate them with project-specific configurations using parameters from `/config`.
 
-The `services` folder is split into:
+The `/services` folder is split into two submodules to prevent circular imports:
 
--   **instances** – Contains instantiated services consumed by the API (e.g. databases, third-party APIs, task publishers)
--   **setup** – Contains helpers to orchestrate connection and shutdown logic for the service instances
+- **instances** – Contains instantiated service objects consumed throughout the application (e.g., database connections, Redis clients, task queue publishers, external API clients). Each instance should expose:
+    - `start()` or `connect()` – Initialize the service connection
+    - `close()` or `disconnect()` – Gracefully shutdown the service
 
-> **instances** is placed near the bottom of the import order, while **setup** sits at the top, as it is intended to be used just before the application starts. This split helps avoid circular imports.
+- **setup** – Contains orchestration logic to manage the lifecycle of all service instances. This module:
+    - Calls `start()`/`connect()` on all instances during application startup
+    - Calls `close()`/`disconnect()` on all instances during application shutdown
+    - Handles dependency ordering (e.g., connect to database before Redis)
+
+> **Import order:** The **instances** submodule sits near the bottom (can be imported by models, routes, etc.), while **setup** sits at the top (only imported by the main entry point). This separation prevents circular dependencies where services need each other during initialization.
 
 ### 📁 Models
 
-Contains the **data layer**. Well-thought-out data models are critical not only for development, but also for testing, seeding, and consistency across different backend implementations.
+Contains the **data layer** — the core domain models and database interaction logic.
 
-Each backend includes a `models/` folder with several key subfolders:
+Well-designed data models are critical for:
 
-#### 📁 📁 Schemas
+- **Development** – Clear contracts between layers
+- **Testing** – Reproducible test data and fixtures
+- **Seeding** – Generating realistic dummy data
+- **Consistency** – Identical behavior across all backend implementations
 
-We break down schema definitions based on their **specific purpose** in the application lifecycle: creation, seeding, reading, editing, querying...
+The `/models` folder is organized into subfolders that separate concerns by lifecycle stage:
 
-Each model or object will have its own schema file.
+#### 📁📁 Schemas
 
-The types of schemas defined are described below:
+Schema definitions are organized by their **specific purpose in the application lifecycle** — from creation and storage to retrieval and querying.
+
+Each model has its own schema file containing multiple schema types:
 
 ##### 📦 DB Schema
 
--   Defines how the data is stored in the database.
--   Includes all internal fields and references.
+Defines how data is **stored in the database**, including all internal fields, indexes, and relationships.
 
 ##### 🌱 Seed Schema
 
--   Used for generating dummy data when seeding a test database.
--   Can include reference fields to link documents across collections since raw examples does not have proper indexes prior to DB injection.
+Used for **generating dummy data** during database seeding. May include reference fields (e.g. `_ref` or `_creator_ref`) to link records across tables.
 
 ##### ✍️ Creation Schema
 
--   Represents the structure of a new document before it's inserted.
--   Typically excludes fields like IDs or reverse relationships.
+Represents the **internal structure** of a new record before insertion. Typically excludes auto-generated fields like IDs, timestamps, or reverse relationships.
 
 ##### 📤 Post Schema
 
--   Defines the structure of the data received via `HTTP POST` to create a record.
--   May differ from the creation schema (e.g. an object has an `imageUrl` field stored but the user uploads an image file instead of sending the `imageUrl` string).
+Defines the **API request body** for `HTTP POST` endpoints. May differ from the Create Schema when transformation is needed (e.g., accepting a file upload that becomes an `imageUrl` string in storage).
 
 ##### 🔧 Update Schema
 
--   Describes partial updates to existing documents.
--   Often allows optional fields for flexible updates.
+Describes **partial updates** to existing records. All fields are typically optional to allow flexible modifications.
 
 ##### 📥 Put Schema
 
--   Defines the structure of the data received via `HTTP PUT`.
--   May differ from the update schema (e.g. an object has an `imageUrl` field stored but the user uploads an image file instead of sending the `imageUrl` string).
+Defines the **API request body** for `HTTP PUT` endpoints. May differ from the Update Schema when transformation is needed (e.g. raw image to imageUrl).
+
+> **Note:** REST conventions suggest using `PATCH` for partial updates, but `PUT` is used here due to its wider adoption and familiarity.
 
 ##### 📄 Read Schema
 
--   Used when retrieving data from the database to return to clients.
--   Sensitive or internal fields (e.g., passwords) are omitted for security.
+Used when **returning data to clients**. Excludes sensitive or internal fields (e.g., password hashes, internal IDs) for security.
+
+##### 🔍 Filter Schema
+
+Defines **which fields and operations are available for filtering** data (e.g., `age=gte:30` for `age >= 30`, `name=like:John` for `name contains "John"`).
+
+> **Implementation detail:** In addition to the Filter Schema, **type literals** are defined to specify:
+>
+> - **Selectable fields** – Which fields can be returned in responses (e.g., `placeSelectableFields`)
+> - **Searchable fields** – Which fields can be filtered on (e.g., `placeSearchableFields`)
+> - **Sortable fields** – Which fields can be used for sorting, including direction (e.g., `placeSortableFields: ["createdAt", "-createdAt"]`)
+>
+> These literals provide type safety and are used to construct the complete search API.
 
 ##### 📃 Paginated Data Schema
 
--   Used when returning search results in pages.
--   Handles metadata like `totalCount`, `page`, `pageSize`, and `data`.
+Wraps search results with **pagination metadata**: `totalCount`, `page`, `pageSize`, and the `data` array.
 
-##### 🔍 Filters Schema
+#### 📁📁 ORM
 
--   Defines the format for complex queries with filters, sorting, paginating etc...
+The `/orm` folder contains the **implementation of each model** using the chosen ORM (SQLAlchemy, TypeORM, GORM, or SeaORM).
 
-#### 📁📁 Collections
+ORMs are preferred over raw SQL queries because they offer:
 
-Depending on the programming language and available stack, an ORM or ODM (Object Document Mapper) may be used to interact with the MongoDB database.
+- **Type safety** – Catch errors at compile/transpile time, or via static analysis tools (e.g., MyPy for Python)
+- **Easier refactoring** – Rename fields once, changes propagate everywhere
+- **Cross-dialect compatibility** – Same code works across PostgreSQL versions
 
-The `/collections` folder contains the **implementation of each model** using the chosen ORM/ODM.
+#### 📁📁 Migrations
 
-Each collection ties the schema definitions to the actual database logic, enabling CRUD operations, relationships, and additional behaviors.
+The `/migrations` folder contains **database migration files** that track and apply schema changes over time.
 
-#### 📁📁 Crud
+Each migration file:
 
-For each collection, a corresponding **CRUD object** is created to encapsulate its business logic—handling all Create, Read, Update, and Delete operations.
+- Creates or alters tables based on ORM definitions
+- Adds/removes columns, indexes, and constraints
+- Ensures database schema stays in sync with code
+- Provides rollback capability for reverting changes
 
-To promote structure and security, CRUD operations are organized into **three layers**:
+Migration workflows vary by stack:
 
-1. **`*Document` methods**: Direct interaction with the ORM/database layer.
-2. **Main methods**: High-level interface that uses schemas (e.g., converts `PostSchema` → `CreateSchema`).
-3. **`user*` methods**: Add authorization and access control logic. A user needs to be passed as parameter to check if allowed to perform the crud operation.
+- **TypeScript/Express** – TypeORM handles both ORM and migrations
+- **Python/FastAPI** – Alembic manages migrations for SQLAlchemy
+- **Go/Gin** – Atlas (provides TypeORM/Alembic-like declarative migrations for GORM)
+- **Rust/Axum** – sea-orm-migration (official SeaORM migration tool via `sea-orm-cli`)
+
+#### 📁📁 CRUDS
+
+For each model, a corresponding **CRUDS class** is created to encapsulate all **Create, Read, Update, Delete, and Search** operations.
+
+**CRUDS** stands for:
+
+- **C** → Create
+- **R** → Read
+- **U** → Update
+- **D** → Delete
+- **S** → Search
+
+> **Why the extra "S"?** Traditional CRUD's "Read" typically covers simple ID-based retrieval. The added **"S" for Search** represents a sophisticated query API that combines filtering, sorting, field selection, and pagination—distinguishing `get(id)` from complex `search(query)` operations.
+
+CRUDS operations are organized into **four layers**:
+
+CRUDS operations are organized into **four layers**:
+
+1. **Core methods** (`create`, `read`, `update`, `delete`, `search`) – Direct database operations using the ORM
+2. **HTTP methods** (`post`, `get`, `put`, `delete`, `paginate`) – Methods exposed via HTTP endpoints (`delete` stays the same as the core method)
+3. **Authorization hooks** (`authPost`, `authGet`, `authPut`, `authDelete`, `authSearch`) – Validate user permissions and throw 401/403 errors when unauthorized
+4. **User methods** (`userPost`, `userGet`, `userPut`, `userDelete`, `userSearch`/`userPaginate`) – Combine authorization + HTTP methods for authenticated endpoints. The **user method** calls its corresponding **auth method** for validation, then executes the **core/HTTP method** to perform the actual operation.
 
 Below the operations breakdown
 
-##### 📄 get
+##### ✏️ Create
 
--   `getDocument`: Fetches a single raw ORM object by ID.
--   `get`: Returns the object in a `ReadSchema` format.
--   `userGet`: Ensures the requesting user has access to the document.
+- `create(data)`: Takes a `CreateSchema` and inserts a new record into the database, returns the new ID
+- `postToCreate(data)`: Transforms HTTP `PostSchema` to internal `CreateSchema` (e.g., file upload → imageUrl)
+- `post(form)`: Combines transformation + creation, returns the created record as `ReadSchema`
+- `authPost(user, form)`: Authorization hook—override to validate user permissions. Takes a `User` and a `PostSchema` and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission or attempts to set restricted fields or values
+- `userPost(user, form)`: Takes a `User` and a `PostSchema`, checks the user authorization before posting (combines `authPost()` and `post()`)
 
-##### 📚 fetch
+##### 📄 Read
 
--   `fetchDocuments`: Queries the DB with filters, projections, pagination, etc.
--   `fetch`: Returns results in a `PaginatedDataSchema` format.
--   `userFetch`: Restricts results to data the user has access to.
+- `read(id)`: Fetches a raw ORM entity by ID, returns `null` if not found
+- `get(id)`: Takes an ID and returns a single record in `ReadSchema` format, throws an HTTP 404 NOT_FOUND error if not found
+- `authGet(user, data)`: Authorization hook—override to validate user access to the record. Takes a `User` and a `ReadSchema` and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission to read the data
+- `userGet(user, id)`: Takes a `User` and an ID, checks authorization before reading (combines `authGet()` and `get()`)
 
-##### ✏️ create
+##### 🛠️ Update
 
--   `createDocument`: Creates a new record using a `CreateSchema`, inside a transaction.
--   `create`: Converts a `PostSchema` to a `CreateSchema`, then calls `createDocument`.
--   `userCreate`: Prevents unauthorized field assignment or object relations (e.g., assigning ownership improperly).
+- `update(id, data)`: Takes an `UpdateSchema` and updates an existing record, throws an exception if not found
+- `putToUpdate(data)`: Transforms HTTP `PutSchema` to internal `UpdateSchema`
+- `put(id, form)`: Combines transformation + update, returns updated record as `ReadSchema`
+- `authPut(user, id, form)`: Authorization hook—override to validate update permissions. Takes a `User`, an ID, and a `PutSchema` and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission or attempts to set restricted fields or values
+- `userPut(user, id, form)`: Takes a `User`, an ID, and a `PutSchema`, checks authorization before updating (combines `authPut()` and `put()`)
 
-##### 🛠️ update
+##### 🗑️ Delete
 
--   `updateDocument`: Updates an existing record using an `UpdateSchema`, inside a transaction.
--   `update`: Converts a `PutSchema` to an `UpdateSchema`, then calls `updateDocument`.
--   `userUpdate`: Prevents illegal changes to relationships or protected fields.
+- `delete(id)`: Takes an ID and deletes the record, throws a 404 exception if not found
+- `authDelete(user, id)`: Authorization hook—override to validate deletion permissions. Takes a `User` and an ID and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission to delete the record
+- `userDelete(user, id)`: Takes a `User` and an ID, checks authorization before deleting (combines `authDelete()` and `delete()`)
 
-##### 🗑️ delete
+##### 🔍 Search
 
--   `deleteDocument`: Deletes a record using a Mongo transaction.
--   `delete`: Delete a record by id.
--   `userDelete`: Ensures the user is authorized to delete the object.
+- `search(query: FindQuery)`: Takes a query with filters, sorting, and field selection
+- `paginate(query: FindQuery)`: Takes a query and returns paginated results with metadata (`page`, `totalPages`, `totalCount`, `data`)
+- `authSearch(user, query)`: Authorization hook—override to modify query and restrict results based on user permissions
+- `userSearch(user, query)`: Applies authorization filters before searching (combines `authSearch()` and `search()`)
+- `userPaginate(user, query)`: Applies authorization filters before paginating (combines `authSearch()` and `paginate()`)
 
 #### 📁📁 Examples
 
-This folder contains **example documents** for each model, along with utility methods to **seed/dump the database** for testing.
+This folder contains **example records** for each model, along with utility methods to **seed and dump the database** for testing and development.
 
-Each example is structured using the `SeedSchema` defined in the `schemas/` folder.
+Each example is structured using the `SeedSchema` defined in the `schemas/` folder, which may include reference placeholders (e.g., `_creatorRef`) that get resolved to actual IDs during the seeding process.
+
+**Typical contents:**
+
+- Sample data fixtures for each model
+- Seeding scripts to populate the database
+- Dump utilities to export data for backup or migration
 
 ### 📁 Core
 
-In a SaaS application, the data is used to **perform actions** and **deliver services** for each user—this is the role of the `/core` layer.  
-It contains the **core business logic** that defines how the application uses data to fulfill its purpose.
+In a full-featured application, the `/core` layer contains **business logic** that orchestrates data operations to deliver complex functionality beyond basic CRUDS.
 
-> This project does not include a `/core` folder, as it is just a basic CRUD API.
+The Core layer uses CRUDS methods from **Models** and clients from **Services** to implement multi-step workflows, enforce business rules, and coordinate cross-model operations.
+
+> **Note:** This project does not include a `/core` folder, as it is a basic CRUDS API demonstration.
 
 ### 📁 Background
 
 The `/background` folder contains code responsible for **executing background jobs**—tasks that run **outside the scope of an API request**.
 
-These jobs often **manipulate data** defined in `/models` and apply **business logic** from `/core` or `/lib`.
+These jobs often **manipulate data** defined in `/models` and apply **business logic** from `/core`.
 
-For this reason, `/background` should sit higher in the import order than the other modules.
+For this reason, `/background` sits higher in the import order.
 
-Some models or core logic may trigger background jobs (e.g. updating an embedding vector after a CRUD operation). To avoid circular imports, **publishers** (functions that enqueue tasks) and **handlers** (functions that process tasks) are separated into two modules that do not import each other.
+Some models or core logic may trigger background jobs (e.g., updating an embedding vector after a CRUDS operation). To avoid circular imports, **publishers** (functions that enqueue tasks) and **handlers** (functions that process tasks) are separated into modules that do not import each other.
 
-A model can import a publisher to trigger a task, while a handler can import the same model to process that task.
+A model can import a publisher to trigger a task, while a handler can import the same model to process that task—avoiding circular dependencies.
 
-**publishers** and **handlers** may share common parameters (e.g. broker URLs, task names, queue names, execution order). A third **setup** module is used to store these shared parameters, which both **publishers** and **handlers** import.
+**publishers** and **handlers** share common parameters (e.g., broker URLs, task names, queue names, execution order). A **bgconfig** module stores these shared parameters, which both publishers and handlers import.
 
-**crons** is the fourth submodule of `/background`. It contains tasks that periodically trigger jobs by calling a **publisher**.
+**crons** is the fourth submodule of `/background`. It contains scheduled tasks that periodically trigger jobs by calling a **publisher**.
 
-The import order within `/background` is as follows:
+**Import order within `/background`:**
 
--   **crons**
--   **publishers**
--   **handlers**
--   **setup**
+1. **bgconfig** (lowest - shared config)
+2. **publishers** (imports setup, can be imported by models)
+3. **crons** (imports publishers)
+4. **handlers** (highest - imports setup + models)
+
+### 📁 Bin
+
+Includes scripts for **data migration**, **debugging**, or **manual testing**.
+
+> This folder was initially named **scripts**. It was renamed to **bin** because **Rust** provides special support for executing code placed in this directory.
 
 ### 📁 API
 
@@ -279,197 +367,167 @@ It includes the following subfolders:
 
 Contains middleware functions that apply logic **before or after route handling**, including:
 
--   **Authentication & Authorization**
--   **CORS policies**
--   **Data validation**
--   **Error handling**
+- **Authentication & Authorization**
+- **CORS policies**
+- **Request/Response validation**
+- **Error handling**
+- **Rate limiting**
 
-> ⚠️ Some frameworks (like FastAPI) use dependency injection for middleware-like behavior. However, the **concept maps closely to route-level middleware** in frameworks like Express or Gin.
+> ⚠️ Different frameworks implement this concept differently: **Express/Gin** use traditional middleware functions, **FastAPI** uses dependency injection (`Depends()`), and **Axum** uses extractors for request data and Tower middleware layers for cross-cutting concerns. Despite these implementation differences, the core concept remains the same: reusable logic that executes around route handlers and extracts data from the incoming request.
 
 #### 📁📁 Docs
 
-Contains code responsible for setting up the **Swagger UI**
+Contains code responsible for setting up the **Swagger/OpenAPI documentation**.
 
-> ⚠️ Depending on the framework:
->
-> -   **FastAPI**: Automatically generates Swagger UI from route and schema definitions.
-> -   **Express/Gin/Axum**: May require manual setup using tools like `swagger-jsdoc`, comments, or YAML/JSON files.
+**Documentation generation varies by framework**:
+
+- **Express**: Manual setup using `swagger-jsdoc` or decorators
+- **FastAPI**: Automatically generates Swagger UI from route and schema definitions
+- **Gin**: Uses `swaggo/swag` with comment annotations to generate OpenAPI specs
+- **Axum**: Manual setup using `utoipa` crate for Rust macro-based documentation
 
 #### 📁📁 Routes
 
-Defines the actual **REST API endpoints** for each resource / data model.
+Defines the actual **REST API endpoints** for each resource/data model.
 
-Each model exposes a standardized set of **6 CRUD endpoints**, ensuring consistency across all backends:
+Each model exposes a standardized set of **6 CRUDS endpoints**, ensuring consistency across all backends:
 
-| Method | Path                    | Purpose                                  | Input Schema   | Output Schema       | CRUD Function |
-| ------ | ----------------------- | ---------------------------------------- | -------------- | ------------------- | ------------- |
-| GET    | `/model-name/`          | Search with filters via query parameters | (Query Params) | PaginatedDataSchema | `*Fetch()`    |
-| POST   | `/model-name/query`     | Search with filters via request body     | SearchSchema   | PaginatedDataSchema | `*Fetch()`    |
-| POST   | `/model-name/`          | Create a new record                      | PostSchema     | ReadSchema          | `*Create()`   |
-| GET    | `/model-name/:objectId` | Retrieve a single record by ID           | –              | ReadSchema          | `*Get()`      |
-| PUT    | `/model-name/:objectId` | Update an existing record                | PutSchema      | ReadSchema          | `*Update()`   |
-| DELETE | `/model-name/:objectId` | Delete a record by ID                    | –              | –                   | `*Delete()`   |
+| Method | Path                 | Purpose                                  | Input Schema | Output Schema       | CRUDS Method                     |
+| ------ | -------------------- | ---------------------------------------- | ------------ | ------------------- | -------------------------------- |
+| GET    | `/model-name/`       | Search with filters via query parameters | Query Params | PaginatedDataSchema | `paginate()` or `userPaginate()` |
+| POST   | `/model-name/search` | Search with filters via request body     | SearchSchema | PaginatedDataSchema | `paginate()` or `userPaginate()` |
+| POST   | `/model-name/`       | Create a new record                      | PostSchema   | ReadSchema          | `post()` or `userPost()`         |
+| GET    | `/model-name/:id`    | Retrieve a single record by ID           | Query Params | ReadSchema          | `get()` or `userGet()`           |
+| PUT    | `/model-name/:id`    | Update an existing record                | PutSchema    | ReadSchema          | `put()` or `userPut()`           |
+| DELETE | `/model-name/:id`    | Delete a record by ID                    | –            | –                   | `delete()` or `userDelete()`     |
 
-Each route is tied to a corresponding method in the related CRUD module for consistent error handling and logic reuse.
+> **Note:** For `GET /model-name/`, query params are parsed and converted into a `SearchSchema` via middleware. For `GET /model-name/:id`, optional `fields` query param controls which fields are returned.
 
-##### 🔍 Querying
+##### 🔍 Search API
 
-In the REST philosophy, the `GET` verb is used to retrieve data, while `POST` is typically used to create resources.
+The `GET /model-name/` and `POST /model-name/search` endpoints support advanced filtering, field selection, sorting, and pagination.
 
-A limitation of `GET` requests is that they **do not support a request body**, which restricts how advanced queries can be expressed. Instead, filtering must rely on **query parameters**:
+**Accepted query parameters:**
 
-```
-/model-name?age=25&name=Slim
-```
+- `page` and `size` – Pagination controls
+- `fields` – Select which fields to return (field projection)
+- `sort` – Sort order (prefix with `-` for descending)
+- Filter fields – Any filterable field with optional operators
 
-This simple syntax works for basic use cases, but it falls short when:
+Each filtering query parameter follows the pattern: **`field=operator:value`**
 
--   Filtering by a **range** (e.g. age between 30 and 40)
--   Matching **substrings** or patterns (e.g. names containing a keyword)
--   Filtering on **nested fields** (e.g. `address.zipcode`)
+If no operator is provided, `eq` (equals) is assumed. For nested fields, aliases may be used (e.g., `zipcode` for `address.zipcode`).
 
-Using a JSON body in a `POST` request would solve this, but that would break REST principles. To address this, a more expressive **query parameter syntax** is used.
+**Supported operators:**
 
-Each query parameter follows the pattern: `field=operator:value`. If no operator is given, `eq` (equals) is assumed. For nested fields, an alias may be used like `addressZipcode` or just `zipcode` to filter on the `address.zipcode` nested property.
+| Operator | Meaning                  | Example                    |
+| -------- | ------------------------ | -------------------------- |
+| `eq`     | Equals                   | `age=eq:30`                |
+| `ne`     | Not equals               | `status=ne:inactive`       |
+| `gt`     | Greater than             | `age=gt:18`                |
+| `gte`    | Greater or equal         | `age=gte:21`               |
+| `lt`     | Less than                | `price=lt:100`             |
+| `lte`    | Less or equal            | `age=lte:65`               |
+| `in`     | In list                  | `status=in:active,pending` |
+| `nin`    | Not in list              | `role=nin:admin,moderator` |
+| `like`   | Pattern match (SQL LIKE) | `name=like:John%`          |
+| `regex`  | Regex match              | `email=regex:.*@gmail.com` |
 
-The different operations to be used are inspired by MongoDB’s query language:
-
-```
-operations = {
-    eq: "$eq",
-    ne: "$ne",
-    gt: "$gt",
-    gte: "$gte",
-    lt: "$lt",
-    lte: "$lte",
-    in: "$in",
-    nin: "$nin",
-    regex: "$regex",
-    text: "$text",
-}
-```
-
-For example, the following request:
-`/user?age=lte:40&age=gte:30&name=regex:Slim&zipcode=2040`
-
-Would return users
-
--   whose age is between 30 and 40
--   whose name contains `'Slim'`
--   whose address has a `zipcode=2040`
-
-This will translate to the following mongoDB query
+**Example GET request:**
 
 ```
-{
-  age: {
-    $lte: 40,
-    $gte: 30
-  },
-  name: {
-    $regex: "Slim"
-  },
-  "address.zipcode": {
-    $eq: 2040
-  }
-}
-
+/users?fields=name,age&age=gte:30&age=lte:40&name=like:%Slim%&zipcode=2040&sort=-age
 ```
 
-> A post processing of the query parameters to convert nested fields filter names may be needed (e.g. from `zipcode` to `address.zipcode`)
+Returns:
 
-##### 🔁 REST vs GraphQL
+- User's `name` and `age` fields only (`fields=name,age`)
+- Users whose age is between 30 and 40 (`age=gte:30&age=lte:40`)
+- Whose name contains `'Slim'` (`name=like:%Slim%`)
+- Whose address has `zipcode=2040` (`zipcode=2040`)
+- Sorted by descending age (`sort=-age`)
 
-A common limitation of REST APIs is **over-fetching** — retrieving more data than needed. For example, you may only need a few fields, but the API returns the entire object. This increases the size of the HTTP response, leading to higher latency and unnecessary load on the backend server.
+This translates to SQL similar to:
 
-Another issue arises with **GET request limitations**. Most browsers and servers enforce a maximum URL length (e.g. **2,083 characters in Internet Explorer**). For complex or deeply nested queries, this limit can be exceeded.
+```sql
+SELECT name, age FROM users
+WHERE age >= 30
+  AND age <= 40
+  AND name LIKE '%Slim%'
+  AND address->>'zipcode' = '2040'
+ORDER BY age DESC
+```
 
-**GraphQL** addresses both problems by allowing clients to:
+> **Note:** Query params are parsed and converted into a `SearchSchema` via middleware before being passed to the CRUDS `paginate()` method.
 
--   Specify exactly what data they want
--   Use a JSON body for flexible and complex queries
+##### 📤 POST /model-name/search - Advanced Search
 
-However, GraphQL comes with additional complexity, and in many cases, a well-designed REST API remains simpler and more approachable.
+To overcome `GET` request limitations (URL length, lack of request body), the **`POST /model-name/search`** endpoint provides the same functionality using a JSON body.
 
-To bring some of GraphQL's flexibility into REST, this project introduces a **`POST /model-name/query`** endpoint.
+The main advantage is to circumvent GET requests' URL length restrictions (~2,000 characters) for complex queries.
 
-It offers the same functionality as `GET /model-name`, but with more powerful querying capabilities, including:
-
--   **Advanced filters**
--   **Nested fields**
--   **Field projection**
-
-The following json body
+**Example request body:**
 
 ```json
 {
-    "name": ["regex:Slim"],
-    "age": ["gte:30", "lte:40"],
-    "zipcode": [2040],
+    "filters": {
+        "age": ["gte:30", "lte:40"],
+        "name": ["like:%Slim%"],
+        "zipcode": ["2040"]
+    },
+    "fields": ["name", "age"],
+    "sort": ["-age"],
     "page": 1,
-    "size": 100,
-    "sort": ["name"],
-    "fields": ["id", "name", "address.zipcode"]
+    "size": 50
 }
 ```
 
-would generate this MongoDB query
+This is equivalent to:
 
-```js
-db.users
-    .find(
-        {
-            name: { $regex: 'Slim' },
-            age: { $gte: 30, $lte: 40 },
-            'address.zipcode': { $eq: 2040 },
-        },
-        {
-            id: 1,
-            name: 1,
-            'address.zipcode': 1,
-        }
-    )
-    .sort({ name: 1 })
-    .skip(0)
-    .limit(100);
+```
+/users?fields=name,age&age=gte:30&age=lte:40&name=like:%Slim%&zipcode=2040&sort=-age
 ```
 
-### 📁 Bin
-
-Includes scripts for **data migration**, **debugging**, or **manual testing**.
-
-> This folder was initially named **scripts**. It was renamed to **bin** because **Rust** provides special support for executing code placed in this directory.
+> **Note:** Filter values are always arrays because multiple operators can be applied to the same field (e.g., `age` has both `gte:30` and `lte:40`).
 
 ### 📁 Entrypoint
 
-A single file responsible for starting the HTTP server and running the REST API (e.g. `index.ts`, `app.py`, `app.go`, `main.rs`).
+A single file responsible for **starting the HTTP server** and running the REST API (e.g., `index.ts`, `app.py`, `app.go`, `main.rs`).
 
-Located at the top of the import order, it imports the endpoints defined in the `/api` folder, sets up application dependencies by calling `/services/setup`, and starts the server.
+Located at the **top of the import order**, the entrypoint:
+
+- Imports the router/endpoints from `/api`
+- Calls `/services/setup` to initialize database connections and external services
+- Starts the HTTP server and begins listening for requests
+
+This is the application's main entry point.
 
 ### 📁 Tests
 
-Contains **unit tests** and other automated tests used to validate the application logic.
+Contains **unit tests**, **integration tests**, and other automated tests used to validate the application logic.
 
-`/tests` naturally sits at the top of the import order, allowing it to import all other modules.
+`/tests` naturally sits at the top of the import order alongside `/entrypoint`, allowing it to import and test all other modules without being imported by them.
 
-## 📐 Frontend Strcuture
+## 📐 Frontend Structure
+
+While backend architecture focuses on data and business logic, frontend structure emphasizes component reusability and user experience. Despite framework-specific differences, a common organizational pattern emerges across all implementations.
 
 ### 📁 `/src` Folder
 
 Each framework has its own specifics and terminology, but a common structure can be identified.
 
-#### 📁📁 Entrypoints
+#### 📁📁 Entrypoint
 
 Entry files that initialize the application (`main`) and define the root component (`App`):
 
--   **React** → `main.tsx` + `App.tsx`
--   **Vue** → `main.ts` + `App.vue`
--   **Svelte** → `main.ts` + `App.svelte`
--   **Angular** → `main.ts` + `app.component.ts` (via `AppModule`)
+- **React** → `main.tsx` + `App.tsx`
+- **Vue** → `main.ts` + `App.vue`
+- **Svelte** → `main.ts` + `App.svelte`
+- **Angular** → `main.ts` + `app.component.ts` (via `AppModule`)
 
 #### 📁📁 Pages
 
-Top-level components that represent whole pages
+Top-level components that represent **entire routes/pages** (e.g., `/login`, `/dashboard`, `/profile`)
 
 #### 📁📁 Components
 
@@ -477,7 +535,7 @@ Reusable UI components and layout building blocks. This convention is shared acr
 
 #### 📁📁 Store
 
-Holds application state management logic.
+Holds **application state management** logic (e.g., user session, global UI state, cached data)
 
 #### 📁📁 Lib
 
@@ -493,7 +551,7 @@ Static files such as images, icons, and fonts.
 
 ### 🎨 Theme Colors
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) with a custom naming system.  
+This project uses [Tailwind CSS](https://tailwindcss.com/) with a custom naming system.
 The goal is consistency, clarity, and avoiding clashes with Tailwind’s built-in keywords.
 
 #### 🖼️ Surface
@@ -503,9 +561,9 @@ The term **surface** is preferred over `background` and `bg` to avoid naming col
 
 Variations:
 
--   `surface` → page/app background (primary canvas)
--   `surface-alt` → alternative/raised surfaces (e.g. cards)
--   `surface-on` → hover/focus/highlight used on top of the surface
+- `surface` → page/app background (primary canvas)
+- `surface-alt` → alternative/raised surfaces (e.g. cards)
+- `surface-on` → hover/focus/highlight used on top of the surface
 
 ```css
 --color-surface: var(--color-white);
@@ -515,15 +573,15 @@ Variations:
 
 #### 📋 Panel
 
-`panel-*` represents the **complementary surface layer** — usually opposite in brightness to the main `surface`.  
-This allows for clear contrast zones, such as side panels, headers/footers, or sticky overlays.  
+`panel-*` represents the **complementary surface layer** — usually opposite in brightness to the main `surface`.
+This allows for clear contrast zones, such as side panels, headers/footers, or sticky overlays.
 `surface`/`panel` is conceptually similar to Bootstrap’s `light`/`dark` themes.
 
 Variations:
 
--   `panel` → primary complementary surface
--   `panel-alt` → alternative/raised complementary surface
--   `panel-on` → hover/focus/highlight used on top of the panel
+- `panel` → primary complementary surface
+- `panel-alt` → alternative/raised complementary surface
+- `panel-on` → hover/focus/highlight used on top of the panel
 
 ```css
 --color-panel: var(--color-stone-700);
@@ -533,15 +591,15 @@ Variations:
 
 #### ✒️ Pen
 
-`pen-*` methaphorically represents things written or drawn by a pen such as text, lines and borders.  
+`pen-*` methaphorically represents things written or drawn by a pen such as text, lines and borders.
 The term avoids collisions with Tailwind utilities like `text-*` or `border-*`.
 
 Variations:
 
--   `pen` → default text/ink color
--   `pen-muted` → secondary/less prominent text
--   `pen-ruler` → borders, dividers, or lines (as if drawn with a ruler)
--   `pen-inverse` → text/ink used on dark panels
+- `pen` → default text/ink color
+- `pen-muted` → secondary/less prominent text
+- `pen-ruler` → borders, dividers, or lines (as if drawn with a ruler)
+- `pen-inverse` → text/ink used on dark panels
 
 ```css
 --color-pen: var(--color-stone-700);
@@ -552,14 +610,14 @@ Variations:
 
 #### 🎨 Primary / Secondary / Success / Warning / Danger
 
-These groups follow a similar convention to **Bootstrap’s contextual colors**.  
+These groups follow a similar convention to **Bootstrap’s contextual colors**.
 They serve both **theming** (primary/secondary) and **functional roles** (success/warning/danger).
 
--   `primary-*` and `secondary-*` → define the main theme colors of the dashboard along with `surface-*` and `panel-*`.
--   `success-*`, `warning-*`, `danger-*` → used for conveying functional meaning (feedback, alerts, validation).
--   Each group provides consistent variations:
-    -   `-on` → used for hover, focus, or active states
-    -   `-surface` → inverted version, aligned with the main `surface` brightness
+- `primary-*` and `secondary-*` → define the main theme colors of the dashboard along with `surface-*` and `panel-*`.
+- `success-*`, `warning-*`, `danger-*` → used for conveying functional meaning (feedback, alerts, validation).
+- Each group provides consistent variations:
+    - `-on` → used for hover, focus, or active states
+    - `-surface` → inverted version, aligned with the main `surface` brightness
 
 ```css
 --color-primary: var(--color-sky-400);
@@ -585,14 +643,14 @@ They serve both **theming** (primary/secondary) and **functional roles** (succes
 
 #### 🚫 Disabled
 
-The `disabled-*` group defines styles for **inactive or disabled form inputs**.  
+The `disabled-*` group defines styles for **inactive or disabled form inputs**.
 It ensures consistency across backgrounds, text, and borders.
 
 Variations:
 
--   `disabled-surface` → background of a disabled input
--   `disabled-pen` → text color of a disabled input
--   `disabled-ruler` → border/outline color of a disabled input
+- `disabled-surface` → background of a disabled input
+- `disabled-pen` → text color of a disabled input
+- `disabled-ruler` → border/outline color of a disabled input
 
 ```css
 --color-disabled-surface: var(--color-gray-300);
@@ -602,7 +660,7 @@ Variations:
 
 #### 🎭 Backdrop
 
-The `backdrop` color is used for **overlay layers** behind modals, dialogs, or drawers.  
+The `backdrop` color is used for **overlay layers** behind modals, dialogs, or drawers.
 It helps separate focus areas from the rest of the UI.
 
 ```css
@@ -611,5 +669,6 @@ It helps separate focus areas from the rest of the UI.
 
 ## 🚀 Next Steps
 
--   Add the **Rust/Axum** backend (ongoing)
--   Add an **Angular** SPA frontend
+- Migrate the **Python/FastAPI** and **Go/Gin** backends to PostgreSQL (ongoing)
+- Add the **Rust/Axum** backend (ongoing)
+- Add an **Angular** SPA frontend
