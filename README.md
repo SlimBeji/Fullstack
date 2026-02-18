@@ -260,8 +260,6 @@ For each model, a corresponding **CRUDS class** is created to encapsulate all **
 
 CRUDS operations are organized into **four layers**:
 
-CRUDS operations are organized into **four layers**:
-
 1. **Core methods** (`create`, `read`, `update`, `delete`, `search`) – Direct database operations using the ORM
 2. **HTTP methods** (`post`, `get`, `put`, `delete`, `paginate`) – Methods exposed via HTTP endpoints (`delete` stays the same as the core method)
 3. **Authorization hooks** (`authPost`, `authGet`, `authPut`, `authDelete`, `authSearch`) – Validate user permissions and throw 401/403 errors when unauthorized
