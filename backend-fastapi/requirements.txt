@@ -11,10 +11,15 @@ python-jose[cryptography]
 types-python-jose
 bcrypt
 
-# MongoDB & Redis
+# PostgreSQL & Redis
+sqlalchemy[asyncio]
+asyncpg
+alembic
+redis
+
+# Deprecated
 beanie
 motor
-redis
 
 # Tasks
 dramatiq[redis]

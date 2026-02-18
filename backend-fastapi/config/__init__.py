@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     ENV: Literal["dev", "test", "production"]
 
     # DATABASE
+    DATABASE_URL: str
+    DATABASE_TEST_URL: str
     MONGO_URL: str
     MONGO_DBNAME: str
     MONGO_TEST_DBNAME: str = "tests"
