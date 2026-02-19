@@ -1,20 +1,13 @@
 import asyncio
-from typing import Any
 
 from models.crud import crud_place
 from services.setup import close_all, start_all
 
 
-def echo(output: Any):
-    print("--------------------------")
-    print(output)
-    print("--------------------------")
-
-
 async def debug():
     place = await crud_place.get("689caa667815c102e5d7f0df")
     if place:
-        echo(place.model_dump())
+        print(place.model_dump())
 
 
 async def main():
