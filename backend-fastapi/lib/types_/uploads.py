@@ -31,6 +31,7 @@ class FileToUpload:
 
     @classmethod
     def validate(cls, file: UploadFile | Self) -> Self:
+        """Size validation for the file"""
         if isinstance(file, cls):
             if len(file.buffer) > cls.MAX_SIZE * 1024 * 1024:
                 raise ValueError(f"File too large (> {cls.MAX_SIZE} MB)")
@@ -47,6 +48,7 @@ class FileToUpload:
 
     @classmethod
     def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
+        """Special Pydantic method"""
         return core_schema.no_info_after_validator_function(
             cls.validate,
             core_schema.union_schema(
@@ -61,10 +63,13 @@ class FileToUpload:
     def __get_pydantic_json_schema__(
         cls, _core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
     ) -> dict[str, Any]:
+        """Special Pydantic method"""
         return dict(type="string", format="binary")
 
     @classmethod
     def __class_getitem__(cls, size_mb: int) -> type[Self]:
+        """Return a FileToUpload with a custom max file size"""
+
         class FileWithCustomLimit(cls):  # type: ignore
             MAX_SIZE = size_mb
 
