@@ -415,9 +415,12 @@ export const httpFilter = (
 
 const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     const usedOperators: FilterOperation[] = [];
+    const duplicate: FilterOperation[] = [];
+
+    // Rule 0: make sure no operator is used twice
     filters.forEach((f) => {
-        // make sure no operator is used twice
-        if (usedOperators.includes(f.op)) {
+        if (usedOperators.includes(f.op) && !duplicate.includes(f.op)) {
+            duplicate.push(f.op);
             ctx.addIssue({
                 code: zod.ZodIssueCode.custom,
                 message: `cannot use an operator twice for the same field. ${f.op} used multiple times`,
@@ -438,7 +441,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     }
 
     // Rule 2: if eq not used than null should be used exclusively
-    if (!eqUsed && usedOperators.includes("null") && length >= 2) {
+    else if (!eqUsed && usedOperators.includes("null") && length >= 2) {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
             message: `null operator should be used exclusively. ${usedOperators} used at the same time`,
@@ -446,7 +449,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     }
 
     // Rule 3: if eq not used than in should be used exclusively
-    if (!eqUsed && usedOperators.includes("in") && length >= 2) {
+    else if (!eqUsed && usedOperators.includes("in") && length >= 2) {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
             message: `in operator should be used exclusively. ${usedOperators} used at the same time`,
@@ -457,7 +460,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     if (usedOperators.includes("gt") && usedOperators.includes("gte")) {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
-            message: `gt and gte operators should not be used together. ${usedOperators} used at the same time`,
+            message: `gt and gte operators should not be used together`,
         });
     }
 
@@ -465,7 +468,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     if (usedOperators.includes("lt") && usedOperators.includes("lte")) {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
-            message: `lt and lte operators should not be used together. ${usedOperators} used at the same time`,
+            message: "lt and lte operators should not be used together",
         });
     }
 
@@ -473,18 +476,18 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     if (usedOperators.includes("like") && usedOperators.includes("ilike")) {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
-            message: `like and ilike operators should not be used together. ${usedOperators} used at the same time`,
+            message: "like and ilike operators should not be used together",
         });
     }
 
     // Rule 7: regex cannot be used with like/ilike
     if (
         usedOperators.includes("regex") &&
-        (usedOperators.includes("ilike") || usedOperators.includes("ilike"))
+        (usedOperators.includes("like") || usedOperators.includes("ilike"))
     ) {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
-            message: `regex should not be used along like or ilike operators. ${usedOperators} used at the same time`,
+            message: "regex should not be used along like or ilike operators",
         });
     }
 
