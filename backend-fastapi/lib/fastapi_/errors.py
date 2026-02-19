@@ -1,5 +1,8 @@
 from http import HTTPStatus
 
+from fastapi import Request, Response
+from fastapi.responses import JSONResponse
+
 from .types import CallNext
 
 
@@ -10,10 +13,6 @@ class ApiError(Exception):
         self.code = code
         self.message = message or "An unknown error occured"
         self.details = details or {}
-
-
-from fastapi import Request, Response
-from fastapi.responses import JSONResponse
 
 
 async def catch_exceptions(request: Request, call_next: CallNext) -> Response:
