@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel
@@ -5,7 +6,8 @@ from pydantic import BaseModel
 ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
 
 
-class PaginationData(BaseModel):
+@dataclass
+class PaginationData:
     page: int
     size: int
 
