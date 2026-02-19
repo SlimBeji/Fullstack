@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypedDict, TypeVar
 
 from pydantic import BaseModel
 
@@ -25,8 +24,8 @@ FilterOperation = Literal[
 ]
 
 
-@dataclass
-class Filter:
+# Using TypedDict instead of dataclass because of easy serialization
+class Filter(TypedDict):
     op: FilterOperation
     val: Any
 
