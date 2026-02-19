@@ -1,5 +1,4 @@
 import { pgClient } from "@/services/instances";
-import { closeDbs, connectDbs } from "@/services/setup";
 
 async function debug() {
     const tables = await pgClient.client.query(
@@ -9,5 +8,8 @@ async function debug() {
 }
 
 if (require.main === module) {
-    connectDbs().then(debug).finally(closeDbs);
+    pgClient
+        .connect()
+        .then(debug)
+        .finally(() => pgClient.close());
 }
