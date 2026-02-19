@@ -35,7 +35,7 @@ type WhereFilters[Searchables: str] = dict[Searchables, list[Filter]]
 
 class SearchQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
     page: int = 1
-    size: int
+    size: int | None = None
     orderby: list[Sortables] | None = None
     select: list[Selectables] | None = None
     where: WhereFilters[Searchables] | None = None
