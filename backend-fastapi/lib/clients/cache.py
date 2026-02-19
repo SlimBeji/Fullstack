@@ -1,13 +1,11 @@
 import json
-from typing import Any, Literal, ParamSpec, TypeVar
+from typing import Any, Literal
 
 import redis.asyncio as async_redis
 from pydantic import BaseModel
 
 from lib.utils.helpers import str_to_bool
 
-P = ParamSpec("P")
-R = TypeVar("R")
 OutputFormat = Literal["json", "int", "float", "bool", ""] | type[BaseModel]
 
 
@@ -32,7 +30,7 @@ class RedisClient:
         return self._client
 
     async def connect(self) -> None:
-        # Connect to the database
+        # Connect to the redis database
         if self._client is None:
             self._client = async_redis.Redis.from_url(self.uri)
             await self._client.ping()
