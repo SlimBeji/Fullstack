@@ -4,22 +4,21 @@ from lib.clients import (
     CloudStorageConfig,
     HuggingFaceClient,
     HuggingFaceClientConfig,
-    MongoClient,
-    MongoClientConfig,
+    PgClient,
+    PgClientConfig,
     RedisClient,
     RedisClientConfig,
 )
 
-mongo_config = MongoClientConfig(
-    uri=settings.MONGO_URL,
-    db_name=(
-        settings.MONGO_TEST_DBNAME
+pg_config = PgClientConfig(
+    uri=(
+        settings.async_db_test_url
         if settings.is_test
-        else settings.MONGO_DBNAME
-    ),
+        else settings.async_db_url
+    )
 )
-db = MongoClient(mongo_config)
 
+pg_client = PgClient(pg_config)
 
 redis_config = RedisClientConfig(
     uri=settings.REDIS_TEST_URL if settings.is_test else settings.REDIS_URL,

@@ -2,18 +2,18 @@ import asyncio
 
 from background.publishers import publisher
 from models.examples import dump_db, seed_db
-from services.instances import db, redis_client
+from services.instances import pg_client, redis_client
 
 
 async def connect_dbs() -> None:
     # when updating this, dont forget to update connect_dbs
     # in tasks/broker.py. This method was duplicated there
     # to avoid circular imports or complicated code reorganization
-    await asyncio.gather(db.connect(), redis_client.connect())
+    await asyncio.gather(pg_client.connect(), redis_client.connect())
 
 
 async def close_dbs() -> None:
-    await asyncio.gather(db.close(), redis_client.close())
+    await asyncio.gather(pg_client.close(), redis_client.close())
 
 
 async def start_all() -> None:
