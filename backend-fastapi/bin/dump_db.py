@@ -1,13 +1,13 @@
 import asyncio
 
 from models.examples import dump_db
-from services.setup import close_all, start_all
+from services.instances import pg_client
 
 
 async def main() -> None:
-    await start_all()
+    await pg_client.connect()
     await dump_db(True)
-    await close_all()
+    await pg_client.close()
 
 
 if __name__ == "__main__":
