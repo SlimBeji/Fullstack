@@ -1,13 +1,13 @@
 import asyncio
 
 from models.examples import seed_db
-from services.instances import pg_client
+from services.setup import close_dbs, connect_dbs
 
 
 async def main() -> None:
-    await pg_client.connect()
+    await connect_dbs()
     await seed_db(True)
-    await pg_client.close()
+    await close_dbs()
 
 
 if __name__ == "__main__":
