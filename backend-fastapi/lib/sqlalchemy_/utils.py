@@ -4,7 +4,7 @@ from sqlalchemy import Select
 from sqlalchemy.orm import InstrumentedAttribute
 
 from ..types_ import Filter, WhereFilters
-from .types import Join, OrderBy, SelectField
+from .types import OrderBy, SelectField, TableSelection
 
 
 def apply_order_by(
@@ -37,30 +37,30 @@ def apply_select(
     if len(clauses) == 0:
         return query
 
-    # Deduplicate fields and Joins
-    select_set: set[InstrumentedAttribute] = set()
-    joins_map: dict[InstrumentedAttribute, Join] = {}
+    tables: dict[str, TableSelection] = {}
+
     for clause in clauses:
         select_fields = map_func(clause)
         for select_field in select_fields:
-            if select_field.select not in select_set:
-                select_set.add(select_field.select)
             if select_field.joins:
-                for join in select_field.joins:
-                    if join.relation not in joins_map:
-                        joins_map[join.relation] = join
+                # Relationship field
+                table_name = select_field.tablename
+                path = [j.relation for j in select_field.joins]
+            else:
+                # Main entity field
+                table_name = ""
+                path = []
 
-    # Sort joins by level (parent before child)
-    sorted_joins = sorted(joins_map.values(), key=lambda j: j.level)
+            if table_name not in tables:
+                tables[table_name] = TableSelection(
+                    table_name=table_name, fields=set(), path=path
+                )
+            tables[table_name].fields.add(select_field.select)
 
-    # Apply joins in order
-    for join in sorted_joins:
-        query = query.join(join.relation, isouter=True)
+    # Apply all load options
+    for table_selection in tables.values():
+        query = query.options(table_selection.to_selection_load())
 
-    # Apply the select
-    query = query.with_only_columns(*select_set)
-
-    # Return query
     return query
 
 
