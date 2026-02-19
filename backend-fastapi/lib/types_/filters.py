@@ -1,34 +1,42 @@
+from dataclasses import dataclass
 from typing import Any, Generic, Literal, TypeVar
 
-from beanie import Insert, Replace, Update
 from pydantic import BaseModel
 
-SaveEvent = [Insert, Replace, Update]
-
-ChangeEvent = [Replace, Update]
-
-Sortables = TypeVar("Sortables", bound=str)
 Selectables = TypeVar("Selectables", bound=str)
+Sortables = TypeVar("Sortables", bound=str)
 Searchables = TypeVar("Searchables", bound=str)
 
 # ---- Public Types for searching data ----
 
 FilterOperation = Literal[
-    "eq", "ne", "gt", "gte", "lt", "lte", "in", "nin", "regex", "text", "exists"
+    "eq",
+    "ne",
+    "null",
+    "in",
+    "nin",
+    "lt",
+    "lte",
+    "gt",
+    "gte",
+    "like",
+    "ilike",
+    "regex",
 ]
 
 
-class Filter(BaseModel):
+@dataclass
+class Filter:
     op: FilterOperation
     val: Any
 
 
-type FindQueryFilters[Searchables: str] = dict[Searchables, list[Filter]]
+type WhereFilters[Searchables: str] = dict[Searchables, list[Filter]]
 
 
-class FindQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
+class SearchQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
     page: int = 1
     size: int
-    sort: list[Sortables] | None = None
-    fields: list[Selectables] | None = None
-    filters: FindQueryFilters[Searchables] | None = None
+    orderby: list[Sortables] | None = None
+    select: list[Selectables] | None = None
+    where: WhereFilters[Searchables] | None = None
