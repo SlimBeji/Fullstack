@@ -310,9 +310,6 @@ export class CrudsClass<
         options: Options = {} as Options
     ): Promise<Read> {
         const result = await this.get(id, options);
-        if (!result) {
-            throw this.notFoundError(id);
-        }
         await this.authGet(user, result);
         return result;
     }
