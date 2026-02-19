@@ -208,17 +208,57 @@ class HttpFilter(Generic[T]):
 
 def _field_filters_validator(filters: list[Filter]):
     used_operators: list[FilterOperation] = []
+    errors: list[str] = []
+    duplicate: list[str] = []
+
+    # Rule 0: make sure no operator is used twice
     for filter in filters:
         op = filter["op"]
-        if op in used_operators:
-            raise ValueError(
+        if op in used_operators and op not in duplicate:
+            duplicate.append(op)
+            errors.append(
                 f"cannot use an operator twice for the same field. {op} used multiple times"
             )
         used_operators.append(op)
-        if "eq" in used_operators and len(used_operators) >= 2:
-            raise ValueError(
-                f"eq can only be used exclusively. {used_operators} used at the same time"
-            )
+
+    length = len(used_operators)
+    eq_used = "eq" in used_operators
+
+    # Rule 1: eq should be used exclusively
+    if length >= 2 and eq_used:
+        errors.append(
+            f"eq can only be used exclusively. {used_operators} used at the same time"
+        )
+
+    # Rule 2: if eq not used than null should be used exclusively
+    elif not eq_used and "null" in used_operators and length >= 2:
+        errors.append(
+            f"null operator should be used exclusively. {used_operators} used at the same time"
+        )
+
+    # Rule 3: if eq not used than in should be used exclusively
+    elif not eq_used and "in" in used_operators and length >= 2:
+        errors.append(
+            f"in operator should be used exclusively. {used_operators} used at the same time"
+        )
+
+    # Rule 4: gt/gte cannot be used together
+    if "gt" in used_operators and "gte" in used_operators:
+        errors.append("gt and gte operators should not be used together")
+
+    # Rule 5: lt/lte cannot be used together
+    if "lt" in used_operators and "lte" in used_operators:
+        errors.append("lt and lte operators should not be used together")
+
+    # Rule 6: like/ilike cannot be used together
+    if "like" in used_operators and "ilike" in used_operators:
+        errors.append("like and ilike operators should not be used together")
+
+    # Rule 7: regex cannot be used with like/ilike
+    if "regex" in used_operators and (
+        "like" in used_operators or "ilike" in used_operators
+    ):
+        errors.append("regex should not be used along like or ilike operators")
 
     return filters
 
