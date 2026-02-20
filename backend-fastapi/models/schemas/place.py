@@ -220,7 +220,6 @@ class PlaceUpdateSchema(BaseModel):
     description: description_annot | None = None
     address: address_annot | None = None
     location: Location | None = None
-    creatorId: creatorId_annot | None = None
 
 
 class PlacePutSchema(PlaceUpdateSchema):
