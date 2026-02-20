@@ -30,7 +30,7 @@ async def get_users(
 
 
 @user_router.post(
-    "/query",
+    "/search",
     summary="Search and Retrieve users",
     response_model=UsersPaginatedSchema,
 )

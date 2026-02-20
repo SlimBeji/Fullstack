@@ -35,7 +35,7 @@ async def get_places(
 
 
 @place_router.post(
-    "/query",
+    "/search",
     summary="Search and Retrieve places",
     response_model=PlacesPaginatedSchema,
 )
