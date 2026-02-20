@@ -232,7 +232,7 @@ class PlacePutSchema(PlaceUpdateSchema):
 PlacesPaginatedSchema = PaginatedData[PlaceReadSchema] | PaginatedDict
 
 
-class PlaceFiltersSchema(
+class PlaceSearchSchema(
     BaseSearchSchema[PlaceSelectableFields, PlaceSortableFields]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
@@ -246,6 +246,6 @@ class PlaceFiltersSchema(
     locationLng: HttpFilters[lng_annot]
 
 
-PlaceFindQuery = SearchQuery[
+PlaceSearchQuery = SearchQuery[
     PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
 ]
