@@ -1,11 +1,15 @@
 import asyncio
 
-from models.crud import crud_place
+from models.cruds import CrudsPlace
+from services.instances import pg_client
 from services.setup import close_all, start_all
 
 
 async def debug():
-    place = await crud_place.get("689caa667815c102e5d7f0df")
+    async with pg_client.session() as session:
+        cruds = CrudsPlace(session)
+        place = await cruds.get(1)
+
     if place:
         print(place.model_dump())
 
