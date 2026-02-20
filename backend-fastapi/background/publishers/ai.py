@@ -1,9 +1,11 @@
-from beanie import PydanticObjectId
-from bson import ObjectId
 from dramatiq import Message
 
+from background.bgconfig import (
+    TASK_PLACE_EMBEDDING,
+    PlaceEmbbeddingData,
+    Queues,
+)
 from background.publishers.publisher import publisher
-from background.setup import TASK_PLACE_EMBEDDING, PlaceEmbbeddingData, Queues
 from config import settings
 
 

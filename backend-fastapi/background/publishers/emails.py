@@ -1,7 +1,7 @@
 from dramatiq import Message
 
+from background.bgconfig import TASK_NEWSLETTER, NewsletterData, Queues
 from background.publishers.publisher import publisher
-from background.setup import TASK_NEWSLETTER, NewsletterData, Queues
 from config import settings
 
 
