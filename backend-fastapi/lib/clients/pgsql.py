@@ -1,7 +1,13 @@
-from typing import List
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator, List
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 
 class PgClientConfig:
@@ -29,6 +35,9 @@ class PgClient:
         self.client: AsyncEngine = create_async_engine(
             self.uri, echo=False, pool_pre_ping=True
         )
+        self.session_maker = async_sessionmaker(
+            self.client, class_=AsyncSession
+        )
 
     async def connect(self) -> None:
         """Test the connection by executing a simple query"""
@@ -37,6 +46,12 @@ class PgClient:
 
     async def close(self) -> None:
         await self.client.dispose()
+
+    @asynccontextmanager
+    async def session(self) -> AsyncGenerator[AsyncSession, None]:
+        """Get a new session for each context block"""
+        async with self.session_maker() as session:
+            yield session
 
     async def list_tables(self) -> List[str]:
         async with self.client.connect() as conn:
