@@ -1,16 +1,18 @@
+import json
 from http import HTTPStatus
+from typing import TypedDict, get_args
 
-from beanie import PydanticObjectId
+from sqlalchemy import Float, select, text, update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import InstrumentedAttribute
 
 from background.publishers import place_embedding
 from lib.fastapi_ import ApiError
-from lib.types_ import Filter
-from models.collections.place import Place
-from models.crud.base import CrudBase, CrudEvent
+from lib.sqlalchemy_ import CrudsClass
+from lib.types_ import WhereFilters
+from models.orm import Place, User
 from models.schemas import (
     PlaceCreateSchema,
-    PlaceFiltersSchema,
-    PlaceFindQuery,
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
@@ -20,98 +22,208 @@ from models.schemas import (
     PlaceUpdateSchema,
     UserReadSchema,
 )
-from services.instances import cloud_storage
+from services.instances import cloud_storage, hf_client
+
+from .utils import user_exists
 
 
-class CrudPlace(
-    CrudBase[
+class PlaceOptions(TypedDict):
+    process: bool | None
+    fields: list[PlaceSelectableFields]
+
+
+class CrudsPlace(
+    CrudsClass[
         Place,
-        PlaceReadSchema,
-        PlaceSortableFields,
-        PlaceSelectableFields,
-        PlaceSearchableFields,
-        PlaceFiltersSchema,
+        User,
         PlaceCreateSchema,
         PlacePostSchema,
+        PlaceReadSchema,
+        PlaceSelectableFields,
+        PlaceSortableFields,
+        PlaceSearchableFields,
         PlaceUpdateSchema,
         PlacePutSchema,
+        PlaceOptions,
     ]
 ):
-    FILTER_FIELD_MAPPING: dict[str, str] = dict(
-        locationLat="location.lat", locationLng="location.lng"
-    )
+    # Init
 
-    def auth_check(
-        self,
-        user: UserReadSchema,
-        data: Place | PlacePostSchema | PlacePutSchema,
-        event: CrudEvent,
+    def __init__(self, session: AsyncSession):
+        super().__init__(
+            session,
+            Place,
+            list(get_args(PlaceSelectableFields)),
+            ["-createdAt"],
+        )
+
+    # Post-Processing
+
+    async def post_process(
+        self, raw: PlaceReadSchema | dict
+    ) -> PlaceReadSchema | dict:
+        # Handling dict
+        if isinstance(raw, dict):
+            image_url = raw.get("image_url")
+            if image_url:
+                raw["image_url"] = cloud_storage.get_signed_url(image_url)
+            return raw
+
+        # raw is a UserRead
+        if raw.imageUrl:
+            raw.imageUrl = cloud_storage.get_signed_url(raw.imageUrl)
+        return raw
+
+    # Query Building
+
+    def map_where(self, field: str) -> InstrumentedAttribute:
+        if field == "locationLat":
+            return self.model.location["lat"].astext.cast(Float)  # type: ignore
+        elif field == "locationLng":
+            return self.model.location["lng"].astext.cast(Float)  # type: ignore
+        else:
+            return super().map_where(field)
+
+    # Create
+
+    async def create(self, data: PlaceCreateSchema) -> int:
+        id = await super().create(data)
+        place_embedding(id)
+        return id
+
+    async def seed(
+        self, data: PlaceCreateSchema, embedding: list[float]
+    ) -> PlaceReadSchema:
+        id = await self.create(data)
+        await self.update_embedding(id, embedding)
+        return await self.get(id)
+
+    async def post_to_create(self, data: PlacePostSchema) -> PlaceCreateSchema:
+        json = data.model_dump(exclude_none=True, exclude_unset=True)
+        image = json.pop("image", None)
+        if image:
+            json["image_url"] = cloud_storage.upload_file(image)
+        else:
+            json["image_url"] = ""
+
+        return self.create_schema.model_construct(**json)
+
+    async def auth_post(
+        self, user: UserReadSchema, form: PlacePostSchema
     ) -> None:
-        if user is None:
-            raise ApiError(HTTPStatus.UNAUTHORIZED, "Not Authenticated")
+        if user.isAdmin:
+            if not await user_exists(self.session, form.creatorId):
+                raise ApiError(
+                    HTTPStatus.NOT_FOUND,
+                    "User not found",
+                    dict(
+                        message=f"Cannot set creatorId to {form.creatorId}, No user with id {form.creatorId} found in the database",
+                    ),
+                )
+
+        if user.id != form.creatorId:
+            raise ApiError(
+                HTTPStatus.UNAUTHORIZED,
+                "Accessdenied",
+                dict(message=f"Cannot add places to user {form.creatorId}"),
+            )
+
+    # Read
+
+    # Update
+
+    async def update(self, id: int | str, form: PlaceUpdateSchema) -> None:
+        record = await self.read(id)
+        if not record:
+            raise self.not_found_error(id)
+
+        description_changed = (
+            form.description and form.description != record.description
+        )
+        title_changed = form.title and form.title != record.title
+        await super().update(id, form)
+
+        if description_changed or title_changed:
+            place_embedding(record.id)
+
+    async def auth_put(
+        self, user: UserReadSchema, id: int | str, form: PlacePutSchema
+    ) -> None:
         if user.isAdmin:
             return
 
-        creatorId: PydanticObjectId | None = getattr(data, "creatorId", None)
-        if creatorId and str(creatorId) != str(user.id):
+        where: WhereFilters[PlaceSearchableFields] = {
+            "id": self.eq(id),
+            "creatorId": self.eq(user.id),
+        }
+        exists = await self.exists(where)
+        if not exists:
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                f"Access denied to creator {creatorId}",
+                "Access denied",
+                dict(message=f"Cannot access place {id}"),
             )
 
-    def add_ownership_filters(
-        self, user: UserReadSchema, query: PlaceFindQuery
-    ) -> PlaceFindQuery:
-        ownership_filters = [Filter(op="eq", val=user.id)]
-
-        if query.filters is None:
-            query.filters = {}
-
-        creatorId_filters = query.filters.get("creatorId", [])
-        creatorId_filters.extend(ownership_filters)
-        query.filters["creatorId"] = creatorId_filters
-        return query
-
-    async def _post_process_raw(self, item: dict) -> dict:
-        item = await super()._post_process_raw(item)
-        item.pop("embedding", None)
-        image_url: str | None = item.get("imageUrl", None)
-        if image_url is not None:
-            item["imageUrl"] = cloud_storage.get_signed_url(image_url)
-        return item
-
-    async def create(self, form: PlacePostSchema) -> PlaceReadSchema:
-        data = form.model_dump()
-        lat = data.pop("lat")
-        lng = data.pop("lng")
-        data["location"] = dict(lat=lat, lng=lng)
-        image = data.pop("image", None)
-        data["imageUrl"] = cloud_storage.upload_file(image)
-        create_form = PlaceCreateSchema(**data)
-        document = await self.create_document(create_form)
-        place_embedding(document.id)
-        return await self.post_process(document)
-
-    async def update(
-        self, document: Place, form: PlacePutSchema
-    ) -> PlaceReadSchema:
-        j = form.model_dump(exclude_none=True, exclude_unset=True)
-        update = self.update_schema(**j)
-        document = await self.update_document(document, update)
-
-        # Trigger new embedding if title or description changed
-        description_changed = (
-            form.description and form.description != document.description
+    async def update_embedding(self, id: int, embedding: list[float]) -> None:
+        stmt = (
+            update(self.model)
+            .where(self.model.id == id)
+            .values(embedding=text(f"'{json.dumps(embedding)}'::vector"))
         )
-        title_changed = form.title and form.title != document.title
-        if description_changed or title_changed:
-            place_embedding(document.id)
+        await self.session.execute(stmt)
+        await self.session.commit()
 
-        return await self.post_process(document)
+    async def embed(self, id: int) -> list[float]:
+        stmt = select(self.model.title, self.model.description).where(
+            self.model.id == id
+        )
+        result = await self.session.execute(stmt)
+        row = result.one_or_none()
 
-    async def delete_cleanup(self, document: Place):
-        if document.imageUrl:
-            cloud_storage.delete_file(document.imageUrl)
+        if not row:
+            raise ApiError(
+                HTTPStatus.NOT_FOUND,
+                f"No place with id {id} found in the database",
+            )
 
+        text = f"{row.title} - {row.description}"
+        embedding = await hf_client.embed_text(text)
 
-crud_place = CrudPlace()
+        try:
+            await self.update_embedding(id, embedding)
+        except Exception as err:
+            raise ApiError(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                "embedding failed",
+                dict(place_id=id, message=str(err)),
+            )
+
+        return embedding
+
+    # Delete
+
+    async def delete(self, id: int | str) -> None:
+        record = await self.get(id)
+        if not record:
+            raise self.not_found_error(id)
+        await super().delete(id)
+        if record.imageUrl:
+            cloud_storage.delete_file(record.imageUrl)
+
+    async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
+        if user.isAdmin:
+            return
+
+        where: WhereFilters[PlaceSearchableFields] = {
+            "id": self.eq(id),
+            "creatorId": self.eq(user.id),
+        }
+        exists = await self.exists(where)
+        if not exists:
+            raise ApiError(
+                HTTPStatus.UNAUTHORIZED,
+                "Access denied",
+                dict(message=f"cannot access place {id}"),
+            )
+
+    # Search
