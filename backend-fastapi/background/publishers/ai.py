@@ -8,7 +8,7 @@ from config import settings
 
 
 def place_embedding(
-    place_id: str | ObjectId | PydanticObjectId | None,
+    place_id: int,
 ):
     if settings.is_test or place_id is None:
         return
