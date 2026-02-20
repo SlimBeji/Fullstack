@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Mapping
 from http import HTTPStatus
 from typing import Any, Generic, TypeVar, cast, get_args
 
@@ -30,7 +31,7 @@ Sortables = TypeVar("Sortables", bound=str)
 Searchables = TypeVar("Searchables", bound=str)
 Update = TypeVar("Update", bound=BaseModel)
 Put = TypeVar("Put", bound=BaseModel)
-Options = TypeVar("Options", bound=dict)
+Options = TypeVar("Options", bound=Mapping)
 
 
 class CrudsClass(
@@ -120,8 +121,8 @@ class CrudsClass(
         return raw
 
     async def post_process_batch(
-        self, raw: list[Read | dict[str, Any]], batch_size: int = 50
-    ) -> list[Read | dict[str, Any]]:
+        self, raw: list[Read | dict], batch_size: int = 50
+    ) -> list[Read | dict]:
         """
         Post process a batch asynchronously
         Process in chunks to avoid rate limits
@@ -308,9 +309,10 @@ class CrudsClass(
 
         stmt = self.build_select_query(self.cast_query(query))
         result = await self.session.execute(stmt)
-        if not result:
+        record = result.scalar_one()
+        if not record:
             raise self.not_found_error(id)
-        return cast(DbModel, result.scalar_one())
+        return cast(DbModel, record)
 
     async def get(self, id: int | str, options: Options | None = None) -> Read:
         obj = await self._get_raw(id)
@@ -319,7 +321,7 @@ class CrudsClass(
     async def get_partial(
         self, id: int | str, options: Options | None = None
     ) -> dict:
-        options = options or {}
+        options = options or cast(Options, {})
         fields = options.get("fields", self.default_select)
         obj = await self._get_raw(id, fields=fields)
         return obj.to_dict()
@@ -333,7 +335,7 @@ class CrudsClass(
     async def user_get_partial(
         self, user: User, id: int | str, options: Options | None = None
     ) -> dict:
-        options = options or {}
+        options = cast(Options, {})
         fields = options.get("fields", self.default_select)
         obj = await self._get_raw(id, fields=fields, user=user)
         return obj.to_dict()
