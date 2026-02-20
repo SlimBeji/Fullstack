@@ -17,6 +17,8 @@ class PaginationData:
 
 
 class PaginatedDict(BaseModel):
+    """Using camelCase to stay coherent with other backends"""
+
     page: int
     totalPages: int
     totalCount: int
@@ -24,6 +26,8 @@ class PaginatedDict(BaseModel):
 
 
 class PaginatedData(BaseModel, Generic[ReadSchema]):
+    """Using camelCase to stay coherent with other backends"""
+
     page: int
     totalPages: int
     totalCount: int
