@@ -1,52 +1,22 @@
 from typing import Annotated, Literal
 
-from beanie.odm.fields import PydanticObjectId
 from pydantic import BaseModel
 
 from config import settings
-from lib.pydantic_ import BaseFiltersSchema, FieldMeta, HttpFilters
-from lib.types_ import FileToUpload, FindQuery, PaginatedData, PaginatedDict
+from lib.pydantic_ import (
+    BaseGetSchema,
+    BaseSearchSchema,
+    FieldMeta,
+    HttpFilters,
+)
+from lib.types_ import FileToUpload, PaginatedData, PaginatedDict, SearchQuery
 
 from .common import created_at_annot, updated_at_annot
 
 # --- Fields ----
 
-type PlaceSelectableFields = Literal[
-    "id",
-    "title",
-    "description",
-    "address",
-    "location.lat",
-    "location.lng",
-    "imageUrl",
-    "creatorId",
-]
-
-type PlaceSearchableFields = Literal[
-    "id",
-    "title",
-    "description",
-    "address",
-    "creatorId",
-    "locationLat",
-    "locationLng",
-]
-
-type PlaceSortableFields = Literal[
-    "createdAt",
-    "-createdAt",
-    "title",
-    "-title",
-    "description",
-    "-description",
-    "address",
-    "-address",
-]
-
-id_meta = FieldMeta(
-    description="The Place ID", examples=["683b21134e2e5d46978daf1f"]
-)
-id_annot = Annotated[PydanticObjectId, id_meta.info]
+id_meta = FieldMeta(description="The Place ID", examples=[123456789])
+id_annot = Annotated[int, id_meta.info]
 
 title_meta = FieldMeta(
     min_length=10,
@@ -88,10 +58,10 @@ address_annot = Annotated[str, address_meta.info]
 
 creatorId_meta = FieldMeta(
     description="The place creator ID",
-    examples=["683b21134e2e5d46978daf1f"],
-    filter_examples=["eq:683b21134e2e5d46978daf1f"],
+    examples=[123456789],
+    filter_examples=["in:123456789"],
 )
-creatorId_annot = Annotated[PydanticObjectId, creatorId_meta.info]
+creatorId_annot = Annotated[int, creatorId_meta.info]
 
 lat_meta = FieldMeta(
     description="The latitude of the place",
@@ -108,15 +78,51 @@ lng_meta = FieldMeta(
 lng_annot = Annotated[float, lng_meta.info]
 
 
+class Location(BaseModel):
+    lat: lat_annot
+    lng: lng_annot
+
+
 location_meta = FieldMeta(
     description="The place coordianets",
     examples=[dict(lat=51.48180425016331, lng=-0.19090418688755467)],
 )
+location_annot = Annotated[Location, location_meta.info]
 
 
-class Location(BaseModel):
-    lat: lat_annot
-    lng: lng_annot
+# --- Selectables, Serchables, Sortables ----
+
+type PlaceSelectableFields = Literal[
+    "id",
+    "title",
+    "description",
+    "address",
+    "location",
+    "imageUrl",
+    "creatorId",
+    "createdAt",
+]
+
+type PlaceSearchableFields = Literal[
+    "id",
+    "title",
+    "description",
+    "address",
+    "creatorId",
+    "locationLat",
+    "locationLng",
+]
+
+type PlaceSortableFields = Literal[
+    "createdAt",
+    "-createdAt",
+    "title",
+    "-title",
+    "description",
+    "-description",
+    "address",
+    "-address",
+]
 
 
 # --- Base Schemas ----
@@ -164,7 +170,7 @@ class PlaceMultipartPost:
         address: str = address_meta.multipart,
         lat: float = lat_meta.multipart,
         lng: float = lng_meta.multipart,
-        creatorId: PydanticObjectId = creatorId_meta.multipart,
+        creatorId: int = creatorId_meta.multipart,
         image: FileToUpload | None = image_meta.multipart,
     ):
         self.title = title
@@ -202,28 +208,9 @@ class PlaceReadSchema(BaseModel):
     createdAt: created_at_annot
 
 
-PlacesPaginatedSchema = PaginatedData[PlaceReadSchema] | PaginatedDict
+class PlaceGetSchema(BaseGetSchema):
+    pass
 
-# --- Query Schemas ---
-
-
-class PlaceFiltersSchema(
-    BaseFiltersSchema[PlaceSelectableFields, PlaceSortableFields]
-):
-    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
-
-    id: HttpFilters[id_annot]
-    title: HttpFilters[title_annot]
-    description: HttpFilters[description_annot]
-    address: HttpFilters[address_annot]
-    creatorId: HttpFilters[creatorId_annot]
-    locationLat: HttpFilters[lat_annot]
-    locationLng: HttpFilters[lng_annot]
-
-
-PlaceFindQuery = FindQuery[
-    PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
-]
 
 # --- Update Schemas ---
 
@@ -238,3 +225,27 @@ class PlaceUpdateSchema(BaseModel):
 
 class PlacePutSchema(PlaceUpdateSchema):
     pass
+
+
+# --- Query Schemas ---
+
+PlacesPaginatedSchema = PaginatedData[PlaceReadSchema] | PaginatedDict
+
+
+class PlaceFiltersSchema(
+    BaseSearchSchema[PlaceSelectableFields, PlaceSortableFields]
+):
+    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
+
+    id: HttpFilters[id_annot]
+    title: HttpFilters[title_annot]
+    description: HttpFilters[description_annot]
+    address: HttpFilters[address_annot]
+    creatorId: HttpFilters[creatorId_annot]
+    locationLat: HttpFilters[lat_annot]
+    locationLng: HttpFilters[lng_annot]
+
+
+PlaceFindQuery = SearchQuery[
+    PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
+]

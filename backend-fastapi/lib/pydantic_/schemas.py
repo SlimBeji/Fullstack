@@ -7,6 +7,31 @@ SortableFields = TypeVar("SortableFields")
 SelectableFields = TypeVar("SelectableFields")
 
 
+class BaseGetSchema(BaseModel, Generic[SelectableFields]):
+    _DEFAULT_FIELDS: list[str] = ["id"]
+
+    fields: Annotated[
+        list[SelectableFields] | None,
+        Field(
+            description="Fields to include in the response; omit for full document",
+            examples=[_DEFAULT_FIELDS],
+        ),
+    ] = None
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        # Update fields default and examples
+        default_fields = cast(ModelPrivateAttr, cls._DEFAULT_FIELDS)
+        fields_field = cls.model_fields["fields"]
+        cls.model_fields["fields"] = FieldInfo(
+            annotation=fields_field.annotation,
+            default=default_fields.default,
+            description=fields_field.description,
+            examples=[default_fields.default],
+        )
+
+
 class BaseSearchSchema(BaseModel, Generic[SelectableFields, SortableFields]):
     _MAX_SIZE: int = 100
     _DEFAULT_SORT: list[str] = ["-createdAt"]

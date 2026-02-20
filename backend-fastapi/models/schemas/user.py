@@ -1,31 +1,25 @@
 from typing import Annotated, Literal
 
-from beanie.odm.fields import PydanticObjectId
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from config import settings
-from lib.pydantic_ import BaseFiltersSchema, FieldMeta, HttpFilters
-from lib.types_ import FileToUpload, FindQuery, PaginatedData, PaginatedDict
+from lib.pydantic_ import (
+    BaseGetSchema,
+    BaseSearchSchema,
+    FieldMeta,
+    HttpFilters,
+)
+from lib.types_ import FileToUpload, PaginatedData, PaginatedDict, SearchQuery
 
 from .common import created_at_annot, updated_at_annot
 
 # --- Fields ----
 
-type UserSelectableFields = Literal[
-    "id", "name", "email", "isAdmin", "imageUrl", "places"
-]
-
-type UserSearchableFields = Literal["id", "name", "email"]
-
-type UserSortableFields = Literal[
-    "createdAt", "-createdAt", "name", "-name", "email", "-email"
-]
-
 id_meta = FieldMeta(
     description="The User ID",
-    examples=["683b21134e2e5d46978daf1f"],
+    examples=[123456789],
 )
-id_annot = Annotated[PydanticObjectId, id_meta.info]
+id_annot = Annotated[int, id_meta.info]
 
 name_meta = FieldMeta(
     min_length=2,
@@ -64,22 +58,31 @@ isAdmin_meta = FieldMeta(
 )
 isAdmin_annot = Annotated[bool, isAdmin_meta.info]
 
-places_meta = FieldMeta(
-    description="The id of places belonging to the user, 24 characters"
-)
-places_annot = Annotated[
-    list[
-        Annotated[
-            PydanticObjectId,
-            FieldMeta(
-                description="The Place ID",
-                examples=["683b21134e2e5d46978daf1f"],
-            ).info,
-        ]
-    ],
-    places_meta.info,
+
+class UserPlace(BaseModel):
+    id: Annotated[int, Field(description="The place ID", examples=[123456789])]
+    title: Annotated[
+        str, Field(description="The place title", examples=["Stamford Bridge"])
+    ]
+    address: Annotated[
+        str, Field(description="The place address", examples=["Fulham road"])
+    ]
+
+
+places_meta = FieldMeta(description="The user places")
+places_annot = Annotated[list[UserPlace], places_meta.info]
+
+# --- Selectables, Serchables, Sortables ----
+
+type UserSelectableFields = Literal[
+    "id", "name", "email", "isAdmin", "imageUrl", "places", "createdAt"
 ]
 
+type UserSearchableFields = Literal["id", "name", "email"]
+
+type UserSortableFields = Literal[
+    "createdAt", "-createdAt", "name", "-name", "email", "-email"
+]
 
 # --- Base Schemas ----
 
@@ -151,25 +154,9 @@ class UserReadSchema(BaseModel):
     createdAt: created_at_annot
 
 
-UsersPaginatedSchema = PaginatedData[UserReadSchema] | PaginatedDict
+class UserGetSchema(BaseGetSchema):
+    pass
 
-
-# --- Query Schemas ---
-
-
-class UserFiltersSchema(
-    BaseFiltersSchema[UserSelectableFields, UserSortableFields]
-):
-    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
-
-    id: HttpFilters[id_annot]
-    name: HttpFilters[name_annot]
-    email: HttpFilters[email_annot]
-
-
-UserFindQuery = FindQuery[
-    UserSelectableFields, UserSortableFields, UserSearchableFields
-]
 
 # --- Update Schemas ---
 
@@ -182,3 +169,23 @@ class UserUpdateSchema(BaseModel):
 
 class UserPutSchema(UserUpdateSchema):
     pass
+
+
+# --- Search Schemas ---
+
+UsersPaginatedSchema = PaginatedData[UserReadSchema] | PaginatedDict
+
+
+class UserSearchSchema(
+    BaseSearchSchema[UserSelectableFields, UserSortableFields]
+):
+    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
+
+    id: HttpFilters[id_annot]
+    name: HttpFilters[name_annot]
+    email: HttpFilters[email_annot]
+
+
+UserSearchQuery = SearchQuery[
+    UserSelectableFields, UserSortableFields, UserSearchableFields
+]
