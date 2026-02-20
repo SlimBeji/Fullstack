@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from api.middlewares import get_current_user
-from models.crud import crud_place
+from models.cruds import CrudsPlace
 from models.schemas import (
     PlaceFiltersSchema,
     PlaceMultipartPost,
@@ -12,6 +12,8 @@ from models.schemas import (
     PlacesPaginatedSchema,
     UserReadSchema,
 )
+
+from ..middlewares import get_cruds_place
 
 place_router = APIRouter(prefix="/api/places", tags=["Place"])
 
@@ -29,9 +31,10 @@ place_id_param = Path(
 )
 async def get_places(
     query: Annotated[PlaceFiltersSchema, Query()],
+    cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.fetch(query)
+    return await cruds.fetch(query)
 
 
 @place_router.post(
@@ -41,9 +44,10 @@ async def get_places(
 )
 async def get_places_from_post(
     query: PlaceFiltersSchema,
+    cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.fetch(query)
+    return await cruds.fetch(query)
 
 
 @place_router.post(
@@ -51,9 +55,10 @@ async def get_places_from_post(
 )
 async def create_place(
     multipart_form: PlaceMultipartPost = Depends(),
+    cruds: CrudsPlace = Depends(get_cruds_place),
     user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.user_create(user, multipart_form.to_post_schema())
+    return await cruds.user_create(user, multipart_form.to_post_schema())
 
 
 @place_router.get(
@@ -63,9 +68,10 @@ async def create_place(
 )
 async def get_place(
     place_id: str = place_id_param,
+    cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.get(place_id)
+    return await cruds.get(place_id)
 
 
 @place_router.put(
@@ -74,9 +80,10 @@ async def get_place(
 async def update_place(
     form: PlacePutSchema,
     place_id: str = place_id_param,
+    cruds: CrudsPlace = Depends(get_cruds_place),
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_place.user_update_by_id(current_user, place_id, form)
+    return await cruds.user_update_by_id(current_user, place_id, form)
 
 
 @place_router.delete(
@@ -98,6 +105,7 @@ async def update_place(
 async def delete_place(
     user: UserReadSchema = Depends(get_current_user),
     place_id: str = place_id_param,
+    cruds: CrudsPlace = Depends(get_cruds_place),
 ):
-    await crud_place.user_delete(user, place_id)
+    await cruds.user_delete(user, place_id)
     return dict(message=f"Deleted place {place_id}")

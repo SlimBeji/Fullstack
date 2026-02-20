@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from api.middlewares import get_current_admin, get_current_user
-from models.crud import crud_user
+from models.cruds import CrudsUser
 from models.schemas import (
     UserFiltersSchema,
     UserMultipartPost,
@@ -11,6 +11,8 @@ from models.schemas import (
     UserReadSchema,
     UsersPaginatedSchema,
 )
+
+from ..middlewares import get_cruds_user
 
 user_router = APIRouter(prefix="/api/users", tags=["User"])
 
@@ -24,9 +26,10 @@ user_id_param = Path(
 )
 async def get_users(
     query: Annotated[UserFiltersSchema, Query()],
+    cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.fetch(query)
+    return await cruds.fetch(query)
 
 
 @user_router.post(
@@ -36,17 +39,19 @@ async def get_users(
 )
 async def get_users_from_post(
     query: UserFiltersSchema,
+    cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.fetch(query)
+    return await cruds.fetch(query)
 
 
 @user_router.post("/", summary="User creation", response_model=UserReadSchema)
 async def create_user(
+    cruds: CrudsUser = Depends(get_cruds_user),
     multipart_form: UserMultipartPost = Depends(),
     admin: UserReadSchema = Depends(get_current_admin),
 ):
-    return await crud_user.user_create(admin, multipart_form.to_post_schema())
+    return await cruds.user_create(admin, multipart_form.to_post_schema())
 
 
 @user_router.get(
@@ -56,9 +61,10 @@ async def create_user(
 )
 async def get_user(
     user_id: str = user_id_param,
+    cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await crud_user.get(user_id)
+    return await cruds.get(user_id)
 
 
 @user_router.put(
@@ -68,8 +74,9 @@ async def update_user(
     form: UserPutSchema,
     user_id: str = user_id_param,
     current_user: UserReadSchema = Depends(get_current_user),
+    cruds: CrudsUser = Depends(get_cruds_user),
 ):
-    return await crud_user.user_update_by_id(current_user, user_id, form)
+    return await cruds.user_update_by_id(current_user, user_id, form)
 
 
 @user_router.delete(
@@ -91,6 +98,7 @@ async def update_user(
 async def delete_user(
     user: UserReadSchema = Depends(get_current_admin),
     user_id: str = user_id_param,
+    cruds: CrudsUser = Depends(get_cruds_user),
 ):
-    await crud_user.user_delete(user, user_id)
+    await cruds.user_delete(user, user_id)
     return dict(message=f"Deleted user {user_id}")

@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
 
-from models.crud import crud_user
+from models.cruds import CrudsUser
 from models.schemas import EncodedTokenSchema, SigninForm, SignupForm
+
+from ..middlewares import get_cruds_user
 
 auth_router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
@@ -9,12 +11,16 @@ auth_router = APIRouter(prefix="/api/auth", tags=["Auth"])
 @auth_router.post(
     "/signup", summary="User registration", response_model=EncodedTokenSchema
 )
-async def signup(form: SignupForm = Depends()):
-    return await crud_user.signup(form)
+async def signup(
+    cruds: CrudsUser = Depends(get_cruds_user), form: SignupForm = Depends()
+):
+    return await cruds.signup(form)
 
 
 @auth_router.post(
     "/signin", summary="User authentication", response_model=EncodedTokenSchema
 )
-async def signin(form: SigninForm = Depends()):
-    return await crud_user.signin(form)
+async def signin(
+    cruds: CrudsUser = Depends(get_cruds_user), form: SigninForm = Depends()
+):
+    return await cruds.signin(form)
