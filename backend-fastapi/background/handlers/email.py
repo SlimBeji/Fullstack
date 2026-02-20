@@ -1,6 +1,6 @@
 import time
 
-from background.setup import NewsletterData
+from background.bgconfig import NewsletterData
 
 
 def send_newsletter_task(payload: NewsletterData):

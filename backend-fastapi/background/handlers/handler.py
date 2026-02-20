@@ -1,16 +1,16 @@
 import asyncio
 
-from background.handlers.ai import place_embedding_task
-from background.handlers.email import send_newsletter_task
-from background.setup import (
+from background.bgconfig import (
     MAX_AGE,
     TASK_NEWSLETTER,
     TASK_PLACE_EMBEDDING,
     Queues,
 )
+from background.handlers.ai import place_embedding_task
+from background.handlers.email import send_newsletter_task
 from config import settings
 from lib.clients import TaskConfig, TaskHandler
-from services.instances import db, redis_client
+from services.instances import pg_client, redis_client
 
 TASKS: list[TaskConfig] = [
     TaskConfig(TASK_NEWSLETTER, Queues.EMAILS, send_newsletter_task),
@@ -19,7 +19,7 @@ TASKS: list[TaskConfig] = [
 
 
 async def connect_dbs() -> None:
-    await asyncio.gather(db.connect(), redis_client.connect())
+    await asyncio.gather(pg_client.connect(), redis_client.connect())
 
 
 handler = TaskHandler(
