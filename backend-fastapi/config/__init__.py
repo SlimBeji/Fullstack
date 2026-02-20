@@ -31,9 +31,6 @@ class Settings(BaseSettings):
     # DATABASE
     DATABASE_URL: str
     DATABASE_TEST_URL: str
-    MONGO_URL: str
-    MONGO_DBNAME: str
-    MONGO_TEST_DBNAME: str = "tests"
     REDIS_URL: str
     REDIS_TEST_URL: str = ""
     REDIS_DEFAULT_EXPIRATION: int = 3600

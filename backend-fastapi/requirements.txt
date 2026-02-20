@@ -19,10 +19,6 @@ pgvector
 alembic
 redis
 
-# Deprecated
-beanie
-motor
-
 # Tasks
 dramatiq[redis]
 apscheduler
