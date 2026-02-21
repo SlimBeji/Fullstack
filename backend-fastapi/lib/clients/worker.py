@@ -53,7 +53,7 @@ class TaskPublisher:
 
 def async_middleware(connect_dbs: Callable) -> AsyncIO:
     # Overloading AsyncIO middleware
-    class AsyncIOWithBeanie(AsyncIO):
+    class MyAsyncIO(AsyncIO):
         def before_worker_boot(self, broker, worker):
             """Oveloading AsyncIo before_worker_boot"""
             event_loop_thread = EventLoopThread(self.logger)
@@ -63,7 +63,7 @@ def async_middleware(connect_dbs: Callable) -> AsyncIO:
             ).result()
             set_event_loop_thread(event_loop_thread)
 
-    return AsyncIOWithBeanie()
+    return MyAsyncIO()
 
 
 class TaskConfig:
