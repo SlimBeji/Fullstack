@@ -180,7 +180,6 @@ export const PlaceUpdateSchema = zod.object({
     description: PlaceFields.description.optional(),
     address: PlaceFields.address.optional(),
     location: PlaceFields.location.optional(),
-    creatorId: PlaceFields.creatorId.optional(),
 });
 
 export type PlaceUpdate = ZodInfer<typeof PlaceUpdateSchema>;

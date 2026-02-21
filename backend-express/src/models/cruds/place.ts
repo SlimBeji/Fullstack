@@ -145,17 +145,16 @@ export class CrudsPlace extends CrudsClass<
         const descriptionChanged =
             !!data.description && data.description !== record.description;
         const titleChanged = !!data.title && data.title !== record.title;
-        const updated = await super.update(id, data);
+        await super.update(id, data);
         if (descriptionChanged || titleChanged) {
             placeEmbedding(index);
         }
-        return updated;
     }
 
     async authPut(
         user: UserRead,
         id: number | string,
-        data: PlacePut
+        _data: PlacePut
     ): Promise<void> {
         if (!user) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
@@ -170,12 +169,6 @@ export class CrudsPlace extends CrudsClass<
         if (!check) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
                 message: `Cannot not access place ${id}`,
-            });
-        }
-
-        if (data.creatorId) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
-                message: `Cannot set creatorId to ${data.creatorId}`,
             });
         }
     }
