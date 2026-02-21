@@ -37,7 +37,7 @@ class UserOptions(TypedDict):
 class CrudsUser(
     CrudsClass[
         User,
-        User,
+        UserReadSchema,
         UserCreateSchema,
         UserPostSchema,
         UserReadSchema,
@@ -103,9 +103,11 @@ class CrudsUser(
 
         return self.create_schema.model_construct(**json)
 
-    async def auth_post(self, user: User, form: UserPostSchema) -> None:
+    async def auth_post(
+        self, user: UserReadSchema, form: UserPostSchema
+    ) -> None:
         """Only admins can create users"""
-        if user.is_admin:
+        if user.isAdmin:
             return
         raise ApiError(
             HTTPStatus.UNAUTHORIZED,
@@ -176,9 +178,9 @@ class CrudsUser(
         await super().update(id, form)
 
     async def auth_put(
-        self, user: User, id: int | str, form: UserPutSchema
+        self, user: UserReadSchema, id: int | str, form: UserPutSchema
     ) -> None:
-        if user.is_admin:
+        if user.isAdmin:
             return
 
         if user.id != self.parse_id(id):
@@ -197,8 +199,8 @@ class CrudsUser(
         if record.imageUrl:
             cloud_storage.delete_file(record.imageUrl)
 
-    async def auth_delete(self, user: User, id: int | str) -> None:
-        if user.is_admin:
+    async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
+        if user.isAdmin:
             return
 
         raise ApiError(

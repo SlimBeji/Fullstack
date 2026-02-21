@@ -10,7 +10,7 @@ from background.publishers import place_embedding
 from lib.fastapi_ import ApiError
 from lib.sqlalchemy_ import CrudsClass
 from lib.types_ import WhereFilters
-from models.orm import Place, User
+from models.orm import Place
 from models.schemas import (
     PlaceCreateSchema,
     PlacePostSchema,
@@ -35,7 +35,7 @@ class PlaceOptions(TypedDict):
 class CrudsPlace(
     CrudsClass[
         Place,
-        User,
+        UserReadSchema,
         PlaceCreateSchema,
         PlacePostSchema,
         PlaceReadSchema,

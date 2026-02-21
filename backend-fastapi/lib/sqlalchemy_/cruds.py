@@ -22,7 +22,7 @@ from .types import SelectField
 from .utils import apply_order_by, apply_select, apply_where
 
 DbModel = TypeVar("DbModel", bound=SqlBaseModel)
-User = TypeVar("User", bound=SqlBaseModel)
+User = TypeVar("User", bound=BaseModel)
 Create = TypeVar("Create", bound=BaseModel)
 Post = TypeVar("Post", bound=BaseModel)
 Read = TypeVar("Read", bound=BaseModel)
@@ -37,7 +37,7 @@ Options = TypeVar("Options", bound=Mapping)
 class CrudsClass(
     Generic[
         DbModel,  # The Database model interface
-        User,  # The User model used for authorization
+        User,  # The User read schema used for authorization
         Create,  # Creation Interface
         Post,  # HTTP Post form
         Read,  # The Read interface
@@ -69,7 +69,7 @@ class CrudsClass(
         orig_base = self.__class__.__orig_bases__[0]  # type: ignore[attr-defined]
         types = get_args(orig_base)
         # self.model_type: type[DbModel] = types[0]  # DbModel
-        # self.user_model: type[User] = types[1] # User
+        # self.user_read_schema: type[User] = types[1] # User
         self.create_schema: type[Create] = types[2]  # Create BaseModel
         self.post_schema: type[Post] = types[3]  # Post BaseModel
         self.read_schema: type[Read] = types[4]  # Read BaseModel
