@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, Path, Query
 from api.middlewares import get_current_user
 from models.cruds import CrudsPlace
 from models.schemas import (
-    PlaceFiltersSchema,
     PlaceMultipartPost,
     PlacePutSchema,
     PlaceReadSchema,
+    PlaceSearchSchema,
     PlacesPaginatedSchema,
     UserReadSchema,
 )
@@ -30,7 +30,7 @@ place_id_param = Path(
     response_model=PlacesPaginatedSchema,
 )
 async def get_places(
-    query: Annotated[PlaceFiltersSchema, Query()],
+    query: Annotated[PlaceSearchSchema, Query()],
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
@@ -43,7 +43,7 @@ async def get_places(
     response_model=PlacesPaginatedSchema,
 )
 async def get_places_from_post(
-    query: PlaceFiltersSchema,
+    query: PlaceSearchSchema,
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):

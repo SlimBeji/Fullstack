@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, Path, Query
 from api.middlewares import get_current_admin, get_current_user
 from models.cruds import CrudsUser
 from models.schemas import (
-    UserFiltersSchema,
     UserMultipartPost,
     UserPutSchema,
     UserReadSchema,
+    UserSearchSchema,
     UsersPaginatedSchema,
 )
 
@@ -25,7 +25,7 @@ user_id_param = Path(
     "/", summary="Search and Filter users", response_model=UsersPaginatedSchema
 )
 async def get_users(
-    query: Annotated[UserFiltersSchema, Query()],
+    query: Annotated[UserSearchSchema, Query()],
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
@@ -38,7 +38,7 @@ async def get_users(
     response_model=UsersPaginatedSchema,
 )
 async def get_users_from_post(
-    query: UserFiltersSchema,
+    query: UserSearchSchema,
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
