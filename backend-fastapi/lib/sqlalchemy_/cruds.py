@@ -215,10 +215,13 @@ class CrudsClass(
     async def create(self, data: Create) -> int:
         """Create from a create form, return id"""
         try:
+            await self.before_create(data)
             entity = self.create_entity(data)
             self.session.add(entity)
-            await self.session.commit()
+            await self.session.flush()
             await self.session.refresh(entity)
+            await self.after_create(entity.id, data)
+            await self.session.commit()
             return entity.id
         except IntegrityError as err:
             await self.session.rollback()
@@ -234,6 +237,14 @@ class CrudsClass(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not create {self.model_name} object: {str(err)}!",
             )
+
+    async def before_create(self, data: Create) -> None:
+        """Overload this to run code before create"""
+        pass
+
+    async def after_create(self, id: int, data: Create) -> None:
+        """Overload this to run code after create"""
+        pass
 
     async def post_to_create(self, data: Post) -> Create:
         """Update this when subclassing if needed"""
@@ -346,6 +357,7 @@ class CrudsClass(
         """update from a Update form"""
         key = self.parse_id(id)
         try:
+            await self.before_update(id, data)
             stmt = (
                 update(self.model)
                 .where(self.model.id == key)
@@ -355,6 +367,7 @@ class CrudsClass(
             result = await self.session.execute(stmt)
             if result.scalar_one_or_none() is None:
                 raise self.not_found_error(id)
+            await self.after_update(id, data)
             await self.session.commit()
 
         except Exception as err:
@@ -363,6 +376,14 @@ class CrudsClass(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not update {self.model_name} object: {str(err)}!",
             )
+
+    async def before_update(self, id: int | str, data: Update) -> None:
+        """Overload this to run code before update"""
+        pass
+
+    async def after_update(self, id: int | str, data: Update) -> None:
+        """Overload this to run code after update"""
+        pass
 
     async def auth_put(self, user: User, id: int | str, form: Put) -> None:
         """
@@ -401,10 +422,13 @@ class CrudsClass(
         """delete object by id"""
         key = self.parse_id(id)
         try:
-            stmt = delete(self.model).where(self.model.id == key)
-            result = await self.session.execute(stmt)
-            if result.scalar_one_or_none() is None:
+            record = await self.read(id)
+            if record is None:
                 raise self.not_found_error(id)
+            await self.before_delete(record)
+            stmt = delete(self.model).where(self.model.id == key)
+            await self.session.execute(stmt)
+            await self.after_delete(record)
             await self.session.commit()
 
         except Exception as err:
@@ -413,6 +437,14 @@ class CrudsClass(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not delete {self.model_name} object: {str(err)}!",
             )
+
+    async def before_delete(self, record: DbModel) -> None:
+        """Overload this to run code before delete"""
+        pass
+
+    async def after_delete(self, record: DbModel) -> None:
+        """Overload this to run code after delete"""
+        pass
 
     async def auth_delete(self, user: User, id: int | str) -> None:
         """Raise an ApiError if user lacks authorization"""

@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 from typing import TypedDict, get_args
 
@@ -191,13 +192,15 @@ class CrudsUser(
 
     # Delete
 
-    async def delete(self, id: int | str) -> None:
-        record = await self.get(id)
-        if not record:
-            raise self.not_found_error(id)
-        await super().delete(id)
-        if record.imageUrl:
-            cloud_storage.delete_file(record.imageUrl)
+    async def after_delete(self, record: User) -> None:
+        try:
+            if record.image_url:
+                cloud_storage.delete_file(record.image_url)
+        except Exception as e:
+            # Logging error instead of canceling whole transaction
+            logging.error(
+                f"Could not delete User image file: {record.image_url}. The following error occured: {str(e)}"
+            )
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
         if user.isAdmin:

@@ -1,4 +1,5 @@
 import json
+import logging
 from http import HTTPStatus
 from typing import TypedDict, get_args
 
@@ -86,10 +87,8 @@ class CrudsPlace(
 
     # Create
 
-    async def create(self, data: PlaceCreateSchema) -> int:
-        id = await super().create(data)
+    async def after_create(self, id: int, data: PlaceCreateSchema) -> None:
         place_embedding(id)
-        return id
 
     async def seed(
         self, data: PlaceCreateSchema, embedding: list[float]
@@ -133,6 +132,13 @@ class CrudsPlace(
     # Update
 
     async def update(self, id: int | str, form: PlaceUpdateSchema) -> None:
+        """
+        Overloading the update method is cheaper than
+        handling the check in the after_update.
+        The goal is to avoid run unneccary embedding.
+        A form might be submitted even if the data stays the same
+        """
+
         record = await self.read(id)
         if not record:
             raise self.not_found_error(id)
@@ -202,13 +208,15 @@ class CrudsPlace(
 
     # Delete
 
-    async def delete(self, id: int | str) -> None:
-        record = await self.get(id)
-        if not record:
-            raise self.not_found_error(id)
-        await super().delete(id)
-        if record.imageUrl:
-            cloud_storage.delete_file(record.imageUrl)
+    async def after_delete(self, record: Place) -> None:
+        try:
+            if record.image_url:
+                cloud_storage.delete_file(record.image_url)
+        except Exception as e:
+            # Logging error instead of canceling whole transaction
+            logging.error(
+                f"Could not delete User image file: {record.image_url}. The following error occured: {str(e)}"
+            )
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
         if user.isAdmin:
