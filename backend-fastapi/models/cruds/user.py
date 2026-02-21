@@ -57,21 +57,17 @@ class CrudsUser(
             session, User, list(get_args(UserSelectableFields)), ["-createdAt"]
         )
 
-    # Post-Processing
+    # Serialization and Post-Processing
 
-    async def post_process(
-        self, raw: UserReadSchema | dict
-    ) -> UserReadSchema | dict:
-        # Handling dict
-        if isinstance(raw, dict):
-            image_url = raw.get("image_url")
-            if image_url:
-                raw["image_url"] = cloud_storage.get_signed_url(image_url)
-            return raw
-
-        # raw is a UserRead
+    async def post_process(self, raw: UserReadSchema) -> UserReadSchema:
         if raw.imageUrl:
             raw.imageUrl = cloud_storage.get_signed_url(raw.imageUrl)
+        return raw
+
+    async def post_process_dict(self, raw: dict) -> dict:
+        image_url = raw.get("imageUrl")
+        if image_url:
+            raw["imageUrl"] = cloud_storage.get_signed_url(image_url)
         return raw
 
     # Query Building

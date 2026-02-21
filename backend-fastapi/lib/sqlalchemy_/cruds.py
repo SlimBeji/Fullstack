@@ -54,6 +54,7 @@ class CrudsClass(
     # Constructor, Properties & Helpers
 
     MAX_ITEMS_PER_PAGE = 100
+    POST_PROCESSING_BATCH_SIZE = 50
 
     def __init__(
         self,
@@ -128,13 +129,12 @@ class CrudsClass(
         """Override this when subclassing"""
         return raw
 
-    async def post_process_batch(
-        self, raw: list[Read], batch_size: int = 50
-    ) -> list[Read]:
+    async def post_process_batch(self, raw: list[Read]) -> list[Read]:
         """
         Post process a batch asynchronously
         Process in chunks to avoid rate limits
         """
+        batch_size = self.POST_PROCESSING_BATCH_SIZE
         results: list[Read] = []
         for i in range(0, len(raw), batch_size):
             chunk = raw[i : i + batch_size]
@@ -144,13 +144,12 @@ class CrudsClass(
             results.extend(processed)
         return results
 
-    async def post_process_dict_batch(
-        self, raw: list[dict], batch_size: int = 50
-    ) -> list[dict]:
+    async def post_process_dict_batch(self, raw: list[dict]) -> list[dict]:
         """
         Post process a batch asynchronously
         Process in chunks to avoid rate limits
         """
+        batch_size = self.POST_PROCESSING_BATCH_SIZE
         results: list[dict] = []
         for i in range(0, len(raw), batch_size):
             chunk = raw[i : i + batch_size]
