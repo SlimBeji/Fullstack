@@ -114,27 +114,18 @@ class CrudsUser(
 
     # Read
 
-    async def get(
-        self, id: int | str, options: UserOptions | None = None
-    ) -> UserReadSchema:
-        result = await super().get(id, options)
-        if options and options.get("process", False):
-            return await self.post_process(result)  # type: ignore
-        return result
-
     def auth_get(
         self,
         user: UserReadSchema,
         query: UserSearchQuery,
     ) -> UserSearchQuery:
-        ownership_filters = [Filter(op="eq", val=user.id)]
+        if user.isAdmin:
+            return query
 
         if query.where is None:
             query.where = {}
 
-        id_filters = query.where.get("id", [])
-        id_filters.extend(ownership_filters)
-        query.where["id"] = id_filters
+        query.where["id"] = self.eq(user.id)
         return query
 
     async def check_duplicate(self, email: str, name: str) -> str:
@@ -207,8 +198,6 @@ class CrudsUser(
             "Not Authenticated",
             dict(message="Only admins can delete users"),
         )
-
-    # Search
 
     # Auth methods
 

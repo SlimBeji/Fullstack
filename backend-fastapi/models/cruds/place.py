@@ -10,7 +10,7 @@ from sqlalchemy.orm import InstrumentedAttribute
 from background.publishers import place_embedding
 from lib.fastapi_ import ApiError
 from lib.sqlalchemy_ import CrudsClass
-from lib.types_ import WhereFilters
+from lib.types_ import Filter, WhereFilters
 from models.orm import Place
 from models.schemas import (
     PlaceCreateSchema,
@@ -18,6 +18,7 @@ from models.schemas import (
     PlacePutSchema,
     PlaceReadSchema,
     PlaceSearchableFields,
+    PlaceSearchQuery,
     PlaceSelectableFields,
     PlaceSortableFields,
     PlaceUpdateSchema,
@@ -125,6 +126,20 @@ class CrudsPlace(
 
     # Read
 
+    def auth_get(
+        self,
+        user: UserReadSchema,
+        query: PlaceSearchQuery,
+    ) -> PlaceSearchQuery:
+        if user.isAdmin:
+            return query
+
+        if query.where is None:
+            query.where = {}
+
+        query.where["creatorId"] = self.eq(user.id)
+        return query
+
     # Update
 
     async def update(self, id: int | str, form: PlaceUpdateSchema) -> None:
@@ -229,5 +244,3 @@ class CrudsPlace(
                 "Access denied",
                 dict(message=f"cannot access place {id}"),
             )
-
-    # Search
