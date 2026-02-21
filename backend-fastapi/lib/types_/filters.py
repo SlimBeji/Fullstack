@@ -20,7 +20,6 @@ FilterOperation = Literal[
     "gte",
     "like",
     "ilike",
-    "regex",
 ]
 
 

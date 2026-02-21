@@ -30,7 +30,7 @@ description_meta = FieldMeta(
     min_length=10,
     description="The place description, 10 characters minimum",
     examples=["Stadium of Chelsea football club"],
-    filter_examples=["regex:football"],
+    filter_examples=["like:football"],
 )
 description_annot = Annotated[str, description_meta.info]
 
@@ -52,7 +52,7 @@ address_meta = FieldMeta(
     min_length=1,
     description="The place address",
     examples=["Fulham road"],
-    filter_examples=["regex:d{1,2} Boulevard"],
+    filter_examples=["like:d{1,2} Boulevard"],
 )
 address_annot = Annotated[str, address_meta.info]
 

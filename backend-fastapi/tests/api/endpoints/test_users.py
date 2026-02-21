@@ -21,7 +21,7 @@ async def test_fetch_users(helpers: Helpers):
 @pytest.mark.asyncio
 async def test_query_users(helpers: Helpers):
     headers = dict(Authorization=helpers.user_token)
-    payload = dict(email=["regex:@gmail.com"], fields=["email", "name"])
+    payload = dict(email=["like:@gmail.com"], fields=["email", "name"])
     response = await helpers.client.post(
         "/api/users/query", json=payload, headers=headers
     )

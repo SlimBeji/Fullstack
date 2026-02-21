@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from typing import (
     Annotated,
@@ -89,16 +88,10 @@ def _string_filter_validator(
         return Filter(op=op, val=val)
     elif op in ["like", "ilike"]:
         return Filter(op=op, val=raw)
-    elif op == "regex":
-        try:
-            re.compile(raw)
-            return Filter(op=op, val=raw)
-        except Exception:
-            raise ValueError(f"{raw} is not a valid regex expression")
     else:
         raise PydanticCustomError(
             "invalid string operation",
-            f"{op} is not a valid operation for string fields - Valid: eq,ne,in,nin,null,like,ilike,regex",
+            f"{op} is not a valid operation for string fields - Valid: eq,ne,in,nin,null,like,ilike",
         )
 
 
@@ -253,12 +246,6 @@ def _field_filters_validator(filters: list[Filter]):
     # Rule 6: like/ilike cannot be used together
     if "like" in used_operators and "ilike" in used_operators:
         errors.append("like and ilike operators should not be used together")
-
-    # Rule 7: regex cannot be used with like/ilike
-    if "regex" in used_operators and (
-        "like" in used_operators or "ilike" in used_operators
-    ):
-        errors.append("regex should not be used along like or ilike operators")
 
     return filters
 

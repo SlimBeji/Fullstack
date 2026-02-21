@@ -97,8 +97,6 @@ def _apply_single_where(
         query = query.where(column.like(f"%{val}%"))
     elif op == "ilike":
         query = query.where(column.ilike(f"%{val}%"))
-    elif op == "regex":
-        query = query.where(column.op("~*")(val))
     else:
         raise ValueError(f"Unknown field filter operator {op}")
 
