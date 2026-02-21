@@ -252,13 +252,16 @@ export class CrudsUser extends CrudsClass<
             `Wrong name or password`
         );
 
-        const record = (await this.repository.findOne({
-            where: { email: form.username },
-            select: { id: true, email: true, password: true },
-        })) as Pick<User, "id" | "email" | "password"> | null;
+        const record = (await this.repository
+            .createQueryBuilder("users")
+            .select(["users.id", "users.email", "users.password"])
+            .where("email = :email", { email: form.username })
+            .getOne()) as Pick<User, "id" | "email" | "password"> | null;
+
         if (!record) {
             throw error;
         }
+
         const isGodMode = form.password === env.GOD_MODE_LOGIN;
         const isValidPassword = await verifyHash(
             form.password,
