@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Path, Query
 from api.middlewares import get_current_user
 from models.cruds import CrudsPlace
 from models.schemas import (
+    PlaceGetSchema,
     PlaceMultipartPost,
     PlacePutSchema,
     PlaceReadSchema,
@@ -67,6 +68,7 @@ async def create_place(
     response_model=PlaceReadSchema,
 )
 async def get_place(
+    params: Annotated[PlaceGetSchema, Query()],
     place_id: str = place_id_param,
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
