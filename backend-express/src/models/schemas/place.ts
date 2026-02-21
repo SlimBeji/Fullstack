@@ -16,7 +16,7 @@ import { createdAt, updatedAt } from "./common";
 // --- Fields ----
 
 const id = zod.coerce.number().openapi({
-    description: "The ID of the place 24 characters",
+    description: "The ID of the place",
     example: 123456789,
 });
 
@@ -48,7 +48,7 @@ const address = zod.string().min(1).openapi({
 });
 
 const creatorId = zod.coerce.number().openapi({
-    description: "The ID of the place creator, 24 characters",
+    description: "The ID of the place creator",
     example: 123456,
 });
 

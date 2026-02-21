@@ -16,7 +16,7 @@ import { createdAt, updatedAt } from "./common";
 // --- Fields ----
 
 const id = zod.coerce.number().openapi({
-    description: "The user ID, 24 characters",
+    description: "The user ID",
     example: 123456789,
 });
 
@@ -61,8 +61,7 @@ const userPlace = zodObject({
         description: "The place address",
     }),
 }).openapi({
-    description: "The id of places belonging to the user, 24 characters",
-    example: "683b21134e2e5d46978daf1f",
+    description: "Places created by the user",
 });
 
 export type UserPlaceType = ZodInfer<typeof userPlace>;
