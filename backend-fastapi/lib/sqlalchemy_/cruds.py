@@ -9,6 +9,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
+from lib.utils import convert_dict_to_camel
+
 from ..fastapi_ import ApiError
 from ..types_ import (
     Filter,
@@ -112,26 +114,48 @@ class CrudsClass(
             f"No record with id {id} found in {self.model_name}s",
         )
 
-    # Post-Processing
+    # Serialization and Post-Processing
 
-    async def post_process(
-        self, raw: Read | dict[str, Any]
-    ) -> Read | dict[str, Any]:
+    def _serialize_to_dict(self, record: DbModel) -> dict:
+        data = record.to_dict()
+        return convert_dict_to_camel(data)
+
+    async def post_process(self, raw: Read) -> Read:
+        """Override this when subclassing"""
+        return raw
+
+    async def post_process_dict(self, raw: dict) -> dict:
         """Override this when subclassing"""
         return raw
 
     async def post_process_batch(
-        self, raw: list[Read | dict], batch_size: int = 50
-    ) -> list[Read | dict]:
+        self, raw: list[Read], batch_size: int = 50
+    ) -> list[Read]:
         """
         Post process a batch asynchronously
         Process in chunks to avoid rate limits
         """
-        results: list[Read | dict[str, Any]] = []
+        results: list[Read] = []
         for i in range(0, len(raw), batch_size):
             chunk = raw[i : i + batch_size]
             processed = await asyncio.gather(
                 *(self.post_process(item) for item in chunk)
+            )
+            results.extend(processed)
+        return results
+
+    async def post_process_dict_batch(
+        self, raw: list[dict], batch_size: int = 50
+    ) -> list[dict]:
+        """
+        Post process a batch asynchronously
+        Process in chunks to avoid rate limits
+        """
+        results: list[dict] = []
+        for i in range(0, len(raw), batch_size):
+            chunk = raw[i : i + batch_size]
+            processed = await asyncio.gather(
+                *(self.post_process_dict(item) for item in chunk)
             )
             results.extend(processed)
         return results
@@ -326,30 +350,48 @@ class CrudsClass(
         return cast(DbModel, record)
 
     async def get(self, id: int | str, options: Options | None = None) -> Read:
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         obj = await self._get_raw(id)
-        return self.read_schema.model_validate(obj, from_attributes=True)
+        result = self.read_schema.model_validate(obj, from_attributes=True)
+        if process:
+            result = await self.post_process(result)
+        return result
 
     async def get_partial(
         self, id: int | str, options: Options | None = None
     ) -> dict:
         options = options or cast(Options, {})
         fields = options.get("fields", self.default_select)
+        process = options.get("process", False)
         obj = await self._get_raw(id, fields=fields)
-        return obj.to_dict()
+        result = self._serialize_to_dict(obj)
+        if process:
+            result = await self.post_process_dict(result)
+        return result
 
     async def user_get(
         self, user: User, id: int | str, options: Options | None = None
     ) -> Read:
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         obj = await self._get_raw(id, user=user)
-        return self.read_schema.model_validate(obj, from_attributes=True)
+        result = self.read_schema.model_validate(obj, from_attributes=True)
+        if process:
+            result = await self.post_process(result)
+        return result
 
     async def user_get_partial(
         self, user: User, id: int | str, options: Options | None = None
     ) -> dict:
-        options = cast(Options, {})
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         fields = options.get("fields", self.default_select)
         obj = await self._get_raw(id, fields=fields, user=user)
-        return obj.to_dict()
+        result = self._serialize_to_dict(obj)
+        if process:
+            result = await self.post_process_dict(result)
+        return result
 
     # Update
 
@@ -520,57 +562,82 @@ class CrudsClass(
         return result.scalars().all()  # type: ignore
 
     async def search(
-        self, query: SearchQuery[Selectables, Sortables, Searchables]
+        self,
+        query: SearchQuery[Selectables, Sortables, Searchables],
+        options: Options | None = None,
     ) -> list[Read]:
         """
         search records, returns list of Read
         query.select is ignored, in order to return the full Read schema
         """
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         query.select = self.default_select
         records = await self._get_many(query)
-        return [
+        results = [
             self.read_schema.model_validate(r, from_attributes=True)
             for r in records
         ]
+        if process:
+            results = await self.post_process_batch(results)
+        return results
 
     async def user_search(
         self,
         user: User,
         query: SearchQuery[Selectables, Sortables, Searchables],
+        options: Options | None = None,
     ) -> list[Read]:
         """
         search records accessible by the user, returns list of Read
         query.select is ignored, in order to return the full Read schema
         """
-
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         query.select = self.default_select
         records = await self._get_many(query, user)
-        return [
+        results = [
             self.read_schema.model_validate(r, from_attributes=True)
             for r in records
         ]
+        if process:
+            results = await self.post_process_batch(results)
+        return results
 
     async def search_partial(
-        self, query: SearchQuery[Selectables, Sortables, Searchables]
+        self,
+        query: SearchQuery[Selectables, Sortables, Searchables],
+        options: Options | None = None,
     ) -> list[dict]:
         """
         search records, returns list of dict (partial data)
         query.select is ignored, in order to return the full Read schema
         """
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         records = await self._get_many(query)
-        return [r.to_dict() for r in records]
+        results = [self._serialize_to_dict(r) for r in records]
+        if process:
+            results = await self.post_process_dict_batch(results)
+        return results
 
     async def user_search_partial(
         self,
         user: User,
         query: SearchQuery[Selectables, Sortables, Searchables],
+        options: Options | None = None,
     ) -> list[dict]:
         """
         search records accessible by the user, returns list of dict (partial data)
         query.select is ignored, in order to return the full Read schema
         """
+        options = options or cast(Options, {})
+        process = options.get("process", False)
         records = await self._get_many(query, user)
-        return [r.to_dict() for r in records]
+        results = [self._serialize_to_dict(r) for r in records]
+        if process:
+            results = await self.post_process_dict_batch(results)
+        return results
 
     async def paginate(
         self, query: SearchQuery[Selectables, Sortables, Searchables]

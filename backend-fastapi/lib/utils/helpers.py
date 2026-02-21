@@ -23,6 +23,27 @@ def check_bool(val: Any) -> bool:
     raise error
 
 
+def to_camel_case(snake_str: str) -> str:
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
+
+
+def convert_dict_to_camel(data: dict) -> dict:
+    result = {}
+    for key, value in data.items():
+        camel_key = to_camel_case(key)
+        if isinstance(value, dict):
+            result[camel_key] = convert_dict_to_camel(value)
+        elif isinstance(value, list):
+            result[camel_key] = [
+                convert_dict_to_camel(item) if isinstance(item, dict) else item
+                for item in value
+            ]
+        else:
+            result[camel_key] = value
+    return result
+
+
 def parse_dot_notation(data: dict[str, Any]) -> dict[str, Any]:
     result: dict[str, Any] = {}
 
