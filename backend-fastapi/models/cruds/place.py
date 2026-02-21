@@ -97,9 +97,9 @@ class CrudsPlace(
         json = data.model_dump(exclude_none=True, exclude_unset=True)
         image = json.pop("image", None)
         if image:
-            json["image_url"] = cloud_storage.upload_file(image)
+            json["imageUrl"] = cloud_storage.upload_file(image)
         else:
-            json["image_url"] = ""
+            json["imageUrl"] = ""
 
         return self.create_schema.model_construct(**json)
 
