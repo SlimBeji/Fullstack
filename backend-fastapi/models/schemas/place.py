@@ -92,7 +92,7 @@ location_annot = Annotated[Location, location_meta.info]
 
 # --- Selectables, Serchables, Sortables ----
 
-type PlaceSelectableFields = Literal[
+PlaceSelectableFields = Literal[
     "id",
     "title",
     "description",
@@ -103,7 +103,7 @@ type PlaceSelectableFields = Literal[
     "createdAt",
 ]
 
-type PlaceSearchableFields = Literal[
+PlaceSearchableFields = Literal[
     "id",
     "title",
     "description",
@@ -113,7 +113,7 @@ type PlaceSearchableFields = Literal[
     "locationLng",
 ]
 
-type PlaceSortableFields = Literal[
+PlaceSortableFields = Literal[
     "createdAt",
     "-createdAt",
     "title",

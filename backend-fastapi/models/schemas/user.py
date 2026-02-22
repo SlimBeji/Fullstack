@@ -74,13 +74,13 @@ places_annot = Annotated[list[UserPlace], places_meta.info]
 
 # --- Selectables, Serchables, Sortables ----
 
-type UserSelectableFields = Literal[
+UserSelectableFields = Literal[
     "id", "name", "email", "isAdmin", "imageUrl", "places", "createdAt"
 ]
 
-type UserSearchableFields = Literal["id", "name", "email"]
+UserSearchableFields = Literal["id", "name", "email"]
 
-type UserSortableFields = Literal[
+UserSortableFields = Literal[
     "createdAt", "-createdAt", "name", "-name", "email", "-email"
 ]
 
