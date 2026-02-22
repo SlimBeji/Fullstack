@@ -6,7 +6,6 @@ from typing import (
     Generic,
     Optional,
     TypeVar,
-    cast,
     get_args,
 )
 
@@ -143,7 +142,8 @@ def _extract_raw_filter(value: str) -> tuple[FilterOperation, Any]:
         op, raw_val = "eq", value
 
     check_filter_op(op)
-    return cast(FilterOperation, op), raw_val
+    # The check filter make sure op is of type FilterOperation
+    return op, raw_val  # type: ignore
 
 
 def _make_filter_validator(real_type: Any):

@@ -129,7 +129,9 @@ class CloudStorage:
 
         blob = self.bucket.blob(filename)
         blob.upload_from_string(file.buffer, content_type=file.mimetype)
-        return cast(str, blob.name)
+
+        # We have just created the blob so blob.name should be an str
+        return blob.name  # type: ignore
 
     def delete_file(self, filename: str) -> bool:
         try:

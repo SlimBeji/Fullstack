@@ -104,11 +104,6 @@ class CrudsClass(
 
         return int(trimmed)
 
-    def cast_query(
-        self, query
-    ) -> SearchQuery[Selectables, Sortables, Searchables]:
-        return cast(SearchQuery[Selectables, Sortables, Searchables], query)
-
     def not_found_error(self, id: int | str) -> ApiError:
         return ApiError(
             HTTPStatus.NOT_FOUND,
@@ -325,13 +320,13 @@ class CrudsClass(
         self,
         id: int | str,
         *,
-        fields: list[Sortables] | None = None,
+        fields: list[Selectables] | None = None,
         user: User | None = None,
     ) -> DbModel:
         """Raise a 404 Not Found ApiError if not found"""
 
         query = SearchQuery[Selectables, Sortables, Searchables](
-            select=cast(list[Selectables], fields or self.default_select),
+            select=fields or self.default_select,
             where=cast(WhereFilters[Searchables], {"id": self.eq(id)}),
         )
 
@@ -339,12 +334,14 @@ class CrudsClass(
         if user:
             query = self.auth_get(user, query)
 
-        stmt = self.build_select_query(self.cast_query(query))
+        stmt = self.build_select_query(query)
         result = await self.session.execute(stmt)
         record = result.scalar_one()
         if not record:
             raise self.not_found_error(id)
-        return cast(DbModel, record)
+
+        # scalar_one() should return a DbModel
+        return record  # type: ignore
 
     async def get(self, id: int | str, options: Options | None = None) -> Read:
         options = options or cast(Options, {})
@@ -535,7 +532,7 @@ class CrudsClass(
         if user:
             filter_query = self.auth_get(user, filter_query)
 
-        stmt = self.build_select_query(self.cast_query(filter_query))
+        stmt = self.build_select_query(filter_query)
         result = await self.session.execute(stmt)
         ids = [row.id for row in result.scalars().all()]
 

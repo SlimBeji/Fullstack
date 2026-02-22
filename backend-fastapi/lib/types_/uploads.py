@@ -1,10 +1,13 @@
 import mimetypes
 import os
-from typing import Any, Self, cast
+from http import HTTPStatus
+from typing import Any, Self
 
 from pydantic import GetJsonSchemaHandler
 from pydantic_core import core_schema
 from starlette.datastructures import UploadFile
+
+from ..fastapi_ import ApiError
 
 
 class FileToUpload:
@@ -25,26 +28,31 @@ class FileToUpload:
 
     @classmethod
     def from_upload_file(cls, file: UploadFile) -> Self:
-        name = cast(str, file.filename)
-        content_type = cast(str, file.content_type)
-        return cls(name, content_type, file.file.read())
+        if not file.filename or not file.content_type:
+            raise ApiError(
+                HTTPStatus.BAD_REQUEST,
+                "uploaded file must have a name and a content type",
+            )
+        return cls(file.filename, file.content_type, file.file.read())
 
     @classmethod
     def validate(cls, file: UploadFile | Self) -> Self:
         """Size validation for the file"""
-        if isinstance(file, cls):
+        if not isinstance(file, UploadFile):
             if len(file.buffer) > cls.MAX_SIZE * 1024 * 1024:
                 raise ValueError(f"File too large (> {cls.MAX_SIZE} MB)")
             return file
 
-        upload_file = cast(UploadFile, file)
-        buffer = upload_file.file.read()
-        name = cast(str, upload_file.filename)
-        mimetype = cast(str, upload_file.content_type)
+        if not file.filename or not file.content_type:
+            raise ApiError(
+                HTTPStatus.BAD_REQUEST,
+                "uploaded file must have a name and a content type",
+            )
 
+        buffer = file.file.read()
         if len(buffer) > cls.MAX_SIZE * 1024 * 1024:
             raise ValueError(f"File too large (> {cls.MAX_SIZE} MB)")
-        return cls(name, mimetype, buffer)
+        return cls(file.filename, file.content_type, buffer)
 
     @classmethod
     def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
@@ -74,4 +82,4 @@ class FileToUpload:
             MAX_SIZE = size_mb
 
         FileWithCustomLimit.__name__ = f"FileToUpload_{size_mb}MB"
-        return cast(type[Self], FileWithCustomLimit)
+        return FileWithCustomLimit  # type: ignore
