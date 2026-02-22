@@ -1,5 +1,4 @@
-import asyncio
-
+from background.publishers import publisher
 from models.cruds import CrudsPlace, CrudsUser
 from models.examples.places import PLACES
 from models.examples.users import USERS
@@ -16,44 +15,40 @@ USER_REF_MAPPING: dict[int, int] = {}
 PLACE_REF_MAPPING: dict[int, int] = {}
 
 
-async def _seed_user(cruds: CrudsUser, user: UserSeedSchema) -> None:
-    if user.imageUrl:
-        imageUrl = cloud_storage.upload_file(user.imageUrl)
-    else:
-        imageUrl = ""
-
-    data = user.model_dump()
-    data["imageUrl"] = imageUrl
-    id = await cruds.create(UserCreateSchema(**data))
-    USER_REF_MAPPING[user.ref] = id
-
-
 async def seed_users(cruds: CrudsUser, users: list[UserSeedSchema]) -> None:
-    couroutines = [_seed_user(cruds, u) for u in users]
-    await asyncio.gather(*couroutines)
+    for user in users:
+        if user.imageUrl:
+            imageUrl = cloud_storage.upload_file(user.imageUrl)
+        else:
+            imageUrl = ""
+
+        data = user.model_dump()
+        data["imageUrl"] = imageUrl
+        id = await cruds.create(UserCreateSchema(**data))
+        USER_REF_MAPPING[user.ref] = id
 
 
-async def _seed_place(cruds: CrudsPlace, place: PlaceSeedSchema) -> None:
-    if place.imageUrl:
-        imageUrl = cloud_storage.upload_file(place.imageUrl)
-    else:
-        imageUrl = ""
+async def seed_places(cruds: CrudsPlace, places: list[PlaceSeedSchema]) -> None:
+    for place in places:
+        if place.imageUrl:
+            imageUrl = cloud_storage.upload_file(place.imageUrl)
+        else:
+            imageUrl = ""
 
-    creatorId = USER_REF_MAPPING[place.creator_ref]
-    data = place.model_dump()
-    data["imageUrl"] = imageUrl
-    data["creatorId"] = creatorId
-    embedding = data.pop("embedding")
-    record = await cruds.seed(PlaceCreateSchema(**data), embedding)
-    PLACE_REF_MAPPING[place.ref] = record.id
-
-
-async def seed_places(crud: CrudsPlace, places: list[PlaceSeedSchema]) -> None:
-    couroutines = [_seed_place(crud, p) for p in places]
-    await asyncio.gather(*couroutines)
+        creatorId = USER_REF_MAPPING[place.creator_ref]
+        data = place.model_dump()
+        data["imageUrl"] = imageUrl
+        data["creatorId"] = creatorId
+        embedding = data.pop("embedding")
+        id = await cruds.seed(PlaceCreateSchema(**data), embedding)
+        PLACE_REF_MAPPING[place.ref] = id
 
 
 async def seed_db(verbose: bool = False) -> None:
+    # Need to start the publisher because because cruds place
+    # is calling it in the after_create hook
+    publisher.start()
+
     async with pg_client.session() as session:
         cruds_user = CrudsUser(session)
         cruds_place = CrudsPlace(session)
