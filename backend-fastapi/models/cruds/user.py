@@ -136,11 +136,12 @@ class CrudsUser(
         if record is None:
             return ""
 
+        errors = []
         if record.email == email:
-            return f"email {email} is already used"
+            errors.append(f"email {email} is already used")
         if record.name == name:
-            return f"name {name} is already used"
-        return ""
+            errors.append(f"name {name} is already used")
+        return ", ".join(errors)
 
     async def get_by_email(self, email: str) -> UserReadSchema | None:
         query = UserSearchQuery(
