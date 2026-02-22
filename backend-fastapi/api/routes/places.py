@@ -1,15 +1,16 @@
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, Path, Query
 
 from api.middlewares import get_current_user
-from models.cruds import CrudsPlace
+from models.cruds import CrudsPlace, PlaceOptions
 from models.schemas import (
     PlaceGetSchema,
     PlaceMultipartPost,
     PlacePutSchema,
     PlaceReadSchema,
     PlaceSearchSchema,
+    PlaceSelectableFields,
     PlacesPaginatedSchema,
     UserReadSchema,
 )
@@ -35,7 +36,7 @@ async def get_places(
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.fetch(query)
+    return await cruds.paginate(query)
 
 
 @place_router.post(
@@ -48,7 +49,7 @@ async def get_places_from_post(
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.fetch(query)
+    return await cruds.paginate(query)
 
 
 @place_router.post(
@@ -59,7 +60,8 @@ async def create_place(
     cruds: CrudsPlace = Depends(get_cruds_place),
     user: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.user_create(user, multipart_form.to_post_schema())
+    options = PlaceOptions(fields=None, process=True)
+    return await cruds.user_post(user, multipart_form.to_post_schema(), options)
 
 
 @place_router.get(
@@ -73,7 +75,9 @@ async def get_place(
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.get(place_id)
+    fields = cast(list[PlaceSelectableFields], params.fields)
+    options = PlaceOptions(fields=fields, process=True)
+    return await cruds.get(place_id, options)
 
 
 @place_router.put(
@@ -85,7 +89,8 @@ async def update_place(
     cruds: CrudsPlace = Depends(get_cruds_place),
     current_user: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.user_update_by_id(current_user, place_id, form)
+    options = PlaceOptions(fields=None, process=True)
+    return await cruds.user_put(current_user, place_id, form, options)
 
 
 @place_router.delete(

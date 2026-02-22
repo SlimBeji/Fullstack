@@ -1,15 +1,16 @@
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Depends, Path, Query
 
 from api.middlewares import get_current_admin, get_current_user
-from models.cruds import CrudsUser
+from models.cruds import CrudsUser, UserOptions
 from models.schemas import (
     UserGetSchema,
     UserMultipartPost,
     UserPutSchema,
     UserReadSchema,
     UserSearchSchema,
+    UserSelectableFields,
     UsersPaginatedSchema,
 )
 
@@ -30,7 +31,7 @@ async def get_users(
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.fetch(query)
+    return await cruds.paginate(query)
 
 
 @user_router.post(
@@ -43,7 +44,7 @@ async def get_users_from_post(
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.fetch(query)
+    return await cruds.paginate(query)
 
 
 @user_router.post("/", summary="User creation", response_model=UserReadSchema)
@@ -52,7 +53,10 @@ async def create_user(
     multipart_form: UserMultipartPost = Depends(),
     admin: UserReadSchema = Depends(get_current_admin),
 ):
-    return await cruds.user_create(admin, multipart_form.to_post_schema())
+    options = UserOptions(process=True, fields=None)
+    return await cruds.user_post(
+        admin, multipart_form.to_post_schema(), options
+    )
 
 
 @user_router.get(
@@ -66,7 +70,9 @@ async def get_user(
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.get(user_id)
+    fields = cast(list[UserSelectableFields], params.fields)
+    options = UserOptions(process=True, fields=fields)
+    return await cruds.get(user_id, options)
 
 
 @user_router.put(
@@ -78,7 +84,8 @@ async def update_user(
     current_user: UserReadSchema = Depends(get_current_user),
     cruds: CrudsUser = Depends(get_cruds_user),
 ):
-    return await cruds.user_update_by_id(current_user, user_id, form)
+    options = UserOptions(process=True, fields=None)
+    return await cruds.user_put(current_user, user_id, form)
 
 
 @user_router.delete(
