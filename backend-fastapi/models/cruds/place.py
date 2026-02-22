@@ -120,11 +120,12 @@ class CrudsPlace(
                         message=f"Cannot set creatorId to {form.creatorId}, No user with id {form.creatorId} found in the database",
                     ),
                 )
+            return
 
         if user.id != form.creatorId:
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                "Accessdenied",
+                "Access denied",
                 dict(message=f"Cannot add places to user {form.creatorId}"),
             )
 
