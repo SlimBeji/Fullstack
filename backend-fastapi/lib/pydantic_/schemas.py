@@ -3,7 +3,7 @@ from typing import Annotated, Generic, TypeVar, cast
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo, ModelPrivateAttr
 
-from lib.types_ import SearchQuery, WhereFilters
+from lib.types_ import SearchQuery
 
 SortableFields = TypeVar("SortableFields", bound=str)
 SelectableFields = TypeVar("SelectableFields", bound=str)
