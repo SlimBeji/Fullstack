@@ -89,10 +89,10 @@ class CrudsPlace(
 
     async def seed(
         self, data: PlaceCreateSchema, embedding: list[float]
-    ) -> PlaceReadSchema:
+    ) -> int:
         id = await self.create(data)
         await self.update_embedding(id, embedding)
-        return await self.get(id)
+        return id
 
     async def post_to_create(self, data: PlacePostSchema) -> PlaceCreateSchema:
         json = data.model_dump(exclude_none=True, exclude_unset=True)
