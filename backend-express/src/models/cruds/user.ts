@@ -1,3 +1,5 @@
+import { EntityManager } from "typeorm";
+
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass, SelectField } from "@/lib/typeorm_";
@@ -178,14 +180,9 @@ export class CrudsUser extends CrudsClass<
 
     // Delete
 
-    async delete(id: number | string): Promise<void> {
-        const object = await this.read(id);
-        if (!object) {
-            throw this.notFoundError(id);
-        }
-        await super.delete(id);
-        if (object.imageUrl) {
-            storage.deleteFile(object.imageUrl);
+    async afterDelete(_manager: EntityManager, obj: User): Promise<void> {
+        if (obj.imageUrl) {
+            storage.deleteFile(obj.imageUrl);
         }
     }
 

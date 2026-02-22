@@ -1,7 +1,6 @@
 import {
     DataSource,
     DeepPartial,
-    DeleteResult,
     EntityManager,
     QueryFailedError,
     Repository,
@@ -450,25 +449,58 @@ export class CrudsClass<
     async delete(id: number | string): Promise<void> {
         // delete object by id
         const key = this.parseId(id);
-        let result: DeleteResult;
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        const manager = queryRunner.manager;
+
         try {
-            result = await this.repository.delete({ id: key } as any);
+            const obj = await this.read(id);
+            if (!obj) {
+                throw this.notFoundError(id);
+            }
+            await this.beforeDelete(manager, obj);
+            const result = await manager
+                .createQueryBuilder()
+                .delete()
+                .from(this.repository.target)
+                .where("id = :id", { id: key })
+                .execute();
+            if (result.affected === 0) {
+                throw this.notFoundError(id);
+            }
+            await this.afterDelete(manager, obj);
+            await queryRunner.commitTransaction();
         } catch (err) {
-            if (err instanceof Error) {
+            await queryRunner.rollbackTransaction();
+            if (err instanceof ApiError) {
+                throw err;
+            } else if (err instanceof Error) {
                 throw new ApiError(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     `Could not delete ${this.modelName} object: ${err.message}!`
                 );
             }
             throw err;
+        } finally {
+            await queryRunner.release();
         }
-        if (result.affected === 0) {
-            throw this.notFoundError(id);
-        }
+    }
+
+    async beforeDelete(_manager: EntityManager, _obj: DbModel): Promise<void> {
+        // Overload this to run code before delete
+    }
+
+    async afterDelete(_manager: EntityManager, _obj: DbModel): Promise<void> {
+        // Overload this to run code before delete
     }
 
     async authDelete(_user: User, _id: number | string): Promise<void> {
         // Raise an ApiError if user lacks authorization
+        throw new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "authDelete not implemented"
+        );
     }
 
     async userDelete(user: User, id: number | string): Promise<void> {
