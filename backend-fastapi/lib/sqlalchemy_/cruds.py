@@ -263,11 +263,9 @@ class CrudsClass(
 
     async def before_create(self, data: Create) -> None:
         """Overload this to run code before create"""
-        pass
 
     async def after_create(self, id: int, data: Create) -> None:
         """Overload this to run code after create"""
-        pass
 
     async def post_to_create(self, data: Post) -> Create:
         """Update this when subclassing if needed"""
@@ -420,11 +418,9 @@ class CrudsClass(
 
     async def before_update(self, id: int | str, data: Update) -> None:
         """Overload this to run code before update"""
-        pass
 
     async def after_update(self, id: int | str, data: Update) -> None:
         """Overload this to run code after update"""
-        pass
 
     async def auth_put(self, user: User, id: int | str, form: Put) -> None:
         """
@@ -481,11 +477,9 @@ class CrudsClass(
 
     async def before_delete(self, record: DbModel) -> None:
         """Overload this to run code before delete"""
-        pass
 
     async def after_delete(self, record: DbModel) -> None:
         """Overload this to run code after delete"""
-        pass
 
     async def auth_delete(self, user: User, id: int | str) -> None:
         """Raise an ApiError if user lacks authorization"""
