@@ -9,7 +9,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
-from lib.utils import convert_dict_to_camel, convert_dict_to_snake
+from lib.utils import (
+    convert_dict_to_camel,
+    convert_dict_to_snake,
+    to_snake_case,
+)
 
 from ..fastapi_ import ApiError
 from ..types_ import (
@@ -161,21 +165,25 @@ class CrudsClass(
         override this method when subclassing for custom behavior
         """
         # some fields maybe attributes in a JSONB column
-        return getattr(self.model, field)
+        return getattr(self.model, to_snake_case(field))
 
     def map_select(self, field: str) -> list[SelectField]:
         """
         override this method when subclassing for custom behavior
         some fields may require joins
         """
-        return [SelectField(select=getattr(self.model, field), joins=None)]
+        return [
+            SelectField(
+                select=getattr(self.model, to_snake_case(field)), joins=None
+            )
+        ]
 
     def map_where(self, field: str) -> InstrumentedAttribute:
         """
         override this method when subclassing for custom behavior
         some fields maybe attributes in a JSONB column
         """
-        return getattr(self.model, field)
+        return getattr(self.model, to_snake_case(field))
 
     def eq(self, val: Any) -> list[Filter]:
         return [{"op": "eq", "val": val}]
