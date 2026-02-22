@@ -409,7 +409,7 @@ class CrudsClass(
             stmt = (
                 update(self.model)
                 .where(self.model.id == key)
-                .values(**data.__dict__)
+                .values(data.model_dump(exclude_unset=True))
                 .returning(self.model.id)
             )
             result = await self.session.execute(stmt)
@@ -441,7 +441,8 @@ class CrudsClass(
 
     async def put_to_update(self, data: Put) -> Update:
         """Update this when subclassing"""
-        return self.update_schema.model_construct(**data.__dict__)
+        data_dict = data.model_dump(exclude_unset=True)
+        return self.update_schema.model_validate(data_dict)
 
     async def put(
         self, id: int | str, form: Put, options: Options | None = None
