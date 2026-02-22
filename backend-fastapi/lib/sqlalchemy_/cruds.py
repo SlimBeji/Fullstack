@@ -493,7 +493,7 @@ class CrudsClass(
         self, query: SearchQuery[Selectables, Sortables, Searchables]
     ) -> int:
         """count the number of rows"""
-        where = query.where or {}  # type: ignore
+        where = query.where or cast(WhereFilters[Searchables], {})
         stmt = select(self.model.id)
         stmt = apply_where(stmt, where, self.map_where)
         count_stmt = select(func.count()).select_from(stmt.subquery())
@@ -513,7 +513,7 @@ class CrudsClass(
         if not query.orderby or len(query.orderby) == 0:
             query.orderby = list(self.default_orderby)
         if not query.where or len(query.where) == 0:
-            query.where = {}  # type: ignore
+            query.where = cast(WhereFilters[Searchables], {})
         if not query.page:
             query.page = 1
         if not query.size:
@@ -523,7 +523,7 @@ class CrudsClass(
         filter_query = SearchQuery[Selectables, Sortables, Searchables](
             page=query.page,
             size=query.size,
-            select=["id"],  # type: ignore
+            select=cast(list[Selectables], ["id"]),
             where=query.where,
             orderby=query.orderby,
         )
@@ -544,7 +544,7 @@ class CrudsClass(
             page=1,
             size=len(ids),
             select=query.select,
-            where={"id": self.in_(ids)},  # type: ignore
+            where=cast(WhereFilters[Searchables], {"id": self.in_(ids)}),
             orderby=query.orderby,
         )
         stmt = self.build_select_query(fetch_query)

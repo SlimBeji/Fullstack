@@ -145,7 +145,7 @@ class CrudsUser(
     async def get_by_email(self, email: str) -> UserReadSchema | None:
         query = UserSearchQuery(
             select=self.default_select,
-            where=dict(email=self.eq(email)),  # type: ignore
+            where={"email": self.eq(email)},
         )
         stmt = self.build_select_query(query)
         result = await self.session.execute(stmt)

@@ -11,8 +11,9 @@ from static import get_image_path
 
 async def _get_place_id(db_session: AsyncSession) -> int:
     cruds = CrudsPlace(db_session)
-    where = dict(title=cruds.eq("Stamford Bridge"))
-    query = PlaceSearchQuery(size=100, where=where)  # type: ignore
+    query = PlaceSearchQuery(
+        size=100, where={"title": cruds.eq("Stamford Bridge")}
+    )
     result = await cruds.search(query)
     return result[0].id
 
