@@ -34,13 +34,13 @@ class BaseModel(DeclarativeBase):
             if c.key not in insp.unloaded:
                 result[c.key] = getattr(self, c.key)
 
-        for c in insp.mapper.relationships:
-            if c.key not in insp.unloaded:
-                val = getattr(self, c.key)
+        for rel in insp.mapper.relationships:
+            if rel.key not in insp.unloaded:
+                val = getattr(self, rel.key)
                 if val is not None:
                     if isinstance(val, list):
-                        result[c.key] = [item.to_dict() for item in val]
+                        result[rel.key] = [item.to_dict() for item in val]
                     else:
-                        result[c.key] = val.to_dict()
+                        result[rel.key] = val.to_dict()
 
         return result
