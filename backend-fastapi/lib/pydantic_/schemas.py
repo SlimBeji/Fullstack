@@ -65,7 +65,9 @@ class BaseSearchSchema(
         where = {}
         for field_name in self.__class__.model_fields:
             if field_name not in ["page", "size", "sort", "fields"]:
-                where[field_name] = getattr(self, field_name)
+                val = getattr(self, field_name)
+                if val is not None:
+                    where[field_name] = val
 
         return SearchQuery[SelectableFields, SortableFields, SearchableFields](
             page=self.page,
