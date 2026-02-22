@@ -2,8 +2,9 @@ from http import HTTPStatus
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.crud import crud_user
+from models.cruds import CrudsUser
 
 
 @pytest.mark.asyncio
@@ -15,8 +16,9 @@ async def test_hello_world(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_hello_user(client: AsyncClient):
-    token = await crud_user.get_bearer("mslimbeji@gmail.com")
+async def test_hello_user(client: AsyncClient, db_session: AsyncSession):
+    cruds = CrudsUser(db_session)
+    token = await cruds.get_bearer("mslimbeji@gmail.com")
     headers = dict(Authorization=token)
     resp = await client.get("/api/hello-world/user", headers=headers)
     j = resp.json()
@@ -25,8 +27,9 @@ async def test_hello_user(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_hello_admin(client: AsyncClient):
-    token = await crud_user.get_bearer("mslimbeji@gmail.com")
+async def test_hello_admin(client: AsyncClient, db_session: AsyncSession):
+    cruds = CrudsUser(db_session)
+    token = await cruds.get_bearer("mslimbeji@gmail.com")
     headers = dict(Authorization=token)
     resp = await client.get("/api/hello-world/admin", headers=headers)
     j = resp.json()

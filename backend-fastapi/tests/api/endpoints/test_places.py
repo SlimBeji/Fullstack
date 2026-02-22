@@ -1,24 +1,20 @@
 from http import HTTPStatus
-from typing import cast
 
 import pytest
 from conftest import Helpers
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from lib.types_ import Filter, FindQueryFilters
-from models.crud import crud_place
-from models.schemas import PlaceFindQuery, PlaceReadSchema
+from models.cruds import CrudsPlace
+from models.schemas import PlaceSearchQuery
 from static import get_image_path
 
 
-async def _get_place_id() -> str:
-    filters = cast(
-        FindQueryFilters, dict(title=[Filter(op="eq", val="Stamford Bridge")])
-    )
-    query = PlaceFindQuery(size=100, filters=filters)
-    result = await crud_place.fetch(query)
-    data = result.data
-    place = cast(PlaceReadSchema, data[0])
-    return str(place.id)
+async def _get_place_id(db_session: AsyncSession) -> int:
+    cruds = CrudsPlace(db_session)
+    where = dict(title=cruds.eq("Stamford Bridge"))
+    query = PlaceSearchQuery(size=100, where=where)  # type: ignore
+    result = await cruds.search(query)
+    return result[0].id
 
 
 @pytest.mark.asyncio
@@ -105,8 +101,8 @@ async def test_create_place_belonging_to_others(helpers: Helpers):
 
 
 @pytest.mark.asyncio
-async def test_get_place_by_id(helpers: Helpers):
-    place_id = await _get_place_id()
+async def test_get_place_by_id(helpers: Helpers, db_session: AsyncSession):
+    place_id = await _get_place_id(db_session)
     headers = dict(Authorization=helpers.user_token)
     response = await helpers.client.get(
         f"/api/places/{place_id}", headers=headers
@@ -119,8 +115,8 @@ async def test_get_place_by_id(helpers: Helpers):
 
 
 @pytest.mark.asyncio
-async def test_update_place(helpers: Helpers):
-    place_id = await _get_place_id()
+async def test_update_place(helpers: Helpers, db_session: AsyncSession):
+    place_id = await _get_place_id(db_session)
     payload = dict(description="Stamford Bridge - Home of the Blues")
     headers = dict(Authorization=helpers.admin_token)
     response = await helpers.client.put(
@@ -134,8 +130,10 @@ async def test_update_place(helpers: Helpers):
 
 
 @pytest.mark.asyncio
-async def test_update_place_belonging_to_others(helpers: Helpers):
-    place_id = await _get_place_id()
+async def test_update_place_belonging_to_others(
+    helpers: Helpers, db_session: AsyncSession
+):
+    place_id = await _get_place_id(db_session)
     payload = dict(description="Stamford Bridge - Stadium of the Blues")
     headers = dict(Authorization=helpers.user_token)
     response = await helpers.client.put(
@@ -145,9 +143,11 @@ async def test_update_place_belonging_to_others(helpers: Helpers):
 
 
 @pytest.mark.asyncio
-async def test_delete_place_belonging_to_others(helpers: Helpers):
+async def test_delete_place_belonging_to_others(
+    helpers: Helpers, db_session: AsyncSession
+):
     headers = dict(Authorization=helpers.user_token)
-    place_id = await _get_place_id()
+    place_id = await _get_place_id(db_session)
     response = await helpers.client.delete(
         f"/api/places/{place_id}", headers=headers
     )
@@ -155,9 +155,9 @@ async def test_delete_place_belonging_to_others(helpers: Helpers):
 
 
 @pytest.mark.asyncio
-async def test_delete_place(helpers: Helpers):
+async def test_delete_place(helpers: Helpers, db_session: AsyncSession):
     headers = dict(Authorization=helpers.admin_token)
-    place_id = await _get_place_id()
+    place_id = await _get_place_id(db_session)
     response = await helpers.client.delete(
         f"/api/places/{place_id}", headers=headers
     )
