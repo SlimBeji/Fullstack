@@ -23,6 +23,35 @@ def check_bool(val: Any) -> bool:
     raise error
 
 
+def to_snake_case(camel_str: str) -> str:
+    result = []
+    for i, char in enumerate(camel_str):
+        if char.isupper():
+            # Add underscore before uppercase letter, but not at the start
+            if i > 0:
+                result.append("_")
+            result.append(char.lower())
+        else:
+            result.append(char)
+    return "".join(result)
+
+
+def convert_dict_to_snake(data: dict[str, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in data.items():
+        snake_key = to_snake_case(key)
+        if isinstance(value, dict):
+            result[snake_key] = convert_dict_to_snake(value)
+        elif isinstance(value, list):
+            result[snake_key] = [
+                convert_dict_to_snake(item) if isinstance(item, dict) else item
+                for item in value
+            ]
+        else:
+            result[snake_key] = value
+    return result
+
+
 def to_camel_case(snake_str: str) -> str:
     components = snake_str.split("_")
     return components[0] + "".join(x.title() for x in components[1:])
