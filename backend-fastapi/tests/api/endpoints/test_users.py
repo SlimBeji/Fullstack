@@ -23,7 +23,7 @@ async def test_query_users(helpers: Helpers):
     headers = dict(Authorization=helpers.user_token)
     payload = dict(email=["like:@gmail.com"], fields=["email", "name"])
     response = await helpers.client.post(
-        "/api/users/query", json=payload, headers=headers
+        "/api/users/search", json=payload, headers=headers
     )
     assert response.status_code == HTTPStatus.OK
     data = response.json()
@@ -31,7 +31,11 @@ async def test_query_users(helpers: Helpers):
     assert "totalPages" in data
     assert data["totalCount"] == 1
     fetched = data["data"][0]
-    assert fetched == {"name": "Slim Beji", "email": "mslimbeji@gmail.com"}
+    assert fetched == {
+        "id": 1,
+        "name": "Slim Beji",
+        "email": "mslimbeji@gmail.com",
+    }
 
 
 @pytest.mark.asyncio
