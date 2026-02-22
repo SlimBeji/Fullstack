@@ -227,22 +227,10 @@ const stringQueryParamTransform = (
         case "ilike":
             return { op, val };
 
-        case "regex":
-            try {
-                new RegExp(val);
-                return { op, val };
-            } catch (err) {
-                return updateContextFromError(
-                    context,
-                    err,
-                    `Invalid regex pattern: ${val}`
-                );
-            }
-
         default:
             context.addIssue({
                 code: zod.ZodIssueCode.custom,
-                message: `Unknown operator "${op}". Valid: eq,ne,in,nin,null,like,ilike,regex`,
+                message: `Unknown operator "${op}". Valid: eq,ne,in,nin,null,like,ilike`,
             });
             return zod.NEVER;
     }
@@ -477,17 +465,6 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
         ctx.addIssue({
             code: zod.ZodIssueCode.custom,
             message: "like and ilike operators should not be used together",
-        });
-    }
-
-    // Rule 7: regex cannot be used with like/ilike
-    if (
-        usedOperators.includes("regex") &&
-        (usedOperators.includes("like") || usedOperators.includes("ilike"))
-    ) {
-        ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
-            message: "regex should not be used along like or ilike operators",
         });
     }
 

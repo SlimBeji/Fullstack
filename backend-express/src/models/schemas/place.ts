@@ -202,10 +202,10 @@ export const PlaceSearchSchema = filtersSchema(
             example: "eq:Some Place",
         }).optional(),
         description: httpFilters(PlaceFields.description, {
-            example: "regex:football",
+            example: "like:football",
         }).optional(),
         address: httpFilters(PlaceFields.address, {
-            example: "regex:Boulevard",
+            example: "ilike:boulevard",
         }).optional(),
         locationLat: httpFilters(PlaceFields.lat, {
             example: "gt:3.5",
