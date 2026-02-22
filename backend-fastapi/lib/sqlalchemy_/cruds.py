@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
-from lib.utils import convert_dict_to_camel
+from lib.utils import convert_dict_to_camel, convert_dict_to_snake
 
 from ..fastapi_ import ApiError
 from ..types_ import (
@@ -222,7 +222,10 @@ class CrudsClass(
 
     def create_entity(self, data: Create) -> DbModel:
         """Overload this when subclassing if required"""
-        return self.model(**data.__dict__)
+        normalized = convert_dict_to_snake(
+            cast(dict, data.model_dump(exclude_unset=True, exclude_none=True))
+        )
+        return self.model(**normalized)
 
     async def create(self, data: Create) -> int:
         """Create from a create form, return id"""
@@ -231,10 +234,10 @@ class CrudsClass(
             entity = self.create_entity(data)
             self.session.add(entity)
             await self.session.flush()
-            await self.session.refresh(entity)
-            await self.after_create(entity.id, data)
+            entity_id = entity.id
+            await self.after_create(entity_id, data)
             await self.session.commit()
-            return entity.id
+            return entity_id
         except IntegrityError as err:
             await self.session.rollback()
             if "duplicate key" in str(err.orig).lower():
