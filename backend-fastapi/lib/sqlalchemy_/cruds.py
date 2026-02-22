@@ -190,13 +190,7 @@ class CrudsClass(
 
         # Apply select
         if not query.select or len(query.select) == 0:
-            raise ApiError(
-                HTTPStatus.INTERNAL_SERVER_ERROR,
-                "CRUDS error",
-                {
-                    "error": f"No fields provided for the select statement for {self.model_name} query"
-                },
-            )
+            query.select = self.default_select
         stmt = apply_select(
             stmt, cast(list[str], query.select), self.map_select
         )
