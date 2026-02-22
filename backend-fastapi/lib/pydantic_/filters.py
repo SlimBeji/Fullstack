@@ -159,6 +159,10 @@ def _make_filter_validator(real_type: Any):
     def validator(value: str | dict) -> Filter:
         if isinstance(value, str):
             op, raw_val = _extract_raw_filter(value)
+        elif isinstance(value, int) or isinstance(value, float):
+            return _numeric_filter_validator(
+                "eq", str(value), adapter, is_index
+            )
         else:
             try:
                 op = value["op"]
@@ -251,6 +255,14 @@ def _field_filters_validator(filters: list[Filter]):
     return filters
 
 
+def _ensure_list(value: Any) -> list | None:
+    if value is None:
+        return None
+    if isinstance(value, list):
+        return value
+    return [value]
+
+
 class HttpFilters(Generic[T]):
     def __class_getitem__(cls, item):
         field_info = _get_field_info(item)
@@ -272,5 +284,6 @@ class HttpFilters(Generic[T]):
                 json_schema_extra=extra,
                 examples=examples,
             ),
+            BeforeValidator(_ensure_list),
             AfterValidator(_field_filters_validator),
         ]
