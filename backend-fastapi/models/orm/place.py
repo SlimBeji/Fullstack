@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from pgvector.sqlalchemy import Vector
@@ -14,6 +15,11 @@ if TYPE_CHECKING:
 class Place(BaseModel):
     __tablename__ = "places"
     __table_args__ = (Index("idx_place_creator", "creator_id"),)
+
+    # Fixing mypy bug by referencing again the inherited fields
+    id: Mapped[int]
+    created_at: Mapped[datetime]
+    updated_at: Mapped[datetime]
 
     # Fields
     title: Mapped[str] = mapped_column(String, nullable=False)

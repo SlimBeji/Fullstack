@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Boolean, String
@@ -13,6 +14,11 @@ class User(BaseModel):
     """User model"""
 
     __tablename__ = "users"
+
+    # Fixing mypy bug by referencing again the inherited fields
+    id: Mapped[int]
+    created_at: Mapped[datetime]
+    updated_at: Mapped[datetime]
 
     # Fields
     name: Mapped[str] = mapped_column(String, nullable=False)

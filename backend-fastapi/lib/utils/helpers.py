@@ -28,8 +28,8 @@ def to_camel_case(snake_str: str) -> str:
     return components[0] + "".join(x.title() for x in components[1:])
 
 
-def convert_dict_to_camel(data: dict) -> dict:
-    result = {}
+def convert_dict_to_camel(data: dict[str, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
     for key, value in data.items():
         camel_key = to_camel_case(key)
         if isinstance(value, dict):

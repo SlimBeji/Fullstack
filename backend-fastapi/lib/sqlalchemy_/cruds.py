@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from http import HTTPStatus
 from typing import Any, Generic, TypeVar, cast, get_args
 
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy import Select, delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,20 +19,20 @@ from ..types_ import (
     SearchQuery,
     WhereFilters,
 )
-from .model import BaseModel as SqlBaseModel
+from .model import BaseModel
 from .types import SelectField
 from .utils import apply_order_by, apply_select, apply_where
 
-DbModel = TypeVar("DbModel", bound=SqlBaseModel)
-User = TypeVar("User", bound=BaseModel)
-Create = TypeVar("Create", bound=BaseModel)
-Post = TypeVar("Post", bound=BaseModel)
-Read = TypeVar("Read", bound=BaseModel)
+DbModel = TypeVar("DbModel", bound=BaseModel)
+User = TypeVar("User", bound=PydanticBaseModel)
+Create = TypeVar("Create", bound=PydanticBaseModel)
+Post = TypeVar("Post", bound=PydanticBaseModel)
+Read = TypeVar("Read", bound=PydanticBaseModel)
 Selectables = TypeVar("Selectables", bound=str)
 Sortables = TypeVar("Sortables", bound=str)
 Searchables = TypeVar("Searchables", bound=str)
-Update = TypeVar("Update", bound=BaseModel)
-Put = TypeVar("Put", bound=BaseModel)
+Update = TypeVar("Update", bound=PydanticBaseModel)
+Put = TypeVar("Put", bound=PydanticBaseModel)
 Options = TypeVar("Options", bound=Mapping)
 
 
@@ -73,14 +73,14 @@ class CrudsClass(
         types = get_args(orig_base)
         # self.model_type: type[DbModel] = types[0]  # DbModel
         # self.user_read_schema: type[User] = types[1] # User
-        self.create_schema: type[Create] = types[2]  # Create BaseModel
-        self.post_schema: type[Post] = types[3]  # Post BaseModel
-        self.read_schema: type[Read] = types[4]  # Read BaseModel
+        self.create_schema: type[Create] = types[2]  # Create PydanticBaseModel
+        self.post_schema: type[Post] = types[3]  # Post PydanticBaseModel
+        self.read_schema: type[Read] = types[4]  # Read PydanticBaseModel
         # self.selectables_type: type[Selectables] = types[5]  # Selectables type
         # self.sortables_type: type[Sortables] = types[6]  # Sortables type
         # self.searchables_type: type[Searchables] = types[7]  # Searchables type
-        self.update_schema: type[Update] = types[8]  # Update BaseModel
-        self.put_schema: type[Put] = types[9]  # Put BaseModel
+        self.update_schema: type[Update] = types[8]  # Update PydanticBaseModel
+        self.put_schema: type[Put] = types[9]  # Put PydanticBaseModel
         # self.options_type: type[Options] = types[10] # Options type
 
     @property

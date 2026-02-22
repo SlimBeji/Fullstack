@@ -3,7 +3,7 @@ from typing import Annotated, Generic, TypeVar, cast
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo, ModelPrivateAttr
 
-from lib.types_ import SearchQuery
+from lib.types_ import SearchQuery, WhereFilters
 
 SortableFields = TypeVar("SortableFields", bound=str)
 SelectableFields = TypeVar("SelectableFields", bound=str)
@@ -72,7 +72,7 @@ class BaseSearchSchema(
             size=self.size,
             select=self.fields,
             orderby=self.sort,
-            where=where,
+            where=cast(WhereFilters[SearchableFields], where),
         )
 
     def __init_subclass__(cls, **kwargs):
