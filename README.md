@@ -28,7 +28,7 @@ The `backend-` and `frontend-` prefixes group related applications together for 
 
 The `docker-compose.yaml` file orchestrates the following shared services:
 
-- **PostgreSQL**: Primary relational database with replication support
+- **PostgreSQL**: Primary relational database
 - **pgAdmin**: Web-based PostgreSQL administration interface
 - **Redis**: In-memory data store for caching and message brokering
 - **RedisInsight**: Web UI for monitoring and managing Redis
@@ -38,7 +38,7 @@ The `docker-compose.yaml` file orchestrates the following shared services:
 
 ### 🗄️ Database: PostgreSQL
 
-This project uses **PostgreSQL** as its primary database. While earlier iterations explored MongoDB for its document-oriented model, the project has migrated to PostgreSQL for its industry-standard adoption, superior performance, and robust feature set.
+This project uses **PostgreSQL** as its primary database. While earlier iterations explored MongoDB for its document-oriented model, the project has migrated to PostgreSQL for its industry-standard adoption, superior performance, and robust feature set
 
 - **Industry Standard**: Widely adopted across enterprises, with extensive tooling, community support, and proven scalability
 - **Superior Performance**: Optimized query execution with advanced indexing (B-tree, GiST, GIN) and query planning
@@ -109,7 +109,7 @@ The `/lib` folder acts as the **glue layer** between the application logic and e
 - **/types** – Reusable type definitions shared across the project (e.g., pagination parameters, file upload schemas, error responses)
 - **/clients** – Wrappers around external services and APIs (e.g., Redis, Google Cloud Storage, task queues, HuggingFace, third-party APIs)
 - **/framework\_** – Abstraction layer over web frameworks to normalize routing, middleware, and request handling (e.g., `fastapi_`, `express_`, `gin_`, `axum_`)
-- **/validation\_** – Abstraction layer over validation/serialization libraries to provide consistent schema definitions (e.g., `pydantic_`, `zod_`, `validator_` (go), `validator_` (Rust))
+- **/validation\_** – Abstraction layer over validation/serialization libraries to provide consistent schema definitions (e.g., `pydantic_`, `zod_`, `validator_ (go)`, `validator_ (Rust)`)
 - **/orm\_** – Abstraction layer over ORMs to provide consistent database interaction patterns (e.g., `sqlalchemy_`, `typeorm_`, `gorm_`, `seaorm_`)
 
 > **Note:** The naming convention follows Rust's `/lib` folder structure, which is used for reusable library code separate from application-specific logic. The underscore suffix (e.g., `express_`, `pydantic_`) distinguishes these abstraction layers from the underlying libraries they wrap.
@@ -147,7 +147,6 @@ The `/services` folder is split into two submodules to prevent circular imports:
 - **setup** – Contains orchestration logic to manage the lifecycle of all service instances. This module:
     - Calls `start()`/`connect()` on all instances during application startup
     - Calls `close()`/`disconnect()` on all instances during application shutdown
-    - Handles dependency ordering (e.g., connect to database before Redis)
 
 > **Import order:** The **instances** submodule sits near the bottom (can be imported by models, routes, etc.), while **setup** sits at the top (only imported by the main entry point). This separation prevents circular dependencies where services need each other during initialization.
 
@@ -169,10 +168,6 @@ The `/models` folder is organized into subfolders that separate concerns by life
 Schema definitions are organized by their **specific purpose in the application lifecycle** — from creation and storage to retrieval and querying.
 
 Each model has its own schema file containing multiple schema types:
-
-##### 📦 DB Schema
-
-Defines how data is **stored in the database**, including all internal fields, indexes, and relationships.
 
 ##### 🌱 Seed Schema
 
@@ -269,49 +264,10 @@ For each model, a corresponding **CRUDS class** is created to encapsulate all **
 
 CRUDS operations are organized into **four layers**:
 
-1. **Core methods** (`create`, `read`, `update`, `delete`, `search`) – Direct database operations using the ORM
+1. **Core methods** (e.g. `create`, `read`, `update`, `delete`, `search`) – Direct database operations using the ORM
 2. **HTTP methods** (`post`, `get`, `put`, `delete`, `paginate`) – Methods exposed via HTTP endpoints (`delete` stays the same as the core method)
-3. **Authorization hooks** (`authPost`, `authGet`, `authPut`, `authDelete`, `authSearch`) – Validate user permissions and throw 401/403 errors when unauthorized
-4. **User methods** (`userPost`, `userGet`, `userPut`, `userDelete`, `userSearch`/`userPaginate`) – Combine authorization + HTTP methods for authenticated endpoints. The **user method** calls its corresponding **auth method** for validation, then executes the **core/HTTP method** to perform the actual operation.
-
-Below the operations breakdown
-
-##### ✏️ Create
-
-- `create(data)`: Takes a `CreateSchema` and inserts a new record into the database, returns the new ID
-- `postToCreate(data)`: Transforms HTTP `PostSchema` to internal `CreateSchema` (e.g., file upload → imageUrl)
-- `post(form)`: Combines transformation + creation, returns the created record as `ReadSchema`
-- `authPost(user, form)`: Authorization hook—override to validate user permissions. Takes a `User` and a `PostSchema` and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission or attempts to set restricted fields or values
-- `userPost(user, form)`: Takes a `User` and a `PostSchema`, checks the user authorization before posting (combines `authPost()` and `post()`)
-
-##### 📄 Read
-
-- `read(id)`: Fetches a raw ORM entity by ID, returns `null` if not found
-- `get(id)`: Takes an ID and returns a single record in `ReadSchema` format, throws an HTTP 404 NOT_FOUND error if not found
-- `authGet(user, data)`: Authorization hook—override to validate user access to the record. Takes a `User` and a `ReadSchema` and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission to read the data
-- `userGet(user, id)`: Takes a `User` and an ID, checks authorization before reading (combines `authGet()` and `get()`)
-
-##### 🛠️ Update
-
-- `update(id, data)`: Takes an `UpdateSchema` and updates an existing record, throws an exception if not found
-- `putToUpdate(data)`: Transforms HTTP `PutSchema` to internal `UpdateSchema`
-- `put(id, form)`: Combines transformation + update, returns updated record as `ReadSchema`
-- `authPut(user, id, form)`: Authorization hook—override to validate update permissions. Takes a `User`, an ID, and a `PutSchema` and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission or attempts to set restricted fields or values
-- `userPut(user, id, form)`: Takes a `User`, an ID, and a `PutSchema`, checks authorization before updating (combines `authPut()` and `put()`)
-
-##### 🗑️ Delete
-
-- `delete(id)`: Takes an ID and deletes the record, throws a 404 exception if not found
-- `authDelete(user, id)`: Authorization hook—override to validate deletion permissions. Takes a `User` and an ID and throws an HTTP 403 FORBIDDEN or 401 UNAUTHORIZED error if user lacks permission to delete the record
-- `userDelete(user, id)`: Takes a `User` and an ID, checks authorization before deleting (combines `authDelete()` and `delete()`)
-
-##### 🔍 Search
-
-- `search(query: FindQuery)`: Takes a query with filters, sorting, and field selection
-- `paginate(query: FindQuery)`: Takes a query and returns paginated results with metadata (`page`, `totalPages`, `totalCount`, `data`)
-- `authSearch(user, query)`: Authorization hook—override to modify query and restrict results based on user permissions
-- `userSearch(user, query)`: Applies authorization filters before searching (combines `authSearch()` and `search()`)
-- `userPaginate(user, query)`: Applies authorization filters before paginating (combines `authSearch()` and `paginate()`)
+3. **Authorization hooks** (`authPost`, `authGet`, `authPut`, `authDelete`) – Validate user permissions and throw 401/403 errors when unauthorized (The search API uses the same `authGet` as the GET API)
+4. **User methods** (`userPost`, `userGet`, `userPut`, `userDelete`, `userPaginate`) – Combine authorization + HTTP methods for authenticated endpoints. The **user method** calls its corresponding **auth method** for validation, then executes the **core/HTTP method** to perform the actual operation.
 
 #### 📁📁 Examples
 
