@@ -215,8 +215,15 @@ class CrudsUser(
         duplicate_msg = await self.check_duplicate(form.email, form.name)
         if duplicate_msg:
             raise ApiError(HTTPStatus.BAD_REQUEST, duplicate_msg)
-        data = self.create_schema(isAdmin=False, **form.model_dump())
-        id = await self.create(data)
+        data = form.model_dump()
+        image = data.pop("image", None)
+        if image:
+            data["imageUrl"] = cloud_storage.upload_file(image)
+        else:
+            data["imageUrl"] = ""
+
+        create_form = self.create_schema(isAdmin=False, **data)
+        id = await self.create(create_form)
         stmt = select(User.id, User.email).where(User.id == id)
         result = await self.session.execute(stmt)
         record = result.one()
