@@ -3,7 +3,6 @@ import { EntityManager } from "typeorm";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass, SelectField } from "@/lib/typeorm_";
-import { PaginatedData } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
 import { pgClient, storage } from "@/services/instances";
 
@@ -177,23 +176,6 @@ export class CrudsUser extends CrudsClass<
         throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
             message: "Only admins can delete users",
         });
-    }
-
-    // Search
-
-    authSearch(user: UserRead, query: UserSearchQuery): UserSearchQuery {
-        // User can only access his profile in secure mode
-        if (!query.where) query.where = {};
-        query.where.id = this.eq(user.id);
-        return query;
-    }
-
-    async paginate(
-        query: UserSearchQuery
-    ): Promise<PaginatedData<Partial<UserRead>>> {
-        const result = await super.paginate(query);
-        const data = await this.postProcessBatch(result.data);
-        return { ...result, data };
     }
 
     // Auth methods

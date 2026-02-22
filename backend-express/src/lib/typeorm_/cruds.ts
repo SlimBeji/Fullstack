@@ -345,6 +345,19 @@ export class CrudsClass<
         return result;
     }
 
+    async userGet(
+        user: User,
+        id: number | string,
+        options: Options = {} as Options
+    ): Promise<Read> {
+        // By using the defaultSelect, we get a Read
+        const result = (await this.get_raw(id, user, null)) as any as Read;
+        if (options.process) {
+            return await this.postProcess(result);
+        }
+        return result;
+    }
+
     async getPartial(
         id: number | string,
         options: Options = {} as Options
@@ -355,19 +368,6 @@ export class CrudsClass<
             null,
             options.fields || null
         )) as any as Partial<Read>;
-        if (options.process) {
-            return await this.postProcess(result);
-        }
-        return result;
-    }
-
-    async userGet(
-        user: User,
-        id: number | string,
-        options: Options = {} as Options
-    ): Promise<Read> {
-        // By using the defaultSelect, we get a Read
-        const result = (await this.get_raw(id, user, null)) as any as Read;
         if (options.process) {
             return await this.postProcess(result);
         }
@@ -565,6 +565,16 @@ export class CrudsClass<
 
     // Search
 
+    async count(
+        query: SearchQuery<Selectables, Sortables, Searchables>
+    ): Promise<number> {
+        // count the number of rows
+        const where = query.where || ({} as WhereFilters<Searchables>);
+        let ormQuery = this.repository.createQueryBuilder(this.tablename);
+        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
+        return await ormQuery.getCount();
+    }
+
     authSearch(
         _user: User,
         _query: SearchQuery<Selectables, Sortables, Searchables>
@@ -574,9 +584,10 @@ export class CrudsClass<
         throw new Error(`authSearch not implemented for ${this.modelName}`);
     }
 
-    async search(
-        query: SearchQuery<Selectables, Sortables, Searchables>
-    ): Promise<Partial<Read>[]> {
+    async getMany(
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        user: User | null
+    ): Promise<DbModel[]> {
         // search records
 
         // Setting default values
@@ -599,7 +610,17 @@ export class CrudsClass<
         // Because TypeOrm .getMany() is broken with pagination
         // We first fetch the ids with pagination, then we fetch the data
         // by removing the pagination
-        const filterQuery = { ...query, select: ["id"] as Selectables[] };
+        let filterQuery: SearchQuery<Selectables, Sortables, Searchables> = {
+            ...query,
+            select: ["id"] as Selectables[],
+        };
+
+        // Apply auth filter if required
+        if (user) {
+            filterQuery = this.authGet(user, filterQuery);
+        }
+
+        // Get the ids
         const ids = (await this.buildSelectQuery(filterQuery).getRawMany()).map(
             (row) => Object.values(row)[0] // avoid naming the attribute
         );
@@ -612,27 +633,59 @@ export class CrudsClass<
             orderby: query.orderby,
         };
         const result = await this.buildSelectQuery(fetchQuery).getMany();
+        return result;
+    }
+
+    async search(
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        options: Options = {} as Options
+    ): Promise<Read[]> {
+        query.select = [...this.defaultSelect];
+        const record = (await this.getMany(query, null)) as any as Read[];
         // By selecting only Selectables, we are guarenteed to have Partial<Read>
-        return result as any as Partial<Read>[];
+        if (options.process) {
+            return await this.postProcessBatch(record);
+        }
+        return record;
     }
 
     async userSearch(
         user: User,
-        query: SearchQuery<Selectables, Sortables, Searchables>
-    ): Promise<Partial<Read>[]> {
-        // search records accessible by the user
-        query = await this.authSearch(user, query);
-        return await this.search(query);
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        options: Options = {} as Options
+    ): Promise<Read[]> {
+        query.select = [...this.defaultSelect];
+        const record = (await this.getMany(query, user)) as any as Read[];
+        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        if (options.process) {
+            return await this.postProcessBatch(record);
+        }
+        return record;
     }
 
-    async count(
-        query: SearchQuery<Selectables, Sortables, Searchables>
-    ): Promise<number> {
-        // count the number of rows
-        const where = query.where || ({} as WhereFilters<Searchables>);
-        let ormQuery = this.repository.createQueryBuilder(this.tablename);
-        ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
-        return await ormQuery.getCount();
+    async searchPartial(
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        options: Options = {} as Options
+    ): Promise<Partial<Read>[]> {
+        const record = (await this.getMany(query, null)) as any as Read[];
+        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        if (options.process) {
+            return await this.postProcessBatch(record);
+        }
+        return record;
+    }
+
+    async userSearchPartial(
+        user: User,
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        options: Options = {} as Options
+    ): Promise<Partial<Read>[]> {
+        const record = (await this.getMany(query, user)) as any as Read[];
+        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        if (options.process) {
+            return await this.postProcessBatch(record);
+        }
+        return record;
     }
 
     async paginate(
@@ -652,7 +705,7 @@ export class CrudsClass<
         const normalized = { ...query, page, size };
 
         // Step 3: fetching results
-        const data = await this.search(normalized);
+        const data = await this.searchPartial(normalized);
 
         // Step 4: return paginated result
         return { page, totalPages, totalCount, data };

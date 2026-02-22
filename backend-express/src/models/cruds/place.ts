@@ -4,7 +4,6 @@ import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass } from "@/lib/typeorm_";
-import { PaginatedData } from "@/lib/types";
 import { huggingFace, pgClient, storage } from "@/services/instances";
 
 import { Models, Place } from "../orm";
@@ -230,22 +229,6 @@ export class CrudsPlace extends CrudsClass<
                 message: `Cannot not access place ${id}`,
             });
         }
-    }
-
-    // Search
-
-    authSearch(user: UserRead, query: PlaceSearchQuery): PlaceSearchQuery {
-        if (!query.where) query.where = {};
-        query.where.creatorId = this.eq(user.id);
-        return query;
-    }
-
-    async paginate(
-        query: PlaceSearchQuery
-    ): Promise<PaginatedData<Partial<PlaceRead>>> {
-        const result = await super.paginate(query);
-        const data = await this.postProcessBatch(result.data);
-        return { ...result, data };
     }
 }
 
