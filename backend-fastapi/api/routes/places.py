@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Path, Query
 from api.middlewares import get_current_user
 from models.cruds import CrudsPlace, PlaceOptions
 from models.schemas import (
-    PlaceGetSchema,
     PlaceMultipartPost,
     PlacePutSchema,
     PlaceReadSchema,
@@ -67,17 +66,22 @@ async def create_place(
 @place_router.get(
     "/{place_id}",
     summary="Search and Retrieve place by id",
-    response_model=PlaceReadSchema,
+    response_model=PlaceReadSchema | dict,
 )
 async def get_place(
-    params: Annotated[PlaceGetSchema, Query()],
+    fields: Annotated[
+        list[PlaceSelectableFields] | None,
+        Query(
+            description="Fields to include in the response; omit for full document",
+            examples=[["id"]],
+        ),
+    ] = None,
     place_id: str = place_id_param,
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    fields = cast(list[PlaceSelectableFields], params.fields)
     options = PlaceOptions(fields=fields, process=True)
-    return await cruds.get(place_id, options)
+    return await cruds.get_partial(place_id, options)
 
 
 @place_router.put(

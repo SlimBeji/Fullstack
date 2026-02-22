@@ -1,5 +1,6 @@
 from typing import Annotated, Generic, TypeVar, cast
 
+from fastapi import Query
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo, ModelPrivateAttr
 
@@ -8,31 +9,6 @@ from lib.types_ import SearchQuery, WhereFilters
 SortableFields = TypeVar("SortableFields", bound=str)
 SelectableFields = TypeVar("SelectableFields", bound=str)
 SearchableFields = TypeVar("SearchableFields", bound=str)
-
-
-class BaseGetSchema(BaseModel, Generic[SelectableFields]):
-    _DEFAULT_FIELDS: list[str] = ["id"]
-
-    fields: Annotated[
-        list[SelectableFields] | None,
-        Field(
-            description="Fields to include in the response; omit for full document",
-            examples=[_DEFAULT_FIELDS],
-        ),
-    ] = None
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-
-        # Update fields default and examples
-        default_fields = cast(ModelPrivateAttr, cls._DEFAULT_FIELDS)
-        fields_field = cls.model_fields["fields"]
-        cls.model_fields["fields"] = FieldInfo(
-            annotation=fields_field.annotation,
-            default=default_fields.default,
-            description=fields_field.description,
-            examples=[default_fields.default],
-        )
 
 
 class BaseSearchSchema(

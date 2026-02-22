@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Path, Query
 from api.middlewares import get_current_admin, get_current_user
 from models.cruds import CrudsUser, UserOptions
 from models.schemas import (
-    UserGetSchema,
     UserMultipartPost,
     UserPutSchema,
     UserReadSchema,
@@ -62,17 +61,22 @@ async def create_user(
 @user_router.get(
     "/{user_id}",
     summary="Search and Retrieve user by id",
-    response_model=UserReadSchema,
+    response_model=UserReadSchema | dict,
 )
 async def get_user(
-    params: Annotated[UserGetSchema, Query()],
+    fields: Annotated[
+        list[UserSelectableFields] | None,
+        Query(
+            description="Fields to include in the response; omit for full document",
+            examples=[["id"]],
+        ),
+    ] = None,
     user_id: str = user_id_param,
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    fields = cast(list[UserSelectableFields], params.fields)
     options = UserOptions(process=True, fields=fields)
-    return await cruds.get(user_id, options)
+    return await cruds.get_partial(user_id, options)
 
 
 @user_router.put(
