@@ -96,13 +96,17 @@ class CrudsPlace(
 
     async def post_to_create(self, data: PlacePostSchema) -> PlaceCreateSchema:
         json = data.model_dump(exclude_none=True, exclude_unset=True)
+        lat = json.pop("lat", None)
+        lng = json.pop("lng", None)
+        json["location"] = dict(lat=lat, lng=lng)
+
         image = json.pop("image", None)
         if image:
             json["imageUrl"] = cloud_storage.upload_file(image)
         else:
             json["imageUrl"] = ""
 
-        return self.create_schema.model_construct(**json)
+        return self.create_schema.model_validate(json)
 
     async def auth_post(
         self, user: UserReadSchema, form: PlacePostSchema
