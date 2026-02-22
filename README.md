@@ -676,6 +676,6 @@ It helps separate focus areas from the rest of the UI.
 
 ## 🚀 Next Steps
 
-- Migrate the **Python/FastAPI** and **Go/Gin** backends to PostgreSQL (ongoing)
+- Migrate the **Go/Gin** backend to PostgreSQL (ongoing)
 - Add the **Rust/Axum** backend (ongoing)
 - Add an **Angular** SPA frontend
