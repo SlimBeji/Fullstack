@@ -153,7 +153,7 @@ class CrudsPlace(
         The goal is to avoid run unneccary embedding.
         A form might be submitted even if the data stays the same
         """
-
+        id = self.parse_id(id)
         record = await self.read(id)
         if not record:
             raise self.not_found_error(id)
@@ -165,7 +165,7 @@ class CrudsPlace(
         await super().update(id, form)
 
         if description_changed or title_changed:
-            place_embedding(record.id)
+            place_embedding(id)
 
     async def auth_put(
         self, user: UserReadSchema, id: int | str, form: PlacePutSchema
@@ -173,6 +173,7 @@ class CrudsPlace(
         if user.isAdmin:
             return
 
+        id = self.parse_id(id)
         where: WhereFilters[PlaceSearchableFields] = {
             "id": self.eq(id),
             "creatorId": self.eq(user.id),
@@ -237,6 +238,7 @@ class CrudsPlace(
         if user.isAdmin:
             return
 
+        id = self.parse_id(id)
         where: WhereFilters[PlaceSearchableFields] = {
             "id": self.eq(id),
             "creatorId": self.eq(user.id),
