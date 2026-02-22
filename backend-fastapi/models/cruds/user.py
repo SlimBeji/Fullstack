@@ -132,7 +132,7 @@ class CrudsUser(
             or_(User.name == name, User.email == email)
         )
         result = await self.session.execute(stmt)
-        record = result.scalar_one_or_none()
+        record = result.one_or_none()
         if record is None:
             return ""
 
@@ -218,7 +218,7 @@ class CrudsUser(
         id = await self.create(data)
         stmt = select(User.id, User.email).where(User.id == id)
         result = await self.session.execute(stmt)
-        record = result.scalar_one()
+        record = result.one()
         return create_token(record.id, record.email)
 
     async def signin(self, form: SigninForm) -> EncodedTokenSchema:
@@ -227,7 +227,7 @@ class CrudsUser(
             User.email == form.username
         )
         result = await self.session.execute(stmt)
-        record = result.scalar_one_or_none()
+        record = result.one_or_none()
         if record is None:
             raise error
 
