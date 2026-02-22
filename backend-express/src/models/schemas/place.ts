@@ -196,7 +196,7 @@ export type PlacesPaginated = ZodInfer<typeof PlacesPaginatedSchema>;
 export const PlaceSearchSchema = filtersSchema(
     zod.object({
         id: httpFilters(PlaceFields.id, {
-            example: "683b21134e2e5d46978daf1f",
+            example: 123456789,
         }).optional(),
         title: httpFilters(PlaceFields.title, {
             example: "eq:Some Place",
@@ -216,7 +216,7 @@ export const PlaceSearchSchema = filtersSchema(
         creatorId: httpFilters(
             PlaceFields.creatorId,
             {
-                example: "eq:683b21134e2e5d46978daf1f",
+                example: 123456789,
             },
             { isIndex: true }
         ).optional(),
