@@ -6,7 +6,7 @@ from config import settings
 from lib.pydantic_ import BaseSearchSchema, FieldMeta, HttpFilters
 from lib.types_ import FileToUpload, PaginatedData, PaginatedDict, SearchQuery
 
-from .common import BaseReadSchema, created_at_annot, updated_at_annot
+from .common import BaseReadSchema, created_at_annot
 
 # --- Fields ----
 
