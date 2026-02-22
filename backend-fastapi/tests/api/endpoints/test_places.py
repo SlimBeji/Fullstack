@@ -34,12 +34,10 @@ async def test_get_places(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_query_places(helpers: Helpers):
-    payload = dict(
-        title=["Stamford Bridge"], fields=["location.lng", "location.lat"]
-    )
+    payload = dict(title=["Stamford Bridge"], fields=["location"])
     headers = dict(Authorization=helpers.user_token)
     response = await helpers.client.post(
-        "/api/places/query",
+        "/api/places/search",
         json=payload,
         headers=headers,
     )
@@ -51,7 +49,7 @@ async def test_query_places(helpers: Helpers):
     assert "data" in data
     fetched = data["data"][0]
     assert fetched == dict(
-        location=dict(lat=51.48180425016331, lng=-0.19090418688755467)
+        id=1, location=dict(lat=51.48180425016331, lng=-0.19090418688755467)
     )
 
 
@@ -77,7 +75,7 @@ async def test_create_place(helpers: Helpers):
 
     assert response.status_code == HTTPStatus.OK
     data = response.json()
-    assert data["creatorId"] == str(helpers.admin.id)
+    assert data["creatorId"] == helpers.admin.id
     assert data["description"] == "A brand new place"
     assert data["title"] == "Brand New Place"
     assert data["address"] == "Somewhere over the rainbow"
