@@ -150,7 +150,6 @@ class UserReadSchema(BaseReadSchema):
     isAdmin: isAdmin_annot
     imageUrl: imageUrl_annot | None = None
     places: places_annot
-    updatedAt: updated_at_annot
     createdAt: created_at_annot
 
 

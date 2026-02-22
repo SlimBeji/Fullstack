@@ -204,7 +204,6 @@ class PlaceReadSchema(BaseReadSchema):
     location: Location | None = None
     imageUrl: imageUrl_annot | None = None
     creatorId: creatorId_annot
-    updatedAt: updated_at_annot
     createdAt: created_at_annot
 
 
