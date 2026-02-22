@@ -342,28 +342,40 @@ export class CrudsClass<
 
     async update(id: number | string, data: Update): Promise<void> {
         // Use transactions when executing pre and post hooks
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        const manager = queryRunner.manager;
+
         const key = this.parseId(id);
         let result: UpdateResult;
         try {
-            result = await this.repository
+            await this.beforeUpdate(manager, key, data);
+            result = await manager
                 .createQueryBuilder()
-                .update()
+                .update(this.repository.target)
                 .set(data as any)
                 .where("id = :id", { id: key })
                 .returning("id")
                 .execute();
+            if (result.affected === 0) {
+                throw this.notFoundError(id);
+            }
+            await this.afterUpdate(manager, key, data);
+            await queryRunner.commitTransaction();
         } catch (err) {
-            if (err instanceof Error) {
+            await queryRunner.rollbackTransaction();
+            if (err instanceof ApiError) {
+                throw err;
+            } else if (err instanceof Error) {
                 throw new ApiError(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     `Could not update ${this.modelName} object: ${err.message}!`
                 );
             }
             throw err;
-        }
-
-        if (result.affected === 0) {
-            throw this.notFoundError(id);
+        } finally {
+            await queryRunner.release();
         }
 
         if (Array.isArray(result.raw) && result.raw.length === 1) {
@@ -373,6 +385,36 @@ export class CrudsClass<
         throw new ApiError(
             HttpStatus.INTERNAL_SERVER_ERROR,
             `Could not update ${this.modelName} object: unexpected result`
+        );
+    }
+
+    async beforeUpdate(
+        _manager: EntityManager,
+        _id: number,
+        _data: Update
+    ): Promise<void> {
+        // Overload this to run code before update
+    }
+
+    async afterUpdate(
+        _manager: EntityManager,
+        _id: number,
+        _data: Update
+    ): Promise<void> {
+        // Overload this to run code before update
+    }
+
+    async authPut(
+        _user: User,
+        _id: number | string,
+        _form: Put
+    ): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+        // Must have access to the records
+        // Data updates must be allowed
+        throw new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "authPut not implemented"
         );
     }
 
@@ -390,16 +432,6 @@ export class CrudsClass<
         const data = await this.putToUpdate(form);
         await this.update(id, data);
         return await this.get(id, options);
-    }
-
-    async authPut(
-        _user: User,
-        _id: number | string,
-        _form: Put
-    ): Promise<void> {
-        // Raise an ApiError if user lacks authorization
-        // Must have access to the records
-        // Data updates must be allowed
     }
 
     async userPut(

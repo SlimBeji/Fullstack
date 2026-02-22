@@ -140,6 +140,11 @@ export class CrudsPlace extends CrudsClass<
     // Update
 
     async update(id: number | string, data: PlaceUpdate): Promise<void> {
+        /*  Overloading the update method is cheaper than
+        handling the check in the after_update.
+        The goal is to avoid run unneccary embedding.
+        A form might be submitted even if the data stays the same*/
+
         const index = this.parseId(id);
         const record = await this.read(id);
         if (!record) {
