@@ -10,7 +10,7 @@ from sqlalchemy.orm import InstrumentedAttribute
 from background.publishers import place_embedding
 from lib.fastapi_ import ApiError
 from lib.sqlalchemy_ import CrudsClass
-from lib.types_ import Filter, WhereFilters
+from lib.types_ import WhereFilters
 from models.orm import Place
 from models.schemas import (
     PlaceCreateSchema,
@@ -31,7 +31,7 @@ from .utils import user_exists
 
 class PlaceOptions(TypedDict):
     process: bool | None
-    fields: list[PlaceSelectableFields]
+    fields: list[PlaceSelectableFields] | None
 
 
 class CrudsPlace(

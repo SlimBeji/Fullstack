@@ -9,7 +9,6 @@ from sqlalchemy.sql import or_
 from config import settings
 from lib.fastapi_ import ApiError
 from lib.sqlalchemy_ import CrudsClass, Join, SelectField
-from lib.types_ import Filter
 from lib.utils import hash_input, verify_hash
 from models.orm import Place, User
 from models.schemas import (
@@ -32,7 +31,7 @@ from services.instances import cloud_storage
 
 class UserOptions(TypedDict):
     process: bool | None
-    fields: list[UserSelectableFields]
+    fields: list[UserSelectableFields] | None
 
 
 class CrudsUser(
