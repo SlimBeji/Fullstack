@@ -364,6 +364,17 @@ class CrudsClass(
             result = await self.post_process(result)
         return result
 
+    async def user_get(
+        self, user: User, id: int | str, options: Options | None = None
+    ) -> Read:
+        options = options or cast(Options, {})
+        process = options.get("process", False)
+        obj = await self._get_raw(id, user=user)
+        result = self._serialize_to_read(obj)
+        if process:
+            result = await self.post_process(result)
+        return result
+
     async def get_partial(
         self, id: int | str, options: Options | None = None
     ) -> dict:
@@ -374,17 +385,6 @@ class CrudsClass(
         result = self._serialize_to_dict(obj)
         if process:
             result = await self.post_process_dict(result)
-        return result
-
-    async def user_get(
-        self, user: User, id: int | str, options: Options | None = None
-    ) -> Read:
-        options = options or cast(Options, {})
-        process = options.get("process", False)
-        obj = await self._get_raw(id, user=user)
-        result = self._serialize_to_read(obj)
-        if process:
-            result = await self.post_process(result)
         return result
 
     async def user_get_partial(
