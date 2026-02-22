@@ -337,7 +337,9 @@ class CrudsClass(
 
         query = SearchQuery[Selectables, Sortables, Searchables](
             select=fields or self.default_select,
-            where=cast(WhereFilters[Searchables], {"id": self.eq(id)}),
+            where=cast(
+                WhereFilters[Searchables], {"id": self.eq(self.parse_id(id))}
+            ),
         )
 
         # Apply ownership if needed
