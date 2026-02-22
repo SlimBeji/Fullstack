@@ -11,7 +11,7 @@ import {
     zodObject,
 } from "@/lib/zod_";
 
-import { createdAt, updatedAt } from "./common";
+import { createdAt } from "./common";
 
 // --- Fields ----
 
@@ -141,7 +141,6 @@ export type UserPost = ZodInfer<typeof UserPostSchema>;
 
 export const UserReadSchema = UserDBSchema.omit({ password: true }).extend({
     createdAt,
-    updatedAt,
 });
 
 export type UserRead = ZodInfer<typeof UserReadSchema>;

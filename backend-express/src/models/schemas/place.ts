@@ -11,7 +11,7 @@ import {
     zodObject,
 } from "@/lib/zod_";
 
-import { createdAt, updatedAt } from "./common";
+import { createdAt } from "./common";
 
 // --- Fields ----
 
@@ -164,7 +164,6 @@ export type PlacePost = ZodInfer<typeof PlacePostSchema>;
 
 export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true }).extend({
     createdAt,
-    updatedAt,
 });
 
 export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
@@ -206,7 +205,7 @@ export const PlaceSearchSchema = filtersSchema(
             example: "regex:football",
         }).optional(),
         address: httpFilters(PlaceFields.address, {
-            example: "regex:d{1,2} Boulevard",
+            example: "regex:Boulevard",
         }).optional(),
         locationLat: httpFilters(PlaceFields.lat, {
             example: "gt:3.5",
