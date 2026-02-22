@@ -114,27 +114,10 @@ export class CrudsPlace extends CrudsClass<
 
     // Read
 
-    async get(
-        id: number | string,
-        options: PlaceOptions = {} as PlaceOptions
-    ): Promise<PlaceRead> {
-        const result = await super.get(id, options);
-        if (options?.process) return await this.postProcess(result);
-        return result;
-    }
-
-    async authGet(user: UserRead, data: PlaceRead): Promise<void> {
-        if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
-        }
-
-        if (user.isAdmin) return;
-
-        if (user.id != data.creatorId) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
-                message: `Cannot access user ${data.creatorId} places`,
-            });
-        }
+    authGet(user: UserRead, query: PlaceSearchQuery): PlaceSearchQuery {
+        if (!query.where) query.where = {};
+        query.where.creatorId = this.eq(user.id);
+        return query;
     }
 
     // Update

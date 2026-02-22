@@ -98,28 +98,11 @@ export class CrudsUser extends CrudsClass<
 
     // Read
 
-    async get(
-        id: number | string,
-        options: UserOptions = {} as UserOptions
-    ): Promise<UserRead> {
-        const result = await super.get(id, options);
-        if (options?.process) return await this.postProcess(result);
-        return result;
-    }
-
-    async authGet(user: UserRead, data: UserRead): Promise<void> {
-        if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
-        }
-
-        if (user.isAdmin) return;
-
-        if (user.id !== data.id) {
-            throw new ApiError(
-                HttpStatus.UNAUTHORIZED,
-                `Access to user with id ${data.id} not granted`
-            );
-        }
+    authGet(user: UserRead, query: UserSearchQuery): UserSearchQuery {
+        // User can only access his profile in secure mode
+        if (!query.where) query.where = {};
+        query.where.id = this.eq(user.id);
+        return query;
     }
 
     async checkDuplicate(email: string, name: string): Promise<string> {

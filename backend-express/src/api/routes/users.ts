@@ -143,7 +143,7 @@ swaggerRegistery.registerPath({
 // Get User Endpoint
 async function getUser(req: Request, res: Response) {
     // All users are public
-    const user = await crudsUser.get(req.params.userId, {
+    const user = await crudsUser.getPartial(req.params.userId, {
         fields: req.parsedQuery.fields,
         process: true,
     });

@@ -30,7 +30,7 @@ export class CrudsClass<
     Searchables extends string, // List of keys we can search on
     Update extends object, // Update Interface
     Put extends object, // HTTP Put Interface
-    Options extends { fields?: Selectables[] }, // General options for HTTP methods/actions
+    Options extends { process?: boolean; fields?: Selectables[] }, // General options for HTTP methods/actions
 > {
     // Constructor, Properties & Helpers
 
@@ -300,31 +300,65 @@ export class CrudsClass<
         return await this.repository.findOneBy({ id: this.parseId(id) } as any);
     }
 
-    async get(
+    authGet(
+        _user: User,
+        _query: SearchQuery<Selectables, Sortables, Searchables>
+    ): SearchQuery<Selectables, Sortables, Searchables> {
+        // Update the where statement to add ownership filters
+        // check the select clause to see if some fields are accessible or not by the user
+        throw new Error(`authSearch not implemented for ${this.modelName}`);
+    }
+
+    async get_raw(
         id: number | string,
-        options: Options = {} as Options
-    ): Promise<Read> {
+        user: User | null,
+        fields: Selectables[] | null
+    ): Promise<DbModel> {
         // Raise a 404 Not Found ApiError if not found
-        let fields = [...this.defaultSelect];
-        if (options.fields && options.fields.length > 0) {
-            fields = options.fields;
+        let query: SearchQuery<Selectables, Sortables, Searchables> = {
+            select: fields || [...this.defaultSelect],
+            where: { id: this.eq(id) } as WhereFilters<Searchables>,
+        };
+
+        // Apply ownership if needed
+        if (user) {
+            query = this.authGet(user, query);
         }
 
-        const query = {
-            select: fields,
-            where: { id: this.eq(id) },
-        };
         const ormQuery = this.buildSelectQuery(query);
         const result = await ormQuery.getOne();
         if (!result) {
             throw this.notFoundError(id);
         }
-        // Using this.defaultSelect as select should gives a Read schema
-        return result as any as Read;
+        return result;
     }
 
-    async authGet(_user: User, _data: Read): Promise<void> {
-        // Raise an ApiError if user lacks authorization
+    async get(
+        id: number | string,
+        options: Options = {} as Options
+    ): Promise<Read> {
+        // By using the defaultSelect, we get a Read
+        const result = (await this.get_raw(id, null, null)) as any as Read;
+        if (options.process) {
+            return await this.postProcess(result);
+        }
+        return result;
+    }
+
+    async getPartial(
+        id: number | string,
+        options: Options = {} as Options
+    ): Promise<Partial<Read>> {
+        // Raise a 404 Not Found ApiError if not found
+        const result = (await this.get_raw(
+            id,
+            null,
+            options.fields || null
+        )) as any as Partial<Read>;
+        if (options.process) {
+            return await this.postProcess(result);
+        }
+        return result;
     }
 
     async userGet(
@@ -332,8 +366,28 @@ export class CrudsClass<
         id: number | string,
         options: Options = {} as Options
     ): Promise<Read> {
-        const result = await this.get(id, options);
-        await this.authGet(user, result);
+        // By using the defaultSelect, we get a Read
+        const result = (await this.get_raw(id, user, null)) as any as Read;
+        if (options.process) {
+            return await this.postProcess(result);
+        }
+        return result;
+    }
+
+    async userGetPartial(
+        user: User,
+        id: number | string,
+        options: Options = {} as Options
+    ): Promise<Partial<Read>> {
+        // Raise a 404 Not Found ApiError if not found
+        const result = (await this.get_raw(
+            id,
+            user,
+            options.fields || null
+        )) as any as Partial<Read>;
+        if (options.process) {
+            return await this.postProcess(result);
+        }
         return result;
     }
 

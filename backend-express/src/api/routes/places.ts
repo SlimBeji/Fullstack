@@ -148,7 +148,7 @@ swaggerRegistery.registerPath({
 // Get a place by ID
 async function getPlace(req: Request, res: Response) {
     // All places are public
-    const place = await crudsPlace.get(req.params.placeId, {
+    const place = await crudsPlace.getPartial(req.params.placeId, {
         fields: req.parsedQuery.fields,
         process: true,
     });
