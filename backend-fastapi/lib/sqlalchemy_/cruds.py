@@ -120,6 +120,11 @@ class CrudsClass(
         data = record.to_dict()
         return convert_dict_to_camel(data)
 
+    def _serialize_to_read(self, record: DbModel) -> Read:
+        data = record.to_dict()
+        data = convert_dict_to_camel(data)
+        return self.read_schema.model_validate(data)
+
     async def post_process(self, raw: Read) -> Read:
         """Override this when subclassing"""
         return raw
@@ -352,7 +357,7 @@ class CrudsClass(
         options = options or cast(Options, {})
         process = options.get("process", False)
         obj = await self._get_raw(id)
-        result = self.read_schema.model_validate(obj, from_attributes=True)
+        result = self._serialize_to_read(obj)
         if process:
             result = await self.post_process(result)
         return result
@@ -375,7 +380,7 @@ class CrudsClass(
         options = options or cast(Options, {})
         process = options.get("process", False)
         obj = await self._get_raw(id, user=user)
-        result = self.read_schema.model_validate(obj, from_attributes=True)
+        result = self._serialize_to_read(obj)
         if process:
             result = await self.post_process(result)
         return result
@@ -569,10 +574,7 @@ class CrudsClass(
         process = options.get("process", False)
         query.select = self.default_select
         records = await self._get_many(query)
-        results = [
-            self.read_schema.model_validate(r, from_attributes=True)
-            for r in records
-        ]
+        results = [self._serialize_to_read(r) for r in records]
         if process:
             results = await self.post_process_batch(results)
         return results
@@ -591,10 +593,7 @@ class CrudsClass(
         process = options.get("process", False)
         query.select = self.default_select
         records = await self._get_many(query, user)
-        results = [
-            self.read_schema.model_validate(r, from_attributes=True)
-            for r in records
-        ]
+        results = [self._serialize_to_read(r) for r in records]
         if process:
             results = await self.post_process_batch(results)
         return results
