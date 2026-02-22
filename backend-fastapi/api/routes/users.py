@@ -30,7 +30,8 @@ async def get_users(
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.paginate(query.to_search())
+    options = UserOptions(process=True, fields=None)
+    return await cruds.paginate(query.to_search(), options)
 
 
 @user_router.post(

@@ -637,7 +637,9 @@ class CrudsClass(
         return results
 
     async def paginate(
-        self, query: SearchQuery[Selectables, Sortables, Searchables]
+        self,
+        query: SearchQuery[Selectables, Sortables, Searchables],
+        options: Options | None = None,
     ) -> PaginatedDict:
         # The inputs should be validated in the HTTP layer
         # The selectable fields should include only fields
@@ -661,7 +663,11 @@ class CrudsClass(
         # Step 3: fetching results
         data = await self.search_partial(normalized)
 
-        # Step 4: return paginated result
+        # Ste 4: post-processing
+        if options and options.get("process", False):
+            data = await self.post_process_dict_batch(data)
+
+        # Step 5: return paginated result
         return PaginatedDict(
             page=page,
             totalPages=total_pages,
@@ -673,6 +679,7 @@ class CrudsClass(
         self,
         user: User,
         query: SearchQuery[Selectables, Sortables, Searchables],
+        options: Options | None = None,
     ) -> PaginatedDict:
         query = self.auth_get(user, query)
-        return await self.paginate(query)
+        return await self.paginate(query, options)
