@@ -2,6 +2,7 @@ import {
     DataSource,
     DeepPartial,
     DeleteResult,
+    EntityManager,
     QueryFailedError,
     Repository,
     SelectQueryBuilder,
@@ -141,13 +142,7 @@ export class CrudsClass<
 
         // Apply select
         if (!query.select || query.select.length === 0) {
-            throw new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "CRUDS error",
-                {
-                    error: `No fields provided for the select statement for ${this.modelName} query`,
-                }
-            );
+            query.select = [...this.defaultSelect];
         }
         ormQuery = applySelect(ormQuery, query.select, (item) =>
             this.mapSelect(item)
@@ -194,12 +189,23 @@ export class CrudsClass<
 
     async create(data: Create): Promise<number> {
         // Use transactions when executing pre and post hooks
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        const manager = queryRunner.manager;
+
         try {
-            const result = await this.repository.insert(
+            await this.beforeCreate(manager, data);
+            const result = await manager.insert(
+                this.repository.target,
                 this.createEntity(data)
             );
-            return result.identifiers[0].id;
+            const id = result.identifiers[0].id;
+            await this.afterCreate(manager, id, data);
+            await queryRunner.commitTransaction();
+            return id;
         } catch (err) {
+            await queryRunner.rollbackTransaction();
             if (
                 err instanceof QueryFailedError &&
                 err.driverError?.code === "23505"
@@ -214,7 +220,21 @@ export class CrudsClass<
                 throw new ApiError(status, message);
             }
             throw err;
+        } finally {
+            await queryRunner.release();
         }
+    }
+
+    async beforeCreate(_manager: EntityManager, _data: Create): Promise<void> {
+        // Overload this to run code before create
+    }
+
+    async afterCreate(
+        _manager: EntityManager,
+        _id: number,
+        _data: Create
+    ): Promise<void> {
+        // Overload this to run code before create
     }
 
     async postToCreate(data: Post): Promise<Create> {
@@ -222,15 +242,19 @@ export class CrudsClass<
         return data as any as Create;
     }
 
+    async authPost(_user: User, _form: Post): Promise<void> {
+        // Raise an ApiError if user lacks authorization
+        throw new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "authPost not implemented"
+        );
+    }
+
     async post(form: Post, options: Options = {} as Options): Promise<Read> {
         // create from a post form
         const data = await this.postToCreate(form);
         const id = await this.create(data);
         return await this.get(id, options);
-    }
-
-    async authPost(_user: User, _form: Post): Promise<void> {
-        // Raise an ApiError if user lacks authorization
     }
 
     async userPost(

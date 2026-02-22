@@ -1,3 +1,5 @@
+import { EntityManager } from "typeorm";
+
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
 import { ApiError, HttpStatus } from "@/lib/express_";
@@ -67,18 +69,20 @@ export class CrudsPlace extends CrudsClass<
 
     // Create
 
-    async create(data: PlaceCreate) {
-        const id = await super.create(data);
+    async afterCreate(
+        _manager: EntityManager,
+        id: number,
+        _data: PlaceCreate
+    ): Promise<void> {
         placeEmbedding(id);
-        return id;
     }
 
-    async seed(data: PlaceCreate, embedding: number[]): Promise<PlaceRead> {
+    async seed(data: PlaceCreate, embedding: number[]): Promise<number> {
         // Used when seeding the dev/test database
         // Avoid triggering the place embedding
         const id = await super.create(data);
         await this.updateEmbedding(id, embedding);
-        return await this.get(id);
+        return id;
     }
 
     async postToCreate(form: PlacePost): Promise<PlaceCreate> {

@@ -32,8 +32,8 @@ const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
                 creatorId: userRefMapping.get(_createorRef)!,
             };
             // using seed instead of create to be able to set the embedding
-            const place = await crudsPlace.seed(data, embedding!);
-            placeRefMapping.set(newPlaceIn._ref, place.id);
+            const id = await crudsPlace.seed(data, embedding!);
+            placeRefMapping.set(newPlaceIn._ref, id);
         })
     );
 };
