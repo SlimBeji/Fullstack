@@ -13,7 +13,6 @@ bcrypt
 
 # PostgreSQL & Redis
 sqlalchemy[asyncio]
-sqlalchemy-serializer
 asyncpg
 pgvector
 alembic

@@ -1,12 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer
+from sqlalchemy import DateTime, Integer, inspect
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
-from sqlalchemy_serializer import SerializerMixin
 
 
-class BaseModel(DeclarativeBase, SerializerMixin):
+class BaseModel(DeclarativeBase):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(
@@ -26,3 +25,17 @@ class BaseModel(DeclarativeBase, SerializerMixin):
         onupdate=func.now(),
         nullable=False,
     )
+
+    def to_dict(self) -> dict:
+        result = {}
+        insp = inspect(self)
+
+        for c in insp.mapper.column_attrs:
+            if c.key not in insp.unloaded:
+                result[c.key] = getattr(self, c.key)
+
+        for c in insp.mapper.relationships:
+            if c.key not in insp.unloaded:
+                result[c.key] = getattr(self, c.key)
+
+        return result
