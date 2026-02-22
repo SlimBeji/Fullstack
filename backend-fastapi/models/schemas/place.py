@@ -47,7 +47,7 @@ address_meta = FieldMeta(
     min_length=1,
     description="The place address",
     examples=["Fulham road"],
-    filter_examples=["like:d{1,2} Boulevard"],
+    filter_examples=["like:Boulevard"],
 )
 address_annot = Annotated[str, address_meta.info]
 
