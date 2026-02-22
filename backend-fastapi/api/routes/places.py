@@ -36,7 +36,7 @@ async def get_places(
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.paginate(query)
+    return await cruds.paginate(query.to_search())
 
 
 @place_router.post(
@@ -49,7 +49,7 @@ async def get_places_from_post(
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.paginate(query)
+    return await cruds.paginate(query.to_search())
 
 
 @place_router.post(

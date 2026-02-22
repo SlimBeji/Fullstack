@@ -232,7 +232,9 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema] | PaginatedDict
 
 
 class PlaceSearchSchema(
-    BaseSearchSchema[PlaceSelectableFields, PlaceSortableFields]
+    BaseSearchSchema[
+        PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
+    ]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
 

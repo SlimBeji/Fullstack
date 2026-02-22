@@ -3,8 +3,11 @@ from typing import Annotated, Generic, TypeVar, cast
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo, ModelPrivateAttr
 
-SortableFields = TypeVar("SortableFields")
-SelectableFields = TypeVar("SelectableFields")
+from lib.types_ import SearchQuery, WhereFilters
+
+SortableFields = TypeVar("SortableFields", bound=str)
+SelectableFields = TypeVar("SelectableFields", bound=str)
+SearchableFields = TypeVar("SearchableFields", bound=str)
 
 
 class BaseGetSchema(BaseModel, Generic[SelectableFields]):
@@ -32,7 +35,9 @@ class BaseGetSchema(BaseModel, Generic[SelectableFields]):
         )
 
 
-class BaseSearchSchema(BaseModel, Generic[SelectableFields, SortableFields]):
+class BaseSearchSchema(
+    BaseModel, Generic[SelectableFields, SortableFields, SearchableFields]
+):
     _MAX_SIZE: int = 100
     _DEFAULT_SORT: list[str] = ["-createdAt"]
     _DEFAULT_FIELDS: list[str] = ["id"]
@@ -53,6 +58,22 @@ class BaseSearchSchema(BaseModel, Generic[SelectableFields, SortableFields]):
             examples=[_DEFAULT_FIELDS],
         ),
     ] = None
+
+    def to_search(
+        self,
+    ) -> SearchQuery[SelectableFields, SortableFields, SearchableFields]:
+        where = {}
+        for field_name in self.__class__.model_fields:
+            if field_name not in ["page", "size", "sort", "fields"]:
+                where[field_name] = getattr(self, field_name)
+
+        return SearchQuery[SelectableFields, SortableFields, SearchableFields](
+            page=self.page,
+            size=self.size,
+            select=self.fields,
+            orderby=self.sort,
+            where=where,
+        )
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)

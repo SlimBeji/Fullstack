@@ -177,7 +177,9 @@ UsersPaginatedSchema = PaginatedData[UserReadSchema] | PaginatedDict
 
 
 class UserSearchSchema(
-    BaseSearchSchema[UserSelectableFields, UserSortableFields]
+    BaseSearchSchema[
+        UserSelectableFields, UserSortableFields, UserSearchableFields
+    ]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
 
