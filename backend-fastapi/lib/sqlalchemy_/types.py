@@ -39,7 +39,7 @@ class SelectField:
 
     @property
     def tablename(self) -> str:
-        return self.select.property.mapper.class_.__tablename__
+        return self.select.class_.__tablename__
 
 
 @dataclass
