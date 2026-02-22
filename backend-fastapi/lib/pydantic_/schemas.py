@@ -1,6 +1,5 @@
 from typing import Annotated, Generic, TypeVar, cast
 
-from fastapi import Query
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo, ModelPrivateAttr
 
@@ -15,8 +14,8 @@ class BaseSearchSchema(
     BaseModel, Generic[SelectableFields, SortableFields, SearchableFields]
 ):
     _MAX_SIZE: int = 100
-    _DEFAULT_SORT: list[str] = ["-createdAt"]
-    _DEFAULT_FIELDS: list[str] = ["id"]
+    _DEFAULT_SORT: list[SortableFields] = ["-createdAt"]  # type: ignore
+    _DEFAULT_FIELDS: list[SelectableFields] = ["id"]  # type: ignore
 
     page: Annotated[int, Field(1, description="The page number")]
     size: Annotated[int, Field(_MAX_SIZE, description="Items per page")]
@@ -24,14 +23,14 @@ class BaseSearchSchema(
         list[SortableFields] | None,
         Field(
             description="Fields to use for sorting. Use '-' for descending",
-            examples=[_DEFAULT_SORT],
+            json_schema_extra={"examples": [_DEFAULT_SORT]},  # type: ignore
         ),
     ] = None
     fields: Annotated[
         list[SelectableFields] | None,
         Field(
             description="Fields to include in the response; omit for full document",
-            examples=[_DEFAULT_FIELDS],
+            json_schema_extra={"examples": [_DEFAULT_FIELDS]},  # type: ignore
         ),
     ] = None
 
@@ -66,9 +65,9 @@ class BaseSearchSchema(
         sort_field = cls.model_fields["sort"]
         cls.model_fields["sort"] = FieldInfo(
             annotation=sort_field.annotation,
-            default=default_sort.default,
+            default=[],
             description=sort_field.description,
-            examples=[default_sort.default],
+            json_schema_extra=dict(examples=[default_sort.default]),  # type: ignore
         )
 
         # Update fields default and examples
@@ -76,7 +75,7 @@ class BaseSearchSchema(
         fields_field = cls.model_fields["fields"]
         cls.model_fields["fields"] = FieldInfo(
             annotation=fields_field.annotation,
-            default=default_fields.default,
+            default=[],
             description=fields_field.description,
-            examples=[default_fields.default],
+            json_schema_extra=dict(examples=[default_fields.default]),  # type: ignore
         )

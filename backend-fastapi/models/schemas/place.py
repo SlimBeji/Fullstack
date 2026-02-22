@@ -227,6 +227,7 @@ class PlaceSearchSchema(
     ]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
+    _DEFAULT_FIELDS = ["id", "location"]  # type: ignore
 
     id: HttpFilters[id_annot]
     title: HttpFilters[title_annot]

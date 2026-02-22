@@ -172,6 +172,7 @@ class UserSearchSchema(
     ]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
+    _DEFAULT_FIELDS = ["id", "places"]  # type: ignore
 
     id: HttpFilters[id_annot]
     name: HttpFilters[name_annot]
