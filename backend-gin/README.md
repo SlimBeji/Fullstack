@@ -7,9 +7,10 @@ This backend is written in **Go** and follows the architecture and principles de
 | Purpose         | Library Used                                                          |
 | --------------- | --------------------------------------------------------------------- |
 | HTTP Server     | [gin](https://github.com/gin-gonic/gin)                               |
-| Database ORM    | [mongo-go-driver](https://github.com/mongodb/mongo-go-driver)         |
+| ORM             | [Gorm](https://gorm.io/)                                              |
+| Migrations      | [Atlas](https://atlasgo.io/)                                          |
 | Data Validation | [go-playground/validator](https://github.com/go-playground/validator) |
-| OpenAPI Docs    | [gin-swagger](github.com/swaggo/gin-swagger)                          |
+| OpenAPI Docs    | [gin-swagger](https://github.com/swaggo/gin-swagger)                  |
 | Background Jobs | [asynq](https://github.com/hibiken/asynq)                             |
 | Task Scheduling | [gocron](https://github.com/go-co-op/gocron)                          |
 
@@ -83,13 +84,4 @@ The following `make` commands help manage the Gin backend:
 
 ## 📌 Notes
 
-Unlike the **FastAPI** and **Express** backends, the `models/collections` and `models/crud` packages are structured differently.
-
-**Go** does not support traditional object-oriented programming like **Python** or **TypeScript**, and it also lacks advanced trait-like abstractions with reusable behavior (as found in **Rust**). Go interfaces define only method signatures, without shared implementations, which makes certain forms of code abstraction more difficult.
-
-For this reason, a slightly different approach was taken.
-
-The `models/crud` folder contains five files—`create.go`, `read.go`, `fetch.go`, `update.go`, and `delete.go`.
-Each file defines an interface that a **collection struct** must implement to support the corresponding CRUD operation.
-
-The `models/collections` folder provides the concrete implementations of these interfaces, along with additional helper methods specific to each model.
+- Swagger documentation is generated using `gin-swagger`. The command `gin-lint` runs under the hood `go swag init` to refresh tge OpenAPI and Swagger files.
