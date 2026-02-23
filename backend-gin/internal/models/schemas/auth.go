@@ -9,8 +9,8 @@ import (
 )
 
 type TokenPayload struct {
-	UserId string `json:"userId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"userId"` // The user ID, 24 characters
-	Email  string `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                     // The user email
+	UserId string `json:"userId" validate:"hexadecimal,len=24"`
+	Email  string `json:"email" validate:"email"`
 }
 
 func DecodeEncodedToken(encoded string) (TokenPayload, error) {
@@ -51,23 +51,23 @@ func DecodeEncodedToken(encoded string) (TokenPayload, error) {
 }
 
 type SignupForm struct {
-	Name     string                `json:"name" form:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                // The user name, two characters at least
-	Email    string                `json:"email" form:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`   // The user email
-	Password string                `json:"password" form:"password" validate:"min=10" example:"very_secret" bson:"password"` // The user password, 10 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`        // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"min=2" example:"Slim Beji"`             // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"email" example:"mslimbeji@gmail.com"` // The user email
+	Password string                `json:"password" form:"password" validate:"min=10" example:"very_secret"`  // The user password, 10 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`      // User's profile image (JPEG)
 }
 
 type SigninForm struct {
-	Username string `json:"username" form:"username" validate:"email" default:"mslimbeji@gmail.com" bson:"username"` // The user email (We use username here because of OAuth spec)
-	Password string `json:"password" form:"password" validate:"min=10" default:"very_secret" bson:"password"`        // The user password, 10 characters at least
+	Username string `json:"username" form:"username" validate:"email" default:"mslimbeji@gmail.com"` // The user email (We use username here because of OAuth spec)
+	Password string `json:"password" form:"password" validate:"min=10" default:"very_secret"`        // The user password, 10 characters at least
 }
 
 type EncodedToken struct {
-	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM" bson:"access_token"` // A generated web token. The 'Bearer ' prefix needs to be added for authentication
-	TokenType   string `json:"token_type" validate:"oneof=bearer" example:"bearer" bson:"token_type"`                                                                                                                                                                                              // The type of token. Only 'bearer' is supported.
-	UserId      string `json:"userId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"userId"`                                                                                                                                                                              // The user ID, 24 characters
-	Email       string `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                                                                                                                                                                                  // The user email
-	ExpiresIn   int    `json:"expires_in" example:"1751879562" bson:"expires_in"`                                                                                                                                                                                                                  // The UNIX timestamp the token expires at
+	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"` // A generated web token. The 'Bearer ' prefix needs to be added for authentication
+	TokenType   string `json:"token_type" validate:"oneof=bearer" example:"bearer"`                                                                                                                                                                                            // The type of token. Only 'bearer' is supported.
+	UserId      string `json:"userId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f"`                                                                                                                                                                        // The user ID, 24 characters
+	Email       string `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                                                                                                                                                                           // The user email
+	ExpiresIn   int    `json:"expires_in" validate:"gt=0" example:"1751879562"`                                                                                                                                                                                                // The UNIX timestamp the token expires at
 }
 
 func CreateToken(id string, email string) (EncodedToken, error) {
