@@ -22,6 +22,8 @@ type Settings struct {
 	Env               string `envconfig:"ENV" required:"true"`
 
 	// DATABASE config
+	DatabaseUrl     string `envconfig:"DATABASE_URL" required:"true"`
+	DatabaseTestUrl string `envconfig:"DATABASE_TEST_URL" default:""`
 	MongoURL        string `envconfig:"MONGO_URL" required:"true"`
 	MongoDBName     string `envconfig:"MONGO_DBNAME" required:"true"`
 	MongoTestDBName string `envconfig:"MONGO_TEST_DBNAME" default:"tests"`
