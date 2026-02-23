@@ -341,48 +341,18 @@ func (pc *PlaceCollection) ToUpdateForm(
 		)
 	}
 
-	if put.CreatorID != nil {
-		creatorId, err := primitive.ObjectIDFromHex(*put.CreatorID)
-		if err != nil {
-			return result, fmt.Errorf(
-				"creatorId %s is not a valid objectId", *put.CreatorID,
-			)
-		}
-		result.CreatorID = &creatorId
-	}
-
 	return result, nil
 }
 
 func (pc *PlaceCollection) AuthUpdate(
 	user *schemas.UserRead, put *schemas.PlacePut,
 ) error {
-	creatorId := put.CreatorID
-	if creatorId == nil {
-		return nil
-	}
-
-	if user.IsAdmin {
-		return nil
-	}
-
-	if user.Id.Hex() == *creatorId {
-		return nil
-	}
-
-	return gin_.AccessDeiniedErr(
-		string(Users), *creatorId,
-	)
+	return nil
 }
 
 func (pc *PlaceCollection) PreUpdate(
 	sc mongo.SessionContext, before bson.Raw, form *schemas.PlaceUpdate,
 ) error {
-	if form.CreatorID != nil {
-		if !checkCreator(sc, *form.CreatorID) {
-			return fmt.Errorf("user %s does not exists", (*form.CreatorID).Hex())
-		}
-	}
 	return nil
 }
 
