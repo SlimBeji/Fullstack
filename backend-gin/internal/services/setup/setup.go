@@ -5,11 +5,8 @@ import (
 	"backend/internal/background/handlers"
 	"backend/internal/background/publishers"
 	"backend/internal/lib/clients"
-	"backend/internal/models/collections"
 	"backend/internal/models/examples"
 	"backend/internal/services/instances"
-	"context"
-	"fmt"
 )
 
 type AppSetup struct {
@@ -28,18 +25,6 @@ func (a *AppSetup) CloseSerives() {
 	a.TaskPublisher.Close()
 	a.TaskHandler.Close()
 	a.TaskScheduler.Close()
-}
-
-func (a *AppSetup) IndexCollections(mapping collections.IndexMapping) {
-	for name, indexes := range mapping {
-		collection := a.Mongo.DB.Collection(string(name))
-		_, err := collection.Indexes().CreateMany(
-			context.Background(), indexes,
-		)
-		if err != nil {
-			panic(fmt.Sprintf("could not index collection %s", name))
-		}
-	}
 }
 
 func New() *AppSetup {
