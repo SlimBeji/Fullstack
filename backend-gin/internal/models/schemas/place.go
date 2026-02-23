@@ -78,8 +78,8 @@ type PlaceFilters struct {
 	Fields      []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId" example:"id,title"`
 	Id          []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"`                  // The ID of the place 24 characters
 	Title       []string `json:"title" form:"title" filter:"string,min=10" example:"eq:Some Place" collectionFormat:"multi"`                                   // The place title/name, 10 characters minimum
-	Description []string `json:"description" form:"description" filter:"string,min=10" example:"regex:football" collectionFormat:"multi"`                      // The place description, 10 characters minimum
-	Address     []string `json:"address" form:"address" filter:"string,min=10" example:"regex:d{2} Boulevard" collectionFormat:"multi"`                        // The place address
+	Description []string `json:"description" form:"description" filter:"string,min=10" example:"like:football" collectionFormat:"multi"`                       // The place description, 10 characters minimum
+	Address     []string `json:"address" form:"address" filter:"string,min=10" example:"like:Boulevard" collectionFormat:"multi"`                              // The place address
 	CreatorId   []string `json:"creatorId" form:"creatorId" filter:"string,hexadecimal,len=24" example:"eq:683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The ID of the place creator, 24 characters
 	LocationLat []string `json:"locationLat" form:"locationLat" filter:"types_.FlexFloat" example:"gt:3.5" collectionFormat:"multi"`                           // The latitude of the place
 	LocationLng []string `json:"locationLng" form:"locationLng" filter:"types_.FlexFloat" example:"lt:4.5" collectionFormat:"multi"`                           // The longitude of the place
