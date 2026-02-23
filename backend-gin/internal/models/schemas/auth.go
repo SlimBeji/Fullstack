@@ -88,6 +88,7 @@ func CreateToken(id string, email string) (EncodedToken, error) {
 		ExpiresIn:   config.Env.JWTExpiration,
 	}, nil
 }
+
 func (et *EncodedToken) Bearer() string {
 	return fmt.Sprintf("Bearer %s", et.AccessToken)
 }
