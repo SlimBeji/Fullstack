@@ -150,6 +150,7 @@ gin-swagger:
 
 gin-lint: gin-swagger
 	docker exec -it gin go fmt .
+	docker exec -it gin go vet .
 	docker exec -it gin go build .
 
 gin-script/%:

@@ -60,9 +60,9 @@ The official go `fmt` package is used for code formatting. No additional utility
 
 The root directory contains the following key directories and files:
 
--   `internal/` – Contains the main application source code, following the structure defined in the root **README.md**.
--   `cmd/` – Contains entrypoints for running scripts.
--   `app.go` – The API server entrypoint.
+- `internal/` – Contains the main application source code, following the structure defined in the root **README.md**.
+- `cmd/` – Contains entrypoints for running scripts.
+- `app.go` – The API server entrypoint.
 
 > For a better development experience, hot reload is enabled in development using [air](https://github.com/air-verse/air). However, **air** does not work well if the entrypoint is placed in the `cmd/` folder. For this reason, the API server entrypoint (`app.go`) is kept separate from other `cmd` entries.
 
@@ -70,17 +70,17 @@ The root directory contains the following key directories and files:
 
 The following `make` commands help manage the Gin backend:
 
-| Command                  | Description                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------ |
-| `make gin-build`         | Build the Docker container for the Gin service.                                |
-| `make gin-bash`          | Open an interactive shell inside the running Gin container.                    |
-| `make gin-test`          | Run unit tests                                                                 |
-| `make gin-swagger`       | Run go swag init command and generate OpenAPI specifiications for Swagger UI   |
-| `make gin-lint`          | Run go swag init + go fmt + go build to make sure format + compilation is good |
-| `make gin-script/⟨name⟩` | Execute a script from `scripts/` directory (e.g. `make fastapi-script/foo`).   |
-| `make gin-debug`         | Run `debug.go` for debugging or manual testing.                                |
-| `make gin-seed`          | Run `seed_db.go` to populate the database with seed data.                      |
-| `make gin-dump`          | Run `dump_db.go` to export the database contents.                              |
+| Command                  | Description                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------------- |
+| `make gin-build`         | Build the Docker container for the Gin service.                                         |
+| `make gin-bash`          | Open an interactive shell inside the running Gin container.                             |
+| `make gin-test`          | Run unit tests                                                                          |
+| `make gin-swagger`       | Run go swag init command and generate OpenAPI specifiications for Swagger UI            |
+| `make gin-lint`          | Run go swag init + go fmt + go vet + go build to make sure format + compilation is good |
+| `make gin-script/⟨name⟩` | Execute a script from `scripts/` directory (e.g. `make fastapi-script/foo`).            |
+| `make gin-debug`         | Run `debug.go` for debugging or manual testing.                                         |
+| `make gin-seed`          | Run `seed_db.go` to populate the database with seed data.                               |
+| `make gin-dump`          | Run `dump_db.go` to export the database contents.                                       |
 
 ## 📌 Notes
 
@@ -90,7 +90,7 @@ Unlike the **FastAPI** and **Express** backends, the `models/collections` and `m
 
 For this reason, a slightly different approach was taken.
 
-The `models/crud` folder contains five files—`create.go`, `read.go`, `fetch.go`, `update.go`, and `delete.go`.  
+The `models/crud` folder contains five files—`create.go`, `read.go`, `fetch.go`, `update.go`, and `delete.go`.
 Each file defines an interface that a **collection struct** must implement to support the corresponding CRUD operation.
 
 The `models/collections` folder provides the concrete implementations of these interfaces, along with additional helper methods specific to each model.
