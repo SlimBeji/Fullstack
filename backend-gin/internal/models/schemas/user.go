@@ -8,6 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// --- Base Schemas ----
+
 type UserDB struct {
 	Id        primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The user ID, 24 characters
 	Name      string             `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
@@ -29,6 +31,8 @@ type UserSeed struct {
 	ImageUrl string          `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 }
 
+// --- Creation Schemas ---
+
 type UserCreate struct {
 	Name     string          `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
 	Email    string          `json:"email" validate:"email" example:"mslimbeji@gmail.com" bson:"email"`                                        // The user email
@@ -45,6 +49,8 @@ type UserPost struct {
 	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`        // User's profile image (JPEG)
 }
 
+// --- Read Schemas ---
+
 type UserRead struct {
 	Id        primitive.ObjectID   `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The user ID, 24 characters
 	Name      string               `json:"name" validate:"min=2" example:"Slim Beji" bson:"name"`                                                    // The user name, two characters at least
@@ -56,17 +62,7 @@ type UserRead struct {
 	UpdatedAt time.Time            `json:"updatedAt" bson:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                            // last update datetime
 }
 
-type UsersPaginated = types_.PaginatedData[PlaceRead]
-
-type UserFilters struct {
-	Page   int      `json:"page" default:"1"`
-	Size   int      `json:"size" default:"100"`
-	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places" example:"id,name"`
-	Id     []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The user ID, 24 characters
-	Name   []string `json:"name" form:"name" filter:"string,min=2" example:"eq:Slim Beji" collectionFormat:"multi"`                      // The user name, two characters at least
-	Email  []string `json:"email" form:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`          // The user email
-}
+// --- Update Schemas ---
 
 type UserUpdate struct {
 	Name     *string `json:"name" validate:"omitempty,min=2" example:"Slim Beji" bson:"name"`             // The user name, two characters at least
@@ -75,3 +71,17 @@ type UserUpdate struct {
 }
 
 type UserPut = UserUpdate
+
+type UsersPaginated = types_.PaginatedData[PlaceRead]
+
+// --- Search Schemas ---
+
+type UserFilters struct {
+	Page   int      `json:"page" default:"1"`
+	Size   int      `json:"size" default:"100"`
+	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`
+	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"`
+	Id     []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The user ID, 24 characters
+	Name   []string `json:"name" form:"name" filter:"string,min=2" example:"eq:Slim Beji" collectionFormat:"multi"`                      // The user name, two characters at least
+	Email  []string `json:"email" form:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`          // The user email
+}

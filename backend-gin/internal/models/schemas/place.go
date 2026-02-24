@@ -8,10 +8,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// --- Fields ----
+
 type Location struct {
 	Lat types_.FlexFloat `json:"lat" example:"51.48180425016331" bson:"lat"`    // The latitude of the place
 	Lng types_.FlexFloat `json:"lng" example:"-0.19090418688755467" bson:"lng"` // The longitude of the place
 }
+
+// --- Base Schemas ----
 
 type PlaceDB struct {
 	ID          primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The ID of the place 24 characters
@@ -37,6 +41,8 @@ type PlaceSeed struct {
 	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
 }
 
+// --- Creation Schemas ---
+
 type PlaceCreate struct {
 	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
 	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
@@ -57,6 +63,8 @@ type PlacePost struct {
 	CreatorID   string                `json:"creatorId" form:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`   // The ID of the place creator, 24 characters
 }
 
+// --- Read Schemas ---
+
 type PlaceRead struct {
 	ID          primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The ID of the place 24 characters
 	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
@@ -69,21 +77,7 @@ type PlaceRead struct {
 	UpdatedAt   time.Time          `json:"updatedAt" bson:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                            // last update datetime
 }
 
-type PlacesPaginated = types_.PaginatedData[PlaceRead]
-
-type PlaceFilters struct {
-	Page        int      `json:"page" default:"1"`
-	Size        int      `json:"size" default:"100"`
-	Sort        []string `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" example:"createdAt"`
-	Fields      []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId" example:"id,title"`
-	Id          []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"`                  // The ID of the place 24 characters
-	Title       []string `json:"title" form:"title" filter:"string,min=10" example:"eq:Some Place" collectionFormat:"multi"`                                   // The place title/name, 10 characters minimum
-	Description []string `json:"description" form:"description" filter:"string,min=10" example:"like:football" collectionFormat:"multi"`                       // The place description, 10 characters minimum
-	Address     []string `json:"address" form:"address" filter:"string,min=10" example:"like:Boulevard" collectionFormat:"multi"`                              // The place address
-	CreatorId   []string `json:"creatorId" form:"creatorId" filter:"string,hexadecimal,len=24" example:"eq:683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The ID of the place creator, 24 characters
-	LocationLat []string `json:"locationLat" form:"locationLat" filter:"types_.FlexFloat" example:"gt:3.5" collectionFormat:"multi"`                           // The latitude of the place
-	LocationLng []string `json:"locationLng" form:"locationLng" filter:"types_.FlexFloat" example:"lt:4.5" collectionFormat:"multi"`                           // The longitude of the place
-}
+// --- Update Schemas ---
 
 type PlaceUpdate struct {
 	Title       *string   `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
@@ -97,4 +91,22 @@ type PlacePut struct {
 	Description *string   `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
 	Address     *string   `json:"address" validate:"omitempty,min=10" example:"Fulham road" bson:"address"`                              // The place address
 	Location    *Location `json:"location" validate:"omitempty" bson:"location"`                                                         // Location object (can be sent as JSON string)
+}
+
+// --- Search Schemas ---
+
+type PlacesPaginated = types_.PaginatedData[PlaceRead]
+
+type PlaceFilters struct {
+	Page        int      `json:"page" default:"1"`
+	Size        int      `json:"size" default:"100"`
+	Sort        []string `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" example:"createdAt"`
+	Fields      []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" example:"id,title"`
+	Id          []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"`                  // The ID of the place 24 characters
+	Title       []string `json:"title" form:"title" filter:"string,min=10" example:"eq:Some Place" collectionFormat:"multi"`                                   // The place title/name, 10 characters minimum
+	Description []string `json:"description" form:"description" filter:"string,min=10" example:"like:football" collectionFormat:"multi"`                       // The place description, 10 characters minimum
+	Address     []string `json:"address" form:"address" filter:"string,min=10" example:"like:Boulevard" collectionFormat:"multi"`                              // The place address
+	CreatorId   []string `json:"creatorId" form:"creatorId" filter:"string,hexadecimal,len=24" example:"eq:683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The ID of the place creator, 24 characters
+	LocationLat []string `json:"locationLat" form:"locationLat" filter:"types_.FlexFloat" example:"gt:3.5" collectionFormat:"multi"`                           // The latitude of the place
+	LocationLng []string `json:"locationLng" form:"locationLng" filter:"types_.FlexFloat" example:"lt:4.5" collectionFormat:"multi"`                           // The longitude of the place
 }
