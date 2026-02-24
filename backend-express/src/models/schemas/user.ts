@@ -170,9 +170,11 @@ export type UsersPaginated = ZodInfer<typeof UsersPaginatedSchema>;
 
 export const UserSearchSchema = filtersSchema(
     zod.object({
-        id: httpFilters(UserFields.id, {
-            example: 123456789,
-        }).optional(),
+        id: httpFilters(
+            UserFields.id,
+            { example: 123456789 },
+            { isIndex: true }
+        ).optional(),
         name: httpFilters(UserFields.name, {
             example: "eq:Slim Beji",
         }).optional(),
