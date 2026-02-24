@@ -11,8 +11,7 @@ from .common import BaseReadSchema, created_at_annot
 # --- Fields ----
 
 id_meta = FieldMeta(
-    description="The User ID",
-    examples=[123456789],
+    description="The User ID", examples=[123456789], is_index=True
 )
 id_annot = Annotated[int, id_meta.info]
 

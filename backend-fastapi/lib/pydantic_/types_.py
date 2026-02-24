@@ -15,6 +15,7 @@ class FieldMeta:
         examples: list | None = None,
         filter_examples: list | None = None,
         is_file: bool = False,
+        is_index: bool = False,
     ):
         # Metatdata
         self.default = default
@@ -24,6 +25,7 @@ class FieldMeta:
         self.examples = examples
         self.filter_examples = filter_examples
         self.is_file = is_file
+        self.is_index = is_index
 
         # HTTP Fields
         self.info = self._build_field()
@@ -38,10 +40,13 @@ class FieldMeta:
             examples=self.examples,
         )
 
+        json_schema_extra = {}
         if self.filter_examples:
-            metadata["json_schema_extra"] = dict(
-                filter_examples=self.filter_examples
-            )
+            json_schema_extra["filter_examples"] = self.filter_examples
+        if self.is_index:
+            json_schema_extra["is_index"] = self.is_index
+        if json_schema_extra:
+            metadata["json_schema_extra"] = json_schema_extra
 
         return metadata
 

@@ -10,7 +10,9 @@ from .common import BaseReadSchema, created_at_annot
 
 # --- Fields ----
 
-id_meta = FieldMeta(description="The Place ID", examples=[123456789])
+id_meta = FieldMeta(
+    description="The Place ID", examples=[123456789], is_index=True
+)
 id_annot = Annotated[int, id_meta.info]
 
 title_meta = FieldMeta(
@@ -55,6 +57,7 @@ creatorId_meta = FieldMeta(
     description="The place creator ID",
     examples=[123456789],
     filter_examples=["in:123456789"],
+    is_index=True,
 )
 creatorId_annot = Annotated[int, creatorId_meta.info]
 
