@@ -18,8 +18,8 @@ export class User extends BaseEntity {
     @Column({ type: "varchar", select: false })
     password!: string;
 
-    @Column({ name: "image_url", type: "varchar", nullable: true })
-    imageUrl?: string;
+    @Column({ name: "image_url", type: "varchar", default: "" })
+    imageUrl!: string;
 
     @Column({ name: "is_admin", type: "bool", default: false })
     isAdmin!: boolean;

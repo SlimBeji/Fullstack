@@ -27,7 +27,9 @@ class User(BaseModel):
 
     password: Mapped[str] = mapped_column(String, nullable=False)
 
-    image_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    image_url: Mapped[Optional[str]] = mapped_column(
+        String, nullable=False, server_default=""
+    )
 
     is_admin: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False

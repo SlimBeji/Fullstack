@@ -18,8 +18,8 @@ export class Place extends BaseEntity {
     @Column("varchar")
     address!: string;
 
-    @Column({ name: "image_url", type: "varchar", nullable: true })
-    imageUrl?: string;
+    @Column({ name: "image_url", type: "varchar", default: "" })
+    imageUrl!: string;
 
     @Column("jsonb")
     location!: {

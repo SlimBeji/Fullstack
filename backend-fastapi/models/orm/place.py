@@ -28,7 +28,9 @@ class Place(BaseModel):
 
     address: Mapped[str] = mapped_column(String, nullable=False)
 
-    image_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    image_url: Mapped[Optional[str]] = mapped_column(
+        String, nullable=False, server_default=""
+    )
 
     location: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
