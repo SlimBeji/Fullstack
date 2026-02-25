@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import ForeignKey, Index, Integer, String, Text
+from sqlalchemy import ForeignKey, Index, Integer, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,14 +22,14 @@ class Place(BaseModel):
     updated_at: Mapped[datetime]
 
     # Fields
-    title: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(Text, nullable=False)
 
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
-    address: Mapped[str] = mapped_column(String, nullable=False)
+    address: Mapped[str] = mapped_column(Text, nullable=False)
 
     image_url: Mapped[Optional[str]] = mapped_column(
-        String, nullable=False, server_default=""
+        Text, nullable=False, server_default=""
     )
 
     location: Mapped[dict] = mapped_column(JSONB, nullable=False)

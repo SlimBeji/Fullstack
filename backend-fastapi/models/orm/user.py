@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Boolean, String
+from sqlalchemy import Boolean, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lib.sqlalchemy_ import BaseModel
@@ -21,14 +21,14 @@ class User(BaseModel):
     updated_at: Mapped[datetime]
 
     # Fields
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
 
-    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
 
-    password: Mapped[str] = mapped_column(String, nullable=False)
+    password: Mapped[str] = mapped_column(Text, nullable=False)
 
     image_url: Mapped[Optional[str]] = mapped_column(
-        String, nullable=False, server_default=""
+        Text, nullable=False, server_default=""
     )
 
     is_admin: Mapped[bool] = mapped_column(
