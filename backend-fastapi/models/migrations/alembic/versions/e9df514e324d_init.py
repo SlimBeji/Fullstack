@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("email", sa.String(), nullable=False),
         sa.Column("password", sa.String(), nullable=False),
-        sa.Column("image_url", sa.String(), nullable=True),
+        sa.Column("image_url", sa.String(), nullable=False, server_default=""),
         sa.Column("is_admin", sa.Boolean(), nullable=False),
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column(
@@ -57,7 +57,7 @@ def upgrade() -> None:
         sa.Column("title", sa.String(), nullable=False),
         sa.Column("description", sa.Text(), nullable=False),
         sa.Column("address", sa.String(), nullable=False),
-        sa.Column("image_url", sa.String(), nullable=True),
+        sa.Column("image_url", sa.String(), nullable=False, server_default=""),
         sa.Column(
             "location", postgresql.JSONB(astext_type=sa.Text()), nullable=False
         ),
@@ -96,7 +96,8 @@ def upgrade() -> None:
         "CREATE INDEX idx_place_embedding_vector ON places "
         "USING ivfflat (embedding vector_cosine_ops)"
     )
-    op.execute("""
+    op.execute(
+        """
         ALTER TABLE places
         ADD CONSTRAINT location_structure CHECK (
             location ? 'lat' AND
@@ -104,7 +105,8 @@ def upgrade() -> None:
             jsonb_typeof(location->'lat') = 'number' AND
             jsonb_typeof(location->'lng') = 'number'
         )
-        """)
+        """
+    )
 
 
 def downgrade() -> None:
