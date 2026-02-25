@@ -11,7 +11,7 @@ type User struct {
 	Name     string `gorm:"not null" json:"name"`
 	Email    string `gorm:"not null;unique" json:"email"`
 	Password string `gorm:"not null" json:"password"`
-	ImageURL string `gorm:"not null" json:"imageUrl"`
+	ImageURL string `gorm:"not null;default:''" json:"imageUrl"`
 	IsAdmin  bool   `gorm:"not null;default:false" json:"isAdmin"`
 
 	// Relationships

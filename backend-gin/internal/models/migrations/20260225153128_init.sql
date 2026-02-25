@@ -8,7 +8,7 @@ CREATE TABLE "users" (
   "name" text NOT NULL,
   "email" text NOT NULL,
   "password" text NOT NULL,
-  "image_url" text NOT NULL,
+  "image_url" text NOT NULL DEFAULT '',
   "is_admin" boolean NOT NULL DEFAULT false,
   PRIMARY KEY ("id"),
   CONSTRAINT "uni_users_email" UNIQUE ("email")
@@ -23,10 +23,10 @@ CREATE TABLE "places" (
   "title" text NOT NULL,
   "description" text NOT NULL,
   "address" text NOT NULL,
-  "image_url" text NOT NULL,
+  "image_url" text NOT NULL DEFAULT '',
   "location" jsonb NOT NULL,
   "embedding" vector(384) NULL,
-  "creator_id" serial NOT NULL,
+  "creator_id" integer NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "fk_users_places" FOREIGN KEY ("creator_id") REFERENCES "users" ("id") ON UPDATE NO ACTION ON DELETE CASCADE
 );
