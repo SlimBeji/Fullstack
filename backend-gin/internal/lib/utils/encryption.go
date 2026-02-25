@@ -9,8 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashInput(input string, salt int) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(input), salt)
+func HashInput(input string, saltCost int) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(input), saltCost)
 	return string(bytes), err
 }
 
@@ -21,6 +21,7 @@ func VerifyHash(plain, hashed string) bool {
 }
 
 func IsHashed(input string) bool {
+	// Cheap check if a value looks hashed or not
 	if len(input) != 60 {
 		return false
 	}
@@ -41,10 +42,13 @@ func EncodePayload(
 
 func DecodePayload(encoded string, secret string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(encoded, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
 		return []byte(secret), nil
 	})
 	if err != nil {
-		if strings.Contains(err.Error(), "token is expired") {
+		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, errors.New("token expired")
 		}
 		return nil, errors.New("token not valid")

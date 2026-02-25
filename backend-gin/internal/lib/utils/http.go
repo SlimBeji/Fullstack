@@ -8,9 +8,10 @@ import (
 	"time"
 )
 
-func PostRequest(
-	url string, timeout int, form map[string]any, auth ...string,
+func JSONPost(
+	url string, timeout int, form map[string]any, token string,
 ) (*http.Response, error) {
+	// timeout in seconds
 	jsonData, err := json.Marshal(form)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request body: %w", err)
@@ -20,10 +21,9 @@ func PostRequest(
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	if len(auth) > 0 && auth[0] != "" {
-		req.Header.Set("Authorization", "Bearer "+auth[0])
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
-
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	return client.Do(req)
 }

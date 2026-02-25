@@ -24,7 +24,7 @@ func (h *HuggingFaceClient) BaseUrl() string {
 func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
 	requestBody := map[string]any{"inputs": []string{text}}
 	url := h.BaseUrl()
-	resp, err := utils.PostRequest(
+	resp, err := utils.JSONPost(
 		url, h.config.Timeout, requestBody, h.config.Token,
 	)
 	if err != nil {

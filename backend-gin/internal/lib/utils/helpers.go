@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -13,6 +12,17 @@ func StrToBool(str string) bool {
 		return true
 	default:
 		return false
+	}
+}
+
+func CheckBool(str string) (bool, error) {
+	switch strings.ToLower(str) {
+	case "true", "1", "t", "y", "yes":
+		return true, nil
+	case "false", "0", "f", "n", "no":
+		return false, nil
+	default:
+		return false, fmt.Errorf("cannot convert %q to boolean", str)
 	}
 }
 
@@ -29,26 +39,6 @@ func RemoveFromList(list []string, sub string) ([]string, bool) {
 	}
 
 	return result, found
-}
-
-func RemoveReFromList(list []string, pattern string) ([]string, string) {
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return list, ""
-	}
-
-	match := ""
-	result := make([]string, 0, len(list))
-
-	for _, i := range list {
-		if re.MatchString(i) {
-			match = i
-		} else {
-			result = append(result, i)
-		}
-	}
-
-	return result, match
 }
 
 func MergeUnique[T comparable](l1, l2 []T) []T {
