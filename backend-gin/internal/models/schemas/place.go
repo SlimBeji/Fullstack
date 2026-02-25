@@ -18,79 +18,79 @@ type Location struct {
 // --- Base Schemas ----
 
 type PlaceDB struct {
-	ID          primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The ID of the place 24 characters
-	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
-	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
-	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
-	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=0|len=384" bson:"embedding"`                                                      // Title + Description embedding
-	CreatorID   primitive.ObjectID `json:"creatorId" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`                                            // The ID of the place creator, 24 characters
-	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time          `json:"updatedAt" bson:"updatedAt"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Title       string             `bson:"title"`
+	Description string             `bson:"description"`
+	Address     string             `bson:"address"`
+	Location    Location           `bson:"location"`
+	ImageUrl    string             `bson:"imageUrl"`
+	Embedding   []types_.FlexFloat `bson:"embedding"`
+	CreatorID   primitive.ObjectID `bson:"creatorId"`
+	CreatedAt   time.Time          `bson:"createdAt"`
+	UpdatedAt   time.Time          `bson:"updatedAt"`
 }
 
 type PlaceSeed struct {
 	Ref         int
 	CreatorRef  int
-	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
-	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
-	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
-	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=0|len=384" bson:"embedding"`                                                      // Title + Description embedding
-	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
+	Title       string
+	Description string
+	Address     string
+	Location    Location
+	Embedding   []types_.FlexFloat
+	ImageUrl    string
 }
 
 // --- Creation Schemas ---
 
 type PlaceCreate struct {
-	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
-	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
-	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
-	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=0|len=384" bson:"embedding"`                                                      // Title + Description embedding
-	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	CreatorID   primitive.ObjectID `json:"creatorId" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`                                            // The ID of the place creator, 24 characters
+	Title       string             `json:"title" validate:"min=10"`
+	Description string             `json:"description" validate:"min=10" `
+	Address     string             `json:"address" validate:"min=10" `
+	Location    Location           `json:"location" `
+	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=0|len=384" `
+	ImageUrl    string             `json:"imageUrl" validate:"omitempty" `
+	CreatorID   primitive.ObjectID `json:"creatorId" `
 }
 
 type PlacePost struct {
-	Title       string                `json:"title" form:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                    // The place title/name, 10 characters minimum
-	Description string                `json:"description" form:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
-	Address     string                `json:"address" form:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                  // The place address
-	Lat         types_.FlexFloat      `json:"lat" form:"lat" example:"51.48180425016331" bson:"lat"`                                                          // The latitude of the place
-	Lng         types_.FlexFloat      `json:"lng" form:"lng" example:"-0.19090418688755467" bson:"lng"`                                                       // The longitude of the place
-	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" bson:"image" swaggerignore:"true"`                                      // Place Image (JPEG)
-	CreatorID   string                `json:"creatorId" form:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`   // The ID of the place creator, 24 characters
+	Title       string                `json:"title" form:"title" validate:"min=10" example:"Stamford Bridge"`                               // The place title/name, 10 characters minimum
+	Description string                `json:"description" form:"description" validate:"min=10" example:"Stadium of Chelsea football club" ` // The place description, 10 characters minimum
+	Address     string                `json:"address" form:"address" validate:"min=10" example:"Fulham road" `                              // The place address
+	Lat         types_.FlexFloat      `json:"lat" form:"lat" example:"51.48180425016331" `                                                  // The latitude of the place
+	Lng         types_.FlexFloat      `json:"lng" form:"lng" example:"-0.19090418688755467" `                                               // The longitude of the place
+	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                 // Place Image (JPEG)
+	CreatorID   string                `json:"creatorId" form:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" ` // The ID of the place creator, 24 characters
 }
 
 // --- Read Schemas ---
 
 type PlaceRead struct {
-	ID          primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"_id,omitempty"`                 // The ID of the place 24 characters
-	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" bson:"title"`                                           // The place title/name, 10 characters minimum
-	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" bson:"description"`              // The place description, 10 characters minimum
-	Address     string             `json:"address" validate:"min=10" example:"Fulham road" bson:"address"`                                           // The place address
-	Location    Location           `json:"location" bson:"location"`                                                                                 // Location object (can be sent as JSON string)
-	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" bson:"imageUrl"` // local url on the storage
-	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" bson:"creatorId"`              // The ID of the place creator, 24 characters
-	CreatedAt   time.Time          `json:"createdAt" bson:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                            // creation datetime
-	UpdatedAt   time.Time          `json:"updatedAt" bson:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                            // last update datetime
+	ID          primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" `                      // The ID of the place 24 characters
+	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" `                                        // The place title/name, 10 characters minimum
+	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" `                 // The place description, 10 characters minimum
+	Address     string             `json:"address" validate:"min=10" example:"Fulham road" `                                          // The place address
+	Location    Location           `json:"location" `                                                                                 // Location object (can be sent as JSON string)
+	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
+	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" `               // The ID of the place creator, 24 characters
+	CreatedAt   time.Time          `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
+	UpdatedAt   time.Time          `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
 }
 
 // --- Update Schemas ---
 
 type PlaceUpdate struct {
-	Title       *string   `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
-	Description *string   `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
-	Address     *string   `json:"address" validate:"omitempty,min=10" example:"Fulham road" bson:"address"`                              // The place address
-	Location    *Location `json:"location" validate:"omitempty" bson:"location"`                                                         // Location object (can be sent as JSON string)
+	Title       *string   `json:"title" validate:"omitempty,min=10" `
+	Description *string   `json:"description" validate:"omitempty,min=10" `
+	Address     *string   `json:"address" validate:"omitempty,min=10" `
+	Location    *Location `json:"location" validate:"omitempty" `
 }
 
 type PlacePut struct {
-	Title       *string   `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" bson:"title"`                              // The place title/name, 10 characters minimum
-	Description *string   `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" bson:"description"` // The place description, 10 characters minimum
-	Address     *string   `json:"address" validate:"omitempty,min=10" example:"Fulham road" bson:"address"`                              // The place address
-	Location    *Location `json:"location" validate:"omitempty" bson:"location"`                                                         // Location object (can be sent as JSON string)
+	Title       *string   `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" `                        // The place title/name, 10 characters minimum
+	Description *string   `json:"description" validate:"omitempty,min=10" example:"Stadium of Chelsea football club" ` // The place description, 10 characters minimum
+	Address     *string   `json:"address" validate:"omitempty,min=10" example:"Fulham road" `                          // The place address
+	Location    *Location `json:"location" validate:"omitempty" `                                                      // Location object (can be sent as JSON string)
 }
 
 // --- Search Schemas ---

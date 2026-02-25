@@ -530,7 +530,7 @@ func (uc *UserCollection) UpdateById(
 func (uc *UserCollection) UserUpdate(
 	user *schemas.UserRead,
 	filters bson.M,
-	put *schemas.UserUpdate,
+	put *schemas.UserPut,
 	ctx context.Context,
 ) (schemas.UserRead, error) {
 	return crud.UserUpdate(uc, user, filters, put, ctx)
@@ -539,7 +539,7 @@ func (uc *UserCollection) UserUpdate(
 func (uc *UserCollection) UserUpdateById(
 	user *schemas.UserRead,
 	id string,
-	put *schemas.UserUpdate,
+	put *schemas.UserPut,
 	ctx context.Context,
 ) (schemas.UserRead, error) {
 	return crud.UserUpdateById(uc, user, id, put, ctx)
