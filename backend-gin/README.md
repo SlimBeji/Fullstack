@@ -74,6 +74,10 @@ The following `make` commands help manage the Gin backend:
 | ------------------------ | --------------------------------------------------------------------------------------- |
 | `make gin-build`         | Build the Docker container for the Gin service.                                         |
 | `make gin-bash`          | Open an interactive shell inside the running Gin container.                             |
+| `make gin-atlas`         | Setup Atlas clean Dev DB.                                                               |
+| `make gin-diff/⟨name⟩`   | Generate a new sql migration file (e.g. `make gin-diff/add_users`).                     |
+| `make gin-migrate`       | Apply pending migrations to both dev and test databases.                                |
+| `make gin-revert`        | Rollback the last migration on both dev and test databases.                             |
 | `make gin-test`          | Run unit tests                                                                          |
 | `make gin-swagger`       | Run go swag init command and generate OpenAPI specifiications for Swagger UI            |
 | `make gin-lint`          | Run go swag init + go fmt + go vet + go build to make sure format + compilation is good |
