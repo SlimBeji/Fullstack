@@ -9,16 +9,16 @@ import { Tables } from "./tables";
 export class User extends BaseEntity {
     // Fields
 
-    @Column("varchar")
+    @Column("text")
     name!: string;
 
-    @Column({ type: "varchar", unique: true })
+    @Column({ type: "text", unique: true })
     email!: string;
 
-    @Column({ type: "varchar", select: false })
+    @Column({ type: "text", select: false })
     password!: string;
 
-    @Column({ name: "image_url", type: "varchar", default: "" })
+    @Column({ name: "image_url", type: "text", default: "" })
     imageUrl!: string;
 
     @Column({ name: "is_admin", type: "bool", default: false })

@@ -9,16 +9,16 @@ import { User } from "./user.entity";
 export class Place extends BaseEntity {
     // Fields
 
-    @Column("varchar")
+    @Column("text")
     title!: string;
 
     @Column("text")
     description!: string;
 
-    @Column("varchar")
+    @Column("text")
     address!: string;
 
-    @Column({ name: "image_url", type: "varchar", default: "" })
+    @Column({ name: "image_url", type: "text", default: "" })
     imageUrl!: string;
 
     @Column("jsonb")
