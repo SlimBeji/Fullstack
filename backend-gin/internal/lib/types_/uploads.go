@@ -18,42 +18,47 @@ func (f *FileToUpload) Size() int {
 	return len(f.Buffer)
 }
 
-func (f *FileToUpload) FromPath(filePath string) error {
-	f.OriginalName = filepath.Base(filePath)
-
-	f.MimeType = mime.TypeByExtension(filepath.Ext(filePath))
-	if f.MimeType == "" {
-		f.MimeType = "application/octet-stream"
-	}
-
+func NewFileFromPath(filePath string) (*FileToUpload, error) {
 	buffer, err := os.ReadFile(filePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	f.Buffer = buffer
-	return nil
+	mimeType := mime.TypeByExtension(filepath.Ext(filePath))
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	return &FileToUpload{
+		OriginalName: filepath.Base(filePath),
+		MimeType:     mimeType,
+		Buffer:       buffer,
+	}, nil
 }
 
-func (f *FileToUpload) FromMultipartHeader(
-	fileHeader *multipart.FileHeader,
-) error {
-	f.OriginalName = fileHeader.Filename
-
-	f.MimeType = mime.TypeByExtension(filepath.Ext(f.OriginalName))
-	if f.MimeType == "" {
-		f.MimeType = fileHeader.Header.Get("Content-Type")
-		if f.MimeType == "" {
-			f.MimeType = "application/octet-stream"
-		}
-	}
-
+func NewFileFromMultipart(fileHeader *multipart.FileHeader) (*FileToUpload, error) {
 	file, err := fileHeader.Open()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
-	f.Buffer, err = io.ReadAll(file)
-	return err
+	buffer, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	mimeType := mime.TypeByExtension(filepath.Ext(fileHeader.Filename))
+	if mimeType == "" {
+		mimeType = fileHeader.Header.Get("Content-Type")
+		if mimeType == "" {
+			mimeType = "application/octet-stream"
+		}
+	}
+
+	return &FileToUpload{
+		OriginalName: fileHeader.Filename,
+		MimeType:     mimeType,
+		Buffer:       buffer,
+	}, nil
 }

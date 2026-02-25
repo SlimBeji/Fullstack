@@ -277,8 +277,11 @@ func (uc *UserCollection) ToCreateForm(
 	}
 
 	if post.Image != nil {
-		var f types_.FileToUpload
-		f.FromMultipartHeader(post.Image)
+		f, err := types_.NewFileFromMultipart(post.Image)
+		if err != nil {
+			return form, fmt.Errorf("could not read image: %w", err)
+		}
+
 		storage := instances.GetStorage()
 		form.ImageUrl, err = storage.UploadFile(&f)
 		if err != nil {

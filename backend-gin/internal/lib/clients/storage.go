@@ -119,17 +119,19 @@ func (cs *CloudStorage) UploadFile(file any, destination ...string) (string, err
 		return "", nil
 	}
 
-	var fileToUpload types_.FileToUpload
+	var fileToUpload *types_.FileToUpload
 	var err error
 
 	switch f := file.(type) {
 	case string:
-		err = fileToUpload.FromPath(f)
+		fileToUpload, err = types_.NewFileFromPath(f)
 		if err != nil {
 			return "", fmt.Errorf("failed to read file from path: %w", err)
 		}
 	case *types_.FileToUpload:
-		fileToUpload = *f
+		fileToUpload = f
+	case types_.FileToUpload:
+		fileToUpload = &f
 	default:
 		return "", fmt.Errorf("unsupported file type %T", file)
 	}
