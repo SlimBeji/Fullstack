@@ -10,18 +10,12 @@ from lib.clients import (
     RedisClientConfig,
 )
 
-pg_config = PgClientConfig(
-    uri=(
-        settings.async_db_test_url
-        if settings.is_test
-        else settings.async_db_url
-    )
-)
+pg_config = PgClientConfig(uri=settings.pg_url)
 
 pg_client = PgClient(pg_config)
 
 redis_config = RedisClientConfig(
-    uri=settings.REDIS_TEST_URL if settings.is_test else settings.REDIS_URL,
+    uri=settings.redis_url,
     expiration=settings.REDIS_DEFAULT_EXPIRATION,
 )
 redis_client = RedisClient(redis_config)
