@@ -23,12 +23,12 @@ import (
 
 func getPlaceExamples() ([]schemas.PlaceRead, error) {
 	pc := collections.GetPlaceCollection()
-	findQuery := types_.FindQuery{
-		Filters: types_.FindQueryFilters{
+	searchQuery := types_.SearchQuery{
+		Where: types_.WhereFilters{
 			"title": {{Op: "eq", Val: "Stamford Bridge"}},
 		},
 	}
-	data, err := pc.FetchPage(&findQuery, context.Background())
+	data, err := pc.FetchPage(&searchQuery, context.Background())
 	if err != nil {
 		return []schemas.PlaceRead{}, errors.New(
 			"could not extract examples for testing places endpoints",

@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-func BuildFindQuery(
-	filters any, findQuery *types_.FindQuery, maxItems int,
+func BuildSearchQuery(
+	filters any, findQuery *types_.SearchQuery, maxItems int,
 ) map[string][]string {
 	result := make(map[string][]string)
 	values := reflect.ValueOf(filters)
@@ -59,23 +59,23 @@ func BuildFindQuery(
 			if msg != "" {
 				result["sort"] = []string{msg}
 			}
-			findQuery.Sort = val
+			findQuery.OrderBy = val
 		case "Fields":
 			val, msg := validateLists(value, validateTag)
 			if msg != "" {
 				result["fields"] = []string{msg}
 			}
-			findQuery.Fields = val
+			findQuery.Select = val
 		default:
 			val, msgs := validateFilters(type_.Name, value, filterTag)
 			if len(msgs) > 0 {
 				result[type_.Name] = msgs
 			}
-			if findQuery.Filters == nil {
-				findQuery.Filters = make(types_.FindQueryFilters)
+			if findQuery.Where == nil {
+				findQuery.Where = make(types_.WhereFilters)
 			}
 			if len(val) > 0 {
-				findQuery.Filters[type_.Tag.Get("json")] = val
+				findQuery.Where[type_.Tag.Get("json")] = val
 			}
 		}
 	}
@@ -200,27 +200,21 @@ func validateStringFilter(
 	filter.Op = op
 
 	switch op {
-	case types_.FilterEq, types_.FilterNe:
+	// Single value filters that needs validation
+	case types_.FilterEq, types_.FilterNe, types_.FilterNull:
 		filter.Val = rawVal
 		vals = []string{rawVal}
+	// Array values filters that needs validation
 	case types_.FilterIn, types_.FilterNin:
 		parts := strings.Split(rawVal, ",")
 		filter.Val = parts
 		vals = parts
-	case types_.FilterRegex:
+	// Single value filters that needs no validation
+	case types_.FilterLike, types_.FilterIlike:
 		filter.Val = rawVal
-		return filter, msgs
-	case types_.FilterText:
-		filter.Val = rawVal
-		if !params.isIndexed {
-			return filter, []string{fmt.Sprintf("you cannot use text filter for field %s", params.fieldName)}
-		}
-		return filter, msgs
-	case types_.FilterExists:
-		filter.Val = utils.StrToBool(rawVal)
 		return filter, msgs
 	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne, regex, text, in, nin, exists", params.fieldName, op)
+		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,null,in,nin,like,ilike", params.fieldName, op)
 		return filter, []string{msg}
 	}
 
@@ -265,11 +259,8 @@ func validateIntFilter(
 			return filter, msgs
 		}
 		filter.Val = vals
-	case types_.FilterExists:
-		filter.Val = utils.StrToBool(rawVal)
-		return filter, msgs
 	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne, gt, gte, lt, lte, in, nin, exists", params.fieldName, op)
+		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,lt,lte,gt,gte,in,nin", params.fieldName, op)
 		return filter, []string{msg}
 	}
 
@@ -314,11 +305,8 @@ func validateFloat64Filter(
 			return filter, msgs
 		}
 		filter.Val = vals
-	case types_.FilterExists:
-		filter.Val = utils.StrToBool(rawVal)
-		return filter, msgs
 	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne, gt, gte, lt, lte, in, nin, exists", params.fieldName, op)
+		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne,null,lt,lte,gt,gte,in,nin", params.fieldName, op)
 		return filter, []string{msg}
 	}
 
@@ -341,11 +329,11 @@ func validateBoolFilter(
 
 	val := utils.StrToBool(rawVal)
 	switch op {
-	case types_.FilterEq, types_.FilterNe, types_.FilterExists:
+	case types_.FilterEq, types_.FilterNe, types_.FilterNull:
 		filter.Val = val
 		return filter, msgs
 	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne, exists", params.fieldName, op)
+		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,null", params.fieldName, op)
 		return filter, []string{msg}
 	}
 }
@@ -367,7 +355,7 @@ func validateTimeFilter(
 		}
 		vals = append(vals, val)
 		filter.Val = val
-	case types_.FilterIn, types_.FilterNin:
+	case types_.FilterIn, types_.FilterNin, types_.FilterNull:
 		parts := strings.Split(rawVal, ",")
 		for _, i := range parts {
 			val, err := utils.ParseTime(i)
@@ -381,11 +369,8 @@ func validateTimeFilter(
 			return filter, msgs
 		}
 		filter.Val = vals
-	case types_.FilterExists:
-		filter.Val = utils.StrToBool(rawVal)
-		return filter, msgs
 	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne, gt, gte, lt, lte, in, nin, exists", params.fieldName, op)
+		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,lt,lte,gt,gte,in,nin,exists", params.fieldName, op)
 		return filter, []string{msg}
 	}
 

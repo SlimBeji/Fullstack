@@ -74,8 +74,8 @@ func Filter[T any](maxItems int) func(c *gin.Context) {
 			return
 		}
 
-		form := types_.FindQuery{}
-		errsMap := validator_.BuildFindQuery(body, &form, maxItems)
+		form := types_.SearchQuery{}
+		errsMap := validator_.BuildSearchQuery(body, &form, maxItems)
 		if len(errsMap) > 0 {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
 				"error":   "Invalid request",

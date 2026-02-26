@@ -22,9 +22,9 @@ import (
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/ [get]
 func getPlaces(c *gin.Context) {
-	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
+	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
 	pc := collections.GetPlaceCollection()
-	data, err := pc.FetchBsonPage(&findQuery, c)
+	data, err := pc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -41,9 +41,9 @@ func getPlaces(c *gin.Context) {
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/query [post]
 func queryPlaces(c *gin.Context) {
-	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
+	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
 	pc := collections.GetPlaceCollection()
-	data, err := pc.FetchBsonPage(&findQuery, c)
+	data, err := pc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return

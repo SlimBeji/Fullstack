@@ -224,15 +224,15 @@ func (uc *UserCollection) GetFiltersMapping() map[string]string {
 }
 
 func (uc *UserCollection) AddOwnershipFilters(
-	user *schemas.UserRead, findQuery *types_.FindQuery,
+	user *schemas.UserRead, findQuery *types_.SearchQuery,
 ) {
-	if findQuery.Filters == nil {
-		findQuery.Filters = make(types_.FindQueryFilters)
+	if findQuery.Where == nil {
+		findQuery.Where = make(types_.WhereFilters)
 	}
 
 	// No need to convert id to primitive.ObjectId
 	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
-	findQuery.Filters["id"] = append(findQuery.Filters["id"], ownershipFilter)
+	findQuery.Where["id"] = append(findQuery.Where["id"], ownershipFilter)
 }
 
 func (uc *UserCollection) FetchDocuments(
@@ -242,27 +242,27 @@ func (uc *UserCollection) FetchDocuments(
 }
 
 func (uc *UserCollection) FetchBsonPage(
-	findQuery *types_.FindQuery, ctx context.Context,
+	searchQuery *types_.SearchQuery, ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
-	return crud.FetchBsonPage(uc, findQuery, ctx)
+	return crud.FetchBsonPage(uc, searchQuery, ctx)
 }
 
 func (uc *UserCollection) FetchPage(
-	findQuery *types_.FindQuery, ctx context.Context,
+	searchQuery *types_.SearchQuery, ctx context.Context,
 ) (types_.PaginatedData[schemas.UserRead], error) {
-	return crud.FetchPage(uc, findQuery, ctx)
+	return crud.FetchPage(uc, searchQuery, ctx)
 }
 
 func (uc *UserCollection) UserFetchBsonPage(
-	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
+	user *schemas.UserRead, searchQuery *types_.SearchQuery, ctx context.Context,
 ) (types_.PaginatedData[bson.M], error) {
-	return crud.UserFetchBsonPage(uc, user, findQuery, ctx)
+	return crud.UserFetchBsonPage(uc, user, searchQuery, ctx)
 }
 
 func (uc *UserCollection) UserFetchPage(
-	user *schemas.UserRead, findQuery *types_.FindQuery, ctx context.Context,
+	user *schemas.UserRead, searchQuery *types_.SearchQuery, ctx context.Context,
 ) (types_.PaginatedData[schemas.UserRead], error) {
-	return crud.UserFetchPage(uc, user, findQuery, ctx)
+	return crud.UserFetchPage(uc, user, searchQuery, ctx)
 }
 
 // Create

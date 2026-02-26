@@ -22,9 +22,9 @@ import (
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/ [get]
 func getUsers(c *gin.Context) {
-	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
+	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
 	uc := collections.GetUserCollection()
-	data, err := uc.FetchBsonPage(&findQuery, c)
+	data, err := uc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -41,9 +41,9 @@ func getUsers(c *gin.Context) {
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/query [post]
 func queryUsers(c *gin.Context) {
-	findQuery, _ := gin_.GetBody[types_.FindQuery](c)
+	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
 	uc := collections.GetUserCollection()
-	data, err := uc.FetchBsonPage(&findQuery, c)
+	data, err := uc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
