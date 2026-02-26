@@ -96,3 +96,11 @@ All tools were selected to be **compatible with Python's async ecosystem**, taki
 
 - **SQLAlchemy (async) + asyncpg** were chosen for interacting with PostgreSQL in an async-friendly manner, providing robust ORM capabilities with full async/await support.
 - **Dramatiq** handles background jobs and scheduled tasks. It integrates well with async workflows and message brokers like Redis or RabbitMQ.
+- The python backend is run with `honcho` so that the backend, scheduler and worker are all run inside the same container using a `Procfile`
+
+```
+web: uvicorn api.app:create_app --factory --host 0.0.0.0 --port 5001 --reload
+worker: watchmedo auto-restart --patterns="*.py" --recursive -- dramatiq background.handlers.handler
+scheduler: watchmedo auto-restart --patterns="*.py" --recursive -- python -m background.crons.scheduler
+
+```
