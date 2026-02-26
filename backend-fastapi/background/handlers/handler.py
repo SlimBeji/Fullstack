@@ -24,4 +24,6 @@ async def connect_dbs() -> None:
 
 
 handler = TaskHandler(BROKER_URL, TASKS, connect_dbs, MAX_AGE, settings.is_test)
-handler.start()
+
+if __name__ == "__main__":
+    handler.start()
