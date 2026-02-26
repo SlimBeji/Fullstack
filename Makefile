@@ -166,7 +166,7 @@ gin-test:
 	docker exec -it gin go test -failfast /app/internal/tests/... -p=1
 
 gin-swagger:
-	docker exec -it gin swag init -g ./app.go -o internal/api/docs
+	docker exec -it gin swag init -g ./app.go -o internal/api/docs -q
 
 gin-lint: gin-swagger
 	docker exec -it gin go fmt .
