@@ -96,8 +96,7 @@ def upgrade() -> None:
         "CREATE INDEX idx_place_embedding_vector ON places "
         "USING ivfflat (embedding vector_cosine_ops)"
     )
-    op.execute(
-        """
+    op.execute("""
         ALTER TABLE places
         ADD CONSTRAINT location_structure CHECK (
             location ? 'lat' AND
@@ -105,8 +104,7 @@ def upgrade() -> None:
             jsonb_typeof(location->'lat') = 'number' AND
             jsonb_typeof(location->'lng') = 'number'
         )
-        """
-    )
+        """)
 
 
 def downgrade() -> None:
