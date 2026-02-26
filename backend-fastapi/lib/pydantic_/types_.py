@@ -40,7 +40,7 @@ class FieldMeta:
             examples=self.examples,
         )
 
-        json_schema_extra = {}
+        json_schema_extra: dict[str, Any] = {}
         if self.filter_examples:
             json_schema_extra["filter_examples"] = self.filter_examples
         if self.is_index:
