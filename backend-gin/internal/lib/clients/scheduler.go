@@ -16,6 +16,10 @@ type TaskScheduler struct {
 	scheduler gocron.Scheduler
 }
 
+func (ts *TaskScheduler) Close() error {
+	return ts.scheduler.Shutdown()
+}
+
 func NewScheduler(crons []JobConfig) *TaskScheduler {
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
@@ -33,8 +37,4 @@ func NewScheduler(crons []JobConfig) *TaskScheduler {
 	}
 	scheduler.Start()
 	return &TaskScheduler{scheduler: scheduler}
-}
-
-func (ts *TaskScheduler) Close() {
-	ts.scheduler.Shutdown()
 }
