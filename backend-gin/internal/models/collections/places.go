@@ -2,6 +2,7 @@ package collections
 
 import (
 	"backend/internal/background/publishers"
+	"backend/internal/config"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
@@ -74,7 +75,7 @@ func (pc *PlaceCollection) PostProcess(
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(result.ImageUrl)
+	signedUrl, err := storage.GetSignedURL(result.ImageUrl, config.Env.JWTExpiration)
 	if err != nil {
 		return result, err
 	}
@@ -103,7 +104,7 @@ func (pc *PlaceCollection) PostProcessBson(
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(imageUrl.(string))
+	signedUrl, err := storage.GetSignedURL(imageUrl.(string), config.Env.JWTExpiration)
 	if err != nil {
 		return result, err
 	}
@@ -235,7 +236,8 @@ func (pc *PlaceCollection) ToCreateForm(
 		}
 
 		storage := instances.GetStorage()
-		form.ImageUrl, err = storage.UploadFile(&f)
+		ctx := context.Background()
+		form.ImageUrl, err = storage.UploadFile(ctx, &f, "")
 		if err != nil {
 			return form, fmt.Errorf("could not upload image: %w", err)
 		}
@@ -432,7 +434,8 @@ func (pc *PlaceCollection) PostDelete(
 		// Not handling errors, file might still exists
 		imageUrl, _ := imageUrlVal.StringValueOK()
 		storage := instances.GetStorage()
-		storage.DeleteFile(imageUrl)
+		ctx := context.Background()
+		storage.DeleteFile(ctx, imageUrl)
 	}
 
 	// Remove id from creator places

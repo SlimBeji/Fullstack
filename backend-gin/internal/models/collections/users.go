@@ -73,7 +73,7 @@ func (uc *UserCollection) PostProcess(
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(result.ImageUrl)
+	signedUrl, err := storage.GetSignedURL(result.ImageUrl, config.Env.JWTExpiration)
 	if err != nil {
 		return result, err
 	}
@@ -102,7 +102,7 @@ func (uc *UserCollection) PostProcessBson(
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedUrl(imageUrl.(string))
+	signedUrl, err := storage.GetSignedURL(imageUrl.(string), config.Env.JSONMaxSize)
 	if err != nil {
 		return result, err
 	}
@@ -282,8 +282,9 @@ func (uc *UserCollection) ToCreateForm(
 			return form, fmt.Errorf("could not read image: %w", err)
 		}
 
+		ctx := context.Background()
 		storage := instances.GetStorage()
-		form.ImageUrl, err = storage.UploadFile(&f)
+		form.ImageUrl, err = storage.UploadFile(ctx, &f, "")
 		if err != nil {
 			return form, fmt.Errorf("could not upload image: %w", err)
 		}
@@ -558,8 +559,9 @@ func (uc *UserCollection) PostDelete(
 	if !imageUrlVal.IsZero() {
 		// Not handling errors, file might still exists
 		imageUrl, _ := imageUrlVal.StringValueOK()
+		ctx := context.Background()
 		storage := instances.GetStorage()
-		storage.DeleteFile(imageUrl)
+		storage.DeleteFile(ctx, imageUrl)
 	}
 
 	// Delete all places

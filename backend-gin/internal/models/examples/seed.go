@@ -65,7 +65,7 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 				return handleError(err, isVerbose)
 			}
 
-			url, err := storage.UploadFile(userIn.ImageUrl)
+			url, err := storage.UploadFile(ctx, userIn.ImageUrl, "")
 			if err != nil {
 				return handleError(err, isVerbose)
 			}
@@ -113,7 +113,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 				return handleError(err, isVerbose)
 			}
 
-			url, err := storage.UploadFile(placeIn.ImageUrl)
+			url, err := storage.UploadFile(ctx, placeIn.ImageUrl, "")
 			if err != nil {
 				return handleError(err, isVerbose)
 			}

@@ -76,8 +76,8 @@ var storageConfig = clients.CloudStorageConfig{
 	BucketName:         config.Env.GCSBucketName,
 	AccessExpiration:   config.Env.GCSBlobExpiration,
 	CredentialsFile:    config.Env.GoogleCredentials,
-	EmulatorPublicUrl:  config.Env.GCSEmulatorPub,
-	EmulatorPrivateUrl: config.Env.GCSEmulatorPriv,
+	EmulatorPublicURL:  config.Env.GCSEmulatorPub,
+	EmulatorPrivateURL: config.Env.GCSEmulatorPriv,
 }
 
 func GetStorage() *clients.CloudStorage {
