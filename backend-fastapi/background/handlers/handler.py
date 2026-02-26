@@ -1,6 +1,7 @@
 import asyncio
 
 from background.bgconfig import (
+    BROKER_URL,
     MAX_AGE,
     TASK_NEWSLETTER,
     TASK_PLACE_EMBEDDING,
@@ -22,7 +23,5 @@ async def connect_dbs() -> None:
     await asyncio.gather(pg_client.connect(), redis_client.connect())
 
 
-handler = TaskHandler(
-    settings.REDIS_URL, TASKS, connect_dbs, MAX_AGE, settings.is_test
-)
+handler = TaskHandler(BROKER_URL, TASKS, connect_dbs, MAX_AGE, settings.is_test)
 handler.start()
