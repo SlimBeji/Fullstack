@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/models/schemas"
 	"context"
 	"fmt"
@@ -62,7 +62,7 @@ func Delete[Read any](
 ) error {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return gin_.UnprocessableErr(
+		return types_.UnprocessableErr(
 			fmt.Sprintf("invalid object ID %s", id), err,
 		)
 	}
@@ -81,7 +81,7 @@ func UserDelete[Read any](
 	}
 
 	if user == nil {
-		return gin_.NotAuthenticatedErr()
+		return types_.NotAuthenticatedErr()
 	}
 
 	if err := dd.AuthDelete(user, &doc); err != nil {

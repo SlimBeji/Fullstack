@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/models/schemas"
 	"context"
 	"fmt"
@@ -33,7 +33,7 @@ func GetDocumentById[Read any](
 ) (bson.Raw, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return bson.Raw{}, gin_.UnprocessableErr(
+		return bson.Raw{}, types_.UnprocessableErr(
 			fmt.Sprintf("invalid object ID %s", id), err,
 		)
 	}
@@ -49,7 +49,7 @@ func GetById[Read any](
 	raw, err := GetDocumentById(dr, id, ctx)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return zero, gin_.IdNotFoundErr(dr.Name(), id)
+			return zero, types_.IdNotFoundErr(dr.Name(), id)
 		} else {
 			return zero, fmt.Errorf("get document failed: %w", err)
 		}
@@ -67,7 +67,7 @@ func Get[Read any](
 	raw, err := GetDocument(dr, filter, ctx)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return zero, gin_.NotFoundErr(dr.Name(), filter)
+			return zero, types_.NotFoundErr(dr.Name(), filter)
 		} else {
 			return zero, fmt.Errorf("get document failed: %w", err)
 		}
@@ -89,7 +89,7 @@ func UserGet[Read any](
 
 	if user == nil {
 		var zero Read
-		return zero, gin_.NotAuthenticatedErr()
+		return zero, types_.NotAuthenticatedErr()
 	}
 
 	err = dr.AuthRead(user, &result)
@@ -112,7 +112,7 @@ func UserGetById[Read any](
 
 	if user == nil {
 		var zero Read
-		return zero, gin_.NotAuthenticatedErr()
+		return zero, types_.NotAuthenticatedErr()
 	}
 
 	err = dr.AuthRead(user, &result)

@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/lib/validator_"
 	"backend/internal/models/schemas"
 	"context"
@@ -38,7 +38,7 @@ func InsertExample[Read any, Db any, Form any, Post any](
 	if dc.ShouldValidate() {
 		errs := validator_.ValidateStruct(form)
 		if len(errs) > 0 {
-			return &result, gin_.ValidationErrs(
+			return &result, types_.ValidationErrs(
 				"wrong input for InsertExample", errs,
 			)
 		}
@@ -62,7 +62,7 @@ func CreateDocument[Read any, Db any, Form any, Post any](
 	if dc.ShouldValidate() {
 		errs := validator_.ValidateStruct(form)
 		if len(errs) > 0 {
-			return result, gin_.ValidationErrs(
+			return result, types_.ValidationErrs(
 				fmt.Sprintf("create form for %s not valid", dc.Name()), errs,
 			)
 		}
@@ -155,7 +155,7 @@ func UserCreate[Read any, Db any, Form any, Post any](
 	var zero Read
 
 	if user == nil {
-		return zero, gin_.NotAuthenticatedErr()
+		return zero, types_.NotAuthenticatedErr()
 	}
 
 	if post == nil {
@@ -163,7 +163,7 @@ func UserCreate[Read any, Db any, Form any, Post any](
 	}
 
 	if err := dc.AuthCreate(user, post); err != nil {
-		return zero, gin_.NotAdminErr(err)
+		return zero, types_.NotAdminErr(err)
 	}
 	return Create(dc, post, ctx)
 }

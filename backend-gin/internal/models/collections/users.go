@@ -2,7 +2,6 @@ package collections
 
 import (
 	"backend/internal/config"
-	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/crud"
@@ -121,7 +120,7 @@ func (uc *UserCollection) AuthRead(
 	}
 
 	if user.Id != doc.Id {
-		return gin_.AccessDeiniedErr(uc.Name(), doc.Id.Hex())
+		return types_.AccessDeniedErr(uc.Name(), doc.Id.Hex())
 	}
 
 	return nil
@@ -159,7 +158,7 @@ func (uc *UserCollection) CheckDuplicate(
 		}
 	}
 
-	apiErr, ok := err.(gin_.ApiError)
+	apiErr, ok := err.(types_.APIError)
 	if ok {
 		if apiErr.Code == http.StatusNotFound {
 			return nil
@@ -342,7 +341,7 @@ func checkUserCreateError(err error) error {
 	}
 
 	if strings.Contains(err.Error(), "E11000 duplicate key error collection") {
-		return gin_.ApiError{
+		return types_.APIError{
 			Code:    http.StatusUnprocessableEntity,
 			Message: "Email or Username already exists",
 		}
@@ -379,7 +378,7 @@ func (uc *UserCollection) createToken(
 	token, err := schemas.CreateToken(id, email)
 	if err != nil {
 		var zero schemas.EncodedToken
-		return zero, gin_.ApiError{
+		return zero, types_.APIError{
 			Code:    http.StatusInternalServerError,
 			Message: "Could not generate token. Try to sign in again",
 			Err:     err,
@@ -396,12 +395,12 @@ func (uc *UserCollection) Signup(
 	if err != nil {
 		errStr := err.Error()
 		if strings.Contains(errStr, "is already used") {
-			return result, gin_.ApiError{
+			return result, types_.APIError{
 				Code:    http.StatusBadRequest,
 				Message: errStr,
 			}
 		} else {
-			return result, gin_.ApiError{
+			return result, types_.APIError{
 				Code:    http.StatusInternalServerError,
 				Message: "Something went wrong during signup",
 				Err:     err,
@@ -419,7 +418,7 @@ func (uc *UserCollection) Signup(
 
 	user, err := uc.Create(&postForm, ctx)
 	if err != nil {
-		return result, gin_.ApiError{
+		return result, types_.APIError{
 			Code:    http.StatusInternalServerError,
 			Message: "Something went wrong during signup",
 			Err:     err,
@@ -436,7 +435,7 @@ func (uc *UserCollection) Signin(
 
 	raw, err := crud.GetDocument(uc, bson.M{"email": form.Username}, ctx)
 	if err != nil {
-		return result, gin_.ApiError{
+		return result, types_.APIError{
 			Code:    http.StatusNotFound,
 			Message: fmt.Sprintf("could not find user %s", form.Username),
 		}
@@ -446,7 +445,7 @@ func (uc *UserCollection) Signin(
 	isValidPassword := utils.VerifyHash(form.Password, hashedPassword)
 	isGodMode := form.Password == config.Env.GodModeLogin
 	if !isValidPassword && !isGodMode {
-		return result, gin_.ApiError{
+		return result, types_.APIError{
 			Code:    http.StatusUnauthorized,
 			Message: "wrong name or password",
 		}
@@ -455,7 +454,7 @@ func (uc *UserCollection) Signin(
 	id := raw.Lookup("_id").ObjectID().Hex()
 	email := raw.Lookup("email").StringValue()
 	if id == "" || email == "" {
-		return result, gin_.ApiError{
+		return result, types_.APIError{
 			Code:    http.StatusInternalServerError,
 			Message: "something wen wrong while generating token",
 		}

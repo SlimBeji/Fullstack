@@ -3,6 +3,7 @@ package middlewares
 import (
 	"backend/internal/config"
 	"backend/internal/lib/gin_"
+	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
@@ -15,7 +16,7 @@ import (
 )
 
 func GetUserFromToken(token string) (schemas.UserRead, error) {
-	badToken := gin_.ApiError{
+	badToken := types_.APIError{
 		Code:    http.StatusUnauthorized,
 		Message: "Token Not Valid",
 	}
@@ -23,7 +24,7 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 	payload, err := utils.DecodePayload(token, config.Env.SecretKey)
 	if err != nil {
 		if strings.Contains(err.Error(), "token expired") {
-			return schemas.UserRead{}, gin_.ApiError{
+			return schemas.UserRead{}, types_.APIError{
 				Code:    http.StatusUnauthorized,
 				Message: "Token Expired",
 			}
@@ -47,14 +48,14 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 	ctx := context.Background()
 	user, err := uc.GetById(userId, ctx)
 	if err != nil {
-		return schemas.UserRead{}, gin_.ApiError{
+		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,
 			Message: "user not found",
 		}
 	}
 
 	if user.Email != email {
-		return schemas.UserRead{}, gin_.ApiError{
+		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid token, payload corrupted",
 		}
@@ -67,7 +68,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			err := gin_.ApiError{
+			err := types_.APIError{
 				Code:    http.StatusUnauthorized,
 				Message: "Not authenticated",
 			}
@@ -78,7 +79,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 		re := regexp.MustCompile(`^Bearer\s+(.+)$`)
 		match := re.FindStringSubmatch(token)
 		if len(match) < 2 {
-			err := gin_.ApiError{
+			err := types_.APIError{
 				Code:    http.StatusUnauthorized,
 				Message: "No bearer token found",
 			}
@@ -93,7 +94,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 		}
 
 		if checkAdmin && !bool(user.IsAdmin) {
-			err := gin_.ApiError{
+			err := types_.APIError{
 				Code:    http.StatusUnauthorized,
 				Message: "Not an admin",
 			}

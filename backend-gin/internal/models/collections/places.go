@@ -3,7 +3,6 @@ package collections
 import (
 	"backend/internal/background/publishers"
 	"backend/internal/config"
-	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/models/crud"
 	"backend/internal/models/schemas"
@@ -123,7 +122,7 @@ func (pc *PlaceCollection) AuthRead(
 	}
 
 	if user.Id != doc.CreatorID {
-		return gin_.AccessDeiniedErr(pc.Name(), doc.ID.Hex())
+		return types_.AccessDeniedErr(pc.Name(), doc.ID.Hex())
 	}
 
 	return nil
@@ -306,7 +305,7 @@ func (pc *PlaceCollection) AuthCreate(
 	}
 
 	if user.Id.Hex() != item.CreatorID {
-		return gin_.AccessDeiniedErr(
+		return types_.AccessDeniedErr(
 			string(Users), item.CreatorID,
 		)
 	}
