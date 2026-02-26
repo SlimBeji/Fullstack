@@ -205,6 +205,7 @@ func DumpDb(verbose ...bool) error {
 		isVerbose = verbose[0]
 	}
 
+	ctx := context.Background()
 	mc := instances.GetMongo()
 	collections, err := mc.ListCollections()
 	if err != nil {
@@ -229,7 +230,7 @@ func DumpDb(verbose ...bool) error {
 	}
 
 	rc := instances.GetRedisClient()
-	rc.FlushAll()
+	rc.FlushAll(ctx)
 
 	if isVerbose {
 		fmt.Println("✅ Cache DB flushed")

@@ -11,45 +11,44 @@ import (
 
 type RedisClientConfig struct {
 	Url        string
-	Expiration int
+	Expiration int // duration in seconds
 }
 
 type RedisClient struct {
 	config RedisClientConfig
 	client *redis.Client
-	ctx    context.Context
 }
 
-func (r *RedisClient) Close() error {
-	return r.client.Close()
+func (r *RedisClient) getDuration() time.Duration {
+	return time.Duration(r.config.Expiration) * time.Second
 }
 
-func (r *RedisClient) FlushAll() error {
-	return r.client.FlushAll(r.ctx).Err()
-}
-
-func (r *RedisClient) Get(key string) (string, error) {
-	val, err := r.client.Get(r.ctx, key).Result()
+func (r *RedisClient) Get(ctx context.Context, key string) (string, error) {
+	val, err := r.client.Get(ctx, key).Result()
 	if err == redis.Nil {
 		return "", nil
 	}
 	return val, err
 }
 
-func (r *RedisClient) Set(key string, val any) error {
+func (r *RedisClient) Set(ctx context.Context, key string, val any) error {
 	data, err := json.Marshal(val)
 	if err != nil {
-		return fmt.Errorf("could not store value in redis: %v", err)
+		return fmt.Errorf("could not store value in redis: %w", err)
 	}
-	return r.client.Set(r.ctx, key, data, r.getDuration()).Err()
+	return r.client.Set(ctx, key, data, r.getDuration()).Err()
 }
 
-func (r *RedisClient) Delete(key string) error {
-	return r.client.Del(r.ctx, key).Err()
+func (r *RedisClient) Delete(ctx context.Context, key string) error {
+	return r.client.Del(ctx, key).Err()
 }
 
-func (r *RedisClient) getDuration() time.Duration {
-	return time.Duration(r.config.Expiration) * time.Second
+func (r *RedisClient) FlushAll(ctx context.Context) error {
+	return r.client.FlushAll(ctx).Err()
+}
+
+func (r *RedisClient) Close() error {
+	return r.client.Close()
 }
 
 func NewRedisClient(config RedisClientConfig) *RedisClient {
@@ -58,9 +57,15 @@ func NewRedisClient(config RedisClientConfig) *RedisClient {
 		panic(fmt.Sprintf("Invalid Redis URL: %v", err))
 	}
 
+	client := redis.NewClient(opt)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := client.Ping(ctx).Err(); err != nil {
+		panic("failed to connect to Redis")
+	}
 	return &RedisClient{
 		config: config,
 		client: redis.NewClient(opt),
-		ctx:    context.Background(),
 	}
 }
