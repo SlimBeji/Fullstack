@@ -1,4 +1,4 @@
-package gin_
+package types_
 
 import (
 	"encoding/json"
