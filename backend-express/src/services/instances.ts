@@ -9,8 +9,9 @@ import {
     RedisClient,
     RedisClientConfig,
 } from "@/lib/clients";
+import { isTest } from "@/lib/utils";
 
-const IS_TEST = !!process.env.JEST_WORKER_ID;
+const IS_TEST = isTest();
 
 const pgsqlConfig: PgClientConfig = {
     uri: IS_TEST ? env.DATABASE_TEST_URL : env.DATABASE_URL,
