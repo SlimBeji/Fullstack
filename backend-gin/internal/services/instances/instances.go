@@ -47,15 +47,8 @@ var (
 	redisClient *clients.RedisClient
 )
 
-func GetRedisUrl() string {
-	if testing.Testing() {
-		return config.Env.RedisTestURL
-	}
-	return config.Env.RedisURL
-}
-
 var redisConfig = clients.RedisClientConfig{
-	Url:        GetRedisUrl(),
+	Url:        config.Env.GetRedisURL(),
 	Expiration: config.Env.RedisExpiration,
 }
 

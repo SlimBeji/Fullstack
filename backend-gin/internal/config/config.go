@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"testing"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -41,6 +42,20 @@ type Settings struct {
 	GCSBlobExpiration int    `envconfig:"GCS_BLOB_ACCESS_EXPIRATION" default:"3600"`
 	GCSEmulatorPriv   string `envconfig:"GCS_EMULATOR_PRIVATE_URL" default:""`
 	GCSEmulatorPub    string `envconfig:"GCS_EMULATOR_PUBLIC_URL" default:""`
+}
+
+func (s *Settings) GetPGURL() string {
+	if testing.Testing() {
+		return s.DatabaseTestUrl
+	}
+	return s.DatabaseUrl
+}
+
+func (s *Settings) GetRedisURL() string {
+	if testing.Testing() {
+		return s.RedisTestURL
+	}
+	return s.RedisURL
 }
 
 // Global settings instance
