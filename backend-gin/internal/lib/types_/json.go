@@ -1,11 +1,23 @@
+/*
+Go json package does not handle coercion of basic types when unmarshalling,
+(e.g. "1" is not accepted as int, "false" is not accepted as boolean)
+This file include helper types that works with the json package accepts
+and acccepts strings during unmarshalling
+*/
+
 package types_
 
 import (
+	"backend/internal/lib/utils"
 	"encoding/json"
 	"strconv"
 )
 
 type FlexFloat float64
+
+func (f FlexFloat) MarshalJSON() ([]byte, error) {
+	return json.Marshal(float64(f))
+}
 
 func (f *FlexFloat) UnmarshalJSON(data []byte) error {
 	// Try direct number
@@ -33,6 +45,10 @@ func (f *FlexFloat) UnmarshalJSON(data []byte) error {
 
 type FlexInt int
 
+func (i FlexInt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(int(i))
+}
+
 func (i *FlexInt) UnmarshalJSON(data []byte) error {
 	// Try direct number
 	var num int
@@ -48,7 +64,7 @@ func (i *FlexInt) UnmarshalJSON(data []byte) error {
 		return mainErr
 	}
 
-	v, err := strconv.ParseInt(s, 10, 64)
+	v, err := strconv.Atoi(s)
 	if err != nil {
 		return mainErr
 	}
@@ -59,6 +75,10 @@ func (i *FlexInt) UnmarshalJSON(data []byte) error {
 
 type FlexBool bool
 
+func (b FlexBool) MarshalJSON() ([]byte, error) {
+	return json.Marshal(bool(b))
+}
+
 func (b *FlexBool) UnmarshalJSON(data []byte) error {
 	// Try direct boolean
 	var val bool
@@ -68,25 +88,16 @@ func (b *FlexBool) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	// Try string: "true", "false", "1", "0"
+	// Try string
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return mainErr
 	}
-
-	switch s {
-	case "true", "1":
-		*b = FlexBool(true)
-	case "false", "0":
-		*b = FlexBool(false)
-	default:
-		// fallback to strconv.ParseBool
-		v, err := strconv.ParseBool(s)
-		if err != nil {
-			return mainErr
-		}
-		*b = FlexBool(v)
+	v, err := utils.CheckBool(s)
+	if err != nil {
+		return mainErr
 	}
 
+	*b = FlexBool(v)
 	return nil
 }
