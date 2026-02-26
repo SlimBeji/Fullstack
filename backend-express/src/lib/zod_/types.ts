@@ -1,6 +1,6 @@
 import { ZodTypeAny } from "zod";
 
-import { ApiError, HttpStatus, MimeType } from "../express_";
+import { ApiError, HttpStatus, MimeType } from "../types";
 import { zod } from "./base";
 
 const _zodFile = (acceptedMimetypes: string[] | null, maxSize: number) => {

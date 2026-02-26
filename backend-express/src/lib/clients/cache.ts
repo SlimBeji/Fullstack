@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from "redis";
 
-import { ApiError, HttpStatus } from "@/lib/express_";
+import { ApiError, HttpStatus } from "@/lib/types";
 
 export interface RedisClientConfig {
     url: string;

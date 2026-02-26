@@ -1,7 +1,7 @@
 import { JwtPayload } from "jsonwebtoken";
 
 import { env } from "@/config";
-import { ApiError, HttpStatus } from "@/lib/express_";
+import { ApiError, HttpStatus } from "@/lib/types";
 import { decodePayload, encodePayload } from "@/lib/utils";
 import { zod, ZodInfer } from "@/lib/zod_";
 

@@ -1,6 +1,6 @@
 import { Job, Queue, QueueOptions, Worker, WorkerOptions } from "bullmq";
 
-import { ApiError, HttpStatus } from "@/lib/express_";
+import { ApiError, HttpStatus } from "@/lib/types";
 
 // Publisher
 

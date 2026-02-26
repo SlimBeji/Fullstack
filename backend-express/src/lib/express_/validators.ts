@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { AnyZodObject, ZodTypeAny } from "zod";
 
-import { HttpStatus } from "./enums";
-import { ApiError } from "./errors";
+import { ApiError, HttpStatus } from "../types";
 import { isMultipartFormData } from "./helpers";
 
 const isFileField = (field: ZodTypeAny | any): boolean => {

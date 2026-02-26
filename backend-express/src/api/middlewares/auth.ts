@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 
-import { ApiError, HttpStatus } from "@/lib/express_";
+import { ApiError, HttpStatus } from "@/lib/types";
 import { crudsUser } from "@/models/cruds";
 import { decodeToken, UserRead } from "@/models/schemas";
 

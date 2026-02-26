@@ -2,10 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParsedQs } from "qs";
 import { AnyZodObject } from "zod";
 
-import { Filter } from "@/lib/types";
-
-import { HttpStatus } from "./enums";
-import { ApiError } from "./errors";
+import { ApiError, Filter, HttpStatus } from "../types";
 
 const GLOBAL_PARAMS = new Set(["page", "size", "sort", "fields"]);
 

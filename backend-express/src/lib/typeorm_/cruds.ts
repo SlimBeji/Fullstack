@@ -8,7 +8,7 @@ import {
     UpdateResult,
 } from "typeorm";
 
-import { ApiError, HttpStatus } from "../express_";
+import { ApiError, HttpStatus } from "../types";
 import {
     Filter,
     PaginatedData,

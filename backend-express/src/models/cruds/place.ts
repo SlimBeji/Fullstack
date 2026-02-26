@@ -2,8 +2,8 @@ import { EntityManager } from "typeorm";
 
 import { placeEmbedding } from "@/background/publishers";
 import { env } from "@/config";
-import { ApiError, HttpStatus } from "@/lib/express_";
 import { CrudsClass } from "@/lib/typeorm_";
+import { ApiError, HttpStatus } from "@/lib/types";
 import { huggingFace, pgClient, storage } from "@/services/instances";
 
 import { Models, Place } from "../orm";
