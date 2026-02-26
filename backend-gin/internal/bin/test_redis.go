@@ -10,7 +10,7 @@ import (
 func TestRedis() {
 	// setup
 	setup := setup.New()
-	defer setup.CloseSerives()
+	defer setup.CloseSerivces()
 
 	ctx := context.Background()
 	redis := instances.GetRedisClient()

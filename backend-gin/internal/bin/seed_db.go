@@ -7,6 +7,6 @@ import (
 
 func SeedDB() {
 	setup := setup.New()
-	defer setup.CloseSerives()
+	defer setup.CloseSerivces()
 	examples.SeedDb(true)
 }

@@ -13,7 +13,7 @@ import (
 func Debug() {
 	// Setup
 	setup := setup.New()
-	defer setup.CloseSerives()
+	defer setup.CloseSerivces()
 
 	// Get the collection
 	uc := collections.GetUserCollection()

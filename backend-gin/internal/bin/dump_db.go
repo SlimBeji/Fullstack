@@ -7,6 +7,6 @@ import (
 
 func DumpDb() {
 	setup := setup.New()
-	defer setup.CloseSerives()
+	defer setup.CloseSerivces()
 	examples.DumpDb(true)
 }

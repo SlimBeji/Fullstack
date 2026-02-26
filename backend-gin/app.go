@@ -22,7 +22,7 @@ import (
 func main() {
 	// Initialize DBS connection
 	setup := setup.New()
-	defer setup.CloseSerives()
+	defer setup.CloseSerivces()
 	r := routes.SetupRouter()
 	r.Run(fmt.Sprintf(":%d", config.Env.Port))
 }

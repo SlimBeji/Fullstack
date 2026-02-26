@@ -10,7 +10,7 @@ import (
 
 func TestStorage() {
 	setup := setup.New()
-	defer setup.CloseSerives()
+	defer setup.CloseSerivces()
 
 	ctx := context.Background()
 	path := static.GetImagePath("avatar1.jpg")

@@ -18,7 +18,7 @@ type AppSetup struct {
 	TaskScheduler *clients.TaskScheduler
 }
 
-func (a *AppSetup) CloseSerives() {
+func (a *AppSetup) CloseSerivces() {
 	a.Mongo.Close()
 	a.Redis.Close()
 	a.Storage.Close()
