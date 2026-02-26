@@ -2,13 +2,17 @@ package clients
 
 import (
 	"backend/internal/background"
-	"backend/internal/config"
 	"context"
 	"fmt"
 	"strings"
 
 	"github.com/hibiken/asynq"
 )
+
+func extractRedisAddress(url string) string {
+	addr := strings.TrimPrefix(url, "redis://")
+	return strings.SplitN(addr, "/", 2)[0]
+}
 
 // Publisher
 
@@ -17,15 +21,14 @@ type TaskPublisher struct {
 }
 
 func NewPublisher(brokerUrl string) *TaskPublisher {
-	url := strings.TrimPrefix(brokerUrl, "redis://")
-	url = strings.SplitN(url, "/", 2)[0]
+	url := extractRedisAddress(brokerUrl)
 	redisConfig := asynq.RedisClientOpt{Addr: url}
 	client := asynq.NewClient(redisConfig)
 	return &TaskPublisher{client: client}
 }
 
-func (tp *TaskPublisher) Close() {
-	tp.client.Close()
+func (tp *TaskPublisher) Close() error {
+	return tp.client.Close()
 }
 
 func (tm *TaskPublisher) NewTask(
@@ -39,22 +42,26 @@ func (tm *TaskPublisher) NewTask(
 // Handler
 
 type HandlerFunc = func(ctx context.Context, t *asynq.Task) error
-type TasksRegisteryType = map[background.TaskType]HandlerFunc
+type TasksRegistryType = map[background.TaskType]HandlerFunc
+
+type TaskHandlerConfig struct {
+	Url      string
+	Registry TasksRegistryType
+}
 
 type TaskHandler struct {
 	mux    *asynq.ServeMux
 	server *asynq.Server
 }
 
-func NewHandler(registery TasksRegisteryType) *TaskHandler {
+func NewHandler(config TaskHandlerConfig) *TaskHandler {
 	// redis config
-	url := strings.TrimPrefix(config.Env.RedisURL, "redis://")
-	url = strings.SplitN(url, "/", 2)[0]
-	redisConfig := asynq.RedisClientOpt{Addr: url}
+	addr := extractRedisAddress(config.Url)
+	redisConfig := asynq.RedisClientOpt{Addr: addr}
 
 	// mux server
 	mux := asynq.NewServeMux()
-	for name, handler := range registery {
+	for name, handler := range config.Registry {
 		mux.HandleFunc(string(name), handler)
 	}
 
@@ -63,11 +70,9 @@ func NewHandler(registery TasksRegisteryType) *TaskHandler {
 	for _, name := range background.AllQueues {
 		queues[string(name)] = 1
 	}
-	config := asynq.Config{Queues: queues, Concurrency: 10}
-	server := asynq.NewServer(redisConfig, config)
-
+	asynqConfig := asynq.Config{Queues: queues, Concurrency: 10}
+	server := asynq.NewServer(redisConfig, asynqConfig)
 	tm := TaskHandler{mux: mux, server: server}
-	go tm.Start()
 	return &tm
 }
 
@@ -78,6 +83,9 @@ func (th *TaskHandler) Start() {
 	}
 }
 
-func (th *TaskHandler) Close() {
+func (th *TaskHandler) Close() error {
+	// Shutdown() method does not return an err
+	// Returning nil to keep the pattern
 	th.server.Shutdown()
+	return nil
 }

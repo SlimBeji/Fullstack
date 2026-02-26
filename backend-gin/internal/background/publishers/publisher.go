@@ -12,6 +12,6 @@ var (
 )
 
 func GetPublisher() *clients.TaskPublisher {
-	once.Do(func() { publisher = clients.NewPublisher(config.Env.RedisURL) })
+	once.Do(func() { publisher = clients.NewPublisher(config.Env.GetRedisURL()) })
 	return publisher
 }
