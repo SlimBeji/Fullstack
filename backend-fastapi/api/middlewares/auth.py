@@ -4,7 +4,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lib.fastapi_ import ApiError
+from lib.types_ import ApiError
 from models.cruds import CrudsUser
 from models.schemas import (
     ExpiredToken,

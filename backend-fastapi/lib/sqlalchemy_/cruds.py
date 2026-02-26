@@ -15,8 +15,8 @@ from lib.utils import (
     to_snake_case,
 )
 
-from ..fastapi_ import ApiError
 from ..types_ import (
+    ApiError,
     Filter,
     PaginatedDict,
     PaginationData,

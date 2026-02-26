@@ -1,8 +1,7 @@
-from http import HTTPStatus
-
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 
+from ..types_ import ApiError
 from .types import CallNext
 
 

@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import or_
 
 from config import settings
-from lib.fastapi_ import ApiError
 from lib.sqlalchemy_ import CrudsClass, Join, SelectField
+from lib.types_ import ApiError
 from lib.utils import hash_input, verify_hash
 from models.orm import Place, User
 from models.schemas import (

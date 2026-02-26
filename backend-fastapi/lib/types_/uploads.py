@@ -7,7 +7,7 @@ from pydantic import GetJsonSchemaHandler
 from pydantic_core import core_schema
 from starlette.datastructures import UploadFile
 
-from ..fastapi_ import ApiError
+from .error import ApiError
 
 
 class FileToUpload:

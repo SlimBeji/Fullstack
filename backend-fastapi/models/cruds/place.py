@@ -8,9 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
 from background.publishers import place_embedding
-from lib.fastapi_ import ApiError
 from lib.sqlalchemy_ import CrudsClass
-from lib.types_ import WhereFilters
+from lib.types_ import ApiError, WhereFilters
 from models.orm import Place
 from models.schemas import (
     PlaceCreateSchema,
