@@ -23,8 +23,8 @@ type Settings struct {
 	Env               string `envconfig:"ENV" required:"true"`
 
 	// DATABASE config
-	DatabaseUrl     string `envconfig:"DATABASE_URL" required:"true"`
-	DatabaseTestUrl string `envconfig:"DATABASE_TEST_URL" default:""`
+	DatabaseURL     string `envconfig:"DATABASE_URL" required:"true"`
+	DatabaseTestURL string `envconfig:"DATABASE_TEST_URL" default:""`
 	MongoURL        string `envconfig:"MONGO_URL" required:"true"`
 	MongoDBName     string `envconfig:"MONGO_DBNAME" required:"true"`
 	MongoTestDBName string `envconfig:"MONGO_TEST_DBNAME" default:"tests"`
@@ -46,9 +46,9 @@ type Settings struct {
 
 func (s *Settings) GetPGURL() string {
 	if testing.Testing() {
-		return s.DatabaseTestUrl
+		return s.DatabaseTestURL
 	}
-	return s.DatabaseUrl
+	return s.DatabaseURL
 }
 
 func (s *Settings) GetRedisURL() string {
