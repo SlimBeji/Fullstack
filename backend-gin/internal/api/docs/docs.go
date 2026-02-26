@@ -289,7 +289,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "regex:d{2} Boulevard"
+                            "like:Boulevard"
                         ],
                         "description": "The place address",
                         "name": "address",
@@ -315,7 +315,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "regex:football"
+                            "like:football"
                         ],
                         "description": "The place description, 10 characters minimum",
                         "name": "description",
@@ -1000,7 +1000,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "regex:d{2} Boulevard"
+                        "like:Boulevard"
                     ]
                 },
                 "creatorId": {
@@ -1020,7 +1020,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "regex:football"
+                        "like:football"
                     ]
                 },
                 "fields": {
@@ -1100,11 +1100,6 @@ const docTemplate = `{
                     "type": "string",
                     "minLength": 10,
                     "example": "Fulham road"
-                },
-                "creatorId": {
-                    "description": "The ID of the place creator, 24 characters",
-                    "type": "string",
-                    "example": "683b21134e2e5d46978daf1f"
                 },
                 "description": {
                     "description": "The place description, 10 characters minimum",

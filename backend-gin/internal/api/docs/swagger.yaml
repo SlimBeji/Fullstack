@@ -58,7 +58,7 @@ definitions:
       address:
         description: The place address
         example:
-        - regex:d{2} Boulevard
+        - like:Boulevard
         items:
           type: string
         type: array
@@ -72,7 +72,7 @@ definitions:
       description:
         description: The place description, 10 characters minimum
         example:
-        - regex:football
+        - like:football
         items:
           type: string
         type: array
@@ -130,10 +130,6 @@ definitions:
         description: The place address
         example: Fulham road
         minLength: 10
-        type: string
-      creatorId:
-        description: The ID of the place creator, 24 characters
-        example: 683b21134e2e5d46978daf1f
         type: string
       description:
         description: The place description, 10 characters minimum
@@ -489,7 +485,7 @@ paths:
       - collectionFormat: multi
         description: The place address
         example:
-        - regex:d{2} Boulevard
+        - like:Boulevard
         in: query
         items:
           type: string
@@ -507,7 +503,7 @@ paths:
       - collectionFormat: multi
         description: The place description, 10 characters minimum
         example:
-        - regex:football
+        - like:football
         in: query
         items:
           type: string
