@@ -32,7 +32,7 @@ func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
 	}
 	text := fmt.Sprintf("%s - %s", place.Title, place.Description)
 	hf := instances.GetHfClient()
-	result, err := hf.EmbedText(text)
+	result, err := hf.EmbedText(ctx, text)
 	if err != nil {
 		newErr := fmt.Errorf(
 			"could not run embedding of place %s with huggingface: %w",

@@ -2,6 +2,7 @@ package clients
 
 import (
 	"backend/internal/lib/utils"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,15 +18,19 @@ type HuggingFaceClient struct {
 	config HuggingFaceClientConfig
 }
 
-func (h *HuggingFaceClient) BaseUrl() string {
+func (h *HuggingFaceClient) baseUrl() string {
 	return fmt.Sprintf("https://router.huggingface.co/hf-inference/models/%s/pipeline/feature-extraction", h.config.EmbedModel)
 }
 
-func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
+func (h *HuggingFaceClient) EmbedText(ctx context.Context, text string) ([]float64, error) {
+	if text == "" {
+		return nil, fmt.Errorf("text cannot be empty")
+	}
+
 	requestBody := map[string]any{"inputs": []string{text}}
-	url := h.BaseUrl()
+	url := h.baseUrl()
 	resp, err := utils.JSONPost(
-		url, h.config.Timeout, requestBody, h.config.Token,
+		ctx, url, h.config.Timeout, requestBody, h.config.Token,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
@@ -47,9 +52,9 @@ func (h *HuggingFaceClient) EmbedText(text string) ([]float64, error) {
 	return embeddingResponse[0], nil
 }
 
-func NewHuggingFaceClient(config HuggingFaceClientConfig) HuggingFaceClient {
+func NewHuggingFaceClient(config HuggingFaceClientConfig) *HuggingFaceClient {
 	if config.EmbedModel == "" {
 		config.EmbedModel = "sentence-transformers/all-MiniLM-L6-v2"
 	}
-	return HuggingFaceClient{config: config}
+	return &HuggingFaceClient{config: config}
 }

@@ -2,12 +2,14 @@ package bin
 
 import (
 	"backend/internal/services/instances"
+	"context"
 	"fmt"
 )
 
 func TestHuggingFace() {
 	hf := instances.GetHfClient()
-	vec, err := hf.EmbedText("I am trying to debug my code in go")
+	ctx := context.Background()
+	vec, err := hf.EmbedText(ctx, "I am trying to debug my code in go")
 	if err != nil {
 		fmt.Println(err)
 	} else {

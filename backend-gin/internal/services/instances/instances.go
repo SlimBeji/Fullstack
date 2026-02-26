@@ -92,6 +92,6 @@ var hfConfig = clients.HuggingFaceClientConfig{
 	Timeout: config.Env.DefaultTimeout,
 }
 
-func GetHfClient() clients.HuggingFaceClient {
+func GetHfClient() *clients.HuggingFaceClient {
 	return clients.NewHuggingFaceClient(hfConfig)
 }

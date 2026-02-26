@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,14 +10,14 @@ import (
 )
 
 func JSONPost(
-	url string, timeout int, form map[string]any, token string,
+	ctx context.Context, url string, timeout int, form map[string]any, token string,
 ) (*http.Response, error) {
 	// timeout in seconds
 	jsonData, err := json.Marshal(form)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request body: %w", err)
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -24,6 +25,7 @@ func JSONPost(
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
+
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	return client.Do(req)
 }
