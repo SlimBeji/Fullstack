@@ -52,11 +52,13 @@ func (cs *CloudStorage) getStorageClient(ctx context.Context) *storage.Client {
 		opts = append(opts, option.WithEndpoint(cs.emulatorPrivateURL()))
 		opts = append(opts, option.WithoutAuthentication())
 	} else if cs.config.CredentialsFile != "" {
-		// Check if credentials file exists
-		if _, err := os.Stat(cs.config.CredentialsFile); err != nil {
-			panic(fmt.Sprintf("Failed to create a GCS client from credential file %s", cs.config.CredentialsFile))
+		// Use Credential file
+		credBytes, err := os.ReadFile(cs.config.CredentialsFile)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to read GCS credentials file %s: %v", cs.config.CredentialsFile, err))
 		}
-		opts = append(opts, option.WithCredentialsFile(cs.config.CredentialsFile))
+		opts = append(opts, option.WithAuthCredentialsJSON(option.ServiceAccount, credBytes))
+
 	}
 
 	client, err := storage.NewClient(ctx, opts...)
@@ -90,7 +92,7 @@ func (cs *CloudStorage) getEmulatorFileURL(filename string) string {
 	encodedFilename := url.PathEscape(filename)
 	return fmt.Sprintf(
 		"%s/download/storage/v1/b/%s/o/%s?alt=media",
-		cs.emulatorPrivateURL(), cs.config.BucketName, encodedFilename,
+		cs.config.EmulatorPublicURL, cs.config.BucketName, encodedFilename,
 	)
 }
 
