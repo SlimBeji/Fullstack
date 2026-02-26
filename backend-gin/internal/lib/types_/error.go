@@ -10,41 +10,41 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type ApiError struct {
+type APIError struct {
 	Code    int
 	Message string
 	Details map[string]any
 	Err     error
 }
 
-func (ae ApiError) Error() string {
+func (ae APIError) Error() string {
 	if ae.Err != nil {
 		return fmt.Sprintf("API %d Error: %s - %v", ae.Code, ae.Message, ae.Err)
 	}
 	return fmt.Sprintf("API %d Error: %s", ae.Code, ae.Message)
 }
 
-func (ae ApiError) Unwrap() error {
+func (ae APIError) Unwrap() error {
 	return ae.Err
 }
 
 func NotAuthenticatedErr() error {
-	return ApiError{
+	return APIError{
 		Code:    http.StatusUnauthorized,
-		Message: "not Authenticated",
+		Message: "not authenticated",
 	}
 }
 
-func AccessDeiniedErr(collection string, id string) error {
-	return ApiError{
-		Code:    http.StatusUnauthorized,
+func AccessDeniedErr(collection string, id string) error {
+	return APIError{
+		Code:    http.StatusForbidden,
 		Message: fmt.Sprintf("access to %s document %s denied", collection, id),
 	}
 }
 
 func NotFoundErr(collection string, filters bson.M) error {
 	filtersJSON, _ := json.Marshal(filters)
-	return ApiError{
+	return APIError{
 		Code: http.StatusNotFound,
 		Message: fmt.Sprintf(
 			"no %s document found with following criteria: %s",
@@ -54,22 +54,22 @@ func NotFoundErr(collection string, filters bson.M) error {
 }
 
 func IdNotFoundErr(collection string, id string) error {
-	return ApiError{
+	return APIError{
 		Code:    http.StatusNotFound,
 		Message: fmt.Sprintf("%s document %s not found", collection, id),
 	}
 }
 
 func NotAdminErr(err error) error {
-	return ApiError{
+	return APIError{
 		Code:    http.StatusUnauthorized,
-		Message: "not an admin!",
+		Message: "not an admin",
 		Err:     err,
 	}
 }
 
 func UnprocessableErr(message string, err error) error {
-	return ApiError{
+	return APIError{
 		Code:    http.StatusUnprocessableEntity,
 		Message: message,
 		Err:     err,
@@ -79,7 +79,7 @@ func UnprocessableErr(message string, err error) error {
 func ValidationErrs(message string, errMessages []string) error {
 	merged := strings.Join(errMessages, "\n")
 	err := errors.New(merged)
-	return ApiError{
+	return APIError{
 		Code:    http.StatusUnprocessableEntity,
 		Message: message,
 		Err:     err,
