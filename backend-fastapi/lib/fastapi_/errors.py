@@ -6,15 +6,6 @@ from fastapi.responses import JSONResponse
 from .types import CallNext
 
 
-class ApiError(Exception):
-    def __init__(
-        self, code: HTTPStatus, message: str = "", details: dict | None = None
-    ) -> None:
-        self.code = code
-        self.message = message or "An unknown error occured"
-        self.details = details or {}
-
-
 async def catch_exceptions(request: Request, call_next: CallNext) -> Response:
     try:
         return await call_next(request)
