@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/api/routes"
 	"backend/internal/config"
+	"backend/internal/lib/gin_"
 	"backend/internal/services/setup"
 	"fmt"
 
@@ -24,5 +25,6 @@ func main() {
 	setup := setup.New()
 	defer setup.CloseServices()
 	r := routes.SetupRouter()
+	r.Use(gin_.LimitRequestBody(config.Env.JSONMaxSize))
 	r.Run(fmt.Sprintf(":%d", config.Env.Port))
 }
