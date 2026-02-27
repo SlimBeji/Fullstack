@@ -98,6 +98,10 @@ type SearchQuery struct {
 	Where   WhereFilters
 }
 
+type SearchQueryReader interface {
+	ToSearchQuery() SearchQuery
+}
+
 func NewSearchQuery() *SearchQuery {
 	return &SearchQuery{
 		Page:    1,

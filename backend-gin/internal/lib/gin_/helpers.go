@@ -38,6 +38,16 @@ func GetQuery[T any](c *gin.Context) (T, bool) {
 	return body, ok
 }
 
+func GetSearchQuery(c *gin.Context) (types_.SearchQuery, bool) {
+	var zero types_.SearchQuery
+	raw, exists := c.Get("parsedSearchQuery")
+	if !exists {
+		return zero, false
+	}
+	searchQuery, ok := raw.(types_.SearchQuery)
+	return searchQuery, ok
+}
+
 func AbortWithStatusJSON(c *gin.Context, err error) {
 	var apiError types_.APIError
 	if !errors.As(err, &apiError) {

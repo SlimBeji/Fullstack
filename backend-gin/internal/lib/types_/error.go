@@ -68,6 +68,14 @@ func NotAdminErr(err error) error {
 	}
 }
 
+func SerializationErr(err error) error {
+	return APIError{
+		Code:    http.StatusBadRequest,
+		Message: "failed to serialize request",
+		Err:     err,
+	}
+}
+
 func UnprocessableErr(message string, err error) error {
 	return APIError{
 		Code:    http.StatusUnprocessableEntity,
