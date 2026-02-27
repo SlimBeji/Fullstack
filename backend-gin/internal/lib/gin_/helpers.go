@@ -2,6 +2,7 @@ package gin_
 
 import (
 	"backend/internal/lib/types_"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -10,9 +11,9 @@ import (
 
 func IsMultipart(c *gin.Context) bool {
 	contentType := c.GetHeader("Content-Type")
-	xxxUrlEncoded := strings.HasPrefix(contentType, string(types_.ContentTypeFormUrlencoded))
-	formData := strings.HasPrefix(contentType, string(types_.ContentTypeMultipart))
-	return xxxUrlEncoded || formData
+	isFormUrlEncoded := strings.HasPrefix(contentType, string(types_.ContentTypeFormUrlencoded))
+	isMultipart := strings.HasPrefix(contentType, string(types_.ContentTypeMultipart))
+	return isFormUrlEncoded || isMultipart
 }
 
 func GetBody[T any](c *gin.Context) (T, bool) {
@@ -27,9 +28,9 @@ func GetBody[T any](c *gin.Context) (T, bool) {
 }
 
 func AbortWithStatusJSON(c *gin.Context, err error) {
-	apiError, ok := err.(types_.APIError)
-	if !ok {
-		resp := gin.H{"error": true, "message": "Internal server error"}
+	var apiError types_.APIError
+	if !errors.As(err, &apiError) {
+		resp := gin.H{"error": true, "message": "internal server error"}
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 		return
 	}
