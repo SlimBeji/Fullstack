@@ -110,3 +110,22 @@ type PlaceFilters struct {
 	LocationLat []string `json:"locationLat" form:"locationLat" filter:"types_.FlexFloat" example:"gt:3.5" collectionFormat:"multi"`                                  // The latitude of the place
 	LocationLng []string `json:"locationLng" form:"locationLng" filter:"types_.FlexFloat" example:"lt:4.5" collectionFormat:"multi"`                                  // The longitude of the place
 }
+
+func (pf PlaceFilters) ToSearchQuery() types_.SearchQuery {
+	return types_.SearchQuery{
+		Page:    pf.Page,
+		Size:    pf.Size,
+		OrderBy: pf.Sort,
+		Select:  pf.Fields,
+		Where:   types_.WhereFilters{
+			// Parse these from []string to []Filter
+			// "Id":          pf.Id,
+			// "Title":       pf.Title,
+			// "Description": pf.Description,
+			// "Address":     pf.Address,
+			// "CreatorId":   pf.CreatorId,
+			// "LocationLat": pf.LocationLat,
+			// "LocationLng": pf.LocationLng,
+		},
+	}
+}

@@ -89,3 +89,18 @@ type UserFilters struct {
 	Name   []string `json:"name" form:"name" filter:"string,min=2" example:"eq:Slim Beji" collectionFormat:"multi"`                      // The user name, two characters at least
 	Email  []string `json:"email" form:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`          // The user email
 }
+
+func (uf UserFilters) ToSearchQuery() types_.SearchQuery {
+	return types_.SearchQuery{
+		Page:    uf.Page,
+		Size:    uf.Size,
+		OrderBy: uf.Sort,
+		Select:  uf.Fields,
+		Where:   types_.WhereFilters{
+			//Parse these from []string to []Filter
+			// "Id":    pf.Id,
+			// "Name":  pf.Name,
+			// "Email": pf.Email,
+		},
+	}
+}
