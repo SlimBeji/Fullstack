@@ -17,6 +17,8 @@ func main() {
 		bin.DumpDb()
 	case "storage":
 		bin.TestStorage()
+	case "pgsql":
+		bin.TestPgsql()
 	case "redis":
 		bin.TestRedis()
 	case "hf":
