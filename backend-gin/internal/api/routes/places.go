@@ -2,9 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
-	"backend/internal/config"
 	"backend/internal/lib/gin_"
-	"backend/internal/lib/types_"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"fmt"
@@ -22,7 +20,7 @@ import (
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/ [get]
 func getPlaces(c *gin.Context) {
-	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
+	searchQuery, _ := gin_.GetSearchQuery(c)
 	pc := collections.GetPlaceCollection()
 	data, err := pc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
@@ -41,7 +39,7 @@ func getPlaces(c *gin.Context) {
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/query [post]
 func queryPlaces(c *gin.Context) {
-	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
+	searchQuery, _ := gin_.GetSearchQuery(c)
 	pc := collections.GetPlaceCollection()
 	data, err := pc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
@@ -143,13 +141,13 @@ func RegisterPlaces(r *gin.Engine) {
 	router.GET(
 		"/",
 		middlewares.Authenticated,
-		gin_.Filter[schemas.PlaceFilters](config.Env.MaxItemsPerPage),
+		gin_.QueryFilters[schemas.PlaceFilters],
 		getPlaces,
 	)
 	router.POST(
 		"/query",
 		middlewares.Authenticated,
-		gin_.Filter[schemas.PlaceFilters](config.Env.MaxItemsPerPage),
+		gin_.BodyFilters[schemas.PlaceFilters],
 		queryPlaces,
 	)
 	router.POST(

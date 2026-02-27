@@ -2,9 +2,7 @@ package routes
 
 import (
 	"backend/internal/api/middlewares"
-	"backend/internal/config"
 	"backend/internal/lib/gin_"
-	"backend/internal/lib/types_"
 	"backend/internal/models/collections"
 	"backend/internal/models/schemas"
 	"fmt"
@@ -22,7 +20,7 @@ import (
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/ [get]
 func getUsers(c *gin.Context) {
-	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
+	searchQuery, _ := gin_.GetSearchQuery(c)
 	uc := collections.GetUserCollection()
 	data, err := uc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
@@ -41,7 +39,7 @@ func getUsers(c *gin.Context) {
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/query [post]
 func queryUsers(c *gin.Context) {
-	searchQuery, _ := gin_.GetBody[types_.SearchQuery](c)
+	searchQuery, _ := gin_.GetSearchQuery(c)
 	uc := collections.GetUserCollection()
 	data, err := uc.FetchBsonPage(&searchQuery, c)
 	if err != nil {
@@ -143,13 +141,13 @@ func RegisterUsers(r *gin.Engine) {
 	router.GET(
 		"/",
 		middlewares.Authenticated,
-		gin_.Filter[schemas.UserFilters](config.Env.MaxItemsPerPage),
+		gin_.QueryFilters[schemas.UserFilters],
 		getUsers,
 	)
 	router.POST(
 		"/query",
 		middlewares.Authenticated,
-		gin_.Filter[schemas.UserFilters](config.Env.MaxItemsPerPage),
+		gin_.BodyFilters[schemas.UserFilters],
 		queryUsers,
 	)
 	router.POST(
