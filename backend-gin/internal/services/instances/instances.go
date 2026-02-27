@@ -48,7 +48,7 @@ var (
 )
 
 var redisConfig = clients.RedisClientConfig{
-	Url:        config.Env.GetRedisURL(),
+	URL:        config.Env.GetRedisURL(),
 	Expiration: config.Env.RedisExpiration,
 }
 

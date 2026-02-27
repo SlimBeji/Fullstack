@@ -10,7 +10,7 @@ import (
 )
 
 type RedisClientConfig struct {
-	Url        string
+	URL        string
 	Expiration int // duration in seconds
 }
 
@@ -52,7 +52,7 @@ func (r *RedisClient) Close() error {
 }
 
 func NewRedisClient(config RedisClientConfig) *RedisClient {
-	opt, err := redis.ParseURL(config.Url)
+	opt, err := redis.ParseURL(config.URL)
 	if err != nil {
 		panic(fmt.Sprintf("Invalid Redis URL: %v", err))
 	}
