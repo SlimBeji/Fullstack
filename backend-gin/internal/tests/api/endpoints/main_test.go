@@ -39,6 +39,6 @@ func TestMain(m *testing.M) {
 	gin.SetMode(gin.ReleaseMode)
 	setup := setup.New()
 	code := m.Run()
-	setup.CloseSerivces()
+	setup.CloseServices()
 	os.Exit(code)
 }
