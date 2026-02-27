@@ -44,8 +44,15 @@ func QueryFilters[T types_.SearchQueryReader](c *gin.Context) {
 		return
 	}
 
+	// Convert filters schema to a SearchQuey
+	parsed, err := data.ToSearchQuery()
+	if err != nil {
+		AbortWithStatusJSON(c, err)
+		return
+	}
+
 	// Store the parsed form in context for later use
-	c.Set("parsedSearchQuery", data.ToSearchQuery())
+	c.Set("parsedSearchQuery", parsed)
 	c.Next()
 }
 
@@ -68,7 +75,14 @@ func BodyFilters[T types_.SearchQueryReader](c *gin.Context) {
 		return
 	}
 
+	// Convert filters schema to a SearchQuey
+	parsed, err := body.ToSearchQuery()
+	if err != nil {
+		AbortWithStatusJSON(c, err)
+		return
+	}
+
 	// Store the parsed form in context for later use
-	c.Set("parsedSearchQuery", body.ToSearchQuery())
+	c.Set("parsedSearchQuery", parsed)
 	c.Next()
 }
