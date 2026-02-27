@@ -13,6 +13,30 @@ import (
 	"strconv"
 )
 
+type FlexStrList []string
+
+func (f *FlexStrList) UnmarshalJSON(data []byte) error {
+	// Try array first
+	var arr []string
+	if err := json.Unmarshal(data, &arr); err == nil {
+		*f = FlexStrList(arr)
+		return nil
+	}
+
+	// Try single string
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+
+	*f = FlexStrList([]string{str})
+	return nil
+}
+
+func (f FlexStrList) MarshalJSON() ([]byte, error) {
+	return json.Marshal([]string(f))
+}
+
 type FlexFloat float64
 
 func (f FlexFloat) MarshalJSON() ([]byte, error) {
