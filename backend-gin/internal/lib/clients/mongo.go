@@ -21,8 +21,8 @@ type MongoClient struct {
 	DB     *mongo.Database
 }
 
-func (mc *MongoClient) Close() {
-	mc.Conn.Disconnect(context.Background())
+func (mc *MongoClient) Close() error {
+	return mc.Conn.Disconnect(context.Background())
 }
 
 func (mc *MongoClient) CreateCollection(name string) error {
