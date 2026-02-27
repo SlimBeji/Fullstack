@@ -52,18 +52,21 @@ func (r *RedisClient) Close() error {
 }
 
 func NewRedisClient(config RedisClientConfig) *RedisClient {
+	// Creating client
 	opt, err := redis.ParseURL(config.URL)
 	if err != nil {
 		panic(fmt.Sprintf("Invalid Redis URL: %v", err))
 	}
-
 	client := redis.NewClient(opt)
+
+	// Test connection
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
 	if err := client.Ping(ctx).Err(); err != nil {
 		panic("failed to connect to Redis")
 	}
+
+	// Returning struct ref
 	return &RedisClient{
 		config: config,
 		client: redis.NewClient(opt),
