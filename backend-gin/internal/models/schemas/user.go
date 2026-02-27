@@ -81,10 +81,10 @@ type UserPut struct {
 type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 type UserFilters struct {
-	Page   int      `json:"page" default:"1"`
-	Size   int      `json:"size" default:"100"`
-	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"`
+	Page   int      `json:"page" default:"1" validate:"gte=1"`                                                                           // The page number
+	Size   int      `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                 // Items per page
+	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`                 // Fields to use for sorting. Use the '-' for descending sorting
+	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"`              // Fields to include in the response; omit for full document
 	Id     []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The user ID, 24 characters
 	Name   []string `json:"name" form:"name" filter:"string,min=2" example:"eq:Slim Beji" collectionFormat:"multi"`                      // The user name, two characters at least
 	Email  []string `json:"email" form:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`          // The user email
