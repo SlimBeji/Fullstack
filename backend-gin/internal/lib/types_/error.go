@@ -76,6 +76,17 @@ func SerializationErr(err error) error {
 	}
 }
 
+func StringsToSerializationErr(errMessages []string) error {
+	merged := strings.Join(errMessages, "\n")
+	err := errors.New(merged)
+	return APIError{
+		Code:    http.StatusBadRequest,
+		Message: "failed to serialize request",
+		Err:     err,
+		Details: map[string]any{"errs": errMessages},
+	}
+}
+
 func UnprocessableErr(message string, err error) error {
 	return APIError{
 		Code:    http.StatusUnprocessableEntity,
