@@ -2,33 +2,13 @@ package gin_
 
 import (
 	"backend/internal/lib/types_"
+	"backend/internal/lib/utils"
 	"backend/internal/lib/validator_"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-viper/mapstructure/v2"
 )
-
-func smartDecode(in map[string]any, out any) error {
-	// using WeaklyTypedInput for easy int conversion like "1"->1
-	decoderConfig := &mapstructure.DecoderConfig{
-		Result:           out,
-		TagName:          "json",
-		WeaklyTypedInput: true,
-	}
-
-	decoder, err := mapstructure.NewDecoder(decoderConfig)
-	if err != nil {
-		return err
-	}
-
-	if err := decoder.Decode(in); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 	var body T
@@ -47,7 +27,7 @@ func queryParamsToBody[T any](c *gin.Context) (T, []string) {
 		}
 	}
 
-	if err := smartDecode(paramsMap, &body); err != nil {
+	if err := utils.SmartDecode(paramsMap, &body); err != nil {
 		return body, []string{err.Error()}
 	}
 
