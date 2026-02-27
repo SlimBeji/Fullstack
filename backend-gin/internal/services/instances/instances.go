@@ -40,6 +40,22 @@ func GetMongoDB(client *mongo.Client) *mongo.Database {
 	return client.Database(dbName)
 }
 
+// Postgresql
+
+var (
+	pgOnce   sync.Once
+	pgClient *clients.PgClient
+)
+
+var pgConfig = clients.PgClientConfig{
+	URL: config.Env.GetPGURL(),
+}
+
+func GetPgClient() *clients.PgClient {
+	pgOnce.Do(func() { pgClient = clients.NewPgClient(pgConfig) })
+	return pgClient
+}
+
 // Redis
 
 var (
