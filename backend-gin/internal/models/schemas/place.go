@@ -2,6 +2,7 @@ package schemas
 
 import (
 	"backend/internal/lib/types_"
+	"backend/internal/lib/validator_"
 	"mime/multipart"
 	"strings"
 	"time"
@@ -116,30 +117,64 @@ type PlaceFilters struct {
 	Size        int      `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                         // Items per page
 	Sort        []string `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" example:"createdAt"`          // Fields to use for sorting. Use the '-' for descending sorting
 	Fields      []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" example:"id,title"` // Fields to include in the response; omit for full document
-	Id          []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"`                         // The ID of the place 24 characters
-	Title       []string `json:"title" form:"title" filter:"string,min=10" example:"eq:Some Place" collectionFormat:"multi"`                                          // The place title/name, 10 characters minimum
-	Description []string `json:"description" form:"description" filter:"string,min=10" example:"like:football" collectionFormat:"multi"`                              // The place description, 10 characters minimum
-	Address     []string `json:"address" form:"address" filter:"string,min=10" example:"like:Boulevard" collectionFormat:"multi"`                                     // The place address
-	CreatorId   []string `json:"creatorId" form:"creatorId" filter:"string,hexadecimal,len=24" example:"eq:683b21134e2e5d46978daf1f" collectionFormat:"multi"`        // The ID of the place creator, 24 characters
-	LocationLat []string `json:"locationLat" form:"locationLat" filter:"types_.FlexFloat" example:"gt:3.5" collectionFormat:"multi"`                                  // The latitude of the place
-	LocationLng []string `json:"locationLng" form:"locationLng" filter:"types_.FlexFloat" example:"lt:4.5" collectionFormat:"multi"`                                  // The longitude of the place
+	Id          []string `json:"id" form:"id" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"`                                                            // The ID of the place 24 characters
+	Title       []string `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                 // The place title/name, 10 characters minimum
+	Description []string `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                     // The place description, 10 characters minimum
+	Address     []string `json:"address" form:"address" example:"like:Boulevard" collectionFormat:"multi"`                                                            // The place address
+	CreatorId   []string `json:"creatorId" form:"creatorId" example:"eq:683b21134e2e5d46978daf1f" collectionFormat:"multi"`                                           // The ID of the place creator, 24 characters
+	LocationLat []string `json:"locationLat" form:"locationLat" example:"gt:3.5" collectionFormat:"multi"`                                                            // The latitude of the place
+	LocationLng []string `json:"locationLng" form:"locationLng" example:"lt:4.5" collectionFormat:"multi"`                                                            // The longitude of the place
 }
 
-func (pf PlaceFilters) ToSearchQuery() types_.SearchQuery {
+func (pf PlaceFilters) ToSearchQuery() (types_.SearchQuery, error) {
+	errorsMap := make(map[string][]string)
+
+	// Helper to collect errors
+	addErrors := func(field string, errors []string) {
+		if len(errors) > 0 {
+			errorsMap[field] = errors
+		}
+	}
+
+	idFilters, errs := validator_.ToIndexFilters(pf.Id)
+	addErrors("id", errs)
+
+	titleFilters, errs := validator_.ToStringFilters(pf.Title, "min=10")
+	addErrors("title", errs)
+
+	descriptionFilters, errs := validator_.ToStringFilters(pf.Description, "min=10")
+	addErrors("description", errs)
+
+	addressFilters, errs := validator_.ToStringFilters(pf.Address, "min=10")
+	addErrors("address", errs)
+
+	creatorFilters, errs := validator_.ToIndexFilters(pf.CreatorId)
+	addErrors("creatorId", errs)
+
+	latFilters, errs := validator_.ToFloat64Filters(pf.LocationLat, "")
+	addErrors("locationLat", errs)
+
+	lngFilters, errs := validator_.ToFloat64Filters(pf.LocationLng, "")
+	addErrors("locationLng", errs)
+
+	if len(errorsMap) > 0 {
+		err := types_.MapToValidationErrs("invalid place filters", errorsMap)
+		return types_.SearchQuery{}, err
+	}
+
 	return types_.SearchQuery{
 		Page:    pf.Page,
 		Size:    pf.Size,
 		OrderBy: pf.Sort,
 		Select:  pf.Fields,
-		Where:   types_.WhereFilters{
-			// Parse these from []string to []Filter
-			// "Id":          pf.Id,
-			// "Title":       pf.Title,
-			// "Description": pf.Description,
-			// "Address":     pf.Address,
-			// "CreatorId":   pf.CreatorId,
-			// "LocationLat": pf.LocationLat,
-			// "LocationLng": pf.LocationLng,
+		Where: types_.WhereFilters{
+			"id":          idFilters,
+			"title":       titleFilters,
+			"description": descriptionFilters,
+			"address":     addressFilters,
+			"creatorId":   creatorFilters,
+			"locationLat": latFilters,
+			"locationLng": lngFilters,
 		},
-	}
+	}, nil
 }

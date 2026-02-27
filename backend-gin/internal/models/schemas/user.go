@@ -2,6 +2,7 @@ package schemas
 
 import (
 	"backend/internal/lib/types_"
+	"backend/internal/lib/validator_"
 	"mime/multipart"
 	"strings"
 	"time"
@@ -95,26 +96,48 @@ type UserPut struct {
 type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 type UserFilters struct {
-	Page   int      `json:"page" default:"1" validate:"gte=1"`                                                                           // The page number
-	Size   int      `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                 // Items per page
-	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`                 // Fields to use for sorting. Use the '-' for descending sorting
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"`              // Fields to include in the response; omit for full document
-	Id     []string `json:"id" form:"id" filter:"string,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"` // The user ID, 24 characters
-	Name   []string `json:"name" form:"name" filter:"string,min=2" example:"eq:Slim Beji" collectionFormat:"multi"`                      // The user name, two characters at least
-	Email  []string `json:"email" form:"email" filter:"string,email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`          // The user email
+	Page   int      `json:"page" default:"1" validate:"gte=1"`                                                              // The page number
+	Size   int      `json:"size" default:"100" validate:"lte=100,gte=1"`                                                    // Items per page
+	Sort   []string `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`    // Fields to use for sorting. Use the '-' for descending sorting
+	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"` // Fields to include in the response; omit for full document
+	Id     []string `json:"id" form:"id" example:"683b21134e2e5d46978daf1f" collectionFormat:"multi"`                       // The user ID, 24 characters
+	Name   []string `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                               // The user name, two characters at least
+	Email  []string `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                   // The user email
 }
 
-func (uf UserFilters) ToSearchQuery() types_.SearchQuery {
+func (uf UserFilters) ToSearchQuery() (types_.SearchQuery, error) {
+	errorsMap := make(map[string][]string)
+
+	// Helper to collect errors
+	addErrors := func(field string, errors []string) {
+		if len(errors) > 0 {
+			errorsMap[field] = errors
+		}
+	}
+
+	idFilters, errs := validator_.ToIndexFilters(uf.Id)
+	addErrors("id", errs)
+
+	nameFilters, errs := validator_.ToStringFilters(uf.Name, "min=2")
+	addErrors("name", errs)
+
+	emailFilters, errs := validator_.ToStringFilters(uf.Email, "email")
+	addErrors("email", errs)
+
+	if len(errorsMap) > 0 {
+		err := types_.MapToValidationErrs("invalid user filters", errorsMap)
+		return types_.SearchQuery{}, err
+	}
+
 	return types_.SearchQuery{
 		Page:    uf.Page,
 		Size:    uf.Size,
 		OrderBy: uf.Sort,
 		Select:  uf.Fields,
-		Where:   types_.WhereFilters{
-			//Parse these from []string to []Filter
-			// "Id":    pf.Id,
-			// "Name":  pf.Name,
-			// "Email": pf.Email,
+		Where: types_.WhereFilters{
+			"id":    idFilters,
+			"name":  nameFilters,
+			"email": emailFilters,
 		},
-	}
+	}, nil
 }

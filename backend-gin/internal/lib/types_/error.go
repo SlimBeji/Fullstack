@@ -105,3 +105,20 @@ func ValidationErrs(message string, errMessages []string) error {
 		Details: map[string]any{"errs": errMessages},
 	}
 }
+
+func MapToValidationErrs(message string, mapErrs map[string][]string) error {
+	if message == "" {
+		message = "form not valid"
+	}
+
+	details := make(map[string]any)
+	for k, v := range mapErrs {
+		details[k] = v
+	}
+
+	return APIError{
+		Code:    http.StatusUnprocessableEntity,
+		Message: message,
+		Details: details,
+	}
+}

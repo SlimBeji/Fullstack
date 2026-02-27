@@ -113,7 +113,7 @@ type SearchQuery struct {
 }
 
 type SearchQueryReader interface {
-	ToSearchQuery() SearchQuery
+	ToSearchQuery() (SearchQuery, error)
 }
 
 func NewSearchQuery() *SearchQuery {
