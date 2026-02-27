@@ -156,7 +156,12 @@ func RegisterUsers(r *gin.Engine) {
 		gin_.BodyValidator[schemas.UserPost],
 		createUser,
 	)
-	router.GET("/:userId", middlewares.Authenticated, getUser)
+	router.GET(
+		"/:userId",
+		middlewares.Authenticated,
+		gin_.QueryValidator[schemas.UserGet],
+		getUser,
+	)
 	router.PUT(
 		"/:userId",
 		middlewares.Authenticated,

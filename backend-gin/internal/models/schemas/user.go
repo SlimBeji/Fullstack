@@ -3,8 +3,10 @@ package schemas
 import (
 	"backend/internal/lib/types_"
 	"mime/multipart"
+	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -60,6 +62,18 @@ type UserRead struct {
 	Places    []primitive.ObjectID `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f"`              // The id of places belonging to the user, 24 characters
 	CreatedAt time.Time            `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
 	UpdatedAt time.Time            `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
+}
+
+type UserGet struct {
+	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"` // Fields to include in the response; omit for full document
+}
+
+func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
+	result := UserGet{}
+	fieldsRaw, _ := c.GetQuery("fields")
+	result.Fields = strings.Split(fieldsRaw, ",")
+	// No errors to return, field optional
+	return result, []string{}
 }
 
 // --- Update Schemas ---

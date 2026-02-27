@@ -156,7 +156,12 @@ func RegisterPlaces(r *gin.Engine) {
 		gin_.BodyValidator[schemas.PlacePost],
 		createPlace,
 	)
-	router.GET("/:placeId", middlewares.Authenticated, getPlace)
+	router.GET(
+		"/:placeId",
+		middlewares.Authenticated,
+		gin_.QueryValidator[schemas.PlaceGet],
+		getPlace,
+	)
 	router.PUT(
 		"/:placeId",
 		middlewares.Authenticated,

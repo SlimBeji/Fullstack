@@ -3,8 +3,10 @@ package schemas
 import (
 	"backend/internal/lib/types_"
 	"mime/multipart"
+	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -75,6 +77,18 @@ type PlaceRead struct {
 	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" `               // The ID of the place creator, 24 characters
 	CreatedAt   time.Time          `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
 	UpdatedAt   time.Time          `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
+}
+
+type PlaceGet struct {
+	Fields []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" example:"id,title"` // Fields to include in the response; omit for full document
+}
+
+func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {
+	result := PlaceGet{}
+	fieldsRaw, _ := c.GetQuery("fields")
+	result.Fields = strings.Split(fieldsRaw, ",")
+	// No errors to return, field optional
+	return result, []string{}
 }
 
 // --- Update Schemas ---
