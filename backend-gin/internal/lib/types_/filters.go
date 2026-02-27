@@ -3,6 +3,7 @@ package types_
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type FilterOp string
@@ -40,6 +41,19 @@ type Filter struct {
 }
 
 func NewFilter(op FilterOp, val any) Filter {
+	return Filter{Op: op, Val: val}
+}
+
+func StringToFilter(raw string) Filter {
+	parts := strings.SplitN(raw, ":", 2)
+	op := FilterEq
+	val := ""
+	if len(parts) > 1 {
+		op = FilterOp(parts[0])
+		val = parts[1]
+	} else {
+		val = parts[0]
+	}
 	return Filter{Op: op, Val: val}
 }
 
