@@ -28,7 +28,7 @@ func BodyValidator[T any](c *gin.Context) {
 	form, errs := ExtractBody[T](c)
 	if len(errs) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error":   "Invalid request body",
+			"error":   "invalid request body",
 			"details": errs,
 		})
 		c.Abort()
