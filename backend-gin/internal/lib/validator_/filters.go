@@ -4,382 +4,437 @@ import (
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"fmt"
-	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func BuildSearchQuery(
-	filters any, findQuery *types_.SearchQuery, maxItems int,
-) map[string][]string {
-	result := make(map[string][]string)
-	values := reflect.ValueOf(filters)
-	types := reflect.TypeOf(filters)
+func ToIntFilters(values []string, validationTag string) ([]types_.Filter, []string) {
+	filters := make([]types_.Filter, 0, len(values))
+	errMessages := make([]string, 0, len(values))
 
-	for i := 0; i < types.NumField(); i++ {
-		value := values.Field(i)
-		type_ := types.Field(i)
-		validateTag := type_.Tag.Get("validate")
-		filterTag := type_.Tag.Get("filter")
-
-		if !value.IsValid() {
-			return map[string][]string{"general": {"something went wrong while parsing http filters!"}}
-		}
-
-		switch type_.Name {
-		case "Page":
-			if value.Kind() != reflect.Int {
-				result["page"] = []string{"Page value must be a positive integer"}
-			}
-			val := int(value.Int())
-			if val < 0 {
-				result["page"] = []string{"Page value must be a positive integer"}
-			} else if val == 0 {
-				// zero value, probably was not set
-				val = 1
-			}
-			findQuery.Page = val
-		case "Size":
-			if value.Kind() != reflect.Int {
-				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", maxItems)}
-			}
-			val := int(value.Int())
-			if val == 0 {
-				// zero value, probably was not set
-				val = maxItems
-			}
-			if val < 0 || val > maxItems {
-				result["size"] = []string{fmt.Sprintf("Size value must be an integer between 1 and %d", maxItems)}
-			}
-			findQuery.Size = val
-		case "Sort":
-			val, msg := validateLists(value, validateTag)
-			if msg != "" {
-				result["sort"] = []string{msg}
-			}
-			findQuery.OrderBy = val
-		case "Fields":
-			val, msg := validateLists(value, validateTag)
-			if msg != "" {
-				result["fields"] = []string{msg}
-			}
-			findQuery.Select = val
-		default:
-			val, msgs := validateFilters(type_.Name, value, filterTag)
-			if len(msgs) > 0 {
-				result[type_.Name] = msgs
-			}
-			if findQuery.Where == nil {
-				findQuery.Where = make(types_.WhereFilters)
-			}
-			if len(val) > 0 {
-				findQuery.Where[type_.Tag.Get("json")] = val
-			}
-		}
+	if len(values) == 0 {
+		return filters, errMessages
 	}
 
-	return result
-}
-
-func validateLists(v reflect.Value, tag string) ([]string, string) {
-	val, ok := v.Interface().([]string)
-	if !ok {
-		return val, "Fields value must be a list of strings"
-	}
-	msg := ValidateVar(val, tag)
-	return val, msg
-}
-
-type filterValidationParams struct {
-	fieldName     string
-	isIndexed     bool
-	validationTag string
-	typeStr       string
-}
-
-func validateFilters(
-	name string, v reflect.Value, tag string,
-) ([]types_.Filter, []string) {
-	var strErrors []string
-	var filters []types_.Filter
-	var params filterValidationParams
-	params.fieldName = name
-
-	strFilters, ok := v.Interface().([]string)
-	if !ok {
-		msg := fmt.Sprintf("param %s filters must be a list of strings", name)
-		return filters, []string{msg}
-	}
-
-	// Returns nothing if no strFilters
-	if len(strFilters) == 0 {
-		return filters, strErrors
-	}
-
-	// Parse the tags
-	tagParts := strings.Split(tag, ",")
-	params.typeStr = tagParts[0]
-	if params.typeStr == "" {
-		params.typeStr = "string"
-	}
-	tagParts = tagParts[1:]
-	tagParts, params.isIndexed = utils.RemoveFromList(tagParts, "indexed")
-	params.validationTag = strings.Join(tagParts, ",")
-
-	// Iterate over each str filter and convert it to Filter with validation
-	var usedFilters []types_.FilterOp
-	for _, strFilter := range strFilters {
-		filter, fieldErrors := validateFilter(strFilter, params)
-
-		if slices.Contains(usedFilters, filter.Op) {
-			fieldErrors = append(
-				fieldErrors,
-				fmt.Sprintf("cannot use an operator twice for the same field. %s used multiple times", filter.Op),
-			)
-		} else {
-			usedFilters = append(usedFilters, filter.Op)
-		}
-
-		if slices.Contains(usedFilters, types_.FilterEq) && len(usedFilters) >= 2 {
-			fieldErrors = append(
-				fieldErrors,
-				fmt.Sprintf("eq can only be used exclusively. %s used at the same time", usedFilters),
-			)
-		}
-
-		if len(fieldErrors) > 0 {
-			strErrors = append(strErrors, fieldErrors...)
-		} else {
+	for _, value := range values {
+		filter := types_.StringToFilter(value)
+		switch filter.Op {
+		case types_.FilterEq, types_.FilterNe,
+			types_.FilterGt, types_.FilterGte, types_.FilterLt, types_.FilterLte:
+			val, err := strconv.Atoi(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid integer", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			if msg := ValidateVar(val, validationTag); msg != "" {
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = val
 			filters = append(filters, filter)
-		}
-	}
-
-	return filters, strErrors
-}
-
-func validateFilter(
-	strFilter string, params filterValidationParams,
-) (types_.Filter, []string) {
-	var filter types_.Filter
-	op := types_.FilterOp("eq")
-	rawVal := ""
-
-	parts := strings.SplitN(strFilter, ":", 2)
-	if len(parts) == 1 {
-		rawVal = parts[0]
-	} else if len(parts) == 2 {
-		op = types_.FilterOp(parts[0])
-		rawVal = parts[1]
-	}
-
-	switch params.typeStr {
-	case "string":
-		return validateStringFilter(rawVal, op, params)
-	case "int", "types_.FlexInt":
-		return validateIntFilter(rawVal, op, params)
-	case "float64", "types_.FlexFloat":
-		return validateFloat64Filter(rawVal, op, params)
-	case "bool", "types_.FlexBool":
-		return validateBoolFilter(rawVal, op, params)
-	case "time.Time":
-		return validateTimeFilter(rawVal, op, params)
-	default:
-		msg := fmt.Sprintf("Unknown type %s for field %s", params.typeStr, params.fieldName)
-		return filter, []string{msg}
-	}
-}
-
-func validateStringFilter(
-	rawVal string, op types_.FilterOp, params filterValidationParams,
-) (types_.Filter, []string) {
-	var filter types_.Filter
-	var vals []string
-	var msgs []string
-	filter.Op = op
-
-	switch op {
-	// Single value filters that needs validation
-	case types_.FilterEq, types_.FilterNe, types_.FilterNull:
-		filter.Val = rawVal
-		vals = []string{rawVal}
-	// Array values filters that needs validation
-	case types_.FilterIn, types_.FilterNin:
-		parts := strings.Split(rawVal, ",")
-		filter.Val = parts
-		vals = parts
-	// Single value filters that needs no validation
-	case types_.FilterLike, types_.FilterIlike:
-		filter.Val = rawVal
-		return filter, msgs
-	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,null,in,nin,like,ilike", params.fieldName, op)
-		return filter, []string{msg}
-	}
-
-	// Validate the vals here
-	for _, val := range vals {
-		msg := ValidateVar(val, params.validationTag)
-		if msg != "" {
-			msgs = append(msgs, msg)
-		}
-	}
-	return filter, msgs
-}
-
-func validateIntFilter(
-	rawVal string, op types_.FilterOp, params filterValidationParams,
-) (types_.Filter, []string) {
-	var filter types_.Filter
-	var vals []int
-	var msgs []string
-	filter.Op = op
-
-	switch op {
-	case types_.FilterEq, types_.FilterNe, types_.FilterGt, types_.FilterGte, types_.FilterLt, types_.FilterLte:
-		val, err := strconv.Atoi(rawVal)
-		if err != nil {
-			msg := fmt.Sprintf("%s is not a valid integer", rawVal)
-			return filter, []string{msg}
-		}
-		vals = append(vals, val)
-		filter.Val = val
-	case types_.FilterIn, types_.FilterNin:
-		parts := strings.Split(rawVal, ",")
-		for _, i := range parts {
-			val, err := strconv.Atoi(i)
+		case types_.FilterNull:
+			boolVal, err := utils.CheckBool(filter.Val.(string))
 			if err != nil {
-				msgs = append(msgs, fmt.Sprintf("%s is not a valid integer", i))
-			} else {
-				vals = append(vals, val)
+				msg := fmt.Sprintf("%s is not a valid boolean for null filter", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
 			}
+			filter.Val = boolVal
+			filters = append(filters, filter)
+		case types_.FilterIn, types_.FilterNin:
+			errFound := false
+			parts := strings.Split(filter.Val.(string), ",")
+			parsed := make([]int, 0, len(parts))
+			for _, i := range parts {
+				val, err := strconv.Atoi(i)
+				if err != nil {
+					errFound = true
+					msg := fmt.Sprintf("%s is not a valid integer", i)
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				if msg := ValidateVar(val, validationTag); msg != "" {
+					errFound = true
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				parsed = append(parsed, val)
+			}
+			if errFound {
+				continue
+			}
+			filter.Val = parsed
+			filters = append(filters, filter)
+		default:
+			msg := fmt.Sprintf("wrong filter operation: %s is not among eq,ne,null,gt,gte,lt,lte,in,nin", filter.Op)
+			errMessages = append(errMessages, msg)
 		}
-		if len(msgs) > 0 {
-			return filter, msgs
-		}
-		filter.Val = vals
-	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,lt,lte,gt,gte,in,nin", params.fieldName, op)
-		return filter, []string{msg}
 	}
 
-	// Validate the vals here
-	for _, val := range vals {
-		msg := ValidateVar(val, params.validationTag)
-		if msg != "" {
-			msgs = append(msgs, msg)
-		}
-	}
-	return filter, msgs
+	errs := ValidateFilterLogic(filters)
+	errMessages = append(errMessages, errs...)
+	return filters, errMessages
 }
 
-func validateFloat64Filter(
-	rawVal string, op types_.FilterOp, params filterValidationParams,
-) (types_.Filter, []string) {
-	var filter types_.Filter
-	var vals []float64
-	var msgs []string
-	filter.Op = op
+func ToFloat64Filters(values []string, validationTag string) ([]types_.Filter, []string) {
+	filters := make([]types_.Filter, 0, len(values))
+	errMessages := make([]string, 0, len(values))
 
-	switch op {
-	case types_.FilterEq, types_.FilterNe, types_.FilterGt, types_.FilterGte, types_.FilterLt, types_.FilterLte:
-		val, err := strconv.ParseFloat(rawVal, 64)
-		if err != nil {
-			msg := fmt.Sprintf("%s is not a valid float", rawVal)
-			return filter, []string{msg}
-		}
-		vals = append(vals, val)
-		filter.Val = val
-	case types_.FilterIn, types_.FilterNin:
-		parts := strings.Split(rawVal, ",")
-		for _, i := range parts {
-			val, err := strconv.ParseFloat(i, 64)
+	if len(values) == 0 {
+		return filters, errMessages
+	}
+
+	for _, value := range values {
+		filter := types_.StringToFilter(value)
+		switch filter.Op {
+		case types_.FilterEq, types_.FilterNe,
+			types_.FilterGt, types_.FilterGte, types_.FilterLt, types_.FilterLte:
+			val, err := strconv.ParseFloat(filter.Val.(string), 64)
 			if err != nil {
-				msgs = append(msgs, fmt.Sprintf("%s is not a valid float", i))
-			} else {
-				vals = append(vals, val)
+				msg := fmt.Sprintf("%s is not a valid float", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
 			}
-		}
-		if len(msgs) > 0 {
-			return filter, msgs
-		}
-		filter.Val = vals
-	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq, ne,null,lt,lte,gt,gte,in,nin", params.fieldName, op)
-		return filter, []string{msg}
-	}
-
-	// Validate the vals here
-	for _, val := range vals {
-		msg := ValidateVar(val, params.validationTag)
-		if msg != "" {
-			msgs = append(msgs, msg)
-		}
-	}
-	return filter, msgs
-}
-
-func validateBoolFilter(
-	rawVal string, op types_.FilterOp, params filterValidationParams,
-) (types_.Filter, []string) {
-	var filter types_.Filter
-	var msgs []string
-	filter.Op = op
-
-	val := utils.StrToBool(rawVal)
-	switch op {
-	case types_.FilterEq, types_.FilterNe, types_.FilterNull:
-		filter.Val = val
-		return filter, msgs
-	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,null", params.fieldName, op)
-		return filter, []string{msg}
-	}
-}
-
-func validateTimeFilter(
-	rawVal string, op types_.FilterOp, params filterValidationParams,
-) (types_.Filter, []string) {
-	var filter types_.Filter
-	var vals []time.Time
-	var msgs []string
-	filter.Op = op
-
-	switch op {
-	case types_.FilterEq, types_.FilterNe, types_.FilterGt, types_.FilterGte, types_.FilterLt, types_.FilterLte:
-		val, err := utils.ParseTime(rawVal)
-		if err != nil {
-			msg := fmt.Sprintf("%s is not a valid datetime", rawVal)
-			return filter, []string{msg}
-		}
-		vals = append(vals, val)
-		filter.Val = val
-	case types_.FilterIn, types_.FilterNin, types_.FilterNull:
-		parts := strings.Split(rawVal, ",")
-		for _, i := range parts {
-			val, err := utils.ParseTime(i)
+			if msg := ValidateVar(val, validationTag); msg != "" {
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = val
+			filters = append(filters, filter)
+		case types_.FilterNull:
+			boolVal, err := utils.CheckBool(filter.Val.(string))
 			if err != nil {
-				msgs = append(msgs, fmt.Sprintf("%s is not a valid datetime", i))
-			} else {
-				vals = append(vals, val)
+				msg := fmt.Sprintf("%s is not a valid boolean for null filter", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
 			}
+			filter.Val = boolVal
+			filters = append(filters, filter)
+		case types_.FilterIn, types_.FilterNin:
+			errFound := false
+			parts := strings.Split(filter.Val.(string), ",")
+			parsed := make([]float64, 0, len(parts))
+			for _, i := range parts {
+				val, err := strconv.ParseFloat(i, 64)
+				if err != nil {
+					errFound = true
+					msg := fmt.Sprintf("%s is not a valid float", i)
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				if msg := ValidateVar(val, validationTag); msg != "" {
+					errFound = true
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				parsed = append(parsed, val)
+			}
+			if errFound {
+				continue
+			}
+			filter.Val = parsed
+			filters = append(filters, filter)
+		default:
+			msg := fmt.Sprintf("wrong filter operation: %s is not among eq,ne,null,gt,gte,lt,lte,in,nin", filter.Op)
+			errMessages = append(errMessages, msg)
 		}
-		if len(msgs) > 0 {
-			return filter, msgs
-		}
-		filter.Val = vals
-	default:
-		msg := fmt.Sprintf("wrong filter operation for %s param. %s is not among eq,ne,lt,lte,gt,gte,in,nin,exists", params.fieldName, op)
-		return filter, []string{msg}
 	}
 
-	// Validate the vals here
-	for _, val := range vals {
-		msg := ValidateVar(val, params.validationTag)
-		if msg != "" {
-			msgs = append(msgs, msg)
+	errs := ValidateFilterLogic(filters)
+	errMessages = append(errMessages, errs...)
+	return filters, errMessages
+}
+
+func ToIndexFilters(values []string) ([]types_.Filter, []string) {
+	filters := make([]types_.Filter, 0, len(values))
+	errMessages := make([]string, 0, len(values))
+
+	if len(values) == 0 {
+		return filters, errMessages
+	}
+
+	for _, value := range values {
+		filter := types_.StringToFilter(value)
+		switch filter.Op {
+		case types_.FilterEq, types_.FilterNe:
+			val, err := strconv.Atoi(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid index (must be integer)", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = val
+			filters = append(filters, filter)
+		case types_.FilterNull:
+			boolVal, err := utils.CheckBool(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid boolean for null filter", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = boolVal
+			filters = append(filters, filter)
+		case types_.FilterIn, types_.FilterNin:
+			errFound := false
+			parts := strings.Split(filter.Val.(string), ",")
+			parsed := make([]int, 0, len(parts))
+			for _, i := range parts {
+				val, err := strconv.Atoi(i)
+				if err != nil {
+					errFound = true
+					msg := fmt.Sprintf("%s is not a valid index (must be integer)", i)
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				parsed = append(parsed, val)
+			}
+			if errFound {
+				continue
+			}
+			filter.Val = parsed
+			filters = append(filters, filter)
+		default:
+			msg := fmt.Sprintf("wrong filter operation: %s is not allowed for indexes, not among eq,ne,null,in,nin", filter.Op)
+			errMessages = append(errMessages, msg)
 		}
 	}
-	return filter, msgs
+
+	errs := ValidateFilterLogic(filters)
+	errMessages = append(errMessages, errs...)
+	return filters, errMessages
+}
+
+func ToStringFilters(values []string, validationTag string) ([]types_.Filter, []string) {
+	filters := make([]types_.Filter, 0, len(values))
+	errMessages := make([]string, 0, len(values))
+
+	if len(values) == 0 {
+		return filters, errMessages
+	}
+
+	for _, value := range values {
+		filter := types_.StringToFilter(value)
+		switch filter.Op {
+		case types_.FilterEq, types_.FilterNe:
+			strVal := filter.Val.(string)
+			if msg := ValidateVar(strVal, validationTag); msg != "" {
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = strVal
+			filters = append(filters, filter)
+		case types_.FilterLike, types_.FilterIlike:
+			// No validation for like/ilike - they contain partial patterns
+			strVal := filter.Val.(string)
+			filter.Val = strVal
+			filters = append(filters, filter)
+		case types_.FilterNull:
+			boolVal, err := utils.CheckBool(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid boolean for null filter", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = boolVal
+			filters = append(filters, filter)
+		case types_.FilterIn, types_.FilterNin:
+			errFound := false
+			parts := strings.Split(filter.Val.(string), ",")
+			parsed := make([]string, 0, len(parts))
+			for _, i := range parts {
+				if msg := ValidateVar(i, validationTag); msg != "" {
+					errFound = true
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				parsed = append(parsed, i)
+			}
+			if errFound {
+				continue
+			}
+			filter.Val = parsed
+			filters = append(filters, filter)
+		default:
+			msg := fmt.Sprintf("wrong filter operation: %s is not among eq,ne,in,nin,null,like,ilike", filter.Op)
+			errMessages = append(errMessages, msg)
+		}
+	}
+
+	errs := ValidateFilterLogic(filters)
+	errMessages = append(errMessages, errs...)
+	return filters, errMessages
+}
+
+func ToBooleanFilters(values []string) ([]types_.Filter, []string) {
+	filters := make([]types_.Filter, 0, len(values))
+	errMessages := make([]string, 0, len(values))
+
+	if len(values) == 0 {
+		return filters, errMessages
+	}
+
+	for _, value := range values {
+		filter := types_.StringToFilter(value)
+		switch filter.Op {
+		case types_.FilterEq, types_.FilterNe, types_.FilterNull:
+			boolVal, err := utils.CheckBool(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid boolean (use true/false, 1/0, yes/no)", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = boolVal
+			filters = append(filters, filter)
+		default:
+			msg := fmt.Sprintf("wrong filter operation: %s is not allowed for booleans (use eq,ne,null)", filter.Op)
+			errMessages = append(errMessages, msg)
+		}
+	}
+
+	errs := ValidateFilterLogic(filters)
+	errMessages = append(errMessages, errs...)
+	return filters, errMessages
+}
+
+func ToTimeFilters(values []string, validationTag string) ([]types_.Filter, []string) {
+	filters := make([]types_.Filter, 0, len(values))
+	errMessages := make([]string, 0, len(values))
+
+	if len(values) == 0 {
+		return filters, errMessages
+	}
+
+	for _, value := range values {
+		filter := types_.StringToFilter(value)
+		switch filter.Op {
+		case types_.FilterEq, types_.FilterNe,
+			types_.FilterGt, types_.FilterGte, types_.FilterLt, types_.FilterLte:
+			val, err := utils.ParseTime(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid time format", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			if msg := ValidateVar(val, validationTag); msg != "" {
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = val
+			filters = append(filters, filter)
+		case types_.FilterNull:
+			boolVal, err := utils.CheckBool(filter.Val.(string))
+			if err != nil {
+				msg := fmt.Sprintf("%s is not a valid boolean for null filter", filter.Val)
+				errMessages = append(errMessages, msg)
+				continue
+			}
+			filter.Val = boolVal
+			filters = append(filters, filter)
+		case types_.FilterIn, types_.FilterNin:
+			errFound := false
+			parts := strings.Split(filter.Val.(string), ",")
+			parsed := make([]time.Time, 0, len(parts))
+			for _, i := range parts {
+				val, err := utils.ParseTime(i)
+				if err != nil {
+					errFound = true
+					msg := fmt.Sprintf("%s is not a valid time format", i)
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				if msg := ValidateVar(val, validationTag); msg != "" {
+					errFound = true
+					errMessages = append(errMessages, msg)
+					continue
+				}
+				parsed = append(parsed, val)
+			}
+			if errFound {
+				continue
+			}
+			filter.Val = parsed
+			filters = append(filters, filter)
+		default:
+			msg := fmt.Sprintf("wrong filter operation: %s is not among eq,ne,null,gt,gte,lt,lte,in,nin", filter.Op)
+			errMessages = append(errMessages, msg)
+		}
+	}
+
+	errs := ValidateFilterLogic(filters)
+	errMessages = append(errMessages, errs...)
+	return filters, errMessages
+}
+
+func ValidateFilterLogic(filters []types_.Filter) []string {
+	var errMessages []string
+
+	if len(filters) <= 1 {
+		return errMessages
+	}
+
+	// Collect all operators
+	usedOps := make(map[types_.FilterOp]int)
+	var opList []types_.FilterOp
+
+	for _, filter := range filters {
+		usedOps[filter.Op]++
+		opList = append(opList, filter.Op)
+	}
+
+	// Rule 0: No operator used twice
+	for op, count := range usedOps {
+		if count > 1 {
+			msg := fmt.Sprintf("cannot use operator %s multiple times for the same field", op)
+			errMessages = append(errMessages, msg)
+		}
+	}
+
+	// Early return: if only one unique operator, no conflicts possible
+	if len(usedOps) == 1 {
+		return errMessages
+	}
+
+	// From here on, length is guaranteed >= 2
+	_, eqUsed := usedOps[types_.FilterEq]
+	_, nullUsed := usedOps[types_.FilterNull]
+	_, inUsed := usedOps[types_.FilterIn]
+	_, gtUsed := usedOps[types_.FilterGt]
+	_, gteUsed := usedOps[types_.FilterGte]
+	_, ltUsed := usedOps[types_.FilterLt]
+	_, lteUsed := usedOps[types_.FilterLte]
+	_, likeUsed := usedOps[types_.FilterLike]
+	_, ilikeUsed := usedOps[types_.FilterIlike]
+
+	// Rule 1: eq should be used exclusively
+	if eqUsed {
+		msg := fmt.Sprintf("eq can only be used exclusively, but found: %v", opList)
+		errMessages = append(errMessages, msg)
+	} else if nullUsed {
+		// Rule 2: null should be used exclusively (if eq not used)
+		msg := fmt.Sprintf("null operator should be used exclusively, but found: %v", opList)
+		errMessages = append(errMessages, msg)
+	} else if inUsed {
+		// Rule 3: in should be used exclusively (if eq not used)
+		msg := fmt.Sprintf("in operator should be used exclusively, but found: %v", opList)
+		errMessages = append(errMessages, msg)
+	}
+
+	// Rule 4: gt/gte cannot be used together
+	if gtUsed && gteUsed {
+		errMessages = append(errMessages, "gt and gte operators should not be used together")
+	}
+
+	// Rule 5: lt/lte cannot be used together
+	if ltUsed && lteUsed {
+		errMessages = append(errMessages, "lt and lte operators should not be used together")
+	}
+
+	// Rule 6: like/ilike cannot be used together
+	if likeUsed && ilikeUsed {
+		errMessages = append(errMessages, "like and ilike operators should not be used together")
+	}
+
+	return errMessages
 }
