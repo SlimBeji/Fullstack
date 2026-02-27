@@ -205,6 +205,9 @@ class HttpFilter(Generic[T]):
 
 
 def _field_filters_validator(filters: list[Filter]):
+    if len(filters) <= 1:
+        return filters
+
     used_operators: list[FilterOperation] = []
     errors: list[str] = []
     duplicate: list[str] = []

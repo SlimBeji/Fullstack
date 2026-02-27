@@ -402,6 +402,10 @@ export const httpFilter = (
 };
 
 const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
+    if (filters.length <= 1) {
+        return filters;
+    }
+
     const usedOperators: FilterOperation[] = [];
     const duplicate: FilterOperation[] = [];
 
