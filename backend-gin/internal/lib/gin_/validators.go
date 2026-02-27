@@ -36,6 +36,6 @@ func BodyValidator[T any](c *gin.Context) {
 	}
 
 	// Store the parsed form in context for later use
-	c.Set("requestBody", form)
+	c.Set("parsedBody", form)
 	c.Next()
 }

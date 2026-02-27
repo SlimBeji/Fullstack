@@ -18,7 +18,18 @@ func IsMultipart(c *gin.Context) bool {
 
 func GetBody[T any](c *gin.Context) (T, bool) {
 	var zero T
-	raw, exists := c.Get("requestBody")
+	raw, exists := c.Get("parsedBody")
+	if !exists {
+		return zero, false
+	}
+
+	body, ok := raw.(T)
+	return body, ok
+}
+
+func GetQuery[T any](c *gin.Context) (T, bool) {
+	var zero T
+	raw, exists := c.Get("parsedQuery")
 	if !exists {
 		return zero, false
 	}
