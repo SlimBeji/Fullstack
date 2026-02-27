@@ -34,7 +34,7 @@ func (p *PgClient) Close() error {
 func (p *PgClient) ListTables(ctx context.Context) ([]string, error) {
 	var tables []string
 
-	query := `SELECT tablename FROM pg_tables WHERE schemaname = "public"`
+	query := `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`
 	rows, err := p.sqlDB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list tables: %w", err)
