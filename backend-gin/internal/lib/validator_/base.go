@@ -9,7 +9,10 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
 
+// ErrorTranslator translates validation errors to English
 var ErrorTranslator ut.Translator
+
+// Validate is the global validator instance
 var Validate *validator.Validate
 
 func GetBaseValidator() *validator.Validate {
@@ -26,7 +29,7 @@ func TranslateErrors(err error) []string {
 
 	errs, ok := err.(validator.ValidationErrors)
 	if !ok {
-		return result
+		return []string{err.Error()}
 	}
 
 	for _, e := range errs {
@@ -55,9 +58,13 @@ func ValidateVar(val any, tag string) string {
 
 func init() {
 	// Initialize the Error Translator
+	var found bool
 	translator := en.New()
 	uni := ut.New(translator, translator)
-	ErrorTranslator, _ = uni.GetTranslator("en")
+	ErrorTranslator, found = uni.GetTranslator("en")
+	if !found {
+		panic("failed to get English translator")
+	}
 
 	// Initialize the main validator
 	Validate = GetBaseValidator()
