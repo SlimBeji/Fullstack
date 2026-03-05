@@ -11,6 +11,70 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// --- Selectables, Serchables, Sortables ----
+
+type UserSelectables string
+
+const (
+	UserSelectId        UserSelectables = "id"
+	UserSelectName      UserSelectables = "name"
+	UserSelectEmail     UserSelectables = "email"
+	UserSelectIsAdmin   UserSelectables = "isAdmin"
+	UserSelectImageUrl  UserSelectables = "imageUrl"
+	UserSelectPlaces    UserSelectables = "places"
+	UserSelectCreatedAt UserSelectables = "createdAt"
+	UserSelectUpdatedAt UserSelectables = "updatedAt"
+)
+
+func (field UserSelectables) Validate() bool {
+	switch field {
+	case UserSelectId, UserSelectName, UserSelectEmail, UserSelectIsAdmin,
+		UserSelectImageUrl, UserSelectPlaces, UserSelectCreatedAt, UserSelectUpdatedAt:
+		return true
+	default:
+		return false
+	}
+}
+
+type UserSearchables string
+
+const (
+	UserSearchId    UserSearchables = "id"
+	UserSearchName  UserSearchables = "name"
+	UserSearchEmail UserSearchables = "email"
+)
+
+func (field UserSearchables) Validate() bool {
+	switch field {
+	case UserSearchId, UserSearchName, UserSearchEmail:
+		return true
+	default:
+		return false
+	}
+}
+
+type UserSortables string
+
+const (
+	UserSortCreatedAtAsc  UserSortables = "createdAt"
+	UserSortCreatedAtDesc UserSortables = "-createdAt"
+	UserSortNameAsc       UserSortables = "name"
+	UserSortNameDesc      UserSortables = "-name"
+	UserSortEmailAsc      UserSortables = "email"
+	UserSortEmailDesc     UserSortables = "-email"
+)
+
+func (field UserSortables) Validate() bool {
+	switch field {
+	case UserSortCreatedAtAsc, UserSortCreatedAtDesc,
+		UserSortNameAsc, UserSortNameDesc,
+		UserSortEmailAsc, UserSortEmailDesc:
+		return true
+	default:
+		return false
+	}
+}
+
 // --- Base Schemas ----
 
 type UserDB struct {

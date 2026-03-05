@@ -11,6 +11,78 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// --- Selectables, Serchables, Sortables ----
+
+type PlaceSelectables string
+
+const (
+	PlaceSelectId          PlaceSelectables = "id"
+	PlaceSelectTitle       PlaceSelectables = "title"
+	PlaceSelectDescription PlaceSelectables = "description"
+	PlaceSelectAddress     PlaceSelectables = "address"
+	PlaceSelectLocation    PlaceSelectables = "location"
+	PlaceSelectImageUrl    PlaceSelectables = "imageUrl"
+	PlaceSelectCreatorId   PlaceSelectables = "creatorId"
+	PlaceSelectCreatedAt   PlaceSelectables = "createdAt"
+)
+
+func (field PlaceSelectables) Validate() bool {
+	switch field {
+	case PlaceSelectId, PlaceSelectTitle, PlaceSelectDescription, PlaceSelectAddress,
+		PlaceSelectLocation, PlaceSelectImageUrl, PlaceSelectCreatorId, PlaceSelectCreatedAt:
+		return true
+	default:
+		return false
+	}
+}
+
+type PlaceSearchables string
+
+const (
+	PlaceSearchId          PlaceSearchables = "id"
+	PlaceSearchTitle       PlaceSearchables = "title"
+	PlaceSearchDescription PlaceSearchables = "description"
+	PlaceSearchAddress     PlaceSearchables = "address"
+	PlaceSearchCreatorId   PlaceSearchables = "creatorId"
+	PlaceSearchLocationLat PlaceSearchables = "locationLat"
+	PlaceSearchLocationLng PlaceSearchables = "locationLng"
+)
+
+func (field PlaceSearchables) Validate() bool {
+	switch field {
+	case PlaceSearchId, PlaceSearchTitle, PlaceSearchDescription, PlaceSearchAddress,
+		PlaceSearchCreatorId, PlaceSearchLocationLat, PlaceSearchLocationLng:
+		return true
+	default:
+		return false
+	}
+}
+
+type PlaceSortables string
+
+const (
+	PlaceSortCreatedAtAsc    PlaceSortables = "createdAt"
+	PlaceSortCreatedAtDesc   PlaceSortables = "-createdAt"
+	PlaceSortTitleAsc        PlaceSortables = "title"
+	PlaceSortTitleDesc       PlaceSortables = "-title"
+	PlaceSortDescriptionAsc  PlaceSortables = "description"
+	PlaceSortDescriptionDesc PlaceSortables = "-description"
+	PlaceSortAddressAsc      PlaceSortables = "address"
+	PlaceSortAddressDesc     PlaceSortables = "-address"
+)
+
+func (field PlaceSortables) Validate() bool {
+	switch field {
+	case PlaceSortCreatedAtAsc, PlaceSortCreatedAtDesc,
+		PlaceSortTitleAsc, PlaceSortTitleDesc,
+		PlaceSortDescriptionAsc, PlaceSortDescriptionDesc,
+		PlaceSortAddressAsc, PlaceSortAddressDesc:
+		return true
+	default:
+		return false
+	}
+}
+
 // --- Fields ----
 
 type Location struct {
