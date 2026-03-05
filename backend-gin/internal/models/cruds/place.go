@@ -60,3 +60,21 @@ func (cp *CRUDSPlace) DefaultOrderBy() []schemas.PlaceSortables {
 func (cp *CRUDSPlace) DefaultSelect() []schemas.PlaceSelectables {
 	return cp.defaultSelect
 }
+
+// Serialization and Post-Processing
+
+func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {
+	return schemas.PlaceRead{
+		ID:          dbModel.ID,
+		Title:       dbModel.Title,
+		Description: dbModel.Description,
+		Address:     dbModel.Address,
+		Location: schemas.Location{
+			Lat: dbModel.Location.Lat,
+			Lng: dbModel.Location.Lng,
+		},
+		ImageUrl:  dbModel.ImageURL,
+		CreatorID: dbModel.CreatorID,
+		CreatedAt: dbModel.CreatedAt,
+	}
+}

@@ -59,3 +59,17 @@ func (cu *CRUDSUser) DefaultOrderBy() []schemas.UserSortables {
 func (cu *CRUDSUser) DefaultSelect() []schemas.UserSelectables {
 	return cu.defaultSelect
 }
+
+// Serialization and Post-Processing
+
+func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
+	return schemas.UserRead{
+		ID:       dbModel.ID,
+		Name:     dbModel.Name,
+		Email:    dbModel.Email,
+		IsAdmin:  dbModel.IsAdmin,
+		ImageUrl: dbModel.ImageURL,
+		//Places: Move from []uint to []UserPlace,
+		CreatedAt: dbModel.CreatedAt,
+	}
+}
