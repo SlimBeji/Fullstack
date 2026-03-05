@@ -32,17 +32,17 @@ func NotAuthenticatedErr() error {
 	}
 }
 
-func AccessDeniedErr(collection string, id string) error {
+func AccessDeniedErr(modelname string, id int) error {
 	return APIError{
 		Code:    http.StatusForbidden,
-		Message: fmt.Sprintf("access to %s document %s denied", collection, id),
+		Message: fmt.Sprintf("access to %s record with id %d denied", modelname, id),
 	}
 }
 
-func IdNotFoundErr(collection string, id string) error {
+func NotFoundError(modelname string, id int) error {
 	return APIError{
 		Code:    http.StatusNotFound,
-		Message: fmt.Sprintf("%s document %s not found", collection, id),
+		Message: fmt.Sprintf("No record with id %d found in %s", id, modelname),
 	}
 }
 
