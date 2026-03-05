@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 )
@@ -87,4 +89,33 @@ func ParseTime(str string) (time.Time, error) {
 	}
 
 	return time.Time{}, fmt.Errorf("invalid time format: %s", str)
+}
+
+func BatchProcess[T any, K any](
+	batch []T, transform func(T) (K, error), maxWorkers int,
+) ([]K, error) {
+	var wg sync.WaitGroup
+	results := make([]K, len(batch))
+	errs := make([]error, len(batch))
+	usedWorkers := make(chan struct{}, maxWorkers)
+
+	for i := range batch {
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+			usedWorkers <- struct{}{}
+			defer func() { <-usedWorkers }()
+			processed, err := transform(batch[idx])
+			results[idx] = processed
+			errs[idx] = err
+		}(i)
+	}
+
+	wg.Wait()
+	err := errors.Join(errs...)
+	if err != nil {
+		return results, fmt.Errorf("batch processing failed:\n%w", err)
+	}
+
+	return results, nil
 }
