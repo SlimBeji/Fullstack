@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson"
@@ -119,7 +118,7 @@ func (uc *UserCollection) AuthRead(
 		return nil
 	}
 
-	if user.Id != doc.Id {
+	if user.ID != doc.ID {
 		return types_.AccessDeniedErr(uc.Name(), 123)
 	}
 
@@ -184,7 +183,7 @@ func (uc *UserCollection) GetTokenPayload(
 		)
 	}
 
-	token, err := schemas.CreateToken(user.Id.Hex(), user.Email)
+	token, err := schemas.CreateToken(user.ID, user.Email)
 	if err != nil {
 		return zero, fmt.Errorf("could not create token for user %s: %w", email, err)
 	}
@@ -230,7 +229,7 @@ func (uc *UserCollection) AddOwnershipFilters(
 	}
 
 	// No need to convert id to primitive.ObjectId
-	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
+	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.ID}
 	findQuery.Where["id"] = append(findQuery.Where["id"], ownershipFilter)
 }
 
@@ -294,8 +293,8 @@ func (uc *UserCollection) ToCreateForm(
 
 func (uc *UserCollection) ToDBDoc(
 	form *schemas.UserCreate,
-) (schemas.UserDB, error) {
-	var result schemas.UserDB
+) (schemas.UserCreate, error) {
+	var result schemas.UserCreate
 	if err := copier.Copy(&result, form); err != nil {
 		return result, err
 	}
@@ -305,22 +304,19 @@ func (uc *UserCollection) ToDBDoc(
 		return result, fmt.Errorf("could not hash password: %w", err)
 	}
 
-	result.UpdatedAt = time.Now()
-	result.CreatedAt = time.Now()
-	result.Places = []string{}
 	result.Password = hashed
 	return result, nil
 }
 
 func (uc *UserCollection) PreCreate(
-	sc mongo.SessionContext, doc *schemas.UserDB,
+	sc mongo.SessionContext, doc *schemas.UserCreate,
 ) error {
 	return nil
 }
 
 func (uc *UserCollection) PostCreate(
 	sc mongo.SessionContext,
-	doc *schemas.UserDB,
+	doc *schemas.UserCreate,
 	result *mongo.InsertOneResult,
 ) error {
 	return nil
@@ -373,7 +369,7 @@ func (uc *UserCollection) UserCreate(
 // User Auth Methods
 
 func (uc *UserCollection) createToken(
-	id string, email string,
+	id uint, email string,
 ) (schemas.EncodedToken, error) {
 	token, err := schemas.CreateToken(id, email)
 	if err != nil {
@@ -425,7 +421,7 @@ func (uc *UserCollection) Signup(
 		}
 	}
 
-	return uc.createToken(user.Id.Hex(), user.Email)
+	return uc.createToken(user.ID, user.Email)
 }
 
 func (uc *UserCollection) Signin(
@@ -451,12 +447,12 @@ func (uc *UserCollection) Signin(
 		}
 	}
 
-	id := raw.Lookup("_id").ObjectID().Hex()
+	var id uint = 123456789
 	email := raw.Lookup("email").StringValue()
-	if id == "" || email == "" {
+	if id == 0 || email == "" {
 		return result, types_.APIError{
 			Code:    http.StatusInternalServerError,
-			Message: "something wen wrong while generating token",
+			Message: "something when wrong while generating token",
 		}
 	}
 	return uc.createToken(id, email)

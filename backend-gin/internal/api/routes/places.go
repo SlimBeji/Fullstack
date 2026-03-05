@@ -141,13 +141,13 @@ func RegisterPlaces(r *gin.Engine) {
 	router.GET(
 		"/",
 		middlewares.Authenticated,
-		gin_.QueryFilters[schemas.PlaceFilters],
+		gin_.QueryFilters[schemas.PlaceSearch],
 		getPlaces,
 	)
 	router.POST(
 		"/query",
 		middlewares.Authenticated,
-		gin_.BodyFilters[schemas.PlaceFilters],
+		gin_.BodyFilters[schemas.PlaceSearch],
 		queryPlaces,
 	)
 	router.POST(

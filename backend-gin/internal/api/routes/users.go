@@ -141,13 +141,13 @@ func RegisterUsers(r *gin.Engine) {
 	router.GET(
 		"/",
 		middlewares.Authenticated,
-		gin_.QueryFilters[schemas.UserFilters],
+		gin_.QueryFilters[schemas.UserSearch],
 		getUsers,
 	)
 	router.POST(
 		"/query",
 		middlewares.Authenticated,
-		gin_.BodyFilters[schemas.UserFilters],
+		gin_.BodyFilters[schemas.UserSearch],
 		queryUsers,
 	)
 	router.POST(

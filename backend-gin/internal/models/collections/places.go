@@ -10,7 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
+	"strconv"
 
 	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson"
@@ -121,7 +121,7 @@ func (pc *PlaceCollection) AuthRead(
 		return nil
 	}
 
-	if user.Id != doc.CreatorID {
+	if user.ID != doc.CreatorID {
 		return types_.AccessDeniedErr(pc.Name(), 123)
 	}
 
@@ -170,7 +170,7 @@ func (pc *PlaceCollection) AddOwnershipFilters(
 		searchQuery.Where = make(types_.WhereFilters)
 	}
 
-	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.Id}
+	ownershipFilter := types_.Filter{Op: types_.FilterEq, Val: user.ID}
 	searchQuery.Where["creatorId"] = append(
 		searchQuery.Where["creatorId"], ownershipFilter,
 	)
@@ -213,20 +213,12 @@ func (pc *PlaceCollection) ToCreateForm(
 ) (schemas.PlaceCreate, error) {
 	var form schemas.PlaceCreate
 
-	creatorId, err := primitive.ObjectIDFromHex(post.CreatorID)
-	if err != nil {
-		return form, fmt.Errorf(
-			"creatorId %s is not a valid objectId", post.CreatorID,
-		)
-	}
-
-	err = copier.Copy(&form, post)
+	err := copier.Copy(&form, post)
 	if err != nil {
 		return form, err
 	}
-	form.Location.Lat = post.Lat
-	form.Location.Lng = post.Lng
-	form.CreatorID = creatorId
+	form.Location.Lat = float64(post.Lat)
+	form.Location.Lng = float64(post.Lng)
 
 	if post.Image != nil {
 		f, err := types_.NewFileFromMultipart(post.Image)
@@ -247,30 +239,23 @@ func (pc *PlaceCollection) ToCreateForm(
 
 func (pc *PlaceCollection) ToDBDoc(
 	form *schemas.PlaceCreate,
-) (schemas.PlaceDB, error) {
-	var result schemas.PlaceDB
+) (schemas.PlaceCreate, error) {
+	var result schemas.PlaceCreate
 	if err := copier.Copy(&result, form); err != nil {
 		return result, err
 	}
-
-	result.UpdatedAt = time.Now()
-	result.CreatedAt = time.Now()
 	return result, nil
 }
 
 func (pc *PlaceCollection) PreCreate(
-	sc mongo.SessionContext, doc *schemas.PlaceDB,
+	sc mongo.SessionContext, doc *schemas.PlaceCreate,
 ) error {
-	if !checkCreator(sc, doc.CreatorID) {
-		return fmt.Errorf("user %s does not exists", doc.CreatorID.Hex())
-	}
-
 	return nil
 }
 
 func (pc *PlaceCollection) PostCreate(
 	sc mongo.SessionContext,
-	doc *schemas.PlaceDB,
+	doc *schemas.PlaceCreate,
 	result *mongo.InsertOneResult,
 ) error {
 	// Add placeId to the crator places
@@ -304,7 +289,7 @@ func (pc *PlaceCollection) AuthCreate(
 		return nil
 	}
 
-	if user.Id.Hex() != item.CreatorID {
+	if user.ID != item.CreatorID {
 		return errors.New("access denied")
 	}
 
@@ -372,7 +357,7 @@ func (pc *PlaceCollection) PostUpdate(
 	}
 
 	if pre.Description != post.Description || pre.Title != post.Title {
-		_, err := publishers.PlaceEmbedding(post.ID.Hex())
+		_, err := publishers.PlaceEmbedding(strconv.Itoa(int(post.ID)))
 		return err
 	}
 	return nil

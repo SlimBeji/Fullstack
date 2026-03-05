@@ -13,7 +13,6 @@ import (
 
 	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -40,7 +39,7 @@ func createCollections(mc *clients.MongoClient, isVerbose bool) error {
 }
 
 func seedUsers(refs RefMappings, isVerbose bool) error {
-	userRefs := make(map[int]primitive.ObjectID)
+	userRefs := make(map[int]uint)
 	refs[collections.Users] = userRefs
 	uc := collections.GetUserCollection()
 	storage := instances.GetStorage()
@@ -77,7 +76,7 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 			}
 
 			mu.Lock()
-			userRefs[example.Ref] = raw.InsertedID.(primitive.ObjectID)
+			userRefs[example.Ref] = raw.InsertedID.(uint)
 			mu.Unlock()
 			return nil
 		})
@@ -87,7 +86,7 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 }
 
 func seedPlaces(refs RefMappings, isVerbose bool) error {
-	placeRefs := make(map[int]primitive.ObjectID)
+	placeRefs := make(map[int]uint)
 	refs[collections.Places] = placeRefs
 	uc := collections.GetUserCollection()
 	pc := collections.GetPlaceCollection()
@@ -138,7 +137,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 				return handleError(err, isVerbose)
 			}
 
-			insertedId := raw.InsertedID.(primitive.ObjectID)
+			insertedId := raw.InsertedID.(uint)
 			update := bson.M{"$addToSet": bson.M{"places": insertedId}}
 			userFilter := bson.M{"_id": creatorId}
 			_, err = uc.FindOneAndUpdate(ctx, userFilter, update).Raw()
@@ -156,7 +155,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 	return eg.Wait()
 }
 
-type RefMappings map[collections.CollectionName]map[int]primitive.ObjectID
+type RefMappings map[collections.CollectionName]map[int]uint
 
 func SeedDb(verbose ...bool) error {
 	mc := instances.GetMongo()
