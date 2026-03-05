@@ -75,7 +75,7 @@ export class CrudsClass<
         );
     }
 
-    // Post-Processing
+    // Serialization and Post-Processing
 
     async postProcess<T extends Partial<Read> | Read>(raw: T): Promise<T> {
         // Override this when subclassing
