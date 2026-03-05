@@ -71,7 +71,7 @@ export class CrudsClass<
     notFoundError(id: number | string): ApiError {
         return new ApiError(
             HttpStatus.NOT_FOUND,
-            `No document with id ${id} found in ${this.modelName}s`
+            `No record with id ${id} found in ${this.modelName}s`
         );
     }
 
