@@ -122,7 +122,7 @@ func (pc *PlaceCollection) AuthRead(
 	}
 
 	if user.Id != doc.CreatorID {
-		return types_.AccessDeniedErr(pc.Name(), doc.ID.Hex())
+		return types_.AccessDeniedErr(pc.Name(), 123)
 	}
 
 	return nil
@@ -305,9 +305,7 @@ func (pc *PlaceCollection) AuthCreate(
 	}
 
 	if user.Id.Hex() != item.CreatorID {
-		return types_.AccessDeniedErr(
-			string(Users), item.CreatorID,
-		)
+		return errors.New("access denied")
 	}
 
 	return nil

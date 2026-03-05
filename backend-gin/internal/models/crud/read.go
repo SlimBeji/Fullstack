@@ -4,6 +4,7 @@ import (
 	"backend/internal/lib/types_"
 	"backend/internal/models/schemas"
 	"context"
+	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -49,7 +50,7 @@ func GetById[Read any](
 	raw, err := GetDocumentById(dr, id, ctx)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return zero, types_.IdNotFoundErr(dr.Name(), id)
+			return zero, errors.New("object not found")
 		} else {
 			return zero, fmt.Errorf("get document failed: %w", err)
 		}

@@ -120,7 +120,7 @@ func (uc *UserCollection) AuthRead(
 	}
 
 	if user.Id != doc.Id {
-		return types_.AccessDeniedErr(uc.Name(), doc.Id.Hex())
+		return types_.AccessDeniedErr(uc.Name(), 123)
 	}
 
 	return nil
