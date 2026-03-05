@@ -63,13 +63,22 @@ func (cu *CRUDSUser) DefaultSelect() []schemas.UserSelectables {
 // Serialization and Post-Processing
 
 func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
+	places := make([]schemas.UserPlace, 0, len(dbModel.Places))
+	for _, place := range dbModel.Places {
+		places = append(places, schemas.UserPlace{
+			ID:      place.ID,
+			Title:   place.Title,
+			Address: place.Address,
+		})
+	}
+
 	return schemas.UserRead{
-		ID:       dbModel.ID,
-		Name:     dbModel.Name,
-		Email:    dbModel.Email,
-		IsAdmin:  dbModel.IsAdmin,
-		ImageUrl: dbModel.ImageURL,
-		//Places: Move from []uint to []UserPlace,
+		ID:        dbModel.ID,
+		Name:      dbModel.Name,
+		Email:     dbModel.Email,
+		IsAdmin:   dbModel.IsAdmin,
+		ImageUrl:  dbModel.ImageURL,
+		Places:    places,
 		CreatedAt: dbModel.CreatedAt,
 	}
 }

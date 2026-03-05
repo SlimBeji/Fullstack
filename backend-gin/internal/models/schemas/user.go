@@ -73,6 +73,14 @@ func (field UserSortables) Validate() bool {
 	}
 }
 
+// --- Fields ----
+
+type UserPlace struct {
+	ID      uint   `json:"id" example:"123456789" `                            // The ID of the place
+	Title   string `json:"title" validate:"min=10" example:"Stamford Bridge" ` // The place title/name, 10 characters minimum
+	Address string `json:"address" validate:"min=1" example:"Fulham road" `    // The place address
+}
+
 // --- Base Schemas ----
 
 type UserSeed struct {
@@ -105,13 +113,13 @@ type UserPost struct {
 // --- Read Schemas ---
 
 type UserRead struct {
-	ID        uint      `json:"id" example:"12345678"`                                                                     // The user ID
-	Name      string    `json:"name" validate:"min=2" example:"Slim Beji"`                                                 // The user name, two characters at least
-	Email     string    `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                      // The user email
-	IsAdmin   bool      `json:"isAdmin" example:"false" `                                                                  // Whether the user is an admin or not
-	ImageUrl  string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
-	Places    []uint    `json:"places" example:"123456789"`                                                                // The id of places belonging to the user
-	CreatedAt time.Time `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
+	ID        uint        `json:"id" example:"12345678"`                                                                     // The user ID
+	Name      string      `json:"name" validate:"min=2" example:"Slim Beji"`                                                 // The user name, two characters at least
+	Email     string      `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                      // The user email
+	IsAdmin   bool        `json:"isAdmin" example:"false" `                                                                  // Whether the user is an admin or not
+	ImageUrl  string      `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
+	Places    []UserPlace `json:"places"`                                                                                    // Places created by the user
+	CreatedAt time.Time   `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
 }
 
 type UserGet struct {
