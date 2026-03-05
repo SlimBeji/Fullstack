@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // --- Selectables, Serchables, Sortables ----
@@ -86,24 +85,11 @@ func (field PlaceSortables) Validate() bool {
 // --- Fields ----
 
 type Location struct {
-	Lat types_.FlexFloat `json:"lat" example:"51.48180425016331" bson:"lat"`    // The latitude of the place
-	Lng types_.FlexFloat `json:"lng" example:"-0.19090418688755467" bson:"lng"` // The longitude of the place
+	Lat types_.FlexFloat `json:"lat" example:"51.48180425016331"`    // The latitude of the place
+	Lng types_.FlexFloat `json:"lng" example:"-0.19090418688755467"` // The longitude of the place
 }
 
 // --- Base Schemas ----
-
-type PlaceDB struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Title       string             `bson:"title"`
-	Description string             `bson:"description"`
-	Address     string             `bson:"address"`
-	Location    Location           `bson:"location"`
-	ImageUrl    string             `bson:"imageUrl"`
-	Embedding   []types_.FlexFloat `bson:"embedding"`
-	CreatorID   primitive.ObjectID `bson:"creatorId"`
-	CreatedAt   time.Time          `bson:"createdAt"`
-	UpdatedAt   time.Time          `bson:"updatedAt"`
-}
 
 type PlaceSeed struct {
 	Ref         int
@@ -125,7 +111,7 @@ type PlaceCreate struct {
 	Location    Location           `json:"location" `
 	Embedding   []types_.FlexFloat `json:"embedding" validate:"len=0|len=384" `
 	ImageUrl    string             `json:"imageUrl" validate:"omitempty" `
-	CreatorID   primitive.ObjectID `json:"creatorId" `
+	CreatorID   uint               `json:"creatorId" `
 }
 
 type PlacePost struct {
@@ -135,21 +121,21 @@ type PlacePost struct {
 	Lat         types_.FlexFloat      `json:"lat" form:"lat" example:"51.48180425016331" `                                                  // The latitude of the place
 	Lng         types_.FlexFloat      `json:"lng" form:"lng" example:"-0.19090418688755467" `                                               // The longitude of the place
 	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                 // Place Image (JPEG)
-	CreatorID   string                `json:"creatorId" form:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" ` // The ID of the place creator, 24 characters
+	CreatorID   uint                  `json:"creatorId" form:"creatorId" example:"683b21134e2e5d46978daf1f" `                               // The ID of the place creator, 24 characters
 }
 
 // --- Read Schemas ---
 
 type PlaceRead struct {
-	ID          primitive.ObjectID `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" `                      // The ID of the place 24 characters
-	Title       string             `json:"title" validate:"min=10" example:"Stamford Bridge" `                                        // The place title/name, 10 characters minimum
-	Description string             `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" `                 // The place description, 10 characters minimum
-	Address     string             `json:"address" validate:"min=10" example:"Fulham road" `                                          // The place address
-	Location    Location           `json:"location" `                                                                                 // Location object (can be sent as JSON string)
-	ImageUrl    string             `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
-	CreatorID   primitive.ObjectID `json:"creatorId" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f" `               // The ID of the place creator, 24 characters
-	CreatedAt   time.Time          `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
-	UpdatedAt   time.Time          `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
+	ID          uint      `json:"id" example:"683b21134e2e5d46978daf1f" `                                                    // The ID of the place 24 characters
+	Title       string    `json:"title" validate:"min=10" example:"Stamford Bridge" `                                        // The place title/name, 10 characters minimum
+	Description string    `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" `                 // The place description, 10 characters minimum
+	Address     string    `json:"address" validate:"min=10" example:"Fulham road" `                                          // The place address
+	Location    Location  `json:"location" `                                                                                 // Location object (can be sent as JSON string)
+	ImageUrl    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
+	CreatorID   uint      `json:"creatorId" example:"683b21134e2e5d46978daf1f" `                                             // The ID of the place creator, 24 characters
+	CreatedAt   time.Time `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
+	UpdatedAt   time.Time `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
 }
 
 type PlaceGet struct {

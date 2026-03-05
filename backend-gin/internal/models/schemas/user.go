@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // --- Selectables, Serchables, Sortables ----
@@ -77,18 +76,6 @@ func (field UserSortables) Validate() bool {
 
 // --- Base Schemas ----
 
-type UserDB struct {
-	Id        primitive.ObjectID `bson:"_id,omitempty"`
-	Name      string             `bson:"name"`
-	Email     string             `bson:"email"`
-	IsAdmin   types_.FlexBool    `bson:"isAdmin"`
-	Password  string             `bson:"password"`
-	ImageUrl  string             `bson:"imageUrl"`
-	Places    []string           `bson:"places"`
-	CreatedAt time.Time          `bson:"createdAt"`
-	UpdatedAt time.Time          `bson:"updatedAt"`
-}
-
 type UserSeed struct {
 	Ref      int
 	Name     string
@@ -119,14 +106,14 @@ type UserPost struct {
 // --- Read Schemas ---
 
 type UserRead struct {
-	Id        primitive.ObjectID   `json:"id" validate:"hexadecimal,len=24" example:"683b21134e2e5d46978daf1f"`                       // The user ID, 24 characters
-	Name      string               `json:"name" validate:"min=2" example:"Slim Beji"`                                                 // The user name, two characters at least
-	Email     string               `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                      // The user email
-	IsAdmin   types_.FlexBool      `json:"isAdmin" example:"false" `                                                                  // Whether the user is an admin or not
-	ImageUrl  string               `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
-	Places    []primitive.ObjectID `json:"places" validate:"dive,hexadecimal,len=24" example:"683b21134e2e5d46978daf1f"`              // The id of places belonging to the user, 24 characters
-	CreatedAt time.Time            `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
-	UpdatedAt time.Time            `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
+	Id        uint            `json:"id" example:"683b21134e2e5d46978daf1f"`                                                     // The user ID
+	Name      string          `json:"name" validate:"min=2" example:"Slim Beji"`                                                 // The user name, two characters at least
+	Email     string          `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                      // The user email
+	IsAdmin   types_.FlexBool `json:"isAdmin" example:"false" `                                                                  // Whether the user is an admin or not
+	ImageUrl  string          `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
+	Places    []uint          `json:"places" example:"683b21134e2e5d46978daf1f"`                                                 // The id of places belonging to the user
+	CreatedAt time.Time       `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime
+	UpdatedAt time.Time       `json:"updatedAt" example:"2024-01-12T10:15:30.000Z"`                                              // last update datetime
 }
 
 type UserGet struct {
