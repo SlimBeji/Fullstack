@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 )
 
 func StrToBool(str string) bool {
@@ -24,6 +25,17 @@ func CheckBool(str string) (bool, error) {
 	default:
 		return false, fmt.Errorf("cannot convert %q to boolean", str)
 	}
+}
+
+func camelToSnake(s string) string {
+	var result strings.Builder
+	for i, r := range s {
+		if i > 0 && unicode.IsUpper(r) {
+			result.WriteRune('_')
+		}
+		result.WriteRune(unicode.ToLower(r))
+	}
+	return result.String()
 }
 
 func RemoveFromList(list []string, sub string) ([]string, bool) {
