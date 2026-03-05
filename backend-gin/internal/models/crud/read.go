@@ -67,7 +67,7 @@ func Get[Read any](
 	raw, err := GetDocument(dr, filter, ctx)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return zero, types_.NotFoundErr(dr.Name(), filter)
+			return zero, NotFoundErr(dr.Name(), filter)
 		} else {
 			return zero, fmt.Errorf("get document failed: %w", err)
 		}

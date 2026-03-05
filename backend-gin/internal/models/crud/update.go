@@ -147,7 +147,7 @@ func Update[Read any, Form any, Put any](
 	raw, err := UpdateDocument(du, filter, &form, ctx)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return result, types_.NotFoundErr(du.Name(), filter)
+			return result, NotFoundErr(du.Name(), filter)
 		} else {
 			return result, fmt.Errorf("update document failed: %w", err)
 		}

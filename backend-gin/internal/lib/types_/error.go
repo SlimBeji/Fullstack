@@ -1,13 +1,10 @@
 package types_
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type APIError struct {
@@ -39,17 +36,6 @@ func AccessDeniedErr(collection string, id string) error {
 	return APIError{
 		Code:    http.StatusForbidden,
 		Message: fmt.Sprintf("access to %s document %s denied", collection, id),
-	}
-}
-
-func NotFoundErr(collection string, filters bson.M) error {
-	filtersJSON, _ := json.Marshal(filters)
-	return APIError{
-		Code: http.StatusNotFound,
-		Message: fmt.Sprintf(
-			"no %s document found with following criteria: %s",
-			collection, string(filtersJSON),
-		),
 	}
 }
 
