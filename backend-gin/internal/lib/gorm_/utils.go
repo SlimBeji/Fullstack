@@ -1,0 +1,138 @@
+package gorm_
+
+import (
+	"backend/internal/lib/types_"
+	"fmt"
+	"strings"
+
+	"gorm.io/gorm"
+)
+
+func parseOrderBy(input string) OrderBy {
+	if strings.HasPrefix(input, "-") {
+		return OrderBy{
+			Field: input[1:],
+			Order: Desc,
+		}
+	}
+	return OrderBy{
+		Field: input,
+		Order: Asc,
+	}
+}
+
+func ApplyOrderBy(
+	db *gorm.DB,
+	clauses []string,
+	mapFunc func(string) string,
+) *gorm.DB {
+	// Early exit
+	if len(clauses) == 0 {
+		return db
+	}
+
+	// Apply OrderBy
+	for _, clause := range clauses {
+		parsed := parseOrderBy(clause)
+		db = db.Order(mapFunc(parsed.Field) + " " + parsed.Order)
+	}
+
+	// Return query
+	return db
+}
+
+func ApplySelect(
+	db *gorm.DB,
+	clauses []string,
+	mapFunc func(string) []SelectField,
+) *gorm.DB {
+	// Early exit
+	if len(clauses) == 0 {
+		return db
+	}
+
+	// Use map[string]bool to avoid duplicates
+	selectSet := make(map[string]bool)
+	joinSet := make(map[string]bool)
+
+	// Collect all SelectFields and deduplicate
+	for _, clause := range clauses {
+		selectFields := mapFunc(clause)
+		for _, sf := range selectFields {
+			selectSet[sf.Select] = true
+			if sf.JoinPath != "" {
+				joinSet[sf.JoinPath] = true
+			}
+		}
+	}
+
+	// Apply joins
+	for joinPath := range joinSet {
+		db = db.Joins(joinPath)
+	}
+
+	// Apply selects (convert from map[string]bool to []string)
+	selectFields := make([]string, 0, len(selectSet))
+	for field := range selectSet {
+		selectFields = append(selectFields, field)
+	}
+	db = db.Select(selectFields)
+
+	// Return Query
+	return db
+}
+
+func applySingleWhere(
+	db *gorm.DB,
+	path string,
+	filter types_.Filter,
+) (*gorm.DB, error) {
+	switch filter.Op {
+	case types_.FilterEq:
+		return db.Where(fmt.Sprintf("%s = ?", path), filter.Val), nil
+	case types_.FilterNe:
+		return db.Where(fmt.Sprintf("%s != ?", path), filter.Val), nil
+	case types_.FilterNull:
+		if filter.Val.(bool) {
+			return db.Where(fmt.Sprintf("%s IS NULL", path)), nil
+		}
+		return db.Where(fmt.Sprintf("%s IS NOT NULL", path)), nil
+	case types_.FilterIn:
+		return db.Where(fmt.Sprintf("%s IN ?", path), filter.Val), nil
+	case types_.FilterNin:
+		return db.Where(fmt.Sprintf("%s NOT IN ?", path), filter.Val), nil
+	case types_.FilterLt:
+		return db.Where(fmt.Sprintf("%s < ?", path), filter.Val), nil
+	case types_.FilterLte:
+		return db.Where(fmt.Sprintf("%s <= ?", path), filter.Val), nil
+	case types_.FilterGt:
+		return db.Where(fmt.Sprintf("%s > ?", path), filter.Val), nil
+	case types_.FilterGte:
+		return db.Where(fmt.Sprintf("%s >= ?", path), filter.Val), nil
+	case types_.FilterLike:
+		return db.Where(fmt.Sprintf("%s LIKE ?", path), fmt.Sprintf("%%%v%%", filter.Val)), nil
+	case types_.FilterIlike:
+		return db.Where(fmt.Sprintf("%s ILIKE ?", path), fmt.Sprintf("%%%v%%", filter.Val)), nil
+	default:
+		return nil, fmt.Errorf("unknown filter operator: %s", filter.Op)
+	}
+}
+
+func ApplyWhere(
+	db *gorm.DB,
+	filters types_.WhereFilters,
+	mapFunc func(string) string,
+) (*gorm.DB, error) {
+	for field, filterList := range filters {
+		path := mapFunc(field)
+		for _, filter := range filterList {
+			var err error
+			db, err = applySingleWhere(db, path, filter)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return db, nil
+}
