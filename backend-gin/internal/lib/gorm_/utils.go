@@ -225,7 +225,7 @@ func Exists(
 
 // Read Helpers
 
-type RecordRead[User any, Model any, Read any] interface {
+type RecordRead[User any, Model BaseModelReader, Read any] interface {
 	QueryBuilder
 	ModelName() string
 	GetModel() *gorm.DB
@@ -236,7 +236,7 @@ type RecordRead[User any, Model any, Read any] interface {
 	PostProcessPartial(map[string]any) error
 }
 
-func Read[User any, Model any, Read any](
+func Read[User any, Model BaseModelReader, Read any](
 	crud RecordRead[User, Model, Read], id int,
 ) (*Model, error) {
 	var result Model
@@ -250,7 +250,7 @@ func Read[User any, Model any, Read any](
 	return &result, nil
 }
 
-func Get[User any, Model any, Read any](
+func Get[User any, Model BaseModelReader, Read any](
 	crud RecordRead[User, Model, Read], id int, user *User,
 ) (Read, error) {
 	var zero Read
@@ -287,7 +287,7 @@ func Get[User any, Model any, Read any](
 	return crud.ToRead(&model), nil
 }
 
-func GetPartial[User any, Model any, Read any](
+func GetPartial[User any, Model BaseModelReader, Read any](
 	crud RecordRead[User, Model, Read],
 	id int,
 	fields []string,
@@ -331,7 +331,13 @@ func GetPartial[User any, Model any, Read any](
 
 // Create Helpers
 
-type RecordCreate[User any, Model any, Read any, Create any, Post any] interface {
+type RecordCreate[
+	User any,
+	Model BaseModelReader,
+	Read any,
+	Create any,
+	Post any,
+] interface {
 	RecordRead[User, Model, Read]
 	ToModel(Create) Model
 	PostToCreate(Post) (Create, error)
