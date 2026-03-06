@@ -42,6 +42,10 @@ func NewCRUDSUser() *CRUDSUser {
 	}
 }
 
+func (cu *CRUDSUser) GetModel() *gorm.DB {
+	return cu.Model
+}
+
 func (cu *CRUDSUser) TableName() string {
 	return "users"
 }

@@ -43,6 +43,10 @@ func NewCRUDSPlace() *CRUDSPlace {
 	}
 }
 
+func (cp *CRUDSPlace) GetModel() *gorm.DB {
+	return cp.Model
+}
+
 func (cp *CRUDSPlace) TableName() string {
 	return "places"
 }
