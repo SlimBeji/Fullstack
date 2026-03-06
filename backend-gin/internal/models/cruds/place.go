@@ -152,7 +152,7 @@ func (cp *CRUDSPlace) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
 // Read
 
 func (cp *CRUDSPlace) AuthGet(
-	user *schemas.UserRead, query types_.SearchQuery,
+	user schemas.UserRead, query types_.SearchQuery,
 ) types_.SearchQuery {
 	// User can only access places they created
 	if query.Where == nil {

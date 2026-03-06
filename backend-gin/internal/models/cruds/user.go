@@ -164,7 +164,7 @@ func (cu *CRUDSUser) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
 // Read
 
 func (cu *CRUDSUser) AuthGet(
-	user *schemas.UserRead, query types_.SearchQuery,
+	user schemas.UserRead, query types_.SearchQuery,
 ) types_.SearchQuery {
 	// User can only access their own profile in secure mode
 	if query.Where == nil {

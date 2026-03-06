@@ -230,7 +230,7 @@ type RecordRead[User any, Model any, Read any] interface {
 	ModelName() string
 	GetModel() *gorm.DB
 	DefaultSelect() []string
-	AuthGet(user *User, query types_.SearchQuery) types_.SearchQuery
+	AuthGet(user User, query types_.SearchQuery) types_.SearchQuery
 	ToRead(*Model) Read
 	PostProcess(*Read) error
 	PostProcessPartial(map[string]any) error
@@ -266,7 +266,7 @@ func Get[User any, Model any, Read any](
 
 	// Apply auth if user provided
 	if user != nil {
-		query = crud.AuthGet(user, query)
+		query = crud.AuthGet(*user, query)
 	}
 
 	// Build and execute query
@@ -308,7 +308,7 @@ func GetPartial[User any, Model any, Read any](
 
 	// Apply auth if user provided
 	if user != nil {
-		query = crud.AuthGet(user, query)
+		query = crud.AuthGet(*user, query)
 	}
 
 	// Build and execute query
