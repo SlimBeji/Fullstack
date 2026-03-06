@@ -146,6 +146,17 @@ func (cp *CRUDSPlace) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
 
 // Read
 
+func (cp *CRUDSPlace) AuthGet(
+	user *schemas.UserRead, query types_.SearchQuery,
+) types_.SearchQuery {
+	// User can only access places they created
+	if query.Where == nil {
+		query.Where = make(types_.WhereFilters)
+	}
+	query.Where["creatorId"] = types_.EqFilters(user.ID)
+	return query
+}
+
 func (cp *CRUDSPlace) Read(id int) (*orm.Place, error) {
 	return gorm_.Read[orm.Place](cp, id)
 }
