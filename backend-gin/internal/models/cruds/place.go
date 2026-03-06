@@ -201,7 +201,7 @@ func (cp *CRUDSPlace) BeforeCreate(tx *gorm.DB, data schemas.PlaceCreate) error 
 	return nil
 }
 
-func (cp *CRUDSPlace) AfterCreate(tx *gorm.DB, id int, data schemas.PlaceCreate) error {
+func (cp *CRUDSPlace) AfterCreate(tx *gorm.DB, id uint, data schemas.PlaceCreate) error {
 	return nil
 }
 

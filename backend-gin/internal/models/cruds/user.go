@@ -205,7 +205,7 @@ func (cu *CRUDSUser) BeforeCreate(tx *gorm.DB, data schemas.UserCreate) error {
 	return nil
 }
 
-func (cu *CRUDSUser) AfterCreate(tx *gorm.DB, id int, data schemas.UserCreate) error {
+func (cu *CRUDSUser) AfterCreate(tx *gorm.DB, id uint, data schemas.UserCreate) error {
 	return nil
 }
 

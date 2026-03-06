@@ -344,5 +344,5 @@ type RecordCreate[
 	PostToCreate(Post) (Create, error)
 	AuthPost(User, Post) error
 	BeforeCreate(*gorm.DB, Create) error
-	AfterCreate(*gorm.DB, int, Create) error
+	AfterCreate(*gorm.DB, uint, Create) error
 }
