@@ -348,7 +348,7 @@ type RecordCreate[
 	AfterCreate(*gorm.DB, uint, Create) error
 }
 
-func Create[User any, Model BaseModelReader, Read any, Create any, Post any](
+func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post any](
 	crud RecordCreate[User, Model, Read, Create, Post],
 	data Create,
 ) (uint, error) {

@@ -228,7 +228,7 @@ func (cu *CRUDSUser) Create(data schemas.UserCreate) (uint, error) {
 		return 0, err
 	}
 	data.Password = hashed
-	return gorm_.Create(cu, data)
+	return gorm_.CreateRecord(cu, data)
 }
 
 // Read

@@ -238,7 +238,7 @@ func (cp *CRUDSPlace) AuthPost(
 }
 
 func (cp *CRUDSPlace) Create(data schemas.PlaceCreate) (uint, error) {
-	return gorm_.Create(cp, data)
+	return gorm_.CreateRecord(cp, data)
 }
 
 // Read
