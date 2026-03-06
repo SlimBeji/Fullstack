@@ -166,5 +166,5 @@ func (cu *CRUDSUser) AuthGet(
 }
 
 func (cu *CRUDSUser) Read(id int) (*orm.User, error) {
-	return gorm_.Read[orm.User](cu, id)
+	return gorm_.Read(cu, id)
 }

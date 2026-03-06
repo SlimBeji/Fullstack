@@ -225,14 +225,19 @@ func Exists(
 
 // Read Helpers
 
-type CRUDSGet interface {
+type RecordRead[User any, Model any, Read any] interface {
 	GetModel() *gorm.DB
+	DefaultSelect() []string
+	AuthGet(user *User, query types_.SearchQuery) types_.SearchQuery
+	ToRead(*Model) Read
+	PostProcess(*Read) error
+	PostProcessPartial(map[string]any) error
 }
 
-func Read[T any](
-	crud CRUDSGet, id int,
-) (*T, error) {
-	var result T
+func Read[User any, Model any, Read any](
+	crud RecordRead[User, Model, Read], id int,
+) (*Model, error) {
+	var result Model
 	err := crud.GetModel().First(&result, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

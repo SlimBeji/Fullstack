@@ -158,5 +158,5 @@ func (cp *CRUDSPlace) AuthGet(
 }
 
 func (cp *CRUDSPlace) Read(id int) (*orm.Place, error) {
-	return gorm_.Read[orm.Place](cp, id)
+	return gorm_.Read(cp, id)
 }
