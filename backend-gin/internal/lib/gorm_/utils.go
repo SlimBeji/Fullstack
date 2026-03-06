@@ -2,11 +2,14 @@ package gorm_
 
 import (
 	"backend/internal/lib/types_"
+	"errors"
 	"fmt"
 	"strings"
 
 	"gorm.io/gorm"
 )
+
+// Query Helpers
 
 type CRUDSQuery interface {
 	GetModel() *gorm.DB
@@ -218,4 +221,24 @@ func Exists(
 	}
 
 	return count > 0, nil
+}
+
+// Read Helpers
+
+type CRUDSGet interface {
+	GetModel() *gorm.DB
+}
+
+func Read[T any](
+	crud CRUDSGet, id int,
+) (*T, error) {
+	var result T
+	err := crud.GetModel().First(&result, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // Not found
+		}
+		return nil, err // Database error
+	}
+	return &result, nil
 }

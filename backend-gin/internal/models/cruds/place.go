@@ -143,3 +143,9 @@ func (cp *CRUDSPlace) MapWhere(field string) string {
 func (cp *CRUDSPlace) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
 	return gorm_.BuildSelectQuery(cp, query)
 }
+
+// Read
+
+func (cp *CRUDSPlace) Read(id int) (*orm.Place, error) {
+	return gorm_.Read[orm.Place](cp, id)
+}
