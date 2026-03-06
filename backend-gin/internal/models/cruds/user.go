@@ -12,6 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserOptions struct {
+	Fields  []string
+	Process bool
+}
+
 type CRUDSUser struct {
 	DB              *gorm.DB
 	Model           *gorm.DB
@@ -167,4 +172,106 @@ func (cu *CRUDSUser) AuthGet(
 
 func (cu *CRUDSUser) Read(id int) (*orm.User, error) {
 	return gorm_.Read(cu, id)
+}
+
+func (cu *CRUDSUser) Get(
+	id int, options *UserOptions,
+) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+
+	if options == nil {
+		options = &UserOptions{}
+	}
+
+	result, err := gorm_.Get(cu, id, nil)
+	if err != nil {
+		return zero, err
+	}
+
+	if options.Process {
+		err = cu.PostProcess(&result)
+		if err != nil {
+			return zero, err
+		}
+	}
+
+	return result, nil
+}
+
+func (cu *CRUDSUser) UserGet(
+	user *schemas.UserRead, id int, options *UserOptions,
+) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+
+	if options == nil {
+		options = &UserOptions{}
+	}
+
+	result, err := gorm_.Get(cu, id, user)
+	if err != nil {
+		return zero, err
+	}
+
+	if options.Process {
+		err = cu.PostProcess(&result)
+		if err != nil {
+			return zero, err
+		}
+	}
+
+	return result, nil
+}
+
+func (cu *CRUDSUser) GetPartial(
+	id int, options *UserOptions,
+) (map[string]any, error) {
+	if options == nil {
+		options = &UserOptions{}
+	}
+
+	fields := options.Fields
+	if len(fields) == 0 {
+		fields = cu.DefaultSelect()
+	}
+
+	result, err := gorm_.GetPartial(cu, id, fields, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if options.Process {
+		err = cu.PostProcessPartial(result)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
+func (cu *CRUDSUser) UserGetPartial(
+	user *schemas.UserRead, id int, options *UserOptions,
+) (map[string]any, error) {
+	if options == nil {
+		options = &UserOptions{}
+	}
+
+	fields := options.Fields
+	if len(fields) == 0 {
+		fields = cu.DefaultSelect()
+	}
+
+	result, err := gorm_.GetPartial(cu, id, fields, user)
+	if err != nil {
+		return nil, err
+	}
+
+	if options.Process {
+		err = cu.PostProcessPartial(result)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }

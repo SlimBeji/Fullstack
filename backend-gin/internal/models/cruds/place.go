@@ -12,6 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type PlaceOptions struct {
+	Fields  []string
+	Process bool
+}
+
 type CRUDSPlace struct {
 	DB              *gorm.DB
 	Model           *gorm.DB
@@ -159,4 +164,106 @@ func (cp *CRUDSPlace) AuthGet(
 
 func (cp *CRUDSPlace) Read(id int) (*orm.Place, error) {
 	return gorm_.Read(cp, id)
+}
+
+func (cp *CRUDSPlace) Get(
+	id int, options *PlaceOptions,
+) (schemas.PlaceRead, error) {
+	var zero schemas.PlaceRead
+
+	if options == nil {
+		options = &PlaceOptions{}
+	}
+
+	result, err := gorm_.Get(cp, id, nil)
+	if err != nil {
+		return zero, err
+	}
+
+	if options.Process {
+		err = cp.PostProcess(&result)
+		if err != nil {
+			return zero, err
+		}
+	}
+
+	return result, nil
+}
+
+func (cp *CRUDSPlace) UserGet(
+	user *schemas.UserRead, id int, options *PlaceOptions,
+) (schemas.PlaceRead, error) {
+	var zero schemas.PlaceRead
+
+	if options == nil {
+		options = &PlaceOptions{}
+	}
+
+	result, err := gorm_.Get(cp, id, user)
+	if err != nil {
+		return zero, err
+	}
+
+	if options.Process {
+		err = cp.PostProcess(&result)
+		if err != nil {
+			return zero, err
+		}
+	}
+
+	return result, nil
+}
+
+func (cp *CRUDSPlace) GetPartial(
+	id int, options *PlaceOptions,
+) (map[string]any, error) {
+	if options == nil {
+		options = &PlaceOptions{}
+	}
+
+	fields := options.Fields
+	if len(fields) == 0 {
+		fields = cp.DefaultSelect()
+	}
+
+	result, err := gorm_.GetPartial(cp, id, fields, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if options.Process {
+		err = cp.PostProcessPartial(result)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
+func (cp *CRUDSPlace) UserGetPartial(
+	user *schemas.UserRead, id int, options *PlaceOptions,
+) (map[string]any, error) {
+	if options == nil {
+		options = &PlaceOptions{}
+	}
+
+	fields := options.Fields
+	if len(fields) == 0 {
+		fields = cp.DefaultSelect()
+	}
+
+	result, err := gorm_.GetPartial(cp, id, fields, user)
+	if err != nil {
+		return nil, err
+	}
+
+	if options.Process {
+		err = cp.PostProcessPartial(result)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }
