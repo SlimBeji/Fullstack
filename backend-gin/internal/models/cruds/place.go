@@ -245,7 +245,7 @@ func (cp *CRUDSPlace) Post(
 	form schemas.PlacePost, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
-	createdId, err := gorm_.Post(cp, form, nil)
+	createdId, err := gorm_.PostRecord(cp, form, nil)
 	if err != nil {
 		return zero, err
 	}
@@ -256,7 +256,7 @@ func (cp *CRUDSPlace) UserPost(
 	user schemas.UserRead, form schemas.PlacePost, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
-	createdId, err := gorm_.Post(cp, form, &user)
+	createdId, err := gorm_.PostRecord(cp, form, &user)
 	if err != nil {
 		return zero, err
 	}

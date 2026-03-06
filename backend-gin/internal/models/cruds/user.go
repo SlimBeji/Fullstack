@@ -235,7 +235,7 @@ func (cu *CRUDSUser) Post(
 	form schemas.UserPost, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
-	createdId, err := gorm_.Post(cu, form, nil)
+	createdId, err := gorm_.PostRecord(cu, form, nil)
 	if err != nil {
 		return zero, err
 	}
@@ -246,7 +246,7 @@ func (cu *CRUDSUser) UserPost(
 	user schemas.UserRead, form schemas.UserPost, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
-	createdId, err := gorm_.Post(cu, form, &user)
+	createdId, err := gorm_.PostRecord(cu, form, &user)
 	if err != nil {
 		return zero, err
 	}

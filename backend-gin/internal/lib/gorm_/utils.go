@@ -398,7 +398,7 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post an
 	return createdID, nil
 }
 
-func Post[User any, Model BaseModelReader, Read any, Create any, Post any](
+func PostRecord[User any, Model BaseModelReader, Read any, Create any, Post any](
 	crud RecordCreate[User, Model, Read, Create, Post],
 	form Post,
 	user *User,
