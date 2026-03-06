@@ -8,6 +8,7 @@ import (
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -159,6 +160,62 @@ func (cu *CRUDSUser) MapWhere(field string) string {
 
 func (cu *CRUDSUser) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
 	return gorm_.BuildSelectQuery(cu, query)
+}
+
+// Create
+
+func (cu *CRUDSUser) ToModel(data schemas.UserCreate) orm.User {
+	return orm.User{
+		Name:     data.Name,
+		Email:    data.Email,
+		Password: data.Password,
+		ImageURL: data.ImageURL,
+		IsAdmin:  data.IsAdmin,
+	}
+}
+
+func (cu *CRUDSUser) PostToCreate(
+	data schemas.UserPost,
+) (schemas.UserCreate, error) {
+	var zero schemas.UserCreate
+	var err error
+	imageURL := ""
+	if data.Image != nil {
+		ctx := context.Background()
+		storage := instances.GetStorage()
+		imageURL, err = storage.UploadFile(ctx, data.Image, "")
+		if err != nil {
+			return zero, err
+		}
+	}
+	return schemas.UserCreate{
+		Name:     data.Name,
+		Email:    data.Email,
+		IsAdmin:  bool(data.IsAdmin),
+		Password: data.Password,
+		ImageURL: imageURL,
+	}, nil
+}
+
+func (cu *CRUDSUser) BeforeCreate(tx *gorm.DB, data schemas.UserCreate) error {
+	return nil
+}
+
+func (cu *CRUDSUser) AfterCreate(tx *gorm.DB, id int, data schemas.UserCreate) error {
+	return nil
+}
+
+func (cu *CRUDSUser) AuthPost(
+	user schemas.UserRead, data schemas.UserPost,
+) error {
+	if user.IsAdmin {
+		return nil
+	}
+	return types_.APIError{
+		Code:    http.StatusUnauthorized,
+		Message: "Not Authenticated",
+		Details: map[string]any{"message": "Only admins can delete users"},
+	}
 }
 
 // Read

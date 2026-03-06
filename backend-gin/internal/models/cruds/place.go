@@ -8,6 +8,9 @@ import (
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
+	"context"
+	"fmt"
+	"net/http"
 
 	"gorm.io/gorm"
 )
@@ -147,6 +150,85 @@ func (cp *CRUDSPlace) MapWhere(field string) string {
 
 func (cp *CRUDSPlace) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
 	return gorm_.BuildSelectQuery(cp, query)
+}
+
+// Create
+
+func (cp *CRUDSPlace) ToModel(data schemas.PlaceCreate) orm.Place {
+	return orm.Place{
+		Title:       data.Title,
+		Description: data.Description,
+		Address:     data.Address,
+		ImageURL:    data.ImageURL,
+		Location:    orm.Location(data.Location),
+		Embedding:   nil,
+		CreatorID:   data.CreatorID,
+	}
+}
+
+func (cp *CRUDSPlace) PostToCreate(
+	data schemas.PlacePost,
+) (schemas.PlaceCreate, error) {
+	var zero schemas.PlaceCreate
+	var err error
+	imageURL := ""
+	if data.Image != nil {
+		ctx := context.Background()
+		storage := instances.GetStorage()
+		imageURL, err = storage.UploadFile(ctx, data.Image, "")
+		if err != nil {
+			return zero, err
+		}
+	}
+
+	location := schemas.Location{Lat: float64(data.Lat), Lng: float64(data.Lng)}
+	return schemas.PlaceCreate{
+		Title:       data.Title,
+		Description: data.Description,
+		Address:     data.Address,
+		Location:    location,
+		Embedding:   nil,
+		ImageURL:    imageURL,
+		CreatorID:   data.CreatorID,
+	}, nil
+}
+
+func (cp *CRUDSPlace) BeforeCreate(tx *gorm.DB, data schemas.PlaceCreate) error {
+	return nil
+}
+
+func (cp *CRUDSPlace) AfterCreate(tx *gorm.DB, id int, data schemas.PlaceCreate) error {
+	return nil
+}
+
+func (cp *CRUDSPlace) AuthPost(
+	user schemas.UserRead, data schemas.PlacePost,
+) error {
+	if user.IsAdmin {
+		exists, err := UserExists(cp.DB, int(data.CreatorID))
+		if err != nil {
+			return err
+		}
+		if !exists {
+			message := fmt.Sprintf("Cannot set creatorId to %d, No user with id %d found in the database", data.CreatorID, data.CreatorID)
+			return types_.APIError{
+				Code:    http.StatusNotFound,
+				Message: "User not found",
+				Details: map[string]any{"message": message},
+			}
+		}
+		return nil
+	}
+
+	if user.ID != data.CreatorID {
+		message := fmt.Sprintf("Cannot add places to user %d", data.CreatorID)
+		return types_.APIError{
+			Code:    http.StatusUnauthorized,
+			Message: "Access denied",
+			Details: map[string]any{"message": message},
+		}
+	}
+	return nil
 }
 
 // Read

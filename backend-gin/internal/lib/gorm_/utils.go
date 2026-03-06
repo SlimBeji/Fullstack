@@ -328,3 +328,14 @@ func GetPartial[User any, Model any, Read any](
 
 	return result, nil
 }
+
+// Create Helpers
+
+type RecordCreate[User any, Model any, Read any, Create any, Post any] interface {
+	RecordRead[User, Model, Read]
+	ToModel(Create) Model
+	PostToCreate(Post) (Create, error)
+	AuthPost(User, Post) error
+	BeforeCreate(*gorm.DB, Create) error
+	AfterCreate(*gorm.DB, int, Create) error
+}
