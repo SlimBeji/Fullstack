@@ -54,11 +54,11 @@ func (cp *CRUDSPlace) GetModel() *gorm.DB {
 }
 
 func (cp *CRUDSPlace) TableName() string {
-	return "places"
+	return string(orm.TablePlaces)
 }
 
 func (cp *CRUDSPlace) ModelName() string {
-	return "Place"
+	return string(orm.ModelPlace)
 }
 
 func (cp *CRUDSPlace) MaxItemsPerPage() int {

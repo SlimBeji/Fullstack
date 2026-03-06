@@ -57,11 +57,11 @@ func (cu *CRUDSUser) GetModel() *gorm.DB {
 }
 
 func (cu *CRUDSUser) TableName() string {
-	return "users"
+	return string(orm.TableUsers)
 }
 
 func (cu *CRUDSUser) ModelName() string {
-	return "User"
+	return string(orm.ModelUser)
 }
 
 func (cu *CRUDSUser) MaxItemsPerPage() int {
