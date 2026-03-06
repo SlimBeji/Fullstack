@@ -15,8 +15,8 @@ type CRUDSUser struct {
 	DB              *gorm.DB
 	Model           *gorm.DB
 	maxItemsPerPage int
-	defaultSelect   []schemas.UserSelectables
-	defaultOrderBy  []schemas.UserSortables
+	defaultSelect   []string
+	defaultOrderBy  []string
 }
 
 // Constructor, Properties & Helpers
@@ -27,17 +27,17 @@ func NewCRUDSUser() *CRUDSUser {
 		DB:              db,
 		Model:           db.Model(&orm.User{}),
 		maxItemsPerPage: config.Env.MaxItemsPerPage,
-		defaultSelect: []schemas.UserSelectables{
-			schemas.UserSelectId,
-			schemas.UserSelectName,
-			schemas.UserSelectEmail,
-			schemas.UserSelectIsAdmin,
-			schemas.UserSelectImageUrl,
-			schemas.UserSelectPlaces,
-			schemas.UserSelectCreatedAt,
+		defaultSelect: []string{
+			string(schemas.UserSelectId),
+			string(schemas.UserSelectName),
+			string(schemas.UserSelectEmail),
+			string(schemas.UserSelectIsAdmin),
+			string(schemas.UserSelectImageUrl),
+			string(schemas.UserSelectPlaces),
+			string(schemas.UserSelectCreatedAt),
 		},
-		defaultOrderBy: []schemas.UserSortables{
-			schemas.UserSortCreatedAtDesc,
+		defaultOrderBy: []string{
+			string(schemas.UserSortCreatedAtDesc),
 		},
 	}
 }
@@ -58,11 +58,11 @@ func (cu *CRUDSUser) MaxItemsPerPage() int {
 	return cu.maxItemsPerPage
 }
 
-func (cu *CRUDSUser) DefaultSelect() []schemas.UserSelectables {
+func (cu *CRUDSUser) DefaultSelect() []string {
 	return cu.defaultSelect
 }
 
-func (cu *CRUDSUser) DefaultOrderBy() []schemas.UserSortables {
+func (cu *CRUDSUser) DefaultOrderBy() []string {
 	return cu.defaultOrderBy
 }
 

@@ -15,8 +15,8 @@ type CRUDSPlace struct {
 	DB              *gorm.DB
 	Model           *gorm.DB
 	maxItemsPerPage int
-	defaultSelect   []schemas.PlaceSelectables
-	defaultOrderBy  []schemas.PlaceSortables
+	defaultSelect   []string
+	defaultOrderBy  []string
 }
 
 // Constructor, Properties & Helpers
@@ -27,18 +27,18 @@ func NewCRUDSPlace() *CRUDSPlace {
 		DB:              db,
 		Model:           db.Model(&orm.User{}),
 		maxItemsPerPage: config.Env.MaxItemsPerPage,
-		defaultSelect: []schemas.PlaceSelectables{
-			schemas.PlaceSelectId,
-			schemas.PlaceSelectTitle,
-			schemas.PlaceSelectDescription,
-			schemas.PlaceSelectAddress,
-			schemas.PlaceSelectLocation,
-			schemas.PlaceSelectImageUrl,
-			schemas.PlaceSelectCreatorId,
-			schemas.PlaceSelectCreatedAt,
+		defaultSelect: []string{
+			string(schemas.PlaceSelectId),
+			string(schemas.PlaceSelectTitle),
+			string(schemas.PlaceSelectDescription),
+			string(schemas.PlaceSelectAddress),
+			string(schemas.PlaceSelectLocation),
+			string(schemas.PlaceSelectImageUrl),
+			string(schemas.PlaceSelectCreatorId),
+			string(schemas.PlaceSelectCreatedAt),
 		},
-		defaultOrderBy: []schemas.PlaceSortables{
-			schemas.PlaceSortCreatedAtDesc,
+		defaultOrderBy: []string{
+			string(schemas.PlaceSortCreatedAtDesc),
 		},
 	}
 }
@@ -59,11 +59,11 @@ func (cp *CRUDSPlace) MaxItemsPerPage() int {
 	return cp.maxItemsPerPage
 }
 
-func (cp *CRUDSPlace) DefaultSelect() []schemas.PlaceSelectables {
+func (cp *CRUDSPlace) DefaultSelect() []string {
 	return cp.defaultSelect
 }
 
-func (cp *CRUDSPlace) DefaultOrderBy() []schemas.PlaceSortables {
+func (cp *CRUDSPlace) DefaultOrderBy() []string {
 	return cp.defaultOrderBy
 }
 
