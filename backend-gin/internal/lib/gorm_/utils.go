@@ -227,6 +227,7 @@ func Exists(
 
 type RecordRead[User any, Model any, Read any] interface {
 	QueryBuilder
+	ModelName() string
 	GetModel() *gorm.DB
 	DefaultSelect() []string
 	AuthGet(user *User, query types_.SearchQuery) types_.SearchQuery
@@ -247,4 +248,83 @@ func Read[User any, Model any, Read any](
 		return nil, err // Database error
 	}
 	return &result, nil
+}
+
+func Get[User any, Model any, Read any](
+	crud RecordRead[User, Model, Read], id int, user *User,
+) (Read, error) {
+	var zero Read
+
+	// Build query
+	selectFields := crud.DefaultSelect()
+	query := types_.SearchQuery{
+		Select: selectFields,
+		Where: types_.WhereFilters{
+			"id": types_.EqFilters(id),
+		},
+	}
+
+	// Apply auth if user provided
+	if user != nil {
+		query = crud.AuthGet(user, query)
+	}
+
+	// Build and execute query
+	qb, err := BuildSelectQuery(crud, query)
+	if err != nil {
+		return zero, err
+	}
+
+	var model Model
+	err = qb.First(&model).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return zero, types_.NotFoundError(crud.ModelName(), id)
+		}
+		return zero, err
+	}
+
+	return crud.ToRead(&model), nil
+}
+
+func GetPartial[User any, Model any, Read any](
+	crud RecordRead[User, Model, Read],
+	id int,
+	fields []string,
+	user *User,
+) (map[string]any, error) {
+	// Build query
+	selectFields := fields
+	if len(selectFields) == 0 {
+		selectFields = crud.DefaultSelect()
+	}
+
+	query := types_.SearchQuery{
+		Select: selectFields,
+		Where: types_.WhereFilters{
+			"id": types_.EqFilters(id),
+		},
+	}
+
+	// Apply auth if user provided
+	if user != nil {
+		query = crud.AuthGet(user, query)
+	}
+
+	// Build and execute query
+	qb, err := BuildSelectQuery(crud, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var result map[string]any
+	err = qb.First(&result).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, types_.NotFoundError(crud.ModelName(), id)
+		}
+		return nil, err
+	}
+
+	return result, nil
 }
