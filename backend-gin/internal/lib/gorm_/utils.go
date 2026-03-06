@@ -11,7 +11,7 @@ import (
 
 // Query Helpers
 
-type CRUDSQuery interface {
+type QueryBuilder interface {
 	GetModel() *gorm.DB
 	DefaultSelect() []string
 	DefaultOrderBy() []string
@@ -151,7 +151,7 @@ func ApplyWhere(
 }
 
 func BuildSelectQuery(
-	crud CRUDSQuery,
+	crud QueryBuilder,
 	query types_.SearchQuery,
 ) (*gorm.DB, error) {
 	qb := crud.GetModel()
@@ -198,7 +198,7 @@ func BuildSelectQuery(
 }
 
 func Exists(
-	crud CRUDSQuery,
+	crud QueryBuilder,
 	where types_.WhereFilters,
 ) (bool, error) {
 	qb := crud.GetModel()
@@ -226,6 +226,7 @@ func Exists(
 // Read Helpers
 
 type RecordRead[User any, Model any, Read any] interface {
+	QueryBuilder
 	GetModel() *gorm.DB
 	DefaultSelect() []string
 	AuthGet(user *User, query types_.SearchQuery) types_.SearchQuery
