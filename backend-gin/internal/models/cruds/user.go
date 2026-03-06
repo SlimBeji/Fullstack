@@ -8,6 +8,10 @@ import (
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -274,4 +278,61 @@ func (cu *CRUDSUser) UserGetPartial(
 	}
 
 	return result, nil
+}
+
+func (cu *CRUDSUser) CheckDuplicate(email string, name string) (string, error) {
+	var messages []string
+
+	emailExists, err := gorm_.Exists(cu, types_.WhereFilters{
+		"email": types_.EqFilters(email),
+	})
+	if err != nil {
+		return "", err
+	}
+	if emailExists {
+		messages = append(messages, fmt.Sprintf("email %s already in use.", email))
+	}
+
+	nameExists, err := gorm_.Exists(cu, types_.WhereFilters{
+		"name": types_.EqFilters(name),
+	})
+	if err != nil {
+		return "", err
+	}
+	if nameExists {
+		messages = append(messages, fmt.Sprintf("username %s already in use.", name))
+	}
+
+	return strings.Join(messages, " "), nil
+}
+
+func (cu *CRUDSUser) GetByEmail(email string) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+
+	query := types_.SearchQuery{
+		Select: cu.DefaultSelect(),
+		Where: types_.WhereFilters{
+			"email": types_.EqFilters(email),
+		},
+	}
+
+	qb, err := gorm_.BuildSelectQuery(cu, query)
+	if err != nil {
+		return zero, err
+	}
+
+	var model orm.User
+	err = qb.First(&model).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err := types_.APIError{
+				Code:    http.StatusNotFound,
+				Message: fmt.Sprintf("User with email %s not found", email),
+			}
+			return zero, err
+		}
+		return zero, err
+	}
+
+	return cu.ToRead(&model), nil
 }
