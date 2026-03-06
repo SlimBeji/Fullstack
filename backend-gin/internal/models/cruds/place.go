@@ -3,6 +3,7 @@ package cruds
 import (
 	"backend/internal/config"
 	"backend/internal/lib/gorm_"
+	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
@@ -137,4 +138,8 @@ func (cp *CRUDSPlace) MapWhere(field string) string {
 	default:
 		return cp.TableName() + "." + utils.CamelToSnake(field)
 	}
+}
+
+func (cp *CRUDSPlace) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
+	return gorm_.BuildSelectQuery(cp, query)
 }

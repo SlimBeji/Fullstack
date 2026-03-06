@@ -8,6 +8,16 @@ import (
 	"gorm.io/gorm"
 )
 
+type CRUDSQuery interface {
+	GetModel() *gorm.DB
+	DefaultSelect() []string
+	DefaultOrderBy() []string
+	MaxItemsPerPage() int
+	MapSelect(field string) []SelectField
+	MapWhere(field string) string
+	MapOrderBy(field string) string
+}
+
 func parseOrderBy(input string) OrderBy {
 	if strings.HasPrefix(input, "-") {
 		return OrderBy{
@@ -135,4 +145,51 @@ func ApplyWhere(
 	}
 
 	return db, nil
+}
+
+func BuildSelectQuery(
+	crud CRUDSQuery,
+	query types_.SearchQuery,
+) (*gorm.DB, error) {
+	qb := crud.GetModel()
+
+	// Apply select
+	selectFields := query.Select
+	if len(selectFields) == 0 {
+		selectFields = crud.DefaultSelect()
+	}
+	qb = ApplySelect(qb, selectFields, crud.MapSelect)
+
+	// Apply where
+	if len(query.Where) > 0 {
+		var err error
+		qb, err = ApplyWhere(qb, query.Where, crud.MapWhere)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Apply orderby
+	orderBy := query.OrderBy
+	if len(orderBy) == 0 {
+		orderBy = crud.DefaultOrderBy()
+	}
+	qb = ApplyOrderBy(qb, orderBy, crud.MapOrderBy)
+
+	// Apply limit
+	if query.Size > 0 {
+		qb = qb.Limit(query.Size)
+	}
+
+	// Apply offset (pagination)
+	if query.Page > 0 {
+		size := query.Size
+		if size == 0 {
+			size = crud.MaxItemsPerPage()
+		}
+		offset := (query.Page - 1) * size
+		qb = qb.Offset(offset)
+	}
+
+	return qb, nil
 }
