@@ -29,7 +29,7 @@ func CheckBool(str string) (bool, error) {
 	}
 }
 
-func camelToSnake(s string) string {
+func CamelToSnake(s string) string {
 	var result strings.Builder
 	for i, r := range s {
 		if i > 0 && unicode.IsUpper(r) {
