@@ -2,6 +2,8 @@ package cruds
 
 import (
 	"backend/internal/config"
+	"backend/internal/lib/gorm_"
+	"backend/internal/lib/utils"
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
@@ -108,4 +110,27 @@ func (cp *CRUDSPlace) PostProcessPartial(partial map[string]any) error {
 
 	partial["imageUrl"] = signedUrl
 	return nil
+}
+
+// Query Building
+
+func (cp *CRUDSPlace) MapSelect(field string) []gorm_.SelectField {
+	return []gorm_.SelectField{
+		{Select: cp.TableName() + "." + utils.CamelToSnake(field), JoinPath: ""},
+	}
+}
+
+func (cp *CRUDSPlace) MapOrderBy(field string) string {
+	return cp.TableName() + "." + utils.CamelToSnake(field)
+}
+
+func (cp *CRUDSPlace) MapWhere(field string) string {
+	switch field {
+	case string(schemas.PlaceSearchLocationLat):
+		return "(location->>'lat')::float"
+	case string(schemas.PlaceSearchLocationLng):
+		return "(location->>'lng')::float"
+	default:
+		return cp.TableName() + "." + utils.CamelToSnake(field)
+	}
 }
