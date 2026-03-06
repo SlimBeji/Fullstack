@@ -69,17 +69,17 @@ func (pc *PlaceCollection) PostProcess(
 		return result, errors.New("decoding of place documenet failed")
 	}
 
-	if result.ImageUrl == "" {
+	if result.ImageURL == "" {
 		return result, nil
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedURL(result.ImageUrl, config.Env.JWTExpiration)
+	signedUrl, err := storage.GetSignedURL(result.ImageURL, config.Env.JWTExpiration)
 	if err != nil {
 		return result, err
 	}
 
-	result.ImageUrl = signedUrl
+	result.ImageURL = signedUrl
 	return result, nil
 }
 
@@ -228,7 +228,7 @@ func (pc *PlaceCollection) ToCreateForm(
 
 		storage := instances.GetStorage()
 		ctx := context.Background()
-		form.ImageUrl, err = storage.UploadFile(ctx, &f, "")
+		form.ImageURL, err = storage.UploadFile(ctx, &f, "")
 		if err != nil {
 			return form, fmt.Errorf("could not upload image: %w", err)
 		}

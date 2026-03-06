@@ -42,7 +42,7 @@ func NewCRUDSUser() *CRUDSUser {
 			string(schemas.UserSelectName),
 			string(schemas.UserSelectEmail),
 			string(schemas.UserSelectIsAdmin),
-			string(schemas.UserSelectImageUrl),
+			string(schemas.UserSelectImageURL),
 			string(schemas.UserSelectPlaces),
 			string(schemas.UserSelectCreatedAt),
 		},
@@ -93,40 +93,40 @@ func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
 		Name:      dbModel.Name,
 		Email:     dbModel.Email,
 		IsAdmin:   dbModel.IsAdmin,
-		ImageUrl:  dbModel.ImageURL,
+		ImageURL:  dbModel.ImageURL,
 		Places:    places,
 		CreatedAt: dbModel.CreatedAt,
 	}
 }
 
 func (cu *CRUDSUser) PostProcess(read *schemas.UserRead) error {
-	if read.ImageUrl == "" {
+	if read.ImageURL == "" {
 		return nil
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedURL(read.ImageUrl, config.Env.JWTExpiration)
+	signedURL, err := storage.GetSignedURL(read.ImageURL, config.Env.JWTExpiration)
 	if err != nil {
 		return err
 	}
 
-	read.ImageUrl = signedUrl
+	read.ImageURL = signedURL
 	return nil
 }
 
 func (cu *CRUDSUser) PostProcessPartial(partial map[string]any) error {
-	imageUrl, exists := partial["imageUrl"]
+	imageURL, exists := partial["imageUrl"]
 	if !exists {
 		return nil
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedURL(imageUrl.(string), config.Env.JWTExpiration)
+	signedURL, err := storage.GetSignedURL(imageURL.(string), config.Env.JWTExpiration)
 	if err != nil {
 		return err
 	}
 
-	partial["imageUrl"] = signedUrl
+	partial["imageUrl"] = signedURL
 	return nil
 }
 

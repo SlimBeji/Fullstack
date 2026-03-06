@@ -20,7 +20,7 @@ const (
 	PlaceSelectDescription PlaceSelectables = "description"
 	PlaceSelectAddress     PlaceSelectables = "address"
 	PlaceSelectLocation    PlaceSelectables = "location"
-	PlaceSelectImageUrl    PlaceSelectables = "imageUrl"
+	PlaceSelectImageURL    PlaceSelectables = "imageUrl"
 	PlaceSelectCreatorId   PlaceSelectables = "creatorId"
 	PlaceSelectCreatedAt   PlaceSelectables = "createdAt"
 )
@@ -28,7 +28,7 @@ const (
 func (field PlaceSelectables) Validate() bool {
 	switch field {
 	case PlaceSelectId, PlaceSelectTitle, PlaceSelectDescription, PlaceSelectAddress,
-		PlaceSelectLocation, PlaceSelectImageUrl, PlaceSelectCreatorId, PlaceSelectCreatedAt:
+		PlaceSelectLocation, PlaceSelectImageURL, PlaceSelectCreatorId, PlaceSelectCreatedAt:
 		return true
 	default:
 		return false
@@ -105,7 +105,7 @@ type PlaceSeed struct {
 	Address     string
 	Location    Location
 	Embedding   []float64
-	ImageUrl    string
+	ImageURL    string
 }
 
 // --- Creation Schemas ---
@@ -116,7 +116,7 @@ type PlaceCreate struct {
 	Address     string    `json:"address" validate:"min=1" `
 	Location    Location  `json:"location" `
 	Embedding   []float64 `json:"embedding" validate:"len=0|len=384" `
-	ImageUrl    string    `json:"imageUrl" validate:"omitempty" `
+	ImageURL    string    `json:"imageUrl" validate:"omitempty" `
 	CreatorID   uint      `json:"creatorId" `
 }
 
@@ -138,7 +138,7 @@ type PlaceRead struct {
 	Description string    `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" `                 // The place description, 10 characters minimum
 	Address     string    `json:"address" validate:"min=1" example:"Fulham road" `                                           // The place address
 	Location    Location  `json:"location" `                                                                                 // Location object (can be sent as JSON string)
-	ImageUrl    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
+	ImageURL    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
 	CreatorID   uint      `json:"creatorId" example:"123456789" `                                                            // The ID of the place creator
 	CreatedAt   time.Time `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
 }

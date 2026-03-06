@@ -11,7 +11,7 @@ var Users = []schemas.UserSeed{
 		Name:     "Slim Beji",
 		Email:    "mslimbeji@gmail.com",
 		Password: "very_secret",
-		ImageUrl: static.GetImagePath("avatar1.jpg"),
+		ImageURL: static.GetImagePath("avatar1.jpg"),
 		IsAdmin:  true,
 	},
 	{
@@ -19,7 +19,7 @@ var Users = []schemas.UserSeed{
 		Name:     "Mohamed Slim Beji",
 		Email:    "beji.slim@yahoo.fr",
 		Password: "very_secret",
-		ImageUrl: static.GetImagePath("avatar2.jpg"),
+		ImageURL: static.GetImagePath("avatar2.jpg"),
 		IsAdmin:  false,
 	},
 }

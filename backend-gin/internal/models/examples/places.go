@@ -274,7 +274,7 @@ var Places = []schemas.PlaceSeed{
 		Title:       "Stamford Bridge",
 		Description: "Chelsea FC Stadium",
 		Embedding:   embedding1,
-		ImageUrl:    static.GetImagePath("place1.jpg"),
+		ImageURL:    static.GetImagePath("place1.jpg"),
 		Address:     "Fulham Road, London",
 		Location: schemas.Location{
 			Lat: 51.48180425016331, Lng: -0.19090418688755467,
@@ -286,7 +286,7 @@ var Places = []schemas.PlaceSeed{
 		Title:       "Cobham Training Facility",
 		Description: "Chelsea training facility",
 		Embedding:   embedding2,
-		ImageUrl:    static.GetImagePath("place2.jpg"),
+		ImageURL:    static.GetImagePath("place2.jpg"),
 		Address:     "64 Stoke Rd, Stoke D'Abernon, Cobham KT11 3PT",
 		Location: schemas.Location{
 			Lat: 51.31735558375386, Lng: -0.38584590510204153,

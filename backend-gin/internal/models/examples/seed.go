@@ -64,11 +64,11 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 				return handleError(err, isVerbose)
 			}
 
-			url, err := storage.UploadFile(ctx, userIn.ImageUrl, "")
+			url, err := storage.UploadFile(ctx, userIn.ImageURL, "")
 			if err != nil {
 				return handleError(err, isVerbose)
 			}
-			userIn.ImageUrl = url
+			userIn.ImageURL = url
 
 			raw, err := crud.InsertExample(uc, &userIn, ctx)
 			if err != nil {
@@ -112,11 +112,11 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 				return handleError(err, isVerbose)
 			}
 
-			url, err := storage.UploadFile(ctx, placeIn.ImageUrl, "")
+			url, err := storage.UploadFile(ctx, placeIn.ImageURL, "")
 			if err != nil {
 				return handleError(err, isVerbose)
 			}
-			placeIn.ImageUrl = url
+			placeIn.ImageURL = url
 
 			creatorId, found := refs[collections.Users][placeEx.CreatorRef]
 			if !found {

@@ -39,7 +39,7 @@ func NewCRUDSPlace() *CRUDSPlace {
 			string(schemas.PlaceSelectDescription),
 			string(schemas.PlaceSelectAddress),
 			string(schemas.PlaceSelectLocation),
-			string(schemas.PlaceSelectImageUrl),
+			string(schemas.PlaceSelectImageURL),
 			string(schemas.PlaceSelectCreatorId),
 			string(schemas.PlaceSelectCreatedAt),
 		},
@@ -85,40 +85,40 @@ func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {
 			Lat: dbModel.Location.Lat,
 			Lng: dbModel.Location.Lng,
 		},
-		ImageUrl:  dbModel.ImageURL,
+		ImageURL:  dbModel.ImageURL,
 		CreatorID: dbModel.CreatorID,
 		CreatedAt: dbModel.CreatedAt,
 	}
 }
 
 func (cp *CRUDSPlace) PostProcess(read *schemas.PlaceRead) error {
-	if read.ImageUrl == "" {
+	if read.ImageURL == "" {
 		return nil
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedURL(read.ImageUrl, config.Env.JWTExpiration)
+	signedURL, err := storage.GetSignedURL(read.ImageURL, config.Env.JWTExpiration)
 	if err != nil {
 		return err
 	}
 
-	read.ImageUrl = signedUrl
+	read.ImageURL = signedURL
 	return nil
 }
 
 func (cp *CRUDSPlace) PostProcessPartial(partial map[string]any) error {
-	imageUrl, exists := partial["imageUrl"]
+	imageURL, exists := partial["imageUrl"]
 	if !exists {
 		return nil
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedURL(imageUrl.(string), config.Env.JWTExpiration)
+	signedURL, err := storage.GetSignedURL(imageURL.(string), config.Env.JWTExpiration)
 	if err != nil {
 		return err
 	}
 
-	partial["imageUrl"] = signedUrl
+	partial["imageUrl"] = signedURL
 	return nil
 }
 

@@ -66,17 +66,17 @@ func (uc *UserCollection) PostProcess(
 		return result, errors.New("decoding of user documenet failed")
 	}
 
-	if result.ImageUrl == "" {
+	if result.ImageURL == "" {
 		return result, nil
 	}
 
 	storage := instances.GetStorage()
-	signedUrl, err := storage.GetSignedURL(result.ImageUrl, config.Env.JWTExpiration)
+	signedUrl, err := storage.GetSignedURL(result.ImageURL, config.Env.JWTExpiration)
 	if err != nil {
 		return result, err
 	}
 
-	result.ImageUrl = signedUrl
+	result.ImageURL = signedUrl
 	return result, nil
 }
 
@@ -282,7 +282,7 @@ func (uc *UserCollection) ToCreateForm(
 
 		ctx := context.Background()
 		storage := instances.GetStorage()
-		form.ImageUrl, err = storage.UploadFile(ctx, &f, "")
+		form.ImageURL, err = storage.UploadFile(ctx, &f, "")
 		if err != nil {
 			return form, fmt.Errorf("could not upload image: %w", err)
 		}
