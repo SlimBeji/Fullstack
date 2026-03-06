@@ -397,3 +397,23 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post an
 
 	return createdID, nil
 }
+
+func Post[User any, Model BaseModelReader, Read any, Create any, Post any](
+	crud RecordCreate[User, Model, Read, Create, Post],
+	form Post,
+	user *User,
+) (uint, error) {
+	if user != nil {
+		err := crud.AuthPost(*user, form)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	data, err := crud.PostToCreate(form)
+	if err != nil {
+		return 0, err
+	}
+
+	return CreateRecord(crud, data)
+}

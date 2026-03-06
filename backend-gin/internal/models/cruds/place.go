@@ -241,6 +241,28 @@ func (cp *CRUDSPlace) Create(data schemas.PlaceCreate) (uint, error) {
 	return gorm_.CreateRecord(cp, data)
 }
 
+func (cp *CRUDSPlace) Post(
+	form schemas.PlacePost, options *PlaceOptions,
+) (schemas.PlaceRead, error) {
+	var zero schemas.PlaceRead
+	createdId, err := gorm_.Post(cp, form, nil)
+	if err != nil {
+		return zero, err
+	}
+	return cp.Get(createdId, options)
+}
+
+func (cp *CRUDSPlace) UserPost(
+	user schemas.UserRead, form schemas.PlacePost, options *PlaceOptions,
+) (schemas.PlaceRead, error) {
+	var zero schemas.PlaceRead
+	createdId, err := gorm_.Post(cp, form, &user)
+	if err != nil {
+		return zero, err
+	}
+	return cp.Get(createdId, options)
+}
+
 // Read
 
 func (cp *CRUDSPlace) AuthGet(

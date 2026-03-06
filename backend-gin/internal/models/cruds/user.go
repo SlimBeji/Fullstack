@@ -231,6 +231,28 @@ func (cu *CRUDSUser) Create(data schemas.UserCreate) (uint, error) {
 	return gorm_.CreateRecord(cu, data)
 }
 
+func (cu *CRUDSUser) Post(
+	form schemas.UserPost, options *UserOptions,
+) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+	createdId, err := gorm_.Post(cu, form, nil)
+	if err != nil {
+		return zero, err
+	}
+	return cu.Get(createdId, options)
+}
+
+func (cu *CRUDSUser) UserPost(
+	user schemas.UserRead, form schemas.UserPost, options *UserOptions,
+) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+	createdId, err := gorm_.Post(cu, form, &user)
+	if err != nil {
+		return zero, err
+	}
+	return cu.Get(createdId, options)
+}
+
 // Read
 
 func (cu *CRUDSUser) AuthGet(
