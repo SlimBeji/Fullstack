@@ -193,3 +193,29 @@ func BuildSelectQuery(
 
 	return qb, nil
 }
+
+func Exists(
+	crud CRUDSQuery,
+	where types_.WhereFilters,
+) (bool, error) {
+	qb := crud.GetModel()
+
+	// Select only ID (minimal query)
+	qb = qb.Select("id")
+
+	// Apply where filters
+	var err error
+	qb, err = ApplyWhere(qb, where, crud.MapWhere)
+	if err != nil {
+		return false, err
+	}
+
+	// Check if any record exists
+	var count int64
+	err = qb.Limit(1).Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
