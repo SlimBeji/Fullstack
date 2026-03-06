@@ -266,12 +266,12 @@ func (cu *CRUDSUser) AuthGet(
 	return query
 }
 
-func (cu *CRUDSUser) Read(id int) (*orm.User, error) {
+func (cu *CRUDSUser) Read(id uint) (*orm.User, error) {
 	return gorm_.Read(cu, id)
 }
 
 func (cu *CRUDSUser) Get(
-	id int, options *UserOptions,
+	id uint, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
@@ -295,7 +295,7 @@ func (cu *CRUDSUser) Get(
 }
 
 func (cu *CRUDSUser) UserGet(
-	user *schemas.UserRead, id int, options *UserOptions,
+	user *schemas.UserRead, id uint, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
@@ -319,7 +319,7 @@ func (cu *CRUDSUser) UserGet(
 }
 
 func (cu *CRUDSUser) GetPartial(
-	id int, options *UserOptions,
+	id uint, options *UserOptions,
 ) (map[string]any, error) {
 	if options == nil {
 		options = &UserOptions{}
@@ -346,7 +346,7 @@ func (cu *CRUDSUser) GetPartial(
 }
 
 func (cu *CRUDSUser) UserGetPartial(
-	user *schemas.UserRead, id int, options *UserOptions,
+	user *schemas.UserRead, id uint, options *UserOptions,
 ) (map[string]any, error) {
 	if options == nil {
 		options = &UserOptions{}

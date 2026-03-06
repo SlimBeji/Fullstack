@@ -239,7 +239,7 @@ type RecordRead[User any, Model BaseModelReader, Read any] interface {
 }
 
 func Read[User any, Model BaseModelReader, Read any](
-	crud RecordRead[User, Model, Read], id int,
+	crud RecordRead[User, Model, Read], id uint,
 ) (*Model, error) {
 	var result Model
 	err := crud.GetModel().First(&result, id).Error
@@ -253,7 +253,7 @@ func Read[User any, Model BaseModelReader, Read any](
 }
 
 func Get[User any, Model BaseModelReader, Read any](
-	crud RecordRead[User, Model, Read], id int, user *User,
+	crud RecordRead[User, Model, Read], id uint, user *User,
 ) (Read, error) {
 	var zero Read
 
@@ -281,7 +281,7 @@ func Get[User any, Model BaseModelReader, Read any](
 	err = qb.First(&model).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return zero, types_.NotFoundError(crud.ModelName(), id)
+			return zero, types_.NotFoundError(crud.ModelName(), int(id))
 		}
 		return zero, err
 	}
@@ -291,7 +291,7 @@ func Get[User any, Model BaseModelReader, Read any](
 
 func GetPartial[User any, Model BaseModelReader, Read any](
 	crud RecordRead[User, Model, Read],
-	id int,
+	id uint,
 	fields []string,
 	user *User,
 ) (map[string]any, error) {
@@ -323,7 +323,7 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 	err = qb.First(&result).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, types_.NotFoundError(crud.ModelName(), id)
+			return nil, types_.NotFoundError(crud.ModelName(), int(id))
 		}
 		return nil, err
 	}
