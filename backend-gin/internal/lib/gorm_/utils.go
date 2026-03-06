@@ -417,3 +417,19 @@ func PostRecord[User any, Model BaseModelReader, Read any, Create any, Post any]
 
 	return CreateRecord(crud, data)
 }
+
+// Update Helpers
+
+type RecordUpdate[
+	User any,
+	Model BaseModelReader,
+	Read any,
+	Update any,
+	Put any,
+] interface {
+	RecordRead[User, Model, Read]
+	PutToUpdate(Put) (Update, error)
+	AuthPut(User, Put) error
+	BeforeUpdate(*gorm.DB, uint, Update) error
+	AfterUpdate(*gorm.DB, uint, Update) error
+}
