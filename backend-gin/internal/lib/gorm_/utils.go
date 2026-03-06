@@ -4,6 +4,7 @@ import (
 	"backend/internal/lib/types_"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"gorm.io/gorm"
@@ -345,4 +346,54 @@ type RecordCreate[
 	AuthPost(User, Post) error
 	BeforeCreate(*gorm.DB, Create) error
 	AfterCreate(*gorm.DB, uint, Create) error
+}
+
+func Create[User any, Model BaseModelReader, Read any, Create any, Post any](
+	crud RecordCreate[User, Model, Read, Create, Post],
+	data Create,
+) (uint, error) {
+	var createdID uint
+
+	err := crud.GetDB().Transaction(func(tx *gorm.DB) error {
+		// Convert Create to Model
+		entity := crud.ToModel(data)
+
+		// Before create hook
+		if err := crud.BeforeCreate(tx, data); err != nil {
+			return err
+		}
+
+		// Insert into database
+		if err := tx.Create(&entity).Error; err != nil {
+			return err
+		}
+
+		// Extract ID from entity
+		createdID = entity.GetId()
+
+		// After create hook
+		if err := crud.AfterCreate(tx, createdID, data); err != nil {
+			return err
+		}
+
+		return nil // Commit
+	})
+
+	if err != nil {
+		// Check for duplicate key error
+		if strings.Contains(err.Error(), "duplicate key") ||
+			strings.Contains(err.Error(), "UNIQUE constraint") {
+			return 0, types_.APIError{
+				Code:    http.StatusConflict,
+				Message: "Record already exists",
+			}
+		}
+
+		return 0, types_.APIError{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("Could not create %s object: %v", crud.ModelName(), err),
+		}
+	}
+
+	return createdID, nil
 }

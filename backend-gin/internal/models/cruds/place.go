@@ -1,6 +1,7 @@
 package cruds
 
 import (
+	"backend/internal/background/publishers"
 	"backend/internal/config"
 	"backend/internal/lib/gorm_"
 	"backend/internal/lib/types_"
@@ -202,7 +203,8 @@ func (cp *CRUDSPlace) BeforeCreate(tx *gorm.DB, data schemas.PlaceCreate) error 
 }
 
 func (cp *CRUDSPlace) AfterCreate(tx *gorm.DB, id uint, data schemas.PlaceCreate) error {
-	return nil
+	_, err := publishers.PlaceEmbedding(id)
+	return err
 }
 
 func (cp *CRUDSPlace) AuthPost(
@@ -233,6 +235,10 @@ func (cp *CRUDSPlace) AuthPost(
 		}
 	}
 	return nil
+}
+
+func (cp *CRUDSPlace) Create(data schemas.PlaceCreate) (uint, error) {
+	return gorm_.Create(cp, data)
 }
 
 // Read

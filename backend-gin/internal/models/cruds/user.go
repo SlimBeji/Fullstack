@@ -222,6 +222,15 @@ func (cu *CRUDSUser) AuthPost(
 	}
 }
 
+func (cu *CRUDSUser) Create(data schemas.UserCreate) (uint, error) {
+	hashed, err := utils.HashInput(data.Password, config.Env.DefaultHashSalt)
+	if err != nil {
+		return 0, err
+	}
+	data.Password = hashed
+	return gorm_.Create(cu, data)
+}
+
 // Read
 
 func (cu *CRUDSUser) AuthGet(
