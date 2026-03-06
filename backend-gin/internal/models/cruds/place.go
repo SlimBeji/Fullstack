@@ -78,3 +78,34 @@ func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {
 		CreatedAt: dbModel.CreatedAt,
 	}
 }
+
+func (cp *CRUDSPlace) PostProcess(read *schemas.PlaceRead) error {
+	if read.ImageUrl == "" {
+		return nil
+	}
+
+	storage := instances.GetStorage()
+	signedUrl, err := storage.GetSignedURL(read.ImageUrl, config.Env.JWTExpiration)
+	if err != nil {
+		return err
+	}
+
+	read.ImageUrl = signedUrl
+	return nil
+}
+
+func (cp *CRUDSPlace) PostProcessPartial(partial map[string]any) error {
+	imageUrl, exists := partial["imageUrl"]
+	if !exists {
+		return nil
+	}
+
+	storage := instances.GetStorage()
+	signedUrl, err := storage.GetSignedURL(imageUrl.(string), config.Env.JWTExpiration)
+	if err != nil {
+		return err
+	}
+
+	partial["imageUrl"] = signedUrl
+	return nil
+}

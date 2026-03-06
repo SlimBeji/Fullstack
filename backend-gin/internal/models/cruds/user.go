@@ -82,3 +82,34 @@ func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
 		CreatedAt: dbModel.CreatedAt,
 	}
 }
+
+func (cu *CRUDSUser) PostProcess(read *schemas.UserRead) error {
+	if read.ImageUrl == "" {
+		return nil
+	}
+
+	storage := instances.GetStorage()
+	signedUrl, err := storage.GetSignedURL(read.ImageUrl, config.Env.JWTExpiration)
+	if err != nil {
+		return err
+	}
+
+	read.ImageUrl = signedUrl
+	return nil
+}
+
+func (cu *CRUDSUser) PostProcessPartial(partial map[string]any) error {
+	imageUrl, exists := partial["imageUrl"]
+	if !exists {
+		return nil
+	}
+
+	storage := instances.GetStorage()
+	signedUrl, err := storage.GetSignedURL(imageUrl.(string), config.Env.JWTExpiration)
+	if err != nil {
+		return err
+	}
+
+	partial["imageUrl"] = signedUrl
+	return nil
+}
