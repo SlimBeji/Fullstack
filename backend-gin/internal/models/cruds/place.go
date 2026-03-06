@@ -52,6 +52,10 @@ func NewCRUDSPlace() *CRUDSPlace {
 	}
 }
 
+func (cp *CRUDSPlace) GetDB() *gorm.DB {
+	return cp.DB
+}
+
 func (cp *CRUDSPlace) GetModel() *gorm.DB {
 	return cp.Model
 }

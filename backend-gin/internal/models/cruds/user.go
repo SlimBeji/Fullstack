@@ -53,6 +53,10 @@ func NewCRUDSUser() *CRUDSUser {
 	}
 }
 
+func (cu *CRUDSUser) GetDB() *gorm.DB {
+	return cu.DB
+}
+
 func (cu *CRUDSUser) GetModel() *gorm.DB {
 	return cu.Model
 }

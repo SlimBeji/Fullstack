@@ -12,6 +12,7 @@ import (
 // Query Helpers
 
 type QueryBuilder interface {
+	GetDB() *gorm.DB
 	GetModel() *gorm.DB
 	DefaultSelect() []string
 	DefaultOrderBy() []string
