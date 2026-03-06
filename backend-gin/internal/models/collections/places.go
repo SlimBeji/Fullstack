@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson"
@@ -274,7 +273,7 @@ func (pc *PlaceCollection) PostCreate(
 	}
 
 	// Run embedding
-	_, err = publishers.PlaceEmbedding(placeId.Hex())
+	_, err = publishers.PlaceEmbedding(123)
 	if err != nil {
 		return errors.New("could not run embedding for newly created place")
 	}
@@ -357,7 +356,7 @@ func (pc *PlaceCollection) PostUpdate(
 	}
 
 	if pre.Description != post.Description || pre.Title != post.Title {
-		_, err := publishers.PlaceEmbedding(strconv.Itoa(int(post.ID)))
+		_, err := publishers.PlaceEmbedding(123)
 		return err
 	}
 	return nil

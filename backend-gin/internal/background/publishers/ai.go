@@ -10,13 +10,13 @@ import (
 )
 
 func PlaceEmbedding(
-	placeId string, opts ...asynq.Option,
+	placeId uint, opts ...asynq.Option,
 ) (*asynq.TaskInfo, error) {
 	if testing.Testing() {
 		return nil, nil
 	}
 
-	data := background.PlaceEmbeddingData{PlaceId: placeId}
+	data := background.PlaceEmbeddingData{PlaceId: fmt.Sprintf("%d", placeId)}
 	payloadData, err := json.Marshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal place embedding data: %w", err)
