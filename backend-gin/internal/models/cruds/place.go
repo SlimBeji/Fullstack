@@ -59,12 +59,12 @@ func (cp *CRUDSPlace) MaxItemsPerPage() int {
 	return cp.maxItemsPerPage
 }
 
-func (cp *CRUDSPlace) DefaultOrderBy() []schemas.PlaceSortables {
-	return cp.defaultOrderBy
-}
-
 func (cp *CRUDSPlace) DefaultSelect() []schemas.PlaceSelectables {
 	return cp.defaultSelect
+}
+
+func (cp *CRUDSPlace) DefaultOrderBy() []schemas.PlaceSortables {
+	return cp.defaultOrderBy
 }
 
 // Serialization and Post-Processing

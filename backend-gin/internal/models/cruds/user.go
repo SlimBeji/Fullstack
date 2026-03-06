@@ -58,12 +58,12 @@ func (cu *CRUDSUser) MaxItemsPerPage() int {
 	return cu.maxItemsPerPage
 }
 
-func (cu *CRUDSUser) DefaultOrderBy() []schemas.UserSortables {
-	return cu.defaultOrderBy
-}
-
 func (cu *CRUDSUser) DefaultSelect() []schemas.UserSelectables {
 	return cu.defaultSelect
+}
+
+func (cu *CRUDSUser) DefaultOrderBy() []schemas.UserSortables {
+	return cu.defaultOrderBy
 }
 
 // Serialization and Post-Processing
