@@ -223,11 +223,8 @@ class CrudsUser(
             data["imageUrl"] = ""
 
         create_form = self.create_schema(isAdmin=False, **data)
-        id = await self.create(create_form)
-        stmt = select(User.id, User.email).where(User.id == id)
-        result = await self.session.execute(stmt)
-        record = result.one()
-        return create_token(record.id, record.email)
+        id_ = await self.create(create_form)
+        return create_token(id_, form.email)
 
     async def signin(self, form: SigninForm) -> EncodedTokenSchema:
         error = ApiError(HTTPStatus.UNAUTHORIZED, "Wrong name or password")
