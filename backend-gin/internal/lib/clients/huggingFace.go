@@ -22,7 +22,7 @@ func (h *HuggingFaceClient) baseUrl() string {
 	return fmt.Sprintf("https://router.huggingface.co/hf-inference/models/%s/pipeline/feature-extraction", h.config.EmbedModel)
 }
 
-func (h *HuggingFaceClient) EmbedText(ctx context.Context, text string) ([]float64, error) {
+func (h *HuggingFaceClient) EmbedText(ctx context.Context, text string) ([]float32, error) {
 	if text == "" {
 		return nil, fmt.Errorf("text cannot be empty")
 	}
@@ -41,7 +41,7 @@ func (h *HuggingFaceClient) EmbedText(ctx context.Context, text string) ([]float
 		return nil, fmt.Errorf("API request failed with status: %s", resp.Status)
 	}
 
-	var embeddingResponse [][]float64
+	var embeddingResponse [][]float32
 	if err := json.NewDecoder(resp.Body).Decode(&embeddingResponse); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}

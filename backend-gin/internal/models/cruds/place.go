@@ -10,9 +10,11 @@ import (
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/pgvector/pgvector-go"
 	"gorm.io/gorm"
 )
 
@@ -241,6 +243,14 @@ func (cp *CRUDSPlace) Create(data schemas.PlaceCreate) (uint, error) {
 	return gorm_.CreateRecord(cp, data)
 }
 
+func (cp *CRUDSPlace) Seed(data schemas.PlaceCreate, embedding []float32) (uint, error) {
+	id, err := gorm_.CreateRecord(cp, data)
+	if err != nil {
+		return 0, err
+	}
+	return id, cp.UpdateEmbedding(id, embedding)
+}
+
 func (cp *CRUDSPlace) Post(
 	form schemas.PlacePost, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
@@ -458,4 +468,58 @@ func (cp *CRUDSPlace) UserPut(
 		return zero, err
 	}
 	return cp.Get(id, options)
+}
+
+func (cp *CRUDSPlace) UpdateEmbedding(id uint, vector []float32) error {
+	pgVector := pgvector.NewVector(vector)
+	return cp.Model.Where("id = ?", id).
+		Update("embedding", pgVector).
+		Error
+}
+
+func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
+	// Fetch title and description
+	var place orm.Place
+	err := cp.Model.Select("title", "description").First(&place, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, types_.APIError{
+				Code:    http.StatusNotFound,
+				Message: fmt.Sprintf("No place with id %d found in the database", id),
+			}
+		}
+		return nil, err
+	}
+
+	// Create text for embedding
+	text := fmt.Sprintf("%s - %s", place.Title, place.Description)
+
+	// Get embedding from service
+	hf := instances.GetHfClient()
+	vector, err := hf.EmbedText(ctx, text)
+	if err != nil {
+		return nil, types_.APIError{
+			Code:    http.StatusConflict,
+			Message: "embedding failed",
+			Details: map[string]any{
+				"placeId": id,
+				"message": err.Error(),
+			},
+			Err: err,
+		}
+	}
+
+	// Update embedding in database
+	if err := cp.UpdateEmbedding(id, vector); err != nil {
+		return nil, types_.APIError{
+			Code:    http.StatusInternalServerError,
+			Message: "embedding failed",
+			Details: map[string]any{
+				"placeId": id,
+				"message": err.Error(),
+			},
+		}
+	}
+
+	return vector, nil
 }
