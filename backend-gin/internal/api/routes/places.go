@@ -151,7 +151,7 @@ func deletePlace(c *gin.Context) {
 		return
 	}
 
-	message := fmt.Sprintf("Deleted place %s", placeId)
+	message := fmt.Sprintf("Deleted place %d", placeId)
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
 

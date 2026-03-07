@@ -151,7 +151,7 @@ func deleteUser(c *gin.Context) {
 		return
 	}
 
-	message := fmt.Sprintf("Deleted user %s", userId)
+	message := fmt.Sprintf("Deleted user %d", userId)
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
 
