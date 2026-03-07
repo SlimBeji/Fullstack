@@ -45,7 +45,7 @@ func NewCRUDSPlace() *CRUDSPlace {
 	db := instances.GetPgClient().DB
 	return &CRUDSPlace{
 		DB:              db,
-		Model:           db.Model(&orm.User{}),
+		Model:           db.Model(&orm.Place{}),
 		maxItemsPerPage: config.Env.MaxItemsPerPage,
 		defaultSelect: []string{
 			string(schemas.PlaceSelectId),
