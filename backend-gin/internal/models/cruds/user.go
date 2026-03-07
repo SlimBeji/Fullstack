@@ -470,3 +470,27 @@ func (cu *CRUDSUser) AfterUpdate(
 func (cu *CRUDSUser) Update(id uint, data schemas.UserUpdate) error {
 	return gorm_.UpdateRecord(cu, id, data)
 }
+
+func (cu *CRUDSUser) Put(
+	id uint, form schemas.UserPut, options *UserOptions,
+) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+
+	err := gorm_.PutRecord(cu, id, form, nil)
+	if err != nil {
+		return zero, err
+	}
+	return cu.Get(id, options)
+}
+
+func (cu *CRUDSUser) UserPut(
+	user schemas.UserRead, id uint, form schemas.UserPut, options *UserOptions,
+) (schemas.UserRead, error) {
+	var zero schemas.UserRead
+
+	err := gorm_.PutRecord(cu, id, form, &user)
+	if err != nil {
+		return zero, err
+	}
+	return cu.Get(id, options)
+}

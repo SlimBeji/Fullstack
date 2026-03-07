@@ -435,3 +435,27 @@ func (cp *CRUDSPlace) AfterUpdate(
 func (cp *CRUDSPlace) Update(id uint, data schemas.PlaceUpdate) error {
 	return gorm_.UpdateRecord(cp, id, data)
 }
+
+func (cp *CRUDSPlace) Put(
+	id uint, form schemas.PlacePut, options *PlaceOptions,
+) (schemas.PlaceRead, error) {
+	var zero schemas.PlaceRead
+
+	err := gorm_.PutRecord(cp, id, form, nil)
+	if err != nil {
+		return zero, err
+	}
+	return cp.Get(id, options)
+}
+
+func (cp *CRUDSPlace) UserPut(
+	user schemas.UserRead, id uint, form schemas.PlacePut, options *PlaceOptions,
+) (schemas.PlaceRead, error) {
+	var zero schemas.PlaceRead
+
+	err := gorm_.PutRecord(cp, id, form, &user)
+	if err != nil {
+		return zero, err
+	}
+	return cp.Get(id, options)
+}

@@ -476,3 +476,24 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any
 
 	return nil
 }
+
+func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
+	crud RecordUpdate[User, Model, Read, Update, Put],
+	id uint,
+	form Put,
+	user *User,
+) error {
+	if user != nil {
+		err := crud.AuthPut(*user, id, form)
+		if err != nil {
+			return err
+		}
+	}
+
+	data, err := crud.PutToUpdate(form)
+	if err != nil {
+		return err
+	}
+
+	return UpdateRecord(crud, id, data)
+}
