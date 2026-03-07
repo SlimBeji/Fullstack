@@ -594,7 +594,7 @@ func (cp *CRUDSPlace) BeforeDelete(query *gorm.DB, model orm.Place) error {
 
 func (cp *CRUDSPlace) AfterDelete(query *gorm.DB, model orm.Place) error {
 	if model.ImageURL != "" {
-		ctx := context.Background()
+		ctx := query.Statement.Context
 		storage := instances.GetStorage()
 		_, err := storage.DeleteFile(ctx, model.ImageURL)
 		if err != nil {

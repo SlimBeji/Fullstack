@@ -553,7 +553,7 @@ func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, model orm.User) error {
 
 func (cu *CRUDSUser) AfterDelete(query *gorm.DB, model orm.User) error {
 	if model.ImageURL != "" {
-		ctx := context.Background()
+		ctx := query.Statement.Context
 		storage := instances.GetStorage()
 		_, err := storage.DeleteFile(ctx, model.ImageURL)
 		if err != nil {
