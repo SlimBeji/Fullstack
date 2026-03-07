@@ -4,41 +4,7 @@ import (
 	"backend/internal/config"
 	"backend/internal/lib/clients"
 	"sync"
-	"testing"
-
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-// Mongo
-
-var (
-	mongoOnce   sync.Once
-	mongoClient *clients.MongoClient
-)
-
-func GetMongoDbName() string {
-	if testing.Testing() {
-		return config.Env.MongoTestDBName
-	}
-	return config.Env.MongoDBName
-}
-
-var mongoConfig = clients.MongoClientConfig{
-	Uri:    config.Env.MongoURL,
-	DbName: GetMongoDbName(),
-}
-
-func GetMongo() *clients.MongoClient {
-	mongoOnce.Do(func() {
-		mongoClient = clients.NewMongoClient(mongoConfig)
-	})
-	return mongoClient
-}
-
-func GetMongoDB(client *mongo.Client) *mongo.Database {
-	dbName := GetMongoDbName()
-	return client.Database(dbName)
-}
 
 // Postgresql
 

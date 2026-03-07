@@ -11,7 +11,6 @@ import (
 )
 
 type AppSetup struct {
-	Mongo         *clients.MongoClient
 	Pg            *clients.PgClient
 	Redis         *clients.RedisClient
 	Storage       *clients.CloudStorage
@@ -21,9 +20,6 @@ type AppSetup struct {
 }
 
 func (a *AppSetup) CloseServices() {
-	if err := a.Mongo.Close(); err != nil {
-		log.Printf("failed to close Mongo: %v", err)
-	}
 	if err := a.Pg.Close(); err != nil {
 		log.Printf("failed to close PostgreSQL: %v", err)
 	}
@@ -46,7 +42,6 @@ func (a *AppSetup) CloseServices() {
 
 func New() *AppSetup {
 	return &AppSetup{
-		Mongo:         instances.GetMongo(),
 		Pg:            instances.GetPgClient(),
 		Redis:         instances.GetRedisClient(),
 		Storage:       instances.GetStorage(),
