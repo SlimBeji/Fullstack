@@ -381,3 +381,53 @@ func (cp *CRUDSPlace) UserGetPartial(
 
 	return result, nil
 }
+
+// Update
+
+func (cp *CRUDSPlace) PutToUpdate(form schemas.PlacePut) (schemas.PlaceUpdate, error) {
+	location := schemas.Location{
+		Lat: float64(form.Location.Lat), Lng: float64(form.Location.Lng),
+	}
+	return schemas.PlaceUpdate{
+		Title:       form.Title,
+		Description: form.Description,
+		Address:     form.Address,
+		Location:    &location,
+	}, nil
+}
+
+func (cp *CRUDSPlace) AuthPut(
+	user schemas.UserRead, id uint, data schemas.PlaceUpdate,
+) error {
+	if user.IsAdmin {
+		return nil
+	}
+
+	exists, err := gorm_.Exists(cp, types_.WhereFilters{
+		"id": types_.EqFilters(id), "creatorId": types_.EqFilters(user.ID),
+	})
+	if err != nil {
+		return err
+	}
+	if !exists {
+		message := fmt.Sprintf("Cannot access place %d", id)
+		return types_.APIError{
+			Code:    http.StatusUnauthorized,
+			Message: "Access denied",
+			Details: map[string]any{"message": message},
+		}
+	}
+	return nil
+}
+
+func (cp *CRUDSPlace) BeforeUpdate(
+	query *gorm.DB, id uint, data schemas.PlaceUpdate,
+) error {
+	return nil
+}
+
+func (cp *CRUDSPlace) AfterUpdate(
+	query *gorm.DB, id uint, data schemas.PlaceUpdate,
+) error {
+	return nil
+}

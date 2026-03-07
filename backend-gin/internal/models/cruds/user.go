@@ -428,3 +428,41 @@ func (cu *CRUDSUser) GetByEmail(email string) (schemas.UserRead, error) {
 
 	return cu.ToRead(&model), nil
 }
+
+// Update
+
+func (cu *CRUDSUser) PutToUpdate(form schemas.UserPut) (schemas.UserUpdate, error) {
+	return schemas.UserUpdate{
+		Name:     form.Name,
+		Email:    form.Email,
+		Password: form.Password,
+	}, nil
+}
+
+func (cu *CRUDSUser) AuthPut(
+	user schemas.UserRead, id uint, data schemas.UserUpdate,
+) error {
+	if user.IsAdmin {
+		return nil
+	}
+
+	if user.ID != id {
+		return types_.APIError{
+			Code:    http.StatusUnauthorized,
+			Message: fmt.Sprintf("Access to user with id %d not granted", id),
+		}
+	}
+	return nil
+}
+
+func (cu *CRUDSUser) BeforeUpdate(
+	query *gorm.DB, id uint, data schemas.UserUpdate,
+) error {
+	return nil
+}
+
+func (cu *CRUDSUser) AfterUpdate(
+	query *gorm.DB, id uint, data schemas.UserUpdate,
+) error {
+	return nil
+}

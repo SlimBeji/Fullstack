@@ -429,7 +429,7 @@ type RecordUpdate[
 ] interface {
 	RecordRead[User, Model, Read]
 	PutToUpdate(Put) (Update, error)
-	AuthPut(User, Put) error
+	AuthPut(User, uint, Put) error
 	BeforeUpdate(*gorm.DB, uint, Update) error
 	AfterUpdate(*gorm.DB, uint, Update) error
 }
