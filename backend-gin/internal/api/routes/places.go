@@ -22,7 +22,7 @@ import (
 func getPlaces(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
 	cp := cruds.GetCRUDSPlace()
-	data, err := cp.Paginate(searchQuery, &cruds.PlaceOptions{Process: true})
+	data, err := cp.Paginate(c, searchQuery, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -41,7 +41,7 @@ func getPlaces(c *gin.Context) {
 func searchPlaces(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
 	cp := cruds.GetCRUDSPlace()
-	data, err := cp.Paginate(searchQuery, &cruds.PlaceOptions{Process: true})
+	data, err := cp.Paginate(c, searchQuery, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -63,7 +63,7 @@ func createPlace(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.PlacePost](c)
 
 	cp := cruds.GetCRUDSPlace()
-	place, err := cp.UserPost(currentUser, body, &cruds.PlaceOptions{Process: true})
+	place, err := cp.UserPost(c, currentUser, body, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -87,7 +87,7 @@ func getPlace(c *gin.Context) {
 	}
 
 	cp := cruds.GetCRUDSPlace()
-	place, err := cp.GetPartial(placeId, &cruds.PlaceOptions{Process: true})
+	place, err := cp.GetPartial(c, placeId, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -115,7 +115,7 @@ func updatePlace(c *gin.Context) {
 	}
 
 	cp := cruds.GetCRUDSPlace()
-	place, err := cp.UserPut(currentUser, placeId, body, &cruds.PlaceOptions{Process: true})
+	place, err := cp.UserPut(c, currentUser, placeId, body, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -145,7 +145,7 @@ func deletePlace(c *gin.Context) {
 	}
 
 	cp := cruds.GetCRUDSPlace()
-	err = cp.UserDelete(currentUser, placeId)
+	err = cp.UserDelete(c, currentUser, placeId)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return

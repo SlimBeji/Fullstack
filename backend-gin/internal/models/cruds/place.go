@@ -70,12 +70,12 @@ func GetCRUDSPlace() *CRUDSPlace {
 	return crudsPlace
 }
 
-func (cp *CRUDSPlace) GetDB() *gorm.DB {
-	return cp.DB
+func (cp *CRUDSPlace) GetDB(ctx context.Context) *gorm.DB {
+	return cp.DB.WithContext(ctx)
 }
 
-func (cp *CRUDSPlace) GetModel() *gorm.DB {
-	return cp.Model
+func (cp *CRUDSPlace) GetModel(ctx context.Context) *gorm.DB {
+	return cp.Model.WithContext(ctx)
 }
 
 func (cp *CRUDSPlace) TableName() string {
@@ -116,7 +116,9 @@ func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {
 	}
 }
 
-func (cp *CRUDSPlace) PostProcess(read *schemas.PlaceRead) error {
+func (cp *CRUDSPlace) PostProcess(
+	ctx context.Context, read *schemas.PlaceRead,
+) error {
 	if read.ImageURL == "" {
 		return nil
 	}
@@ -131,7 +133,9 @@ func (cp *CRUDSPlace) PostProcess(read *schemas.PlaceRead) error {
 	return nil
 }
 
-func (cp *CRUDSPlace) PostProcessPartial(partial map[string]any) error {
+func (cp *CRUDSPlace) PostProcessPartial(
+	ctx context.Context, partial map[string]any,
+) error {
 	imageURL, exists := partial["imageUrl"]
 	if !exists {
 		return nil
@@ -170,8 +174,10 @@ func (cp *CRUDSPlace) MapWhere(field string) string {
 	}
 }
 
-func (cp *CRUDSPlace) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
-	return gorm_.BuildSelectQuery(cp, query)
+func (cp *CRUDSPlace) BuildQuery(
+	ctx context.Context, query types_.SearchQuery,
+) (*gorm.DB, error) {
+	return gorm_.BuildSelectQuery(ctx, cp, query)
 }
 
 // Create
@@ -189,13 +195,12 @@ func (cp *CRUDSPlace) ToModel(data schemas.PlaceCreate) orm.Place {
 }
 
 func (cp *CRUDSPlace) PostToCreate(
-	data schemas.PlacePost,
+	ctx context.Context, data schemas.PlacePost,
 ) (schemas.PlaceCreate, error) {
 	var zero schemas.PlaceCreate
 	var err error
 	imageURL := ""
 	if data.Image != nil {
-		ctx := context.Background()
 		storage := instances.GetStorage()
 		imageURL, err = storage.UploadFile(ctx, data.Image, "")
 		if err != nil {
@@ -225,10 +230,12 @@ func (cp *CRUDSPlace) AfterCreate(tx *gorm.DB, id uint, data schemas.PlaceCreate
 }
 
 func (cp *CRUDSPlace) AuthPost(
-	user schemas.UserRead, data schemas.PlacePost,
+	ctx context.Context,
+	user schemas.UserRead,
+	data schemas.PlacePost,
 ) error {
 	if user.IsAdmin {
-		exists, err := UserExists(cp.DB, int(data.CreatorID))
+		exists, err := UserExists(cp.GetDB(ctx), int(data.CreatorID))
 		if err != nil {
 			return err
 		}
@@ -254,44 +261,51 @@ func (cp *CRUDSPlace) AuthPost(
 	return nil
 }
 
-func (cp *CRUDSPlace) Create(data schemas.PlaceCreate) (uint, error) {
-	return gorm_.CreateRecord(cp, data)
+func (cp *CRUDSPlace) Create(
+	ctx context.Context, data schemas.PlaceCreate,
+) (uint, error) {
+	return gorm_.CreateRecord(ctx, cp, data)
 }
 
-func (cp *CRUDSPlace) Seed(data schemas.PlaceCreate, embedding []float32) (uint, error) {
-	id, err := gorm_.CreateRecord(cp, data)
+func (cp *CRUDSPlace) Seed(
+	ctx context.Context, data schemas.PlaceCreate, embedding []float32,
+) (uint, error) {
+	id, err := gorm_.CreateRecord(ctx, cp, data)
 	if err != nil {
 		return 0, err
 	}
-	return id, cp.UpdateEmbedding(id, embedding)
+	return id, cp.UpdateEmbedding(ctx, id, embedding)
 }
 
 func (cp *CRUDSPlace) Post(
-	form schemas.PlacePost, options *PlaceOptions,
+	ctx context.Context, form schemas.PlacePost, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
-	createdId, err := gorm_.PostRecord(cp, form, nil)
+	createdId, err := gorm_.PostRecord(ctx, cp, form, nil)
 	if err != nil {
 		return zero, err
 	}
-	return cp.Get(createdId, options)
+	return cp.Get(ctx, createdId, options)
 }
 
 func (cp *CRUDSPlace) UserPost(
-	user schemas.UserRead, form schemas.PlacePost, options *PlaceOptions,
+	ctx context.Context,
+	user schemas.UserRead,
+	form schemas.PlacePost,
+	options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
-	createdId, err := gorm_.PostRecord(cp, form, &user)
+	createdId, err := gorm_.PostRecord(ctx, cp, form, &user)
 	if err != nil {
 		return zero, err
 	}
-	return cp.Get(createdId, options)
+	return cp.Get(ctx, createdId, options)
 }
 
 // Read
 
 func (cp *CRUDSPlace) AuthGet(
-	user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
 ) types_.SearchQuery {
 	// User can only access places they created
 	if query.Where == nil {
@@ -301,12 +315,12 @@ func (cp *CRUDSPlace) AuthGet(
 	return query
 }
 
-func (cp *CRUDSPlace) Read(id uint) (*orm.Place, error) {
-	return gorm_.Read(cp, id)
+func (cp *CRUDSPlace) Read(ctx context.Context, id uint) (*orm.Place, error) {
+	return gorm_.Read(ctx, cp, id)
 }
 
 func (cp *CRUDSPlace) Get(
-	id uint, options *PlaceOptions,
+	ctx context.Context, id uint, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
 
@@ -314,13 +328,13 @@ func (cp *CRUDSPlace) Get(
 		options = &PlaceOptions{}
 	}
 
-	result, err := gorm_.Get(cp, id, nil)
+	result, err := gorm_.Get(ctx, cp, id, nil)
 	if err != nil {
 		return zero, err
 	}
 
 	if options.Process {
-		err = cp.PostProcess(&result)
+		err = cp.PostProcess(ctx, &result)
 		if err != nil {
 			return zero, err
 		}
@@ -330,7 +344,7 @@ func (cp *CRUDSPlace) Get(
 }
 
 func (cp *CRUDSPlace) UserGet(
-	user *schemas.UserRead, id uint, options *PlaceOptions,
+	ctx context.Context, user *schemas.UserRead, id uint, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
 
@@ -338,13 +352,13 @@ func (cp *CRUDSPlace) UserGet(
 		options = &PlaceOptions{}
 	}
 
-	result, err := gorm_.Get(cp, id, user)
+	result, err := gorm_.Get(ctx, cp, id, user)
 	if err != nil {
 		return zero, err
 	}
 
 	if options.Process {
-		err = cp.PostProcess(&result)
+		err = cp.PostProcess(ctx, &result)
 		if err != nil {
 			return zero, err
 		}
@@ -354,7 +368,7 @@ func (cp *CRUDSPlace) UserGet(
 }
 
 func (cp *CRUDSPlace) GetPartial(
-	id uint, options *PlaceOptions,
+	ctx context.Context, id uint, options *PlaceOptions,
 ) (map[string]any, error) {
 	if options == nil {
 		options = &PlaceOptions{}
@@ -365,13 +379,13 @@ func (cp *CRUDSPlace) GetPartial(
 		fields = cp.DefaultSelect()
 	}
 
-	result, err := gorm_.GetPartial(cp, id, fields, nil)
+	result, err := gorm_.GetPartial(ctx, cp, id, fields, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	if options.Process {
-		err = cp.PostProcessPartial(result)
+		err = cp.PostProcessPartial(ctx, result)
 		if err != nil {
 			return nil, err
 		}
@@ -381,7 +395,7 @@ func (cp *CRUDSPlace) GetPartial(
 }
 
 func (cp *CRUDSPlace) UserGetPartial(
-	user *schemas.UserRead, id uint, options *PlaceOptions,
+	ctx context.Context, user *schemas.UserRead, id uint, options *PlaceOptions,
 ) (map[string]any, error) {
 	if options == nil {
 		options = &PlaceOptions{}
@@ -392,13 +406,13 @@ func (cp *CRUDSPlace) UserGetPartial(
 		fields = cp.DefaultSelect()
 	}
 
-	result, err := gorm_.GetPartial(cp, id, fields, user)
+	result, err := gorm_.GetPartial(ctx, cp, id, fields, user)
 	if err != nil {
 		return nil, err
 	}
 
 	if options.Process {
-		err = cp.PostProcessPartial(result)
+		err = cp.PostProcessPartial(ctx, result)
 		if err != nil {
 			return nil, err
 		}
@@ -409,7 +423,9 @@ func (cp *CRUDSPlace) UserGetPartial(
 
 // Update
 
-func (cp *CRUDSPlace) PutToUpdate(form schemas.PlacePut) (schemas.PlaceUpdate, error) {
+func (cp *CRUDSPlace) PutToUpdate(
+	ctx context.Context, form schemas.PlacePut,
+) (schemas.PlaceUpdate, error) {
 	location := schemas.Location{
 		Lat: float64(form.Location.Lat), Lng: float64(form.Location.Lng),
 	}
@@ -422,13 +438,13 @@ func (cp *CRUDSPlace) PutToUpdate(form schemas.PlacePut) (schemas.PlaceUpdate, e
 }
 
 func (cp *CRUDSPlace) AuthPut(
-	user schemas.UserRead, id uint, data schemas.PlacePut,
+	ctx context.Context, user schemas.UserRead, id uint, data schemas.PlacePut,
 ) error {
 	if user.IsAdmin {
 		return nil
 	}
 
-	exists, err := gorm_.Exists(cp, types_.WhereFilters{
+	exists, err := gorm_.Exists(ctx, cp, types_.WhereFilters{
 		"id": types_.EqFilters(id), "creatorId": types_.EqFilters(user.ID),
 	})
 	if err != nil {
@@ -457,37 +473,44 @@ func (cp *CRUDSPlace) AfterUpdate(
 	return nil
 }
 
-func (cp *CRUDSPlace) Update(id uint, data schemas.PlaceUpdate) error {
-	return gorm_.UpdateRecord(cp, id, data)
+func (cp *CRUDSPlace) Update(
+	ctx context.Context, id uint, data schemas.PlaceUpdate,
+) error {
+	return gorm_.UpdateRecord(ctx, cp, id, data)
 }
 
 func (cp *CRUDSPlace) Put(
-	id uint, form schemas.PlacePut, options *PlaceOptions,
+	ctx context.Context, id uint, form schemas.PlacePut, options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
 
-	err := gorm_.PutRecord(cp, id, form, nil)
+	err := gorm_.PutRecord(ctx, cp, id, form, nil)
 	if err != nil {
 		return zero, err
 	}
-	return cp.Get(id, options)
+	return cp.Get(ctx, id, options)
 }
 
 func (cp *CRUDSPlace) UserPut(
-	user schemas.UserRead, id uint, form schemas.PlacePut, options *PlaceOptions,
+	ctx context.Context,
+	user schemas.UserRead,
+	id uint,
+	form schemas.PlacePut,
+	options *PlaceOptions,
 ) (schemas.PlaceRead, error) {
 	var zero schemas.PlaceRead
 
-	err := gorm_.PutRecord(cp, id, form, &user)
+	err := gorm_.PutRecord(ctx, cp, id, form, &user)
 	if err != nil {
 		return zero, err
 	}
-	return cp.Get(id, options)
+	return cp.Get(ctx, id, options)
 }
 
-func (cp *CRUDSPlace) UpdateEmbedding(id uint, vector []float32) error {
+func (cp *CRUDSPlace) UpdateEmbedding(
+	ctx context.Context, id uint, vector []float32) error {
 	pgVector := pgvector.NewVector(vector)
-	return cp.Model.Where("id = ?", id).
+	return cp.GetModel(ctx).Where("id = ?", id).
 		Update("embedding", pgVector).
 		Error
 }
@@ -495,7 +518,7 @@ func (cp *CRUDSPlace) UpdateEmbedding(id uint, vector []float32) error {
 func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
 	// Fetch title and description
 	var place orm.Place
-	err := cp.Model.Select("title", "description").First(&place, id).Error
+	err := cp.GetModel(ctx).Select("title", "description").First(&place, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, types_.APIError{
@@ -525,7 +548,7 @@ func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
 	}
 
 	// Update embedding in database
-	if err := cp.UpdateEmbedding(id, vector); err != nil {
+	if err := cp.UpdateEmbedding(ctx, id, vector); err != nil {
 		return nil, types_.APIError{
 			Code:    http.StatusInternalServerError,
 			Message: "embedding failed",
@@ -541,12 +564,14 @@ func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
 
 // Delete
 
-func (cp *CRUDSPlace) AuthDelete(user schemas.UserRead, id uint) error {
+func (cp *CRUDSPlace) AuthDelete(
+	ctx context.Context, user schemas.UserRead, id uint,
+) error {
 	if user.IsAdmin {
 		return nil
 	}
 
-	exists, err := gorm_.Exists(cp, types_.WhereFilters{
+	exists, err := gorm_.Exists(ctx, cp, types_.WhereFilters{
 		"id": types_.EqFilters(id), "creatorId": types_.EqFilters(user.ID),
 	})
 	if err != nil {
@@ -583,52 +608,61 @@ func (cp *CRUDSPlace) AfterDelete(query *gorm.DB, model orm.Place) error {
 	return nil
 }
 
-func (cp *CRUDSPlace) Delete(id uint) error {
-	return gorm_.DeleteRecord(cp, id, nil)
+func (cp *CRUDSPlace) Delete(ctx context.Context, id uint) error {
+	return gorm_.DeleteRecord(ctx, cp, id, nil)
 }
 
-func (cp *CRUDSPlace) UserDelete(user schemas.UserRead, id uint) error {
-	return gorm_.DeleteRecord(cp, id, &user)
+func (cp *CRUDSPlace) UserDelete(
+	ctx context.Context, user schemas.UserRead, id uint,
+) error {
+	return gorm_.DeleteRecord(ctx, cp, id, &user)
 }
 
 // Search
 
-func (cp *CRUDSPlace) Search(query types_.SearchQuery) ([]schemas.PlaceRead, error) {
-	return gorm_.GetMany(cp, query, nil)
+func (cp *CRUDSPlace) Search(
+	ctx context.Context, query types_.SearchQuery,
+) ([]schemas.PlaceRead, error) {
+	return gorm_.GetMany(ctx, cp, query, nil)
 }
 
 func (cp *CRUDSPlace) UserSearch(
-	user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
 ) ([]schemas.PlaceRead, error) {
-	return gorm_.GetMany(cp, query, &user)
+	return gorm_.GetMany(ctx, cp, query, &user)
 }
 
-func (cp *CRUDSPlace) SearchPartial(query types_.SearchQuery) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(cp, query, nil)
+func (cp *CRUDSPlace) SearchPartial(
+	ctx context.Context, query types_.SearchQuery,
+) ([]map[string]any, error) {
+	return gorm_.GetManyPartial(ctx, cp, query, nil)
 }
 
 func (cp *CRUDSPlace) UserSearchPartial(
-	user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
 ) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(cp, query, &user)
+	return gorm_.GetManyPartial(ctx, cp, query, &user)
 }
 
 func (cp *CRUDSPlace) Paginate(
-	query types_.SearchQuery, options *PlaceOptions,
+	ctx context.Context, query types_.SearchQuery, options *PlaceOptions,
 ) (types_.PaginatedDict, error) {
 	process := false
 	if options != nil {
 		process = options.Process
 	}
-	return gorm_.Paginate(cp, query, nil, process, MaxPlaceConcurentProcessing)
+	return gorm_.Paginate(ctx, cp, query, nil, process, MaxPlaceConcurentProcessing)
 }
 
 func (cp *CRUDSPlace) UserPaginate(
-	user schemas.UserRead, query types_.SearchQuery, options *PlaceOptions,
+	ctx context.Context,
+	user schemas.UserRead,
+	query types_.SearchQuery,
+	options *PlaceOptions,
 ) (types_.PaginatedDict, error) {
 	process := false
 	if options != nil {
 		process = options.Process
 	}
-	return gorm_.Paginate(cp, query, &user, process, MaxPlaceConcurentProcessing)
+	return gorm_.Paginate(ctx, cp, query, &user, process, MaxPlaceConcurentProcessing)
 }

@@ -8,6 +8,7 @@ import (
 	"backend/internal/services/setup"
 	"backend/internal/static"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,7 +29,7 @@ func getPlaceExamples() ([]schemas.PlaceRead, error) {
 			"title": {{Op: "eq", Val: "Stamford Bridge"}},
 		},
 	}
-	data, err := cp.Search(searchQuery)
+	data, err := cp.Search(context.Background(), searchQuery)
 	if err != nil {
 		return []schemas.PlaceRead{}, errors.New(
 			"could not extract examples for testing places endpoints",
