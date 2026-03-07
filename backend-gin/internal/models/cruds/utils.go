@@ -5,13 +5,14 @@ package cruds
 
 import (
 	"backend/internal/models/orm"
+	"context"
 
 	"gorm.io/gorm"
 )
 
-func UserExists(db *gorm.DB, id int) (bool, error) {
+func UserExists(ctx context.Context, db *gorm.DB, id int) (bool, error) {
 	var count int64
-	err := db.Model(&orm.User{}).
+	err := db.Model(&orm.User{}).WithContext(ctx).
 		Where("id = ?", id).
 		Limit(1).
 		Count(&count).
