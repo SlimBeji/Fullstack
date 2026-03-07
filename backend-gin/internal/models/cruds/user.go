@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 
 	"gorm.io/gorm"
 )
@@ -31,6 +32,11 @@ type CRUDSUser struct {
 	defaultSelect   []string
 	defaultOrderBy  []string
 }
+
+var (
+	crudsUserOnce sync.Once
+	crudsUser     *CRUDSUser
+)
 
 // Constructor, Properties & Helpers
 
@@ -53,6 +59,13 @@ func NewCRUDSUser() *CRUDSUser {
 			string(schemas.UserSortCreatedAtDesc),
 		},
 	}
+}
+
+func GetCRUDSUser() *CRUDSUser {
+	crudsUserOnce.Do(func() {
+		crudsUser = NewCRUDSUser()
+	})
+	return crudsUser
 }
 
 func (cu *CRUDSUser) GetDB() *gorm.DB {

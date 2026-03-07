@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/pgvector/pgvector-go"
 	"gorm.io/gorm"
@@ -32,6 +33,11 @@ type CRUDSPlace struct {
 	defaultSelect   []string
 	defaultOrderBy  []string
 }
+
+var (
+	crudsPlaceOnce sync.Once
+	crudsPlace     *CRUDSPlace
+)
 
 // Constructor, Properties & Helpers
 
@@ -55,6 +61,13 @@ func NewCRUDSPlace() *CRUDSPlace {
 			string(schemas.PlaceSortCreatedAtDesc),
 		},
 	}
+}
+
+func GetCRUDSPlace() *CRUDSPlace {
+	crudsPlaceOnce.Do(func() {
+		crudsPlace = NewCRUDSPlace()
+	})
+	return crudsPlace
 }
 
 func (cp *CRUDSPlace) GetDB() *gorm.DB {
