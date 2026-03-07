@@ -4,6 +4,7 @@ import (
 	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
 	"backend/internal/services/setup"
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -17,7 +18,7 @@ const adminEmail = "mslimbeji@gmail.com"
 func getUser(email string) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.GetByEmail(email)
+	user, err := cu.GetByEmail(context.Background(), email)
 	if err != nil {
 		return zero, fmt.Errorf("Could not extract user %s", email)
 	}

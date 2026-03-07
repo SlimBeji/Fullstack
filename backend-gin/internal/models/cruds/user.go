@@ -68,12 +68,12 @@ func GetCRUDSUser() *CRUDSUser {
 	return crudsUser
 }
 
-func (cu *CRUDSUser) GetDB() *gorm.DB {
-	return cu.DB
+func (cu *CRUDSUser) GetDB(ctx context.Context) *gorm.DB {
+	return cu.DB.WithContext(ctx)
 }
 
-func (cu *CRUDSUser) GetModel() *gorm.DB {
-	return cu.Model
+func (cu *CRUDSUser) GetModel(ctx context.Context) *gorm.DB {
+	return cu.Model.WithContext(ctx)
 }
 
 func (cu *CRUDSUser) TableName() string {
@@ -119,7 +119,9 @@ func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
 	}
 }
 
-func (cu *CRUDSUser) PostProcess(read *schemas.UserRead) error {
+func (cu *CRUDSUser) PostProcess(
+	ctx context.Context, read *schemas.UserRead,
+) error {
 	if read.ImageURL == "" {
 		return nil
 	}
@@ -134,7 +136,9 @@ func (cu *CRUDSUser) PostProcess(read *schemas.UserRead) error {
 	return nil
 }
 
-func (cu *CRUDSUser) PostProcessPartial(partial map[string]any) error {
+func (cu *CRUDSUser) PostProcessPartial(
+	ctx context.Context, partial map[string]any,
+) error {
 	imageURL, exists := partial["imageUrl"]
 	if !exists {
 		return nil
@@ -177,8 +181,10 @@ func (cu *CRUDSUser) MapWhere(field string) string {
 	return cu.TableName() + "." + utils.CamelToSnake(field)
 }
 
-func (cu *CRUDSUser) BuildQuery(query types_.SearchQuery) (*gorm.DB, error) {
-	return gorm_.BuildSelectQuery(cu, query)
+func (cu *CRUDSUser) BuildQuery(
+	ctx context.Context, query types_.SearchQuery,
+) (*gorm.DB, error) {
+	return gorm_.BuildSelectQuery(ctx, cu, query)
 }
 
 // Create
@@ -194,13 +200,12 @@ func (cu *CRUDSUser) ToModel(data schemas.UserCreate) orm.User {
 }
 
 func (cu *CRUDSUser) PostToCreate(
-	data schemas.UserPost,
+	ctx context.Context, data schemas.UserPost,
 ) (schemas.UserCreate, error) {
 	var zero schemas.UserCreate
 	var err error
 	imageURL := ""
 	if data.Image != nil {
-		ctx := context.Background()
 		storage := instances.GetStorage()
 		imageURL, err = storage.UploadFile(ctx, data.Image, "")
 		if err != nil {
@@ -225,7 +230,7 @@ func (cu *CRUDSUser) AfterCreate(tx *gorm.DB, id uint, data schemas.UserCreate) 
 }
 
 func (cu *CRUDSUser) AuthPost(
-	user schemas.UserRead, data schemas.UserPost,
+	ctx context.Context, user schemas.UserRead, data schemas.UserPost,
 ) error {
 	if user.IsAdmin {
 		return nil
@@ -237,41 +242,46 @@ func (cu *CRUDSUser) AuthPost(
 	}
 }
 
-func (cu *CRUDSUser) Create(data schemas.UserCreate) (uint, error) {
+func (cu *CRUDSUser) Create(
+	ctx context.Context, data schemas.UserCreate,
+) (uint, error) {
 	hashed, err := utils.HashInput(data.Password, config.Env.DefaultHashSalt)
 	if err != nil {
 		return 0, err
 	}
 	data.Password = hashed
-	return gorm_.CreateRecord(cu, data)
+	return gorm_.CreateRecord(ctx, cu, data)
 }
 
 func (cu *CRUDSUser) Post(
-	form schemas.UserPost, options *UserOptions,
+	ctx context.Context, form schemas.UserPost, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
-	createdId, err := gorm_.PostRecord(cu, form, nil)
+	createdId, err := gorm_.PostRecord(ctx, cu, form, nil)
 	if err != nil {
 		return zero, err
 	}
-	return cu.Get(createdId, options)
+	return cu.Get(ctx, createdId, options)
 }
 
 func (cu *CRUDSUser) UserPost(
-	user schemas.UserRead, form schemas.UserPost, options *UserOptions,
+	ctx context.Context,
+	user schemas.UserRead,
+	form schemas.UserPost,
+	options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
-	createdId, err := gorm_.PostRecord(cu, form, &user)
+	createdId, err := gorm_.PostRecord(ctx, cu, form, &user)
 	if err != nil {
 		return zero, err
 	}
-	return cu.Get(createdId, options)
+	return cu.Get(ctx, createdId, options)
 }
 
 // Read
 
 func (cu *CRUDSUser) AuthGet(
-	user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
 ) types_.SearchQuery {
 	// User can only access their own profile in secure mode
 	if query.Where == nil {
@@ -281,12 +291,12 @@ func (cu *CRUDSUser) AuthGet(
 	return query
 }
 
-func (cu *CRUDSUser) Read(id uint) (*orm.User, error) {
-	return gorm_.Read(cu, id)
+func (cu *CRUDSUser) Read(ctx context.Context, id uint) (*orm.User, error) {
+	return gorm_.Read(ctx, cu, id)
 }
 
 func (cu *CRUDSUser) Get(
-	id uint, options *UserOptions,
+	ctx context.Context, id uint, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
@@ -294,13 +304,13 @@ func (cu *CRUDSUser) Get(
 		options = &UserOptions{}
 	}
 
-	result, err := gorm_.Get(cu, id, nil)
+	result, err := gorm_.Get(ctx, cu, id, nil)
 	if err != nil {
 		return zero, err
 	}
 
 	if options.Process {
-		err = cu.PostProcess(&result)
+		err = cu.PostProcess(ctx, &result)
 		if err != nil {
 			return zero, err
 		}
@@ -310,7 +320,7 @@ func (cu *CRUDSUser) Get(
 }
 
 func (cu *CRUDSUser) UserGet(
-	user *schemas.UserRead, id uint, options *UserOptions,
+	ctx context.Context, user *schemas.UserRead, id uint, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
@@ -318,13 +328,13 @@ func (cu *CRUDSUser) UserGet(
 		options = &UserOptions{}
 	}
 
-	result, err := gorm_.Get(cu, id, user)
+	result, err := gorm_.Get(ctx, cu, id, user)
 	if err != nil {
 		return zero, err
 	}
 
 	if options.Process {
-		err = cu.PostProcess(&result)
+		err = cu.PostProcess(ctx, &result)
 		if err != nil {
 			return zero, err
 		}
@@ -334,7 +344,7 @@ func (cu *CRUDSUser) UserGet(
 }
 
 func (cu *CRUDSUser) GetPartial(
-	id uint, options *UserOptions,
+	ctx context.Context, id uint, options *UserOptions,
 ) (map[string]any, error) {
 	if options == nil {
 		options = &UserOptions{}
@@ -345,13 +355,13 @@ func (cu *CRUDSUser) GetPartial(
 		fields = cu.DefaultSelect()
 	}
 
-	result, err := gorm_.GetPartial(cu, id, fields, nil)
+	result, err := gorm_.GetPartial(ctx, cu, id, fields, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	if options.Process {
-		err = cu.PostProcessPartial(result)
+		err = cu.PostProcessPartial(ctx, result)
 		if err != nil {
 			return nil, err
 		}
@@ -361,7 +371,7 @@ func (cu *CRUDSUser) GetPartial(
 }
 
 func (cu *CRUDSUser) UserGetPartial(
-	user *schemas.UserRead, id uint, options *UserOptions,
+	ctx context.Context, user *schemas.UserRead, id uint, options *UserOptions,
 ) (map[string]any, error) {
 	if options == nil {
 		options = &UserOptions{}
@@ -372,13 +382,13 @@ func (cu *CRUDSUser) UserGetPartial(
 		fields = cu.DefaultSelect()
 	}
 
-	result, err := gorm_.GetPartial(cu, id, fields, user)
+	result, err := gorm_.GetPartial(ctx, cu, id, fields, user)
 	if err != nil {
 		return nil, err
 	}
 
 	if options.Process {
-		err = cu.PostProcessPartial(result)
+		err = cu.PostProcessPartial(ctx, result)
 		if err != nil {
 			return nil, err
 		}
@@ -387,10 +397,12 @@ func (cu *CRUDSUser) UserGetPartial(
 	return result, nil
 }
 
-func (cu *CRUDSUser) CheckDuplicate(email string, name string) (string, error) {
+func (cu *CRUDSUser) CheckDuplicate(
+	ctx context.Context, email string, name string,
+) (string, error) {
 	var messages []string
 
-	emailExists, err := gorm_.Exists(cu, types_.WhereFilters{
+	emailExists, err := gorm_.Exists(ctx, cu, types_.WhereFilters{
 		"email": types_.EqFilters(email),
 	})
 	if err != nil {
@@ -400,7 +412,7 @@ func (cu *CRUDSUser) CheckDuplicate(email string, name string) (string, error) {
 		messages = append(messages, fmt.Sprintf("email %s already in use.", email))
 	}
 
-	nameExists, err := gorm_.Exists(cu, types_.WhereFilters{
+	nameExists, err := gorm_.Exists(ctx, cu, types_.WhereFilters{
 		"name": types_.EqFilters(name),
 	})
 	if err != nil {
@@ -413,7 +425,9 @@ func (cu *CRUDSUser) CheckDuplicate(email string, name string) (string, error) {
 	return strings.Join(messages, " "), nil
 }
 
-func (cu *CRUDSUser) GetByEmail(email string) (schemas.UserRead, error) {
+func (cu *CRUDSUser) GetByEmail(
+	ctx context.Context, email string,
+) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
 	query := types_.SearchQuery{
@@ -423,7 +437,7 @@ func (cu *CRUDSUser) GetByEmail(email string) (schemas.UserRead, error) {
 		},
 	}
 
-	qb, err := gorm_.BuildSelectQuery(cu, query)
+	qb, err := gorm_.BuildSelectQuery(ctx, cu, query)
 	if err != nil {
 		return zero, err
 	}
@@ -446,7 +460,9 @@ func (cu *CRUDSUser) GetByEmail(email string) (schemas.UserRead, error) {
 
 // Update
 
-func (cu *CRUDSUser) PutToUpdate(form schemas.UserPut) (schemas.UserUpdate, error) {
+func (cu *CRUDSUser) PutToUpdate(
+	ctx context.Context, form schemas.UserPut,
+) (schemas.UserUpdate, error) {
 	return schemas.UserUpdate{
 		Name:     form.Name,
 		Email:    form.Email,
@@ -455,7 +471,7 @@ func (cu *CRUDSUser) PutToUpdate(form schemas.UserPut) (schemas.UserUpdate, erro
 }
 
 func (cu *CRUDSUser) AuthPut(
-	user schemas.UserRead, id uint, data schemas.UserPut,
+	ctx context.Context, user schemas.UserRead, id uint, data schemas.UserPut,
 ) error {
 	if user.IsAdmin {
 		return nil
@@ -482,37 +498,45 @@ func (cu *CRUDSUser) AfterUpdate(
 	return nil
 }
 
-func (cu *CRUDSUser) Update(id uint, data schemas.UserUpdate) error {
-	return gorm_.UpdateRecord(cu, id, data)
+func (cu *CRUDSUser) Update(
+	ctx context.Context, id uint, data schemas.UserUpdate,
+) error {
+	return gorm_.UpdateRecord(ctx, cu, id, data)
 }
 
 func (cu *CRUDSUser) Put(
-	id uint, form schemas.UserPut, options *UserOptions,
+	ctx context.Context, id uint, form schemas.UserPut, options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
-	err := gorm_.PutRecord(cu, id, form, nil)
+	err := gorm_.PutRecord(ctx, cu, id, form, nil)
 	if err != nil {
 		return zero, err
 	}
-	return cu.Get(id, options)
+	return cu.Get(ctx, id, options)
 }
 
 func (cu *CRUDSUser) UserPut(
-	user schemas.UserRead, id uint, form schemas.UserPut, options *UserOptions,
+	ctx context.Context,
+	user schemas.UserRead,
+	id uint,
+	form schemas.UserPut,
+	options *UserOptions,
 ) (schemas.UserRead, error) {
 	var zero schemas.UserRead
 
-	err := gorm_.PutRecord(cu, id, form, &user)
+	err := gorm_.PutRecord(ctx, cu, id, form, &user)
 	if err != nil {
 		return zero, err
 	}
-	return cu.Get(id, options)
+	return cu.Get(ctx, id, options)
 }
 
 // Delete
 
-func (cu *CRUDSUser) AuthDelete(user schemas.UserRead, id uint) error {
+func (cu *CRUDSUser) AuthDelete(
+	ctx context.Context, user schemas.UserRead, id uint,
+) error {
 	if user.IsAdmin {
 		return nil
 	}
@@ -543,60 +567,71 @@ func (cu *CRUDSUser) AfterDelete(query *gorm.DB, model orm.User) error {
 	return nil
 }
 
-func (cu *CRUDSUser) Delete(id uint) error {
-	return gorm_.DeleteRecord(cu, id, nil)
+func (cu *CRUDSUser) Delete(ctx context.Context, id uint) error {
+	return gorm_.DeleteRecord(ctx, cu, id, nil)
 }
 
-func (cu *CRUDSUser) UserDelete(user schemas.UserRead, id uint) error {
-	return gorm_.DeleteRecord(cu, id, &user)
+func (cu *CRUDSUser) UserDelete(
+	ctx context.Context, user schemas.UserRead, id uint,
+) error {
+	return gorm_.DeleteRecord(ctx, cu, id, &user)
 }
 
 // Search
 
-func (cu *CRUDSUser) Search(query types_.SearchQuery) ([]schemas.UserRead, error) {
-	return gorm_.GetMany(cu, query, nil)
+func (cu *CRUDSUser) Search(
+	ctx context.Context, query types_.SearchQuery,
+) ([]schemas.UserRead, error) {
+	return gorm_.GetMany(ctx, cu, query, nil)
 }
 
 func (cu *CRUDSUser) UserSearch(
-	user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
 ) ([]schemas.UserRead, error) {
-	return gorm_.GetMany(cu, query, &user)
+	return gorm_.GetMany(ctx, cu, query, &user)
 }
 
-func (cu *CRUDSUser) SearchPartial(query types_.SearchQuery) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(cu, query, nil)
+func (cu *CRUDSUser) SearchPartial(
+	ctx context.Context, query types_.SearchQuery,
+) ([]map[string]any, error) {
+	return gorm_.GetManyPartial(ctx, cu, query, nil)
 }
 
 func (cu *CRUDSUser) UserSearchPartial(
-	user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
 ) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(cu, query, &user)
+	return gorm_.GetManyPartial(ctx, cu, query, &user)
 }
 
 func (cu *CRUDSUser) Paginate(
-	query types_.SearchQuery, options *UserOptions,
+	ctx context.Context, query types_.SearchQuery, options *UserOptions,
 ) (types_.PaginatedDict, error) {
 	process := false
 	if options != nil {
 		process = options.Process
 	}
-	return gorm_.Paginate(cu, query, nil, process, MaxUserConcurentProcessing)
+	return gorm_.Paginate(ctx, cu, query, nil, process, MaxUserConcurentProcessing)
 }
 
 func (cu *CRUDSUser) UserPaginate(
-	user schemas.UserRead, query types_.SearchQuery, options *UserOptions,
+	ctx context.Context,
+	user schemas.UserRead,
+	query types_.SearchQuery,
+	options *UserOptions,
 ) (types_.PaginatedDict, error) {
 	process := false
 	if options != nil {
 		process = options.Process
 	}
-	return gorm_.Paginate(cu, query, &user, process, MaxUserConcurentProcessing)
+	return gorm_.Paginate(ctx, cu, query, &user, process, MaxUserConcurentProcessing)
 }
 
 // Auth
 
-func (cu *CRUDSUser) GetBearer(email string) (string, error) {
-	user, err := cu.GetByEmail(email)
+func (cu *CRUDSUser) GetBearer(
+	ctx context.Context, email string,
+) (string, error) {
+	user, err := cu.GetByEmail(ctx, email)
 	if err != nil {
 		var apiErr types_.APIError
 		if errors.As(err, &apiErr) && apiErr.Code == http.StatusNotFound {
@@ -617,12 +652,12 @@ func (cu *CRUDSUser) GetBearer(email string) (string, error) {
 }
 
 func (cu *CRUDSUser) Signup(
-	form schemas.SignupForm,
+	ctx context.Context, form schemas.SignupForm,
 ) (schemas.EncodedToken, error) {
 	var zero schemas.EncodedToken
 
 	// Check for duplicates
-	duplicateMsg, err := cu.CheckDuplicate(form.Email, form.Name)
+	duplicateMsg, err := cu.CheckDuplicate(ctx, form.Email, form.Name)
 	if err != nil {
 		return zero, err
 	}
@@ -641,13 +676,13 @@ func (cu *CRUDSUser) Signup(
 		Image:    form.Image,
 		IsAdmin:  false,
 	}
-	createForm, err := cu.PostToCreate(postForm)
+	createForm, err := cu.PostToCreate(ctx, postForm)
 	if err != nil {
 		return zero, err
 	}
 
 	// Create new user
-	id, err := cu.Create(createForm)
+	id, err := cu.Create(ctx, createForm)
 	if err != nil {
 		return zero, err
 	}
@@ -662,7 +697,7 @@ func (cu *CRUDSUser) Signup(
 }
 
 func (cu *CRUDSUser) Signin(
-	form schemas.SigninForm,
+	ctx context.Context, form schemas.SigninForm,
 ) (schemas.EncodedToken, error) {
 	var zero schemas.EncodedToken
 
@@ -673,7 +708,7 @@ func (cu *CRUDSUser) Signin(
 
 	// Fetch user by email (username field)
 	var user orm.User
-	err := cu.Model.
+	err := cu.GetModel(ctx).
 		Select("id", "email", "password").
 		Where("email = ?", form.Username).
 		First(&user).Error

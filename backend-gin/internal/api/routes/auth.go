@@ -20,7 +20,7 @@ import (
 func signup(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.SignupForm](c)
 	cu := cruds.GetCRUDSUser()
-	resp, err := cu.Signup(body)
+	resp, err := cu.Signup(c, body)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -38,7 +38,7 @@ func signup(c *gin.Context) {
 func signin(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.SigninForm](c)
 	cu := cruds.GetCRUDSUser()
-	resp, err := cu.Signin(body)
+	resp, err := cu.Signin(c, body)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return

@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetUserFromToken(token string) (schemas.UserRead, error) {
+func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 	badToken := types_.APIError{
 		Code:    http.StatusUnauthorized,
 		Message: "Token Not Valid",
@@ -44,7 +44,7 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.Get(userId, nil)
+	user, err := cu.Get(c, userId, nil)
 	if err != nil {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,
@@ -85,7 +85,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 			return
 		}
 		authtoken := match[1]
-		user, err := GetUserFromToken(authtoken)
+		user, err := GetUserFromToken(c, authtoken)
 		if err != nil {
 			gin_.AbortWithStatusJSON(c, err)
 			return

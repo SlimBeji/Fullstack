@@ -22,7 +22,7 @@ import (
 func getUsers(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
 	cu := cruds.GetCRUDSUser()
-	data, err := cu.Paginate(searchQuery, &cruds.UserOptions{Process: true})
+	data, err := cu.Paginate(c, searchQuery, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -41,7 +41,7 @@ func getUsers(c *gin.Context) {
 func searchUsers(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
 	cu := cruds.GetCRUDSUser()
-	data, err := cu.Paginate(searchQuery, &cruds.UserOptions{Process: true})
+	data, err := cu.Paginate(c, searchQuery, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -63,7 +63,7 @@ func createUser(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.UserPost](c)
 
 	cu := cruds.GetCRUDSUser()
-	newUser, err := cu.UserPost(currentUser, body, &cruds.UserOptions{Process: true})
+	newUser, err := cu.UserPost(c, currentUser, body, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -87,7 +87,7 @@ func getUser(c *gin.Context) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.Get(userId, &cruds.UserOptions{Process: true})
+	user, err := cu.Get(c, userId, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -115,7 +115,7 @@ func updateUser(c *gin.Context) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.UserPut(currentUser, userId, body, &cruds.UserOptions{Process: true})
+	user, err := cu.UserPut(c, currentUser, userId, body, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -145,7 +145,7 @@ func deleteUser(c *gin.Context) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	err = cu.UserDelete(currentUser, userId)
+	err = cu.UserDelete(c, currentUser, userId)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
