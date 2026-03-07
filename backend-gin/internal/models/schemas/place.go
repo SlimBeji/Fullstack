@@ -104,7 +104,7 @@ type PlaceSeed struct {
 	Description string
 	Address     string
 	Location    Location
-	Embedding   []float64
+	Embedding   []float32
 	ImageURL    string
 }
 
@@ -115,7 +115,7 @@ type PlaceCreate struct {
 	Description string    `json:"description" validate:"min=10" `
 	Address     string    `json:"address" validate:"min=1" `
 	Location    Location  `json:"location" `
-	Embedding   []float64 `json:"embedding" validate:"len=0|len=384" `
+	Embedding   []float32 `json:"embedding" validate:"len=0|len=384" `
 	ImageURL    string    `json:"imageUrl" validate:"omitempty" `
 	CreatorID   uint      `json:"creatorId" `
 }
