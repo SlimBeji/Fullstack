@@ -1,6 +1,6 @@
 # Dev commands
 fix-permission:
-	sudo chown -R $$USER:$$USER --exclude='./pgsql' ./
+	sudo find . ! -path './pgsql/*' -exec chown $$USER:$$USER {} +
 
 # Docker commands
 run:
