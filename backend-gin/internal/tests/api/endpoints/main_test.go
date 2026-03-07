@@ -1,10 +1,9 @@
 package endpoints
 
 import (
-	"backend/internal/models/collections"
+	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
 	"backend/internal/services/setup"
-	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -15,24 +14,29 @@ import (
 const userEmail = "beji.slim@yahoo.fr"
 const adminEmail = "mslimbeji@gmail.com"
 
-func getToken(email string) (schemas.EncodedToken, error) {
-	var zero schemas.EncodedToken
-	uc := collections.GetUserCollection()
-	token, err := uc.GetTokenPayload(email, context.Background())
-	if err != nil {
-		return zero, fmt.Errorf("Could not extract token for user %s", userEmail)
-	}
-	return token, nil
-}
-
 func getUser(email string) (schemas.UserRead, error) {
 	var zero schemas.UserRead
-	uc := collections.GetUserCollection()
-	user, err := uc.GetByEmail(email, context.Background())
+	cu := cruds.GetCRUDSUser()
+	user, err := cu.GetByEmail(email)
 	if err != nil {
 		return zero, fmt.Errorf("Could not extract user %s", email)
 	}
 	return user, nil
+}
+
+func getToken(email string) (schemas.EncodedToken, error) {
+	var zero schemas.EncodedToken
+
+	user, err := getUser(email)
+	if err != nil {
+		return zero, err
+	}
+
+	token, err := schemas.CreateToken(user.ID, email)
+	if err != nil {
+		return zero, fmt.Errorf("Could not extract token for user %s", userEmail)
+	}
+	return token, nil
 }
 
 func TestMain(m *testing.M) {

@@ -242,7 +242,7 @@ func TestGetUserById(t *testing.T) {
 	}
 
 	// sending the request
-	url := fmt.Sprintf("/api/users/%s", token.UserId)
+	url := fmt.Sprintf("/api/users/%d", token.UserId)
 	req := httptest.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -287,7 +287,7 @@ func TestUpdateUser(t *testing.T) {
 		t.Fatal("could not marshal data for TestUpdateUser")
 	}
 	formReader := bytes.NewReader(body)
-	url := fmt.Sprintf("/api/users/%s", token.UserId)
+	url := fmt.Sprintf("/api/users/%d", token.UserId)
 	req := httptest.NewRequest(http.MethodPut, url, formReader)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -362,7 +362,7 @@ func TestDeleteUserAsAdmin(t *testing.T) {
 	}
 
 	// sending the request
-	url := fmt.Sprintf("/api/users/%s", token.UserId)
+	url := fmt.Sprintf("/api/users/%d", token.UserId)
 	req := httptest.NewRequest(http.MethodDelete, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
@@ -382,7 +382,7 @@ func TestDeleteUserAsAdmin(t *testing.T) {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 
-	expected := fmt.Sprintf("Deleted user %s", token.UserId)
+	expected := fmt.Sprintf("Deleted user %d", token.UserId)
 	if resp.Message != expected {
 		t.Fatalf("expected %s, got %s", expected, resp.Message)
 	}
@@ -398,7 +398,7 @@ func TestDeleteUserAsNonAdmin(t *testing.T) {
 	}
 
 	// sending the request
-	url := fmt.Sprintf("/api/users/%s", token.UserId)
+	url := fmt.Sprintf("/api/users/%d", token.UserId)
 	req := httptest.NewRequest(http.MethodDelete, url, nil)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()

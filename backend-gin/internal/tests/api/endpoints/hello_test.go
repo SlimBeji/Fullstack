@@ -2,9 +2,8 @@ package endpoints
 
 import (
 	"backend/internal/api/routes"
-	"backend/internal/models/collections"
+	"backend/internal/models/cruds"
 	"backend/internal/services/setup"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -47,8 +46,9 @@ func TestHelloUser(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	setup.SeedTestData()
-	uc := collections.GetUserCollection()
-	token, err := uc.GetBearer("mslimbeji@gmail.com", context.Background())
+
+	cu := cruds.GetCRUDSUser()
+	token, err := cu.GetBearer("mslimbeji@gmail.com")
 	if err != nil {
 		t.Fatalf("Could not get bearer token for user mslimbeji@gmail.com")
 	}
@@ -84,8 +84,8 @@ func TestHelloAdmin(t *testing.T) {
 	// setup
 	router := routes.SetupRouter()
 	setup.SeedTestData()
-	uc := collections.GetUserCollection()
-	token, err := uc.GetBearer("mslimbeji@gmail.com", context.Background())
+	cu := cruds.GetCRUDSUser()
+	token, err := cu.GetBearer("mslimbeji@gmail.com")
 	if err != nil {
 		t.Fatalf("Could not get bearer token for user mslimbeji@gmail.com")
 	}
