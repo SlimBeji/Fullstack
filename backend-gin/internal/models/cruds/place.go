@@ -18,6 +18,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const MaxPlaceConcurentProcessing = 50
+
 type PlaceOptions struct {
 	Fields  []string
 	Process bool
@@ -596,4 +598,24 @@ func (cp *CRUDSPlace) UserSearchPartial(
 	user schemas.UserRead, query types_.SearchQuery,
 ) ([]map[string]any, error) {
 	return gorm_.GetManyPartial(cp, query, &user)
+}
+
+func (cp *CRUDSPlace) Paginate(
+	query types_.SearchQuery, options *PlaceOptions,
+) (types_.PaginatedDict, error) {
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.Paginate(cp, query, nil, process, MaxPlaceConcurentProcessing)
+}
+
+func (cp *CRUDSPlace) UserPaginate(
+	user schemas.UserRead, query types_.SearchQuery, options *PlaceOptions,
+) (types_.PaginatedDict, error) {
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.Paginate(cp, query, &user, process, MaxPlaceConcurentProcessing)
 }

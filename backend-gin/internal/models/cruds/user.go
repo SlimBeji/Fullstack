@@ -17,6 +17,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const MaxUserConcurentProcessing = 50
+
 type UserOptions struct {
 	Fields  []string
 	Process bool
@@ -556,4 +558,24 @@ func (cu *CRUDSUser) UserSearchPartial(
 	user schemas.UserRead, query types_.SearchQuery,
 ) ([]map[string]any, error) {
 	return gorm_.GetManyPartial(cu, query, &user)
+}
+
+func (cu *CRUDSUser) Paginate(
+	query types_.SearchQuery, options *UserOptions,
+) (types_.PaginatedDict, error) {
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.Paginate(cu, query, nil, process, MaxUserConcurentProcessing)
+}
+
+func (cu *CRUDSUser) UserPaginate(
+	user schemas.UserRead, query types_.SearchQuery, options *UserOptions,
+) (types_.PaginatedDict, error) {
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.Paginate(cu, query, &user, process, MaxUserConcurentProcessing)
 }
