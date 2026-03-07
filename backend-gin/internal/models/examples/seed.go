@@ -1,9 +1,8 @@
 package examples
 
 import (
-	"backend/internal/lib/clients"
-	"backend/internal/models/collections"
-	"backend/internal/models/crud"
+	"backend/internal/models/cruds"
+	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
 	"context"
@@ -11,37 +10,15 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/jinzhu/copier"
-	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/sync/errgroup"
 )
 
-func createCollections(mc *clients.MongoClient, isVerbose bool) error {
-	var eg errgroup.Group
-
-	for _, collection := range collections.AllCollections {
-		name := string(collection)
-		eg.Go(func() error {
-			if err := mc.CreateCollection(name); err != nil {
-				if isVerbose {
-					fmt.Printf(
-						"could not create collection %s: %s", name, err.Error(),
-					)
-				}
-				return fmt.Errorf(
-					"could not create collection %s: %w", name, err,
-				)
-			}
-			return nil
-		})
-	}
-	return eg.Wait()
-}
+type RefMappings map[orm.Model]map[int]uint
 
 func seedUsers(refs RefMappings, isVerbose bool) error {
 	userRefs := make(map[int]uint)
-	refs[collections.Users] = userRefs
-	uc := collections.GetUserCollection()
+	refs[orm.ModelUser] = userRefs
+	cu := cruds.GetCRUDSUser()
 	storage := instances.GetStorage()
 	ctx := context.Background()
 
@@ -59,9 +36,11 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 	for _, userEx := range Users {
 		example := userEx // capture loop variable
 		eg.Go(func() error {
-			var userIn schemas.UserCreate
-			if err := copier.Copy(&userIn, &example); err != nil {
-				return handleError(err, isVerbose)
+			userIn := schemas.UserCreate{
+				Name:     userEx.Name,
+				Email:    userEx.Email,
+				IsAdmin:  userEx.IsAdmin,
+				Password: userEx.Password,
 			}
 
 			url, err := storage.UploadFile(ctx, userIn.ImageURL, "")
@@ -70,13 +49,13 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 			}
 			userIn.ImageURL = url
 
-			raw, err := crud.InsertExample(uc, &userIn, ctx)
+			insertedId, err := cu.Create(userIn)
 			if err != nil {
 				return handleError(err, isVerbose)
 			}
 
 			mu.Lock()
-			userRefs[example.Ref] = raw.InsertedID.(uint)
+			userRefs[example.Ref] = insertedId
 			mu.Unlock()
 			return nil
 		})
@@ -87,9 +66,8 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 
 func seedPlaces(refs RefMappings, isVerbose bool) error {
 	placeRefs := make(map[int]uint)
-	refs[collections.Places] = placeRefs
-	uc := collections.GetUserCollection()
-	pc := collections.GetPlaceCollection()
+	refs[orm.ModelPlace] = placeRefs
+	cp := cruds.GetCRUDSPlace()
 	storage := instances.GetStorage()
 	ctx := context.Background()
 
@@ -107,9 +85,11 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 	for _, placeEx := range Places {
 		example := placeEx // capture loop variable
 		eg.Go(func() error {
-			var placeIn schemas.PlaceCreate
-			if err := copier.Copy(&placeIn, &example); err != nil {
-				return handleError(err, isVerbose)
+			placeIn := schemas.PlaceCreate{
+				Title:       placeEx.Title,
+				Description: placeEx.Description,
+				Address:     placeEx.Address,
+				Location:    placeEx.Location,
 			}
 
 			url, err := storage.UploadFile(ctx, placeIn.ImageURL, "")
@@ -118,7 +98,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 			}
 			placeIn.ImageURL = url
 
-			creatorId, found := refs[collections.Users][placeEx.CreatorRef]
+			creatorId, found := refs[orm.ModelUser][placeEx.CreatorRef]
 			if !found {
 				message := fmt.Sprintf(
 					"examples corrrupted, could not find user with ref %d while creating place with ref %d",
@@ -132,17 +112,9 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 			}
 			placeIn.CreatorID = creatorId
 
-			raw, err := crud.InsertExample(pc, &placeIn, ctx)
+			insertedId, err := cp.Seed(placeIn, placeEx.Embedding)
 			if err != nil {
 				return handleError(err, isVerbose)
-			}
-
-			insertedId := raw.InsertedID.(uint)
-			update := bson.M{"$addToSet": bson.M{"places": insertedId}}
-			userFilter := bson.M{"_id": creatorId}
-			_, err = uc.FindOneAndUpdate(ctx, userFilter, update).Raw()
-			if err != nil {
-				handleError(err, isVerbose)
 			}
 
 			mu.Lock()
@@ -155,22 +127,12 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 	return eg.Wait()
 }
 
-type RefMappings map[collections.CollectionName]map[int]uint
-
 func SeedDb(verbose ...bool) error {
-	mc := instances.GetMongo()
 	refs := make(RefMappings)
 
 	isVerbose := false
 	if len(verbose) > 0 {
 		isVerbose = verbose[0]
-	}
-
-	if err := createCollections(mc, isVerbose); err != nil {
-		if isVerbose {
-			fmt.Println(err.Error())
-		}
-		return err
 	}
 
 	if err := seedUsers(refs, isVerbose); err != nil {
@@ -205,27 +167,27 @@ func DumpDb(verbose ...bool) error {
 	}
 
 	ctx := context.Background()
-	mc := instances.GetMongo()
-	collections, err := mc.ListCollections()
+	pgClient := instances.GetPgClient()
+
+	// Reset places table
+	err := pgClient.ResetTable(ctx, string(orm.TablePlaces))
 	if err != nil {
-		message := "could not extract list of collecions"
+		message := fmt.Sprintf("could not reset table %s", orm.TablePlaces)
 		if isVerbose {
 			fmt.Println(message)
 		}
-		return errors.New(message)
+	} else if isVerbose {
+		fmt.Printf("✅ Table %s cleared!\n", orm.TablePlaces)
 	}
 
-	for _, name := range collections {
-		err := mc.DropCollection(name)
-		if err != nil {
-			message := fmt.Sprintf("could not delete collection %s", name)
-			if isVerbose {
-				fmt.Println(message)
-			}
-			return errors.New(message)
-		} else if isVerbose {
-			fmt.Printf("✅ Collection %s cleared!\n", name)
+	err = pgClient.ResetTable(ctx, string(orm.TableUsers))
+	if err != nil {
+		message := fmt.Sprintf("could not reset table %s", orm.TableUsers)
+		if isVerbose {
+			fmt.Println(message)
 		}
+	} else if isVerbose {
+		fmt.Printf("✅ Table %s cleared!\n", orm.TableUsers)
 	}
 
 	rc := instances.GetRedisClient()
