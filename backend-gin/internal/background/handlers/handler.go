@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	"backend/internal/background"
+	"backend/internal/background/bgconfig"
 	"backend/internal/config"
 	"backend/internal/lib/clients"
 	"sync"
 )
 
 var TASKS_REGISTERY = clients.TasksRegistryType{
-	background.TaskNewsletter:     HandleSendingNewsletter,
-	background.TaskPlaceEmbedding: HandlePlaceEmbedding,
+	bgconfig.TaskNewsletter:     HandleSendingNewsletter,
+	bgconfig.TaskPlaceEmbedding: HandlePlaceEmbedding,
 }
 
 var (

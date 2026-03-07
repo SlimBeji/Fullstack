@@ -1,38 +1,26 @@
 package handlers
 
 import (
-	"backend/internal/background"
-	"backend/internal/models/collections"
-	"backend/internal/services/instances"
+	"backend/internal/background/bgconfig"
+	"backend/internal/models/cruds"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/hibiken/asynq"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
-	var data background.PlaceEmbeddingData
+	var data bgconfig.PlaceEmbeddingData
 	if err := json.Unmarshal(t.Payload(), &data); err != nil {
 		newErr := fmt.Errorf("could not unmarshal data for place embedding task: %w", err)
 		log.Println(newErr.Error())
 		return newErr
 	}
 
-	pc := collections.GetPlaceCollection()
-	place, err := pc.GetById(data.PlaceId, ctx)
-	if err != nil {
-		newErr := fmt.Errorf("could not extract place with id %s", data.PlaceId)
-		log.Println(newErr.Error())
-		return newErr
-
-	}
-	text := fmt.Sprintf("%s - %s", place.Title, place.Description)
-	hf := instances.GetHfClient()
-	result, err := hf.EmbedText(ctx, text)
+	cp := cruds.GetCRUDSPlace()
+	result, err := cp.Embed(ctx, data.PlaceId)
 	if err != nil {
 		newErr := fmt.Errorf(
 			"could not run embedding of place %s with huggingface: %w",
@@ -42,28 +30,6 @@ func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
 		log.Println(newErr.Error())
 		return newErr
 	}
-
-	objId, err := primitive.ObjectIDFromHex(data.PlaceId)
-	if err != nil {
-		newErr := fmt.Errorf(
-			"unexpected error: could not convert %s to objectId in place embdedding task",
-			place.ID,
-		)
-		log.Println(newErr.Error())
-		return newErr
-	}
-	filter := bson.M{"_id": objId}
-	update := bson.M{"$set": bson.M{"embedding": result}}
-	if _, err = pc.UpdateOne(ctx, filter, update); err != nil {
-		newErr := fmt.Errorf(
-			"could not update place %s embedding: %w",
-			place.ID,
-			err,
-		)
-		log.Println(newErr.Error())
-		return newErr
-	}
-
 	fmt.Println(result)
 	return nil
 }

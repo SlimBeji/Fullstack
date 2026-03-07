@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/background"
+	"backend/internal/background/bgconfig"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 func HandleSendingNewsletter(ctx context.Context, t *asynq.Task) error {
-	var data background.NewsletterData
+	var data bgconfig.NewsletterData
 	if err := json.Unmarshal(t.Payload(), &data); err != nil {
 		return fmt.Errorf("could not unmarshal data for newsletter task: %w", err)
 	}
