@@ -37,8 +37,8 @@ func getPlaces(c *gin.Context) {
 // @Security     OAuth2Password[admin]
 // @Param        params body schemas.PlaceFilters true "POST parameters"
 // @Success      200  {object}  schemas.PlacesPaginated
-// @Router       /api/places/query [post]
-func queryPlaces(c *gin.Context) {
+// @Router       /api/places/search [post]
+func searchPlaces(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
 	cp := cruds.GetCRUDSPlace()
 	data, err := cp.Paginate(searchQuery, &cruds.PlaceOptions{Process: true})
@@ -163,10 +163,10 @@ func RegisterPlaces(r *gin.Engine) {
 		getPlaces,
 	)
 	router.POST(
-		"/query",
+		"/search",
 		middlewares.Authenticated,
 		gin_.BodyFilters[schemas.PlaceSearch],
-		queryPlaces,
+		searchPlaces,
 	)
 	router.POST(
 		"",

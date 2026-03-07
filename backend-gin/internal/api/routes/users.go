@@ -37,8 +37,8 @@ func getUsers(c *gin.Context) {
 // @Security     OAuth2Password[admin]
 // @Param        params body schemas.UserFilters true "POST parameters"
 // @Success      200  {object}  schemas.UsersPaginated
-// @Router       /api/users/query [post]
-func queryUsers(c *gin.Context) {
+// @Router       /api/users/search [post]
+func searchUsers(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
 	uc := collections.GetUserCollection()
 	data, err := uc.FetchBsonPage(&searchQuery, c)
@@ -145,10 +145,10 @@ func RegisterUsers(r *gin.Engine) {
 		getUsers,
 	)
 	router.POST(
-		"/query",
+		"/search",
 		middlewares.Authenticated,
 		gin_.BodyFilters[schemas.UserSearch],
-		queryUsers,
+		searchUsers,
 	)
 	router.POST(
 		"",
