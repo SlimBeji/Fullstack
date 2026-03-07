@@ -494,3 +494,24 @@ func (cu *CRUDSUser) UserPut(
 	}
 	return cu.Get(id, options)
 }
+
+// Delete
+
+func (cu *CRUDSUser) AuthDelete(user schemas.UserRead, id uint) error {
+	if user.IsAdmin {
+		return nil
+	}
+	return types_.APIError{
+		Code:    http.StatusUnauthorized,
+		Message: "Not Authenticated",
+		Details: map[string]any{"message": "Only admins can delete users"},
+	}
+}
+
+func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, model orm.User) error {
+	return nil
+}
+
+func (cu *CRUDSUser) AfterDelete(query *gorm.DB, model orm.User) error {
+	return nil
+}

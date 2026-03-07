@@ -523,3 +523,35 @@ func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
 
 	return vector, nil
 }
+
+// Delete
+
+func (cp *CRUDSPlace) AuthDelete(user schemas.UserRead, id uint) error {
+	if user.IsAdmin {
+		return nil
+	}
+
+	exists, err := gorm_.Exists(cp, types_.WhereFilters{
+		"id": types_.EqFilters(id), "creatorId": types_.EqFilters(user.ID),
+	})
+	if err != nil {
+		return err
+	}
+	if !exists {
+		message := fmt.Sprintf("Cannot access place %d", id)
+		return types_.APIError{
+			Code:    http.StatusUnauthorized,
+			Message: "Access denied",
+			Details: map[string]any{"message": message},
+		}
+	}
+	return nil
+}
+
+func (cp *CRUDSPlace) BeforeDelete(query *gorm.DB, model orm.Place) error {
+	return nil
+}
+
+func (cp *CRUDSPlace) AfterDelete(query *gorm.DB, model orm.Place) error {
+	return nil
+}

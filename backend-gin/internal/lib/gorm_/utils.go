@@ -497,3 +497,12 @@ func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
 
 	return UpdateRecord(crud, id, data)
 }
+
+// Delete Helpers
+
+type RecordDelete[User any, Model BaseModelReader, Read any] interface {
+	RecordRead[User, Model, Read]
+	AuthDelete(User, uint) error
+	BeforeDelete(*gorm.DB, Model) error
+	AfterDelete(*gorm.DB, Model) error
+}
