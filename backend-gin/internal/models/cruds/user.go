@@ -535,3 +535,25 @@ func (cu *CRUDSUser) Delete(id uint) error {
 func (cu *CRUDSUser) UserDelete(user schemas.UserRead, id uint) error {
 	return gorm_.DeleteRecord(cu, id, &user)
 }
+
+// Search
+
+func (cu *CRUDSUser) Search(query types_.SearchQuery) ([]schemas.UserRead, error) {
+	return gorm_.GetMany(cu, query, nil)
+}
+
+func (cu *CRUDSUser) UserSearch(
+	user schemas.UserRead, query types_.SearchQuery,
+) ([]schemas.UserRead, error) {
+	return gorm_.GetMany(cu, query, &user)
+}
+
+func (cu *CRUDSUser) SearchPartial(query types_.SearchQuery) ([]map[string]any, error) {
+	return gorm_.GetManyPartial(cu, query, nil)
+}
+
+func (cu *CRUDSUser) UserSearchPartial(
+	user schemas.UserRead, query types_.SearchQuery,
+) ([]map[string]any, error) {
+	return gorm_.GetManyPartial(cu, query, &user)
+}

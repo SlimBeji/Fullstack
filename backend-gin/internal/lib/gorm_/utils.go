@@ -559,3 +559,118 @@ func DeleteRecord[User any, Model BaseModelReader, Read any](
 
 	return nil
 }
+
+// Search Helpers
+
+type RecordsSearch[User any, Model BaseModelReader, Read any] interface {
+	RecordRead[User, Model, Read]
+}
+
+func Count[User any, Model BaseModelReader, Read any](
+	crud RecordsSearch[User, Model, Read], query types_.SearchQuery,
+) (int64, error) {
+	qb := crud.GetModel()
+
+	// Apply where filters
+	if len(query.Where) > 0 {
+		var err error
+		qb, err = ApplyWhere(qb, query.Where, crud.MapWhere)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	// Count records
+	var count int64
+	err := qb.Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func GetMany[User any, Model BaseModelReader, Read any](
+	crud RecordsSearch[User, Model, Read],
+	query types_.SearchQuery,
+	user *User,
+) ([]Read, error) {
+	// Force default select for full Model
+	query.Select = crud.DefaultSelect()
+
+	// Apply defaults
+	if len(query.OrderBy) == 0 {
+		query.OrderBy = crud.DefaultOrderBy()
+	}
+	if query.Page == 0 {
+		query.Page = 1
+	}
+	if query.Size == 0 {
+		query.Size = crud.MaxItemsPerPage()
+	}
+
+	// Apply auth filter if user provided
+	if user != nil {
+		query = crud.AuthGet(*user, query)
+	}
+
+	// Build query
+	qb, err := BuildSelectQuery(crud, query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute query
+	var models []Model
+	err = qb.Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to Read schemas
+	results := make([]Read, len(models))
+	for i, model := range models {
+		results[i] = crud.ToRead(&model)
+	}
+	return results, nil
+}
+
+func GetManyPartial[User any, Model BaseModelReader, Read any](
+	crud RecordsSearch[User, Model, Read],
+	query types_.SearchQuery,
+	user *User,
+) ([]map[string]any, error) {
+	// Apply defaults
+	if len(query.Select) == 0 {
+		query.Select = crud.DefaultSelect()
+	}
+	if len(query.OrderBy) == 0 {
+		query.OrderBy = crud.DefaultOrderBy()
+	}
+	if query.Page == 0 {
+		query.Page = 1
+	}
+	if query.Size == 0 {
+		query.Size = crud.MaxItemsPerPage()
+	}
+
+	// Apply auth filter if user provided
+	if user != nil {
+		query = crud.AuthGet(*user, query)
+	}
+
+	// Build query
+	qb, err := BuildSelectQuery(crud, query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute query into maps
+	var results []map[string]any
+	err = qb.Find(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}

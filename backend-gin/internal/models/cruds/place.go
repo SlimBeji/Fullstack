@@ -575,3 +575,25 @@ func (cp *CRUDSPlace) Delete(id uint) error {
 func (cp *CRUDSPlace) UserDelete(user schemas.UserRead, id uint) error {
 	return gorm_.DeleteRecord(cp, id, &user)
 }
+
+// Search
+
+func (cp *CRUDSPlace) Search(query types_.SearchQuery) ([]schemas.PlaceRead, error) {
+	return gorm_.GetMany(cp, query, nil)
+}
+
+func (cp *CRUDSPlace) UserSearch(
+	user schemas.UserRead, query types_.SearchQuery,
+) ([]schemas.PlaceRead, error) {
+	return gorm_.GetMany(cp, query, &user)
+}
+
+func (cp *CRUDSPlace) SearchPartial(query types_.SearchQuery) ([]map[string]any, error) {
+	return gorm_.GetManyPartial(cp, query, nil)
+}
+
+func (cp *CRUDSPlace) UserSearchPartial(
+	user schemas.UserRead, query types_.SearchQuery,
+) ([]map[string]any, error) {
+	return gorm_.GetManyPartial(cp, query, &user)
+}
