@@ -71,7 +71,9 @@ func NewHandler(config TaskHandlerConfig) *TaskHandler {
 	for _, name := range config.AllQueues {
 		queues[string(name)] = 1
 	}
-	asynqConfig := asynq.Config{Queues: queues, Concurrency: 10}
+	asynqConfig := asynq.Config{
+		Queues: queues, Concurrency: 10, LogLevel: asynq.ErrorLevel,
+	}
 	server := asynq.NewServer(redisConfig, asynqConfig)
 	tm := TaskHandler{mux: mux, server: server}
 	return &tm
