@@ -513,5 +513,17 @@ func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, model orm.User) error {
 }
 
 func (cu *CRUDSUser) AfterDelete(query *gorm.DB, model orm.User) error {
+	if model.ImageURL != "" {
+		ctx := context.Background()
+		storage := instances.GetStorage()
+		_, err := storage.DeleteFile(ctx, model.ImageURL)
+		if err != nil {
+			return types_.APIError{
+				Code:    http.StatusConflict,
+				Message: "could not delete user stored image",
+				Details: map[string]any{"id": model.ID, "email": model.Email},
+			}
+		}
+	}
 	return nil
 }
