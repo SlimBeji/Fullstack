@@ -3,6 +3,7 @@ package gorm_
 import (
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ import (
 // Query Helpers
 
 type QueryBuilder interface {
-	GetDB() *gorm.DB
-	GetModel() *gorm.DB
+	GetDB(ctx context.Context) *gorm.DB
+	GetModel(ctx context.Context) *gorm.DB
 	DefaultSelect() []string
 	DefaultOrderBy() []string
 	MaxItemsPerPage() int
@@ -154,10 +155,11 @@ func ApplyWhere(
 }
 
 func BuildSelectQuery(
+	ctx context.Context,
 	crud QueryBuilder,
 	query types_.SearchQuery,
 ) (*gorm.DB, error) {
-	qb := crud.GetModel()
+	qb := crud.GetModel(ctx)
 
 	// Apply select
 	selectFields := query.Select
@@ -201,10 +203,11 @@ func BuildSelectQuery(
 }
 
 func Exists(
+	ctx context.Context,
 	crud QueryBuilder,
 	where types_.WhereFilters,
 ) (bool, error) {
-	qb := crud.GetModel()
+	qb := crud.GetModel(ctx)
 
 	// Select only ID (minimal query)
 	qb = qb.Select("id")
@@ -231,7 +234,6 @@ func Exists(
 type RecordRead[User any, Model BaseModelReader, Read any] interface {
 	QueryBuilder
 	ModelName() string
-	GetModel() *gorm.DB
 	DefaultSelect() []string
 	AuthGet(user User, query types_.SearchQuery) types_.SearchQuery
 	ToRead(*Model) Read
@@ -240,10 +242,10 @@ type RecordRead[User any, Model BaseModelReader, Read any] interface {
 }
 
 func Read[User any, Model BaseModelReader, Read any](
-	crud RecordRead[User, Model, Read], id uint,
+	ctx context.Context, crud RecordRead[User, Model, Read], id uint,
 ) (*Model, error) {
 	var result Model
-	err := crud.GetModel().First(&result, id).Error
+	err := crud.GetModel(ctx).First(&result, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // Not found
@@ -254,7 +256,7 @@ func Read[User any, Model BaseModelReader, Read any](
 }
 
 func Get[User any, Model BaseModelReader, Read any](
-	crud RecordRead[User, Model, Read], id uint, user *User,
+	ctx context.Context, crud RecordRead[User, Model, Read], id uint, user *User,
 ) (Read, error) {
 	var zero Read
 
@@ -273,7 +275,7 @@ func Get[User any, Model BaseModelReader, Read any](
 	}
 
 	// Build and execute query
-	qb, err := BuildSelectQuery(crud, query)
+	qb, err := BuildSelectQuery(ctx, crud, query)
 	if err != nil {
 		return zero, err
 	}
@@ -291,6 +293,7 @@ func Get[User any, Model BaseModelReader, Read any](
 }
 
 func GetPartial[User any, Model BaseModelReader, Read any](
+	ctx context.Context,
 	crud RecordRead[User, Model, Read],
 	id uint,
 	fields []string,
@@ -315,7 +318,7 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 	}
 
 	// Build and execute query
-	qb, err := BuildSelectQuery(crud, query)
+	qb, err := BuildSelectQuery(ctx, crud, query)
 	if err != nil {
 		return nil, err
 	}
@@ -350,12 +353,13 @@ type RecordCreate[
 }
 
 func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post any](
+	ctx context.Context,
 	crud RecordCreate[User, Model, Read, Create, Post],
 	data Create,
 ) (uint, error) {
 	var createdID uint
 
-	err := crud.GetDB().Transaction(func(tx *gorm.DB) error {
+	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Convert Create to Model
 		entity := crud.ToModel(data)
 
@@ -400,6 +404,7 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post an
 }
 
 func PostRecord[User any, Model BaseModelReader, Read any, Create any, Post any](
+	ctx context.Context,
 	crud RecordCreate[User, Model, Read, Create, Post],
 	form Post,
 	user *User,
@@ -416,7 +421,7 @@ func PostRecord[User any, Model BaseModelReader, Read any, Create any, Post any]
 		return 0, err
 	}
 
-	return CreateRecord(crud, data)
+	return CreateRecord(ctx, crud, data)
 }
 
 // Update Helpers
@@ -436,11 +441,12 @@ type RecordUpdate[
 }
 
 func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
+	ctx context.Context,
 	crud RecordUpdate[User, Model, Read, Update, Put],
 	id uint,
 	data Update,
 ) error {
-	err := crud.GetDB().Transaction(func(tx *gorm.DB) error {
+	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Before update hook
 		if err := crud.BeforeUpdate(tx, id, data); err != nil {
 			return err
@@ -479,6 +485,7 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any
 }
 
 func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
+	ctx context.Context,
 	crud RecordUpdate[User, Model, Read, Update, Put],
 	id uint,
 	form Put,
@@ -496,7 +503,7 @@ func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
 		return err
 	}
 
-	return UpdateRecord(crud, id, data)
+	return UpdateRecord(ctx, crud, id, data)
 }
 
 // Delete Helpers
@@ -509,11 +516,14 @@ type RecordDelete[User any, Model BaseModelReader, Read any] interface {
 }
 
 func DeleteRecord[User any, Model BaseModelReader, Read any](
-	crud RecordDelete[User, Model, Read], id uint, user *User,
+	ctx context.Context,
+	crud RecordDelete[User, Model, Read],
+	id uint,
+	user *User,
 ) error {
 	// Fetch the record first
 	var model Model
-	err := crud.GetModel().First(&model, id).Error
+	err := crud.GetModel(ctx).First(&model, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return types_.NotFoundError(crud.ModelName(), id)
@@ -528,7 +538,7 @@ func DeleteRecord[User any, Model BaseModelReader, Read any](
 		}
 	}
 
-	err = crud.GetDB().Transaction(func(tx *gorm.DB) error {
+	err = crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Before delete hook
 		if err := crud.BeforeDelete(tx, model); err != nil {
 			return err
@@ -568,9 +578,11 @@ type RecordsSearch[User any, Model BaseModelReader, Read any] interface {
 }
 
 func Count[User any, Model BaseModelReader, Read any](
-	crud RecordsSearch[User, Model, Read], query types_.SearchQuery,
+	ctx context.Context,
+	crud RecordsSearch[User, Model, Read],
+	query types_.SearchQuery,
 ) (int64, error) {
-	qb := crud.GetModel()
+	qb := crud.GetModel(ctx)
 
 	// Apply where filters
 	if len(query.Where) > 0 {
@@ -592,6 +604,7 @@ func Count[User any, Model BaseModelReader, Read any](
 }
 
 func GetMany[User any, Model BaseModelReader, Read any](
+	ctx context.Context,
 	crud RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
@@ -616,7 +629,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 	}
 
 	// Build query
-	qb, err := BuildSelectQuery(crud, query)
+	qb, err := BuildSelectQuery(ctx, crud, query)
 	if err != nil {
 		return nil, err
 	}
@@ -637,6 +650,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 }
 
 func GetManyPartial[User any, Model BaseModelReader, Read any](
+	ctx context.Context,
 	crud RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
@@ -661,7 +675,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 	}
 
 	// Build query
-	qb, err := BuildSelectQuery(crud, query)
+	qb, err := BuildSelectQuery(ctx, crud, query)
 	if err != nil {
 		return nil, err
 	}
@@ -677,6 +691,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 }
 
 func Paginate[User any, Model BaseModelReader, Read any](
+	ctx context.Context,
 	crud RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
@@ -691,7 +706,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 	}
 
 	// Step 2: Count total results
-	totalCount, err := Count(crud, query)
+	totalCount, err := Count(ctx, crud, query)
 	if err != nil {
 		return zero, err
 	}
@@ -712,7 +727,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 	query.Size = size
 
 	// Step 5: Fetch results (without auth since already applied)
-	data, err := GetManyPartial(crud, query, nil)
+	data, err := GetManyPartial(ctx, crud, query, nil)
 	if err != nil {
 		return zero, err
 	}
