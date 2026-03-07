@@ -39,7 +39,7 @@ func AccessDeniedErr(modelname string, id int) error {
 	}
 }
 
-func NotFoundError(modelname string, id int) error {
+func NotFoundError(modelname string, id uint) error {
 	return APIError{
 		Code:    http.StatusNotFound,
 		Message: fmt.Sprintf("No record with id %d found in %s", id, modelname),

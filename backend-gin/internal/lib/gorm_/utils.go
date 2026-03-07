@@ -281,7 +281,7 @@ func Get[User any, Model BaseModelReader, Read any](
 	err = qb.First(&model).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return zero, types_.NotFoundError(crud.ModelName(), int(id))
+			return zero, types_.NotFoundError(crud.ModelName(), id)
 		}
 		return zero, err
 	}
@@ -323,7 +323,7 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 	err = qb.First(&result).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, types_.NotFoundError(crud.ModelName(), int(id))
+			return nil, types_.NotFoundError(crud.ModelName(), id)
 		}
 		return nil, err
 	}
