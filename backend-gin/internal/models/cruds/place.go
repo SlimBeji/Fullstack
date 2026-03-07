@@ -567,3 +567,11 @@ func (cp *CRUDSPlace) AfterDelete(query *gorm.DB, model orm.Place) error {
 	}
 	return nil
 }
+
+func (cp *CRUDSPlace) Delete(id uint) error {
+	return gorm_.DeleteRecord(cp, id, nil)
+}
+
+func (cp *CRUDSPlace) UserDelete(user schemas.UserRead, id uint) error {
+	return gorm_.DeleteRecord(cp, id, &user)
+}

@@ -506,3 +506,56 @@ type RecordDelete[User any, Model BaseModelReader, Read any] interface {
 	BeforeDelete(*gorm.DB, Model) error
 	AfterDelete(*gorm.DB, Model) error
 }
+
+func DeleteRecord[User any, Model BaseModelReader, Read any](
+	crud RecordDelete[User, Model, Read], id uint, user *User,
+) error {
+	// Fetch the record first
+	var model Model
+	err := crud.GetModel().First(&model, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return types_.NotFoundError(crud.ModelName(), id)
+		}
+		return err
+	}
+
+	// Check authoriztion
+	if user != nil {
+		if err := crud.AuthDelete(*user, id); err != nil {
+			return err
+		}
+	}
+
+	err = crud.GetDB().Transaction(func(tx *gorm.DB) error {
+		// Before delete hook
+		if err := crud.BeforeDelete(tx, model); err != nil {
+			return err
+		}
+
+		// Delete from database
+		result := tx.Delete(&model)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		// After delete hook
+		if err := crud.AfterDelete(tx, model); err != nil {
+			return err
+		}
+
+		return nil // Commit
+	})
+
+	if err != nil {
+		if errors.As(err, &types_.APIError{}) {
+			return err
+		}
+		return types_.APIError{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("Could not delete %s object: %v", crud.ModelName(), err),
+		}
+	}
+
+	return nil
+}

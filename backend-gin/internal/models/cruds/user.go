@@ -527,3 +527,11 @@ func (cu *CRUDSUser) AfterDelete(query *gorm.DB, model orm.User) error {
 	}
 	return nil
 }
+
+func (cu *CRUDSUser) Delete(id uint) error {
+	return gorm_.DeleteRecord(cu, id, nil)
+}
+
+func (cu *CRUDSUser) UserDelete(user schemas.UserRead, id uint) error {
+	return gorm_.DeleteRecord(cu, id, &user)
+}
