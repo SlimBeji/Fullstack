@@ -40,6 +40,7 @@ func seedUsers(ctx context.Context, refs RefMappings, isVerbose bool) error {
 				Email:    userEx.Email,
 				IsAdmin:  userEx.IsAdmin,
 				Password: userEx.Password,
+				ImageURL: userEx.ImageURL,
 			}
 
 			url, err := storage.UploadFile(ctx, userIn.ImageURL, "")
@@ -88,6 +89,7 @@ func seedPlaces(ctx context.Context, refs RefMappings, isVerbose bool) error {
 				Description: placeEx.Description,
 				Address:     placeEx.Address,
 				Location:    placeEx.Location,
+				ImageURL:    placeEx.ImageURL,
 			}
 
 			url, err := storage.UploadFile(ctx, placeIn.ImageURL, "")
