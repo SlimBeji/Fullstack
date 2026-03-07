@@ -25,9 +25,6 @@ type Settings struct {
 	// DATABASE config
 	DatabaseURL     string `envconfig:"DATABASE_URL" required:"true"`
 	DatabaseTestURL string `envconfig:"DATABASE_TEST_URL" default:""`
-	MongoURL        string `envconfig:"MONGO_URL" required:"true"`
-	MongoDBName     string `envconfig:"MONGO_DBNAME" required:"true"`
-	MongoTestDBName string `envconfig:"MONGO_TEST_DBNAME" default:"tests"`
 	RedisURL        string `envconfig:"REDIS_URL" required:"true"`
 	RedisTestURL    string `envconfig:"REDIS_TEST_URL" default:""`
 	RedisExpiration int    `envconfig:"REDIS_DEFAULT_EXPIRATION" default:"3600"`

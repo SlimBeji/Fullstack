@@ -22,8 +22,6 @@ todo.txt
 
 # Docker local images
 pgsql
-mongo
-mongo-express
 gcs
 redis
 
