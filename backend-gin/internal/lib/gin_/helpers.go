@@ -3,11 +3,25 @@ package gin_
 import (
 	"backend/internal/lib/types_"
 	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+func ExtractId(c *gin.Context, name string) (uint, error) {
+	raw := c.Param(name)
+	id, err := strconv.ParseUint(raw, 10, 32)
+	if err != nil {
+		return 0, types_.APIError{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("%s is not a valid id", raw),
+		}
+	}
+	return uint(id), nil
+}
 
 func IsMultipart(c *gin.Context) bool {
 	contentType := c.GetHeader("Content-Type")
