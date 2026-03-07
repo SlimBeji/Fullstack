@@ -15,12 +15,11 @@ import (
 
 type RefMappings map[orm.Model]map[int]uint
 
-func seedUsers(refs RefMappings, isVerbose bool) error {
+func seedUsers(ctx context.Context, refs RefMappings, isVerbose bool) error {
 	userRefs := make(map[int]uint)
 	refs[orm.ModelUser] = userRefs
 	cu := cruds.GetCRUDSUser()
 	storage := instances.GetStorage()
-	ctx := context.Background()
 
 	handleError := func(err error, isVerbose bool) error {
 		if isVerbose {
@@ -49,7 +48,7 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 			}
 			userIn.ImageURL = url
 
-			insertedId, err := cu.Create(userIn)
+			insertedId, err := cu.Create(ctx, userIn)
 			if err != nil {
 				return handleError(err, isVerbose)
 			}
@@ -64,12 +63,11 @@ func seedUsers(refs RefMappings, isVerbose bool) error {
 	return eg.Wait()
 }
 
-func seedPlaces(refs RefMappings, isVerbose bool) error {
+func seedPlaces(ctx context.Context, refs RefMappings, isVerbose bool) error {
 	placeRefs := make(map[int]uint)
 	refs[orm.ModelPlace] = placeRefs
 	cp := cruds.GetCRUDSPlace()
 	storage := instances.GetStorage()
-	ctx := context.Background()
 
 	handleError := func(err error, isVerbose bool) error {
 		if isVerbose {
@@ -112,7 +110,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 			}
 			placeIn.CreatorID = creatorId
 
-			insertedId, err := cp.Seed(placeIn, placeEx.Embedding)
+			insertedId, err := cp.Seed(ctx, placeIn, placeEx.Embedding)
 			if err != nil {
 				return handleError(err, isVerbose)
 			}
@@ -128,6 +126,7 @@ func seedPlaces(refs RefMappings, isVerbose bool) error {
 }
 
 func SeedDb(verbose ...bool) error {
+	ctx := context.Background()
 	refs := make(RefMappings)
 
 	isVerbose := false
@@ -135,7 +134,7 @@ func SeedDb(verbose ...bool) error {
 		isVerbose = verbose[0]
 	}
 
-	if err := seedUsers(refs, isVerbose); err != nil {
+	if err := seedUsers(ctx, refs, isVerbose); err != nil {
 		if isVerbose {
 			fmt.Println(err.Error())
 		}
@@ -144,7 +143,7 @@ func SeedDb(verbose ...bool) error {
 		fmt.Println("✅ Collection User seeded!")
 	}
 
-	if err := seedPlaces(refs, isVerbose); err != nil {
+	if err := seedPlaces(ctx, refs, isVerbose); err != nil {
 		if isVerbose {
 			fmt.Println(err.Error())
 		}
