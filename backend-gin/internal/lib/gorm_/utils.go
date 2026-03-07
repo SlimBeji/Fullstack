@@ -2,6 +2,7 @@ package gorm_
 
 import (
 	"backend/internal/lib/types_"
+	"backend/internal/lib/utils"
 	"errors"
 	"fmt"
 	"net/http"
@@ -673,4 +674,70 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 	}
 
 	return results, nil
+}
+
+func Paginate[User any, Model BaseModelReader, Read any](
+	crud RecordsSearch[User, Model, Read],
+	query types_.SearchQuery,
+	user *User,
+	process bool,
+	workers int,
+) (types_.PaginatedDict, error) {
+	var zero types_.PaginatedDict
+
+	// Step 1: Apply auth filter if user provided
+	if user != nil {
+		query = crud.AuthGet(*user, query)
+	}
+
+	// Step 2: Count total results
+	totalCount, err := Count(crud, query)
+	if err != nil {
+		return zero, err
+	}
+
+	// Step 3: Calculate pagination
+	page := query.Page
+	if page == 0 {
+		page = 1
+	}
+	size := query.Size
+	if size == 0 {
+		size = crud.MaxItemsPerPage()
+	}
+	totalPages := (int(totalCount) + size - 1) / size
+
+	// Step 4: Normalize query
+	query.Page = page
+	query.Size = size
+
+	// Step 5: Fetch results (without auth since already applied)
+	data, err := GetManyPartial(crud, query, nil)
+	if err != nil {
+		return zero, err
+	}
+
+	// Step 6: Post-process if requested
+	if process {
+		processed, err := utils.BatchProcess(
+			data,
+			func(item map[string]any) (map[string]any, error) {
+				err := crud.PostProcessPartial(item)
+				return item, err
+			},
+			workers,
+		)
+		if err != nil {
+			return zero, err
+		}
+		data = processed
+	}
+
+	// Step 7: Return paginated result
+	return types_.PaginatedDict{
+		Page:       page,
+		TotalPages: totalPages,
+		TotalCount: int(totalCount),
+		Data:       data,
+	}, nil
 }

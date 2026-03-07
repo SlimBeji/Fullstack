@@ -7,6 +7,8 @@ type PaginatedData[T any] struct {
 	Data       []T `json:"data"`
 }
 
+type PaginatedDict = PaginatedData[map[string]any]
+
 type PaginationData struct {
 	Page int
 	Size int
