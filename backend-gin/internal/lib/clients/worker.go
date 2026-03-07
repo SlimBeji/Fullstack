@@ -1,10 +1,10 @@
 package clients
 
 import (
-	"backend/internal/background"
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/hibiken/asynq"
 )
@@ -32,21 +32,22 @@ func (tp *TaskPublisher) Close() error {
 }
 
 func (tm *TaskPublisher) NewTask(
-	name background.TaskType, payload []byte, opts ...asynq.Option,
+	name string, payload []byte, maxAge time.Duration, opts ...asynq.Option,
 ) (*asynq.TaskInfo, error) {
-	task := asynq.NewTask(string(name), payload)
-	opts = append(opts, asynq.Retention(background.MAX_AGE))
+	task := asynq.NewTask(name, payload)
+	opts = append(opts, asynq.Retention(maxAge))
 	return tm.client.Enqueue(task, opts...)
 }
 
 // Handler
 
 type HandlerFunc = func(ctx context.Context, t *asynq.Task) error
-type TasksRegistryType = map[background.TaskType]HandlerFunc
+type TasksRegistryType = map[string]HandlerFunc
 
 type TaskHandlerConfig struct {
-	Url      string
-	Registry TasksRegistryType
+	Url       string
+	Registry  TasksRegistryType
+	AllQueues []string
 }
 
 type TaskHandler struct {
@@ -67,7 +68,7 @@ func NewHandler(config TaskHandlerConfig) *TaskHandler {
 
 	// server
 	queues := make(map[string]int)
-	for _, name := range background.AllQueues {
+	for _, name := range config.AllQueues {
 		queues[string(name)] = 1
 	}
 	asynqConfig := asynq.Config{Queues: queues, Concurrency: 10}

@@ -24,5 +24,7 @@ func PlaceEmbedding(
 
 	opts = append(opts, asynq.Queue(string(bgconfig.QueuesAI)))
 	tp := GetPublisher()
-	return tp.NewTask(bgconfig.TaskPlaceEmbedding, payloadData, opts...)
+	return tp.NewTask(
+		string(bgconfig.TaskPlaceEmbedding), payloadData, bgconfig.MaxAge, opts...,
+	)
 }

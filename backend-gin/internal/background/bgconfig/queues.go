@@ -7,4 +7,4 @@ const (
 	QueuesAI     QueueType = "ai"
 )
 
-var AllQueues = []QueueType{QueueeEmails, QueuesAI}
+var AllQueues = []string{string(QueueeEmails), string(QueuesAI)}

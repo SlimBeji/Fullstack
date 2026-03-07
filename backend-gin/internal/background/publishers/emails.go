@@ -24,5 +24,7 @@ func SendNewsletter(
 
 	opts = append(opts, asynq.Queue(string(bgconfig.QueueeEmails)))
 	tp := GetPublisher()
-	return tp.NewTask(bgconfig.TaskNewsletter, payload, opts...)
+	return tp.NewTask(
+		string(bgconfig.TaskNewsletter), payload, bgconfig.MaxAge, opts...,
+	)
 }

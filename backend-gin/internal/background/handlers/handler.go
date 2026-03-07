@@ -7,9 +7,9 @@ import (
 	"sync"
 )
 
-var TASKS_REGISTERY = clients.TasksRegistryType{
-	bgconfig.TaskNewsletter:     HandleSendingNewsletter,
-	bgconfig.TaskPlaceEmbedding: HandlePlaceEmbedding,
+var TasksRegistery = clients.TasksRegistryType{
+	string(bgconfig.TaskNewsletter):     HandleSendingNewsletter,
+	string(bgconfig.TaskPlaceEmbedding): HandlePlaceEmbedding,
 }
 
 var (
@@ -20,8 +20,9 @@ var (
 func GetHandler() *clients.TaskHandler {
 	once.Do(func() {
 		handlerConfig := clients.TaskHandlerConfig{
-			Url:      config.Env.GetRedisURL(),
-			Registry: TASKS_REGISTERY,
+			Url:       config.Env.GetRedisURL(),
+			Registry:  TasksRegistery,
+			AllQueues: bgconfig.AllQueues,
 		}
 		handler = clients.NewHandler(handlerConfig)
 		handler.Start()
