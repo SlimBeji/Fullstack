@@ -39,8 +39,19 @@ definitions:
         type: string
       userId:
         description: The user ID, 24 characters
-        example: 683b21134e2e5d46978daf1f
-        type: string
+        example: 123456789
+        type: integer
+    type: object
+  schemas.FlexLocation:
+    properties:
+      lat:
+        description: The latitude of the place
+        example: 51.48180425016331
+        type: number
+      lng:
+        description: The longitude of the place
+        example: -0.19090418688755467
+        type: number
     type: object
   schemas.Location:
     properties:
@@ -53,7 +64,68 @@ definitions:
         example: -0.19090418688755467
         type: number
     type: object
-  schemas.PlaceFilters:
+  schemas.PlacePut:
+    properties:
+      address:
+        description: The place address
+        example: Fulham road
+        minLength: 1
+        type: string
+      description:
+        description: The place description, 10 characters minimum
+        example: Stadium of Chelsea football club
+        minLength: 10
+        type: string
+      location:
+        allOf:
+        - $ref: '#/definitions/schemas.FlexLocation'
+        description: Location object (can be sent as JSON string)
+      title:
+        description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        minLength: 10
+        type: string
+    type: object
+  schemas.PlaceRead:
+    properties:
+      address:
+        description: The place address
+        example: Fulham road
+        minLength: 1
+        type: string
+      createdAt:
+        description: creation datetime                                            //
+          last update datetime
+        example: "2024-01-12T10:15:30.000Z"
+        type: string
+      creatorId:
+        description: The ID of the place creator
+        example: 123456789
+        type: integer
+      description:
+        description: The place description, 10 characters minimum
+        example: Stadium of Chelsea football club
+        minLength: 10
+        type: string
+      id:
+        description: The ID of the place
+        example: 123456789
+        type: integer
+      imageUrl:
+        description: local url on the storage
+        example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
+        type: string
+      location:
+        allOf:
+        - $ref: '#/definitions/schemas.Location'
+        description: Location object (can be sent as JSON string)
+      title:
+        description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        minLength: 10
+        type: string
+    type: object
+  schemas.PlaceSearch:
     properties:
       address:
         description: The place address
@@ -63,9 +135,9 @@ definitions:
           type: string
         type: array
       creatorId:
-        description: The ID of the place creator, 24 characters
+        description: The ID of the place creator
         example:
-        - eq:683b21134e2e5d46978daf1f
+        - in:123456789
         items:
           type: string
         type: array
@@ -77,6 +149,7 @@ definitions:
           type: string
         type: array
       fields:
+        description: Fields to include in the response; omit for full document
         example:
         - id
         - title
@@ -84,9 +157,9 @@ definitions:
           type: string
         type: array
       id:
-        description: The ID of the place 24 characters
+        description: The ID of the place
         example:
-        - 683b21134e2e5d46978daf1f
+        - "123456789"
         items:
           type: string
         type: array
@@ -106,11 +179,17 @@ definitions:
         type: array
       page:
         default: 1
+        description: The page number
+        minimum: 1
         type: integer
       size:
         default: 100
+        description: Items per page
+        maximum: 100
+        minimum: 1
         type: integer
       sort:
+        description: Fields to use for sorting. Use the '-' for descending sorting
         example:
         - createdAt
         items:
@@ -123,70 +202,6 @@ definitions:
         items:
           type: string
         type: array
-    type: object
-  schemas.PlacePut:
-    properties:
-      address:
-        description: The place address
-        example: Fulham road
-        minLength: 10
-        type: string
-      description:
-        description: The place description, 10 characters minimum
-        example: Stadium of Chelsea football club
-        minLength: 10
-        type: string
-      location:
-        allOf:
-        - $ref: '#/definitions/schemas.Location'
-        description: Location object (can be sent as JSON string)
-      title:
-        description: The place title/name, 10 characters minimum
-        example: Stamford Bridge
-        minLength: 10
-        type: string
-    type: object
-  schemas.PlaceRead:
-    properties:
-      address:
-        description: The place address
-        example: Fulham road
-        minLength: 10
-        type: string
-      createdAt:
-        description: creation datetime
-        example: "2024-01-12T10:15:30.000Z"
-        type: string
-      creatorId:
-        description: The ID of the place creator, 24 characters
-        example: 683b21134e2e5d46978daf1f
-        type: string
-      description:
-        description: The place description, 10 characters minimum
-        example: Stadium of Chelsea football club
-        minLength: 10
-        type: string
-      id:
-        description: The ID of the place 24 characters
-        example: 683b21134e2e5d46978daf1f
-        type: string
-      imageUrl:
-        description: local url on the storage
-        example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
-        type: string
-      location:
-        allOf:
-        - $ref: '#/definitions/schemas.Location'
-        description: Location object (can be sent as JSON string)
-      title:
-        description: The place title/name, 10 characters minimum
-        example: Stamford Bridge
-        minLength: 10
-        type: string
-      updatedAt:
-        description: last update datetime
-        example: "2024-01-12T10:15:30.000Z"
-        type: string
     type: object
   schemas.PlacesPaginated:
     properties:
@@ -201,48 +216,22 @@ definitions:
       totalPages:
         type: integer
     type: object
-  schemas.UserFilters:
+  schemas.UserPlace:
     properties:
-      email:
-        description: The user email
-        example:
-        - eq:mslimbeji@gmail.com
-        items:
-          type: string
-        type: array
-      fields:
-        example:
-        - id
-        - name
-        items:
-          type: string
-        type: array
+      address:
+        description: The place address
+        example: Fulham road
+        minLength: 1
+        type: string
       id:
-        description: The user ID, 24 characters
-        example:
-        - 683b21134e2e5d46978daf1f
-        items:
-          type: string
-        type: array
-      name:
-        description: The user name, two characters at least
-        example:
-        - eq:Slim Beji
-        items:
-          type: string
-        type: array
-      page:
-        default: 1
+        description: The ID of the place
+        example: 123456789
         type: integer
-      size:
-        default: 100
-        type: integer
-      sort:
-        example:
-        - createdAt
-        items:
-          type: string
-        type: array
+      title:
+        description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        minLength: 10
+        type: string
     type: object
   schemas.UserPut:
     properties:
@@ -256,15 +245,16 @@ definitions:
         minLength: 2
         type: string
       password:
-        description: The user password, 10 characters at least
+        description: The user password, 8 characters at least
         example: very_secret
-        minLength: 10
+        minLength: 8
         type: string
     type: object
   schemas.UserRead:
     properties:
       createdAt:
-        description: creation datetime
+        description: creation datetime                                            //
+          last update datetime
         example: "2024-01-12T10:15:30.000Z"
         type: string
       email:
@@ -272,9 +262,9 @@ definitions:
         example: mslimbeji@gmail.com
         type: string
       id:
-        description: The user ID, 24 characters
-        example: 683b21134e2e5d46978daf1f
-        type: string
+        description: The user ID
+        example: 12345678
+        type: integer
       imageUrl:
         description: local url on the storage
         example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
@@ -289,16 +279,60 @@ definitions:
         minLength: 2
         type: string
       places:
-        description: The id of places belonging to the user, 24 characters
+        description: Places created by the user
+        items:
+          $ref: '#/definitions/schemas.UserPlace'
+        type: array
+    type: object
+  schemas.UserSearch:
+    properties:
+      email:
+        description: The user email
         example:
-        - 683b21134e2e5d46978daf1f
+        - eq:mslimbeji@gmail.com
         items:
           type: string
         type: array
-      updatedAt:
-        description: last update datetime
-        example: "2024-01-12T10:15:30.000Z"
-        type: string
+      fields:
+        description: Fields to include in the response; omit for full document
+        example:
+        - id
+        - name
+        items:
+          type: string
+        type: array
+      id:
+        description: The user ID
+        example:
+        - "123456789"
+        items:
+          type: string
+        type: array
+      name:
+        description: The user name, two characters at least
+        example:
+        - eq:Slim Beji
+        items:
+          type: string
+        type: array
+      page:
+        default: 1
+        description: The page number
+        minimum: 1
+        type: integer
+      size:
+        default: 100
+        description: Items per page
+        maximum: 100
+        minimum: 1
+        type: integer
+      sort:
+        description: Fields to use for sorting. Use the '-' for descending sorting
+        example:
+        - createdAt
+        items:
+          type: string
+        type: array
     type: object
   schemas.UsersPaginated:
     properties:
@@ -322,9 +356,9 @@ paths:
       - application/x-www-form-urlencoded
       parameters:
       - default: very_secret
-        description: The user password, 10 characters at least
+        description: The user password, 8 characters at least
         in: formData
-        minLength: 10
+        minLength: 8
         name: password
         type: string
       - default: mslimbeji@gmail.com
@@ -358,10 +392,10 @@ paths:
         minLength: 2
         name: name
         type: string
-      - description: The user password, 10 characters at least
+      - description: The user password, 8 characters at least
         example: very_secret
         in: formData
-        minLength: 10
+        minLength: 8
         name: password
         type: string
       - description: User's profile image (JPEG)
@@ -429,14 +463,14 @@ paths:
       - description: The place address
         example: Fulham road
         in: formData
-        minLength: 10
+        minLength: 1
         name: address
         type: string
-      - description: The ID of the place creator, 24 characters
-        example: 683b21134e2e5d46978daf1f
+      - description: The ID of the place creator
+        example: 123456789
         in: formData
         name: creatorId
-        type: string
+        type: integer
       - description: The place description, 10 characters minimum
         example: Stadium of Chelsea football club
         in: formData
@@ -492,9 +526,9 @@ paths:
         name: address
         type: array
       - collectionFormat: multi
-        description: The ID of the place creator, 24 characters
+        description: The ID of the place creator
         example:
-        - eq:683b21134e2e5d46978daf1f
+        - in:123456789
         in: query
         items:
           type: string
@@ -510,6 +544,7 @@ paths:
         name: description
         type: array
       - collectionFormat: csv
+        description: Fields to include in the response; omit for full document
         example:
         - id
         - title
@@ -519,9 +554,9 @@ paths:
         name: fields
         type: array
       - collectionFormat: multi
-        description: The ID of the place 24 characters
+        description: The ID of the place
         example:
-        - 683b21134e2e5d46978daf1f
+        - "123456789"
         in: query
         items:
           type: string
@@ -546,14 +581,20 @@ paths:
         name: locationLng
         type: array
       - default: 1
+        description: The page number
         in: query
+        minimum: 1
         name: page
         type: integer
       - default: 100
+        description: Items per page
         in: query
+        maximum: 100
+        minimum: 1
         name: size
         type: integer
       - collectionFormat: csv
+        description: Fields to use for sorting. Use the '-' for descending sorting
         example:
         - createdAt
         in: query
@@ -656,7 +697,7 @@ paths:
       summary: Update places
       tags:
       - Place
-  /api/places/query:
+  /api/places/search:
     post:
       consumes:
       - application/json
@@ -666,7 +707,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/schemas.PlaceFilters'
+          $ref: '#/definitions/schemas.PlaceSearch'
       produces:
       - application/json
       responses:
@@ -701,10 +742,10 @@ paths:
         minLength: 2
         name: name
         type: string
-      - description: The user password, 10 characters at least
+      - description: The user password, 8 characters at least
         example: very_secret
         in: formData
-        minLength: 10
+        minLength: 8
         name: password
         type: string
       - description: the user profile image
@@ -740,6 +781,7 @@ paths:
         name: email
         type: array
       - collectionFormat: csv
+        description: Fields to include in the response; omit for full document
         example:
         - id
         - name
@@ -749,9 +791,9 @@ paths:
         name: fields
         type: array
       - collectionFormat: multi
-        description: The user ID, 24 characters
+        description: The user ID
         example:
-        - 683b21134e2e5d46978daf1f
+        - "123456789"
         in: query
         items:
           type: string
@@ -767,14 +809,20 @@ paths:
         name: name
         type: array
       - default: 1
+        description: The page number
         in: query
+        minimum: 1
         name: page
         type: integer
       - default: 100
+        description: Items per page
         in: query
+        maximum: 100
+        minimum: 1
         name: size
         type: integer
       - collectionFormat: csv
+        description: Fields to use for sorting. Use the '-' for descending sorting
         example:
         - createdAt
         in: query
@@ -868,7 +916,7 @@ paths:
       summary: Update users
       tags:
       - User
-  /api/users/query:
+  /api/users/search:
     post:
       consumes:
       - application/json
@@ -878,7 +926,7 @@ paths:
         name: params
         required: true
         schema:
-          $ref: '#/definitions/schemas.UserFilters'
+          $ref: '#/definitions/schemas.UserSearch'
       produces:
       - application/json
       responses:

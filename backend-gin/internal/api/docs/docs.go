@@ -29,10 +29,10 @@ const docTemplate = `{
                 "summary": "User authentication",
                 "parameters": [
                     {
-                        "minLength": 10,
+                        "minLength": 8,
                         "type": "string",
                         "default": "very_secret",
-                        "description": "The user password, 10 characters at least",
+                        "description": "The user password, 8 characters at least",
                         "name": "password",
                         "in": "formData"
                     },
@@ -83,10 +83,10 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "minLength": 10,
+                        "minLength": 8,
                         "type": "string",
                         "example": "very_secret",
-                        "description": "The user password, 10 characters at least",
+                        "description": "The user password, 8 characters at least",
                         "name": "password",
                         "in": "formData"
                     },
@@ -200,7 +200,7 @@ const docTemplate = `{
                 "summary": "Place creation",
                 "parameters": [
                     {
-                        "minLength": 10,
+                        "minLength": 1,
                         "type": "string",
                         "example": "Fulham road",
                         "description": "The place address",
@@ -208,9 +208,9 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "type": "string",
-                        "example": "683b21134e2e5d46978daf1f",
-                        "description": "The ID of the place creator, 24 characters",
+                        "type": "integer",
+                        "example": 123456789,
+                        "description": "The ID of the place creator",
                         "name": "creatorId",
                         "in": "formData"
                     },
@@ -302,9 +302,9 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "eq:683b21134e2e5d46978daf1f"
+                            "in:123456789"
                         ],
-                        "description": "The ID of the place creator, 24 characters",
+                        "description": "The ID of the place creator",
                         "name": "creatorId",
                         "in": "query"
                     },
@@ -331,6 +331,7 @@ const docTemplate = `{
                             "id",
                             "title"
                         ],
+                        "description": "Fields to include in the response; omit for full document",
                         "name": "fields",
                         "in": "query"
                     },
@@ -341,9 +342,9 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "683b21134e2e5d46978daf1f"
+                            "123456789"
                         ],
-                        "description": "The ID of the place 24 characters",
+                        "description": "The ID of the place",
                         "name": "id",
                         "in": "query"
                     },
@@ -374,14 +375,19 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "default": 1,
+                        "description": "The page number",
                         "name": "page",
                         "in": "query"
                     },
                     {
+                        "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "default": 100,
+                        "description": "Items per page",
                         "name": "size",
                         "in": "query"
                     },
@@ -394,6 +400,7 @@ const docTemplate = `{
                         "example": [
                             "createdAt"
                         ],
+                        "description": "Fields to use for sorting. Use the '-' for descending sorting",
                         "name": "sort",
                         "in": "query"
                     },
@@ -421,7 +428,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/places/query": {
+        "/api/places/search": {
             "post": {
                 "security": [
                     {
@@ -447,7 +454,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.PlaceFilters"
+                            "$ref": "#/definitions/schemas.PlaceSearch"
                         }
                     }
                 ],
@@ -623,10 +630,10 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
-                        "minLength": 10,
+                        "minLength": 8,
                         "type": "string",
                         "example": "very_secret",
-                        "description": "The user password, 10 characters at least",
+                        "description": "The user password, 8 characters at least",
                         "name": "password",
                         "in": "formData"
                     },
@@ -691,6 +698,7 @@ const docTemplate = `{
                             "id",
                             "name"
                         ],
+                        "description": "Fields to include in the response; omit for full document",
                         "name": "fields",
                         "in": "query"
                     },
@@ -701,9 +709,9 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "683b21134e2e5d46978daf1f"
+                            "123456789"
                         ],
-                        "description": "The user ID, 24 characters",
+                        "description": "The user ID",
                         "name": "id",
                         "in": "query"
                     },
@@ -721,14 +729,19 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "default": 1,
+                        "description": "The page number",
                         "name": "page",
                         "in": "query"
                     },
                     {
+                        "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "default": 100,
+                        "description": "Items per page",
                         "name": "size",
                         "in": "query"
                     },
@@ -741,6 +754,7 @@ const docTemplate = `{
                         "example": [
                             "createdAt"
                         ],
+                        "description": "Fields to use for sorting. Use the '-' for descending sorting",
                         "name": "sort",
                         "in": "query"
                     }
@@ -755,7 +769,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/query": {
+        "/api/users/search": {
             "post": {
                 "security": [
                     {
@@ -781,7 +795,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.UserFilters"
+                            "$ref": "#/definitions/schemas.UserSearch"
                         }
                     }
                 ],
@@ -970,8 +984,23 @@ const docTemplate = `{
                 },
                 "userId": {
                     "description": "The user ID, 24 characters",
-                    "type": "string",
-                    "example": "683b21134e2e5d46978daf1f"
+                    "type": "integer",
+                    "example": 123456789
+                }
+            }
+        },
+        "schemas.FlexLocation": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "description": "The latitude of the place",
+                    "type": "number",
+                    "example": 51.48180425016331
+                },
+                "lng": {
+                    "description": "The longitude of the place",
+                    "type": "number",
+                    "example": -0.19090418688755467
                 }
             }
         },
@@ -990,7 +1019,89 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.PlaceFilters": {
+        "schemas.PlacePut": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "The place address",
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Fulham road"
+                },
+                "description": {
+                    "description": "The place description, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stadium of Chelsea football club"
+                },
+                "location": {
+                    "description": "Location object (can be sent as JSON string)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.FlexLocation"
+                        }
+                    ]
+                },
+                "title": {
+                    "description": "The place title/name, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stamford Bridge"
+                }
+            }
+        },
+        "schemas.PlaceRead": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "The place address",
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Fulham road"
+                },
+                "createdAt": {
+                    "description": "creation datetime                                            // last update datetime",
+                    "type": "string",
+                    "example": "2024-01-12T10:15:30.000Z"
+                },
+                "creatorId": {
+                    "description": "The ID of the place creator",
+                    "type": "integer",
+                    "example": 123456789
+                },
+                "description": {
+                    "description": "The place description, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stadium of Chelsea football club"
+                },
+                "id": {
+                    "description": "The ID of the place",
+                    "type": "integer",
+                    "example": 123456789
+                },
+                "imageUrl": {
+                    "description": "local url on the storage",
+                    "type": "string",
+                    "example": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
+                },
+                "location": {
+                    "description": "Location object (can be sent as JSON string)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Location"
+                        }
+                    ]
+                },
+                "title": {
+                    "description": "The place title/name, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stamford Bridge"
+                }
+            }
+        },
+        "schemas.PlaceSearch": {
             "type": "object",
             "properties": {
                 "address": {
@@ -1004,13 +1115,13 @@ const docTemplate = `{
                     ]
                 },
                 "creatorId": {
-                    "description": "The ID of the place creator, 24 characters",
+                    "description": "The ID of the place creator",
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
                     "example": [
-                        "eq:683b21134e2e5d46978daf1f"
+                        "in:123456789"
                     ]
                 },
                 "description": {
@@ -1024,6 +1135,7 @@ const docTemplate = `{
                     ]
                 },
                 "fields": {
+                    "description": "Fields to include in the response; omit for full document",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -1034,13 +1146,13 @@ const docTemplate = `{
                     ]
                 },
                 "id": {
-                    "description": "The ID of the place 24 characters",
+                    "description": "The ID of the place",
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
                     "example": [
-                        "683b21134e2e5d46978daf1f"
+                        "123456789"
                     ]
                 },
                 "locationLat": {
@@ -1064,14 +1176,20 @@ const docTemplate = `{
                     ]
                 },
                 "page": {
+                    "description": "The page number",
                     "type": "integer",
-                    "default": 1
+                    "default": 1,
+                    "minimum": 1
                 },
                 "size": {
+                    "description": "Items per page",
                     "type": "integer",
-                    "default": 100
+                    "default": 100,
+                    "maximum": 100,
+                    "minimum": 1
                 },
                 "sort": {
+                    "description": "Fields to use for sorting. Use the '-' for descending sorting",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -1089,93 +1207,6 @@ const docTemplate = `{
                     "example": [
                         "eq:Some Place"
                     ]
-                }
-            }
-        },
-        "schemas.PlacePut": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "description": "The place address",
-                    "type": "string",
-                    "minLength": 10,
-                    "example": "Fulham road"
-                },
-                "description": {
-                    "description": "The place description, 10 characters minimum",
-                    "type": "string",
-                    "minLength": 10,
-                    "example": "Stadium of Chelsea football club"
-                },
-                "location": {
-                    "description": "Location object (can be sent as JSON string)",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/schemas.Location"
-                        }
-                    ]
-                },
-                "title": {
-                    "description": "The place title/name, 10 characters minimum",
-                    "type": "string",
-                    "minLength": 10,
-                    "example": "Stamford Bridge"
-                }
-            }
-        },
-        "schemas.PlaceRead": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "description": "The place address",
-                    "type": "string",
-                    "minLength": 10,
-                    "example": "Fulham road"
-                },
-                "createdAt": {
-                    "description": "creation datetime",
-                    "type": "string",
-                    "example": "2024-01-12T10:15:30.000Z"
-                },
-                "creatorId": {
-                    "description": "The ID of the place creator, 24 characters",
-                    "type": "string",
-                    "example": "683b21134e2e5d46978daf1f"
-                },
-                "description": {
-                    "description": "The place description, 10 characters minimum",
-                    "type": "string",
-                    "minLength": 10,
-                    "example": "Stadium of Chelsea football club"
-                },
-                "id": {
-                    "description": "The ID of the place 24 characters",
-                    "type": "string",
-                    "example": "683b21134e2e5d46978daf1f"
-                },
-                "imageUrl": {
-                    "description": "local url on the storage",
-                    "type": "string",
-                    "example": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
-                },
-                "location": {
-                    "description": "Location object (can be sent as JSON string)",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/schemas.Location"
-                        }
-                    ]
-                },
-                "title": {
-                    "description": "The place title/name, 10 characters minimum",
-                    "type": "string",
-                    "minLength": 10,
-                    "example": "Stamford Bridge"
-                },
-                "updatedAt": {
-                    "description": "last update datetime",
-                    "type": "string",
-                    "example": "2024-01-12T10:15:30.000Z"
                 }
             }
         },
@@ -1199,65 +1230,25 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.UserFilters": {
+        "schemas.UserPlace": {
             "type": "object",
             "properties": {
-                "email": {
-                    "description": "The user email",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "eq:mslimbeji@gmail.com"
-                    ]
-                },
-                "fields": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "id",
-                        "name"
-                    ]
+                "address": {
+                    "description": "The place address",
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "Fulham road"
                 },
                 "id": {
-                    "description": "The user ID, 24 characters",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "683b21134e2e5d46978daf1f"
-                    ]
-                },
-                "name": {
-                    "description": "The user name, two characters at least",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "eq:Slim Beji"
-                    ]
-                },
-                "page": {
+                    "description": "The ID of the place",
                     "type": "integer",
-                    "default": 1
+                    "example": 123456789
                 },
-                "size": {
-                    "type": "integer",
-                    "default": 100
-                },
-                "sort": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "createdAt"
-                    ]
+                "title": {
+                    "description": "The place title/name, 10 characters minimum",
+                    "type": "string",
+                    "minLength": 10,
+                    "example": "Stamford Bridge"
                 }
             }
         },
@@ -1276,9 +1267,9 @@ const docTemplate = `{
                     "example": "Slim Beji"
                 },
                 "password": {
-                    "description": "The user password, 10 characters at least",
+                    "description": "The user password, 8 characters at least",
                     "type": "string",
-                    "minLength": 10,
+                    "minLength": 8,
                     "example": "very_secret"
                 }
             }
@@ -1287,7 +1278,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "description": "creation datetime",
+                    "description": "creation datetime                                            // last update datetime",
                     "type": "string",
                     "example": "2024-01-12T10:15:30.000Z"
                 },
@@ -1297,9 +1288,9 @@ const docTemplate = `{
                     "example": "mslimbeji@gmail.com"
                 },
                 "id": {
-                    "description": "The user ID, 24 characters",
-                    "type": "string",
-                    "example": "683b21134e2e5d46978daf1f"
+                    "description": "The user ID",
+                    "type": "integer",
+                    "example": 12345678
                 },
                 "imageUrl": {
                     "description": "local url on the storage",
@@ -1318,19 +1309,80 @@ const docTemplate = `{
                     "example": "Slim Beji"
                 },
                 "places": {
-                    "description": "The id of places belonging to the user, 24 characters",
+                    "description": "Places created by the user",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.UserPlace"
+                    }
+                }
+            }
+        },
+        "schemas.UserSearch": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "The user email",
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
                     "example": [
-                        "683b21134e2e5d46978daf1f"
+                        "eq:mslimbeji@gmail.com"
                     ]
                 },
-                "updatedAt": {
-                    "description": "last update datetime",
-                    "type": "string",
-                    "example": "2024-01-12T10:15:30.000Z"
+                "fields": {
+                    "description": "Fields to include in the response; omit for full document",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "id",
+                        "name"
+                    ]
+                },
+                "id": {
+                    "description": "The user ID",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "123456789"
+                    ]
+                },
+                "name": {
+                    "description": "The user name, two characters at least",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "eq:Slim Beji"
+                    ]
+                },
+                "page": {
+                    "description": "The page number",
+                    "type": "integer",
+                    "default": 1,
+                    "minimum": 1
+                },
+                "size": {
+                    "description": "Items per page",
+                    "type": "integer",
+                    "default": 100,
+                    "maximum": 100,
+                    "minimum": 1
+                },
+                "sort": {
+                    "description": "Fields to use for sorting. Use the '-' for descending sorting",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "createdAt"
+                    ]
                 }
             }
         },

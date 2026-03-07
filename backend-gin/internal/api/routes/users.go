@@ -16,7 +16,7 @@ import (
 // @Accept       application/json
 // @Produce      json
 // @Security     OAuth2Password[admin]
-// @Param        params query schemas.UserFilters true "GET parameters"
+// @Param        params query schemas.UserSearch true "GET parameters"
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/ [get]
 func getUsers(c *gin.Context) {
@@ -35,7 +35,7 @@ func getUsers(c *gin.Context) {
 // @Accept       application/json
 // @Produce      json
 // @Security     OAuth2Password[admin]
-// @Param        params body schemas.UserFilters true "POST parameters"
+// @Param        params body schemas.UserSearch true "POST parameters"
 // @Success      200  {object}  schemas.UsersPaginated
 // @Router       /api/users/search [post]
 func searchUsers(c *gin.Context) {

@@ -16,7 +16,7 @@ import (
 // @Accept       application/json
 // @Produce      json
 // @Security     OAuth2Password[admin]
-// @Param        params query schemas.PlaceFilters true "GET parameters"
+// @Param        params query schemas.PlaceSearch true "GET parameters"
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/ [get]
 func getPlaces(c *gin.Context) {
@@ -35,7 +35,7 @@ func getPlaces(c *gin.Context) {
 // @Accept       application/json
 // @Produce      json
 // @Security     OAuth2Password[admin]
-// @Param        params body schemas.PlaceFilters true "POST parameters"
+// @Param        params body schemas.PlaceSearch true "POST parameters"
 // @Success      200  {object}  schemas.PlacesPaginated
 // @Router       /api/places/search [post]
 func searchPlaces(c *gin.Context) {
