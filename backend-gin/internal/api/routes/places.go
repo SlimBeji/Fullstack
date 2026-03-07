@@ -59,8 +59,9 @@ func searchPlaces(c *gin.Context) {
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places [post]
 func createPlace(c *gin.Context) {
-	body, _ := gin_.GetBody[schemas.PlacePost](c)
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
+	body, _ := gin_.GetBody[schemas.PlacePost](c)
+
 	cp := cruds.GetCRUDSPlace()
 	place, err := cp.UserPost(currentUser, body, &cruds.PlaceOptions{Process: true})
 	if err != nil {
