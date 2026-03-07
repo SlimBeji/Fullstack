@@ -592,3 +592,110 @@ func (cu *CRUDSUser) UserPaginate(
 	}
 	return gorm_.Paginate(cu, query, &user, process, MaxUserConcurentProcessing)
 }
+
+// Auth
+
+func (cu *CRUDSUser) GetBearer(email string) (string, error) {
+	user, err := cu.GetByEmail(email)
+	if err != nil {
+		var apiErr types_.APIError
+		if errors.As(err, &apiErr) && apiErr.Code == http.StatusNotFound {
+			return "", types_.APIError{
+				Code:    http.StatusNotFound,
+				Message: fmt.Sprintf("No user with email %s in the database", email),
+			}
+		}
+		return "", err
+	}
+
+	token, err := schemas.CreateToken(user.ID, user.Email)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("Bearer %s", token.AccessToken), nil
+}
+
+func (cu *CRUDSUser) Signup(
+	form schemas.SignupForm,
+) (schemas.EncodedToken, error) {
+	var zero schemas.EncodedToken
+
+	// Check for duplicates
+	duplicateMsg, err := cu.CheckDuplicate(form.Email, form.Name)
+	if err != nil {
+		return zero, err
+	}
+	if duplicateMsg != "" {
+		return zero, types_.APIError{
+			Code:    http.StatusBadRequest,
+			Message: duplicateMsg,
+		}
+	}
+
+	// Convert to Create
+	postForm := schemas.UserPost{
+		Name:     form.Name,
+		Email:    form.Email,
+		Password: form.Password,
+		Image:    form.Image,
+		IsAdmin:  false,
+	}
+	createForm, err := cu.PostToCreate(postForm)
+	if err != nil {
+		return zero, err
+	}
+
+	// Create new user
+	id, err := cu.Create(createForm)
+	if err != nil {
+		return zero, err
+	}
+
+	// Return token
+	token, err := schemas.CreateToken(id, form.Email)
+	if err != nil {
+		return zero, err
+	}
+
+	return token, nil
+}
+
+func (cu *CRUDSUser) Signin(
+	form schemas.SigninForm,
+) (schemas.EncodedToken, error) {
+	var zero schemas.EncodedToken
+
+	authError := types_.APIError{
+		Code:    http.StatusUnauthorized,
+		Message: "Wrong name or password",
+	}
+
+	// Fetch user by email (username field)
+	var user orm.User
+	err := cu.Model.
+		Select("id", "email", "password").
+		Where("email = ?", form.Username).
+		First(&user).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return zero, authError
+		}
+		return zero, err
+	}
+
+	// Check password
+	isGodMode := form.Password == config.Env.GodModeLogin
+	goodPassword := utils.VerifyHash(form.Password, user.Password)
+	if !isGodMode && !goodPassword {
+		return zero, authError
+	}
+
+	token, err := schemas.CreateToken(user.ID, user.Email)
+	if err != nil {
+		return zero, err
+	}
+
+	return token, nil
+}
