@@ -169,25 +169,16 @@ func DumpDb(verbose ...bool) error {
 	ctx := context.Background()
 	pgClient := instances.GetPgClient()
 
-	// Reset places table
-	err := pgClient.ResetTable(ctx, string(orm.TablePlaces))
-	if err != nil {
-		message := fmt.Sprintf("could not reset table %s", orm.TablePlaces)
-		if isVerbose {
-			fmt.Println(message)
+	for _, table := range orm.AllTables {
+		err := pgClient.ResetTable(ctx, string(table))
+		if err != nil {
+			message := fmt.Sprintf("could not reset table %s", table)
+			if isVerbose {
+				fmt.Println(message)
+			}
+		} else if isVerbose {
+			fmt.Printf("✅ Table %s cleared!\n", table)
 		}
-	} else if isVerbose {
-		fmt.Printf("✅ Table %s cleared!\n", orm.TablePlaces)
-	}
-
-	err = pgClient.ResetTable(ctx, string(orm.TableUsers))
-	if err != nil {
-		message := fmt.Sprintf("could not reset table %s", orm.TableUsers)
-		if isVerbose {
-			fmt.Println(message)
-		}
-	} else if isVerbose {
-		fmt.Printf("✅ Table %s cleared!\n", orm.TableUsers)
 	}
 
 	rc := instances.GetRedisClient()
