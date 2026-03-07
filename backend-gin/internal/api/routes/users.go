@@ -3,7 +3,7 @@ package routes
 import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/gin_"
-	"backend/internal/models/collections"
+	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
 	"fmt"
 	"net/http"
@@ -21,8 +21,8 @@ import (
 // @Router       /api/users/ [get]
 func getUsers(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
-	uc := collections.GetUserCollection()
-	data, err := uc.FetchBsonPage(&searchQuery, c)
+	cu := cruds.GetCRUDSUser()
+	data, err := cu.Paginate(searchQuery, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -40,8 +40,8 @@ func getUsers(c *gin.Context) {
 // @Router       /api/users/search [post]
 func searchUsers(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
-	uc := collections.GetUserCollection()
-	data, err := uc.FetchBsonPage(&searchQuery, c)
+	cu := cruds.GetCRUDSUser()
+	data, err := cu.Paginate(searchQuery, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -59,10 +59,11 @@ func searchUsers(c *gin.Context) {
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users [post]
 func createUser(c *gin.Context) {
-	body, _ := gin_.GetBody[schemas.UserPost](c)
-	uc := collections.GetUserCollection()
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
-	newUser, err := uc.UserCreate(&currentUser, &body, c)
+	body, _ := gin_.GetBody[schemas.UserPost](c)
+
+	cu := cruds.GetCRUDSUser()
+	newUser, err := cu.UserPost(currentUser, body, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -79,9 +80,14 @@ func createUser(c *gin.Context) {
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users/{userId} [get]
 func getUser(c *gin.Context) {
-	uc := collections.GetUserCollection()
-	userId := c.Param("userId")
-	user, err := uc.GetById(userId, c)
+	userId, err := gin_.ExtractId(c, "userId")
+	if err != nil {
+		gin_.AbortWithStatusJSON(c, err)
+		return
+	}
+
+	cu := cruds.GetCRUDSUser()
+	user, err := cu.Get(userId, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -99,11 +105,17 @@ func getUser(c *gin.Context) {
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users/{userId} [put]
 func updateUser(c *gin.Context) {
-	userId := c.Param("userId")
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
-	uc := collections.GetUserCollection()
 	body, _ := gin_.GetBody[schemas.UserPut](c)
-	user, err := uc.UserUpdateById(&currentUser, userId, &body, c)
+
+	userId, err := gin_.ExtractId(c, "userId")
+	if err != nil {
+		gin_.AbortWithStatusJSON(c, err)
+		return
+	}
+
+	cu := cruds.GetCRUDSUser()
+	user, err := cu.UserPut(currentUser, userId, body, &cruds.UserOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -124,14 +136,21 @@ type UserDeleteResponse struct {
 // @Success      200  {object}  UserDeleteResponse
 // @Router       /api/users/{userId} [delete]
 func deleteUser(c *gin.Context) {
-	userId := c.Param("userId")
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
-	uc := collections.GetUserCollection()
-	err := uc.UserDelete(&currentUser, userId, c)
+
+	userId, err := gin_.ExtractId(c, "userId")
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
+
+	cu := cruds.GetCRUDSUser()
+	err = cu.UserDelete(currentUser, userId)
+	if err != nil {
+		gin_.AbortWithStatusJSON(c, err)
+		return
+	}
+
 	message := fmt.Sprintf("Deleted user %s", userId)
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
