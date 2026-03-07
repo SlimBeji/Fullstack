@@ -2,11 +2,13 @@ package bin
 
 import (
 	"backend/internal/models/examples"
-	"backend/internal/services/setup"
+	"backend/internal/services/instances"
 )
 
 func SeedDB() {
-	setup := setup.New()
-	defer setup.CloseServices()
+	pgCLient := instances.GetPgClient()
+	defer pgCLient.Close()
+	redisClient := instances.GetRedisClient()
+	defer redisClient.Close()
 	examples.SeedDb(true)
 }
