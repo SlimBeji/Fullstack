@@ -433,3 +433,46 @@ type RecordUpdate[
 	BeforeUpdate(*gorm.DB, uint, Update) error
 	AfterUpdate(*gorm.DB, uint, Update) error
 }
+
+func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
+	crud RecordUpdate[User, Model, Read, Update, Put],
+	id uint,
+	data Update,
+) error {
+	err := crud.GetDB().Transaction(func(tx *gorm.DB) error {
+		// Before update hook
+		if err := crud.BeforeUpdate(tx, id, data); err != nil {
+			return err
+		}
+
+		// Update in database
+		result := tx.Model(new(Model)).Where("id = ?", id).Updates(data)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		// Check if record exists
+		if result.RowsAffected == 0 {
+			return types_.NotFoundError(crud.ModelName(), id)
+		}
+
+		// After update hook
+		if err := crud.AfterUpdate(tx, id, data); err != nil {
+			return err
+		}
+
+		return nil // Commit
+	})
+
+	if err != nil {
+		if errors.As(err, &types_.APIError{}) {
+			return err
+		}
+		return types_.APIError{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("Could not update %s object: %v", crud.ModelName(), err),
+		}
+	}
+
+	return nil
+}

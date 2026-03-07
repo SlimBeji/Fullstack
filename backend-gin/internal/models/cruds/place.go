@@ -397,7 +397,7 @@ func (cp *CRUDSPlace) PutToUpdate(form schemas.PlacePut) (schemas.PlaceUpdate, e
 }
 
 func (cp *CRUDSPlace) AuthPut(
-	user schemas.UserRead, id uint, data schemas.PlaceUpdate,
+	user schemas.UserRead, id uint, data schemas.PlacePut,
 ) error {
 	if user.IsAdmin {
 		return nil
@@ -430,4 +430,8 @@ func (cp *CRUDSPlace) AfterUpdate(
 	query *gorm.DB, id uint, data schemas.PlaceUpdate,
 ) error {
 	return nil
+}
+
+func (cp *CRUDSPlace) Update(id uint, data schemas.PlaceUpdate) error {
+	return gorm_.UpdateRecord(cp, id, data)
 }

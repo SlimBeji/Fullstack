@@ -440,7 +440,7 @@ func (cu *CRUDSUser) PutToUpdate(form schemas.UserPut) (schemas.UserUpdate, erro
 }
 
 func (cu *CRUDSUser) AuthPut(
-	user schemas.UserRead, id uint, data schemas.UserUpdate,
+	user schemas.UserRead, id uint, data schemas.UserPut,
 ) error {
 	if user.IsAdmin {
 		return nil
@@ -465,4 +465,8 @@ func (cu *CRUDSUser) AfterUpdate(
 	query *gorm.DB, id uint, data schemas.UserUpdate,
 ) error {
 	return nil
+}
+
+func (cu *CRUDSUser) Update(id uint, data schemas.UserUpdate) error {
+	return gorm_.UpdateRecord(cu, id, data)
 }
