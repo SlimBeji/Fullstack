@@ -3,7 +3,7 @@ package routes
 import (
 	"backend/internal/api/middlewares"
 	"backend/internal/lib/gin_"
-	"backend/internal/models/collections"
+	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
 	"fmt"
 	"net/http"
@@ -21,8 +21,8 @@ import (
 // @Router       /api/places/ [get]
 func getPlaces(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
-	pc := collections.GetPlaceCollection()
-	data, err := pc.FetchBsonPage(&searchQuery, c)
+	cp := cruds.GetCRUDSPlace()
+	data, err := cp.Paginate(searchQuery, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -40,8 +40,8 @@ func getPlaces(c *gin.Context) {
 // @Router       /api/places/query [post]
 func queryPlaces(c *gin.Context) {
 	searchQuery, _ := gin_.GetSearchQuery(c)
-	pc := collections.GetPlaceCollection()
-	data, err := pc.FetchBsonPage(&searchQuery, c)
+	cp := cruds.GetCRUDSPlace()
+	data, err := cp.Paginate(searchQuery, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -61,8 +61,8 @@ func queryPlaces(c *gin.Context) {
 func createPlace(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.PlacePost](c)
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
-	pc := collections.GetPlaceCollection()
-	place, err := pc.UserCreate(&currentUser, &body, c)
+	cp := cruds.GetCRUDSPlace()
+	place, err := cp.UserPost(currentUser, body, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -79,9 +79,14 @@ func createPlace(c *gin.Context) {
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places/{placeId} [get]
 func getPlace(c *gin.Context) {
-	pc := collections.GetPlaceCollection()
-	placeId := c.Param("placeId")
-	place, err := pc.GetById(placeId, c)
+	placeId, err := gin_.ExtractId(c, "placeId")
+	if err != nil {
+		gin_.AbortWithStatusJSON(c, err)
+		return
+	}
+
+	cp := cruds.GetCRUDSPlace()
+	place, err := cp.GetPartial(placeId, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -99,11 +104,17 @@ func getPlace(c *gin.Context) {
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places/{placeId} [put]
 func updatePlace(c *gin.Context) {
-	placeId := c.Param("placeId")
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
-	pc := collections.GetPlaceCollection()
 	body, _ := gin_.GetBody[schemas.PlacePut](c)
-	place, err := pc.UserUpdateById(&currentUser, placeId, &body, c)
+
+	placeId, err := gin_.ExtractId(c, "placeId")
+	if err != nil {
+		gin_.AbortWithStatusJSON(c, err)
+		return
+	}
+
+	cp := cruds.GetCRUDSPlace()
+	place, err := cp.UserPut(currentUser, placeId, body, &cruds.PlaceOptions{Process: true})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -124,14 +135,21 @@ type PlaceDeleteResponse struct {
 // @Success      200  {object}  PlaceDeleteResponse
 // @Router       /api/places/{placeId} [delete]
 func deletePlace(c *gin.Context) {
-	placeId := c.Param("placeId")
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
-	pc := collections.GetPlaceCollection()
-	err := pc.UserDelete(&currentUser, placeId, c)
+
+	placeId, err := gin_.ExtractId(c, "placeId")
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
 	}
+
+	cp := cruds.GetCRUDSPlace()
+	err = cp.UserDelete(currentUser, placeId)
+	if err != nil {
+		gin_.AbortWithStatusJSON(c, err)
+		return
+	}
+
 	message := fmt.Sprintf("Deleted place %s", placeId)
 	c.JSON(http.StatusOK, gin.H{"message": message})
 }
