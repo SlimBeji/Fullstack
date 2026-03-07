@@ -235,10 +235,10 @@ type RecordRead[User any, Model BaseModelReader, Read any] interface {
 	QueryBuilder
 	ModelName() string
 	DefaultSelect() []string
-	AuthGet(user User, query types_.SearchQuery) types_.SearchQuery
+	AuthGet(context.Context, User, types_.SearchQuery) types_.SearchQuery
 	ToRead(*Model) Read
-	PostProcess(*Read) error
-	PostProcessPartial(map[string]any) error
+	PostProcess(context.Context, *Read) error
+	PostProcessPartial(context.Context, map[string]any) error
 }
 
 func Read[User any, Model BaseModelReader, Read any](
@@ -271,7 +271,7 @@ func Get[User any, Model BaseModelReader, Read any](
 
 	// Apply auth if user provided
 	if user != nil {
-		query = crud.AuthGet(*user, query)
+		query = crud.AuthGet(ctx, *user, query)
 	}
 
 	// Build and execute query
@@ -314,7 +314,7 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 
 	// Apply auth if user provided
 	if user != nil {
-		query = crud.AuthGet(*user, query)
+		query = crud.AuthGet(ctx, *user, query)
 	}
 
 	// Build and execute query
@@ -346,8 +346,8 @@ type RecordCreate[
 ] interface {
 	RecordRead[User, Model, Read]
 	ToModel(Create) Model
-	PostToCreate(Post) (Create, error)
-	AuthPost(User, Post) error
+	PostToCreate(context.Context, Post) (Create, error)
+	AuthPost(context.Context, User, Post) error
 	BeforeCreate(*gorm.DB, Create) error
 	AfterCreate(*gorm.DB, uint, Create) error
 }
@@ -410,13 +410,13 @@ func PostRecord[User any, Model BaseModelReader, Read any, Create any, Post any]
 	user *User,
 ) (uint, error) {
 	if user != nil {
-		err := crud.AuthPost(*user, form)
+		err := crud.AuthPost(ctx, *user, form)
 		if err != nil {
 			return 0, err
 		}
 	}
 
-	data, err := crud.PostToCreate(form)
+	data, err := crud.PostToCreate(ctx, form)
 	if err != nil {
 		return 0, err
 	}
@@ -434,8 +434,8 @@ type RecordUpdate[
 	Put any,
 ] interface {
 	RecordRead[User, Model, Read]
-	PutToUpdate(Put) (Update, error)
-	AuthPut(User, uint, Put) error
+	PutToUpdate(context.Context, Put) (Update, error)
+	AuthPut(context.Context, User, uint, Put) error
 	BeforeUpdate(*gorm.DB, uint, Update) error
 	AfterUpdate(*gorm.DB, uint, Update) error
 }
@@ -492,13 +492,13 @@ func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
 	user *User,
 ) error {
 	if user != nil {
-		err := crud.AuthPut(*user, id, form)
+		err := crud.AuthPut(ctx, *user, id, form)
 		if err != nil {
 			return err
 		}
 	}
 
-	data, err := crud.PutToUpdate(form)
+	data, err := crud.PutToUpdate(ctx, form)
 	if err != nil {
 		return err
 	}
@@ -510,7 +510,7 @@ func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
 
 type RecordDelete[User any, Model BaseModelReader, Read any] interface {
 	RecordRead[User, Model, Read]
-	AuthDelete(User, uint) error
+	AuthDelete(context.Context, User, uint) error
 	BeforeDelete(*gorm.DB, Model) error
 	AfterDelete(*gorm.DB, Model) error
 }
@@ -533,7 +533,7 @@ func DeleteRecord[User any, Model BaseModelReader, Read any](
 
 	// Check authoriztion
 	if user != nil {
-		if err := crud.AuthDelete(*user, id); err != nil {
+		if err := crud.AuthDelete(ctx, *user, id); err != nil {
 			return err
 		}
 	}
@@ -625,7 +625,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 
 	// Apply auth filter if user provided
 	if user != nil {
-		query = crud.AuthGet(*user, query)
+		query = crud.AuthGet(ctx, *user, query)
 	}
 
 	// Build query
@@ -671,7 +671,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 
 	// Apply auth filter if user provided
 	if user != nil {
-		query = crud.AuthGet(*user, query)
+		query = crud.AuthGet(ctx, *user, query)
 	}
 
 	// Build query
@@ -702,7 +702,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 
 	// Step 1: Apply auth filter if user provided
 	if user != nil {
-		query = crud.AuthGet(*user, query)
+		query = crud.AuthGet(ctx, *user, query)
 	}
 
 	// Step 2: Count total results
@@ -737,7 +737,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 		processed, err := utils.BatchProcess(
 			data,
 			func(item map[string]any) (map[string]any, error) {
-				err := crud.PostProcessPartial(item)
+				err := crud.PostProcessPartial(ctx, item)
 				return item, err
 			},
 			workers,
