@@ -5,9 +5,8 @@ import (
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
-	"backend/internal/models/collections"
+	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
-	"context"
 	"net/http"
 	"regexp"
 	"strings"
@@ -38,15 +37,14 @@ func GetUserFromToken(token string) (schemas.UserRead, error) {
 		return schemas.UserRead{}, badToken
 	}
 
-	userId, userIdValid := userIdRaw.(string)
+	userId, userIdValid := userIdRaw.(uint)
 	email, emailValid := emailRaw.(string)
 	if !userIdValid || !emailValid {
 		return schemas.UserRead{}, badToken
 	}
 
-	uc := collections.GetUserCollection()
-	ctx := context.Background()
-	user, err := uc.GetById(userId, ctx)
+	cu := cruds.GetCRUDSUser()
+	user, err := cu.Get(userId, nil)
 	if err != nil {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,
@@ -93,7 +91,7 @@ func checkAuthToken(checkAdmin bool) gin.HandlerFunc {
 			return
 		}
 
-		if checkAdmin && !bool(user.IsAdmin) {
+		if checkAdmin && !user.IsAdmin {
 			err := types_.APIError{
 				Code:    http.StatusUnauthorized,
 				Message: "Not an admin",
