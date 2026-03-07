@@ -2,9 +2,8 @@ package routes
 
 import (
 	"backend/internal/lib/gin_"
-	"backend/internal/models/collections"
+	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,9 +19,8 @@ import (
 // @Router       /api/auth/signup [post]
 func signup(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.SignupForm](c)
-	uc := collections.GetUserCollection()
-	ctx := context.Background()
-	resp, err := uc.Signup(&body, ctx)
+	cu := cruds.GetCRUDSUser()
+	resp, err := cu.Signup(body)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
@@ -39,9 +37,8 @@ func signup(c *gin.Context) {
 // @Router       /api/auth/signin [post]
 func signin(c *gin.Context) {
 	body, _ := gin_.GetBody[schemas.SigninForm](c)
-	uc := collections.GetUserCollection()
-	ctx := context.Background()
-	resp, err := uc.Signin(&body, ctx)
+	cu := cruds.GetCRUDSUser()
+	resp, err := cu.Signin(body)
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return
