@@ -69,7 +69,7 @@ class SignupForm:
         name: str = user.name_meta.multipart,
         email: EmailStr = user.email_meta.multipart,
         password: str = user.password_meta.multipart,
-        image: FileToUpload | None = user.image_meta.multipart,
+        image: FileToUpload | None = user.image_meta.optional_multipart,
     ):
         self.name = name
         self.email = email

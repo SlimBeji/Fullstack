@@ -30,6 +30,7 @@ class FieldMeta:
         # HTTP Fields
         self.info = self._build_field()
         self.multipart = self._build_multpart_field()
+        self.optional_multipart = self._build_multpart_optional_field()
 
     def _build_metadata(self) -> dict:
         metadata = dict(
@@ -60,6 +61,13 @@ class FieldMeta:
     def _build_multpart_field(self) -> Any:
         if self.is_file:
             return File(description=self.description)
+
+        metatdata = self._build_metadata()
+        return Form(**metatdata)
+
+    def _build_multpart_optional_field(self) -> Any:
+        if self.is_file:
+            return File(None, description=self.description)
 
         metatdata = self._build_metadata()
         return Form(**metatdata)

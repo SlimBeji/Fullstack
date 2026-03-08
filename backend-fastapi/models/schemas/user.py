@@ -116,7 +116,7 @@ class UserMultipartPost:
         email: EmailStr = email_meta.multipart,
         isAdmin: bool = isAdmin_meta.multipart,
         password: str = password_meta.multipart,
-        image: FileToUpload | None = image_meta.multipart,
+        image: FileToUpload | None = image_meta.optional_multipart,
     ):
         self.name = name
         self.email = email

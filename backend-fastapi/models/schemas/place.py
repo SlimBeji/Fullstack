@@ -169,7 +169,7 @@ class PlaceMultipartPost:
         lat: float = lat_meta.multipart,
         lng: float = lng_meta.multipart,
         creatorId: int = creatorId_meta.multipart,
-        image: FileToUpload | None = image_meta.multipart,
+        image: FileToUpload | None = image_meta.optional_multipart,
     ):
         self.title = title
         self.description = description
