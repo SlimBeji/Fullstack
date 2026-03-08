@@ -524,6 +524,31 @@ const docTemplate = `{
                         "name": "placeId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "enum": [
+                                "id",
+                                "title",
+                                "description",
+                                "address",
+                                "location.lat",
+                                "location.lng",
+                                "imageUrl",
+                                "creatorId",
+                                "createdAt"
+                            ],
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "id",
+                            "title"
+                        ],
+                        "description": "Fields to include in the response; omit for full document",
+                        "name": "fields",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -886,6 +911,29 @@ const docTemplate = `{
                         "name": "userId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "enum": [
+                                "id",
+                                "name",
+                                "email",
+                                "isAdmin",
+                                "imageUrl",
+                                "places",
+                                "createdAt"
+                            ],
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "id",
+                            "name"
+                        ],
+                        "description": "Fields to include in the response; omit for full document",
+                        "name": "fields",
+                        "in": "query"
                     }
                 ],
                 "responses": {

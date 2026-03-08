@@ -144,7 +144,7 @@ type PlaceRead struct {
 }
 
 type PlaceGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" example:"id,title"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" enums:"id,title,description,address,location.lat,location.lng,imageUrl,creatorId,createdAt" example:"id,title"` // Fields to include in the response; omit for full document
 }
 
 func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {

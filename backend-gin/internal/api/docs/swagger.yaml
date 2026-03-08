@@ -737,6 +737,26 @@ paths:
         name: placeId
         required: true
         type: string
+      - collectionFormat: csv
+        description: Fields to include in the response; omit for full document
+        example:
+        - id
+        - title
+        in: query
+        items:
+          enum:
+          - id
+          - title
+          - description
+          - address
+          - location.lat
+          - location.lng
+          - imageUrl
+          - creatorId
+          - createdAt
+          type: string
+        name: fields
+        type: array
       produces:
       - application/json
       responses:
@@ -975,6 +995,24 @@ paths:
         name: userId
         required: true
         type: string
+      - collectionFormat: csv
+        description: Fields to include in the response; omit for full document
+        example:
+        - id
+        - name
+        in: query
+        items:
+          enum:
+          - id
+          - name
+          - email
+          - isAdmin
+          - imageUrl
+          - places
+          - createdAt
+          type: string
+        name: fields
+        type: array
       produces:
       - application/json
       responses:

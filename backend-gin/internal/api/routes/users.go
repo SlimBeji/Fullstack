@@ -77,6 +77,7 @@ func createUser(c *gin.Context) {
 // @Produce      json
 // @Security     OAuth2Password[admin]
 // @Param        userId path string true "User ID"
+// @Param        params query schemas.UserGet false "GET parameters"
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users/{userId} [get]
 func getUser(c *gin.Context) {
@@ -87,7 +88,10 @@ func getUser(c *gin.Context) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.Get(c, userId, &cruds.UserOptions{Process: true})
+	query, _ := gin_.GetQuery[schemas.UserGet](c)
+	user, err := cu.Get(c, userId, &cruds.UserOptions{
+		Process: true, Fields: query.Fields,
+	})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return

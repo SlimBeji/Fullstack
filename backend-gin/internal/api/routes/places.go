@@ -77,6 +77,7 @@ func createPlace(c *gin.Context) {
 // @Produce      json
 // @Security     OAuth2Password[admin]
 // @Param        placeId path string true "Place ID"
+// @Param        params query schemas.PlaceGet false "GET parameters"
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places/{placeId} [get]
 func getPlace(c *gin.Context) {
@@ -87,7 +88,10 @@ func getPlace(c *gin.Context) {
 	}
 
 	cp := cruds.GetCRUDSPlace()
-	place, err := cp.GetPartial(c, placeId, &cruds.PlaceOptions{Process: true})
+	query, _ := gin_.GetQuery[schemas.PlaceGet](c)
+	place, err := cp.GetPartial(c, placeId, &cruds.PlaceOptions{
+		Process: true, Fields: query.Fields,
+	})
 	if err != nil {
 		gin_.AbortWithStatusJSON(c, err)
 		return

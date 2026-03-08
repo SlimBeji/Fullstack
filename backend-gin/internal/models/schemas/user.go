@@ -123,7 +123,7 @@ type UserRead struct {
 }
 
 type UserGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,name"` // Fields to include in the response; omit for full document
 }
 
 func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
