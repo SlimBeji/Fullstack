@@ -8,57 +8,36 @@ import (
 
 // Postgresql
 
-var (
-	pgOnce   sync.Once
-	pgClient *clients.PgClient
-)
-
-var pgConfig = clients.PgClientConfig{
-	URL: config.Env.GetPGURL(),
-}
-
-func GetPgClient() *clients.PgClient {
-	pgOnce.Do(func() { pgClient = clients.NewPgClient(pgConfig) })
-	return pgClient
-}
+var GetPgClient = sync.OnceValue(func() *clients.PgClient {
+	config := clients.PgClientConfig{
+		URL: config.Env.GetPGURL(),
+	}
+	return clients.NewPgClient(config)
+})
 
 // Redis
 
-var (
-	cacheOnce   sync.Once
-	redisClient *clients.RedisClient
-)
-
-var redisConfig = clients.RedisClientConfig{
-	URL:        config.Env.GetRedisURL(),
-	Expiration: config.Env.RedisExpiration,
-}
-
-func GetRedisClient() *clients.RedisClient {
-	cacheOnce.Do(func() { redisClient = clients.NewRedisClient(redisConfig) })
-	return redisClient
-}
+var GetRedisClient = sync.OnceValue(func() *clients.RedisClient {
+	config := clients.RedisClientConfig{
+		URL:        config.Env.GetRedisURL(),
+		Expiration: config.Env.RedisExpiration,
+	}
+	return clients.NewRedisClient(config)
+})
 
 // Cloud Storage
 
-var (
-	storageOnce sync.Once
-	gcsStorage  *clients.CloudStorage
-)
-
-var storageConfig = clients.CloudStorageConfig{
-	ProjectId:          config.Env.GCPProjectID,
-	BucketName:         config.Env.GCSBucketName,
-	AccessExpiration:   config.Env.GCSBlobExpiration,
-	CredentialsFile:    config.Env.GoogleCredentials,
-	EmulatorPublicURL:  config.Env.GCSEmulatorPub,
-	EmulatorPrivateURL: config.Env.GCSEmulatorPriv,
-}
-
-func GetStorage() *clients.CloudStorage {
-	storageOnce.Do(func() { gcsStorage = clients.NewCloudStorage(storageConfig) })
-	return gcsStorage
-}
+var GetStorage = sync.OnceValue(func() *clients.CloudStorage {
+	config := clients.CloudStorageConfig{
+		ProjectId:          config.Env.GCPProjectID,
+		BucketName:         config.Env.GCSBucketName,
+		AccessExpiration:   config.Env.GCSBlobExpiration,
+		CredentialsFile:    config.Env.GoogleCredentials,
+		EmulatorPublicURL:  config.Env.GCSEmulatorPub,
+		EmulatorPrivateURL: config.Env.GCSEmulatorPriv,
+	}
+	return clients.NewCloudStorage(config)
+})
 
 // HuggingFace
 

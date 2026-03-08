@@ -6,12 +6,6 @@ import (
 	"sync"
 )
 
-var (
-	once      sync.Once
-	publisher *clients.TaskPublisher
-)
-
-func GetPublisher() *clients.TaskPublisher {
-	once.Do(func() { publisher = clients.NewPublisher(config.Env.GetRedisURL()) })
-	return publisher
-}
+var GetPublisher = sync.OnceValue(func() *clients.TaskPublisher {
+	return clients.NewPublisher(config.Env.GetRedisURL())
+})

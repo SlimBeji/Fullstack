@@ -5,14 +5,7 @@ import (
 	"sync"
 )
 
-var AllJobs []clients.JobConfig = []clients.JobConfig{SendNewsletterCron}
-
-var (
-	once      sync.Once
-	scheduler *clients.TaskScheduler
-)
-
-func GetScheduler() *clients.TaskScheduler {
-	once.Do(func() { scheduler = clients.NewScheduler(AllJobs) })
-	return scheduler
-}
+var GetScheduler = sync.OnceValue(func() *clients.TaskScheduler {
+	allJobs := []clients.JobConfig{SendNewsletterCron}
+	return clients.NewScheduler(allJobs)
+})

@@ -23,7 +23,7 @@ func HandlePlaceEmbedding(ctx context.Context, t *asynq.Task) error {
 	result, err := cp.Embed(ctx, data.PlaceId)
 	if err != nil {
 		newErr := fmt.Errorf(
-			"could not run embedding of place %s with huggingface: %w",
+			"could not run embedding of place %d with huggingface: %w",
 			data.PlaceId,
 			err,
 		)

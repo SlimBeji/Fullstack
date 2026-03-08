@@ -7,25 +7,19 @@ import (
 	"sync"
 )
 
-var TasksRegistery = clients.TasksRegistryType{
-	string(bgconfig.TaskNewsletter):     HandleSendingNewsletter,
-	string(bgconfig.TaskPlaceEmbedding): HandlePlaceEmbedding,
-}
+var GetHandler = sync.OnceValue(func() *clients.TaskHandler {
+	tasksRegistry := clients.TasksRegistryType{
+		string(bgconfig.TaskNewsletter):     HandleSendingNewsletter,
+		string(bgconfig.TaskPlaceEmbedding): HandlePlaceEmbedding,
+	}
 
-var (
-	once    sync.Once
-	handler *clients.TaskHandler
-)
+	handlerConfig := clients.TaskHandlerConfig{
+		Url:       config.Env.GetRedisURL(),
+		Registry:  tasksRegistry,
+		AllQueues: bgconfig.AllQueues,
+	}
 
-func GetHandler() *clients.TaskHandler {
-	once.Do(func() {
-		handlerConfig := clients.TaskHandlerConfig{
-			Url:       config.Env.GetRedisURL(),
-			Registry:  TasksRegistery,
-			AllQueues: bgconfig.AllQueues,
-		}
-		handler = clients.NewHandler(handlerConfig)
-		handler.Start()
-	})
+	handler := clients.NewHandler(handlerConfig)
+	handler.Start()
 	return handler
-}
+})

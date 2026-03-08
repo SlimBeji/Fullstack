@@ -33,11 +33,6 @@ type CRUDSUser struct {
 	defaultOrderBy  []string
 }
 
-var (
-	crudsUserOnce sync.Once
-	crudsUser     *CRUDSUser
-)
-
 // Constructor, Properties & Helpers
 
 func NewCRUDSUser() *CRUDSUser {
@@ -61,12 +56,9 @@ func NewCRUDSUser() *CRUDSUser {
 	}
 }
 
-func GetCRUDSUser() *CRUDSUser {
-	crudsUserOnce.Do(func() {
-		crudsUser = NewCRUDSUser()
-	})
-	return crudsUser
-}
+var GetCRUDSUser = sync.OnceValue(func() *CRUDSUser {
+	return NewCRUDSUser()
+})
 
 func (cu *CRUDSUser) GetDB(ctx context.Context) *gorm.DB {
 	return cu.DB.WithContext(ctx)

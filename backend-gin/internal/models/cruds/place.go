@@ -34,11 +34,6 @@ type CRUDSPlace struct {
 	defaultOrderBy  []string
 }
 
-var (
-	crudsPlaceOnce sync.Once
-	crudsPlace     *CRUDSPlace
-)
-
 // Constructor, Properties & Helpers
 
 func NewCRUDSPlace() *CRUDSPlace {
@@ -63,12 +58,9 @@ func NewCRUDSPlace() *CRUDSPlace {
 	}
 }
 
-func GetCRUDSPlace() *CRUDSPlace {
-	crudsPlaceOnce.Do(func() {
-		crudsPlace = NewCRUDSPlace()
-	})
-	return crudsPlace
-}
+var GetCRUDSPlace = sync.OnceValue(func() *CRUDSPlace {
+	return NewCRUDSPlace()
+})
 
 func (cp *CRUDSPlace) GetDB(ctx context.Context) *gorm.DB {
 	return cp.DB.WithContext(ctx)
