@@ -172,14 +172,16 @@ export const UserSearchSchema = filtersSchema(
     zod.object({
         id: httpFilters(
             UserFields.id,
-            { example: 123456789 },
+            { example: 123456789, description: "The user ID" },
             { isIndex: true }
         ).optional(),
         name: httpFilters(UserFields.name, {
             example: "eq:Slim Beji",
+            description: "The user name, two characters at least",
         }).optional(),
         email: httpFilters(UserFields.email, {
             example: "eq:mslimbeji@gmail.com",
+            description: "The user email",
         }).optional(),
     }),
     userSortableFields,

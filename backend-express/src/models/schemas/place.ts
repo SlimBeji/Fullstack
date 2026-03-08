@@ -197,27 +197,32 @@ export const PlaceSearchSchema = filtersSchema(
     zod.object({
         id: httpFilters(
             PlaceFields.id,
-            { example: 123456789 },
+            { example: 123456789, description: "The ID of the place" },
             { isIndex: true }
         ).optional(),
         title: httpFilters(PlaceFields.title, {
             example: "eq:Some Place",
+            description: "The place title/name, 10 characters minimum",
         }).optional(),
         description: httpFilters(PlaceFields.description, {
             example: "like:football",
+            description: "The place description, 10 characters minimum",
         }).optional(),
         address: httpFilters(PlaceFields.address, {
             example: "ilike:boulevard",
+            description: "The place address",
         }).optional(),
         locationLat: httpFilters(PlaceFields.lat, {
             example: "gt:3.5",
+            description: "The latitude of the place",
         }).optional(),
         locationLng: httpFilters(PlaceFields.lng, {
             example: "lt:4.5",
+            description: "The longitude of the place",
         }).optional(),
         creatorId: httpFilters(
             PlaceFields.creatorId,
-            { example: 123456789 },
+            { example: 123456789, description: "The ID of the place creator" },
             { isIndex: true }
         ).optional(),
     }),
