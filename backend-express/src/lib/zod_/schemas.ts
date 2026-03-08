@@ -13,12 +13,10 @@ export const paginatedSchema = (
         totalPages: zod
             .number()
             .openapi({ description: "The total number of pages", example: 2 }),
-        totalCount: zod
-            .number()
-            .openapi({
-                description: "Total number of items in the database",
-                example: 40,
-            }),
+        totalCount: zod.number().openapi({
+            description: "Total number of items in the database",
+            example: 40,
+        }),
         data: zod.array(schema).openapi(description),
     });
 };
@@ -44,8 +42,8 @@ export const filtersSchema = (
     sortables: readonly string[],
     selectables: readonly string[],
     maxItems: number = 100,
-    defaultSort: string[] | null = null,
-    defaultFields: string[] | null = null
+    defaultFields: string[] | null = null,
+    defaultSort: string[] | null = null
 ): AnyZodObject => {
     defaultSort = defaultSort || ["-createdAt"];
     defaultFields = defaultFields || ["id"];

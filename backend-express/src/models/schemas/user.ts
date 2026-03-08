@@ -186,7 +186,8 @@ export const UserSearchSchema = filtersSchema(
     }),
     userSortableFields,
     userSelectableFields,
-    env.MAX_ITEMS_PER_PAGE
+    env.MAX_ITEMS_PER_PAGE,
+    ["id", "place"]
 );
 
 export type UserSearch = ZodInfer<typeof UserSearchSchema>;

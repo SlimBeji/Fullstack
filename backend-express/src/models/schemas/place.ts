@@ -222,13 +222,17 @@ export const PlaceSearchSchema = filtersSchema(
         }).optional(),
         creatorId: httpFilters(
             PlaceFields.creatorId,
-            { example: 123456789, description: "The ID of the place creator" },
+            {
+                example: "in:123456789",
+                description: "The ID of the place creator",
+            },
             { isIndex: true }
         ).optional(),
     }),
     placeSortableFields,
     placeSelectableFields,
-    env.MAX_ITEMS_PER_PAGE
+    env.MAX_ITEMS_PER_PAGE,
+    ["id", "location"]
 );
 
 export type PlaceSearch = ZodInfer<typeof PlaceSearchSchema>;
