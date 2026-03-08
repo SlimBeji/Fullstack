@@ -480,13 +480,20 @@ export const httpFilters = (
     doc?: OpenapiDoc,
     options?: TransformOption
 ): ZodTypeAny => {
-    return zod.preprocess(
-        (val) =>
-            val === undefined
-                ? undefined
-                : Array.isArray(val)
-                  ? val
-                  : [`${val}`],
-        zod.array(httpFilter(field, doc, options)).transform(toFieldFilter)
-    );
+    doc = doc || {};
+    let { description, example } = doc;
+    description = description || "";
+    example = example || null;
+
+    return zod
+        .preprocess(
+            (val) =>
+                val === undefined
+                    ? undefined
+                    : Array.isArray(val)
+                      ? val
+                      : [`${val}`],
+            zod.array(httpFilter(field, doc, options)).transform(toFieldFilter)
+        )
+        .openapi({ description, example, param: { description } });
 };
