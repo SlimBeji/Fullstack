@@ -163,8 +163,7 @@ swaggerRegistery.registerPath({
     request: {
         params: zod.object({
             userId: zod.number().openapi({
-                example: 123456789,
-                description: "MongoDB ObjectId",
+                param: { description: "User ID" },
             }),
         }),
         query: UserGetSchema,
@@ -210,8 +209,7 @@ swaggerRegistery.registerPath({
     request: {
         params: zod.object({
             userId: zod.number().openapi({
-                example: 123456789,
-                description: "MongoDB ObjectId",
+                param: { description: "User ID" },
             }),
         }),
         body: {
@@ -256,8 +254,7 @@ swaggerRegistery.registerPath({
     request: {
         params: zod.object({
             userId: zod.number().openapi({
-                example: 123456789,
-                description: "MongoDB ObjectId",
+                param: { description: "User ID" },
             }),
         }),
     },

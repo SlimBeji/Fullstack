@@ -168,8 +168,7 @@ swaggerRegistery.registerPath({
     request: {
         params: zod.object({
             placeId: zod.number().openapi({
-                example: 123456789,
-                description: "Place Id",
+                param: { description: "Place ID" },
             }),
         }),
         query: PlaceGetSchema,
@@ -215,8 +214,7 @@ swaggerRegistery.registerPath({
     request: {
         params: zod.object({
             placeId: zod.number().openapi({
-                example: 123456789,
-                description: "Place id",
+                param: { description: "Place ID" },
             }),
         }),
         body: {
@@ -261,8 +259,7 @@ swaggerRegistery.registerPath({
     request: {
         params: zod.object({
             placeId: zod.number().openapi({
-                example: 123456789,
-                description: "Place Id",
+                param: { description: "Place ID" },
             }),
         }),
     },
