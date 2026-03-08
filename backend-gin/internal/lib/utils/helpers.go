@@ -101,14 +101,14 @@ func BatchProcess[T any, K any](
 
 	for i := range batch {
 		wg.Add(1)
-		go func(idx int) {
+		go func() {
 			defer wg.Done()
 			usedWorkers <- struct{}{}
 			defer func() { <-usedWorkers }()
-			processed, err := transform(batch[idx])
-			results[idx] = processed
-			errs[idx] = err
-		}(i)
+			processed, err := transform(batch[i])
+			results[i] = processed
+			errs[i] = err
+		}()
 	}
 
 	wg.Wait()
