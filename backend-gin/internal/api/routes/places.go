@@ -55,7 +55,7 @@ func searchPlaces(c *gin.Context) {
 // @Produce      json
 // @Security     OAuth2Password[admin]
 // @Param        params formData schemas.PlacePost true "POST parameters"
-// @Param        image  formData file   true "Place Image (JPEG)"
+// @Param        image  formData file   false "Place Image (JPEG)"
 // @Success      200  {object}  schemas.PlaceRead
 // @Router       /api/places [post]
 func createPlace(c *gin.Context) {

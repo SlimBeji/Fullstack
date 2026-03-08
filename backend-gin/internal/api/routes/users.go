@@ -55,7 +55,7 @@ func searchUsers(c *gin.Context) {
 // @Produce      json
 // @Security     OAuth2Password[admin]
 // @Param        params formData schemas.UserPost true "POST parameters"
-// @Param        image  formData file   true "the user profile image"
+// @Param        image  formData file   false "the user profile image"
 // @Success      200  {object}  schemas.UserRead
 // @Router       /api/users [post]
 func createUser(c *gin.Context) {

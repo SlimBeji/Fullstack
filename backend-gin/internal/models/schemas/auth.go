@@ -51,15 +51,15 @@ func DecodeEncodedToken(encoded string) (TokenPayload, error) {
 }
 
 type SignupForm struct {
-	Name     string                `json:"name" form:"name" validate:"min=2" example:"Slim Beji"`             // The user name, two characters at least
-	Email    string                `json:"email" form:"email" validate:"email" example:"mslimbeji@gmail.com"` // The user email
-	Password string                `json:"password" form:"password" validate:"min=8" example:"very_secret"`   // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`      // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji"`             // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com"` // The user email
+	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`   // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`               // User's profile image (JPEG)
 }
 
 type SigninForm struct {
-	Username string `json:"username" form:"username" validate:"email" default:"mslimbeji@gmail.com"` // The user email (We use username here because of OAuth spec)
-	Password string `json:"password" form:"password" validate:"min=8" default:"very_secret"`         // The user password, 8 characters at least
+	Username string `json:"username" form:"username" validate:"required,email" example:"mslimbeji@gmail.com"` // The user email (We use username here because of OAuth spec)
+	Password string `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`         // The user password, 8 characters at least
 }
 
 type EncodedToken struct {

@@ -1,9 +1,9 @@
 package types_
 
 type PaginatedData[T any] struct {
-	Page       int `json:"page"`
-	TotalPages int `json:"totalPages"`
-	TotalCount int `json:"totalCount"`
+	Page       int `json:"page" example:"1"`
+	TotalPages int `json:"totalPages" example:"2"`
+	TotalCount int `json:"totalCount" example:"40"`
 	Data       []T `json:"data"`
 }
 

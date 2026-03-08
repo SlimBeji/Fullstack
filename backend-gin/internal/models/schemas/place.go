@@ -121,13 +121,13 @@ type PlaceCreate struct {
 }
 
 type PlacePost struct {
-	Title       string                `json:"title" form:"title" validate:"min=10" example:"Stamford Bridge"`                               // The place title/name, 10 characters minimum
-	Description string                `json:"description" form:"description" validate:"min=10" example:"Stadium of Chelsea football club" ` // The place description, 10 characters minimum
-	Address     string                `json:"address" form:"address" validate:"min=1" example:"Fulham road" `                               // The place address
-	Lat         types_.FlexFloat      `json:"lat" form:"lat" example:"51.48180425016331" `                                                  // The latitude of the place
-	Lng         types_.FlexFloat      `json:"lng" form:"lng" example:"-0.19090418688755467" `                                               // The longitude of the place
-	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                 // Place Image (JPEG)
-	CreatorID   uint                  `json:"creatorId" form:"creatorId" example:"123456789" `                                              // The ID of the place creator
+	Title       string                `json:"title" form:"title" validate:"required,min=10" example:"Stamford Bridge"`                               // The place title/name, 10 characters minimum
+	Description string                `json:"description" form:"description" validate:"required,min=10" example:"Stadium of Chelsea football club" ` // The place description, 10 characters minimum
+	Address     string                `json:"address" form:"address" validate:"required,min=1" example:"Fulham road" `                               // The place address
+	Lat         types_.FlexFloat      `json:"lat" form:"lat" validate:"required" example:"51.48180425016331" `                                       // The latitude of the place
+	Lng         types_.FlexFloat      `json:"lng" form:"lng" validate:"required" example:"-0.19090418688755467" `                                    // The longitude of the place
+	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                          // Place Image (JPEG)
+	CreatorID   uint                  `json:"creatorId" form:"creatorId" validate:"required" example:"123456789" `                                   // The ID of the place creator
 }
 
 // --- Read Schemas ---
@@ -176,17 +176,17 @@ type PlacePut struct {
 type PlacesPaginated = types_.PaginatedData[PlaceRead]
 
 type PlaceSearch struct {
-	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                   // The page number
-	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                         // Items per page
-	Sort        []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" example:"createdAt"`          // Fields to use for sorting. Use the '-' for descending sorting
-	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" example:"id,title"` // Fields to include in the response; omit for full document
-	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                           // The ID of the place
-	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                 // The place title/name, 10 characters minimum
-	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                     // The place description, 10 characters minimum
-	Address     types_.FlexStrList `json:"address" form:"address" example:"like:Boulevard" collectionFormat:"multi"`                                                            // The place address
-	CreatorId   types_.FlexStrList `json:"creatorId" form:"creatorId" example:"in:123456789" collectionFormat:"multi"`                                                          // The ID of the place creator
-	LocationLat types_.FlexStrList `json:"locationLat" form:"locationLat" example:"gt:3.5" collectionFormat:"multi"`                                                            // The latitude of the place
-	LocationLng types_.FlexStrList `json:"locationLng" form:"locationLng" example:"lt:4.5" collectionFormat:"multi"`                                                            // The longitude of the place
+	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                                                                                                   // The page number
+	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                                                                                         // Items per page
+	Sort        []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" enums:"createdAt,-createdAt,title,-title,description,-description,address,-address" example:"-createdAt"`                     // Fields to use for sorting. Use the '-' for descending sorting
+	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" enums:"id,title,description,address,location.lat,location.lng,imageUrl,creatorId,createdAt"  example:"id,location"` // Fields to include in the response; omit for full document
+	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                                                                                           // The ID of the place
+	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                                                                                                                 // The place title/name, 10 characters minimum
+	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                                                                                                                     // The place description, 10 characters minimum
+	Address     types_.FlexStrList `json:"address" form:"address" example:"ilike:Boulevard" collectionFormat:"multi"`                                                                                                                                                           // The place address
+	CreatorId   types_.FlexStrList `json:"creatorId" form:"creatorId" example:"in:123456789" collectionFormat:"multi"`                                                                                                                                                          // The ID of the place creator
+	LocationLat types_.FlexStrList `json:"locationLat" form:"locationLat" example:"gt:3.5" collectionFormat:"multi"`                                                                                                                                                            // The latitude of the place
+	LocationLng types_.FlexStrList `json:"locationLng" form:"locationLng" example:"lt:4.5" collectionFormat:"multi"`                                                                                                                                                            // The longitude of the place
 }
 
 func (ps PlaceSearch) ToSearchQuery() (types_.SearchQuery, error) {

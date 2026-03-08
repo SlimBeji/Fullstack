@@ -103,11 +103,11 @@ type UserCreate struct {
 }
 
 type UserPost struct {
-	Name     string                `json:"name" form:"name" validate:"min=2" example:"Slim Beji"`             // The user name, two characters at least
-	Email    string                `json:"email" form:"email" validate:"email" example:"mslimbeji@gmail.com"` // The user email
-	IsAdmin  types_.FlexBool       `json:"isAdmin" form:"isAdmin" example:"false"`                            // Whether the user is an admin or not
-	Password string                `json:"password" form:"password" validate:"min=8" example:"very_secret"`   // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`      // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji"`                                   // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com"`                       // The user email
+	IsAdmin  types_.FlexBool       `json:"isAdmin" form:"isAdmin" validate:"required" example:"false" default:"false" swaggertype:"boolean"` // Whether the user is an admin or not
+	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`                         // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                     // User's profile image (JPEG)
 }
 
 // --- Read Schemas ---
@@ -153,13 +153,13 @@ type UserPut struct {
 type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 type UserSearch struct {
-	Page   int                `json:"page" default:"1" validate:"gte=1"`                                                              // The page number
-	Size   int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                    // Items per page
-	Sort   []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" example:"createdAt"`    // Fields to use for sorting. Use the '-' for descending sorting
-	Fields []string           `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" example:"id,name"` // Fields to include in the response; omit for full document
-	Id     types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                      // The user ID
-	Name   types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                               // The user name, two characters at least
-	Email  types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                   // The user email
+	Page   int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                       // The page number
+	Size   int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                             // Items per page
+	Sort   []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" enums:"createdAt,-createdAt,name,-name,email,-email" example:"-createdAt"`       // Fields to use for sorting. Use the '-' for descending sorting
+	Fields []string           `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,place"` // Fields to include in the response; omit for full document
+	Id     types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                               // The user ID
+	Name   types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                                                                                        // The user name, two characters at least
+	Email  types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                                                                            // The user email
 }
 
 func (us UserSearch) ToSearchQuery() (types_.SearchQuery, error) {

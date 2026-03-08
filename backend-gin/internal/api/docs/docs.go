@@ -31,17 +31,19 @@ const docTemplate = `{
                     {
                         "minLength": 8,
                         "type": "string",
-                        "default": "very_secret",
+                        "example": "very_secret",
                         "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "default": "mslimbeji@gmail.com",
+                        "example": "mslimbeji@gmail.com",
                         "description": "The user email (We use username here because of OAuth spec)",
                         "name": "username",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -72,7 +74,8 @@ const docTemplate = `{
                         "example": "mslimbeji@gmail.com",
                         "description": "The user email",
                         "name": "email",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "minLength": 2,
@@ -80,7 +83,8 @@ const docTemplate = `{
                         "example": "Slim Beji",
                         "description": "The user name, two characters at least",
                         "name": "name",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "minLength": 8,
@@ -88,14 +92,14 @@ const docTemplate = `{
                         "example": "very_secret",
                         "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "file",
                         "description": "User's profile image (JPEG)",
                         "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -121,7 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/routes.ResponseExample"
+                            "$ref": "#/definitions/routes.HelloResponse"
                         }
                     }
                 }
@@ -147,7 +151,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/routes.ResponseExample"
+                            "$ref": "#/definitions/routes.HelloAdminResponse"
                         }
                     }
                 }
@@ -173,7 +177,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/routes.ResponseExample"
+                            "$ref": "#/definitions/routes.HelloUserResponse"
                         }
                     }
                 }
@@ -205,14 +209,16 @@ const docTemplate = `{
                         "example": "Fulham road",
                         "description": "The place address",
                         "name": "address",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "integer",
                         "example": 123456789,
                         "description": "The ID of the place creator",
                         "name": "creatorId",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "minLength": 10,
@@ -220,21 +226,24 @@ const docTemplate = `{
                         "example": "Stadium of Chelsea football club",
                         "description": "The place description, 10 characters minimum",
                         "name": "description",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "number",
                         "example": 51.48180425016331,
                         "description": "The latitude of the place",
                         "name": "lat",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "number",
                         "example": -0.19090418688755467,
                         "description": "The longitude of the place",
                         "name": "lng",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "minLength": 10,
@@ -242,14 +251,14 @@ const docTemplate = `{
                         "example": "Stamford Bridge",
                         "description": "The place title/name, 10 characters minimum",
                         "name": "title",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "file",
                         "description": "Place Image (JPEG)",
                         "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -289,7 +298,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "like:Boulevard"
+                            "ilike:Boulevard"
                         ],
                         "description": "The place address",
                         "name": "address",
@@ -324,12 +333,23 @@ const docTemplate = `{
                     {
                         "type": "array",
                         "items": {
+                            "enum": [
+                                "id",
+                                "title",
+                                "description",
+                                "address",
+                                "location.lat",
+                                "location.lng",
+                                "imageUrl",
+                                "creatorId",
+                                "createdAt"
+                            ],
                             "type": "string"
                         },
                         "collectionFormat": "csv",
                         "example": [
                             "id",
-                            "title"
+                            "location"
                         ],
                         "description": "Fields to include in the response; omit for full document",
                         "name": "fields",
@@ -394,11 +414,21 @@ const docTemplate = `{
                     {
                         "type": "array",
                         "items": {
+                            "enum": [
+                                "createdAt",
+                                "-createdAt",
+                                "title",
+                                "-title",
+                                "description",
+                                "-description",
+                                "address",
+                                "-address"
+                            ],
                             "type": "string"
                         },
                         "collectionFormat": "csv",
                         "example": [
-                            "createdAt"
+                            "-createdAt"
                         ],
                         "description": "Fields to use for sorting. Use the '-' for descending sorting",
                         "name": "sort",
@@ -612,14 +642,17 @@ const docTemplate = `{
                         "example": "mslimbeji@gmail.com",
                         "description": "The user email",
                         "name": "email",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "example": false,
                         "description": "Whether the user is an admin or not",
                         "name": "isAdmin",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "minLength": 2,
@@ -627,7 +660,8 @@ const docTemplate = `{
                         "example": "Slim Beji",
                         "description": "The user name, two characters at least",
                         "name": "name",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "minLength": 8,
@@ -635,14 +669,14 @@ const docTemplate = `{
                         "example": "very_secret",
                         "description": "The user password, 8 characters at least",
                         "name": "password",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "file",
                         "description": "the user profile image",
                         "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -691,12 +725,21 @@ const docTemplate = `{
                     {
                         "type": "array",
                         "items": {
+                            "enum": [
+                                "id",
+                                "name",
+                                "email",
+                                "isAdmin",
+                                "imageUrl",
+                                "places",
+                                "createdAt"
+                            ],
                             "type": "string"
                         },
                         "collectionFormat": "csv",
                         "example": [
                             "id",
-                            "name"
+                            "place"
                         ],
                         "description": "Fields to include in the response; omit for full document",
                         "name": "fields",
@@ -748,11 +791,19 @@ const docTemplate = `{
                     {
                         "type": "array",
                         "items": {
+                            "enum": [
+                                "createdAt",
+                                "-createdAt",
+                                "name",
+                                "-name",
+                                "email",
+                                "-email"
+                            ],
                             "type": "string"
                         },
                         "collectionFormat": "csv",
                         "example": [
-                            "createdAt"
+                            "-createdAt"
                         ],
                         "description": "Fields to use for sorting. Use the '-' for descending sorting",
                         "name": "sort",
@@ -930,20 +981,39 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "routes.HelloAdminResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Hello Admin Slim"
+                }
+            }
+        },
+        "routes.HelloResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Hello World!"
+                }
+            }
+        },
+        "routes.HelloUserResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Hello Slim"
+                }
+            }
+        },
         "routes.PlaceDeleteResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string",
                     "example": "Deleted place 507f1f77bcf86cd799439011"
-                }
-            }
-        },
-        "routes.ResponseExample": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
                 }
             }
         },
@@ -1111,7 +1181,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "like:Boulevard"
+                        "ilike:Boulevard"
                     ]
                 },
                 "creatorId": {
@@ -1138,11 +1208,22 @@ const docTemplate = `{
                     "description": "Fields to include in the response; omit for full document",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "id",
+                            "title",
+                            "description",
+                            "address",
+                            "location.lat",
+                            "location.lng",
+                            "imageUrl",
+                            "creatorId",
+                            "createdAt"
+                        ]
                     },
                     "example": [
                         "id",
-                        "title"
+                        "location"
                     ]
                 },
                 "id": {
@@ -1192,10 +1273,20 @@ const docTemplate = `{
                     "description": "Fields to use for sorting. Use the '-' for descending sorting",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "createdAt",
+                            "-createdAt",
+                            "title",
+                            "-title",
+                            "description",
+                            "-description",
+                            "address",
+                            "-address"
+                        ]
                     },
                     "example": [
-                        "createdAt"
+                        "-createdAt"
                     ]
                 },
                 "title": {
@@ -1220,13 +1311,16 @@ const docTemplate = `{
                     }
                 },
                 "page": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "totalCount": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 40
                 },
                 "totalPages": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -1334,11 +1428,20 @@ const docTemplate = `{
                     "description": "Fields to include in the response; omit for full document",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "id",
+                            "name",
+                            "email",
+                            "isAdmin",
+                            "imageUrl",
+                            "places",
+                            "createdAt"
+                        ]
                     },
                     "example": [
                         "id",
-                        "name"
+                        "place"
                     ]
                 },
                 "id": {
@@ -1378,10 +1481,18 @@ const docTemplate = `{
                     "description": "Fields to use for sorting. Use the '-' for descending sorting",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "createdAt",
+                            "-createdAt",
+                            "name",
+                            "-name",
+                            "email",
+                            "-email"
+                        ]
                     },
                     "example": [
-                        "createdAt"
+                        "-createdAt"
                     ]
                 }
             }
@@ -1396,13 +1507,16 @@ const docTemplate = `{
                     }
                 },
                 "page": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "totalCount": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 40
                 },
                 "totalPages": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 }
             }
         }

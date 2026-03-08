@@ -11,14 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ResponseExample struct {
-	Message string `json:"message"`
+type HelloResponse struct {
+	Message string `json:"message" example:"Hello World!"`
 }
 
 // @Summary      Hello World Endpoint
 // @Tags         Hello World
 // @Produce      json
-// @Success      200  {object}  ResponseExample
+// @Success      200  {object}  HelloResponse
 // @Router       /api/hello-world/ [get]
 func hello(c *gin.Context) {
 	_, err := publishers.SendNewsletter("Slim", "mslimbeji@gmail.com")
@@ -32,11 +32,15 @@ func hello(c *gin.Context) {
 	})
 }
 
+type HelloUserResponse struct {
+	Message string `json:"message" example:"Hello Slim"`
+}
+
 // @Summary      Hello World Endpoint for authenticated users
 // @Tags         Hello World
 // @Produce      json
 // @Security     OAuth2Password[admin]
-// @Success      200  {object}  ResponseExample
+// @Success      200  {object}  HelloUserResponse
 // @Router       /api/hello-world/user [get]
 func helloUser(c *gin.Context) {
 	user := c.MustGet("currentUser").(schemas.UserRead)
@@ -46,11 +50,15 @@ func helloUser(c *gin.Context) {
 	})
 }
 
+type HelloAdminResponse struct {
+	Message string `json:"message" example:"Hello Admin Slim"`
+}
+
 // @Summary      Hello World Endpoint for admins only
 // @Tags         Hello World
 // @Produce      json
 // @Security     OAuth2Password[admin]
-// @Success      200  {object}  ResponseExample
+// @Success      200  {object}  HelloAdminResponse
 // @Router       /api/hello-world/admin [get]
 func helloAdmin(c *gin.Context) {
 	user := c.MustGet("currentUser").(schemas.UserRead)

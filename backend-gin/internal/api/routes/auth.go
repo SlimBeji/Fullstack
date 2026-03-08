@@ -14,7 +14,7 @@ import (
 // @Accept       mpfd
 // @Produce      json
 // @Param        params formData schemas.SignupForm true "Signup parameters"
-// @Param        image  formData file   true "User's profile image (JPEG)"
+// @Param        image  formData file   false "User's profile image (JPEG)"
 // @Success      200  {object}  schemas.EncodedToken
 // @Router       /api/auth/signup [post]
 func signup(c *gin.Context) {

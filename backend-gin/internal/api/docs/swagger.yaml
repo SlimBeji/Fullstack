@@ -1,13 +1,26 @@
 definitions:
+  routes.HelloAdminResponse:
+    properties:
+      message:
+        example: Hello Admin Slim
+        type: string
+    type: object
+  routes.HelloResponse:
+    properties:
+      message:
+        example: Hello World!
+        type: string
+    type: object
+  routes.HelloUserResponse:
+    properties:
+      message:
+        example: Hello Slim
+        type: string
+    type: object
   routes.PlaceDeleteResponse:
     properties:
       message:
         example: Deleted place 507f1f77bcf86cd799439011
-        type: string
-    type: object
-  routes.ResponseExample:
-    properties:
-      message:
         type: string
     type: object
   routes.UserDeleteResponse:
@@ -130,7 +143,7 @@ definitions:
       address:
         description: The place address
         example:
-        - like:Boulevard
+        - ilike:Boulevard
         items:
           type: string
         type: array
@@ -152,8 +165,18 @@ definitions:
         description: Fields to include in the response; omit for full document
         example:
         - id
-        - title
+        - location
         items:
+          enum:
+          - id
+          - title
+          - description
+          - address
+          - location.lat
+          - location.lng
+          - imageUrl
+          - creatorId
+          - createdAt
           type: string
         type: array
       id:
@@ -191,8 +214,17 @@ definitions:
       sort:
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - createdAt
+        - -createdAt
         items:
+          enum:
+          - createdAt
+          - -createdAt
+          - title
+          - -title
+          - description
+          - -description
+          - address
+          - -address
           type: string
         type: array
       title:
@@ -210,10 +242,13 @@ definitions:
           $ref: '#/definitions/schemas.PlaceRead'
         type: array
       page:
+        example: 1
         type: integer
       totalCount:
+        example: 40
         type: integer
       totalPages:
+        example: 2
         type: integer
     type: object
   schemas.UserPlace:
@@ -297,8 +332,16 @@ definitions:
         description: Fields to include in the response; omit for full document
         example:
         - id
-        - name
+        - place
         items:
+          enum:
+          - id
+          - name
+          - email
+          - isAdmin
+          - imageUrl
+          - places
+          - createdAt
           type: string
         type: array
       id:
@@ -329,8 +372,15 @@ definitions:
       sort:
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - createdAt
+        - -createdAt
         items:
+          enum:
+          - createdAt
+          - -createdAt
+          - name
+          - -name
+          - email
+          - -email
           type: string
         type: array
     type: object
@@ -341,10 +391,13 @@ definitions:
           $ref: '#/definitions/schemas.PlaceRead'
         type: array
       page:
+        example: 1
         type: integer
       totalCount:
+        example: 40
         type: integer
       totalPages:
+        example: 2
         type: integer
     type: object
 info:
@@ -355,16 +408,18 @@ paths:
       consumes:
       - application/x-www-form-urlencoded
       parameters:
-      - default: very_secret
-        description: The user password, 8 characters at least
+      - description: The user password, 8 characters at least
+        example: very_secret
         in: formData
         minLength: 8
         name: password
+        required: true
         type: string
-      - default: mslimbeji@gmail.com
-        description: The user email (We use username here because of OAuth spec)
+      - description: The user email (We use username here because of OAuth spec)
+        example: mslimbeji@gmail.com
         in: formData
         name: username
+        required: true
         type: string
       produces:
       - application/json
@@ -385,23 +440,25 @@ paths:
         example: mslimbeji@gmail.com
         in: formData
         name: email
+        required: true
         type: string
       - description: The user name, two characters at least
         example: Slim Beji
         in: formData
         minLength: 2
         name: name
+        required: true
         type: string
       - description: The user password, 8 characters at least
         example: very_secret
         in: formData
         minLength: 8
         name: password
+        required: true
         type: string
       - description: User's profile image (JPEG)
         in: formData
         name: image
-        required: true
         type: file
       produces:
       - application/json
@@ -421,7 +478,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.ResponseExample'
+            $ref: '#/definitions/routes.HelloResponse'
       summary: Hello World Endpoint
       tags:
       - Hello World
@@ -433,7 +490,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.ResponseExample'
+            $ref: '#/definitions/routes.HelloAdminResponse'
       security:
       - OAuth2Password:
         - admin
@@ -448,7 +505,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/routes.ResponseExample'
+            $ref: '#/definitions/routes.HelloUserResponse'
       security:
       - OAuth2Password:
         - admin
@@ -465,38 +522,43 @@ paths:
         in: formData
         minLength: 1
         name: address
+        required: true
         type: string
       - description: The ID of the place creator
         example: 123456789
         in: formData
         name: creatorId
+        required: true
         type: integer
       - description: The place description, 10 characters minimum
         example: Stadium of Chelsea football club
         in: formData
         minLength: 10
         name: description
+        required: true
         type: string
       - description: The latitude of the place
         example: 51.48180425016331
         in: formData
         name: lat
+        required: true
         type: number
       - description: The longitude of the place
         example: -0.19090418688755467
         in: formData
         name: lng
+        required: true
         type: number
       - description: The place title/name, 10 characters minimum
         example: Stamford Bridge
         in: formData
         minLength: 10
         name: title
+        required: true
         type: string
       - description: Place Image (JPEG)
         in: formData
         name: image
-        required: true
         type: file
       produces:
       - application/json
@@ -519,7 +581,7 @@ paths:
       - collectionFormat: multi
         description: The place address
         example:
-        - like:Boulevard
+        - ilike:Boulevard
         in: query
         items:
           type: string
@@ -547,9 +609,19 @@ paths:
         description: Fields to include in the response; omit for full document
         example:
         - id
-        - title
+        - location
         in: query
         items:
+          enum:
+          - id
+          - title
+          - description
+          - address
+          - location.lat
+          - location.lng
+          - imageUrl
+          - creatorId
+          - createdAt
           type: string
         name: fields
         type: array
@@ -596,9 +668,18 @@ paths:
       - collectionFormat: csv
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - createdAt
+        - -createdAt
         in: query
         items:
+          enum:
+          - createdAt
+          - -createdAt
+          - title
+          - -title
+          - description
+          - -description
+          - address
+          - -address
           type: string
         name: sort
         type: array
@@ -730,28 +811,32 @@ paths:
         example: mslimbeji@gmail.com
         in: formData
         name: email
+        required: true
         type: string
-      - description: Whether the user is an admin or not
+      - default: false
+        description: Whether the user is an admin or not
         example: false
         in: formData
         name: isAdmin
+        required: true
         type: boolean
       - description: The user name, two characters at least
         example: Slim Beji
         in: formData
         minLength: 2
         name: name
+        required: true
         type: string
       - description: The user password, 8 characters at least
         example: very_secret
         in: formData
         minLength: 8
         name: password
+        required: true
         type: string
       - description: the user profile image
         in: formData
         name: image
-        required: true
         type: file
       produces:
       - application/json
@@ -784,9 +869,17 @@ paths:
         description: Fields to include in the response; omit for full document
         example:
         - id
-        - name
+        - place
         in: query
         items:
+          enum:
+          - id
+          - name
+          - email
+          - isAdmin
+          - imageUrl
+          - places
+          - createdAt
           type: string
         name: fields
         type: array
@@ -824,9 +917,16 @@ paths:
       - collectionFormat: csv
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - createdAt
+        - -createdAt
         in: query
         items:
+          enum:
+          - createdAt
+          - -createdAt
+          - name
+          - -name
+          - email
+          - -email
           type: string
         name: sort
         type: array
