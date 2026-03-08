@@ -7,11 +7,18 @@ export const paginatedSchema = (
     description: string = "The page data"
 ): AnyZodObject => {
     return zod.object({
-        page: zod.number().openapi("The returned page number"),
-        totalPages: zod.number().openapi("The total number of pages"),
+        page: zod
+            .number()
+            .openapi({ description: "The returned page number", example: 1 }),
+        totalPages: zod
+            .number()
+            .openapi({ description: "The total number of pages", example: 2 }),
         totalCount: zod
             .number()
-            .openapi("Total number of items in the database"),
+            .openapi({
+                description: "Total number of items in the database",
+                example: 40,
+            }),
         data: zod.array(schema).openapi(description),
     });
 };
