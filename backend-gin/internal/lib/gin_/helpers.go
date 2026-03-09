@@ -73,7 +73,9 @@ func AbortWithStatusJSON(c *gin.Context, err error) {
 	}
 
 	log.Println(apiError.Error())
-	log.Println(apiError.Err.Error())
+	if apiError.Err != nil {
+		log.Println(apiError.Err.Error())
+	}
 	resp := gin.H{"error": true, "message": apiError.Message}
 	if apiError.Details != nil {
 		resp["details"] = apiError.Details

@@ -9,7 +9,6 @@ import (
 	"backend/internal/models/schemas"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -40,10 +39,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 	}
 
 	// Converting from string to uint
-	userIdUint64, userIdConv := strconv.ParseUint(userIdRaw.(string), 10, 32)
-	userId := uint(userIdUint64)
-	userIdValid := userIdConv == nil
-
+	userId, userIdValid := userIdRaw.(float64)
 	email, emailValid := emailRaw.(string)
 
 	if !userIdValid || !emailValid {
@@ -51,7 +47,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.Get(c, userId, nil)
+	user, err := cu.Get(c, uint(userId), nil)
 	if err != nil {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,
