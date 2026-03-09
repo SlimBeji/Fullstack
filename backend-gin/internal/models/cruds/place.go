@@ -147,7 +147,7 @@ func (cp *CRUDSPlace) PostProcessPartial(
 
 func (cp *CRUDSPlace) MapSelect(field string) []gorm_.SelectField {
 	return []gorm_.SelectField{
-		{Select: cp.TableName() + "." + utils.CamelToSnake(field), JoinPath: ""},
+		{Select: cp.TableName() + "." + utils.CamelToSnake(field)},
 	}
 }
 

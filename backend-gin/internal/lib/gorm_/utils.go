@@ -70,21 +70,21 @@ func ApplySelect(
 
 	// Use map[string]bool to avoid duplicates
 	selectSet := make(map[string]bool)
-	joinSet := make(map[string]bool)
+	joinMap := make(map[string]string)
 
 	// Collect all SelectFields and deduplicate
 	for _, clause := range clauses {
 		selectFields := mapFunc(clause)
 		for _, sf := range selectFields {
 			selectSet[sf.Select] = true
-			if sf.JoinPath != "" {
-				joinSet[sf.JoinPath] = true
+			if sf.Table != "" {
+				joinMap[sf.Table] = sf.JoinStmt
 			}
 		}
 	}
 
 	// Apply joins
-	for joinPath := range joinSet {
+	for _, joinPath := range joinMap {
 		db = db.Joins(joinPath)
 	}
 

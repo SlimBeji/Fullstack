@@ -151,16 +151,17 @@ func (cu *CRUDSUser) PostProcessPartial(
 func (cu *CRUDSUser) MapSelect(field string) []gorm_.SelectField {
 	switch field {
 	case string(schemas.UserSelectPlaces):
+		joinStmt := "LEFT JOIN places Places ON users.id = Places.creator_id"
 		return []gorm_.SelectField{
-			{Select: "users.id", JoinPath: ""},
-			{Select: "places.id", JoinPath: "Places"},
-			{Select: "places.title", JoinPath: "Places"},
-			{Select: "places.address", JoinPath: "Places"},
+			{Select: "users.id"},
+			{Select: "places.id", Table: string(orm.TablePlaces), JoinStmt: joinStmt},
+			{Select: "places.title", Table: string(orm.TablePlaces), JoinStmt: joinStmt},
+			{Select: "places.address", Table: string(orm.TablePlaces), JoinStmt: joinStmt},
 		}
 
 	default:
 		return []gorm_.SelectField{
-			{Select: cu.TableName() + "." + utils.CamelToSnake(field), JoinPath: ""},
+			{Select: cu.TableName() + "." + utils.CamelToSnake(field)},
 		}
 	}
 }
