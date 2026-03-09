@@ -31,9 +31,14 @@ func CheckBool(str string) (bool, error) {
 
 func CamelToSnake(s string) string {
 	var result strings.Builder
-	for i, r := range s {
+	runes := []rune(s)
+
+	for i, r := range runes {
 		if i > 0 && unicode.IsUpper(r) {
-			result.WriteRune('_')
+			// Only add underscore if previous char was NOT uppercase
+			if !unicode.IsUpper(runes[i-1]) {
+				result.WriteRune('_')
+			}
 		}
 		result.WriteRune(unicode.ToLower(r))
 	}
