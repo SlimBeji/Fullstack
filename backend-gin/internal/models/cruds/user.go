@@ -201,7 +201,7 @@ func (cu *CRUDSUser) PostToCreate(
 		storage := instances.GetStorage()
 		imageURL, err = storage.UploadFile(ctx, data.Image, "")
 		if err != nil {
-			return zero, err
+			return zero, fmt.Errorf("could not upload file: %w", err)
 		}
 	}
 	return schemas.UserCreate{

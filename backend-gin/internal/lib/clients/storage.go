@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -141,6 +142,8 @@ func (cs *CloudStorage) UploadFile(
 		fileToUpload = f
 	case types_.FileToUpload:
 		fileToUpload = &f
+	case *multipart.FileHeader:
+		fileToUpload, err = types_.NewFileFromMultipart(f)
 	default:
 		return "", fmt.Errorf("unsupported file type %T", file)
 	}
