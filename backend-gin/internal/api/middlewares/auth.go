@@ -9,6 +9,7 @@ import (
 	"backend/internal/models/schemas"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 				Message: "Token Expired",
 			}
 		}
+		badToken.Err = err
 		return schemas.UserRead{}, badToken
 	}
 
@@ -37,8 +39,13 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 		return schemas.UserRead{}, badToken
 	}
 
-	userId, userIdValid := userIdRaw.(uint)
+	// Converting from string to uint
+	userIdUint64, userIdConv := strconv.ParseUint(userIdRaw.(string), 10, 32)
+	userId := uint(userIdUint64)
+	userIdValid := userIdConv == nil
+
 	email, emailValid := emailRaw.(string)
+
 	if !userIdValid || !emailValid {
 		return schemas.UserRead{}, badToken
 	}
