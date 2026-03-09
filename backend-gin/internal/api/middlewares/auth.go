@@ -52,6 +52,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,
 			Message: "user not found",
+			Err:     err,
 		}
 	}
 
