@@ -4,6 +4,7 @@ import (
 	"backend/internal/lib/types_"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -66,6 +67,7 @@ func AbortWithStatusJSON(c *gin.Context, err error) {
 	var apiError types_.APIError
 	if !errors.As(err, &apiError) {
 		resp := gin.H{"error": true, "message": "internal server error"}
+		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 		return
 	}
