@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 
 	"gorm.io/gorm"
@@ -70,30 +71,66 @@ func ApplySelect(
 
 	// Use map[string]bool to avoid duplicates
 	selectSet := make(map[string]bool)
-	joinMap := make(map[string]string)
+	selectionLoadMap := make(map[string]SelectionLoad)
 
-	// Collect all SelectFields and deduplicate
+	// Collect all SelectFields and all SelectionLoads
 	for _, clause := range clauses {
 		selectFields := mapFunc(clause)
 		for _, sf := range selectFields {
-			selectSet[sf.Select] = true
-			if sf.Table != "" {
-				joinMap[sf.Table] = sf.JoinStmt
+			if sf.Level == 0 {
+				// This field is on the main table
+				selectSet[sf.Select] = true
+			} else {
+				// This field is on a child/grandchild table
+				selectionLoad, found := selectionLoadMap[sf.Preload]
+				if !found {
+					// First time adding the selection load for this relation
+					selectionLoad = SelectionLoad{
+						Preload: sf.Preload,
+						Level:   sf.Level,
+						Fields:  []string{sf.Select},
+					}
+					selectionLoadMap[sf.Preload] = selectionLoad
+				} else {
+					// Relation was already added, append field if not duplicate
+					fieldExists := false
+					for _, f := range selectionLoad.Fields {
+						if f == sf.Select {
+							fieldExists = true
+							break
+						}
+					}
+					if !fieldExists {
+						selectionLoad.Fields = append(selectionLoad.Fields, sf.Select)
+						selectionLoadMap[sf.Preload] = selectionLoad
+					}
+				}
 			}
 		}
 	}
 
-	// Apply joins
-	for _, joinPath := range joinMap {
-		db = db.Joins(joinPath)
-	}
-
-	// Apply selects (convert from map[string]bool to []string)
+	// Apply select to main columns
 	selectFields := make([]string, 0, len(selectSet))
 	for field := range selectSet {
 		selectFields = append(selectFields, field)
 	}
 	db = db.Select(selectFields)
+
+	// Sort selectionLoads by level
+	selectionLoads := make([]SelectionLoad, 0, len(selectionLoadMap))
+	for _, sl := range selectionLoadMap {
+		selectionLoads = append(selectionLoads, sl)
+	}
+	sort.Slice(selectionLoads, func(i, j int) bool {
+		return selectionLoads[i].Level < selectionLoads[j].Level
+	})
+
+	// Apply preloads in order (shallow to deep)
+	for _, sl := range selectionLoads {
+		db = db.Preload(sl.Preload, func(db *gorm.DB) *gorm.DB {
+			return db.Select(sl.Fields)
+		})
+	}
 
 	// Return Query
 	return db
