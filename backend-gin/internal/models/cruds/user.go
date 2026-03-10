@@ -461,11 +461,21 @@ func (cu *CRUDSUser) GetByEmail(
 func (cu *CRUDSUser) PutToUpdate(
 	ctx context.Context, form schemas.UserPut,
 ) (schemas.UserUpdate, error) {
-	return schemas.UserUpdate{
-		Name:     form.Name,
-		Email:    form.Email,
-		Password: form.Password,
-	}, nil
+	updates := schemas.UserUpdate{}
+	if form.Name != nil {
+		updates["name"] = *form.Name
+	}
+	if form.Email != nil {
+		updates["email"] = *form.Email
+	}
+	if form.Password != nil {
+		hashed, err := utils.HashInput(*form.Password, config.Env.DefaultHashSalt)
+		if err != nil {
+			return nil, err
+		}
+		updates["password"] = hashed
+	}
+	return updates, nil
 }
 
 func (cu *CRUDSUser) AuthPut(

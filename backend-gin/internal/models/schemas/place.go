@@ -160,12 +160,7 @@ func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {
 
 // --- Update Schemas ---
 
-type PlaceUpdate struct {
-	Title       *string   `json:"title" validate:"omitempty,min=10" `
-	Description *string   `json:"description" validate:"omitempty,min=10" `
-	Address     *string   `json:"address" validate:"omitempty,min=1" `
-	Location    *Location `json:"location" validate:"omitempty" `
-}
+type PlaceUpdate = map[string]any
 
 type PlacePut struct {
 	Title       *string       `json:"title" validate:"omitempty,min=10" example:"Stamford Bridge" `                        // The place title/name, 10 characters minimum

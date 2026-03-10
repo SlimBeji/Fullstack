@@ -420,15 +420,25 @@ func (cp *CRUDSPlace) UserGetPartial(
 func (cp *CRUDSPlace) PutToUpdate(
 	ctx context.Context, form schemas.PlacePut,
 ) (schemas.PlaceUpdate, error) {
-	location := schemas.Location{
-		Lat: float64(form.Location.Lat), Lng: float64(form.Location.Lng),
+	updates := schemas.PlaceUpdate{}
+
+	if form.Title != nil {
+		updates["title"] = *form.Title
 	}
-	return schemas.PlaceUpdate{
-		Title:       form.Title,
-		Description: form.Description,
-		Address:     form.Address,
-		Location:    &location,
-	}, nil
+	if form.Description != nil {
+		updates["description"] = *form.Description
+	}
+	if form.Address != nil {
+		updates["address"] = *form.Address
+	}
+	if form.Location != nil {
+		updates["location"] = schemas.Location{
+			Lat: float64(form.Location.Lat),
+			Lng: float64(form.Location.Lng),
+		}
+	}
+
+	return updates, nil
 }
 
 func (cp *CRUDSPlace) AuthPut(

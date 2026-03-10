@@ -139,11 +139,7 @@ func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
 
 // --- Update Schemas ---
 
-type UserUpdate struct {
-	Name     *string `json:"name" validate:"omitempty,min=2"`
-	Email    *string `json:"email" validate:"omitempty,email"`
-	Password *string `json:"password" validate:"omitempty,min=8"`
-}
+type UserUpdate = map[string]any
 
 type UserPut struct {
 	Name     *string `json:"name" validate:"omitempty,min=2" example:"Slim Beji"`             // The user name, two characters at least
