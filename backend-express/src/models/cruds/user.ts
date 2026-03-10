@@ -76,15 +76,11 @@ export class CrudsUser extends CrudsClass<
 
     // Create
 
-    async create(data: UserCreate): Promise<number> {
-        data.password = await hashInput(data.password, env.DEFAULT_HASH_SALT);
-        return await super.create(data);
-    }
-
     async postToCreate(data: UserPost): Promise<UserCreate> {
         const imageUrl = await storage.uploadFile(data.image || null);
-        const { image: _image, ...body } = data;
-        return { ...body, imageUrl };
+        const { image: _image, password, ...body } = data;
+        const hashed = await hashInput(password, env.DEFAULT_HASH_SALT);
+        return { ...body, password: hashed, imageUrl };
     }
 
     async authPost(user: UserRead, _data: UserPost): Promise<void> {
@@ -130,14 +126,15 @@ export class CrudsUser extends CrudsClass<
 
     // Update
 
-    async update(id: number | string, data: UserUpdate): Promise<void> {
-        if (data.password) {
-            data.password = await hashInput(
-                data.password,
+    async putToUpdate(data: UserPut): Promise<UserUpdate> {
+        const result = data as any as UserUpdate;
+        if (result.password) {
+            result.password = await hashInput(
+                result.password,
                 env.DEFAULT_HASH_SALT
             );
         }
-        return await super.update(id, data);
+        return result;
     }
 
     async authPut(

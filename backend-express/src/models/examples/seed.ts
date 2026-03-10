@@ -1,3 +1,5 @@
+import { env } from "@/config";
+import { hashInput } from "@/lib/utils";
 import { pgClient, redisClient, storage } from "@/services/instances";
 
 import { crudsPlace, crudsUser } from "../cruds";
@@ -15,6 +17,10 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
             newUserIn.imageUrl = await storage.uploadFile(newUserIn.imageUrl!);
             const { _ref, ...form } = newUserIn;
             const id = await crudsUser.create(form);
+            form.password = await hashInput(
+                form.password,
+                env.DEFAULT_HASH_SALT
+            );
             userRefMapping.set(newUserIn._ref, id);
         })
     );
