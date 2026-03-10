@@ -75,7 +75,7 @@ func TestQueryUsers(t *testing.T) {
 
 	// sending the request
 	payload := map[string]any{
-		"email":  []string{"regex:@gmail.com"},
+		"email":  []string{"ilike:@gmail.com"},
 		"fields": []string{"email", "name"},
 	}
 	body, err := json.Marshal(payload)
