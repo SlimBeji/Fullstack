@@ -129,6 +129,9 @@ type UserGet struct {
 func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
 	result := UserGet{}
 	fieldsRaw, _ := c.GetQuery("fields")
+	if fieldsRaw == "" {
+		return result, []string{}
+	}
 	result.Fields = strings.Split(fieldsRaw, ",")
 	// No errors to return, field optional
 	return result, []string{}

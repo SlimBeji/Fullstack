@@ -150,6 +150,9 @@ type PlaceGet struct {
 func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {
 	result := PlaceGet{}
 	fieldsRaw, _ := c.GetQuery("fields")
+	if fieldsRaw == "" {
+		return result, []string{}
+	}
 	result.Fields = strings.Split(fieldsRaw, ",")
 	// No errors to return, field optional
 	return result, []string{}
