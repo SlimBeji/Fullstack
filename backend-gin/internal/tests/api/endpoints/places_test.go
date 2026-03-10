@@ -139,8 +139,9 @@ func TestFetchPlaces(t *testing.T) {
 		t.Fatalf("missing data")
 	}
 
-	expected := map[string]map[string]float64{
-		"location": {
+	expected := map[string]any{
+		"address": "Fulham Road, London",
+		"location": map[string]float64{
 			"lat": 51.48180425016331,
 			"lng": -0.19090418688755467,
 		},
