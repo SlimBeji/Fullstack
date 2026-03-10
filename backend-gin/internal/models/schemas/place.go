@@ -144,7 +144,7 @@ type PlaceRead struct {
 }
 
 type PlaceGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" enums:"id,title,description,address,location.lat,location.lng,imageUrl,creatorId,createdAt" example:"id,title"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneofornone=id title description address location.lat location.lng imageUrl creatorId createdAt" enums:"id,title,description,address,location.lat,location.lng,imageUrl,creatorId,createdAt" example:"id,title"` // Fields to include in the response; omit for full document
 }
 
 func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {
@@ -176,17 +176,17 @@ type PlacePut struct {
 type PlacesPaginated = types_.PaginatedData[PlaceRead]
 
 type PlaceSearch struct {
-	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                                                                                                   // The page number
-	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                                                                                         // Items per page
-	Sort        []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" enums:"createdAt,-createdAt,title,-title,description,-description,address,-address" example:"-createdAt"`                     // Fields to use for sorting. Use the '-' for descending sorting
-	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location.lat location.lng imageUrl creatorId createdAt" enums:"id,title,description,address,location.lat,location.lng,imageUrl,creatorId,createdAt"  example:"id,location"` // Fields to include in the response; omit for full document
-	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                                                                                           // The ID of the place
-	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                                                                                                                 // The place title/name, 10 characters minimum
-	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                                                                                                                     // The place description, 10 characters minimum
-	Address     types_.FlexStrList `json:"address" form:"address" example:"ilike:boulevard" collectionFormat:"multi"`                                                                                                                                                           // The place address
-	CreatorId   types_.FlexStrList `json:"creatorId" form:"creatorId" example:"in:123456789" collectionFormat:"multi"`                                                                                                                                                          // The ID of the place creator
-	LocationLat types_.FlexStrList `json:"locationLat" form:"locationLat" example:"gt:3.5" collectionFormat:"multi"`                                                                                                                                                            // The latitude of the place
-	LocationLng types_.FlexStrList `json:"locationLng" form:"locationLng" example:"lt:4.5" collectionFormat:"multi"`                                                                                                                                                            // The longitude of the place
+	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                                                                                                         // The page number
+	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                                                                                               // Items per page
+	Sort        []string           `json:"sort" validate:"dive,oneofornone=createdAt -createdAt title -title description -description address -address" enums:"createdAt,-createdAt,title,-title,description,-description,address,-address" example:"-createdAt"`                     // Fields to use for sorting. Use the '-' for descending sorting
+	Fields      []string           `json:"fields" validate:"dive,oneofornone=id title description address location.lat location.lng imageUrl creatorId createdAt" enums:"id,title,description,address,location.lat,location.lng,imageUrl,creatorId,createdAt"  example:"id,location"` // Fields to include in the response; omit for full document
+	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                                                                                                 // The ID of the place
+	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                                                                                                                       // The place title/name, 10 characters minimum
+	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                                                                                                                           // The place description, 10 characters minimum
+	Address     types_.FlexStrList `json:"address" form:"address" example:"ilike:boulevard" collectionFormat:"multi"`                                                                                                                                                                 // The place address
+	CreatorId   types_.FlexStrList `json:"creatorId" form:"creatorId" example:"in:123456789" collectionFormat:"multi"`                                                                                                                                                                // The ID of the place creator
+	LocationLat types_.FlexStrList `json:"locationLat" form:"locationLat" example:"gt:3.5" collectionFormat:"multi"`                                                                                                                                                                  // The latitude of the place
+	LocationLng types_.FlexStrList `json:"locationLng" form:"locationLng" example:"lt:4.5" collectionFormat:"multi"`                                                                                                                                                                  // The longitude of the place
 }
 
 func (ps PlaceSearch) ToSearchQuery() (types_.SearchQuery, error) {
@@ -221,7 +221,7 @@ func (ps PlaceSearch) ToSearchQuery() (types_.SearchQuery, error) {
 	addErrors("locationLng", errs)
 
 	if len(errorsMap) > 0 {
-		err := types_.MapToValidationErrs("invalid place filters", errorsMap)
+		err := types_.MapToValidationErrs("invalid places filters", errorsMap)
 		return types_.SearchQuery{}, err
 	}
 

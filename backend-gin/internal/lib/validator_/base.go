@@ -1,6 +1,9 @@
 package validator_
 
 import (
+	"fmt"
+	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/creasty/defaults"
@@ -60,6 +63,43 @@ func ValidateVar(val any, tag string) string {
 	return strings.TrimSpace(translated[0])
 }
 
+// Add custom validators here
+
+func RegisterOneofOrNone(v *validator.Validate) error {
+	err := v.RegisterValidation("oneofornone", func(fl validator.FieldLevel) bool {
+		field := fl.Field()
+
+		// field should be a string
+		if field.Kind() != reflect.String {
+			return false
+		}
+
+		// Empty is always valid
+		if field.Len() == 0 {
+			return true
+		}
+
+		// Not empty - validate each item
+		param := fl.Param()
+		value := field.String()
+		allowed := strings.Fields(param)
+		return slices.Contains(allowed, value)
+	})
+	if err != nil {
+		return err
+	}
+
+	return v.RegisterTranslation("oneofornone", ErrorTranslator,
+		func(ut ut.Translator) error {
+			return ut.Add("oneofornone", "{0} must be one of {1} or empty", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("oneofornone", fe.Field(), fe.Param())
+			return t
+		},
+	)
+}
+
 func init() {
 	// Initialize the Error Translator
 	var found bool
@@ -72,4 +112,11 @@ func init() {
 
 	// Initialize the main validator
 	Validate = GetBaseValidator()
+
+	// Register custom validators
+	err := RegisterOneofOrNone(Validate)
+	if err != nil {
+		message := fmt.Sprintf("could not register oneofornone validation rule: %s", err)
+		panic(message)
+	}
 }

@@ -123,7 +123,7 @@ type UserRead struct {
 }
 
 type UserGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,name"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneofornone=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,name"` // Fields to include in the response; omit for full document
 }
 
 func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
@@ -153,13 +153,13 @@ type UserPut struct {
 type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 type UserSearch struct {
-	Page   int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                       // The page number
-	Size   int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                             // Items per page
-	Sort   []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" enums:"createdAt,-createdAt,name,-name,email,-email" example:"-createdAt"`       // Fields to use for sorting. Use the '-' for descending sorting
-	Fields []string           `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,place"` // Fields to include in the response; omit for full document
-	Id     types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                               // The user ID
-	Name   types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                                                                                        // The user name, two characters at least
-	Email  types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                                                                            // The user email
+	Page   int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                             // The page number
+	Size   int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                   // Items per page
+	Sort   []string           `json:"sort" validate:"dive,oneofornone=createdAt -createdAt name -name email -email" enums:"createdAt,-createdAt,name,-name,email,-email" example:"-createdAt"`       // Fields to use for sorting. Use the '-' for descending sorting
+	Fields []string           `json:"fields" validate:"dive,oneofornone=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,place"` // Fields to include in the response; omit for full document
+	Id     types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                     // The user ID
+	Name   types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                                                                                              // The user name, two characters at least
+	Email  types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                                                                                  // The user email
 }
 
 func (us UserSearch) ToSearchQuery() (types_.SearchQuery, error) {
@@ -182,7 +182,7 @@ func (us UserSearch) ToSearchQuery() (types_.SearchQuery, error) {
 	addErrors("email", errs)
 
 	if len(errorsMap) > 0 {
-		err := types_.MapToValidationErrs("invalid user filters", errorsMap)
+		err := types_.MapToValidationErrs("invalid users filters", errorsMap)
 		return types_.SearchQuery{}, err
 	}
 
