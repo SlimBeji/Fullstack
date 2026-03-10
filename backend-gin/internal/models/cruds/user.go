@@ -111,6 +111,10 @@ func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
 	}
 }
 
+func (cu *CRUDSUser) ToJSON(data map[string]any) error {
+	return nil
+}
+
 func (cu *CRUDSUser) PostProcess(
 	ctx context.Context, read *schemas.UserRead,
 ) error {

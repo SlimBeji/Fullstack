@@ -108,6 +108,10 @@ func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {
 	}
 }
 
+func (cp *CRUDSPlace) ToJSON(data map[string]any) error {
+	return utils.DecodeJSONBFields(data, "location")
+}
+
 func (cp *CRUDSPlace) PostProcess(
 	ctx context.Context, read *schemas.PlaceRead,
 ) error {

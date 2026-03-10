@@ -274,6 +274,7 @@ type RecordRead[User any, Model BaseModelReader, Read any] interface {
 	DefaultSelect() []string
 	AuthGet(context.Context, User, types_.SearchQuery) types_.SearchQuery
 	ToRead(*Model) Read
+	ToJSON(map[string]any) error
 	PostProcess(context.Context, *Read) error
 	PostProcessPartial(context.Context, map[string]any) error
 }
@@ -366,6 +367,10 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, types_.NotFoundError(crud.ModelName(), id)
 		}
+		return nil, err
+	}
+
+	if err := crud.ToJSON(result); err != nil {
 		return nil, err
 	}
 
@@ -722,6 +727,12 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 	err = qb.Find(&results).Error
 	if err != nil {
 		return nil, err
+	}
+
+	for _, result := range results {
+		if err := crud.ToJSON(result); err != nil {
+			return results, nil
+		}
 	}
 
 	return results, nil
