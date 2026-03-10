@@ -97,7 +97,7 @@ func TestFetchPlaces(t *testing.T) {
 	// sending the request
 	payload := map[string]any{
 		"title":  []string{"Stamford Bridge"},
-		"fields": []string{"location.lng", "location.lat"},
+		"fields": []string{"address", "location"},
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
