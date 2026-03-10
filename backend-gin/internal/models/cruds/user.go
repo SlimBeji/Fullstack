@@ -198,7 +198,15 @@ func (cu *CRUDSUser) PostToCreate(
 	ctx context.Context, data schemas.UserPost,
 ) (schemas.UserCreate, error) {
 	var zero schemas.UserCreate
-	var err error
+
+	// Hash password
+	hashed, err := utils.HashInput(data.Password, config.Env.DefaultHashSalt)
+	if err != nil {
+		return zero, err
+	}
+	data.Password = hashed
+
+	// Upload Image if found
 	imageURL := ""
 	if data.Image != nil {
 		storage := instances.GetStorage()
@@ -240,11 +248,6 @@ func (cu *CRUDSUser) AuthPost(
 func (cu *CRUDSUser) Create(
 	ctx context.Context, data schemas.UserCreate,
 ) (uint, error) {
-	hashed, err := utils.HashInput(data.Password, config.Env.DefaultHashSalt)
-	if err != nil {
-		return 0, err
-	}
-	data.Password = hashed
 	return gorm_.CreateRecord(ctx, cu, data)
 }
 
