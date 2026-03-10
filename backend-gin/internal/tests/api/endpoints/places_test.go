@@ -104,7 +104,7 @@ func TestFetchPlaces(t *testing.T) {
 		t.Fatal("could not marshal data for TestFetchPlaces")
 	}
 	formReader := bytes.NewReader(body)
-	req := httptest.NewRequest(http.MethodPost, "/api/places/query", formReader)
+	req := httptest.NewRequest(http.MethodPost, "/api/places/search", formReader)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)

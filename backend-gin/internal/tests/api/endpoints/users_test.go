@@ -83,7 +83,7 @@ func TestQueryUsers(t *testing.T) {
 		t.Fatal("could not marshal data for TestQueryUsers")
 	}
 	formReader := bytes.NewReader(body)
-	req := httptest.NewRequest(http.MethodPost, "/api/users/query", formReader)
+	req := httptest.NewRequest(http.MethodPost, "/api/users/search", formReader)
 	req.Header.Set("Authorization", token.Bearer())
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
