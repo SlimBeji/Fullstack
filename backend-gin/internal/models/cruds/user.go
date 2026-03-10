@@ -151,27 +151,25 @@ func (cu *CRUDSUser) PostProcessPartial(
 func (cu *CRUDSUser) MapSelect(field string) []gorm_.SelectField {
 	switch field {
 	case string(schemas.UserSelectPlaces):
-		joinStmt := "LEFT JOIN places Places ON users.id = Places.creator_id"
 		return []gorm_.SelectField{
-			{Select: "users.id"},
-			{Select: "places.id", Table: string(orm.TablePlaces), JoinStmt: joinStmt},
-			{Select: "places.title", Table: string(orm.TablePlaces), JoinStmt: joinStmt},
-			{Select: "places.address", Table: string(orm.TablePlaces), JoinStmt: joinStmt},
+			{Select: "id"},
+			{Select: "creator_id", Preload: "Places", Level: 1},
+			{Select: "id", Preload: "Places", Level: 1},
+			{Select: "title", Preload: "Places", Level: 1},
+			{Select: "address", Preload: "Places", Level: 1},
 		}
 
 	default:
-		return []gorm_.SelectField{
-			{Select: cu.TableName() + "." + utils.CamelToSnake(field)},
-		}
+		return []gorm_.SelectField{{Select: utils.CamelToSnake(field)}}
 	}
 }
 
 func (cu *CRUDSUser) MapOrderBy(field string) string {
-	return cu.TableName() + "." + utils.CamelToSnake(field)
+	return utils.CamelToSnake(field)
 }
 
 func (cu *CRUDSUser) MapWhere(field string) string {
-	return cu.TableName() + "." + utils.CamelToSnake(field)
+	return utils.CamelToSnake(field)
 }
 
 func (cu *CRUDSUser) BuildQuery(

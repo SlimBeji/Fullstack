@@ -15,9 +15,9 @@ type OrderBy struct {
 }
 
 type SelectField struct {
-	Table    string // The table name
-	Select   string // SQL path: "places.title" or "users.name"
-	JoinStmt string // Full JOIN: "LEFT JOIN places ON users.id = places.creator_id"
+	Select  string // SQL path: "places.title" or "users.name"
+	Preload string // GORM preload path: "Places" or "Places.Reviews" (empty if no preload needed)
+	Level   int8   // Depth: 0 = parent, 1 = child, 2 = grandchild
 }
 
 type BaseModelReader interface {

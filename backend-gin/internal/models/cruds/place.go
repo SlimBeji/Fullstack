@@ -146,13 +146,11 @@ func (cp *CRUDSPlace) PostProcessPartial(
 // Query Building
 
 func (cp *CRUDSPlace) MapSelect(field string) []gorm_.SelectField {
-	return []gorm_.SelectField{
-		{Select: cp.TableName() + "." + utils.CamelToSnake(field)},
-	}
+	return []gorm_.SelectField{{Select: utils.CamelToSnake(field)}}
 }
 
 func (cp *CRUDSPlace) MapOrderBy(field string) string {
-	return cp.TableName() + "." + utils.CamelToSnake(field)
+	return utils.CamelToSnake(field)
 }
 
 func (cp *CRUDSPlace) MapWhere(field string) string {
@@ -162,7 +160,7 @@ func (cp *CRUDSPlace) MapWhere(field string) string {
 	case string(schemas.PlaceSearchLocationLng):
 		return "(location->>'lng')::float"
 	default:
-		return cp.TableName() + "." + utils.CamelToSnake(field)
+		return utils.CamelToSnake(field)
 	}
 }
 
