@@ -2,6 +2,9 @@ package orm
 
 import (
 	"backend/internal/lib/gorm_"
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 
 	"github.com/pgvector/pgvector-go"
 )
@@ -9,6 +12,18 @@ import (
 type Location struct {
 	Lat float64 `json:"lat"`
 	Lng float64 `json:"lng"`
+}
+
+func (l *Location) Scan(value any) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New("could not parse raw location vaue")
+	}
+	return json.Unmarshal(bytes, l)
+}
+
+func (l Location) Value() (driver.Value, error) {
+	return json.Marshal(l)
 }
 
 type Place struct {
