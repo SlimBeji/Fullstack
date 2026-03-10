@@ -1,4 +1,6 @@
 from background.publishers import publisher
+from config import settings
+from lib.utils import hash_input
 from models.cruds import CrudsPlace, CrudsUser
 from models.examples.places import PLACES
 from models.examples.users import USERS
@@ -24,6 +26,9 @@ async def seed_users(cruds: CrudsUser, users: list[UserSeedSchema]) -> None:
 
         data = user.model_dump()
         data["imageUrl"] = imageUrl
+        data["password"] = hash_input(
+            data["password"], settings.DEFAULT_HASH_SALT
+        )
         id = await cruds.create(UserCreateSchema(**data))
         USER_REF_MAPPING[user.ref] = id
 

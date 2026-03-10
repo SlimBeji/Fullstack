@@ -85,12 +85,11 @@ class CrudsUser(
 
     # Create
 
-    async def create(self, form: UserCreateSchema) -> int:
-        form.password = hash_input(form.password, settings.DEFAULT_HASH_SALT)
-        return await super().create(form)
-
     async def post_to_create(self, data: UserPostSchema) -> UserCreateSchema:
         json = data.model_dump(exclude_unset=True, exclude_none=True)
+        json["password"] = hash_input(
+            json["password"], settings.DEFAULT_HASH_SALT
+        )
         image = json.pop("image", None)
         if image:
             json["imageUrl"] = cloud_storage.upload_file(image)
@@ -157,13 +156,15 @@ class CrudsUser(
 
     # Update
 
-    async def update(self, id: int | str, form: UserUpdateSchema) -> None:
-        if form.password:
-            form.password = hash_input(
-                form.password, settings.DEFAULT_HASH_SALT
+    async def put_to_update(self, data: UserPutSchema) -> UserUpdateSchema:
+        data_dict = data.model_dump(exclude_unset=True)
+        new_password = data_dict.get("password")
+        if new_password:
+            data_dict["password"] = hash_input(
+                new_password, settings.DEFAULT_HASH_SALT
             )
 
-        await super().update(id, form)
+        return self.update_schema.model_validate(data_dict)
 
     async def auth_put(
         self, user: UserReadSchema, id: int | str, form: UserPutSchema
