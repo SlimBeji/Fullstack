@@ -3,6 +3,7 @@ package validator_
 import (
 	"strings"
 
+	"github.com/creasty/defaults"
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
@@ -39,6 +40,9 @@ func TranslateErrors(err error) []string {
 }
 
 func ValidateStruct(form any) []string {
+	if err := defaults.Set(form); err != nil {
+		return []string{"Failed to set default values"}
+	}
 	err := Validate.Struct(form)
 	return TranslateErrors(err)
 }

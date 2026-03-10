@@ -4,6 +4,7 @@ go 1.26
 
 require (
 	cloud.google.com/go/storage v1.60.0
+	github.com/creasty/defaults v1.8.0
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-co-op/gocron/v2 v2.19.1
