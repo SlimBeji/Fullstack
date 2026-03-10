@@ -1,6 +1,8 @@
 package examples
 
 import (
+	"backend/internal/config"
+	"backend/internal/lib/utils"
 	"backend/internal/models/cruds"
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
@@ -35,11 +37,16 @@ func seedUsers(ctx context.Context, refs RefMappings, isVerbose bool) error {
 	for _, userEx := range Users {
 		example := userEx // capture loop variable
 		eg.Go(func() error {
+			hashed, err := utils.HashInput(userEx.Password, config.Env.DefaultHashSalt)
+			if err != nil {
+				return handleError(err, isVerbose)
+			}
+
 			userIn := schemas.UserCreate{
 				Name:     userEx.Name,
 				Email:    userEx.Email,
 				IsAdmin:  userEx.IsAdmin,
-				Password: userEx.Password,
+				Password: hashed,
 				ImageURL: userEx.ImageURL,
 			}
 
