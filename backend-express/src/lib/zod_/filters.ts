@@ -495,5 +495,9 @@ export const httpFilters = (
                       : [`${val}`],
             zod.array(httpFilter(field, doc, options)).transform(toFieldFilter)
         )
-        .openapi({ description, example, param: { description } });
+        .openapi({
+            description,
+            example,
+            param: { description, schema: { type: "string" } },
+        });
 };
