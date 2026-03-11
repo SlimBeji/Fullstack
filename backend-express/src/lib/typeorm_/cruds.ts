@@ -1,6 +1,5 @@
 import {
     DataSource,
-    DeepPartial,
     EntityManager,
     QueryFailedError,
     Repository,
@@ -181,9 +180,9 @@ export class CrudsClass<
 
     // Create
 
-    createEntity(data: Create): DeepPartial<DbModel> {
+    toModel(data: Create): DbModel {
         // Overload this when subclassing if required
-        return data as any as DeepPartial<DbModel>;
+        return data as any as DbModel;
     }
 
     async create(data: Create): Promise<number> {
@@ -197,7 +196,7 @@ export class CrudsClass<
             await this.beforeCreate(manager, data);
             const result = await manager.insert(
                 this.repository.target,
-                this.createEntity(data)
+                this.toModel(data)
             );
             const id = result.identifiers[0].id;
             await this.afterCreate(manager, id, data);
