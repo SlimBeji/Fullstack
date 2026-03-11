@@ -35,8 +35,8 @@ export const applySelect = <Entity extends ObjectLiteral>(
     query: SelectQueryBuilder<Entity>,
     clauses: string[],
     mapFunc: (f: string) => SelectField[]
-): SelectQueryBuilder<Entity> => {
-    if (clauses.length === 0) return query;
+): [SelectQueryBuilder<Entity>, boolean] => {
+    if (clauses.length === 0) return [query, false];
 
     // Convert to SelectField[] and deduplicate
     const selectSet = new Set<string>();
@@ -57,21 +57,21 @@ export const applySelect = <Entity extends ObjectLiteral>(
         }
     });
 
-    // Sort joins by level (parent before child)
-    const sortedJoins = Array.from(joinMap.values()).sort(
-        (a, b) => a.level - b.level
-    );
-
     // Apply joins in order
-    sortedJoins.forEach((join) => {
-        query = query.leftJoinAndSelect(join.relation, join.table);
-    });
+    const joins = Array.from(joinMap.values());
+    const hasJoins = joins.length > 0;
+    if (hasJoins) {
+        const sortedJoins = joins.sort((a, b) => a.level - b.level);
+        sortedJoins.forEach((join) => {
+            query = query.leftJoinAndSelect(join.relation, join.table);
+        });
+    }
 
     // Apply the select
     query = query.select(Array.from(selectSet));
 
     // Return query
-    return query;
+    return [query, hasJoins];
 };
 
 const applySingleWhere = <Entity extends ObjectLiteral>(
