@@ -7,14 +7,8 @@ import {
     UpdateResult,
 } from "typeorm";
 
-import { ApiError, HttpStatus } from "../types";
-import {
-    Filter,
-    PaginatedData,
-    PaginationData,
-    SearchQuery,
-    WhereFilters,
-} from "../types";
+import { ApiError, HttpStatus, PaginationData } from "../types";
+import { Filter, PaginatedData, SearchQuery, WhereFilters } from "../types";
 import { AbstractEntity, SelectField } from "./types";
 import { applyOrderBy, applySelect, applyWhere } from "./utils";
 
@@ -133,51 +127,6 @@ export class CrudsClass<
         return [{ op: "in", val }];
     }
 
-    buildSelectQuery(
-        query: SearchQuery<Selectables, Sortables, Searchables>
-    ): SelectQueryBuilder<DbModel> {
-        let ormQuery = this.repository.createQueryBuilder(this.tablename);
-
-        // Apply select
-        if (!query.select || query.select.length === 0) {
-            query.select = [...this.defaultSelect];
-        }
-        ormQuery = applySelect(ormQuery, query.select, (item) =>
-            this.mapSelect(item)
-        );
-
-        // Apply where
-        if (query.where && Object.keys(query.where).length > 0) {
-            ormQuery = applyWhere(ormQuery, query.where, (item) =>
-                this.mapWhere(item)
-            );
-        }
-
-        // Apply orderby
-        if (query.orderby && query.orderby.length > 0) {
-            ormQuery = applyOrderBy(ormQuery, query.orderby, (item) =>
-                this.mapOrderBy(item)
-            );
-        }
-
-        // Apply limit
-        if (query.size) {
-            ormQuery = ormQuery.take(query.size);
-        }
-
-        // Apply skip
-        if (query.page) {
-            const pagination = new PaginationData(
-                query.page || 1,
-                query.size || this.MAX_ITEMS_PER_PAGE
-            );
-            ormQuery = ormQuery.skip(pagination.skip);
-        }
-
-        // Return query before executing
-        return ormQuery;
-    }
-
     // Create
 
     toModel(data: Create): DbModel {
@@ -267,12 +216,21 @@ export class CrudsClass<
 
     // Read
 
+    authGet(
+        _user: User,
+        _query: SearchQuery<Selectables, Sortables, Searchables>
+    ): SearchQuery<Selectables, Sortables, Searchables> {
+        // Update the where statement to add ownership filters
+        // check the select clause to see if some fields are accessible or not by the user
+        throw new Error(`authGet not implemented for ${this.modelName}`);
+    }
+
     async exists(where: WhereFilters<Searchables>): Promise<boolean> {
         // A utility function to quickly check if a record exists
         // May be useful for auth methods
         try {
             let ormQuery = this.repository.createQueryBuilder(this.tablename);
-            ormQuery = applySelect(ormQuery, ["id"], (item) =>
+            [ormQuery] = applySelect(ormQuery, ["id"], (item) =>
                 this.mapSelect(item)
             );
             ormQuery = applyWhere(ormQuery, where, (item) =>
@@ -295,20 +253,163 @@ export class CrudsClass<
     }
 
     async read(id: number | string): Promise<DbModel | null> {
-        // Return the DbModel if found else null
+        /* Return the DbModel if found else null
+        Select all the data - while get methods allows selecting
+        partial data */
         return await this.repository.findOneBy({ id: this.parseId(id) } as any);
     }
 
-    authGet(
-        _user: User,
-        _query: SearchQuery<Selectables, Sortables, Searchables>
-    ): SearchQuery<Selectables, Sortables, Searchables> {
-        // Update the where statement to add ownership filters
-        // check the select clause to see if some fields are accessible or not by the user
-        throw new Error(`authGet not implemented for ${this.modelName}`);
+    private async getWithoutJoins(
+        query: SelectQueryBuilder<DbModel>,
+        where: WhereFilters<Searchables> | undefined,
+        orderby: Sortables[] | undefined
+    ): Promise<DbModel | null> {
+        /* Since we dont have joins, we can call getOne()
+        safely without risking truncating child data */
+
+        // Apply where
+        if (where && Object.keys(where).length > 0) {
+            query = applyWhere(query, where, (item) => this.mapWhere(item));
+        }
+
+        // Apply orderby
+        if (orderby && orderby.length > 0) {
+            query = applyOrderBy(query, orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
+
+        // Call getOne()
+        return await query.getOne();
     }
 
-    async get_raw(
+    private async getWithJoins(
+        query: SelectQueryBuilder<DbModel>,
+        where: WhereFilters<Searchables> | undefined,
+        orderby: Sortables[] | undefined
+    ): Promise<DbModel | null> {
+        /* We have joins so we can't call getOne(), We call getMany() to
+        make sure we fetch all child data and return first element if found*/
+
+        // Apply where
+        if (where && Object.keys(where).length > 0) {
+            query = applyWhere(query, where, (item) => this.mapWhere(item));
+        }
+
+        // Apply orderby
+        if (orderby && orderby.length > 0) {
+            query = applyOrderBy(query, orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
+
+        // Call getMany()
+        const results = await query.getMany();
+        if (results.length > 0) {
+            return results[0];
+        }
+        return null;
+    }
+
+    private async getInTwoSteps(
+        query: SelectQueryBuilder<DbModel>,
+        where: WhereFilters<Searchables> | undefined,
+        orderby: Sortables[] | undefined
+    ): Promise<DbModel | null> {
+        /* The where clause might be slow and we want to avoid scanning
+        the whole table just to get one element. We run a first getOne()
+        just to get the id and then a second query to get the full data.
+        The second query should be fast because we would be filtering on the id*/
+
+        // Create a query to get the id
+        let idQuery = this.repository.createQueryBuilder(this.tablename);
+        idQuery.select("id");
+
+        // Apply where
+        if (where && Object.keys(where).length > 0) {
+            idQuery = applyWhere(idQuery, where, (item) => this.mapWhere(item));
+        }
+
+        // Apply orderby
+        if (orderby && orderby.length > 0) {
+            idQuery = applyOrderBy(idQuery, orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
+
+        // Get the id or return null
+        const idRecord = (await idQuery.getOne()) as Pick<DbModel, "id"> | null;
+        if (!idRecord) {
+            return null;
+        }
+
+        // Update the main query to filter on the id
+        const idWhere = {
+            id: this.eq(idRecord.id),
+        } as WhereFilters<Searchables>;
+        query = applyWhere(query, idWhere, (item) => this.mapWhere(item));
+
+        // Call getMany
+        const results = await query.getMany();
+        if (results && results.length > 0) {
+            return results[0];
+        }
+        return null;
+    }
+
+    async getOne(
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        twoSteps: boolean = true
+    ): Promise<DbModel | null> {
+        /*
+        getOne() and Joins do not work well together!
+        getOne() add a LIMIT 1 to the sql query which applies to
+        all rows not to the number of parent record found.
+        This leads to truncated children fetching
+
+        We have 3 cases:
+        - Case 1: No Joins needed: we just call getOne() and get the full data
+                  -> this.getWithoutJoins()
+        - Case 2: We have joins but the where clause is efficient
+                  Example: filters on indexed columns with unique constraint
+                  We just call getMany() and return first element or null
+                  -> this.getWithJoins()
+        - Case 3: We have joins and we want to avoid scanning the whole table like in Case 2.
+                  We run a first query with a getOne() to get the id
+                  We run a second query with a getMany() but filtering on the id obtained
+                  -> this.getInTwoSteps()
+        */
+
+        // Step 1: apply select
+        let hasJoins = false;
+        let ormQuery = this.repository.createQueryBuilder(this.tablename);
+        if (!query.select || query.select.length === 0) {
+            query.select = [...this.defaultSelect];
+        }
+        [ormQuery, hasJoins] = applySelect(ormQuery, query.select, (item) =>
+            this.mapSelect(item)
+        );
+
+        if (!hasJoins) {
+            return await this.getWithoutJoins(
+                ormQuery,
+                query.where,
+                query.orderby
+            );
+        }
+
+        if (twoSteps) {
+            return await this.getInTwoSteps(
+                ormQuery,
+                query.where,
+                query.orderby
+            );
+        }
+
+        return await this.getWithJoins(ormQuery, query.where, query.orderby);
+    }
+
+    async getRaw(
         id: number | string,
         user: User | null,
         fields: Selectables[] | null
@@ -324,8 +425,7 @@ export class CrudsClass<
             query = this.authGet(user, query);
         }
 
-        const ormQuery = this.buildSelectQuery(query);
-        const result = await ormQuery.getOne();
+        const result = await this.getOne(query, false);
         if (!result) {
             throw this.notFoundError(id);
         }
@@ -337,7 +437,7 @@ export class CrudsClass<
         options: Options = {} as Options
     ): Promise<Read> {
         // By using the defaultSelect, we get a Read
-        const result = (await this.get_raw(id, null, null)) as any as Read;
+        const result = (await this.getRaw(id, null, null)) as any as Read;
         if (options.process) {
             return await this.postProcess(result);
         }
@@ -350,7 +450,7 @@ export class CrudsClass<
         options: Options = {} as Options
     ): Promise<Read> {
         // By using the defaultSelect, we get a Read
-        const result = (await this.get_raw(id, user, null)) as any as Read;
+        const result = (await this.getRaw(id, user, null)) as any as Read;
         if (options.process) {
             return await this.postProcess(result);
         }
@@ -362,7 +462,7 @@ export class CrudsClass<
         options: Options = {} as Options
     ): Promise<Partial<Read>> {
         // Raise a 404 Not Found ApiError if not found
-        const result = (await this.get_raw(
+        const result = (await this.getRaw(
             id,
             null,
             options.fields || null
@@ -379,7 +479,7 @@ export class CrudsClass<
         options: Options = {} as Options
     ): Promise<Partial<Read>> {
         // Raise a 404 Not Found ApiError if not found
-        const result = (await this.get_raw(
+        const result = (await this.getRaw(
             id,
             user,
             options.fields || null
@@ -574,56 +674,151 @@ export class CrudsClass<
         return await ormQuery.getCount();
     }
 
+    private async getManyWithoutJoins(
+        query: SelectQueryBuilder<DbModel>,
+        where: WhereFilters<Searchables> | undefined,
+        orderby: Sortables[] | undefined,
+        size: number | undefined,
+        page: number | undefined
+    ): Promise<DbModel[]> {
+        // We dont have joins so we do only one query
+
+        // Apply Where
+        if (where && Object.keys(where).length > 0) {
+            query = applyWhere(query, where, (item) => this.mapWhere(item));
+        }
+
+        // Apply OrderBy
+        if (orderby && orderby.length > 0) {
+            query = applyOrderBy(query, orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
+
+        // Apply Take
+        size = size || this.MAX_ITEMS_PER_PAGE;
+        query = query.take(size);
+
+        // Apply Skip
+        if (page && page > 1) {
+            const pagination = new PaginationData(page, size);
+            query = query.skip(pagination.skip);
+        }
+
+        // Call getMany() and return result
+        return await query.getMany();
+    }
+
+    private async getManyWithJoins(
+        query: SelectQueryBuilder<DbModel>,
+        where: WhereFilters<Searchables> | undefined,
+        orderby: Sortables[] | undefined,
+        size: number | undefined,
+        page: number | undefined
+    ): Promise<DbModel[]> {
+        // We fetch results in 2 steps:
+        // Step 1: we get the ids only - no joins
+        // Step 2: we fetch the data with joins filtering on ids
+
+        // Create idQuery
+        let idQuery = this.repository.createQueryBuilder(this.tablename);
+        idQuery.select("id");
+
+        // Apply Where
+        if (where && Object.keys(where).length > 0) {
+            idQuery = applyWhere(idQuery, where, (item) => this.mapWhere(item));
+        }
+
+        // Apply OrderBy
+        if (orderby && orderby.length > 0) {
+            idQuery = applyOrderBy(idQuery, orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
+
+        // Apply Take
+        size = size || this.MAX_ITEMS_PER_PAGE;
+        idQuery = idQuery.take(size);
+
+        // Apply Skip
+        if (page && page > 1) {
+            const pagination = new PaginationData(page, size);
+            idQuery = idQuery.skip(pagination.skip);
+        }
+
+        // Call getMany() and get the list of ids
+        const ids = (await idQuery.getRawMany()).map(
+            (row) => Object.values(row)[0] // avoid naming the attribute
+        );
+
+        // Apply where with ids on the main query
+        query = applyWhere(query, { id: this.in(ids) }, (item) =>
+            this.mapWhere(item)
+        );
+
+        // Apply order by again to get the data in good order
+        if (orderby && orderby.length > 0) {
+            query = applyOrderBy(query, orderby, (item) =>
+                this.mapOrderBy(item)
+            );
+        }
+
+        // Fetch results
+        return await query.getMany();
+    }
+
     async getMany(
         query: SearchQuery<Selectables, Sortables, Searchables>,
         user: User | null
     ): Promise<DbModel[]> {
-        // search records
+        /*
+        getMany(), Joins and Pagination dont not work well together!
+        the take() and skip() called with TypeOrm will applies to
+        all rows not to the number of parent record found.
+        This leads to truncated children fetching.
 
-        // Setting default values
+        We have 3 cases:
+        - Case 1: No Joins needed: we just call getMany() and get the full data
+                  -> getManyWithoutJoins()
+        - Case 2: We have joins so we proceed in two steps
+                  Step 1: we extract the list of ids (no joins)
+                  Step 2: we fetch our data by filtering on the ids (no pagination)
+                  -> getManyWithJoins()
+        */
+
+        // Step 1: apply select
+        let hasJoins = false;
+        let ormQuery = this.repository.createQueryBuilder(this.tablename);
         if (!query.select || query.select.length === 0) {
             query.select = [...this.defaultSelect];
         }
-        if (!query.orderby || query.orderby.length === 0) {
-            query.orderby = [...this.defaultOrderby];
-        }
-        if (!query.where || Object.keys(query.where).length === 0) {
-            query.where = {};
-        }
-        if (!query.page) {
-            query.page = 1;
-        }
-        if (!query.size) {
-            query.size = this.MAX_ITEMS_PER_PAGE;
-        }
-
-        // Because TypeOrm .getMany() is broken with pagination
-        // We first fetch the ids with pagination, then we fetch the data
-        // by removing the pagination
-        let filterQuery: SearchQuery<Selectables, Sortables, Searchables> = {
-            ...query,
-            select: ["id"] as Selectables[],
-        };
-
-        // Apply auth filter if required
-        if (user) {
-            filterQuery = this.authGet(user, filterQuery);
-        }
-
-        // Get the ids
-        const ids = (await this.buildSelectQuery(filterQuery).getRawMany()).map(
-            (row) => Object.values(row)[0] // avoid naming the attribute
+        [ormQuery, hasJoins] = applySelect(ormQuery, query.select, (item) =>
+            this.mapSelect(item)
         );
-        if (ids.length === 0) return [];
 
-        // Fetching the records with the id in ids, no need for pagination here
-        const fetchQuery = {
-            select: query.select,
-            where: { id: this.in(ids) },
-            orderby: query.orderby,
-        };
-        const result = await this.buildSelectQuery(fetchQuery).getMany();
-        return result;
+        // Step 2: update the where clause if we have authorization
+        if (user) {
+            query = this.authGet(user, query);
+        }
+
+        // Step 3: dispatch the query to the appropriate method
+        if (hasJoins) {
+            return await this.getManyWithJoins(
+                ormQuery,
+                query.where,
+                query.orderby,
+                query.size,
+                query.page
+            );
+        }
+
+        return await this.getManyWithoutJoins(
+            ormQuery,
+            query.where,
+            query.orderby,
+            query.size,
+            query.page
+        );
     }
 
     async search(
