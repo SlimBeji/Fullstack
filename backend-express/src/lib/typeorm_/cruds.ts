@@ -574,15 +574,6 @@ export class CrudsClass<
         return await ormQuery.getCount();
     }
 
-    authSearch(
-        _user: User,
-        _query: SearchQuery<Selectables, Sortables, Searchables>
-    ): SearchQuery<Selectables, Sortables, Searchables> {
-        // Update the where statement to add ownership filters
-        // check the select clause to see if some fields are accessible or not by the user
-        throw new Error(`authSearch not implemented for ${this.modelName}`);
-    }
-
     async getMany(
         query: SearchQuery<Selectables, Sortables, Searchables>,
         user: User | null
@@ -714,7 +705,7 @@ export class CrudsClass<
         user: User,
         query: SearchQuery<Selectables, Sortables, Searchables>
     ): Promise<PaginatedData<Partial<Read>>> {
-        query = this.authSearch(user, query);
+        query = this.authGet(user, query);
         return await this.paginate(query);
     }
 }
