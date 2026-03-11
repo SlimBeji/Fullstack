@@ -233,7 +233,7 @@ class CrudsClass(
 
     # Create
 
-    def create_entity(self, data: Create) -> DbModel:
+    def to_model(self, data: Create) -> DbModel:
         """Overload this when subclassing if required"""
         normalized = convert_dict_to_snake(
             cast(dict, data.model_dump(exclude_unset=True, exclude_none=True))
@@ -244,7 +244,7 @@ class CrudsClass(
         """Create from a create form, return id"""
         try:
             await self.before_create(data)
-            entity = self.create_entity(data)
+            entity = self.to_model(data)
             self.session.add(entity)
             await self.session.flush()
             entity_id = entity.id
