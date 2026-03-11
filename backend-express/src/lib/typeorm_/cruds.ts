@@ -305,7 +305,7 @@ export class CrudsClass<
     ): SearchQuery<Selectables, Sortables, Searchables> {
         // Update the where statement to add ownership filters
         // check the select clause to see if some fields are accessible or not by the user
-        throw new Error(`authSearch not implemented for ${this.modelName}`);
+        throw new Error(`authGet not implemented for ${this.modelName}`);
     }
 
     async get_raw(
