@@ -117,8 +117,8 @@ export class CrudsUser extends CrudsClass<
             select: [...this.defaultSelect],
             where: { email: this.eq(email) },
         };
-        const ormQuery = this.buildSelectQuery(query);
-        const result = await ormQuery.getOne();
+
+        const result = await this.getOne(query, false);
         if (!result) return null;
         // Using this.defaultSelect as select should gives a Read schema
         return result as any as UserRead;
