@@ -189,7 +189,8 @@ export class CrudsUser extends CrudsClass<
     async afterUpdate(
         _manager: EntityManager,
         id: number,
-        _data: UserUpdate
+        _data: UserUpdate,
+        _context: Record<string, any>
     ): Promise<void> {
         await redisClient.delete(this.cacheKey(id));
     }

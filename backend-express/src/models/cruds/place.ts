@@ -122,24 +122,43 @@ export class CrudsPlace extends CrudsClass<
 
     // Update
 
-    async update(id: number | string, data: PlaceUpdate): Promise<void> {
-        /*  Overloading the update method is cheaper than
-        handling the check in the after_update.
-        The goal is to avoid run unneccary embedding.
-        A form might be submitted even if the data stays the same*/
-
-        const index = this.parseId(id);
-        const record = await this.read(id);
+    async beforeUpdate(
+        manager: EntityManager,
+        id: number,
+        data: PlaceUpdate
+    ): Promise<Record<string, any>> {
+        const record = await manager.findOne(Place, {
+            where: { id },
+            select: ["title", "description"],
+        });
         if (!record) {
             throw this.notFoundError(id);
         }
 
+        const titleChanged = !!data.title && data.title !== record.title;
         const descriptionChanged =
             !!data.description && data.description !== record.description;
-        const titleChanged = !!data.title && data.title !== record.title;
-        await super.update(id, data);
         if (descriptionChanged || titleChanged) {
-            placeEmbedding(index);
+            return { triggerEmbedding: true };
+        }
+        return { triggerEmbedding: false };
+    }
+
+    async afterUpdate(
+        _manager: EntityManager,
+        id: number,
+        _data: PlaceUpdate,
+        context: Record<string, any>
+    ): Promise<void> {
+        if (context.triggerEmbedding == undefined) {
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "something went wrong after trying to update place recod"
+            );
+        }
+
+        if (context.triggerEmbedding) {
+            placeEmbedding(id);
         }
     }
 

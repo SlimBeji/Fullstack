@@ -507,7 +507,7 @@ export class CrudsClass<
         const key = this.parseId(id);
         let result: UpdateResult;
         try {
-            await this.beforeUpdate(manager, key, data);
+            const context = await this.beforeUpdate(manager, key, data);
             result = await manager
                 .createQueryBuilder()
                 .update(this.repository.target)
@@ -518,7 +518,7 @@ export class CrudsClass<
             if (result.affected === 0) {
                 throw this.notFoundError(id);
             }
-            await this.afterUpdate(manager, key, data);
+            await this.afterUpdate(manager, key, data, context);
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
@@ -549,14 +549,16 @@ export class CrudsClass<
         _manager: EntityManager,
         _id: number,
         _data: Update
-    ): Promise<void> {
+    ): Promise<Record<string, any>> {
         // Overload this to run code before update
+        return {};
     }
 
     async afterUpdate(
         _manager: EntityManager,
         _id: number,
-        _data: Update
+        _data: Update,
+        _context: Record<string, any>
     ): Promise<void> {
         // Overload this to run code before update
     }
