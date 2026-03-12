@@ -4,7 +4,7 @@ import { env } from "@/config";
 import { CrudsClass, SelectField } from "@/lib/typeorm_";
 import { ApiError, HttpStatus } from "@/lib/types";
 import { hashInput, verifyHash } from "@/lib/utils";
-import { pgClient, storage } from "@/services/instances";
+import { pgClient, redisClient, storage } from "@/services/instances";
 
 import { Models, User } from "../orm";
 import {
@@ -16,6 +16,7 @@ import {
     UserPost,
     UserPut,
     UserRead,
+    UserReadSchema,
     UserSearchableType,
     UserSearchQuery,
     userSelectableFields,
@@ -124,6 +125,34 @@ export class CrudsUser extends CrudsClass<
         return result as any as UserRead;
     }
 
+    cacheKey(id: number | string): string {
+        return `user_read_${id}`;
+    }
+
+    async getCache(id: number | string): Promise<UserRead> {
+        const key = this.cacheKey(id);
+        const value = await redisClient.get(key);
+
+        // If previous value found in the cache
+        if (value != null) {
+            const result = UserReadSchema.safeParse(value);
+            if (result.success) {
+                return result.data;
+            } else {
+                // Old data become invalid - delete it
+                await redisClient.delete(key);
+            }
+        }
+
+        // No previous value found or old value deprecated/corrupted
+        const user = await this.get(id);
+        try {
+            await redisClient.set(key, user);
+        } finally {
+            return user;
+        }
+    }
+
     // Update
 
     async putToUpdate(data: UserPut): Promise<UserUpdate> {
@@ -157,12 +186,21 @@ export class CrudsUser extends CrudsClass<
         }
     }
 
+    async afterUpdate(
+        _manager: EntityManager,
+        id: number,
+        _data: UserUpdate
+    ): Promise<void> {
+        await redisClient.delete(this.cacheKey(id));
+    }
+
     // Delete
 
     async afterDelete(_manager: EntityManager, obj: User): Promise<void> {
         if (obj.imageUrl) {
             storage.deleteFile(obj.imageUrl);
         }
+        await redisClient.delete(this.cacheKey(obj.id));
     }
 
     async authDelete(user: UserRead, _id: number | string): Promise<void> {

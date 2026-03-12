@@ -7,7 +7,7 @@ import { decodeToken, UserRead } from "@/models/schemas";
 
 const getUserFromToken = async (token: string): Promise<UserRead> => {
     const payload = decodeToken(token);
-    const user = await crudsUser.get(payload.userId);
+    const user = await crudsUser.getCache(payload.userId);
     if (!user) {
         throw new ApiError(HttpStatus.NOT_FOUND, "User not found");
     }
