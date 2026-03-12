@@ -29,7 +29,7 @@ async def _get_user_from_token(
         raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Not Valid")
 
     cruds = CrudsUser(session)
-    user = await cruds.get(payload.userId)
+    user = await cruds.getCache(payload.userId)
     if user is None:
         raise ApiError(HTTPStatus.NOT_FOUND, "User Not Found")
 

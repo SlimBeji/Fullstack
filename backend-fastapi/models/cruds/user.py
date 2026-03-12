@@ -27,7 +27,7 @@ from models.schemas import (
     UserUpdateSchema,
     create_token,
 )
-from services.instances import cloud_storage
+from services.instances import cloud_storage, redis_client
 
 
 class UserOptions(TypedDict):
@@ -170,7 +170,26 @@ class CrudsUser(
             return None
         return record  # type : ignore
 
+    def cache_key(self, id: int | str) -> str:
+        return f"user_read_{id}"
+
+    async def getCache(self, id: int | str) -> UserReadSchema:
+        key = self.cache_key(id)
+        value = await redis_client.get(key, format=UserReadSchema)
+        if value:
+            return value
+
+        # Value not found or old value deprecated/correupted
+        value = await self.get(id)
+        await redis_client.set(key, value)
+        return value
+
     # Update
+
+    async def after_update(
+        self, id: int, data: UserUpdateSchema, context: UserUpdateContext
+    ) -> None:
+        await redis_client.delete(self.cache_key(id))
 
     async def put_to_update(self, data: UserPutSchema) -> UserUpdateSchema:
         data_dict = data.model_dump(exclude_unset=True)
@@ -207,15 +226,10 @@ class CrudsUser(
 
         return UserDeleteContext(image_url=record.image_url)
 
-    async def after_delete(self, context: UserDeleteContext) -> None:
-        try:
-            if context.image_url:
-                cloud_storage.delete_file(context.image_url)
-        except Exception as e:
-            # Logging error instead of canceling whole transaction
-            logging.error(
-                f"Could not delete User image file: {context.image_url}. The following error occured: {str(e)}"
-            )
+    async def after_delete(self, id: int, context: UserDeleteContext) -> None:
+        await redis_client.delete(self.cache_key(id))
+        if context.image_url:
+            cloud_storage.delete_file(context.image_url)
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
         if user.isAdmin:
