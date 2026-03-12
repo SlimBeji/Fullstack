@@ -30,14 +30,17 @@ from .utils import apply_order_by, apply_select, apply_where
 DbModel = TypeVar("DbModel", bound=BaseModel)
 User = TypeVar("User", bound=PydanticBaseModel)
 Create = TypeVar("Create", bound=PydanticBaseModel)
+CreateContext = TypeVar("CreateContext", bound=PydanticBaseModel)
 Post = TypeVar("Post", bound=PydanticBaseModel)
 Read = TypeVar("Read", bound=PydanticBaseModel)
+Options = TypeVar("Options", bound=Mapping)
 Selectables = TypeVar("Selectables", bound=str)
 Sortables = TypeVar("Sortables", bound=str)
 Searchables = TypeVar("Searchables", bound=str)
 Update = TypeVar("Update", bound=PydanticBaseModel)
+UpdateContext = TypeVar("UpdateContext", bound=PydanticBaseModel)
 Put = TypeVar("Put", bound=PydanticBaseModel)
-Options = TypeVar("Options", bound=Mapping)
+DeleteContext = TypeVar("DeleteContext", bound=PydanticBaseModel)
 
 
 class CrudsClass(
@@ -45,14 +48,17 @@ class CrudsClass(
         DbModel,  # The Database model interface
         User,  # The User read schema used for authorization
         Create,  # Creation Interface
+        CreateContext,  # Creation Hooks context
         Post,  # HTTP Post form
         Read,  # The Read interface
+        Options,  # General options for HTTP methods/actions
         Selectables,  # Literal of Selectable fields
         Sortables,  # Literal of fields we can use OrderBy on
         Searchables,  # List of keys we can search on
         Update,  # Update Interface
+        UpdateContext,  # Update hooks context
         Put,  # HTTP Put form
-        Options,  # General options for HTTP methods/actions
+        DeleteContext,  # Delete hooks context
     ]
 ):
     # Constructor, Properties & Helpers
@@ -78,14 +84,24 @@ class CrudsClass(
         # self.model_type: type[DbModel] = types[0]  # DbModel
         # self.user_read_schema: type[User] = types[1] # User
         self.create_schema: type[Create] = types[2]  # Create PydanticBaseModel
-        self.post_schema: type[Post] = types[3]  # Post PydanticBaseModel
-        self.read_schema: type[Read] = types[4]  # Read PydanticBaseModel
-        # self.selectables_type: type[Selectables] = types[5]  # Selectables type
-        # self.sortables_type: type[Sortables] = types[6]  # Sortables type
-        # self.searchables_type: type[Searchables] = types[7]  # Searchables type
-        self.update_schema: type[Update] = types[8]  # Update PydanticBaseModel
-        self.put_schema: type[Put] = types[9]  # Put PydanticBaseModel
-        # self.options_type: type[Options] = types[10] # Options type
+        self.create_context_schema: type[CreateContext] = types[
+            3
+        ]  # CreateContext PydanticBaseModel
+
+        self.post_schema: type[Post] = types[4]  # Post PydanticBaseModel
+        self.read_schema: type[Read] = types[5]  # Read PydanticBaseModel
+        # self.options_type: type[Options] = types[6] # Options type
+        # self.selectables_type: type[Selectables] = types[7]  # Selectables type
+        # self.sortables_type: type[Sortables] = types[8]  # Sortables type
+        # self.searchables_type: type[Searchables] = types[9]  # Searchables type
+        self.update_schema: type[Update] = types[10]  # Update PydanticBaseModel
+        self.update_context_schema: type[UpdateContext] = types[
+            11
+        ]  # UpdateContext PydanticBaseModel
+        self.put_schema: type[Put] = types[12]  # Put PydanticBaseModel
+        self.delete_context_schema: type[DeleteContext] = types[
+            13
+        ]  # DeleteContext PydanticBaseModel
 
     @property
     def tablename(self) -> str:
@@ -243,12 +259,12 @@ class CrudsClass(
     async def create(self, data: Create) -> int:
         """Create from a create form, return id"""
         try:
-            await self.before_create(data)
+            context = await self.before_create(data)
             entity = self.to_model(data)
             self.session.add(entity)
             await self.session.flush()
-            entity_id = entity.id
-            await self.after_create(entity_id, data)
+            entity_id = cast(int, entity.id)
+            await self.after_create(entity_id, data, context)
             await self.session.commit()
             return entity_id
         except IntegrityError as err:
@@ -266,10 +282,13 @@ class CrudsClass(
                 f"Could not create {self.model_name} object: {str(err)}!",
             )
 
-    async def before_create(self, data: Create) -> None:
+    async def before_create(self, data: Create) -> CreateContext:
         """Overload this to run code before create"""
+        return self.create_context_schema.model_construct()
 
-    async def after_create(self, id: int, data: Create) -> None:
+    async def after_create(
+        self, id: int, data: Create, context: CreateContext
+    ) -> None:
         """Overload this to run code after create"""
 
     async def post_to_create(self, data: Post) -> Create:
@@ -405,7 +424,7 @@ class CrudsClass(
         """update from a Update form"""
         key = self.parse_id(id)
         try:
-            await self.before_update(id, data)
+            context = await self.before_update(key, data)
             stmt = (
                 update(self.model)
                 .where(self.model.id == key)
@@ -415,7 +434,7 @@ class CrudsClass(
             result = await self.session.execute(stmt)
             if result.scalar_one_or_none() is None:
                 raise self.not_found_error(id)
-            await self.after_update(id, data)
+            await self.after_update(key, data, context)
             await self.session.commit()
 
         except Exception as err:
@@ -425,10 +444,13 @@ class CrudsClass(
                 f"Could not update {self.model_name} object: {str(err)}!",
             )
 
-    async def before_update(self, id: int | str, data: Update) -> None:
+    async def before_update(self, id: int, data: Update) -> UpdateContext:
         """Overload this to run code before update"""
+        return self.update_context_schema.model_construct()
 
-    async def after_update(self, id: int | str, data: Update) -> None:
+    async def after_update(
+        self, id: int, data: Update, context: UpdateContext
+    ) -> None:
         """Overload this to run code after update"""
 
     async def auth_put(self, user: User, id: int | str, form: Put) -> None:
@@ -469,13 +491,17 @@ class CrudsClass(
         """delete object by id"""
         key = self.parse_id(id)
         try:
-            record = await self.read(id)
-            if record is None:
-                raise self.not_found_error(id)
-            await self.before_delete(record)
-            stmt = delete(self.model).where(self.model.id == key)
-            await self.session.execute(stmt)
-            await self.after_delete(record)
+            context = await self.before_delete(key)
+            stmt = (
+                delete(self.model)
+                .where(self.model.id == key)
+                .returning(self.model.id)
+            )
+            result = await self.session.execute(stmt)
+            deleted_id = result.scalar_one_or_none()
+            if deleted_id is None:
+                raise self.not_found_error(key)
+            await self.after_delete(key, context)
             await self.session.commit()
 
         except Exception as err:
@@ -485,10 +511,11 @@ class CrudsClass(
                 f"Could not delete {self.model_name} object: {str(err)}!",
             )
 
-    async def before_delete(self, record: DbModel) -> None:
+    async def before_delete(self, id: int) -> DeleteContext:
         """Overload this to run code before delete"""
+        return self.delete_context_schema.model_construct()
 
-    async def after_delete(self, record: DbModel) -> None:
+    async def after_delete(self, id: int, context: DeleteContext) -> None:
         """Overload this to run code after delete"""
 
     async def auth_delete(self, user: User, id: int | str) -> None:
