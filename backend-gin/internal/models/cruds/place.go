@@ -26,7 +26,11 @@ type PlaceOptions struct {
 	Process bool
 }
 
-type PlaceUpdateContex struct{}
+type PlaceCreateContex struct{}
+
+type PlaceUpdateContext struct {
+	triggerEmbedding bool
+}
 
 type CRUDSPlace struct {
 	DB              *gorm.DB
@@ -218,12 +222,12 @@ func (cp *CRUDSPlace) PostToCreate(
 
 func (cp *CRUDSPlace) BeforeCreate(
 	tx *gorm.DB, data schemas.PlaceCreate,
-) (PlaceUpdateContex, error) {
-	return PlaceUpdateContex{}, nil
+) (PlaceCreateContex, error) {
+	return PlaceCreateContex{}, nil
 }
 
 func (cp *CRUDSPlace) AfterCreate(
-	tx *gorm.DB, id uint, data schemas.PlaceCreate, hooksData PlaceUpdateContex,
+	tx *gorm.DB, id uint, data schemas.PlaceCreate, hooksData PlaceCreateContex,
 ) error {
 	_, err := publishers.PlaceEmbedding(id)
 	return err

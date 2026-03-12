@@ -25,6 +25,8 @@ type UserOptions struct {
 	Process bool
 }
 
+type UserCreateContext struct{}
+
 type UserUpdateContex struct{}
 
 type CRUDSUser struct {
@@ -228,12 +230,12 @@ func (cu *CRUDSUser) PostToCreate(
 
 func (cu *CRUDSUser) BeforeCreate(
 	tx *gorm.DB, data schemas.UserCreate,
-) (UserUpdateContex, error) {
-	return UserUpdateContex{}, nil
+) (UserCreateContext, error) {
+	return UserCreateContext{}, nil
 }
 
 func (cu *CRUDSUser) AfterCreate(
-	tx *gorm.DB, id uint, data schemas.UserCreate, hooksData UserUpdateContex,
+	tx *gorm.DB, id uint, data schemas.UserCreate, hooksData UserCreateContext,
 ) error {
 	return nil
 }
