@@ -29,7 +29,7 @@ type PlaceOptions struct {
 type PlaceCreateContex struct{}
 
 type PlaceUpdateContext struct {
-	triggerEmbedding bool
+	TriggerEmbedding bool
 }
 
 type CRUDSPlace struct {
@@ -477,12 +477,12 @@ func (cp *CRUDSPlace) AuthPut(
 
 func (cp *CRUDSPlace) BeforeUpdate(
 	query *gorm.DB, id uint, data schemas.PlaceUpdate,
-) error {
-	return nil
+) (PlaceUpdateContext, error) {
+	return PlaceUpdateContext{}, nil
 }
 
 func (cp *CRUDSPlace) AfterUpdate(
-	query *gorm.DB, id uint, data schemas.PlaceUpdate,
+	query *gorm.DB, id uint, data schemas.PlaceUpdate, hooksData PlaceUpdateContext,
 ) error {
 	return nil
 }

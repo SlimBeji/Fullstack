@@ -504,12 +504,12 @@ func (cu *CRUDSUser) AuthPut(
 
 func (cu *CRUDSUser) BeforeUpdate(
 	query *gorm.DB, id uint, data schemas.UserUpdate,
-) error {
-	return nil
+) (UserUpdateContex, error) {
+	return UserUpdateContex{}, nil
 }
 
 func (cu *CRUDSUser) AfterUpdate(
-	query *gorm.DB, id uint, data schemas.UserUpdate,
+	query *gorm.DB, id uint, data schemas.UserUpdate, hooksData UserUpdateContex,
 ) error {
 	return nil
 }

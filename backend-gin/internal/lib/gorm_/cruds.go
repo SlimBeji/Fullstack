@@ -221,24 +221,26 @@ type RecordUpdate[
 	Model BaseModelReader,
 	Read any,
 	Update any,
+	HooksData any,
 	Put any,
 ] interface {
 	RecordRead[User, Model, Read]
 	PutToUpdate(context.Context, Put) (Update, error)
 	AuthPut(context.Context, User, uint, Put) error
-	BeforeUpdate(*gorm.DB, uint, Update) error
-	AfterUpdate(*gorm.DB, uint, Update) error
+	BeforeUpdate(*gorm.DB, uint, Update) (HooksData, error)
+	AfterUpdate(*gorm.DB, uint, Update, HooksData) error
 }
 
-func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
+func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, HooksData any, Put any](
 	ctx context.Context,
-	crud RecordUpdate[User, Model, Read, Update, Put],
+	crud RecordUpdate[User, Model, Read, Update, HooksData, Put],
 	id uint,
 	data Update,
 ) error {
 	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Before update hook
-		if err := crud.BeforeUpdate(tx, id, data); err != nil {
+		hooksData, err := crud.BeforeUpdate(tx, id, data)
+		if err != nil {
 			return err
 		}
 
@@ -254,7 +256,7 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any
 		}
 
 		// After update hook
-		if err := crud.AfterUpdate(tx, id, data); err != nil {
+		if err := crud.AfterUpdate(tx, id, data, hooksData); err != nil {
 			return err
 		}
 
@@ -274,9 +276,9 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, Put any
 	return nil
 }
 
-func PutRecord[User any, Model BaseModelReader, Read any, Update any, Put any](
+func PutRecord[User any, Model BaseModelReader, Read any, Update any, HooksData any, Put any](
 	ctx context.Context,
-	crud RecordUpdate[User, Model, Read, Update, Put],
+	crud RecordUpdate[User, Model, Read, Update, HooksData, Put],
 	id uint,
 	form Put,
 	user *User,
