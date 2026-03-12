@@ -227,9 +227,27 @@ export class CrudsPlace extends CrudsClass<
 
     // Delete
 
-    async afterDelete(_manager: EntityManager, obj: Place): Promise<void> {
-        if (obj.imageUrl) {
-            storage.deleteFile(obj.imageUrl);
+    async beforeDelete(
+        manager: EntityManager,
+        id: number
+    ): Promise<Record<string, any>> {
+        const record = (await manager.findOne(Place, {
+            select: { imageUrl: true },
+            where: { id },
+        })) as Pick<Place, "imageUrl"> | null;
+        if (!record) {
+            throw this.notFoundError(id);
+        }
+        return { imageUrl: record.imageUrl };
+    }
+
+    async afterDelete(
+        _manager: EntityManager,
+        context: Record<string, any>
+    ): Promise<void> {
+        // Delete image if exists
+        if (context.imageUrl) {
+            await storage.deleteFile(context.imageUrl);
         }
     }
 

@@ -615,11 +615,7 @@ export class CrudsClass<
         const manager = queryRunner.manager;
 
         try {
-            const obj = await this.read(id);
-            if (!obj) {
-                throw this.notFoundError(id);
-            }
-            await this.beforeDelete(manager, obj);
+            const context = await this.beforeDelete(manager, key);
             const result = await manager
                 .createQueryBuilder()
                 .delete()
@@ -629,7 +625,7 @@ export class CrudsClass<
             if (result.affected === 0) {
                 throw this.notFoundError(id);
             }
-            await this.afterDelete(manager, obj);
+            await this.afterDelete(manager, context);
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
@@ -647,11 +643,18 @@ export class CrudsClass<
         }
     }
 
-    async beforeDelete(_manager: EntityManager, _obj: DbModel): Promise<void> {
+    async beforeDelete(
+        _manager: EntityManager,
+        _id: number
+    ): Promise<Record<string, any>> {
         // Overload this to run code before delete
+        return {};
     }
 
-    async afterDelete(_manager: EntityManager, _obj: DbModel): Promise<void> {
+    async afterDelete(
+        _manager: EntityManager,
+        _context: Record<string, any>
+    ): Promise<void> {
         // Overload this to run code before delete
     }
 

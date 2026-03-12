@@ -197,11 +197,40 @@ export class CrudsUser extends CrudsClass<
 
     // Delete
 
-    async afterDelete(_manager: EntityManager, obj: User): Promise<void> {
-        if (obj.imageUrl) {
-            storage.deleteFile(obj.imageUrl);
+    async beforeDelete(
+        manager: EntityManager,
+        id: number
+    ): Promise<Record<string, any>> {
+        const record = await manager.findOne(User, {
+            select: { imageUrl: true },
+            where: { id },
+        });
+
+        if (!record) {
+            throw this.notFoundError(id);
         }
-        await redisClient.delete(this.cacheKey(obj.id));
+
+        return { id, imageUrl: record.imageUrl };
+    }
+
+    async afterDelete(
+        _manager: EntityManager,
+        context: Record<string, any>
+    ): Promise<void> {
+        if (context.id === undefined) {
+            throw new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Missing context data after delete"
+            );
+        }
+
+        // Invalidate cache
+        await redisClient.delete(this.cacheKey(context.id));
+
+        // Delete image if exists
+        if (context.imageUrl) {
+            await storage.deleteFile(context.imageUrl);
+        }
     }
 
     async authDelete(user: UserRead, _id: number | string): Promise<void> {
