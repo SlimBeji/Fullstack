@@ -30,18 +30,29 @@ export type UserOptions = {
     fields?: UserSelectableType[];
 };
 
+type UserCreateContext = {};
+
+type UserUpdateContext = {};
+
+type UserDeleteContext = {
+    imageUrl: string;
+};
+
 export class CrudsUser extends CrudsClass<
     User,
     UserRead,
     UserCreate,
+    UserCreateContext,
     UserPost,
     UserRead,
+    UserOptions,
     UserSelectableType,
     UserSortableType,
     UserSearchableType,
     UserUpdate,
+    UserUpdateContext,
     UserPut,
-    UserOptions
+    UserDeleteContext
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
@@ -190,7 +201,7 @@ export class CrudsUser extends CrudsClass<
         _manager: EntityManager,
         id: number,
         _data: UserUpdate,
-        _context: Record<string, any>
+        _context: UserUpdateContext
     ): Promise<void> {
         await redisClient.delete(this.cacheKey(id));
     }
@@ -200,7 +211,7 @@ export class CrudsUser extends CrudsClass<
     async beforeDelete(
         manager: EntityManager,
         id: number
-    ): Promise<Record<string, any>> {
+    ): Promise<UserDeleteContext> {
         const record = await manager.findOne(User, {
             select: { imageUrl: true },
             where: { id },
@@ -210,24 +221,15 @@ export class CrudsUser extends CrudsClass<
             throw this.notFoundError(id);
         }
 
-        return { id, imageUrl: record.imageUrl };
+        return { imageUrl: record.imageUrl };
     }
 
     async afterDelete(
         _manager: EntityManager,
-        context: Record<string, any>
+        id: number,
+        context: UserDeleteContext
     ): Promise<void> {
-        if (context.id === undefined) {
-            throw new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Missing context data after delete"
-            );
-        }
-
-        // Invalidate cache
-        await redisClient.delete(this.cacheKey(context.id));
-
-        // Delete image if exists
+        await redisClient.delete(this.cacheKey(id));
         if (context.imageUrl) {
             await storage.deleteFile(context.imageUrl);
         }

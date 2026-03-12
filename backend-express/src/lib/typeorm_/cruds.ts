@@ -16,14 +16,17 @@ export class CrudsClass<
     DbModel extends AbstractEntity, // The Database model interface
     User extends object, // The User model used for authorization
     Create extends object, // Creation Interface
+    CreateContext extends object, // Creation Hooks context
     Post extends object, // HTTP Post Interface
     Read extends object, // The Read interface
+    Options extends { process?: boolean; fields?: Selectables[] }, // General options for HTTP methods/actions
     Selectables extends string, // Literal of Selectable fields
     Sortables extends string, // Literal of fields we can use OrderBy on
     Searchables extends string, // List of keys we can search on
     Update extends object, // Update Interface
+    UpdateContext extends object, // Update hooks context
     Put extends object, // HTTP Put Interface
-    Options extends { process?: boolean; fields?: Selectables[] }, // General options for HTTP methods/actions
+    DeleteContext extends object, // Delete hooks context
 > {
     // Constructor, Properties & Helpers
 
@@ -175,16 +178,16 @@ export class CrudsClass<
     async beforeCreate(
         _manager: EntityManager,
         _data: Create
-    ): Promise<Record<string, any>> {
+    ): Promise<CreateContext> {
         // Overload this to run code before create
-        return {};
+        return {} as CreateContext;
     }
 
     async afterCreate(
         _manager: EntityManager,
         _id: number,
         _data: Create,
-        _context: Record<string, any>
+        _context: CreateContext
     ): Promise<void> {
         // Overload this to run code before create
     }
@@ -549,16 +552,16 @@ export class CrudsClass<
         _manager: EntityManager,
         _id: number,
         _data: Update
-    ): Promise<Record<string, any>> {
+    ): Promise<UpdateContext> {
         // Overload this to run code before update
-        return {};
+        return {} as UpdateContext;
     }
 
     async afterUpdate(
         _manager: EntityManager,
         _id: number,
         _data: Update,
-        _context: Record<string, any>
+        _context: UpdateContext
     ): Promise<void> {
         // Overload this to run code before update
     }
@@ -625,7 +628,7 @@ export class CrudsClass<
             if (result.affected === 0) {
                 throw this.notFoundError(id);
             }
-            await this.afterDelete(manager, context);
+            await this.afterDelete(manager, key, context);
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
@@ -646,14 +649,15 @@ export class CrudsClass<
     async beforeDelete(
         _manager: EntityManager,
         _id: number
-    ): Promise<Record<string, any>> {
+    ): Promise<DeleteContext> {
         // Overload this to run code before delete
-        return {};
+        return {} as DeleteContext;
     }
 
     async afterDelete(
         _manager: EntityManager,
-        _context: Record<string, any>
+        _id: number,
+        _context: DeleteContext
     ): Promise<void> {
         // Overload this to run code before delete
     }

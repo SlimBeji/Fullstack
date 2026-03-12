@@ -27,18 +27,31 @@ export type PlaceOptions = {
     fields?: PlaceSelectableType[];
 };
 
+type PlaceCreateContext = {};
+
+type PlaceUpdateContext = {
+    triggerEmbedding: boolean;
+};
+
+type PlaceDeleteContext = {
+    imageUrl: string;
+};
+
 export class CrudsPlace extends CrudsClass<
     Place,
     UserRead,
     PlaceCreate,
+    PlaceCreateContext,
     PlacePost,
     PlaceRead,
+    PlaceOptions,
     PlaceSelectableType,
     PlaceSortableType,
     PlaceSearchableType,
     PlaceUpdate,
+    PlaceUpdateContext,
     PlacePut,
-    PlaceOptions
+    PlaceDeleteContext
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
 
@@ -72,7 +85,7 @@ export class CrudsPlace extends CrudsClass<
         _manager: EntityManager,
         id: number,
         _data: PlaceCreate,
-        _context: Record<string, any>
+        _context: PlaceCreateContext
     ): Promise<void> {
         placeEmbedding(id);
     }
@@ -126,7 +139,7 @@ export class CrudsPlace extends CrudsClass<
         manager: EntityManager,
         id: number,
         data: PlaceUpdate
-    ): Promise<Record<string, any>> {
+    ): Promise<PlaceUpdateContext> {
         const record = await manager.findOne(Place, {
             where: { id },
             select: ["title", "description"],
@@ -148,15 +161,8 @@ export class CrudsPlace extends CrudsClass<
         _manager: EntityManager,
         id: number,
         _data: PlaceUpdate,
-        context: Record<string, any>
+        context: PlaceUpdateContext
     ): Promise<void> {
-        if (context.triggerEmbedding == undefined) {
-            throw new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "something went wrong after trying to update place recod"
-            );
-        }
-
         if (context.triggerEmbedding) {
             placeEmbedding(id);
         }
@@ -230,7 +236,7 @@ export class CrudsPlace extends CrudsClass<
     async beforeDelete(
         manager: EntityManager,
         id: number
-    ): Promise<Record<string, any>> {
+    ): Promise<PlaceDeleteContext> {
         const record = (await manager.findOne(Place, {
             select: { imageUrl: true },
             where: { id },
@@ -243,7 +249,8 @@ export class CrudsPlace extends CrudsClass<
 
     async afterDelete(
         _manager: EntityManager,
-        context: Record<string, any>
+        _id: number,
+        context: PlaceDeleteContext
     ): Promise<void> {
         // Delete image if exists
         if (context.imageUrl) {
