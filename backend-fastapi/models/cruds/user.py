@@ -2,6 +2,7 @@ import logging
 from http import HTTPStatus
 from typing import TypedDict, get_args
 
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import or_
@@ -34,19 +35,34 @@ class UserOptions(TypedDict):
     fields: list[UserSelectableFields] | None
 
 
+class UserCreateContext(BaseModel):
+    pass
+
+
+class UserUpdateContext(BaseModel):
+    pass
+
+
+class UserDeleteContext(BaseModel):
+    image_url: str
+
+
 class CrudsUser(
     CrudsClass[
         User,
         UserReadSchema,
         UserCreateSchema,
+        UserCreateContext,
         UserPostSchema,
         UserReadSchema,
+        UserOptions,
         UserSelectableFields,
         UserSortableFields,
         UserSearchableFields,
         UserUpdateSchema,
+        UserUpdateContext,
         UserPutSchema,
-        UserOptions,
+        UserDeleteContext,
     ]
 ):
     # Init
@@ -180,14 +196,25 @@ class CrudsUser(
 
     # Delete
 
-    async def after_delete(self, record: User) -> None:
+    async def before_delete(self, id: int) -> UserDeleteContext:
+        stmt = select(self.model.id, self.model.image_url).where(
+            self.model.id == id
+        )
+        result = await self.session.execute(stmt)
+        record = result.one_or_none()
+        if record is None:
+            raise self.not_found_error(id)
+
+        return UserDeleteContext(image_url=record.image_url)
+
+    async def after_delete(self, context: UserDeleteContext) -> None:
         try:
-            if record.image_url:
-                cloud_storage.delete_file(record.image_url)
+            if context.image_url:
+                cloud_storage.delete_file(context.image_url)
         except Exception as e:
             # Logging error instead of canceling whole transaction
             logging.error(
-                f"Could not delete User image file: {record.image_url}. The following error occured: {str(e)}"
+                f"Could not delete User image file: {context.image_url}. The following error occured: {str(e)}"
             )
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:

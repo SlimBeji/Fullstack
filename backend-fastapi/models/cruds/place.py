@@ -3,6 +3,7 @@ import logging
 from http import HTTPStatus
 from typing import TypedDict, get_args
 
+from pydantic import BaseModel
 from sqlalchemy import Float, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
@@ -33,19 +34,34 @@ class PlaceOptions(TypedDict):
     fields: list[PlaceSelectableFields] | None
 
 
+class PlaceCreateContext(BaseModel):
+    pass
+
+
+class PlaceUpdateContext(BaseModel):
+    trigger_embedding: bool
+
+
+class PlaceDeleteContext(BaseModel):
+    image_url: str
+
+
 class CrudsPlace(
     CrudsClass[
         Place,
         UserReadSchema,
         PlaceCreateSchema,
+        PlaceCreateContext,
         PlacePostSchema,
         PlaceReadSchema,
+        PlaceOptions,
         PlaceSelectableFields,
         PlaceSortableFields,
         PlaceSearchableFields,
         PlaceUpdateSchema,
+        PlaceUpdateContext,
         PlacePutSchema,
-        PlaceOptions,
+        PlaceDeleteContext,
     ]
 ):
     # Init
@@ -83,7 +99,9 @@ class CrudsPlace(
 
     # Create
 
-    async def after_create(self, id: int, data: PlaceCreateSchema) -> None:
+    async def after_create(
+        self, id: int, data: PlaceCreateSchema, context: PlaceCreateContext
+    ) -> None:
         place_embedding(id)
 
     async def seed(
@@ -146,25 +164,29 @@ class CrudsPlace(
 
     # Update
 
-    async def update(self, id: int | str, form: PlaceUpdateSchema) -> None:
-        """
-        Overloading the update method is cheaper than
-        handling the check in the after_update.
-        The goal is to avoid run unneccary embedding.
-        A form might be submitted even if the data stays the same
-        """
-        id = self.parse_id(id)
-        record = await self.read(id)
-        if not record:
+    async def before_update(
+        self, id: int, data: PlaceUpdateSchema
+    ) -> PlaceUpdateContext:
+        stmt = select(self.model.title, self.model.description).where(
+            self.model.id == id
+        )
+        result = await self.session.execute(stmt)
+        record = result.one_or_none()
+        if record is None:
             raise self.not_found_error(id)
 
-        description_changed = (
-            form.description and form.description != record.description
+        title_changed = bool(data.title and data.title != record.title)
+        description_changed = bool(
+            data.description and data.description != record.description
         )
-        title_changed = form.title and form.title != record.title
-        await super().update(id, form)
+        return PlaceUpdateContext(
+            trigger_embedding=description_changed or title_changed
+        )
 
-        if description_changed or title_changed:
+    async def after_update(
+        self, id: int, data: PlaceUpdateSchema, context: PlaceUpdateContext
+    ) -> None:
+        if context.trigger_embedding:
             place_embedding(id)
 
     async def auth_put(
@@ -224,14 +246,25 @@ class CrudsPlace(
 
     # Delete
 
-    async def after_delete(self, record: Place) -> None:
+    async def before_delete(self, id: int) -> PlaceDeleteContext:
+        stmt = select(self.model.id, self.model.image_url).where(
+            self.model.id == id
+        )
+        result = await self.session.execute(stmt)
+        record = result.one_or_none()
+        if record is None:
+            raise self.not_found_error(id)
+
+        return PlaceDeleteContext(image_url=record.image_url)
+
+    async def after_delete(self, context: PlaceDeleteContext) -> None:
         try:
-            if record.image_url:
-                cloud_storage.delete_file(record.image_url)
+            if context.image_url:
+                cloud_storage.delete_file(context.image_url)
         except Exception as e:
             # Logging error instead of canceling whole transaction
             logging.error(
-                f"Could not delete User image file: {record.image_url}. The following error occured: {str(e)}"
+                f"Could not delete User image file: {context.image_url}. The following error occured: {str(e)}"
             )
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
