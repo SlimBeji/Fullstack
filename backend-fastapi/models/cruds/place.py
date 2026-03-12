@@ -257,15 +257,9 @@ class CrudsPlace(
 
         return PlaceDeleteContext(image_url=record.image_url)
 
-    async def after_delete(self, context: PlaceDeleteContext) -> None:
-        try:
-            if context.image_url:
-                cloud_storage.delete_file(context.image_url)
-        except Exception as e:
-            # Logging error instead of canceling whole transaction
-            logging.error(
-                f"Could not delete User image file: {context.image_url}. The following error occured: {str(e)}"
-            )
+    async def after_delete(self, id: int, context: PlaceDeleteContext) -> None:
+        if context.image_url:
+            cloud_storage.delete_file(context.image_url)
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
         if user.isAdmin:
