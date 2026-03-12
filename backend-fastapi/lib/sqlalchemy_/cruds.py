@@ -267,16 +267,18 @@ class CrudsClass(
             await self.after_create(entity_id, data, context)
             await self.session.commit()
             return entity_id
-        except IntegrityError as err:
-            await self.session.rollback()
-            if "duplicate key" in str(err.orig).lower():
-                raise ApiError(HTTPStatus.CONFLICT, "Record already exists")
-            raise ApiError(
-                HTTPStatus.INTERNAL_SERVER_ERROR,
-                f"Could not create {self.model_name} object: {str(err)}!",
-            )
         except Exception as err:
             await self.session.rollback()
+
+            if isinstance(err, ApiError):
+                raise err
+
+            if (
+                isinstance(err, IntegrityError)
+                and "duplicate key" in str(err.orig).lower()
+            ):
+                raise ApiError(HTTPStatus.CONFLICT, "Record already exists")
+
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not create {self.model_name} object: {str(err)}!",
@@ -439,6 +441,8 @@ class CrudsClass(
 
         except Exception as err:
             await self.session.rollback()
+            if isinstance(err, ApiError):
+                raise err
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not update {self.model_name} object: {str(err)}!",
@@ -506,6 +510,9 @@ class CrudsClass(
 
         except Exception as err:
             await self.session.rollback()
+            if isinstance(err, ApiError):
+                raise err
+
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not delete {self.model_name} object: {str(err)}!",
