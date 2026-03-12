@@ -142,13 +142,13 @@ export class CrudsClass<
         const manager = queryRunner.manager;
 
         try {
-            await this.beforeCreate(manager, data);
+            const context = await this.beforeCreate(manager, data);
             const result = await manager.insert(
                 this.repository.target,
                 this.toModel(data)
             );
             const id = result.identifiers[0].id;
-            await this.afterCreate(manager, id, data);
+            await this.afterCreate(manager, id, data, context);
             await queryRunner.commitTransaction();
             return id;
         } catch (err) {
@@ -172,14 +172,19 @@ export class CrudsClass<
         }
     }
 
-    async beforeCreate(_manager: EntityManager, _data: Create): Promise<void> {
+    async beforeCreate(
+        _manager: EntityManager,
+        _data: Create
+    ): Promise<Record<string, any>> {
         // Overload this to run code before create
+        return {};
     }
 
     async afterCreate(
         _manager: EntityManager,
         _id: number,
-        _data: Create
+        _data: Create,
+        _context: Record<string, any>
     ): Promise<void> {
         // Overload this to run code before create
     }

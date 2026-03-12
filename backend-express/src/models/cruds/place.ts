@@ -71,7 +71,8 @@ export class CrudsPlace extends CrudsClass<
     async afterCreate(
         _manager: EntityManager,
         id: number,
-        _data: PlaceCreate
+        _data: PlaceCreate,
+        _context: Record<string, any>
     ): Promise<void> {
         placeEmbedding(id);
     }
