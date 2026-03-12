@@ -300,29 +300,19 @@ func PutRecord[User any, Model BaseModelReader, Read any, Update any, HooksData 
 
 // Delete Helpers
 
-type RecordDelete[User any, Model BaseModelReader, Read any] interface {
+type RecordDelete[User any, Model BaseModelReader, Read any, HooksData any] interface {
 	RecordRead[User, Model, Read]
 	AuthDelete(context.Context, User, uint) error
-	BeforeDelete(*gorm.DB, Model) error
-	AfterDelete(*gorm.DB, Model) error
+	BeforeDelete(*gorm.DB, uint) (HooksData, error)
+	AfterDelete(*gorm.DB, uint, HooksData) error
 }
 
-func DeleteRecord[User any, Model BaseModelReader, Read any](
+func DeleteRecord[User any, Model BaseModelReader, Read any, HooksData any](
 	ctx context.Context,
-	crud RecordDelete[User, Model, Read],
+	crud RecordDelete[User, Model, Read, HooksData],
 	id uint,
 	user *User,
 ) error {
-	// Fetch the record first
-	var model Model
-	err := crud.GetModel(ctx).First(&model, id).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return types_.NotFoundError(crud.ModelName(), id)
-		}
-		return err
-	}
-
 	// Check authoriztion
 	if user != nil {
 		if err := crud.AuthDelete(ctx, *user, id); err != nil {
@@ -330,20 +320,22 @@ func DeleteRecord[User any, Model BaseModelReader, Read any](
 		}
 	}
 
-	err = crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
+	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Before delete hook
-		if err := crud.BeforeDelete(tx, model); err != nil {
+		hooksData, err := crud.BeforeDelete(tx, id)
+		if err != nil {
 			return err
 		}
 
 		// Delete from database
-		result := tx.Delete(&model)
+		var model Model
+		result := tx.Delete(&model, id) // How to delete record by id ??
 		if result.Error != nil {
 			return result.Error
 		}
 
 		// After delete hook
-		if err := crud.AfterDelete(tx, model); err != nil {
+		if err := crud.AfterDelete(tx, id, hooksData); err != nil {
 			return err
 		}
 

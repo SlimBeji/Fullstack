@@ -32,6 +32,10 @@ type PlaceUpdateContext struct {
 	TriggerEmbedding bool
 }
 
+type PlaceDeleteContext struct {
+	ImageURL string
+}
+
 type CRUDSPlace struct {
 	DB              *gorm.DB
 	Model           *gorm.DB
@@ -602,20 +606,22 @@ func (cp *CRUDSPlace) AuthDelete(
 	return nil
 }
 
-func (cp *CRUDSPlace) BeforeDelete(query *gorm.DB, model orm.Place) error {
-	return nil
+func (cp *CRUDSPlace) BeforeDelete(query *gorm.DB, id uint) (PlaceDeleteContext, error) {
+	return PlaceDeleteContext{}, nil
 }
 
-func (cp *CRUDSPlace) AfterDelete(query *gorm.DB, model orm.Place) error {
-	if model.ImageURL != "" {
+func (cp *CRUDSPlace) AfterDelete(
+	query *gorm.DB, id uint, hooksData PlaceDeleteContext,
+) error {
+	if hooksData.ImageURL != "" {
 		ctx := query.Statement.Context
 		storage := instances.GetStorage()
-		_, err := storage.DeleteFile(ctx, model.ImageURL)
+		_, err := storage.DeleteFile(ctx, hooksData.ImageURL)
 		if err != nil {
+			message := fmt.Sprintf("something went wrong after trying to delete place %d", id)
 			return types_.APIError{
 				Code:    http.StatusConflict,
-				Message: "could not delete place stored image",
-				Details: map[string]any{"id": model.ID, "title": model.Title},
+				Message: message,
 			}
 		}
 	}

@@ -29,6 +29,10 @@ type UserCreateContext struct{}
 
 type UserUpdateContex struct{}
 
+type UserDeleteContext struct {
+	ImageURL string
+}
+
 type CRUDSUser struct {
 	DB              *gorm.DB
 	Model           *gorm.DB
@@ -563,20 +567,22 @@ func (cu *CRUDSUser) AuthDelete(
 	}
 }
 
-func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, model orm.User) error {
-	return nil
+func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, id uint) (UserDeleteContext, error) {
+	return UserDeleteContext{}, nil
 }
 
-func (cu *CRUDSUser) AfterDelete(query *gorm.DB, model orm.User) error {
-	if model.ImageURL != "" {
+func (cu *CRUDSUser) AfterDelete(
+	query *gorm.DB, id uint, hooksData UserDeleteContext,
+) error {
+	if hooksData.ImageURL != "" {
 		ctx := query.Statement.Context
 		storage := instances.GetStorage()
-		_, err := storage.DeleteFile(ctx, model.ImageURL)
+		_, err := storage.DeleteFile(ctx, hooksData.ImageURL)
 		if err != nil {
+			message := fmt.Sprintf("something went wrong after trying to delete user %d", id)
 			return types_.APIError{
 				Code:    http.StatusConflict,
-				Message: "could not delete user stored image",
-				Details: map[string]any{"id": model.ID, "email": model.Email},
+				Message: message,
 			}
 		}
 	}
