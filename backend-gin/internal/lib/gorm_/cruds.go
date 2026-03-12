@@ -130,19 +130,20 @@ type RecordCreate[
 	Model BaseModelReader,
 	Read any,
 	Create any,
+	HooksData any,
 	Post any,
 ] interface {
 	RecordRead[User, Model, Read]
 	ToModel(Create) Model
 	PostToCreate(context.Context, Post) (Create, error)
 	AuthPost(context.Context, User, Post) error
-	BeforeCreate(*gorm.DB, Create) error
-	AfterCreate(*gorm.DB, uint, Create) error
+	BeforeCreate(*gorm.DB, Create) (HooksData, error)
+	AfterCreate(*gorm.DB, uint, Create, HooksData) error
 }
 
-func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post any](
+func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksData any, Post any](
 	ctx context.Context,
-	crud RecordCreate[User, Model, Read, Create, Post],
+	crud RecordCreate[User, Model, Read, Create, HooksData, Post],
 	data Create,
 ) (uint, error) {
 	var createdID uint
@@ -152,7 +153,8 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post an
 		entity := crud.ToModel(data)
 
 		// Before create hook
-		if err := crud.BeforeCreate(tx, data); err != nil {
+		hooksData, err := crud.BeforeCreate(tx, data)
+		if err != nil {
 			return err
 		}
 
@@ -165,7 +167,7 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post an
 		createdID = entity.GetId()
 
 		// After create hook
-		if err := crud.AfterCreate(tx, createdID, data); err != nil {
+		if err := crud.AfterCreate(tx, createdID, data, hooksData); err != nil {
 			return err
 		}
 
@@ -191,9 +193,9 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, Post an
 	return createdID, nil
 }
 
-func PostRecord[User any, Model BaseModelReader, Read any, Create any, Post any](
+func PostRecord[User any, Model BaseModelReader, Read any, Create any, HooksData any, Post any](
 	ctx context.Context,
-	crud RecordCreate[User, Model, Read, Create, Post],
+	crud RecordCreate[User, Model, Read, Create, HooksData, Post],
 	form Post,
 	user *User,
 ) (uint, error) {
