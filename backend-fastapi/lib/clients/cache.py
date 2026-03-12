@@ -51,7 +51,7 @@ class RedisClient:
         stored = raw.decode()
         if isinstance(format, type) and issubclass(format, BaseModel):
             try:
-                return format(**json.loads(stored))
+                return format.model_validate_json(stored)
             except Exception:
                 # Value become not valid, purge it and return None
                 await self.delete(key)
@@ -74,7 +74,7 @@ class RedisClient:
         if isinstance(val, dict) or isinstance(val, list):
             val = json.dumps(val)
         elif isinstance(val, BaseModel):
-            val = json.dumps(val.model_dump(fallback=str))
+            val = val.model_dump_json()
         return await self.client.set(key, val, ex=expiration)
 
     async def delete(self, key: str) -> None:
