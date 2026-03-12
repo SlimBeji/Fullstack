@@ -1,5 +1,4 @@
 import json
-import logging
 from http import HTTPStatus
 from typing import TypedDict, get_args
 
