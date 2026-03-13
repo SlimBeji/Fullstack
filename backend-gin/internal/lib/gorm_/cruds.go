@@ -39,10 +39,10 @@ func Read[User any, Model BaseModelReader, Read any](
 	return &result, nil
 }
 
-func Get[User any, Model BaseModelReader, Read any](
+func getRaw[User any, Model BaseModelReader, Read any](
 	ctx context.Context, crud RecordRead[User, Model, Read], id uint, user *User,
-) (Read, error) {
-	var zero Read
+) (Model, error) {
+	var zero Model
 
 	// Build query
 	selectFields := crud.DefaultSelect()
@@ -66,6 +66,14 @@ func Get[User any, Model BaseModelReader, Read any](
 
 	var model Model
 	err = qb.First(&model).Error
+	return model, err
+}
+
+func Get[User any, Model BaseModelReader, Read any](
+	ctx context.Context, crud RecordRead[User, Model, Read], id uint, user *User,
+) (Read, error) {
+	var zero Read
+	model, err := getRaw(ctx, crud, id, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return zero, types_.NotFoundError(crud.ModelName(), id)
