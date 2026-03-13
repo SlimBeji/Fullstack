@@ -482,12 +482,31 @@ func (cp *CRUDSPlace) AuthPut(
 func (cp *CRUDSPlace) BeforeUpdate(
 	query *gorm.DB, id uint, data schemas.PlaceUpdate,
 ) (PlaceUpdateContext, error) {
-	return PlaceUpdateContext{}, nil
+	var place orm.Place
+	err := query.
+		Model(&place).Select("title", "description").Where("id = ?", id).First(&place).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return PlaceUpdateContext{}, types_.NotFoundError(cp.ModelName(), id)
+		}
+		return PlaceUpdateContext{}, err
+	}
+
+	newTitle, titleSent := data["title"]
+	titleChanged := newTitle != place.Title && titleSent
+	newDescription, descriptionSent := data["description"]
+	descriptionChanged := newDescription != place.Description && descriptionSent
+
+	return PlaceUpdateContext{TriggerEmbedding: titleChanged || descriptionChanged}, nil
 }
 
 func (cp *CRUDSPlace) AfterUpdate(
 	query *gorm.DB, id uint, data schemas.PlaceUpdate, hooksData PlaceUpdateContext,
 ) error {
+	if hooksData.TriggerEmbedding {
+		_, err := publishers.PlaceEmbedding(id)
+		return err
+	}
 	return nil
 }
 
