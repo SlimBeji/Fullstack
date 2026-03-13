@@ -15,7 +15,7 @@ type OrderBy struct {
 }
 
 type SelectField struct {
-	Select  string // SQL path: "places.title" or "users.name"
+	Field   string // SQL field: e.g. title,  image_url
 	Preload string // GORM preload path: "Places" or "Places.Reviews" (empty if no preload needed)
 	Level   int8   // Depth: 0 = parent, 1 = child, 2 = grandchild
 }

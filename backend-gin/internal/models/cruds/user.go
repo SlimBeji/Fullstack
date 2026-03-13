@@ -195,15 +195,15 @@ func (cu *CRUDSUser) MapSelect(field string) []gorm_.SelectField {
 	switch field {
 	case string(schemas.UserSelectPlaces):
 		return []gorm_.SelectField{
-			{Select: "id"},
-			{Select: "creator_id", Preload: "Places", Level: 1},
-			{Select: "id", Preload: "Places", Level: 1},
-			{Select: "title", Preload: "Places", Level: 1},
-			{Select: "address", Preload: "Places", Level: 1},
+			{Field: "id"},
+			{Field: "creator_id", Preload: "Places", Level: 1},
+			{Field: "id", Preload: "Places", Level: 1},
+			{Field: "title", Preload: "Places", Level: 1},
+			{Field: "address", Preload: "Places", Level: 1},
 		}
 
 	default:
-		return []gorm_.SelectField{{Select: utils.CamelToSnake(field)}}
+		return []gorm_.SelectField{{Field: utils.CamelToSnake(field)}}
 	}
 }
 

@@ -185,7 +185,7 @@ func (cp *CRUDSPlace) PostProcessPartial(
 // Query Building
 
 func (cp *CRUDSPlace) MapSelect(field string) []gorm_.SelectField {
-	return []gorm_.SelectField{{Select: utils.CamelToSnake(field)}}
+	return []gorm_.SelectField{{Field: utils.CamelToSnake(field)}}
 }
 
 func (cp *CRUDSPlace) MapOrderBy(field string) string {

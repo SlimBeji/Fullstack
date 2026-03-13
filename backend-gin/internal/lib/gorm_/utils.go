@@ -76,7 +76,7 @@ func ApplySelect(
 		for _, sf := range selectFields {
 			if sf.Level == 0 {
 				// This field is on the main table
-				selectSet[sf.Select] = true
+				selectSet[sf.Field] = true
 			} else {
 				// This field is on a child/grandchild table
 				selectionLoad, found := selectionLoadMap[sf.Preload]
@@ -85,20 +85,20 @@ func ApplySelect(
 					selectionLoad = SelectionLoad{
 						Preload: sf.Preload,
 						Level:   sf.Level,
-						Fields:  []string{sf.Select},
+						Fields:  []string{sf.Field},
 					}
 					selectionLoadMap[sf.Preload] = selectionLoad
 				} else {
 					// Relation was already added, append field if not duplicate
 					fieldExists := false
 					for _, f := range selectionLoad.Fields {
-						if f == sf.Select {
+						if f == sf.Field {
 							fieldExists = true
 							break
 						}
 					}
 					if !fieldExists {
-						selectionLoad.Fields = append(selectionLoad.Fields, sf.Select)
+						selectionLoad.Fields = append(selectionLoad.Fields, sf.Field)
 						selectionLoadMap[sf.Preload] = selectionLoad
 					}
 				}
