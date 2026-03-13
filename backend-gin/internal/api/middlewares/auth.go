@@ -47,7 +47,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.Get(c, uint(userId), nil)
+	user, err := cu.GetCache(c, uint(userId))
 	if err != nil {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,

@@ -468,6 +468,32 @@ func (cu *CRUDSUser) GetByEmail(
 	return cu.ToRead(&model), nil
 }
 
+func (cu *CRUDSUser) CacheKey(id uint) string {
+	return fmt.Sprintf("user_read_%d", id)
+}
+
+func (cu *CRUDSUser) GetCache(ctx context.Context, id uint) (schemas.UserRead, error) {
+	var result schemas.UserRead
+	key := cu.CacheKey(id)
+	redisClient := instances.GetRedisClient()
+	err := redisClient.GetStruct(ctx, key, &result)
+	if err == nil {
+		return result, nil
+	}
+
+	// GetStruct delete data if it couldn't Unmarshall it
+
+	// Fetch new data
+	result, err = cu.Get(ctx, id, nil)
+	if err != nil {
+		return result, err
+	}
+
+	// Store new data before returning result
+	_ = redisClient.Set(ctx, key, result)
+	return result, nil
+}
+
 // Update
 
 func (cu *CRUDSUser) PutToUpdate(
@@ -515,7 +541,10 @@ func (cu *CRUDSUser) BeforeUpdate(
 func (cu *CRUDSUser) AfterUpdate(
 	query *gorm.DB, id uint, data schemas.UserUpdate, hooksData UserUpdateContex,
 ) error {
-	return nil
+	ctx := query.Statement.Context
+	key := cu.CacheKey(id)
+	redisClient := instances.GetRedisClient()
+	return redisClient.Delete(ctx, key)
 }
 
 func (cu *CRUDSUser) Update(
@@ -582,6 +611,16 @@ func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, id uint) (UserDeleteContext, e
 func (cu *CRUDSUser) AfterDelete(
 	query *gorm.DB, id uint, hooksData UserDeleteContext,
 ) error {
+	// Delete user from redis cache
+	ctx := query.Statement.Context
+	key := cu.CacheKey(id)
+	redisClient := instances.GetRedisClient()
+	err := redisClient.Delete(ctx, key)
+	if err != nil {
+		return err
+	}
+
+	// Delete imageUrl
 	if hooksData.ImageURL != "" {
 		ctx := query.Statement.Context
 		storage := instances.GetStorage()
