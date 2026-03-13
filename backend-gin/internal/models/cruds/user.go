@@ -568,7 +568,15 @@ func (cu *CRUDSUser) AuthDelete(
 }
 
 func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, id uint) (UserDeleteContext, error) {
-	return UserDeleteContext{}, nil
+	var user orm.User
+	err := query.Model(&user).Select("image_url").Where("id = ?", id).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return UserDeleteContext{}, types_.NotFoundError(cu.ModelName(), id)
+		}
+		return UserDeleteContext{}, err
+	}
+	return UserDeleteContext{ImageURL: user.ImageURL}, nil
 }
 
 func (cu *CRUDSUser) AfterDelete(

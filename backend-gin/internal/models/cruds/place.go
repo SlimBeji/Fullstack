@@ -607,7 +607,15 @@ func (cp *CRUDSPlace) AuthDelete(
 }
 
 func (cp *CRUDSPlace) BeforeDelete(query *gorm.DB, id uint) (PlaceDeleteContext, error) {
-	return PlaceDeleteContext{}, nil
+	var place orm.Place
+	err := query.Model(&place).Select("image_url").Where("id = ?", id).First(&place).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return PlaceDeleteContext{}, types_.NotFoundError(cp.ModelName(), id)
+		}
+		return PlaceDeleteContext{}, err
+	}
+	return PlaceDeleteContext{ImageURL: place.ImageURL}, nil
 }
 
 func (cp *CRUDSPlace) AfterDelete(
