@@ -56,6 +56,27 @@ func ApplyOrderBy(
 	return db
 }
 
+func GetSelectedFields(
+	fields []string, mapFunc func(string) []SelectField,
+) []string {
+	fieldsMap := make(map[string]bool)
+	for _, field := range fields {
+		mapped := mapFunc(field)
+		for _, item := range mapped {
+			if item.Preload == "" {
+				fieldsMap[item.Field] = true
+			} else {
+				fieldsMap[strings.ToLower(item.Preload)] = true
+			}
+		}
+	}
+	finalFields := make([]string, 0, len(fieldsMap))
+	for k := range fieldsMap {
+		finalFields = append(finalFields, k)
+	}
+	return finalFields
+}
+
 func ApplySelect(
 	db *gorm.DB,
 	clauses []string,

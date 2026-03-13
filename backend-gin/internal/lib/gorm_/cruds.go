@@ -99,7 +99,9 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 		}
 		return result, err
 	}
-	return crud.ToJSON(model, fields)
+
+	finalFields := GetSelectedFields(fields, crud.MapSelect)
+	return crud.ToJSON(model, finalFields)
 }
 
 // Create Helpers
@@ -452,8 +454,9 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 
 	// Convert to Read schemas
 	results := make([]map[string]any, len(models))
+	finalFields := GetSelectedFields(query.Select, crud.MapSelect)
 	for _, model := range models {
-		partial, err := crud.ToJSON(model, query.Select)
+		partial, err := crud.ToJSON(model, finalFields)
 		if err != nil {
 			return results, err
 		}
