@@ -119,8 +119,39 @@ func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
 	}
 }
 
-func (cu *CRUDSUser) ToJSON(data map[string]any) error {
-	return nil
+func (cu *CRUDSUser) ToJSON(
+	model orm.User, fields []string,
+) (map[string]any, error) {
+	result := make(map[string]any)
+	for _, field := range fields {
+		switch field {
+		case string(schemas.UserSelectId):
+			result["id"] = model.ID
+		case string(schemas.UserSelectName):
+			result["name"] = model.Name
+		case string(schemas.UserSelectEmail):
+			result["email"] = model.Email
+		case string(schemas.UserSelectIsAdmin):
+			result["is_admin"] = model.IsAdmin
+		case string(schemas.UserSelectImageURL):
+			result["image_url"] = model.ImageURL
+		case string(schemas.UserSelectPlaces):
+			places := make([]map[string]any, len(model.Places))
+			for i, place := range model.Places {
+				places[i] = map[string]any{
+					"id":      place.ID,
+					"title":   place.Title,
+					"address": place.Address,
+				}
+			}
+			result["places"] = places
+		case string(schemas.UserSelectCreatedAt):
+			result["created_at"] = model.CreatedAt
+		default:
+			return result, fmt.Errorf("unknow field %s in user schema", field)
+		}
+	}
+	return result, nil
 }
 
 func (cu *CRUDSUser) PostProcess(

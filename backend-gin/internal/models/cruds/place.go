@@ -118,8 +118,33 @@ func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {
 	}
 }
 
-func (cp *CRUDSPlace) ToJSON(data map[string]any) error {
-	return utils.DecodeJSONBFields(data, "location")
+func (cp *CRUDSPlace) ToJSON(
+	model orm.Place, fields []string,
+) (map[string]any, error) {
+	result := make(map[string]any)
+	for _, field := range fields {
+		switch field {
+		case string(schemas.PlaceSelectId):
+			result["id"] = model.ID
+		case string(schemas.PlaceSelectTitle):
+			result["title"] = model.Title
+		case string(schemas.PlaceSelectDescription):
+			result["description"] = model.Description
+		case string(schemas.PlaceSelectAddress):
+			result["address"] = model.Address
+		case string(schemas.PlaceSelectLocation):
+			result["location"] = model.Location
+		case string(schemas.PlaceSelectImageURL):
+			result["image_url"] = model.ImageURL
+		case string(schemas.PlaceSelectCreatorId):
+			result["creator_id"] = model.CreatorID
+		case string(schemas.PlaceSelectCreatedAt):
+			result["created_at"] = model.CreatedAt
+		default:
+			return result, fmt.Errorf("unknow field %s in place schema", field)
+		}
+	}
+	return result, nil
 }
 
 func (cp *CRUDSPlace) PostProcess(

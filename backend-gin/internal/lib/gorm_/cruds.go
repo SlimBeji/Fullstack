@@ -20,7 +20,7 @@ type RecordRead[User any, Model BaseModelReader, Read any] interface {
 	DefaultSelect() []string
 	AuthGet(context.Context, User, types_.SearchQuery) types_.SearchQuery
 	ToRead(*Model) Read
-	ToJSON(map[string]any) error
+	ToJSON(Model, []string) (map[string]any, error)
 	PostProcess(context.Context, *Read) error
 	PostProcessPartial(context.Context, map[string]any) error
 }
@@ -91,44 +91,15 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 	fields []string,
 	user *User,
 ) (map[string]any, error) {
-	// Build query
-	selectFields := fields
-	if len(selectFields) == 0 {
-		selectFields = crud.DefaultSelect()
-	}
-
-	query := types_.SearchQuery{
-		Select: selectFields,
-		Where: types_.WhereFilters{
-			"id": types_.EqFilters(id),
-		},
-	}
-
-	// Apply auth if user provided
-	if user != nil {
-		query = crud.AuthGet(ctx, *user, query)
-	}
-
-	// Build and execute query
-	qb, err := BuildSelectQuery(ctx, crud, query)
-	if err != nil {
-		return nil, err
-	}
-
-	var result map[string]any
-	err = qb.First(&result).Error
+	result := make(map[string]any)
+	model, err := getRaw(ctx, crud, id, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, types_.NotFoundError(crud.ModelName(), id)
+			return result, types_.NotFoundError(crud.ModelName(), id)
 		}
-		return nil, err
+		return result, err
 	}
-
-	if err := crud.ToJSON(result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return crud.ToJSON(model, fields)
 }
 
 // Create Helpers
@@ -472,17 +443,21 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 		return nil, err
 	}
 
-	// Execute query into maps
-	var results []map[string]any
-	err = qb.Find(&results).Error
+	// Execute query
+	var models []Model
+	err = qb.Find(&models).Error
 	if err != nil {
 		return nil, err
 	}
 
-	for _, result := range results {
-		if err := crud.ToJSON(result); err != nil {
-			return results, nil
+	// Convert to Read schemas
+	results := make([]map[string]any, len(models))
+	for _, model := range models {
+		partial, err := crud.ToJSON(model, query.Select)
+		if err != nil {
+			return results, err
 		}
+		results = append(results, partial)
 	}
 
 	return results, nil
