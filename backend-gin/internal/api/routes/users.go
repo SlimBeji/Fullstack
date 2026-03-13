@@ -89,7 +89,7 @@ func getUser(c *gin.Context) {
 
 	cu := cruds.GetCRUDSUser()
 	query, _ := gin_.GetQuery[schemas.UserGet](c)
-	user, err := cu.Get(c, userId, &cruds.UserOptions{
+	user, err := cu.GetPartial(c, userId, &cruds.UserOptions{
 		Process: true, Fields: query.Fields,
 	})
 	if err != nil {
