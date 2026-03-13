@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -29,6 +30,23 @@ func (r *RedisClient) Get(ctx context.Context, key string) (string, error) {
 		return "", nil
 	}
 	return val, err
+}
+
+func (r *RedisClient) GetStruct(ctx context.Context, key string, data any) error {
+	val, err := r.client.Get(ctx, key).Result()
+	if err != nil {
+		// Not found -> redis.Nil or a redis error
+		return err
+	}
+
+	err = json.Unmarshal([]byte(val), data)
+	if err == nil {
+		return nil
+	}
+
+	log.Printf("Failed to unmarshal Redis key %s: %v. Deleting corrupt data.", key, err)
+	_ = r.Delete(ctx, key)
+	return err
 }
 
 func (r *RedisClient) Set(ctx context.Context, key string, val any) error {
@@ -69,6 +87,6 @@ func NewRedisClient(config RedisClientConfig) *RedisClient {
 	// Returning struct ref
 	return &RedisClient{
 		config: config,
-		client: redis.NewClient(opt),
+		client: client,
 	}
 }
