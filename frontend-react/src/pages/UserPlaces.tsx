@@ -13,7 +13,7 @@ const UserPlaces: React.FC = () => {
     const [data, sendRequest, clearError] = useHttp({ ignoreNotFound: true });
     const { userId } = useParams();
 
-    const isSameUser = userId === authData?.user_id ? true : false;
+    const isSameUser = Number(userId) === authData?.user_id ? true : false;
 
     const fetchPlaces = useCallback(
         async (userId: string | undefined) => {

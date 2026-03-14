@@ -20,6 +20,6 @@ export interface Place {
     image_url?: string;
     address: string;
     location: Location;
-    creator_id: string;
+    creator_id: number;
     created_at: string;
 }
