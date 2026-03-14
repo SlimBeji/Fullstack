@@ -51,9 +51,11 @@ const AuthForm: React.FC = () => {
     const onSignup = async (): Promise<void> => {
         const formData = new FormData();
         formData.append("name", state.fields.username.value);
-        formData.append("image", state.fields.image.value.file);
         formData.append("email", state.fields.email.value);
         formData.append("password", state.fields.password.value);
+        if (state.fields.image.value.file) {
+            formData.append("image", state.fields.image.value.file);
+        }
         const resp = await sendRequest("/auth/signup", "post", formData, false);
         const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));

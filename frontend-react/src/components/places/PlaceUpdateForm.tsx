@@ -1,5 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/lib";
 import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
@@ -23,6 +24,7 @@ interface PlaceUpdateFormProps {
 }
 
 const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
+    const navigate = useNavigate();
     const [state, inputHandlers, prefillData] = useForm<FieldsType>(
         UpdatePlaceFormConfig
     );
@@ -55,6 +57,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                     lng: state.fields.lng.value,
                 },
             });
+            navigate("/");
         } catch (err) {
             console.log(err);
         }

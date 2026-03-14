@@ -28,12 +28,14 @@ const NewPlace: React.FC = () => {
         e.preventDefault();
         const formData = new FormData();
         formData.append("title", state.fields.title.value);
-        formData.append("image", state.fields.image.value.file);
         formData.append("description", state.fields.description.value);
         formData.append("address", state.fields.address.value);
         formData.append("lat", state.fields.lat.value);
         formData.append("lng", state.fields.lng.value);
         formData.append("creator_id", authData?.user_id as any);
+        if (state.fields.image.value.file) {
+            formData.append("image", state.fields.image.value.file);
+        }
         try {
             await sendRequest("/places/", "post", formData);
             navigate("/");
