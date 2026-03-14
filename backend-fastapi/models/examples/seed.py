@@ -19,13 +19,13 @@ PLACE_REF_MAPPING: dict[int, int] = {}
 
 async def seed_users(cruds: CrudsUser, users: list[UserSeedSchema]) -> None:
     for user in users:
-        if user.imageUrl:
-            imageUrl = cloud_storage.upload_file(user.imageUrl)
+        if user.image_url:
+            image_url = cloud_storage.upload_file(user.image_url)
         else:
-            imageUrl = ""
+            image_url = ""
 
         data = user.model_dump()
-        data["imageUrl"] = imageUrl
+        data["image_url"] = image_url
         data["password"] = hash_input(
             data["password"], settings.DEFAULT_HASH_SALT
         )
@@ -35,15 +35,15 @@ async def seed_users(cruds: CrudsUser, users: list[UserSeedSchema]) -> None:
 
 async def seed_places(cruds: CrudsPlace, places: list[PlaceSeedSchema]) -> None:
     for place in places:
-        if place.imageUrl:
-            imageUrl = cloud_storage.upload_file(place.imageUrl)
+        if place.image_url:
+            image_url = cloud_storage.upload_file(place.image_url)
         else:
-            imageUrl = ""
+            image_url = ""
 
-        creatorId = USER_REF_MAPPING[place.creator_ref]
+        creator_id = USER_REF_MAPPING[place.creator_ref]
         data = place.model_dump()
-        data["imageUrl"] = imageUrl
-        data["creatorId"] = creatorId
+        data["image_url"] = image_url
+        data["creator_id"] = creator_id
         embedding = data.pop("embedding")
         id = await cruds.seed(PlaceCreateSchema(**data), embedding)
         PLACE_REF_MAPPING[place.ref] = id
