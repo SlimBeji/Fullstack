@@ -104,7 +104,7 @@ const submitHandler = async (e: Event) => {
     formData.append("address", fields.address.value);
     formData.append("lat", fields.lat.value);
     formData.append("lng", fields.lng.value);
-    formData.append("creatorId", authStore.userId || "");
+    formData.append("creator_id", authStore.userId || "");
     try {
         await sendRequest("/places/", "post", formData);
         router.push("/");

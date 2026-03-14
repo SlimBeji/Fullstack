@@ -80,10 +80,10 @@ const showDeleteModal = ref<boolean>(false);
 
 // Computed
 const isUserOwned = computed(() => {
-    return authStore?.userId === props.place.creatorId;
+    return authStore?.userId === props.place.creator_id;
 });
 
-const imageUrl = computed(() => props.place.imageUrl || placeholder);
+const imageUrl = computed(() => props.place.image_url || placeholder);
 
 // Events
 const emit = defineEmits<{

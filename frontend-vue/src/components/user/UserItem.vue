@@ -28,7 +28,7 @@ const props = defineProps<{
 }>();
 
 // Computed
-const imageUrl = computed(() => props.user.imageUrl || placeholder);
+const imageUrl = computed(() => props.user.image_url || placeholder);
 
 const placeNumber = computed(() => {
     const number = props.user.places.length;

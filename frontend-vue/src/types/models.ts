@@ -2,8 +2,10 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    imageUrl?: string;
+    is_admin: boolean;
+    image_url?: string;
     places: string[];
+    created_at: string;
 }
 
 export interface Location {
@@ -15,8 +17,9 @@ export interface Place {
     id: string;
     title: string;
     description: string;
-    imageUrl?: string;
+    image_url?: string;
     address: string;
     location: Location;
-    creatorId: string;
+    creator_id: string;
+    created_at: string;
 }
