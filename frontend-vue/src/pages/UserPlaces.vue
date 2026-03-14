@@ -29,7 +29,7 @@ const route = useRoute();
 const { httpData, sendRequest, clear } = useHttp({ ignoreNotFound: true });
 
 // Computed
-const userId = computed(() => route.params.userId as string | undefined);
+const userId = computed(() => Number(route.params.userId) || undefined);
 const isUserOwned = computed(() => {
     return userId.value === authStore.userId;
 });
@@ -41,7 +41,7 @@ const places = computed(() => {
 });
 
 // Handlers
-const fetchPlaces = (userId: string | undefined) => {
+const fetchPlaces = (userId: number | undefined) => {
     if (!userId) return;
     sendRequest(`/places/?creator_id=${userId}`, "get").catch((err) =>
         console.log(err)
