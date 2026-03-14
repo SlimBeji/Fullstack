@@ -10,7 +10,7 @@ import type { Place } from "@/types";
 
 // Init
 const { route } = $props();
-const userId: string = route.result.path.params.userId;
+const userId: number = Number(route.result.path.params.userId);
 const { httpData, sendRequest, clear } = useHttp({ ignoreNotFound: true });
 const loggedUserId = authStore.userId;
 
@@ -29,7 +29,7 @@ const places = $derived<Place[]>(
 );
 
 // Handlers
-const fetchPlaces = (userId: string | undefined) => {
+const fetchPlaces = (userId: number | undefined) => {
     if (!userId) return;
     sendRequest(`/places/?creator_id=${userId}`, "get").catch((err) =>
         console.log(err)
