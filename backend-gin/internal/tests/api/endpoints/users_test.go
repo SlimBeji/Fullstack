@@ -157,7 +157,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	writer.Close()
 
 	// sending the request
-	req := httptest.NewRequest(http.MethodPost, "/api/users", buffer)
+	req := httptest.NewRequest(http.MethodPost, "/api/users/", buffer)
 	req.Header.Set("Authorization", token.Bearer())
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
@@ -220,7 +220,7 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 	writer.Close()
 
 	// sending the request
-	req := httptest.NewRequest(http.MethodPost, "/api/users", buffer)
+	req := httptest.NewRequest(http.MethodPost, "/api/users/", buffer)
 	req.Header.Set("Authorization", token.Bearer())
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()

@@ -186,7 +186,7 @@ func TestCreatePlace(t *testing.T) {
 	writer.Close()
 
 	// sending the request
-	req := httptest.NewRequest(http.MethodPost, "/api/places", buffer)
+	req := httptest.NewRequest(http.MethodPost, "/api/places/", buffer)
 	req.Header.Set("Authorization", token.Bearer())
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
@@ -267,7 +267,7 @@ func TestCreatePlaceForOthers(t *testing.T) {
 	writer.Close()
 
 	// sending the request
-	req := httptest.NewRequest(http.MethodPost, "/api/places", buffer)
+	req := httptest.NewRequest(http.MethodPost, "/api/places/", buffer)
 	req.Header.Set("Authorization", token.Bearer())
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()

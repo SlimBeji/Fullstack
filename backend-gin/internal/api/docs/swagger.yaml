@@ -511,67 +511,6 @@ paths:
       summary: Hello World Endpoint for authenticated users
       tags:
       - Hello World
-  /api/places:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: The place address
-        example: Fulham road
-        in: formData
-        minLength: 1
-        name: address
-        required: true
-        type: string
-      - description: The ID of the place creator
-        example: 123456789
-        in: formData
-        name: creatorId
-        required: true
-        type: integer
-      - description: The place description, 10 characters minimum
-        example: Stadium of Chelsea football club
-        in: formData
-        minLength: 10
-        name: description
-        required: true
-        type: string
-      - description: The latitude of the place
-        example: 51.48180425016331
-        in: formData
-        name: lat
-        required: true
-        type: number
-      - description: The longitude of the place
-        example: -0.19090418688755467
-        in: formData
-        name: lng
-        required: true
-        type: number
-      - description: The place title/name, 10 characters minimum
-        example: Stamford Bridge
-        in: formData
-        minLength: 10
-        name: title
-        required: true
-        type: string
-      - description: Place Image (JPEG)
-        in: formData
-        name: image
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemas.PlaceRead'
-      security:
-      - OAuth2Password:
-        - admin
-      summary: Place creation
-      tags:
-      - Place
   /api/places/:
     get:
       consumes:
@@ -703,6 +642,66 @@ paths:
       summary: Search and Filter places
       tags:
       - Place
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: The place address
+        example: Fulham road
+        in: formData
+        minLength: 1
+        name: address
+        required: true
+        type: string
+      - description: The ID of the place creator
+        example: 123456789
+        in: formData
+        name: creatorId
+        required: true
+        type: integer
+      - description: The place description, 10 characters minimum
+        example: Stadium of Chelsea football club
+        in: formData
+        minLength: 10
+        name: description
+        required: true
+        type: string
+      - description: The latitude of the place
+        example: 51.48180425016331
+        in: formData
+        name: lat
+        required: true
+        type: number
+      - description: The longitude of the place
+        example: -0.19090418688755467
+        in: formData
+        name: lng
+        required: true
+        type: number
+      - description: The place title/name, 10 characters minimum
+        example: Stamford Bridge
+        in: formData
+        minLength: 10
+        name: title
+        required: true
+        type: string
+      - description: Place Image (JPEG)
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.PlaceRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: Place creation
+      tags:
+      - Place
   /api/places/{placeId}:
     delete:
       consumes:
@@ -819,54 +818,6 @@ paths:
       summary: Search and Retrieve places
       tags:
       - Place
-  /api/users:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: The user email
-        example: mslimbeji@gmail.com
-        in: formData
-        name: email
-        required: true
-        type: string
-      - default: false
-        description: Whether the user is an admin or not
-        example: false
-        in: formData
-        name: isAdmin
-        type: boolean
-      - description: The user name, two characters at least
-        example: Slim Beji
-        in: formData
-        minLength: 2
-        name: name
-        required: true
-        type: string
-      - description: The user password, 8 characters at least
-        example: very_secret
-        in: formData
-        minLength: 8
-        name: password
-        required: true
-        type: string
-      - description: the user profile image
-        in: formData
-        name: image
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemas.UserRead'
-      security:
-      - OAuth2Password:
-        - admin
-      summary: User creation
-      tags:
-      - User
   /api/users/:
     get:
       consumes:
@@ -957,6 +908,53 @@ paths:
       - OAuth2Password:
         - admin
       summary: Search and Filter users
+      tags:
+      - User
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: The user email
+        example: mslimbeji@gmail.com
+        in: formData
+        name: email
+        required: true
+        type: string
+      - default: false
+        description: Whether the user is an admin or not
+        example: false
+        in: formData
+        name: isAdmin
+        type: boolean
+      - description: The user name, two characters at least
+        example: Slim Beji
+        in: formData
+        minLength: 2
+        name: name
+        required: true
+        type: string
+      - description: The user password, 8 characters at least
+        example: very_secret
+        in: formData
+        minLength: 8
+        name: password
+        required: true
+        type: string
+      - description: the user profile image
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserRead'
+      security:
+      - OAuth2Password:
+        - admin
+      summary: User creation
       tags:
       - User
   /api/users/{userId}:

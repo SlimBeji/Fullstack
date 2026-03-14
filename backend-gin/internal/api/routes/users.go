@@ -57,7 +57,7 @@ func searchUsers(c *gin.Context) {
 // @Param        params formData schemas.UserPost true "POST parameters"
 // @Param        image  formData file   false "the user profile image"
 // @Success      200  {object}  schemas.UserRead
-// @Router       /api/users [post]
+// @Router       /api/users/ [post]
 func createUser(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
 	body, _ := gin_.GetBody[schemas.UserPost](c)
@@ -174,7 +174,7 @@ func RegisterUsers(r *gin.Engine) {
 		searchUsers,
 	)
 	router.POST(
-		"",
+		"/",
 		middlewares.Admin,
 		gin_.BodyValidator[schemas.UserPost],
 		createUser,

@@ -183,94 +183,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/places": {
-            "post": {
-                "security": [
-                    {
-                        "OAuth2Password": [
-                            "admin"
-                        ]
-                    }
-                ],
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Place"
-                ],
-                "summary": "Place creation",
-                "parameters": [
-                    {
-                        "minLength": 1,
-                        "type": "string",
-                        "example": "Fulham road",
-                        "description": "The place address",
-                        "name": "address",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "example": 123456789,
-                        "description": "The ID of the place creator",
-                        "name": "creatorId",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "minLength": 10,
-                        "type": "string",
-                        "example": "Stadium of Chelsea football club",
-                        "description": "The place description, 10 characters minimum",
-                        "name": "description",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "number",
-                        "example": 51.48180425016331,
-                        "description": "The latitude of the place",
-                        "name": "lat",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "number",
-                        "example": -0.19090418688755467,
-                        "description": "The longitude of the place",
-                        "name": "lng",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "minLength": 10,
-                        "type": "string",
-                        "example": "Stamford Bridge",
-                        "description": "The place title/name, 10 characters minimum",
-                        "name": "title",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "Place Image (JPEG)",
-                        "name": "image",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.PlaceRead"
-                        }
-                    }
-                }
-            }
-        },
         "/api/places/": {
             "get": {
                 "security": [
@@ -452,6 +364,92 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.PlacesPaginated"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Place"
+                ],
+                "summary": "Place creation",
+                "parameters": [
+                    {
+                        "minLength": 1,
+                        "type": "string",
+                        "example": "Fulham road",
+                        "description": "The place address",
+                        "name": "address",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 123456789,
+                        "description": "The ID of the place creator",
+                        "name": "creatorId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 10,
+                        "type": "string",
+                        "example": "Stadium of Chelsea football club",
+                        "description": "The place description, 10 characters minimum",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "example": 51.48180425016331,
+                        "description": "The latitude of the place",
+                        "name": "lat",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "example": -0.19090418688755467,
+                        "description": "The longitude of the place",
+                        "name": "lng",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 10,
+                        "type": "string",
+                        "example": "Stamford Bridge",
+                        "description": "The place title/name, 10 characters minimum",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Place Image (JPEG)",
+                        "name": "image",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.PlaceRead"
                         }
                     }
                 }
@@ -640,77 +638,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users": {
-            "post": {
-                "security": [
-                    {
-                        "OAuth2Password": [
-                            "admin"
-                        ]
-                    }
-                ],
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "User creation",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "example": "mslimbeji@gmail.com",
-                        "description": "The user email",
-                        "name": "email",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "default": false,
-                        "example": false,
-                        "description": "Whether the user is an admin or not",
-                        "name": "isAdmin",
-                        "in": "formData"
-                    },
-                    {
-                        "minLength": 2,
-                        "type": "string",
-                        "example": "Slim Beji",
-                        "description": "The user name, two characters at least",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "minLength": 8,
-                        "type": "string",
-                        "example": "very_secret",
-                        "description": "The user password, 8 characters at least",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "the user profile image",
-                        "name": "image",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.UserRead"
-                        }
-                    }
-                }
-            }
-        },
         "/api/users/": {
             "get": {
                 "security": [
@@ -837,6 +764,75 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.UsersPaginated"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "OAuth2Password": [
+                            "admin"
+                        ]
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User creation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "mslimbeji@gmail.com",
+                        "description": "The user email",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": false,
+                        "description": "Whether the user is an admin or not",
+                        "name": "isAdmin",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 2,
+                        "type": "string",
+                        "example": "Slim Beji",
+                        "description": "The user name, two characters at least",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 8,
+                        "type": "string",
+                        "example": "very_secret",
+                        "description": "The user password, 8 characters at least",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "the user profile image",
+                        "name": "image",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserRead"
                         }
                     }
                 }

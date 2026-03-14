@@ -57,7 +57,7 @@ func searchPlaces(c *gin.Context) {
 // @Param        params formData schemas.PlacePost true "POST parameters"
 // @Param        image  formData file   false "Place Image (JPEG)"
 // @Success      200  {object}  schemas.PlaceRead
-// @Router       /api/places [post]
+// @Router       /api/places/ [post]
 func createPlace(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(schemas.UserRead)
 	body, _ := gin_.GetBody[schemas.PlacePost](c)
@@ -174,7 +174,7 @@ func RegisterPlaces(r *gin.Engine) {
 		searchPlaces,
 	)
 	router.POST(
-		"",
+		"/",
 		middlewares.Authenticated,
 		gin_.BodyValidator[schemas.PlacePost],
 		createPlace,
