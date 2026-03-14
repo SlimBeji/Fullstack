@@ -29,7 +29,7 @@ async def _get_user_from_token(
         raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Not Valid")
 
     cruds = CrudsUser(session)
-    user = await cruds.getCache(payload.userId)
+    user = await cruds.get_cache(payload.user_id)
     if user is None:
         raise ApiError(HTTPStatus.NOT_FOUND, "User Not Found")
 
@@ -51,6 +51,6 @@ async def get_current_admin(
     token: str = Depends(oauth2_scheme),
 ) -> UserReadSchema:
     user = await _get_user_from_token(session, token)
-    if not user.isAdmin:
+    if not user.is_admin:
         raise ApiError(HTTPStatus.UNAUTHORIZED, "Only admins are allowed")
     return user
