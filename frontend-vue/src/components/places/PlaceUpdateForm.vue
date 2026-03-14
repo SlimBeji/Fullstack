@@ -70,6 +70,7 @@ import { Button, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/lib";
 import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
+import router from "@/router";
 import type { Place } from "@/types";
 
 // Init
@@ -122,6 +123,7 @@ const submitHandler = async (e: Event) => {
                 lng: fields.lng.value,
             },
         });
+        router.push("/");
     } catch (err) {
         console.log(err);
     }
