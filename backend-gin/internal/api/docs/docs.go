@@ -298,7 +298,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
-                            "ilike:Boulevard"
+                            "ilike:boulevard"
                         ],
                         "description": "The place address",
                         "name": "address",
@@ -338,8 +338,7 @@ const docTemplate = `{
                                 "title",
                                 "description",
                                 "address",
-                                "location.lat",
-                                "location.lng",
+                                "location",
                                 "imageUrl",
                                 "creatorId",
                                 "createdAt"
@@ -533,8 +532,7 @@ const docTemplate = `{
                                 "title",
                                 "description",
                                 "address",
-                                "location.lat",
-                                "location.lng",
+                                "location",
                                 "imageUrl",
                                 "creatorId",
                                 "createdAt"
@@ -676,8 +674,7 @@ const docTemplate = `{
                         "example": false,
                         "description": "Whether the user is an admin or not",
                         "name": "isAdmin",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "minLength": 2,
@@ -764,7 +761,7 @@ const docTemplate = `{
                         "collectionFormat": "csv",
                         "example": [
                             "id",
-                            "place"
+                            "places"
                         ],
                         "description": "Fields to include in the response; omit for full document",
                         "name": "fields",
@@ -1229,7 +1226,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "ilike:Boulevard"
+                        "ilike:boulevard"
                     ]
                 },
                 "creatorId": {
@@ -1262,8 +1259,7 @@ const docTemplate = `{
                             "title",
                             "description",
                             "address",
-                            "location.lat",
-                            "location.lng",
+                            "location",
                             "imageUrl",
                             "creatorId",
                             "createdAt"
@@ -1489,7 +1485,7 @@ const docTemplate = `{
                     },
                     "example": [
                         "id",
-                        "place"
+                        "places"
                     ]
                 },
                 "id": {
