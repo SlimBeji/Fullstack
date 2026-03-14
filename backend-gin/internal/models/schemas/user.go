@@ -117,7 +117,7 @@ type UserRead struct {
 	Name      string      `json:"name" validate:"min=2" example:"Slim Beji"`                                                 // The user name, two characters at least
 	Email     string      `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                      // The user email
 	IsAdmin   bool        `json:"isAdmin" example:"false" `                                                                  // Whether the user is an admin or not
-	ImageURL  string      `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // local url on the storage
+	ImageURL  string      `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // image url
 	Places    []UserPlace `json:"places"`                                                                                    // Places created by the user
 	CreatedAt time.Time   `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
 }

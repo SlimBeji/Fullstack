@@ -38,7 +38,7 @@ const password = zod.string().min(8).openapi({
 const imageUrl = zod.string().openapi({
     type: "string",
     example: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-    description: "local url on the storage",
+    description: "image url",
 });
 
 const image = zodFile("User's profile image (JPEG)", env.FILEUPLOAD_MAX_SIZE);
