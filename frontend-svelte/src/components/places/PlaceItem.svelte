@@ -92,8 +92,8 @@ const deleteHandler = () => {
             <Button onClick={openMapHandler} color="secondary" inverse>
                 VIEW ON MAP
             </Button>
-            <Button to={`/places/${props.place.id}`}>EDIT</Button>
             {#if isUserOwned}
+                <Button to={`/places/${props.place.id}`}>EDIT</Button>
                 <Button color="danger" onClick={openDeleteModalHandler}>
                     DELETE
                 </Button>
