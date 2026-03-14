@@ -18,7 +18,7 @@ const routes: RouteConfig[] = [
         component: Users,
     },
     {
-        path: "/places/(?<placeId>[a-z0-9]*)",
+        path: "/places/(?<placeId>[0-9]]+)",
         component: UpdatePlace,
     },
     {
@@ -26,7 +26,7 @@ const routes: RouteConfig[] = [
         component: NewPlace,
     },
     {
-        path: "/(?<userId>[a-z0-9]*)/places",
+        path: "/(?<userId>[0-9]+)/places",
         component: UserPlaces,
     },
 ];

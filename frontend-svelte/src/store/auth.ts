@@ -5,8 +5,8 @@ import type { EncodedUserToken, SigninResponse } from "@/types";
 import { LocalStorageKeys } from "@/types";
 
 const data = writable<EncodedUserToken | undefined>(undefined);
-const isLoggedIn = derived(data, ($data) => !!$data?.userId);
-const userId = derived(data, ($data) => $data?.userId);
+const isLoggedIn = derived(data, ($data) => !!$data?.user_id);
+const userId = derived(data, ($data) => $data?.user_id);
 
 function setAuthData(payload: EncodedUserToken) {
     data.set(payload);
@@ -14,9 +14,9 @@ function setAuthData(payload: EncodedUserToken) {
 
 function login(payload: SigninResponse) {
     const { expires_in, ...rest } = payload;
-    const expiresAt = Math.floor(Date.now() / 1000) + expires_in;
-    const token: EncodedUserToken = { ...rest, expiresAt };
-    data.set({ ...rest, expiresAt });
+    const expires_at = Math.floor(Date.now() / 1000) + expires_in;
+    const token: EncodedUserToken = { ...rest, expires_at };
+    data.set({ ...rest, expires_at });
     localStorage.setItem(LocalStorageKeys.userData, JSON.stringify(token));
     goto("/");
 }
