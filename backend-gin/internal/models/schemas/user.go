@@ -103,11 +103,11 @@ type UserCreate struct {
 }
 
 type UserPost struct {
-	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji"`                                   // The user name, two characters at least
-	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com"`                       // The user email
-	IsAdmin  types_.FlexBool       `json:"isAdmin" form:"isAdmin" validate:"required" example:"false" default:"false" swaggertype:"boolean"` // Whether the user is an admin or not
-	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`                         // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                     // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji"`               // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com"`   // The user email
+	IsAdmin  types_.FlexBool       `json:"isAdmin" form:"isAdmin" example:"false" default:"false" swaggertype:"boolean"` // Whether the user is an admin or not
+	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`     // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                 // User's profile image (JPEG)
 }
 
 // --- Read Schemas ---
