@@ -8,8 +8,8 @@ import { LocalStorageKeys } from "@/types";
 export const useAuthStore = defineStore("auth", () => {
     const data = ref<EncodedUserToken | undefined>(undefined);
 
-    const isLoggedIn = computed(() => !!data.value?.userId);
-    const userId = computed(() => data.value?.userId);
+    const isLoggedIn = computed(() => !!data.value?.user_id);
+    const userId = computed(() => data.value?.user_id);
 
     function setAuthData(payload: EncodedUserToken) {
         data.value = payload;
@@ -17,8 +17,8 @@ export const useAuthStore = defineStore("auth", () => {
 
     function login(payload: SigninResponse) {
         const { expires_in, ...rest } = payload;
-        const expiresAt = Math.floor(Date.now() / 1000) + expires_in;
-        data.value = { ...rest, expiresAt };
+        const expires_at = Math.floor(Date.now() / 1000) + expires_in;
+        data.value = { ...rest, expires_at };
 
         localStorage.setItem(
             LocalStorageKeys.userData,
