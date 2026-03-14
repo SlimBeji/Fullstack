@@ -1,4 +1,5 @@
 <script lang="ts">
+import { goto } from "@mateothegreat/svelte5-router";
 import type { AxiosResponse } from "axios";
 import { onMount } from "svelte";
 
@@ -59,6 +60,7 @@ const submitHandler = async (e: Event) => {
                 lng: $lng.value,
             },
         });
+        goto("/");
     } catch (err) {
         console.log(err);
     }

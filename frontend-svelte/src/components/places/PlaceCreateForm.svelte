@@ -31,12 +31,14 @@ const submitHandler = async (e: Event) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", $title.value);
-    formData.append("image", $image.value.file);
     formData.append("description", $description.value);
     formData.append("address", $address.value);
     formData.append("lat", $lat.value);
     formData.append("lng", $lng.value);
     formData.append("creator_id", $loggedUserId as any);
+    if ($image.value.file) {
+        formData.append("image", $image.value.file);
+    }
     try {
         await sendRequest("/places/", "post", formData);
         goto("/");

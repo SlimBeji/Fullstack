@@ -54,9 +54,11 @@ const onSignin = async (): Promise<void> => {
 const onSignup = async (): Promise<void> => {
     const formData = new FormData();
     formData.append("name", $username.value);
-    formData.append("image", $image.value.file);
     formData.append("email", $email.value);
     formData.append("password", $password.value);
+    if ($image.value.file) {
+        formData.append("image", $image.value.file);
+    }
     const resp = await sendRequest("/auth/signup", "post", formData, false);
     const data = resp.data as SigninResponse;
     authStore.login(data);
