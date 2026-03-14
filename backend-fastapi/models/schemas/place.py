@@ -36,11 +36,11 @@ embedding_meta = FieldMeta(
 )
 embedding_annot = Annotated[list[float], embedding_meta.info]
 
-imageUrl_meta = FieldMeta(
+image_url_meta = FieldMeta(
     examples=["avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"],
-    description="local url on the storage",
+    description="image url on the storage",
 )
-imageUrl_annot = Annotated[str, imageUrl_meta.info]
+image_url_annot = Annotated[str, image_url_meta.info]
 
 image_meta = FieldMeta(is_file=True, description="Place Image (JPEG)")
 image_annot = Annotated[FileToUpload, image_meta.info]
@@ -53,13 +53,13 @@ address_meta = FieldMeta(
 )
 address_annot = Annotated[str, address_meta.info]
 
-creatorId_meta = FieldMeta(
+creator_id_meta = FieldMeta(
     description="The place creator ID",
     examples=[123456789],
     filter_examples=["in:123456789"],
     is_index=True,
 )
-creatorId_annot = Annotated[int, creatorId_meta.info]
+creator_id_annot = Annotated[int, creator_id_meta.info]
 
 lat_meta = FieldMeta(
     description="The latitude of the place",
@@ -96,9 +96,9 @@ PlaceSelectableFields = Literal[
     "description",
     "address",
     "location",
-    "imageUrl",
-    "creatorId",
-    "createdAt",
+    "image_url",
+    "creator_id",
+    "created_at",
 ]
 
 PlaceSearchableFields = Literal[
@@ -106,14 +106,15 @@ PlaceSearchableFields = Literal[
     "title",
     "description",
     "address",
-    "creatorId",
-    "locationLat",
-    "locationLng",
+    "creator_id",
+    "location_lat",
+    "location_lng",
+    "created_at",
 ]
 
 PlaceSortableFields = Literal[
-    "createdAt",
-    "-createdAt",
+    "created_at",
+    "-created_at",
     "title",
     "-title",
     "description",
@@ -134,7 +135,7 @@ class PlaceSeedSchema(BaseModel):
     address: address_annot
     location: Location | None = None
     embedding: embedding_annot | None = None
-    imageUrl: imageUrl_annot | None = None
+    image_url: image_url_annot | None = None
 
 
 # --- Creation Schemas ---
@@ -146,8 +147,8 @@ class PlaceCreateSchema(BaseModel):
     address: address_annot
     location: Location | None = None
     embedding: embedding_annot | None = None
-    imageUrl: imageUrl_annot | None = None
-    creatorId: creatorId_annot
+    image_url: image_url_annot | None = None
+    creator_id: creator_id_annot
 
 
 class PlacePostSchema(BaseModel):
@@ -157,7 +158,7 @@ class PlacePostSchema(BaseModel):
     lat: lat_annot
     lng: lng_annot
     image: image_annot | None = None
-    creatorId: creatorId_annot
+    creator_id: creator_id_annot
 
 
 class PlaceMultipartPost:
@@ -168,7 +169,7 @@ class PlaceMultipartPost:
         address: str = address_meta.multipart,
         lat: float = lat_meta.multipart,
         lng: float = lng_meta.multipart,
-        creatorId: int = creatorId_meta.multipart,
+        creator_id: int = creator_id_meta.multipart,
         image: FileToUpload | None = image_meta.optional_multipart,
     ):
         self.title = title
@@ -176,7 +177,7 @@ class PlaceMultipartPost:
         self.address = address
         self.lat = lat
         self.lng = lng
-        self.creatorId = creatorId
+        self.creator_id = creator_id
         self.image = image or None
 
     def to_post_schema(self) -> PlacePostSchema:
@@ -186,7 +187,7 @@ class PlaceMultipartPost:
             address=self.address,
             lat=self.lat,
             lng=self.lng,
-            creatorId=self.creatorId,
+            creator_id=self.creator_id,
             image=self.image,
         )
 
@@ -200,9 +201,9 @@ class PlaceReadSchema(BaseModel):
     description: description_annot
     address: address_annot
     location: Location | None = None
-    imageUrl: imageUrl_annot | None = None
-    creatorId: creatorId_annot
-    createdAt: created_at_annot
+    image_url: image_url_annot | None = None
+    creator_id: creator_id_annot
+    created_at: created_at_annot
 
 
 # --- Update Schemas ---
@@ -236,9 +237,10 @@ class PlaceSearchSchema(
     title: HttpFilters[title_annot]
     description: HttpFilters[description_annot]
     address: HttpFilters[address_annot]
-    creatorId: HttpFilters[creatorId_annot]
-    locationLat: HttpFilters[lat_annot]
-    locationLng: HttpFilters[lng_annot]
+    creator_id: HttpFilters[creator_id_annot]
+    location_lat: HttpFilters[lat_annot]
+    location_lng: HttpFilters[lng_annot]
+    created_at: HttpFilters[created_at_annot]
 
 
 PlaceSearchQuery = SearchQuery[
