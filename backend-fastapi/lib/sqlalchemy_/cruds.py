@@ -9,12 +9,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
-from lib.utils import (
-    convert_dict_to_camel,
-    convert_dict_to_snake,
-    to_snake_case,
-)
-
 from ..types_ import (
     ApiError,
     Filter,
@@ -133,12 +127,10 @@ class CrudsClass(
     # Serialization and Post-Processing
 
     def _serialize_to_dict(self, record: DbModel) -> dict:
-        data = record.to_dict()
-        return convert_dict_to_camel(data)
+        return record.to_dict()
 
     def _serialize_to_read(self, record: DbModel) -> Read:
         data = record.to_dict()
-        data = convert_dict_to_camel(data)
         return self.read_schema.model_validate(data)
 
     async def post_process(self, raw: Read) -> Read:
@@ -186,25 +178,21 @@ class CrudsClass(
         override this method when subclassing for custom behavior
         """
         # some fields maybe attributes in a JSONB column
-        return getattr(self.model, to_snake_case(field))
+        return getattr(self.model, field)
 
     def map_select(self, field: str) -> list[SelectField]:
         """
         override this method when subclassing for custom behavior
         some fields may require joins
         """
-        return [
-            SelectField(
-                select=getattr(self.model, to_snake_case(field)), joins=None
-            )
-        ]
+        return [SelectField(select=getattr(self.model, field), joins=None)]
 
     def map_where(self, field: str) -> InstrumentedAttribute:
         """
         override this method when subclassing for custom behavior
         some fields maybe attributes in a JSONB column
         """
-        return getattr(self.model, to_snake_case(field))
+        return getattr(self.model, field)
 
     def eq(self, val: Any) -> list[Filter]:
         return [{"op": "eq", "val": val}]
@@ -251,10 +239,8 @@ class CrudsClass(
 
     def to_model(self, data: Create) -> DbModel:
         """Overload this when subclassing if required"""
-        normalized = convert_dict_to_snake(
-            cast(dict, data.model_dump(exclude_unset=True, exclude_none=True))
-        )
-        return self.model(**normalized)
+        d = data.model_dump(exclude_unset=True, exclude_none=True)
+        return self.model(**d)
 
     async def create(self, data: Create) -> int:
         """Create from a create form, return id"""
