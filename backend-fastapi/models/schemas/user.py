@@ -37,20 +37,20 @@ password_meta = FieldMeta(
 )
 password_annot = Annotated[str, password_meta.info]
 
-imageUrl_meta = FieldMeta(
+image_url_meta = FieldMeta(
     examples=["avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"],
-    description="local url on the storage",
+    description="image url",
 )
-imageUrl_annot = Annotated[str, imageUrl_meta.info]
+image_url_annot = Annotated[str, image_url_meta.info]
 
 image_meta = FieldMeta(is_file=True, description="The user profile image")
 image_annot = Annotated[FileToUpload, image_meta.info]
 
-isAdmin_meta = FieldMeta(
+is_admin_meta = FieldMeta(
     description="Whether the user is an admin or not",
     examples=[False],
 )
-isAdmin_annot = Annotated[bool, isAdmin_meta.info]
+is_admin_annot = Annotated[bool, is_admin_meta.info]
 
 
 class UserPlace(BaseModel):
@@ -69,13 +69,13 @@ places_annot = Annotated[list[UserPlace], places_meta.info]
 # --- Selectables, Serchables, Sortables ----
 
 UserSelectableFields = Literal[
-    "id", "name", "email", "isAdmin", "imageUrl", "places", "createdAt"
+    "id", "name", "email", "is_admin", "image_url", "places", "created_at"
 ]
 
-UserSearchableFields = Literal["id", "name", "email"]
+UserSearchableFields = Literal["id", "name", "email", "created_at"]
 
 UserSortableFields = Literal[
-    "createdAt", "-createdAt", "name", "-name", "email", "-email"
+    "created_at", "-created_at", "name", "-name", "email", "-email"
 ]
 
 # --- Base Schemas ----
@@ -85,9 +85,9 @@ class UserSeedSchema(BaseModel):
     ref: int
     name: name_annot
     email: email_annot
-    isAdmin: isAdmin_annot
+    is_admin: is_admin_annot
     password: password_annot
-    imageUrl: imageUrl_annot | None = None
+    image_url: image_url_annot | None = None
 
 
 # --- Creation Schemas ---
@@ -96,15 +96,15 @@ class UserSeedSchema(BaseModel):
 class UserCreateSchema(BaseModel):
     name: name_annot
     email: email_annot
-    isAdmin: isAdmin_annot
+    is_admin: is_admin_annot
     password: password_annot
-    imageUrl: imageUrl_annot | None = None
+    image_url: image_url_annot | None = None
 
 
 class UserPostSchema(BaseModel):
     name: name_annot
     email: email_annot
-    isAdmin: isAdmin_annot
+    is_admin: is_admin_annot
     password: password_annot
     image: image_annot | None = None
 
@@ -114,13 +114,13 @@ class UserMultipartPost:
         self,
         name: str = name_meta.multipart,
         email: EmailStr = email_meta.multipart,
-        isAdmin: bool = isAdmin_meta.multipart,
+        is_admin: bool = is_admin_meta.multipart,
         password: str = password_meta.multipart,
         image: FileToUpload | None = image_meta.optional_multipart,
     ):
         self.name = name
         self.email = email
-        self.isAdmin = isAdmin
+        self.is_admin = is_admin
         self.password = password
         self.image = image or None
 
@@ -128,7 +128,7 @@ class UserMultipartPost:
         return UserPostSchema(
             name=self.name,
             email=self.email,
-            isAdmin=self.isAdmin,
+            is_admin=self.is_admin,
             password=self.password,
             image=self.image,
         )
@@ -141,8 +141,8 @@ class UserReadSchema(BaseModel):
     id: id_annot
     name: name_annot
     email: email_annot
-    isAdmin: isAdmin_annot
-    imageUrl: imageUrl_annot | None = None
+    isAdmin: is_admin_annot
+    imageUrl: image_url_annot | None = None
     places: places_annot
     createdAt: created_at_annot
 
@@ -176,6 +176,7 @@ class UserSearchSchema(
     id: HttpFilters[id_annot]
     name: HttpFilters[name_annot]
     email: HttpFilters[email_annot]
+    created_at: HttpFilters[created_at_annot]
 
 
 UserSearchQuery = SearchQuery[
