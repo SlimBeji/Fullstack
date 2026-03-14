@@ -40,14 +40,17 @@ func Read[User any, Model BaseModelReader, Read any](
 }
 
 func getRaw[User any, Model BaseModelReader, Read any](
-	ctx context.Context, crud RecordRead[User, Model, Read], id uint, user *User,
+	ctx context.Context,
+	crud RecordRead[User, Model, Read],
+	id uint,
+	fields []string,
+	user *User,
 ) (Model, error) {
 	var zero Model
 
 	// Build query
-	selectFields := crud.DefaultSelect()
 	query := types_.SearchQuery{
-		Select: selectFields,
+		Select: fields,
 		Where: types_.WhereFilters{
 			"id": types_.EqFilters(id),
 		},
@@ -73,7 +76,7 @@ func Get[User any, Model BaseModelReader, Read any](
 	ctx context.Context, crud RecordRead[User, Model, Read], id uint, user *User,
 ) (Read, error) {
 	var zero Read
-	model, err := getRaw(ctx, crud, id, user)
+	model, err := getRaw(ctx, crud, id, []string{}, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return zero, types_.NotFoundError(crud.ModelName(), id)
@@ -92,7 +95,7 @@ func GetPartial[User any, Model BaseModelReader, Read any](
 	user *User,
 ) (map[string]any, error) {
 	result := make(map[string]any)
-	model, err := getRaw(ctx, crud, id, user)
+	model, err := getRaw(ctx, crud, id, fields, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return result, types_.NotFoundError(crud.ModelName(), id)
