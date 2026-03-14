@@ -14,7 +14,7 @@ class BaseSearchSchema(
     BaseModel, Generic[SelectableFields, SortableFields, SearchableFields]
 ):
     _MAX_SIZE: int = 100
-    _DEFAULT_SORT: list[SortableFields] = ["-createdAt"]  # type: ignore
+    _DEFAULT_SORT: list[SortableFields] = ["-created_at"]  # type: ignore
     _DEFAULT_FIELDS: list[SelectableFields] = ["id"]  # type: ignore
 
     page: Annotated[int, Field(1, description="The page number")]
