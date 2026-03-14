@@ -18,10 +18,10 @@ const (
 	UserSelectId        UserSelectables = "id"
 	UserSelectName      UserSelectables = "name"
 	UserSelectEmail     UserSelectables = "email"
-	UserSelectIsAdmin   UserSelectables = "isAdmin"
-	UserSelectImageURL  UserSelectables = "imageURL"
+	UserSelectIsAdmin   UserSelectables = "is_admin"
+	UserSelectImageURL  UserSelectables = "image_url"
 	UserSelectPlaces    UserSelectables = "places"
-	UserSelectCreatedAt UserSelectables = "createdAt"
+	UserSelectCreatedAt UserSelectables = "created_at"
 )
 
 func (field UserSelectables) Validate() bool {

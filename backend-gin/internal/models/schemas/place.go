@@ -20,9 +20,9 @@ const (
 	PlaceSelectDescription PlaceSelectables = "description"
 	PlaceSelectAddress     PlaceSelectables = "address"
 	PlaceSelectLocation    PlaceSelectables = "location"
-	PlaceSelectImageURL    PlaceSelectables = "imageUrl"
-	PlaceSelectCreatorId   PlaceSelectables = "creatorId"
-	PlaceSelectCreatedAt   PlaceSelectables = "createdAt"
+	PlaceSelectImageURL    PlaceSelectables = "image_url"
+	PlaceSelectCreatorId   PlaceSelectables = "creator_id"
+	PlaceSelectCreatedAt   PlaceSelectables = "created_at"
 )
 
 func (field PlaceSelectables) Validate() bool {

@@ -193,7 +193,7 @@ func (cu *CRUDSUser) PostProcessPartial(
 
 func (cu *CRUDSUser) MapSelect(field string) []gorm_.SelectField {
 	switch field {
-	case string(schemas.UserSelectPlaces):
+	case "places":
 		return []gorm_.SelectField{
 			{Field: "id"},
 			{Field: "creator_id", Preload: "Places", Level: 1},
