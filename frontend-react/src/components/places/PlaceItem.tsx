@@ -108,12 +108,15 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                             VIEW ON MAP
                         </Button>
                         {authData?.user_id === place.creator_id && (
-                            <Button to={`/places/${place.id}`}>EDIT</Button>
-                        )}
-                        {authData?.user_id === place.creator_id && (
-                            <Button color="danger" onClick={openDeleteModal}>
-                                DELETE
-                            </Button>
+                            <>
+                                <Button to={`/places/${place.id}`}>EDIT</Button>
+                                <Button
+                                    color="danger"
+                                    onClick={openDeleteModal}
+                                >
+                                    DELETE
+                                </Button>
+                            </>
                         )}
                     </div>
                 </div>
