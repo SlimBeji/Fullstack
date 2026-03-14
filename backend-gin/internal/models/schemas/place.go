@@ -12,7 +12,7 @@ import (
 
 // --- Selectables, Serchables, Sortables ----
 
-type PlaceSelectables string
+type PlaceSelectables string // with snake casing
 
 const (
 	PlaceSelectId          PlaceSelectables = "id"
@@ -35,7 +35,7 @@ func (field PlaceSelectables) Validate() bool {
 	}
 }
 
-type PlaceSearchables string
+type PlaceSearchables string // with camel casing
 
 const (
 	PlaceSearchId          PlaceSearchables = "id"
@@ -57,7 +57,7 @@ func (field PlaceSearchables) Validate() bool {
 	}
 }
 
-type PlaceSortables string
+type PlaceSortables string // with camel casing
 
 const (
 	PlaceSortCreatedAtAsc    PlaceSortables = "createdAt"

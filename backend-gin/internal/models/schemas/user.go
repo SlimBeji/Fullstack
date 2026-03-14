@@ -12,7 +12,7 @@ import (
 
 // --- Selectables, Serchables, Sortables ----
 
-type UserSelectables string
+type UserSelectables string // with snake casing
 
 const (
 	UserSelectId        UserSelectables = "id"
@@ -34,7 +34,7 @@ func (field UserSelectables) Validate() bool {
 	}
 }
 
-type UserSearchables string
+type UserSearchables string // with camel casing
 
 const (
 	UserSearchId    UserSearchables = "id"
@@ -51,7 +51,7 @@ func (field UserSearchables) Validate() bool {
 	}
 }
 
-type UserSortables string
+type UserSortables string // with camel casing
 
 const (
 	UserSortCreatedAtAsc  UserSortables = "createdAt"
