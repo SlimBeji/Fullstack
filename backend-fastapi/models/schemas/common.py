@@ -6,18 +6,6 @@ from pydantic.alias_generators import to_camel
 
 from lib.pydantic_ import FieldMeta
 
-
-class BaseReadSchema(BaseModel):
-    """
-    Frontend requires camelCasing
-    Database use convential snake_casing
-    """
-
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, from_attributes=True
-    )
-
-
 created_at_meta = FieldMeta(
     description="creation datetime",
     examples=["2024-01-12T10:15:30.000Z"],

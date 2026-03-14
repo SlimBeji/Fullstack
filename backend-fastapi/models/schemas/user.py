@@ -6,7 +6,7 @@ from config import settings
 from lib.pydantic_ import BaseSearchSchema, FieldMeta, HttpFilters
 from lib.types_ import FileToUpload, PaginatedData, PaginatedDict, SearchQuery
 
-from .common import BaseReadSchema, created_at_annot
+from .common import created_at_annot
 
 # --- Fields ----
 
@@ -137,7 +137,7 @@ class UserMultipartPost:
 # --- Read Schemas ---
 
 
-class UserReadSchema(BaseReadSchema):
+class UserReadSchema(BaseModel):
     id: id_annot
     name: name_annot
     email: email_annot

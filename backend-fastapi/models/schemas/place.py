@@ -6,7 +6,7 @@ from config import settings
 from lib.pydantic_ import BaseSearchSchema, FieldMeta, HttpFilters
 from lib.types_ import FileToUpload, PaginatedData, PaginatedDict, SearchQuery
 
-from .common import BaseReadSchema, created_at_annot
+from .common import created_at_annot
 
 # --- Fields ----
 
@@ -194,7 +194,7 @@ class PlaceMultipartPost:
 # --- Read Schemas ---
 
 
-class PlaceReadSchema(BaseReadSchema):
+class PlaceReadSchema(BaseModel):
     id: id_annot
     title: title_annot
     description: description_annot
