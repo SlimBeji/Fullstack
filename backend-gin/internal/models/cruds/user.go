@@ -132,9 +132,9 @@ func (cu *CRUDSUser) ToJSON(
 		case string(schemas.UserSelectEmail):
 			result["email"] = model.Email
 		case string(schemas.UserSelectIsAdmin):
-			result["is_admin"] = model.IsAdmin
+			result["isAdmin"] = model.IsAdmin
 		case string(schemas.UserSelectImageURL):
-			result["image_url"] = model.ImageURL
+			result["imageUrl"] = model.ImageURL
 		case string(schemas.UserSelectPlaces):
 			places := make([]map[string]any, len(model.Places))
 			for i, place := range model.Places {
@@ -146,7 +146,7 @@ func (cu *CRUDSUser) ToJSON(
 			}
 			result["places"] = places
 		case string(schemas.UserSelectCreatedAt):
-			result["created_at"] = model.CreatedAt
+			result["createdAt"] = model.CreatedAt
 		default:
 			return result, fmt.Errorf("unknow field %s in user schema", field)
 		}

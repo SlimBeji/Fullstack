@@ -135,11 +135,11 @@ func (cp *CRUDSPlace) ToJSON(
 		case string(schemas.PlaceSelectLocation):
 			result["location"] = model.Location
 		case string(schemas.PlaceSelectImageURL):
-			result["image_url"] = model.ImageURL
+			result["imageUrl"] = model.ImageURL
 		case string(schemas.PlaceSelectCreatorId):
-			result["creator_id"] = model.CreatorID
+			result["creatorId"] = model.CreatorID
 		case string(schemas.PlaceSelectCreatedAt):
-			result["created_at"] = model.CreatedAt
+			result["createdAt"] = model.CreatedAt
 		default:
 			return result, fmt.Errorf("unknow field %s in place schema", field)
 		}
