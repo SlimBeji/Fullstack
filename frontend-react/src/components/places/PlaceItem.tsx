@@ -90,7 +90,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 <div className="card place-item-card">
                     <div className="image-container">
                         <img
-                            src={place.imageUrl || placeholder}
+                            src={place.image_url || placeholder}
                             alt={place.title}
                         />
                     </div>
@@ -107,10 +107,10 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                         >
                             VIEW ON MAP
                         </Button>
-                        {authData?.userId === place.creatorId && (
+                        {authData?.userId === place.creator_id && (
                             <Button to={`/places/${place.id}`}>EDIT</Button>
                         )}
-                        {authData?.userId === place.creatorId && (
+                        {authData?.userId === place.creator_id && (
                             <Button color="danger" onClick={openDeleteModal}>
                                 DELETE
                             </Button>

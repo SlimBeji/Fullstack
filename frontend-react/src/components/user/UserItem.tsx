@@ -21,7 +21,7 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
                 <Link to={`/${user.id}/places`} className="user-item-link">
                     <div className="user-avatar">
                         <Avatar
-                            imageUrl={user.imageUrl || placeholder}
+                            imageUrl={user.image_url || placeholder}
                             alt={user.name}
                         />
                     </div>
