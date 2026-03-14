@@ -46,7 +46,7 @@ async def test_create_user_as_admin(helpers: Helpers):
         name="Test Van Test",
         email="test@test.com",
         password="very_secret",
-        isAdmin=True,
+        is_admin=True,
     )
     response = await helpers.client.post(
         "/api/users/", data=data, files=files, headers=headers
@@ -55,7 +55,7 @@ async def test_create_user_as_admin(helpers: Helpers):
     data = response.json()
     assert data["email"] == "test@test.com"
     assert data["name"] == "Test Van Test"
-    assert data["isAdmin"] is True
+    assert data["is_admin"] is True
 
 
 @pytest.mark.asyncio
@@ -66,7 +66,7 @@ async def test_create_user_as_non_admin(helpers: Helpers):
         name="Test Van Test II",
         email="test_2@test.com",
         password="very_secret",
-        isAdmin=True,
+        is_admin=True,
     )
     response = await helpers.client.post(
         "/api/users/", data=data, files=files, headers=headers

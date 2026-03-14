@@ -59,7 +59,7 @@ async def test_create_place(helpers: Helpers):
     headers = dict(Authorization=helpers.admin_token)
 
     multipart_data = dict(
-        creatorId=str(helpers.admin.id),
+        creator_id=str(helpers.admin.id),
         description="A brand new place",
         title="Brand New Place",
         address="Somewhere over the rainbow",
@@ -75,7 +75,7 @@ async def test_create_place(helpers: Helpers):
 
     assert response.status_code == HTTPStatus.OK
     data = response.json()
-    assert data["creatorId"] == helpers.admin.id
+    assert data["creator_id"] == helpers.admin.id
     assert data["description"] == "A brand new place"
     assert data["title"] == "Brand New Place"
     assert data["address"] == "Somewhere over the rainbow"
@@ -86,7 +86,7 @@ async def test_create_place_belonging_to_others(helpers: Helpers):
     files = dict(image=open(get_image_path("place1.jpg"), "rb"))
     headers = dict(Authorization=helpers.user_token)
     multipart_data = dict(
-        creatorId=str(helpers.admin.id),
+        creator_id=str(helpers.admin.id),
         description="A brand new place",
         title="Brand New Place",
         address="Somewhere over the rainbow",

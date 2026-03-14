@@ -17,7 +17,7 @@ async def test_signup(client: AsyncClient):
     assert resp.status_code == 200
     body = resp.json()
     assert body["email"] == "new_user@gmail.com"
-    assert "userId" in body
+    assert "user_id" in body
     assert "access_token" in body
 
 
@@ -33,5 +33,5 @@ async def test_signin(client: AsyncClient):
     assert resp.status_code == 200
     body = resp.json()
     assert body["email"] == "mslimbeji@gmail.com"
-    assert "userId" in body
+    assert "user_id" in body
     assert "access_token" in body
