@@ -33,7 +33,7 @@ const NewPlace: React.FC = () => {
         formData.append("address", state.fields.address.value);
         formData.append("lat", state.fields.lat.value);
         formData.append("lng", state.fields.lng.value);
-        formData.append("creator_id", authData?.userId || "");
+        formData.append("creator_id", authData?.user_id || "");
         try {
             await sendRequest("/places/", "post", formData);
             navigate("/");

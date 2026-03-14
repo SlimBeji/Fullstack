@@ -22,8 +22,8 @@ export const authSlice = createSlice({
         },
         login: (state: AuthState, action: PayloadAction<SigninResponse>) => {
             const { expires_in, ...rest } = action.payload;
-            const expiresAt = Math.floor(Date.now() / 1000) + expires_in;
-            state.data = { ...rest, expiresAt };
+            const expires_at = Math.floor(Date.now() / 1000) + expires_in;
+            state.data = { ...rest, expires_at };
             localStorage.setItem(
                 LocalStorageKeys.userData,
                 JSON.stringify(state.data)

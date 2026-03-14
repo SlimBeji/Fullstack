@@ -20,7 +20,7 @@ const NavLinks: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const authData = useAppSelector((state) => state.auth.data);
-    const userId = authData?.userId;
+    const userId = authData?.user_id;
 
     const onLogout = () => {
         dispatch(authSlice.actions.logout());

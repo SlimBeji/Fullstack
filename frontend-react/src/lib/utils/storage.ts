@@ -14,15 +14,15 @@ export const getAuthData = (): EncodedUserToken | null => {
     if (
         !data.access_token ||
         !(data.token_type === "bearer") ||
-        !data.userId ||
+        !data.user_id ||
         !data.email ||
-        !data.expiresAt
+        !data.expires_at
     ) {
         localStorage.removeItem(LocalStorageKeys.userData);
         return null;
     }
 
-    if (Date.now() > data.expiresAt * 1000) {
+    if (Date.now() > data.expires_at * 1000) {
         localStorage.removeItem(LocalStorageKeys.userData);
         return null;
     }
