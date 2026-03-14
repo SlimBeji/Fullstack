@@ -130,9 +130,11 @@ const onSignin = async (): Promise<void> => {
 const onSignup = async (): Promise<void> => {
     const formData = new FormData();
     formData.append("name", fields.username.value);
-    formData.append("image", fields.image.value.file);
     formData.append("email", fields.email.value);
     formData.append("password", fields.password.value);
+    if (fields.image.value.file) {
+        formData.append("image", fields.image.value.file);
+    }
     const resp = await sendRequest("/auth/signup", "post", formData, false);
     const data = resp.data as SigninResponse;
     authStore.login(data);

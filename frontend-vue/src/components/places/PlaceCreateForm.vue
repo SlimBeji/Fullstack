@@ -99,12 +99,15 @@ const submitHandler = async (e: Event) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", fields.title.value);
-    formData.append("image", fields.image.value.file);
     formData.append("description", fields.description.value);
     formData.append("address", fields.address.value);
     formData.append("lat", fields.lat.value);
     formData.append("lng", fields.lng.value);
     formData.append("creator_id", authStore.userId || "");
+    if (fields.image.value.file) {
+        formData.append("image", fields.image.value.file);
+    }
+
     try {
         await sendRequest("/places/", "post", formData);
         router.push("/");
