@@ -70,28 +70,28 @@ class CrudsPlace(
             session,
             Place,
             list(get_args(PlaceSelectableFields)),
-            ["-createdAt"],
+            ["-created_at"],
         )
 
     # Serialization and Post-Processing
 
     async def post_process(self, raw: PlaceReadSchema) -> PlaceReadSchema:
-        if raw.imageUrl:
-            raw.imageUrl = cloud_storage.get_signed_url(raw.imageUrl)
+        if raw.image_url:
+            raw.image_url = cloud_storage.get_signed_url(raw.image_url)
         return raw
 
     async def post_process_dict(self, raw: dict) -> dict:
-        image_url = raw.get("imageUrl")
+        image_url = raw.get("image_url")
         if image_url:
-            raw["imageUrl"] = cloud_storage.get_signed_url(image_url)
+            raw["image_url"] = cloud_storage.get_signed_url(image_url)
         return raw
 
     # Query Building
 
     def map_where(self, field: str) -> InstrumentedAttribute:
-        if field == "locationLat":
+        if field == "location_lat":
             return self.model.location["lat"].astext.cast(Float)  # type: ignore
-        elif field == "locationLng":
+        elif field == "location_lng":
             return self.model.location["lng"].astext.cast(Float)  # type: ignore
         else:
             return super().map_where(field)
@@ -118,31 +118,31 @@ class CrudsPlace(
 
         image = json.pop("image", None)
         if image:
-            json["imageUrl"] = cloud_storage.upload_file(image)
+            json["image_url"] = cloud_storage.upload_file(image)
         else:
-            json["imageUrl"] = ""
+            json["image_url"] = ""
 
         return self.create_schema.model_validate(json)
 
     async def auth_post(
         self, user: UserReadSchema, form: PlacePostSchema
     ) -> None:
-        if user.isAdmin:
-            if not await user_exists(self.session, form.creatorId):
+        if user.is_admin:
+            if not await user_exists(self.session, form.creator_id):
                 raise ApiError(
                     HTTPStatus.NOT_FOUND,
                     "User not found",
                     dict(
-                        message=f"Cannot set creatorId to {form.creatorId}, No user with id {form.creatorId} found in the database",
+                        message=f"Cannot set creator_id to {form.creator_id}, No user with id {form.creator_id} found in the database",
                     ),
                 )
             return
 
-        if user.id != form.creatorId:
+        if user.id != form.creator_id:
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
                 "Access denied",
-                dict(message=f"Cannot add places to user {form.creatorId}"),
+                dict(message=f"Cannot add places to user {form.creator_id}"),
             )
 
     # Read
@@ -152,13 +152,13 @@ class CrudsPlace(
         user: UserReadSchema,
         query: PlaceSearchQuery,
     ) -> PlaceSearchQuery:
-        if user.isAdmin:
+        if user.is_admin:
             return query
 
         if query.where is None:
             query.where = {}
 
-        query.where["creatorId"] = self.eq(user.id)
+        query.where["creator_id"] = self.eq(user.id)
         return query
 
     # Update
@@ -191,13 +191,13 @@ class CrudsPlace(
     async def auth_put(
         self, user: UserReadSchema, id: int | str, form: PlacePutSchema
     ) -> None:
-        if user.isAdmin:
+        if user.is_admin:
             return
 
         id = self.parse_id(id)
         where: WhereFilters[PlaceSearchableFields] = {
             "id": self.eq(id),
-            "creatorId": self.eq(user.id),
+            "creator_id": self.eq(user.id),
         }
         exists = await self.exists(where)
         if not exists:
@@ -261,13 +261,13 @@ class CrudsPlace(
             cloud_storage.delete_file(context.image_url)
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
-        if user.isAdmin:
+        if user.is_admin:
             return
 
         id = self.parse_id(id)
         where: WhereFilters[PlaceSearchableFields] = {
             "id": self.eq(id),
-            "creatorId": self.eq(user.id),
+            "creator_id": self.eq(user.id),
         }
         exists = await self.exists(where)
         if not exists:

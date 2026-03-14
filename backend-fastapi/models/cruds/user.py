@@ -68,20 +68,20 @@ class CrudsUser(
 
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, User, list(get_args(UserSelectableFields)), ["-createdAt"]
+            session, User, list(get_args(UserSelectableFields)), ["-created_at"]
         )
 
     # Serialization and Post-Processing
 
     async def post_process(self, raw: UserReadSchema) -> UserReadSchema:
-        if raw.imageUrl:
-            raw.imageUrl = cloud_storage.get_signed_url(raw.imageUrl)
+        if raw.image_url:
+            raw.image_url = cloud_storage.get_signed_url(raw.image_url)
         return raw
 
     async def post_process_dict(self, raw: dict) -> dict:
-        image_url = raw.get("imageUrl")
+        image_url = raw.get("image_url")
         if image_url:
-            raw["imageUrl"] = cloud_storage.get_signed_url(image_url)
+            raw["image_url"] = cloud_storage.get_signed_url(image_url)
         return raw
 
     # Query Building
@@ -107,9 +107,9 @@ class CrudsUser(
         )
         image = json.pop("image", None)
         if image:
-            json["imageUrl"] = cloud_storage.upload_file(image)
+            json["image_url"] = cloud_storage.upload_file(image)
         else:
-            json["imageUrl"] = ""
+            json["image_url"] = ""
 
         return self.create_schema.model_construct(**json)
 
@@ -117,7 +117,7 @@ class CrudsUser(
         self, user: UserReadSchema, form: UserPostSchema
     ) -> None:
         """Only admins can create users"""
-        if user.isAdmin:
+        if user.is_admin:
             return
         raise ApiError(
             HTTPStatus.UNAUTHORIZED,
@@ -132,7 +132,7 @@ class CrudsUser(
         user: UserReadSchema,
         query: UserSearchQuery,
     ) -> UserSearchQuery:
-        if user.isAdmin:
+        if user.is_admin:
             return query
 
         if query.where is None:
@@ -203,7 +203,7 @@ class CrudsUser(
     async def auth_put(
         self, user: UserReadSchema, id: int | str, form: UserPutSchema
     ) -> None:
-        if user.isAdmin:
+        if user.is_admin:
             return
 
         if user.id != self.parse_id(id):
@@ -231,7 +231,7 @@ class CrudsUser(
             cloud_storage.delete_file(context.image_url)
 
     async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
-        if user.isAdmin:
+        if user.is_admin:
             return
 
         raise ApiError(
@@ -259,11 +259,11 @@ class CrudsUser(
         data = form.model_dump()
         image = data.pop("image", None)
         if image:
-            data["imageUrl"] = cloud_storage.upload_file(image)
+            data["image_url"] = cloud_storage.upload_file(image)
         else:
-            data["imageUrl"] = ""
+            data["image_url"] = ""
 
-        create_form = self.create_schema(isAdmin=False, **data)
+        create_form = self.create_schema(is_admin=False, **data)
         id_ = await self.create(create_form)
         return create_token(id_, form.email)
 
