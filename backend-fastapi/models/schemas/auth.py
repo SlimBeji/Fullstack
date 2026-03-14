@@ -38,7 +38,7 @@ expires_in_annot = Annotated[int, expires_in_meta.info]
 
 
 class TokenPayload(BaseModel):
-    userId: user.id_annot
+    user_id: user.id_annot
     email: user.email_annot
 
 
@@ -104,13 +104,13 @@ class SigninForm:
 class EncodedTokenSchema(BaseModel):
     access_token: access_token_annot
     token_type: Literal["bearer"]
-    userId: user.id_annot
+    user_id: user.id_annot
     email: user.email_annot
     expires_in: expires_in_annot
 
 
 def create_token(user_id: int, email: str) -> EncodedTokenSchema:
-    payload = TokenPayload(userId=user_id, email=email)
+    payload = TokenPayload(user_id=user_id, email=email)
     expires_in = settings.JWT_EXPIRATION
     access_token = encode_payload(
         payload.model_dump(fallback=str), settings.SECRET_KEY, expires_in
@@ -118,7 +118,7 @@ def create_token(user_id: int, email: str) -> EncodedTokenSchema:
     return EncodedTokenSchema(
         access_token=access_token,
         token_type="bearer",
-        userId=user_id,
+        user_id=user_id,
         email=email,
         expires_in=expires_in,
     )
