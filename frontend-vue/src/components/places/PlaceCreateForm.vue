@@ -103,7 +103,7 @@ const submitHandler = async (e: Event) => {
     formData.append("address", fields.address.value);
     formData.append("lat", fields.lat.value);
     formData.append("lng", fields.lng.value);
-    formData.append("creator_id", authStore.userId || "");
+    formData.append("creator_id", authStore.userId as any);
     if (fields.image.value.file) {
         formData.append("image", fields.image.value.file);
     }
