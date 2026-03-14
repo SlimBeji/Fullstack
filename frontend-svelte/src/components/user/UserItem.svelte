@@ -10,7 +10,7 @@ const props = $props<{ user: User }>();
 const user: User = props.user;
 
 // Computed
-const imageUrl = $derived(user.imageUrl || placeholder);
+const imageUrl = $derived(user.image_url || placeholder);
 const nPlaces = $derived<number>(user.places.length);
 const placeNumber = $derived(
     nPlaces > 1 ? `${nPlaces} Places` : `${nPlaces} Place`

@@ -36,7 +36,7 @@ const submitHandler = async (e: Event) => {
     formData.append("address", $address.value);
     formData.append("lat", $lat.value);
     formData.append("lng", $lng.value);
-    formData.append("creatorId", $loggedUserId as string);
+    formData.append("creator_id", $loggedUserId as string);
     try {
         await sendRequest("/places/", "post", formData);
         goto("/");

@@ -31,7 +31,7 @@ const places = $derived<Place[]>(
 // Handlers
 const fetchPlaces = (userId: string | undefined) => {
     if (!userId) return;
-    sendRequest(`/places/?creatorId=${userId}`, "get").catch((err) =>
+    sendRequest(`/places/?creator_id=${userId}`, "get").catch((err) =>
         console.log(err)
     );
 };

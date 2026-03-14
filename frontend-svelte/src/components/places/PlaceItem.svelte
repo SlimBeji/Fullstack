@@ -21,8 +21,8 @@ let showMap = $state<boolean>(false);
 let showDeleteModal = $state<boolean>(false);
 
 // Computed
-const isUserOwned = $derived<boolean>($loggedUserId === props.place.creatorId);
-const imageUrl = $derived(props.place.imageUrl || placeholder);
+const isUserOwned = $derived<boolean>($loggedUserId === props.place.creator_id);
+const imageUrl = $derived(props.place.image_url || placeholder);
 
 // Handlers
 const openMapHandler = () => {
