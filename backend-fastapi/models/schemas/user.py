@@ -141,10 +141,10 @@ class UserReadSchema(BaseModel):
     id: id_annot
     name: name_annot
     email: email_annot
-    isAdmin: is_admin_annot
-    imageUrl: image_url_annot | None = None
+    is_admin: is_admin_annot
+    image_url: image_url_annot | None = None
     places: places_annot
-    createdAt: created_at_annot
+    created_at: created_at_annot
 
 
 # --- Update Schemas ---
