@@ -66,11 +66,6 @@ This backend uses the following tools to ensure clean and consistent Python code
   Configured to work with `black` formatting (see `.isort.cfg`).
 - **[black](https://black.readthedocs.io/):** Opinionated code formatter for Python.
 
-## 🔠 Casing
-
-In Python, the standard for variables and fields is **snake_case** (e.g., `creator_id`).
-However, since all backends are designed to be interchangeable, **camelCase** will be used for JSON responses (e.g., `creatorId`) to maintain consistency across different backends.
-
 ## 🛠️ Makefile Commands
 
 The following `make` commands help manage the FastAPI backend:
