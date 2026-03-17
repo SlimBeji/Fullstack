@@ -35,7 +35,7 @@ type UserCreateContext = {};
 type UserUpdateContext = {};
 
 type UserDeleteContext = {
-    imageUrl: string;
+    image_url: string;
 };
 
 export class CrudsUser extends CrudsClass<
@@ -61,8 +61,8 @@ export class CrudsUser extends CrudsClass<
     async postProcess<T extends Partial<UserRead> | UserRead>(
         raw: T
     ): Promise<T> {
-        if (raw.imageUrl) {
-            raw.imageUrl = await storage.getSignedUrl(raw.imageUrl);
+        if (raw.image_url) {
+            raw.image_url = await storage.getSignedUrl(raw.image_url);
         }
         return raw;
     }
@@ -92,12 +92,12 @@ export class CrudsUser extends CrudsClass<
         const imageUrl = await storage.uploadFile(data.image || null);
         const { image: _image, password, ...body } = data;
         const hashed = await hashInput(password, env.DEFAULT_HASH_SALT);
-        return { ...body, password: hashed, imageUrl };
+        return { ...body, password: hashed, image_url: imageUrl };
     }
 
     async authPost(user: UserRead, _data: UserPost): Promise<void> {
         // only admins can create users
-        if (user && user.isAdmin) return;
+        if (user && user.is_admin) return;
         throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
             message: "Only admins can delete users",
         });
@@ -187,7 +187,7 @@ export class CrudsUser extends CrudsClass<
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
 
-        if (user.isAdmin) return;
+        if (user.is_admin) return;
 
         if (user.id !== this.parseId(id)) {
             throw new ApiError(
@@ -213,7 +213,7 @@ export class CrudsUser extends CrudsClass<
         id: number
     ): Promise<UserDeleteContext> {
         const record = await manager.findOne(User, {
-            select: { imageUrl: true },
+            select: { image_url: true },
             where: { id },
         });
 
@@ -221,7 +221,7 @@ export class CrudsUser extends CrudsClass<
             throw this.notFoundError(id);
         }
 
-        return { imageUrl: record.imageUrl };
+        return { image_url: record.image_url };
     }
 
     async afterDelete(
@@ -230,13 +230,13 @@ export class CrudsUser extends CrudsClass<
         context: UserDeleteContext
     ): Promise<void> {
         await redisClient.delete(this.cacheKey(id));
-        if (context.imageUrl) {
-            await storage.deleteFile(context.imageUrl);
+        if (context.image_url) {
+            await storage.deleteFile(context.image_url);
         }
     }
 
     async authDelete(user: UserRead, _id: number | string): Promise<void> {
-        if (user && user.isAdmin) {
+        if (user && user.is_admin) {
             return;
         }
 
@@ -268,7 +268,7 @@ export class CrudsUser extends CrudsClass<
             name: form.name,
             email: form.email,
             password: form.password,
-            isAdmin: false,
+            is_admin: false,
             image: form.image,
         };
         const user = await this.post(data);

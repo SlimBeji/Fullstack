@@ -34,7 +34,7 @@ type PlaceUpdateContext = {
 };
 
 type PlaceDeleteContext = {
-    imageUrl: string;
+    image_url: string;
 };
 
 export class CrudsPlace extends CrudsClass<
@@ -60,8 +60,8 @@ export class CrudsPlace extends CrudsClass<
     async postProcess<T extends Partial<PlaceRead> | PlaceRead>(
         raw: T
     ): Promise<T> {
-        if (raw.imageUrl) {
-            raw.imageUrl = await storage.getSignedUrl(raw.imageUrl);
+        if (raw.image_url) {
+            raw.image_url = await storage.getSignedUrl(raw.image_url);
         }
         return raw;
     }
@@ -70,9 +70,9 @@ export class CrudsPlace extends CrudsClass<
 
     mapWhere(field: string): string {
         switch (field) {
-            case "locationLat":
+            case "location_lat":
                 return `(location->>'lat')::float`;
-            case "locationLng":
+            case "location_lng":
                 return `(location->>'lng')::float`;
             default:
                 return this.fieldAlias(field);
@@ -101,7 +101,7 @@ export class CrudsPlace extends CrudsClass<
     async postToCreate(form: PlacePost): Promise<PlaceCreate> {
         const imageUrl = await storage.uploadFile(form.image || null);
         const { image: _image, lat, lng, ...body } = form;
-        return { ...body, imageUrl, location: { lat, lng } };
+        return { ...body, image_url: imageUrl, location: { lat, lng } };
     }
 
     async authPost(user: UserRead, data: PlacePost): Promise<void> {
@@ -109,18 +109,18 @@ export class CrudsPlace extends CrudsClass<
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
 
-        if (user.isAdmin) {
-            const exists = await userExists(this.datasource, data.creatorId);
+        if (user.is_admin) {
+            const exists = await userExists(this.datasource, data.creator_id);
             if (!exists) {
                 throw new ApiError(HttpStatus.NOT_FOUND, "User not found", {
-                    message: `Cannot set creatorId to ${data.creatorId}, No user with id ${data.creatorId} found in the database`,
+                    message: `Cannot set creator_id to ${data.creator_id}, No user with id ${data.creator_id} found in the database`,
                 });
             }
         }
 
-        if (user.id != data.creatorId) {
+        if (user.id != data.creator_id) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
-                message: `Cannot add places to user ${data.creatorId}`,
+                message: `Cannot add places to user ${data.creator_id}`,
             });
         }
     }
@@ -129,7 +129,7 @@ export class CrudsPlace extends CrudsClass<
 
     authGet(user: UserRead, query: PlaceSearchQuery): PlaceSearchQuery {
         if (!query.where) query.where = {};
-        query.where.creatorId = this.eq(user.id);
+        query.where.creator_id = this.eq(user.id);
         return query;
     }
 
@@ -177,11 +177,11 @@ export class CrudsPlace extends CrudsClass<
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
 
-        if (user.isAdmin) return;
+        if (user.is_admin) return;
 
         const check = await this.exists({
             id: this.eq(id),
-            creatorId: this.eq(user.id),
+            creator_id: this.eq(user.id),
         });
         if (!check) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
@@ -238,13 +238,13 @@ export class CrudsPlace extends CrudsClass<
         id: number
     ): Promise<PlaceDeleteContext> {
         const record = (await manager.findOne(Place, {
-            select: { imageUrl: true },
+            select: { image_url: true },
             where: { id },
-        })) as Pick<Place, "imageUrl"> | null;
+        })) as Pick<Place, "image_url"> | null;
         if (!record) {
             throw this.notFoundError(id);
         }
-        return { imageUrl: record.imageUrl };
+        return { image_url: record.image_url };
     }
 
     async afterDelete(
@@ -253,8 +253,8 @@ export class CrudsPlace extends CrudsClass<
         context: PlaceDeleteContext
     ): Promise<void> {
         // Delete image if exists
-        if (context.imageUrl) {
-            await storage.deleteFile(context.imageUrl);
+        if (context.image_url) {
+            await storage.deleteFile(context.image_url);
         }
     }
 
@@ -263,11 +263,11 @@ export class CrudsPlace extends CrudsClass<
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
         }
 
-        if (user.isAdmin) return;
+        if (user.is_admin) return;
 
         const check = await this.exists({
             id: this.eq(id),
-            creatorId: this.eq(user.id),
+            creator_id: this.eq(user.id),
         });
         if (!check) {
             throw new ApiError(HttpStatus.UNAUTHORIZED, "Access denied", {
