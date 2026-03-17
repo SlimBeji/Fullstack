@@ -1,7 +1,15 @@
 import { ZodTypeAny } from "zod";
 
 import { ApiError, HttpStatus, MimeType } from "../types";
+import { parseTime } from "../utils";
 import { zod } from "./base";
+
+export const zodDatetime = zod.preprocess((val) => {
+    if (typeof val === "string") {
+        return parseTime(val);
+    }
+    return val;
+}, zod.date());
 
 const _zodFile = (acceptedMimetypes: string[] | null, maxSize: number) => {
     acceptedMimetypes = acceptedMimetypes || [MimeType.JPEG, MimeType.PNG];
