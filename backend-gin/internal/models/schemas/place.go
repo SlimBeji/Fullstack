@@ -12,7 +12,7 @@ import (
 
 // --- Selectables, Serchables, Sortables ----
 
-type PlaceSelectables string // with snake casing
+type PlaceSelectables string
 
 const (
 	PlaceSelectId          PlaceSelectables = "id"
@@ -35,16 +35,16 @@ func (field PlaceSelectables) Validate() bool {
 	}
 }
 
-type PlaceSearchables string // with camel casing
+type PlaceSearchables string
 
 const (
 	PlaceSearchId          PlaceSearchables = "id"
 	PlaceSearchTitle       PlaceSearchables = "title"
 	PlaceSearchDescription PlaceSearchables = "description"
 	PlaceSearchAddress     PlaceSearchables = "address"
-	PlaceSearchCreatorId   PlaceSearchables = "creatorId"
-	PlaceSearchLocationLat PlaceSearchables = "locationLat"
-	PlaceSearchLocationLng PlaceSearchables = "locationLng"
+	PlaceSearchCreatorId   PlaceSearchables = "creator_id"
+	PlaceSearchLocationLat PlaceSearchables = "location_lat"
+	PlaceSearchLocationLng PlaceSearchables = "location_lng"
 )
 
 func (field PlaceSearchables) Validate() bool {
@@ -57,11 +57,11 @@ func (field PlaceSearchables) Validate() bool {
 	}
 }
 
-type PlaceSortables string // with camel casing
+type PlaceSortables string
 
 const (
-	PlaceSortCreatedAtAsc    PlaceSortables = "createdAt"
-	PlaceSortCreatedAtDesc   PlaceSortables = "-createdAt"
+	PlaceSortCreatedAtAsc    PlaceSortables = "created_at"
+	PlaceSortCreatedAtDesc   PlaceSortables = "-created_at"
 	PlaceSortTitleAsc        PlaceSortables = "title"
 	PlaceSortTitleDesc       PlaceSortables = "-title"
 	PlaceSortDescriptionAsc  PlaceSortables = "description"
@@ -116,8 +116,8 @@ type PlaceCreate struct {
 	Address     string    `json:"address" validate:"min=1" `
 	Location    Location  `json:"location" `
 	Embedding   []float32 `json:"embedding" validate:"len=0|len=384" `
-	ImageURL    string    `json:"imageUrl" validate:"omitempty" `
-	CreatorID   uint      `json:"creatorId" `
+	ImageURL    string    `json:"image_url" validate:"omitempty" `
+	CreatorID   uint      `json:"creator_id" `
 }
 
 type PlacePost struct {
@@ -127,24 +127,24 @@ type PlacePost struct {
 	Lat         types_.FlexFloat      `json:"lat" form:"lat" validate:"required" example:"51.48180425016331" `                                       // The latitude of the place
 	Lng         types_.FlexFloat      `json:"lng" form:"lng" validate:"required" example:"-0.19090418688755467" `                                    // The longitude of the place
 	Image       *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                                          // Place Image (JPEG)
-	CreatorID   uint                  `json:"creatorId" form:"creatorId" validate:"required" example:"123456789" `                                   // The ID of the place creator
+	CreatorID   uint                  `json:"creator_id" form:"creator_id" validate:"required" example:"123456789" `                                 // The ID of the place creator
 }
 
 // --- Read Schemas ---
 
 type PlaceRead struct {
-	ID          uint      `json:"id" example:"123456789" `                                                                   // The ID of the place
-	Title       string    `json:"title" validate:"min=10" example:"Stamford Bridge" `                                        // The place title/name, 10 characters minimum
-	Description string    `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" `                 // The place description, 10 characters minimum
-	Address     string    `json:"address" validate:"min=1" example:"Fulham road" `                                           // The place address
-	Location    Location  `json:"location" `                                                                                 // Location object (can be sent as JSON string)
-	ImageURL    string    `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // image url
-	CreatorID   uint      `json:"creatorId" example:"123456789" `                                                            // The ID of the place creator
-	CreatedAt   time.Time `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
+	ID          uint      `json:"id" example:"123456789" `                                                                    // The ID of the place
+	Title       string    `json:"title" validate:"min=10" example:"Stamford Bridge" `                                         // The place title/name, 10 characters minimum
+	Description string    `json:"description" validate:"min=10" example:"Stadium of Chelsea football club" `                  // The place description, 10 characters minimum
+	Address     string    `json:"address" validate:"min=1" example:"Fulham road" `                                            // The place address
+	Location    Location  `json:"location" `                                                                                  // Location object (can be sent as JSON string)
+	ImageURL    string    `json:"image_url" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // image url
+	CreatorID   uint      `json:"creator_id" example:"123456789" `                                                            // The ID of the place creator
+	CreatedAt   time.Time `json:"created_at" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
 }
 
 type PlaceGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id title description address location imageUrl creatorId createdAt" enums:"id,title,description,address,location,imageUrl,creatorId,createdAt" example:"id,title"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneof=id title description address location image_url creator_id created_at" enums:"id,title,description,address,location,image_url,creator_id,created_at" example:"id,title"` // Fields to include in the response; omit for full document
 }
 
 func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {
@@ -174,17 +174,18 @@ type PlacePut struct {
 type PlacesPaginated = types_.PaginatedData[PlaceRead]
 
 type PlaceSearch struct {
-	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                                                                               // The page number
-	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                                                                     // Items per page
-	Sort        []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt title -title description -description address -address" enums:"createdAt,-createdAt,title,-title,description,-description,address,-address" example:"-createdAt"` // Fields to use for sorting. Use the '-' for descending sorting
-	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location imageUrl creatorId createdAt" enums:"id,title,description,address,location,imageUrl,creatorId,createdAt"  example:"id,location"`               // Fields to include in the response; omit for full document
-	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                                                                       // The ID of the place
-	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                                                                                             // The place title/name, 10 characters minimum
-	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                                                                                                 // The place description, 10 characters minimum
-	Address     types_.FlexStrList `json:"address" form:"address" example:"ilike:boulevard" collectionFormat:"multi"`                                                                                                                                       // The place address
-	CreatorId   types_.FlexStrList `json:"creatorId" form:"creatorId" example:"in:123456789" collectionFormat:"multi"`                                                                                                                                      // The ID of the place creator
-	LocationLat types_.FlexStrList `json:"locationLat" form:"locationLat" example:"gt:3.5" collectionFormat:"multi"`                                                                                                                                        // The latitude of the place
-	LocationLng types_.FlexStrList `json:"locationLng" form:"locationLng" example:"lt:4.5" collectionFormat:"multi"`                                                                                                                                        // The longitude of the place
+	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                                                                                    // The page number
+	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                                                                          // Items per page
+	Sort        []string           `json:"sort" validate:"dive,oneof=created_at -created_at title -title description -description address -address" enums:"created_at,-created_at,title,-title,description,-description,address,-address" example:"-created_at"` // Fields to use for sorting. Use the '-' for descending sorting
+	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location image_url creator_id created_at" enums:"id,title,description,address,location,image_url,creator_id,created_at"  example:"id,location"`              // Fields to include in the response; omit for full document
+	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                                                                            // The ID of the place
+	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                                                                                                  // The place title/name, 10 characters minimum
+	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                                                                                                      // The place description, 10 characters minimum
+	Address     types_.FlexStrList `json:"address" form:"address" example:"ilike:boulevard" collectionFormat:"multi"`                                                                                                                                            // The place address
+	CreatorId   types_.FlexStrList `json:"creator_id" form:"creator_id" example:"in:123456789" collectionFormat:"multi"`                                                                                                                                         // The ID of the place creator
+	LocationLat types_.FlexStrList `json:"location_lat" form:"location_lat" example:"gt:3.5" collectionFormat:"multi"`                                                                                                                                           // The latitude of the place
+	LocationLng types_.FlexStrList `json:"location_lng" form:"location_lng" example:"lt:4.5" collectionFormat:"multi"`                                                                                                                                           // The longitude of the place
+	CreatedAt   types_.FlexStrList `json:"created_at" form:"created_at" example:"gt:2025-09-28" collectionFormat:"multi"`                                                                                                                                        // creation datetime
 }
 
 func (ps PlaceSearch) ToSearchQuery() (types_.SearchQuery, error) {
@@ -210,13 +211,16 @@ func (ps PlaceSearch) ToSearchQuery() (types_.SearchQuery, error) {
 	addErrors("address", errs)
 
 	creatorFilters, errs := validator_.ToIndexFilters(ps.CreatorId)
-	addErrors("creatorId", errs)
+	addErrors("creator_id", errs)
 
 	latFilters, errs := validator_.ToFloat64Filters(ps.LocationLat, "")
-	addErrors("locationLat", errs)
+	addErrors("location_lat", errs)
 
 	lngFilters, errs := validator_.ToFloat64Filters(ps.LocationLng, "")
-	addErrors("locationLng", errs)
+	addErrors("location_lng", errs)
+
+	createdAtFilters, errs := validator_.ToTimeFilters(ps.CreatedAt, "")
+	addErrors("created_at", errs)
 
 	if len(errorsMap) > 0 {
 		err := types_.MapToValidationErrs("invalid places filters", errorsMap)
@@ -229,13 +233,14 @@ func (ps PlaceSearch) ToSearchQuery() (types_.SearchQuery, error) {
 		OrderBy: ps.Sort,
 		Select:  ps.Fields,
 		Where: types_.WhereFilters{
-			"id":          idFilters,
-			"title":       titleFilters,
-			"description": descriptionFilters,
-			"address":     addressFilters,
-			"creatorId":   creatorFilters,
-			"locationLat": latFilters,
-			"locationLng": lngFilters,
+			"id":           idFilters,
+			"title":        titleFilters,
+			"description":  descriptionFilters,
+			"address":      addressFilters,
+			"creator_id":   creatorFilters,
+			"location_lat": latFilters,
+			"location_lng": lngFilters,
+			"created_at":   createdAtFilters,
 		},
 	}, nil
 }

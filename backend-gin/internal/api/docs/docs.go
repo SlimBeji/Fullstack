@@ -223,10 +223,23 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
+                            "gt:2025-09-28"
+                        ],
+                        "description": "creation datetime",
+                        "name": "created_at",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
                             "in:123456789"
                         ],
                         "description": "The ID of the place creator",
-                        "name": "creatorId",
+                        "name": "creator_id",
                         "in": "query"
                     },
                     {
@@ -251,9 +264,9 @@ const docTemplate = `{
                                 "description",
                                 "address",
                                 "location",
-                                "imageUrl",
-                                "creatorId",
-                                "createdAt"
+                                "image_url",
+                                "creator_id",
+                                "created_at"
                             ],
                             "type": "string"
                         },
@@ -289,7 +302,7 @@ const docTemplate = `{
                             "gt:3.5"
                         ],
                         "description": "The latitude of the place",
-                        "name": "locationLat",
+                        "name": "location_lat",
                         "in": "query"
                     },
                     {
@@ -302,7 +315,7 @@ const docTemplate = `{
                             "lt:4.5"
                         ],
                         "description": "The longitude of the place",
-                        "name": "locationLng",
+                        "name": "location_lng",
                         "in": "query"
                     },
                     {
@@ -326,8 +339,8 @@ const docTemplate = `{
                         "type": "array",
                         "items": {
                             "enum": [
-                                "createdAt",
-                                "-createdAt",
+                                "created_at",
+                                "-created_at",
                                 "title",
                                 "-title",
                                 "description",
@@ -339,7 +352,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "csv",
                         "example": [
-                            "-createdAt"
+                            "-created_at"
                         ],
                         "description": "Fields to use for sorting. Use the '-' for descending sorting",
                         "name": "sort",
@@ -400,7 +413,7 @@ const docTemplate = `{
                         "type": "integer",
                         "example": 123456789,
                         "description": "The ID of the place creator",
-                        "name": "creatorId",
+                        "name": "creator_id",
                         "in": "formData",
                         "required": true
                     },
@@ -531,9 +544,9 @@ const docTemplate = `{
                                 "description",
                                 "address",
                                 "location",
-                                "imageUrl",
-                                "creatorId",
-                                "createdAt"
+                                "image_url",
+                                "creator_id",
+                                "created_at"
                             ],
                             "type": "string"
                         },
@@ -665,6 +678,19 @@ const docTemplate = `{
                         },
                         "collectionFormat": "multi",
                         "example": [
+                            "gt:2025-09-28"
+                        ],
+                        "description": "creation datetime",
+                        "name": "created_at",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": [
                             "eq:mslimbeji@gmail.com"
                         ],
                         "description": "The user email",
@@ -678,10 +704,10 @@ const docTemplate = `{
                                 "id",
                                 "name",
                                 "email",
-                                "isAdmin",
-                                "imageUrl",
+                                "is_admin",
+                                "image_url",
                                 "places",
-                                "createdAt"
+                                "created_at"
                             ],
                             "type": "string"
                         },
@@ -741,8 +767,8 @@ const docTemplate = `{
                         "type": "array",
                         "items": {
                             "enum": [
-                                "createdAt",
-                                "-createdAt",
+                                "created_at",
+                                "-created_at",
                                 "name",
                                 "-name",
                                 "email",
@@ -752,7 +778,7 @@ const docTemplate = `{
                         },
                         "collectionFormat": "csv",
                         "example": [
-                            "-createdAt"
+                            "-created_at"
                         ],
                         "description": "Fields to use for sorting. Use the '-' for descending sorting",
                         "name": "sort",
@@ -800,7 +826,7 @@ const docTemplate = `{
                         "default": false,
                         "example": false,
                         "description": "Whether the user is an admin or not",
-                        "name": "isAdmin",
+                        "name": "is_admin",
                         "in": "formData"
                     },
                     {
@@ -912,10 +938,10 @@ const docTemplate = `{
                                 "id",
                                 "name",
                                 "email",
-                                "isAdmin",
-                                "imageUrl",
+                                "is_admin",
+                                "image_url",
                                 "places",
-                                "createdAt"
+                                "created_at"
                             ],
                             "type": "string"
                         },
@@ -1093,7 +1119,7 @@ const docTemplate = `{
                     ],
                     "example": "bearer"
                 },
-                "userId": {
+                "user_id": {
                     "description": "The user ID, 24 characters",
                     "type": "integer",
                     "example": 123456789
@@ -1170,12 +1196,12 @@ const docTemplate = `{
                     "minLength": 1,
                     "example": "Fulham road"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "creation datetime                                            // last update datetime",
                     "type": "string",
                     "example": "2024-01-12T10:15:30.000Z"
                 },
-                "creatorId": {
+                "creator_id": {
                     "description": "The ID of the place creator",
                     "type": "integer",
                     "example": 123456789
@@ -1191,8 +1217,8 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 123456789
                 },
-                "imageUrl": {
-                    "description": "local url on the storage",
+                "image_url": {
+                    "description": "image url",
                     "type": "string",
                     "example": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
                 },
@@ -1225,7 +1251,17 @@ const docTemplate = `{
                         "ilike:boulevard"
                     ]
                 },
-                "creatorId": {
+                "created_at": {
+                    "description": "creation datetime",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "gt:2025-09-28"
+                    ]
+                },
+                "creator_id": {
                     "description": "The ID of the place creator",
                     "type": "array",
                     "items": {
@@ -1256,9 +1292,9 @@ const docTemplate = `{
                             "description",
                             "address",
                             "location",
-                            "imageUrl",
-                            "creatorId",
-                            "createdAt"
+                            "image_url",
+                            "creator_id",
+                            "created_at"
                         ]
                     },
                     "example": [
@@ -1276,7 +1312,7 @@ const docTemplate = `{
                         "123456789"
                     ]
                 },
-                "locationLat": {
+                "location_lat": {
                     "description": "The latitude of the place",
                     "type": "array",
                     "items": {
@@ -1286,7 +1322,7 @@ const docTemplate = `{
                         "gt:3.5"
                     ]
                 },
-                "locationLng": {
+                "location_lng": {
                     "description": "The longitude of the place",
                     "type": "array",
                     "items": {
@@ -1315,8 +1351,8 @@ const docTemplate = `{
                     "items": {
                         "type": "string",
                         "enum": [
-                            "createdAt",
-                            "-createdAt",
+                            "created_at",
+                            "-created_at",
                             "title",
                             "-title",
                             "description",
@@ -1326,7 +1362,7 @@ const docTemplate = `{
                         ]
                     },
                     "example": [
-                        "-createdAt"
+                        "-created_at"
                     ]
                 },
                 "title": {
@@ -1411,7 +1447,7 @@ const docTemplate = `{
         "schemas.UserRead": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "description": "creation datetime                                            // last update datetime",
                     "type": "string",
                     "example": "2024-01-12T10:15:30.000Z"
@@ -1426,12 +1462,12 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 12345678
                 },
-                "imageUrl": {
-                    "description": "local url on the storage",
+                "image_url": {
+                    "description": "image url",
                     "type": "string",
                     "example": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
                 },
-                "isAdmin": {
+                "is_admin": {
                     "description": "Whether the user is an admin or not",
                     "type": "boolean",
                     "example": false
@@ -1454,6 +1490,16 @@ const docTemplate = `{
         "schemas.UserSearch": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "description": "creation datetime",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "gt:2025-09-28"
+                    ]
+                },
                 "email": {
                     "description": "The user email",
                     "type": "array",
@@ -1473,10 +1519,10 @@ const docTemplate = `{
                             "id",
                             "name",
                             "email",
-                            "isAdmin",
-                            "imageUrl",
+                            "is_admin",
+                            "image_url",
                             "places",
-                            "createdAt"
+                            "created_at"
                         ]
                     },
                     "example": [
@@ -1523,8 +1569,8 @@ const docTemplate = `{
                     "items": {
                         "type": "string",
                         "enum": [
-                            "createdAt",
-                            "-createdAt",
+                            "created_at",
+                            "-created_at",
                             "name",
                             "-name",
                             "email",
@@ -1532,7 +1578,7 @@ const docTemplate = `{
                         ]
                     },
                     "example": [
-                        "-createdAt"
+                        "-created_at"
                     ]
                 }
             }

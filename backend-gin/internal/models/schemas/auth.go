@@ -9,7 +9,7 @@ import (
 )
 
 type TokenPayload struct {
-	UserId uint   `json:"userId"`
+	UserId uint   `json:"user_id"`
 	Email  string `json:"email" validate:"email"`
 }
 
@@ -23,14 +23,14 @@ func DecodeEncodedToken(encoded string) (TokenPayload, error) {
 		)
 	}
 
-	userIdRaw, found := decoded["userId"]
+	userIdRaw, found := decoded["user_id"]
 	if !found {
-		return zero, fmt.Errorf("token %s not valid, no userId found", encoded)
+		return zero, fmt.Errorf("token %s not valid, no user_id found", encoded)
 	}
 	userId, ok := userIdRaw.(uint)
 	if !ok {
 		return zero, fmt.Errorf(
-			"token %s not valid, userId %s not valid", encoded, userIdRaw,
+			"token %s not valid, user_id %s not valid", encoded, userIdRaw,
 		)
 	}
 
@@ -65,13 +65,13 @@ type SigninForm struct {
 type EncodedToken struct {
 	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"` // A generated web token. The 'Bearer ' prefix needs to be added for authentication
 	TokenType   string `json:"token_type" validate:"oneof=bearer" example:"bearer"`                                                                                                                                                                                            // The type of token. Only 'bearer' is supported.
-	UserId      uint   `json:"userId" example:"123456789"`                                                                                                                                                                                                                     // The user ID, 24 characters
+	UserId      uint   `json:"user_id" example:"123456789"`                                                                                                                                                                                                                    // The user ID, 24 characters
 	Email       string `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                                                                                                                                                                           // The user email
 	ExpiresIn   int    `json:"expires_in" validate:"gt=0" example:"1751879562"`                                                                                                                                                                                                // The UNIX timestamp the token expires at
 }
 
 func CreateToken(id uint, email string) (EncodedToken, error) {
-	payload := map[string]any{"userId": id, "email": email}
+	payload := map[string]any{"user_id": id, "email": email}
 	acccessToken, err := utils.EncodePayload(
 		payload, config.Env.SecretKey, time.Duration(config.Env.JWTExpiration)*time.Second,
 	)

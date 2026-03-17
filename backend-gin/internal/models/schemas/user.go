@@ -12,7 +12,7 @@ import (
 
 // --- Selectables, Serchables, Sortables ----
 
-type UserSelectables string // with snake casing
+type UserSelectables string
 
 const (
 	UserSelectId        UserSelectables = "id"
@@ -34,7 +34,7 @@ func (field UserSelectables) Validate() bool {
 	}
 }
 
-type UserSearchables string // with camel casing
+type UserSearchables string
 
 const (
 	UserSearchId    UserSearchables = "id"
@@ -51,11 +51,11 @@ func (field UserSearchables) Validate() bool {
 	}
 }
 
-type UserSortables string // with camel casing
+type UserSortables string
 
 const (
-	UserSortCreatedAtAsc  UserSortables = "createdAt"
-	UserSortCreatedAtDesc UserSortables = "-createdAt"
+	UserSortCreatedAtAsc  UserSortables = "created_at"
+	UserSortCreatedAtDesc UserSortables = "-created_at"
 	UserSortNameAsc       UserSortables = "name"
 	UserSortNameDesc      UserSortables = "-name"
 	UserSortEmailAsc      UserSortables = "email"
@@ -97,33 +97,33 @@ type UserSeed struct {
 type UserCreate struct {
 	Name     string `json:"name" validate:"min=2"`
 	Email    string `json:"email" validate:"email"`
-	IsAdmin  bool   `json:"isAdmin" `
+	IsAdmin  bool   `json:"is_admin" `
 	Password string `json:"password" validate:"min=8"`
-	ImageURL string `json:"imageUrl" validate:"omitempty"`
+	ImageURL string `json:"image_url" validate:"omitempty"`
 }
 
 type UserPost struct {
-	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji"`               // The user name, two characters at least
-	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com"`   // The user email
-	IsAdmin  types_.FlexBool       `json:"isAdmin" form:"isAdmin" example:"false" default:"false" swaggertype:"boolean"` // Whether the user is an admin or not
-	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`     // The user password, 8 characters at least
-	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                 // User's profile image (JPEG)
+	Name     string                `json:"name" form:"name" validate:"required,min=2" example:"Slim Beji"`                 // The user name, two characters at least
+	Email    string                `json:"email" form:"email" validate:"required,email" example:"mslimbeji@gmail.com"`     // The user email
+	IsAdmin  types_.FlexBool       `json:"is_admin" form:"is_admin" example:"false" default:"false" swaggertype:"boolean"` // Whether the user is an admin or not
+	Password string                `json:"password" form:"password" validate:"required,min=8" example:"very_secret"`       // The user password, 8 characters at least
+	Image    *multipart.FileHeader `json:"image" form:"image" validate:"omitempty" swaggerignore:"true"`                   // User's profile image (JPEG)
 }
 
 // --- Read Schemas ---
 
 type UserRead struct {
-	ID        uint        `json:"id" example:"12345678"`                                                                     // The user ID
-	Name      string      `json:"name" validate:"min=2" example:"Slim Beji"`                                                 // The user name, two characters at least
-	Email     string      `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                      // The user email
-	IsAdmin   bool        `json:"isAdmin" example:"false" `                                                                  // Whether the user is an admin or not
-	ImageURL  string      `json:"imageUrl" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // image url
-	Places    []UserPlace `json:"places"`                                                                                    // Places created by the user
-	CreatedAt time.Time   `json:"createdAt" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
+	ID        uint        `json:"id" example:"12345678"`                                                                      // The user ID
+	Name      string      `json:"name" validate:"min=2" example:"Slim Beji"`                                                  // The user name, two characters at least
+	Email     string      `json:"email" validate:"email" example:"mslimbeji@gmail.com"`                                       // The user email
+	IsAdmin   bool        `json:"is_admin" example:"false" `                                                                  // Whether the user is an admin or not
+	ImageURL  string      `json:"image_url" validate:"omitempty" example:"avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg" ` // image url
+	Places    []UserPlace `json:"places"`                                                                                     // Places created by the user
+	CreatedAt time.Time   `json:"created_at" example:"2024-01-12T10:15:30.000Z"`                                              // creation datetime                                            // last update datetime
 }
 
 type UserGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,name"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneof=id name email is_admin image_url places created_at" enums:"id,name,email,is_admin,image_url,places,created_at" example:"id,name"` // Fields to include in the response; omit for full document
 }
 
 func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
@@ -152,13 +152,14 @@ type UserPut struct {
 type UsersPaginated = types_.PaginatedData[PlaceRead]
 
 type UserSearch struct {
-	Page   int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                        // The page number
-	Size   int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                              // Items per page
-	Sort   []string           `json:"sort" validate:"dive,oneof=createdAt -createdAt name -name email -email" enums:"createdAt,-createdAt,name,-name,email,-email" example:"-createdAt"`        // Fields to use for sorting. Use the '-' for descending sorting
-	Fields []string           `json:"fields" validate:"dive,oneof=id name email isAdmin imageUrl places createdAt" enums:"id,name,email,isAdmin,imageUrl,places,createdAt" example:"id,places"` // Fields to include in the response; omit for full document
-	Id     types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                // The user ID
-	Name   types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                                                                                         // The user name, two characters at least
-	Email  types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                                                                             // The user email
+	Page      int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                              // The page number
+	Size      int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                    // Items per page
+	Sort      []string           `json:"sort" validate:"dive,oneof=created_at -created_at name -name email -email" enums:"created_at,-created_at,name,-name,email,-email" example:"-created_at"`         // Fields to use for sorting. Use the '-' for descending sorting
+	Fields    []string           `json:"fields" validate:"dive,oneof=id name email is_admin image_url places created_at" enums:"id,name,email,is_admin,image_url,places,created_at" example:"id,places"` // Fields to include in the response; omit for full document
+	Id        types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                      // The user ID
+	Name      types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                                                                                               // The user name, two characters at least
+	Email     types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                                                                                   // The user email
+	CreatedAt types_.FlexStrList `json:"created_at" form:"created_at" example:"gt:2025-09-28" collectionFormat:"multi"`                                                                                  // creation datetime
 }
 
 func (us UserSearch) ToSearchQuery() (types_.SearchQuery, error) {
@@ -180,6 +181,9 @@ func (us UserSearch) ToSearchQuery() (types_.SearchQuery, error) {
 	emailFilters, errs := validator_.ToStringFilters(us.Email, "email")
 	addErrors("email", errs)
 
+	createdAtFilters, errs := validator_.ToTimeFilters(us.CreatedAt, "")
+	addErrors("created_at", errs)
+
 	if len(errorsMap) > 0 {
 		err := types_.MapToValidationErrs("invalid users filters", errorsMap)
 		return types_.SearchQuery{}, err
@@ -191,9 +195,10 @@ func (us UserSearch) ToSearchQuery() (types_.SearchQuery, error) {
 		OrderBy: us.Sort,
 		Select:  us.Fields,
 		Where: types_.WhereFilters{
-			"id":    idFilters,
-			"name":  nameFilters,
-			"email": emailFilters,
+			"id":         idFilters,
+			"name":       nameFilters,
+			"email":      emailFilters,
+			"created_at": createdAtFilters,
 		},
 	}, nil
 }

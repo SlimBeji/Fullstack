@@ -50,7 +50,7 @@ definitions:
         - bearer
         example: bearer
         type: string
-      userId:
+      user_id:
         description: The user ID, 24 characters
         example: 123456789
         type: integer
@@ -106,12 +106,12 @@ definitions:
         example: Fulham road
         minLength: 1
         type: string
-      createdAt:
+      created_at:
         description: creation datetime                                            //
           last update datetime
         example: "2024-01-12T10:15:30.000Z"
         type: string
-      creatorId:
+      creator_id:
         description: The ID of the place creator
         example: 123456789
         type: integer
@@ -124,8 +124,8 @@ definitions:
         description: The ID of the place
         example: 123456789
         type: integer
-      imageUrl:
-        description: local url on the storage
+      image_url:
+        description: image url
         example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
         type: string
       location:
@@ -147,7 +147,14 @@ definitions:
         items:
           type: string
         type: array
-      creatorId:
+      created_at:
+        description: creation datetime
+        example:
+        - gt:2025-09-28
+        items:
+          type: string
+        type: array
+      creator_id:
         description: The ID of the place creator
         example:
         - in:123456789
@@ -173,9 +180,9 @@ definitions:
           - description
           - address
           - location
-          - imageUrl
-          - creatorId
-          - createdAt
+          - image_url
+          - creator_id
+          - created_at
           type: string
         type: array
       id:
@@ -185,14 +192,14 @@ definitions:
         items:
           type: string
         type: array
-      locationLat:
+      location_lat:
         description: The latitude of the place
         example:
         - gt:3.5
         items:
           type: string
         type: array
-      locationLng:
+      location_lng:
         description: The longitude of the place
         example:
         - lt:4.5
@@ -213,11 +220,11 @@ definitions:
       sort:
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - -createdAt
+        - -created_at
         items:
           enum:
-          - createdAt
-          - -createdAt
+          - created_at
+          - -created_at
           - title
           - -title
           - description
@@ -286,7 +293,7 @@ definitions:
     type: object
   schemas.UserRead:
     properties:
-      createdAt:
+      created_at:
         description: creation datetime                                            //
           last update datetime
         example: "2024-01-12T10:15:30.000Z"
@@ -299,11 +306,11 @@ definitions:
         description: The user ID
         example: 12345678
         type: integer
-      imageUrl:
-        description: local url on the storage
+      image_url:
+        description: image url
         example: avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg
         type: string
-      isAdmin:
+      is_admin:
         description: Whether the user is an admin or not
         example: false
         type: boolean
@@ -320,6 +327,13 @@ definitions:
     type: object
   schemas.UserSearch:
     properties:
+      created_at:
+        description: creation datetime
+        example:
+        - gt:2025-09-28
+        items:
+          type: string
+        type: array
       email:
         description: The user email
         example:
@@ -337,10 +351,10 @@ definitions:
           - id
           - name
           - email
-          - isAdmin
-          - imageUrl
+          - is_admin
+          - image_url
           - places
-          - createdAt
+          - created_at
           type: string
         type: array
       id:
@@ -371,11 +385,11 @@ definitions:
       sort:
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - -createdAt
+        - -created_at
         items:
           enum:
-          - createdAt
-          - -createdAt
+          - created_at
+          - -created_at
           - name
           - -name
           - email
@@ -526,13 +540,22 @@ paths:
         name: address
         type: array
       - collectionFormat: multi
+        description: creation datetime
+        example:
+        - gt:2025-09-28
+        in: query
+        items:
+          type: string
+        name: created_at
+        type: array
+      - collectionFormat: multi
         description: The ID of the place creator
         example:
         - in:123456789
         in: query
         items:
           type: string
-        name: creatorId
+        name: creator_id
         type: array
       - collectionFormat: multi
         description: The place description, 10 characters minimum
@@ -556,9 +579,9 @@ paths:
           - description
           - address
           - location
-          - imageUrl
-          - creatorId
-          - createdAt
+          - image_url
+          - creator_id
+          - created_at
           type: string
         name: fields
         type: array
@@ -578,7 +601,7 @@ paths:
         in: query
         items:
           type: string
-        name: locationLat
+        name: location_lat
         type: array
       - collectionFormat: multi
         description: The longitude of the place
@@ -587,7 +610,7 @@ paths:
         in: query
         items:
           type: string
-        name: locationLng
+        name: location_lng
         type: array
       - default: 1
         description: The page number
@@ -605,12 +628,12 @@ paths:
       - collectionFormat: csv
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - -createdAt
+        - -created_at
         in: query
         items:
           enum:
-          - createdAt
-          - -createdAt
+          - created_at
+          - -created_at
           - title
           - -title
           - description
@@ -656,7 +679,7 @@ paths:
       - description: The ID of the place creator
         example: 123456789
         in: formData
-        name: creatorId
+        name: creator_id
         required: true
         type: integer
       - description: The place description, 10 characters minimum
@@ -747,9 +770,9 @@ paths:
           - description
           - address
           - location
-          - imageUrl
-          - creatorId
-          - createdAt
+          - image_url
+          - creator_id
+          - created_at
           type: string
         name: fields
         type: array
@@ -824,6 +847,15 @@ paths:
       - application/json
       parameters:
       - collectionFormat: multi
+        description: creation datetime
+        example:
+        - gt:2025-09-28
+        in: query
+        items:
+          type: string
+        name: created_at
+        type: array
+      - collectionFormat: multi
         description: The user email
         example:
         - eq:mslimbeji@gmail.com
@@ -843,10 +875,10 @@ paths:
           - id
           - name
           - email
-          - isAdmin
-          - imageUrl
+          - is_admin
+          - image_url
           - places
-          - createdAt
+          - created_at
           type: string
         name: fields
         type: array
@@ -884,12 +916,12 @@ paths:
       - collectionFormat: csv
         description: Fields to use for sorting. Use the '-' for descending sorting
         example:
-        - -createdAt
+        - -created_at
         in: query
         items:
           enum:
-          - createdAt
-          - -createdAt
+          - created_at
+          - -created_at
           - name
           - -name
           - email
@@ -924,7 +956,7 @@ paths:
         description: Whether the user is an admin or not
         example: false
         in: formData
-        name: isAdmin
+        name: is_admin
         type: boolean
       - description: The user name, two characters at least
         example: Slim Beji
@@ -1000,10 +1032,10 @@ paths:
           - id
           - name
           - email
-          - isAdmin
-          - imageUrl
+          - is_admin
+          - image_url
           - places
-          - createdAt
+          - created_at
           type: string
         name: fields
         type: array
