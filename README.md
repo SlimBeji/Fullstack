@@ -632,6 +632,5 @@ It helps separate focus areas from the rest of the UI.
 
 ## 🚀 Next Steps
 
-- Use snake casing in JSON responses for **Node/Express** (ongoing)
 - Add the **Rust/Axum** backend (ongoing)
 - Add an **Angular** SPA frontend
