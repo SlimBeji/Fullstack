@@ -15,3 +15,10 @@ const (
 	ModelUser  Model = "User"
 	ModelPlace Model = "Place"
 )
+
+type Relation string
+
+const (
+	RelationUser  Relation = "Users"
+	RelationPlace Relation = "Places"
+)

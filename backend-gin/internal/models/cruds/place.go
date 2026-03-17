@@ -5,7 +5,6 @@ import (
 	"backend/internal/config"
 	"backend/internal/lib/gorm_"
 	"backend/internal/lib/types_"
-	"backend/internal/lib/utils"
 	"backend/internal/models/orm"
 	"backend/internal/models/schemas"
 	"backend/internal/services/instances"
@@ -125,21 +124,21 @@ func (cp *CRUDSPlace) ToJSON(
 	for _, field := range fields {
 		switch field {
 		case string(schemas.PlaceSelectId):
-			result["id"] = model.ID
+			result[string(schemas.PlaceSelectId)] = model.ID
 		case string(schemas.PlaceSelectTitle):
-			result["title"] = model.Title
+			result[string(schemas.PlaceSelectTitle)] = model.Title
 		case string(schemas.PlaceSelectDescription):
-			result["description"] = model.Description
+			result[string(schemas.PlaceSelectDescription)] = model.Description
 		case string(schemas.PlaceSelectAddress):
-			result["address"] = model.Address
+			result[string(schemas.PlaceSelectAddress)] = model.Address
 		case string(schemas.PlaceSelectLocation):
-			result["location"] = model.Location
+			result[string(schemas.PlaceSelectLocation)] = model.Location
 		case string(schemas.PlaceSelectImageURL):
-			result["imageUrl"] = model.ImageURL
+			result[string(schemas.PlaceSelectImageURL)] = model.ImageURL
 		case string(schemas.PlaceSelectCreatorId):
-			result["creatorId"] = model.CreatorID
+			result[string(schemas.PlaceSelectCreatorId)] = model.CreatorID
 		case string(schemas.PlaceSelectCreatedAt):
-			result["createdAt"] = model.CreatedAt
+			result[string(schemas.PlaceSelectCreatedAt)] = model.CreatedAt
 		default:
 			return result, fmt.Errorf("unknow field %s in place schema", field)
 		}
@@ -167,7 +166,7 @@ func (cp *CRUDSPlace) PostProcess(
 func (cp *CRUDSPlace) PostProcessPartial(
 	ctx context.Context, partial map[string]any,
 ) error {
-	imageURL, exists := partial["imageUrl"]
+	imageURL, exists := partial[string(schemas.PlaceSelectImageURL)]
 	if !exists {
 		return nil
 	}
@@ -178,18 +177,18 @@ func (cp *CRUDSPlace) PostProcessPartial(
 		return err
 	}
 
-	partial["imageUrl"] = signedURL
+	partial[string(schemas.PlaceSelectImageURL)] = signedURL
 	return nil
 }
 
 // Query Building
 
 func (cp *CRUDSPlace) MapSelect(field string) []gorm_.SelectField {
-	return []gorm_.SelectField{{Field: utils.CamelToSnake(field)}}
+	return []gorm_.SelectField{{Field: field}}
 }
 
 func (cp *CRUDSPlace) MapOrderBy(field string) string {
-	return utils.CamelToSnake(field)
+	return field
 }
 
 func (cp *CRUDSPlace) MapWhere(field string) string {
@@ -199,7 +198,7 @@ func (cp *CRUDSPlace) MapWhere(field string) string {
 	case string(schemas.PlaceSearchLocationLng):
 		return "(location->>'lng')::float"
 	default:
-		return utils.CamelToSnake(field)
+		return field
 	}
 }
 
@@ -273,7 +272,7 @@ func (cp *CRUDSPlace) AuthPost(
 			return err
 		}
 		if !exists {
-			message := fmt.Sprintf("Cannot set creatorId to %d, No user with id %d found in the database", data.CreatorID, data.CreatorID)
+			message := fmt.Sprintf("Cannot set creator_id to %d, No user with id %d found in the database", data.CreatorID, data.CreatorID)
 			return types_.APIError{
 				Code:    http.StatusNotFound,
 				Message: "User not found",
@@ -344,7 +343,7 @@ func (cp *CRUDSPlace) AuthGet(
 	if query.Where == nil {
 		query.Where = make(types_.WhereFilters)
 	}
-	query.Where["creatorId"] = types_.EqFilters(user.ID)
+	query.Where[string(schemas.PlaceSearchCreatorId)] = types_.EqFilters(user.ID)
 	return query
 }
 
@@ -462,16 +461,16 @@ func (cp *CRUDSPlace) PutToUpdate(
 	updates := schemas.PlaceUpdate{}
 
 	if form.Title != nil {
-		updates["title"] = *form.Title
+		updates[string(schemas.PlaceSelectTitle)] = *form.Title
 	}
 	if form.Description != nil {
-		updates["description"] = *form.Description
+		updates[string(schemas.PlaceSelectDescription)] = *form.Description
 	}
 	if form.Address != nil {
-		updates["address"] = *form.Address
+		updates[string(schemas.PlaceSelectAddress)] = *form.Address
 	}
 	if form.Location != nil {
-		updates["location"] = schemas.Location{
+		updates[string(schemas.PlaceSelectLocation)] = schemas.Location{
 			Lat: float64(form.Location.Lat),
 			Lng: float64(form.Location.Lng),
 		}
@@ -488,7 +487,8 @@ func (cp *CRUDSPlace) AuthPut(
 	}
 
 	exists, err := gorm_.Exists(ctx, cp, types_.WhereFilters{
-		"id": types_.EqFilters(id), "creatorId": types_.EqFilters(user.ID),
+		string(schemas.PlaceSearchId):        types_.EqFilters(id),
+		string(schemas.PlaceSearchCreatorId): types_.EqFilters(user.ID),
 	})
 	if err != nil {
 		return err
@@ -602,8 +602,8 @@ func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
 			Code:    http.StatusConflict,
 			Message: "embedding failed",
 			Details: map[string]any{
-				"placeId": id,
-				"message": err.Error(),
+				"place_id": id,
+				"message":  err.Error(),
 			},
 			Err: err,
 		}
@@ -615,8 +615,8 @@ func (cp *CRUDSPlace) Embed(ctx context.Context, id uint) ([]float32, error) {
 			Code:    http.StatusInternalServerError,
 			Message: "embedding failed",
 			Details: map[string]any{
-				"placeId": id,
-				"message": err.Error(),
+				"place_id": id,
+				"message":  err.Error(),
 			},
 		}
 	}
@@ -634,7 +634,8 @@ func (cp *CRUDSPlace) AuthDelete(
 	}
 
 	exists, err := gorm_.Exists(ctx, cp, types_.WhereFilters{
-		"id": types_.EqFilters(id), "creatorId": types_.EqFilters(user.ID),
+		string(schemas.PlaceSearchId):        types_.EqFilters(id),
+		string(schemas.PlaceSearchCreatorId): types_.EqFilters(user.ID),
 	})
 	if err != nil {
 		return err

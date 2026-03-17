@@ -126,27 +126,27 @@ func (cu *CRUDSUser) ToJSON(
 	for _, field := range fields {
 		switch field {
 		case string(schemas.UserSelectId):
-			result["id"] = model.ID
+			result[string(schemas.UserSelectId)] = model.ID
 		case string(schemas.UserSelectName):
-			result["name"] = model.Name
+			result[string(schemas.UserSelectName)] = model.Name
 		case string(schemas.UserSelectEmail):
-			result["email"] = model.Email
+			result[string(schemas.UserSelectEmail)] = model.Email
 		case string(schemas.UserSelectIsAdmin):
-			result["isAdmin"] = model.IsAdmin
+			result[string(schemas.UserSelectIsAdmin)] = model.IsAdmin
 		case string(schemas.UserSelectImageURL):
-			result["imageUrl"] = model.ImageURL
+			result[string(schemas.UserSelectImageURL)] = model.ImageURL
 		case string(schemas.UserSelectPlaces):
 			places := make([]map[string]any, len(model.Places))
 			for i, place := range model.Places {
 				places[i] = map[string]any{
-					"id":      place.ID,
-					"title":   place.Title,
-					"address": place.Address,
+					string(schemas.PlaceSelectId):      place.ID,
+					string(schemas.PlaceSelectTitle):   place.Title,
+					string(schemas.PlaceSelectAddress): place.Address,
 				}
 			}
-			result["places"] = places
+			result[string(schemas.UserSelectPlaces)] = places
 		case string(schemas.UserSelectCreatedAt):
-			result["createdAt"] = model.CreatedAt
+			result[string(schemas.UserSelectCreatedAt)] = model.CreatedAt
 		default:
 			return result, fmt.Errorf("unknow field %s in user schema", field)
 		}
@@ -174,7 +174,7 @@ func (cu *CRUDSUser) PostProcess(
 func (cu *CRUDSUser) PostProcessPartial(
 	ctx context.Context, partial map[string]any,
 ) error {
-	imageURL, exists := partial["imageUrl"]
+	imageURL, exists := partial[string(schemas.UserSelectImageURL)]
 	if !exists {
 		return nil
 	}
@@ -185,7 +185,7 @@ func (cu *CRUDSUser) PostProcessPartial(
 		return err
 	}
 
-	partial["imageUrl"] = signedURL
+	partial[string(schemas.UserSelectImageURL)] = signedURL
 	return nil
 }
 
@@ -193,26 +193,27 @@ func (cu *CRUDSUser) PostProcessPartial(
 
 func (cu *CRUDSUser) MapSelect(field string) []gorm_.SelectField {
 	switch field {
-	case "places":
+	case string(schemas.UserSelectPlaces):
+		relation := string(orm.RelationPlace)
 		return []gorm_.SelectField{
-			{Field: "id"},
-			{Field: "creator_id", Preload: "Places", Level: 1},
-			{Field: "id", Preload: "Places", Level: 1},
-			{Field: "title", Preload: "Places", Level: 1},
-			{Field: "address", Preload: "Places", Level: 1},
+			{Field: string(schemas.UserSelectId)},
+			{Field: string(schemas.PlaceSelectCreatorId), Preload: relation, Level: 1},
+			{Field: string(schemas.PlaceSelectId), Preload: relation, Level: 1},
+			{Field: string(schemas.PlaceSelectTitle), Preload: relation, Level: 1},
+			{Field: string(schemas.PlaceSelectAddress), Preload: relation, Level: 1},
 		}
 
 	default:
-		return []gorm_.SelectField{{Field: utils.CamelToSnake(field)}}
+		return []gorm_.SelectField{{Field: field}}
 	}
 }
 
 func (cu *CRUDSUser) MapOrderBy(field string) string {
-	return utils.CamelToSnake(field)
+	return field
 }
 
 func (cu *CRUDSUser) MapWhere(field string) string {
-	return utils.CamelToSnake(field)
+	return field
 }
 
 func (cu *CRUDSUser) BuildQuery(
@@ -328,7 +329,7 @@ func (cu *CRUDSUser) AuthGet(
 	if query.Where == nil {
 		query.Where = make(types_.WhereFilters)
 	}
-	query.Where["id"] = types_.EqFilters(user.ID)
+	query.Where[string(schemas.UserSearchId)] = types_.EqFilters(user.ID)
 	return query
 }
 
@@ -532,10 +533,10 @@ func (cu *CRUDSUser) PutToUpdate(
 ) (schemas.UserUpdate, error) {
 	updates := schemas.UserUpdate{}
 	if form.Name != nil {
-		updates["name"] = *form.Name
+		updates[string(schemas.UserSelectId)] = *form.Name
 	}
 	if form.Email != nil {
-		updates["email"] = *form.Email
+		updates[string(schemas.UserSelectEmail)] = *form.Email
 	}
 	if form.Password != nil {
 		hashed, err := utils.HashInput(*form.Password, config.Env.DefaultHashSalt)
@@ -629,7 +630,8 @@ func (cu *CRUDSUser) AuthDelete(
 
 func (cu *CRUDSUser) BeforeDelete(query *gorm.DB, id uint) (UserDeleteContext, error) {
 	var user orm.User
-	err := query.Model(&user).Select("image_url").Where("id = ?", id).First(&user).Error
+	err := query.Model(&user).Select(string(schemas.UserSelectImageURL)).
+		Where("id = ?", id).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return UserDeleteContext{}, types_.NotFoundError(cu.ModelName(), id)
