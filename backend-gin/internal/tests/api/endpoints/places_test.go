@@ -166,7 +166,7 @@ func TestCreatePlace(t *testing.T) {
 	// creating form
 	buffer := &bytes.Buffer{}
 	writer := multipart.NewWriter(buffer)
-	writer.WriteField("creatorId", strconv.Itoa(int(token.UserId)))
+	writer.WriteField("creator_id", strconv.Itoa(int(token.UserId)))
 	writer.WriteField("description", "A brand new place")
 	writer.WriteField("title", "Brand New Place")
 	writer.WriteField("address", "Somewhere over the rainbow")
@@ -208,7 +208,7 @@ func TestCreatePlace(t *testing.T) {
 
 	if resp.CreatorID != token.UserId {
 		t.Fatalf(
-			"expected creatorId to be %d, got %d", token.UserId, resp.CreatorID,
+			"expected creator_id to be %d, got %d", token.UserId, resp.CreatorID,
 		)
 	}
 
@@ -247,7 +247,7 @@ func TestCreatePlaceForOthers(t *testing.T) {
 	// creating form
 	buffer := &bytes.Buffer{}
 	writer := multipart.NewWriter(buffer)
-	writer.WriteField("creatorId", strconv.Itoa(int(admin.ID)))
+	writer.WriteField("creator_id", strconv.Itoa(int(admin.ID)))
 	writer.WriteField("description", "A brand new place")
 	writer.WriteField("title", "Brand New Place")
 	writer.WriteField("address", "Somewhere over the rainbow")

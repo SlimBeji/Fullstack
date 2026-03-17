@@ -533,7 +533,7 @@ func (cu *CRUDSUser) PutToUpdate(
 ) (schemas.UserUpdate, error) {
 	updates := schemas.UserUpdate{}
 	if form.Name != nil {
-		updates[string(schemas.UserSelectId)] = *form.Name
+		updates[string(schemas.UserSelectName)] = *form.Name
 	}
 	if form.Email != nil {
 		updates[string(schemas.UserSelectEmail)] = *form.Email

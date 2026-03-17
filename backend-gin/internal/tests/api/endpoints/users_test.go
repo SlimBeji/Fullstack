@@ -142,7 +142,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	writer.WriteField("name", "Test Van Test")
 	writer.WriteField("email", "test@test.com")
 	writer.WriteField("password", "very_secret")
-	writer.WriteField("isAdmin", "true")
+	writer.WriteField("is_admin", "true")
 
 	// attaching file
 	file, err := os.Open(static.GetImagePath("avatar1.jpg"))
@@ -186,7 +186,7 @@ func TestCreateUserAsAdmin(t *testing.T) {
 	}
 
 	if resp.IsAdmin != true {
-		t.Fatal("expected isAdmin to be true, got false")
+		t.Fatal("expected is_admin to be true, got false")
 	}
 }
 
@@ -205,7 +205,7 @@ func TestCreateUserAsNonAdmin(t *testing.T) {
 	writer.WriteField("name", "Test Van Test II")
 	writer.WriteField("email", "test_2@test.com")
 	writer.WriteField("password", "very_secret")
-	writer.WriteField("isAdmin", "true")
+	writer.WriteField("is_admin", "true")
 
 	// attaching file
 	file, err := os.Open(static.GetImagePath("avatar1.jpg"))
