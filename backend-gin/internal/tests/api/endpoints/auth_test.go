@@ -63,8 +63,8 @@ func TestSignup(t *testing.T) {
 		t.Fatalf("expected email new_user@gmail.com, got %v", resp["email"])
 	}
 
-	if _, ok := resp["userId"]; !ok {
-		t.Fatalf("missing userId")
+	if _, ok := resp["user_id"]; !ok {
+		t.Fatalf("missing user_id")
 	}
 
 	if _, ok := resp["access_token"]; !ok {
@@ -103,8 +103,8 @@ func TestSignin(t *testing.T) {
 		t.Fatalf("expected email mslimbeji@gmail.com, got %v", resp["email"])
 	}
 
-	if _, ok := resp["userId"]; !ok {
-		t.Fatalf("missing userId")
+	if _, ok := resp["user_id"]; !ok {
+		t.Fatalf("missing user_id")
 	}
 
 	if _, ok := resp["access_token"]; !ok {

@@ -32,7 +32,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 		return schemas.UserRead{}, badToken
 	}
 
-	userIdRaw, userFound := payload["userId"]
+	userIdRaw, userFound := payload["user_id"]
 	emailRaw, emailFound := payload["email"]
 	if !userFound || !emailFound {
 		return schemas.UserRead{}, badToken
