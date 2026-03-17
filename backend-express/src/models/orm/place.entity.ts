@@ -19,7 +19,7 @@ export class Place extends BaseEntity {
     address!: string;
 
     @Column({ name: "image_url", type: "text", default: "" })
-    imageUrl!: string;
+    image_url!: string;
 
     @Column("jsonb")
     location!: {
@@ -40,5 +40,5 @@ export class Place extends BaseEntity {
     creator!: User;
 
     @Column({ name: "creator_id", type: "int" })
-    creatorId!: number;
+    creator_id!: number;
 }

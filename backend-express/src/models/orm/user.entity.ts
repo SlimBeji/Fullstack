@@ -19,10 +19,10 @@ export class User extends BaseEntity {
     password!: string;
 
     @Column({ name: "image_url", type: "text", default: "" })
-    imageUrl!: string;
+    image_url!: string;
 
     @Column({ name: "is_admin", type: "bool", default: false })
-    isAdmin!: boolean;
+    is_admin!: boolean;
 
     // Relationships
 

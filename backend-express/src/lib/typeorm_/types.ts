@@ -26,6 +26,6 @@ export type SelectField = {
 
 export type AbstractEntity = ObjectLiteral & {
     id: number;
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date;
+    updated_at: Date;
 };

@@ -11,8 +11,8 @@ export abstract class BaseEntity {
 
     @Index()
     @CreateDateColumn({ name: "created_at", type: "timestamptz" })
-    createdAt!: Date;
+    created_at!: Date;
 
     @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-    updatedAt!: Date;
+    updated_at!: Date;
 }
