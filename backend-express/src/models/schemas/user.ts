@@ -85,10 +85,10 @@ export const userSelectableFields = [
     "id",
     "name",
     "email",
-    "isAdmin",
-    "imageUrl",
+    "is_admin",
+    "image_url",
     "places",
-    "createdAt",
+    "created_at",
 ] as const;
 
 export type UserSelectableType = (typeof userSelectableFields)[number];
@@ -98,8 +98,8 @@ export const userSearchableFields = ["id", "name", "email"] as const;
 export type UserSearchableType = (typeof userSearchableFields)[number];
 
 export const userSortableFields = [
-    "createdAt",
-    "-createdAt",
+    "created_at",
+    "-created_at",
     "name",
     "-name",
     "email",
@@ -113,9 +113,9 @@ export const UserDBSchema = zod.object({
     id: UserFields.id,
     name: UserFields.name,
     email: UserFields.email,
-    isAdmin: UserFields.isAdmin,
+    is_admin: UserFields.isAdmin,
     password: UserFields.password,
-    imageUrl: UserFields.imageUrl.optional(),
+    image_url: UserFields.imageUrl.optional(),
     places: UserFields.places,
 });
 
@@ -131,16 +131,16 @@ export const UserCreateSchema = UserDBSchema.omit({ id: true, places: true });
 
 export type UserCreate = ZodInfer<typeof UserCreateSchema>;
 
-export const UserPostSchema = UserCreateSchema.omit({ imageUrl: true }).extend({
-    image: UserFields.image.optional(),
-});
+export const UserPostSchema = UserCreateSchema.omit({ image_url: true }).extend(
+    { image: UserFields.image.optional() }
+);
 
 export type UserPost = ZodInfer<typeof UserPostSchema>;
 
 // ---  Read Schemas ----
 
 export const UserReadSchema = UserDBSchema.omit({ password: true }).extend({
-    createdAt,
+    created_at: createdAt,
 });
 
 export type UserRead = ZodInfer<typeof UserReadSchema>;
@@ -182,6 +182,10 @@ export const UserSearchSchema = filtersSchema(
         email: httpFilters(UserFields.email, {
             example: "eq:mslimbeji@gmail.com",
             description: "The user email",
+        }).optional(),
+        created_at: httpFilters(createdAt, {
+            example: "gt:2022-05-29",
+            description: "creation datetime",
         }).optional(),
     }),
     userSortableFields,

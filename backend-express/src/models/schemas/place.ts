@@ -88,9 +88,9 @@ export const placeSelectableFields = [
     "description",
     "address",
     "location",
-    "imageUrl",
-    "creatorId",
-    "createdAt",
+    "image_url",
+    "creator_id",
+    "created_at",
 ] as const;
 
 export type PlaceSelectableType = (typeof placeSelectableFields)[number];
@@ -100,16 +100,16 @@ export const placeSearchableFields = [
     "title",
     "description",
     "address",
-    "creatorId",
-    "locationLat",
-    "locationLng",
+    "creator_id",
+    "location_lat",
+    "location_lng",
 ] as const;
 
 export type PlaceSearchableType = (typeof placeSearchableFields)[number];
 
 export const placeSortableFields = [
-    "createdAt",
-    "-createdAt",
+    "created_at",
+    "-created_at",
     "title",
     "-title",
     "description",
@@ -127,15 +127,15 @@ export const PlaceDBSchema = zod.object({
     title: PlaceFields.title,
     description: PlaceFields.description,
     embedding: PlaceFields.embedding.optional(),
-    imageUrl: PlaceFields.imageUrl.optional(),
+    image_url: PlaceFields.imageUrl.optional(),
     address: PlaceFields.address,
     location: PlaceFields.location,
-    creatorId: PlaceFields.creatorId,
+    creator_id: PlaceFields.creatorId,
 });
 
 export type PlaceDB = ZodInfer<typeof PlaceDBSchema>;
 
-export type PlaceSeed = Omit<PlaceDB, "id" | "creatorId"> & {
+export type PlaceSeed = Omit<PlaceDB, "id" | "creator_id"> & {
     _ref: number;
     _createorRef: number;
 };
@@ -150,7 +150,7 @@ export const PlaceCreateSchema = PlaceDBSchema.omit({
 export type PlaceCreate = ZodInfer<typeof PlaceCreateSchema>;
 
 export const PlacePostSchema = PlaceCreateSchema.omit({
-    imageUrl: true,
+    image_url: true,
     location: true,
 }).extend({
     lat: PlaceFields.lat,
@@ -163,7 +163,7 @@ export type PlacePost = ZodInfer<typeof PlacePostSchema>;
 // ---  Read Schemas ----
 
 export const PlaceReadSchema = PlaceDBSchema.omit({ embedding: true }).extend({
-    createdAt,
+    created_at: createdAt,
 });
 
 export type PlaceRead = ZodInfer<typeof PlaceReadSchema>;
@@ -212,15 +212,15 @@ export const PlaceSearchSchema = filtersSchema(
             example: "ilike:boulevard",
             description: "The place address",
         }).optional(),
-        locationLat: httpFilters(PlaceFields.lat, {
+        location_lat: httpFilters(PlaceFields.lat, {
             example: "gt:3.5",
             description: "The latitude of the place",
         }).optional(),
-        locationLng: httpFilters(PlaceFields.lng, {
+        location_lng: httpFilters(PlaceFields.lng, {
             example: "lt:4.5",
             description: "The longitude of the place",
         }).optional(),
-        creatorId: httpFilters(
+        creator_id: httpFilters(
             PlaceFields.creatorId,
             {
                 example: "in:123456789",
@@ -228,6 +228,10 @@ export const PlaceSearchSchema = filtersSchema(
             },
             { isIndex: true }
         ).optional(),
+        created_at: httpFilters(createdAt, {
+            example: "gt:2022-05-29",
+            description: "creation datetime",
+        }).optional(),
     }),
     placeSortableFields,
     placeSelectableFields,

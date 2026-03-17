@@ -35,7 +35,7 @@ export const AuthFields = { username, accessToken, tokenType, expiresIn };
 
 // --- Access Token ----
 export interface TokenPayload {
-    userId: number;
+    user_id: number;
     email: string;
 }
 
@@ -72,7 +72,7 @@ export type Signin = ZodInfer<typeof SigninSchema>;
 export const EncodedTokenSchema = zod.object({
     access_token: AuthFields.accessToken,
     token_type: AuthFields.tokenType,
-    userId: UserFields.id,
+    user_id: UserFields.id,
     email: UserFields.email,
     expires_in: AuthFields.expiresIn,
 });
@@ -80,7 +80,7 @@ export const EncodedTokenSchema = zod.object({
 export type EncodedToken = ZodInfer<typeof EncodedTokenSchema>;
 
 export const createToken = (userId: number, email: string): EncodedToken => {
-    const payload: TokenPayload = { userId, email };
+    const payload: TokenPayload = { user_id: userId, email };
     const access_token = encodePayload(
         payload,
         env.SECRET_KEY,
@@ -90,7 +90,7 @@ export const createToken = (userId: number, email: string): EncodedToken => {
         access_token,
         token_type: "bearer",
         email,
-        userId,
+        user_id: userId,
         expires_in: env.JWT_EXPIRATION,
     };
 };
