@@ -1,53 +1,24 @@
 package middlewares
 
 import (
-	"backend/internal/config"
 	"backend/internal/lib/gin_"
 	"backend/internal/lib/types_"
-	"backend/internal/lib/utils"
 	"backend/internal/models/cruds"
 	"backend/internal/models/schemas"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
-	badToken := types_.APIError{
-		Code:    http.StatusUnauthorized,
-		Message: "Token Not Valid",
-	}
-
-	payload, err := utils.DecodePayload(token, config.Env.SecretKey)
+	payload, err := schemas.TokenPayloadFromString(token)
 	if err != nil {
-		if strings.Contains(err.Error(), "token expired") {
-			return schemas.UserRead{}, types_.APIError{
-				Code:    http.StatusUnauthorized,
-				Message: "Token Expired",
-			}
-		}
-		badToken.Err = err
-		return schemas.UserRead{}, badToken
-	}
-
-	userIdRaw, userFound := payload["user_id"]
-	emailRaw, emailFound := payload["email"]
-	if !userFound || !emailFound {
-		return schemas.UserRead{}, badToken
-	}
-
-	// Converting from string to uint
-	userId, userIdValid := userIdRaw.(float64)
-	email, emailValid := emailRaw.(string)
-
-	if !userIdValid || !emailValid {
-		return schemas.UserRead{}, badToken
+		return schemas.UserRead{}, err
 	}
 
 	cu := cruds.GetCRUDSUser()
-	user, err := cu.GetCache(c, uint(userId))
+	user, err := cu.GetCache(c, payload.UserId)
 	if err != nil {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusNotFound,
@@ -56,7 +27,7 @@ func GetUserFromToken(c *gin.Context, token string) (schemas.UserRead, error) {
 		}
 	}
 
-	if user.Email != email {
+	if user.Email != payload.Email {
 		return schemas.UserRead{}, types_.APIError{
 			Code:    http.StatusBadRequest,
 			Message: "Invalid token, payload corrupted",

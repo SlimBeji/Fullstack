@@ -2,9 +2,12 @@ package schemas
 
 import (
 	"backend/internal/config"
+	"backend/internal/lib/types_"
 	"backend/internal/lib/utils"
 	"fmt"
 	"mime/multipart"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -13,40 +16,41 @@ type TokenPayload struct {
 	Email  string `json:"email" validate:"email"`
 }
 
-func DecodeEncodedToken(encoded string) (TokenPayload, error) {
+func TokenPayloadFromString(encoded string) (TokenPayload, error) {
 	var zero TokenPayload
+	badToken := types_.APIError{
+		Code:    http.StatusUnauthorized,
+		Message: "Token Not Valid",
+	}
 
-	decoded, err := utils.DecodePayload(encoded, config.Env.SecretKey)
+	payload, err := utils.DecodePayload(encoded, config.Env.SecretKey)
 	if err != nil {
-		return zero, fmt.Errorf(
-			"token %s not valid, could not decode it: %w", encoded, err,
-		)
+		if strings.Contains(err.Error(), "token expired") {
+			return zero, types_.APIError{
+				Code:    http.StatusUnauthorized,
+				Message: "Token Expired",
+			}
+		}
+		badToken.Err = err
+		return zero, badToken
 	}
 
-	userIdRaw, found := decoded["user_id"]
-	if !found {
-		return zero, fmt.Errorf("token %s not valid, no user_id found", encoded)
-	}
-	userId, ok := userIdRaw.(uint)
-	if !ok {
-		return zero, fmt.Errorf(
-			"token %s not valid, user_id %s not valid", encoded, userIdRaw,
-		)
+	userIdRaw, userFound := payload["user_id"]
+	emailRaw, emailFound := payload["email"]
+	if !userFound || !emailFound {
+		return zero, badToken
 	}
 
-	emailRaw, found := decoded["email"]
-	if !found {
-		return zero, fmt.Errorf("token %s not valid, no email found", encoded)
-	}
-	email, ok := emailRaw.(string)
-	if !ok {
-		return zero, fmt.Errorf(
-			"token %s not valid, email %s not valid", encoded, emailRaw,
-		)
+	// Converting from string to uint
+	userId, userIdValid := userIdRaw.(float64)
+	email, emailValid := emailRaw.(string)
+
+	if !userIdValid || !emailValid {
+		return zero, badToken
 	}
 
 	return TokenPayload{
-		UserId: userId, Email: email,
+		UserId: uint(userId), Email: email,
 	}, nil
 }
 
