@@ -7,7 +7,7 @@ import { decodeToken, UserRead } from "@/models/schemas";
 
 const getUserFromToken = async (token: string): Promise<UserRead> => {
     const payload = decodeToken(token);
-    const user = await crudsUser.getCache(payload.userId);
+    const user = await crudsUser.getCache(payload.user_id);
     if (!user) {
         throw new ApiError(HttpStatus.NOT_FOUND, "User not found");
     }
@@ -41,7 +41,7 @@ const checkAuthToken = async (
 
     try {
         const user = await getUserFromToken(token);
-        if (isAdmin && !user.isAdmin) {
+        if (isAdmin && !user.is_admin) {
             return getError("Not an admin");
         }
         req.currentUser = user;

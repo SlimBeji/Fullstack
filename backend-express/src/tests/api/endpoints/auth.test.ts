@@ -25,7 +25,7 @@ describe("POST /api/auth/signup", () => {
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("email", "new_user@gmail.com");
-        expect(response.body).toHaveProperty("userId");
+        expect(response.body).toHaveProperty("user_id");
         expect(response.body).toHaveProperty("access_token");
     });
 });
@@ -39,7 +39,7 @@ describe("POST /api/auth/signin", () => {
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("email", "mslimbeji@gmail.com");
-        expect(response.body).toHaveProperty("userId");
+        expect(response.body).toHaveProperty("user_id");
         expect(response.body).toHaveProperty("access_token");
     });
 });
