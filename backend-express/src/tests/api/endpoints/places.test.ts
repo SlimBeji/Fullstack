@@ -71,7 +71,7 @@ describe("POST /api/places", () => {
         const user = (await crudsUser.getByEmail("mslimbeji@gmail.com"))!;
         const response = await request
             .post("/api/places")
-            .field("creatorId", user.id)
+            .field("creator_id", user.id)
             .field("description", "A brand new place")
             .field("title", "Brand New Place")
             .field("address", "Somewhere over the rainbow")
@@ -81,7 +81,7 @@ describe("POST /api/places", () => {
             .set("Authorization", adminToken)
             .expect("Content-Type", /json/)
             .expect(200);
-        expect(response.body).toHaveProperty("creatorId", user.id);
+        expect(response.body).toHaveProperty("creator_id", user.id);
         expect(response.body).toHaveProperty(
             "description",
             "A brand new place"
@@ -97,7 +97,7 @@ describe("POST /api/places", () => {
         const user = (await crudsUser.getByEmail("mslimbeji@gmail.com"))!;
         await request
             .post("/api/places")
-            .field("creatorId", user.id)
+            .field("creator_id", user.id)
             .field("description", "A brand new place")
             .field("title", "Brand New Place")
             .field("address", "Somewhere over the rainbow")

@@ -73,14 +73,14 @@ describe("POST /api/users", () => {
             .field("name", "Test Van Test")
             .field("email", "test@test.com")
             .field("password", "very_secret")
-            .field("isAdmin", true)
+            .field("is_admin", true)
             .attach("image", readImage("avatar1.jpg"))
             .set("Authorization", adminToken)
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("email", "test@test.com");
         expect(response.body).toHaveProperty("name", "Test Van Test");
-        expect(response.body).toHaveProperty("isAdmin", true);
+        expect(response.body).toHaveProperty("is_admin", true);
     });
 
     it("Non Admin users are denied", async () => {
@@ -89,7 +89,7 @@ describe("POST /api/users", () => {
             .field("name", "Test Van Test II")
             .field("email", "test_2@test.com")
             .field("password", "very_secret")
-            .field("isAdmin", true)
+            .field("is_admin", true)
             .attach("image", readImage("avatar1.jpg"))
             .set("Authorization", token)
             .expect("Content-Type", /json/)
