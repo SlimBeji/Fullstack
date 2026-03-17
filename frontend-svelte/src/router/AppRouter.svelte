@@ -18,7 +18,7 @@ const routes: RouteConfig[] = [
         component: Users,
     },
     {
-        path: "/places/(?<placeId>[0-9]]+)",
+        path: "/places/(?<placeId>[0-9]+)",
         component: UpdatePlace,
     },
     {
