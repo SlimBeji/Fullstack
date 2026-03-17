@@ -281,5 +281,5 @@ export const crudsPlace = new CrudsPlace(
     pgClient.client,
     Models.place,
     placeSelectableFields,
-    ["createdAt"]
+    ["created_at"]
 );

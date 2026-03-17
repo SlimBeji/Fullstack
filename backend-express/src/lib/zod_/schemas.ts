@@ -45,7 +45,7 @@ export const filtersSchema = (
     defaultFields: string[] | null = null,
     defaultSort: string[] | null = null
 ): AnyZodObject => {
-    defaultSort = defaultSort || ["-createdAt"];
+    defaultSort = defaultSort || ["-created_at"];
     defaultFields = defaultFields || ["id"];
 
     const page = zod.coerce
