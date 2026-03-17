@@ -9,6 +9,7 @@ from lib.pydantic_ import FieldMeta
 created_at_meta = FieldMeta(
     description="creation datetime",
     examples=["2024-01-12T10:15:30.000Z"],
+    filter_examples=["gt:2022-05-29"],
 )
 created_at_annot = Annotated[datetime, created_at_meta.info]
 
