@@ -285,19 +285,13 @@ const dateQueryParamTransform = (
     value: any,
     context: RefinementCtx
 ): { op: FilterOperation; val: Date | Date[] | boolean } | ZodNever => {
-    if (!value.includes(":")) {
-        try {
-            const date = new Date(value);
-            return { op: "eq", val: field.parse(date) };
-        } catch (err) {
-            return updateContextFromError(
-                context,
-                err,
-                "Invalid date format (use ISO 8601)"
-            );
-        }
+    // If value starts with a digit, we add the eq operator
+    // because later on we will split on ":" and there might be
+    // collision between with the time format ":" separator
+    if (/^\d/.test(value)) {
+        value = "eq:" + value;
     }
-    const [op, val] = value.split(":", 2);
+    const [op, val] = splitOnce(value, ":");
 
     switch (op) {
         case "eq":
