@@ -14,7 +14,9 @@ const placeRefMapping: Map<number, number> = new Map();
 const seedUsers = async (raw: UserSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newUserIn) => {
-            newUserIn.imageUrl = await storage.uploadFile(newUserIn.imageUrl!);
+            newUserIn.image_url = await storage.uploadFile(
+                newUserIn.image_url!
+            );
             const { _ref, ...form } = newUserIn;
             const id = await crudsUser.create(form);
             form.password = await hashInput(
@@ -29,13 +31,13 @@ const seedUsers = async (raw: UserSeed[]): Promise<void> => {
 const seedPlaces = async (raw: PlaceSeed[]): Promise<void> => {
     await Promise.all(
         raw.map(async (newPlaceIn) => {
-            newPlaceIn.imageUrl = await storage.uploadFile(
-                newPlaceIn.imageUrl!
+            newPlaceIn.image_url = await storage.uploadFile(
+                newPlaceIn.image_url!
             );
             const { _ref, _createorRef, embedding, ...form } = newPlaceIn;
             const data = {
                 ...form,
-                creatorId: userRefMapping.get(_createorRef)!,
+                creator_id: userRefMapping.get(_createorRef)!,
             };
             // using seed instead of create to be able to set the embedding
             const id = await crudsPlace.seed(data, embedding!);
