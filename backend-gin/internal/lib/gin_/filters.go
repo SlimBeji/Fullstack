@@ -20,6 +20,9 @@ func QueryFilters[T types_.SearchQueryReader](c *gin.Context) {
 		case "page", "size":
 			paramsMap[key] = values[0]
 		case "sort", "fields":
+			if values[0] == "" {
+				continue
+			}
 			paramsMap[key] = strings.Split(values[0], ",")
 		default:
 			// Filter fields here, use QueryArray because we can get multiple values
