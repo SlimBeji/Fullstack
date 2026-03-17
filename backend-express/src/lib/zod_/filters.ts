@@ -1,6 +1,7 @@
 import { RefinementCtx, ZodNever, ZodTypeAny } from "zod";
 
 import { Filter, FilterOperation } from "../types";
+import { splitOnce } from "../utils";
 import { zod } from "./base";
 
 type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
@@ -46,7 +47,7 @@ const numericQueryParamTransform = (
             );
         }
     }
-    const [op, val] = value.split(":");
+    const [op, val] = splitOnce(value, ":");
 
     switch (op) {
         case "eq":
@@ -116,7 +117,7 @@ const indexQueryParamTransform = (
             );
         }
     }
-    const [op, val] = value.split(":");
+    const [op, val] = splitOnce(value, ":");
 
     switch (op) {
         case "eq":
@@ -182,7 +183,7 @@ const stringQueryParamTransform = (
             );
         }
     }
-    const [op, val] = value.split(":");
+    const [op, val] = splitOnce(value, ":");
 
     switch (op) {
         case "eq":
@@ -252,7 +253,7 @@ const booleanQueryParamTransform = (
             );
         }
     }
-    const [op, val] = value.split(":");
+    const [op, val] = splitOnce(value, ":");
 
     switch (op) {
         case "eq":
@@ -296,7 +297,7 @@ const dateQueryParamTransform = (
             );
         }
     }
-    const [op, val] = value.split(":");
+    const [op, val] = value.split(":", 2);
 
     switch (op) {
         case "eq":

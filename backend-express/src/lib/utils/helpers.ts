@@ -1,3 +1,8 @@
+export const splitOnce = (str: string, sep: string) => {
+    const i = str.indexOf(sep);
+    return i === -1 ? [str] : [str.slice(0, i), str.slice(i + sep.length)];
+};
+
 export const parseTime = (input: string): Date | null => {
     const v = input.trim();
 
