@@ -764,6 +764,9 @@ export class CrudsClass<
         const ids = (await idQuery.getRawMany()).map(
             (row) => Object.values(row)[0] // avoid naming the attribute
         );
+        if (ids.length == 0) {
+            return [];
+        }
 
         // Apply where with ids on the main query
         query = applyWhere(query, { id: this.in(ids) }, (item) =>
