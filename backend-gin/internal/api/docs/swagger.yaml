@@ -169,7 +169,7 @@ definitions:
           type: string
         type: array
       fields:
-        description: Fields to include in the response; omit for full document
+        description: Fields to include in the response; omit for complete data
         example:
         - id
         - location
@@ -342,7 +342,7 @@ definitions:
           type: string
         type: array
       fields:
-        description: Fields to include in the response; omit for full document
+        description: Fields to include in the response; omit for complete data
         example:
         - id
         - places
@@ -567,7 +567,7 @@ paths:
         name: description
         type: array
       - collectionFormat: csv
-        description: Fields to include in the response; omit for full document
+        description: Fields to include in the response; omit for complete data
         example:
         - id
         - location
@@ -758,7 +758,7 @@ paths:
         required: true
         type: string
       - collectionFormat: csv
-        description: Fields to include in the response; omit for full document
+        description: Fields to include in the response; omit for complete data
         example:
         - id
         - title
@@ -865,7 +865,7 @@ paths:
         name: email
         type: array
       - collectionFormat: csv
-        description: Fields to include in the response; omit for full document
+        description: Fields to include in the response; omit for complete data
         example:
         - id
         - places
@@ -1022,7 +1022,7 @@ paths:
         required: true
         type: string
       - collectionFormat: csv
-        description: Fields to include in the response; omit for full document
+        description: Fields to include in the response; omit for complete data
         example:
         - id
         - name

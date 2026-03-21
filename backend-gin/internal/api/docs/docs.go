@@ -275,7 +275,7 @@ const docTemplate = `{
                             "id",
                             "location"
                         ],
-                        "description": "Fields to include in the response; omit for full document",
+                        "description": "Fields to include in the response; omit for complete data",
                         "name": "fields",
                         "in": "query"
                     },
@@ -555,7 +555,7 @@ const docTemplate = `{
                             "id",
                             "title"
                         ],
-                        "description": "Fields to include in the response; omit for full document",
+                        "description": "Fields to include in the response; omit for complete data",
                         "name": "fields",
                         "in": "query"
                     }
@@ -716,7 +716,7 @@ const docTemplate = `{
                             "id",
                             "places"
                         ],
-                        "description": "Fields to include in the response; omit for full document",
+                        "description": "Fields to include in the response; omit for complete data",
                         "name": "fields",
                         "in": "query"
                     },
@@ -950,7 +950,7 @@ const docTemplate = `{
                             "id",
                             "name"
                         ],
-                        "description": "Fields to include in the response; omit for full document",
+                        "description": "Fields to include in the response; omit for complete data",
                         "name": "fields",
                         "in": "query"
                     }
@@ -1282,7 +1282,7 @@ const docTemplate = `{
                     ]
                 },
                 "fields": {
-                    "description": "Fields to include in the response; omit for full document",
+                    "description": "Fields to include in the response; omit for complete data",
                     "type": "array",
                     "items": {
                         "type": "string",
@@ -1511,7 +1511,7 @@ const docTemplate = `{
                     ]
                 },
                 "fields": {
-                    "description": "Fields to include in the response; omit for full document",
+                    "description": "Fields to include in the response; omit for complete data",
                     "type": "array",
                     "items": {
                         "type": "string",

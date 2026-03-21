@@ -144,7 +144,7 @@ type PlaceRead struct {
 }
 
 type PlaceGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id title description address location image_url creator_id created_at" enums:"id,title,description,address,location,image_url,creator_id,created_at" example:"id,title"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneof=id title description address location image_url creator_id created_at" enums:"id,title,description,address,location,image_url,creator_id,created_at" example:"id,title"` // Fields to include in the response; omit for complete data
 }
 
 func (pg PlaceGet) FromRequest(c *gin.Context) (PlaceGet, []string) {
@@ -177,7 +177,7 @@ type PlaceSearch struct {
 	Page        int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                                                                                    // The page number
 	Size        int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                                                                          // Items per page
 	Sort        []string           `json:"sort" validate:"dive,oneof=created_at -created_at title -title description -description address -address" enums:"created_at,-created_at,title,-title,description,-description,address,-address" example:"-created_at"` // Fields to use for sorting. Use the '-' for descending sorting
-	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location image_url creator_id created_at" enums:"id,title,description,address,location,image_url,creator_id,created_at"  example:"id,location"`              // Fields to include in the response; omit for full document
+	Fields      []string           `json:"fields" validate:"dive,oneof=id title description address location image_url creator_id created_at" enums:"id,title,description,address,location,image_url,creator_id,created_at"  example:"id,location"`              // Fields to include in the response; omit for complete data
 	Id          types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                                                                            // The ID of the place
 	Title       types_.FlexStrList `json:"title" form:"title" example:"eq:Some Place" collectionFormat:"multi"`                                                                                                                                                  // The place title/name, 10 characters minimum
 	Description types_.FlexStrList `json:"description" form:"description" example:"like:football" collectionFormat:"multi"`                                                                                                                                      // The place description, 10 characters minimum

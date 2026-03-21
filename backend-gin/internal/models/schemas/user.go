@@ -123,7 +123,7 @@ type UserRead struct {
 }
 
 type UserGet struct {
-	Fields []string `json:"fields" validate:"dive,oneof=id name email is_admin image_url places created_at" enums:"id,name,email,is_admin,image_url,places,created_at" example:"id,name"` // Fields to include in the response; omit for full document
+	Fields []string `json:"fields" validate:"dive,oneof=id name email is_admin image_url places created_at" enums:"id,name,email,is_admin,image_url,places,created_at" example:"id,name"` // Fields to include in the response; omit for complete data
 }
 
 func (ug UserGet) FromRequest(c *gin.Context) (UserGet, []string) {
@@ -155,7 +155,7 @@ type UserSearch struct {
 	Page      int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                              // The page number
 	Size      int                `json:"size" default:"100" validate:"lte=100,gte=1"`                                                                                                                    // Items per page
 	Sort      []string           `json:"sort" validate:"dive,oneof=created_at -created_at name -name email -email" enums:"created_at,-created_at,name,-name,email,-email" example:"-created_at"`         // Fields to use for sorting. Use the '-' for descending sorting
-	Fields    []string           `json:"fields" validate:"dive,oneof=id name email is_admin image_url places created_at" enums:"id,name,email,is_admin,image_url,places,created_at" example:"id,places"` // Fields to include in the response; omit for full document
+	Fields    []string           `json:"fields" validate:"dive,oneof=id name email is_admin image_url places created_at" enums:"id,name,email,is_admin,image_url,places,created_at" example:"id,places"` // Fields to include in the response; omit for complete data
 	Id        types_.FlexStrList `json:"id" form:"id" example:"123456789" collectionFormat:"multi"`                                                                                                      // The user ID
 	Name      types_.FlexStrList `json:"name" form:"name" example:"eq:Slim Beji" collectionFormat:"multi"`                                                                                               // The user name, two characters at least
 	Email     types_.FlexStrList `json:"email" form:"email" example:"eq:mslimbeji@gmail.com" collectionFormat:"multi"`                                                                                   // The user email
