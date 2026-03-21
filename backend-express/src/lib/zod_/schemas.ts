@@ -30,7 +30,7 @@ export const getFieldsSectionSchema = (
             (val) => (typeof val === "string" ? [val] : val),
             zod.array(zod.enum([...fields] as [string, ...string[]])).openapi({
                 description:
-                    "Fields to include in the response; omit for full document",
+                    "Fields to include in the response; omit for complete data",
                 example: [...defaut],
             })
         )
