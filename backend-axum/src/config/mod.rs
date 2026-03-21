@@ -20,9 +20,8 @@ pub struct Settings {
     pub env: String,
 
     // DATABASE config
-    pub mongo_url: String,
-    pub mongo_db_name: String,
-    pub mongo_test_db_name: String,
+    pub database_url: String,
+    pub database_test_url: String,
     pub redis_url: String,
     pub redis_test_url: String,
     pub redis_expiration: usize,
@@ -62,9 +61,8 @@ impl Settings {
             env: get_env("ENV")?,
 
             // DATABASE config
-            mongo_url: get_env("MONGO_URL")?,
-            mongo_db_name: get_env("MONGO_DBNAME")?,
-            mongo_test_db_name: get_env_or("MONGO_TEST_DBNAME", "tests"),
+            database_url: get_env("DATABASE_URL")?,
+            database_test_url: get_env_or("DATABASE_TEST_URL", ""),
             redis_url: get_env("REDIS_URL")?,
             redis_test_url: get_env_or("REDIS_TEST_URL", ""),
             redis_expiration: env_to_num(&get_env_or(
