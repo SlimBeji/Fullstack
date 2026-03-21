@@ -7,7 +7,8 @@ This backend is written in **Rust** and follows the architecture and principles 
 | Purpose         | Library Used                                                              |
 | --------------- | ------------------------------------------------------------------------- |
 | HTTP Server     | [axum](https://github.com/tokio-rs/axum)                                  |
-| Database ORM    | [mongo-rust-driver](https://github.com/mongodb/mongo-rust-driver)         |
+| ORM             | [seaorm](https://www.sea-ql.org/SeaORM/)                                  |
+| Migrations      | [seaorm](https://www.sea-ql.org/SeaORM/)                                  |
 | Data Validation | [validator](https://github.com/Keats/validator)                           |
 | OpenAPI Docs    | [utoipa](https://github.com/juhaku/utoipa)                                |
 | Background Jobs | [apalis](https://github.com/apalis-dev/apalis)                            |
@@ -33,9 +34,8 @@ DEFAULT_TIMEOUT=30
 ENV=dev
 
 # DATABASE
-MONGO_URL=mongodb://mongo1:27017,mongo2:27017/myapp?replicaSet=rs0
-MONGO_DBNAME=myapp
-MONGO_TEST_DBNAME=tests
+DATABASE_URL=postgresql://dev:dev@pgsql:5432/dev
+DATABASE_TEST_URL=postgresql://test:test@test-pgsql:5432/test
 REDIS_URL=redis://redis:6379/0
 REDIS_TEST_URL=redis://redis:6379/1
 REDIS_DEFAULT_EXPIRATION=3600
