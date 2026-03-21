@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from api.middlewares import get_current_admin, get_current_user
+from lib.pydantic_ import FieldsQuery
 from models.cruds import CrudsUser, UserOptions
 from models.schemas import (
     UserMultipartPost,
@@ -65,13 +66,7 @@ async def create_user(
     response_model=UserReadSchema | dict,
 )
 async def get_user(
-    fields: Annotated[
-        list[UserSelectableFields] | None,
-        Query(
-            description="Fields to include in the response; omit for full document",
-            examples=[["id"]],
-        ),
-    ] = None,
+    fields: FieldsQuery[UserSelectableFields] = None,
     user_id: str = user_id_param,
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),

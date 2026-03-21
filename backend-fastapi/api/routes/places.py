@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from api.middlewares import get_current_user
+from lib.pydantic_ import FieldsQuery
 from models.cruds import CrudsPlace, PlaceOptions
 from models.schemas import (
     PlaceMultipartPost,
@@ -70,13 +71,7 @@ async def create_place(
     response_model=PlaceReadSchema | dict,
 )
 async def get_place(
-    fields: Annotated[
-        list[PlaceSelectableFields] | None,
-        Query(
-            description="Fields to include in the response; omit for full document",
-            examples=[["id"]],
-        ),
-    ] = None,
+    fields: FieldsQuery[PlaceSelectableFields] = None,
     place_id: str = place_id_param,
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),

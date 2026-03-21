@@ -1,13 +1,24 @@
 from typing import Annotated, Generic, TypeVar, cast
 
+from fastapi import Query
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo, ModelPrivateAttr
 
 from lib.types_ import SearchQuery, WhereFilters
 
+T = TypeVar("T", bound=str)
 SortableFields = TypeVar("SortableFields", bound=str)
 SelectableFields = TypeVar("SelectableFields", bound=str)
 SearchableFields = TypeVar("SearchableFields", bound=str)
+
+
+FieldsQuery = Annotated[
+    list[T] | None,
+    Query(
+        description="Fields to include in the response; omit for complete data",
+        examples=[["id"]],
+    ),
+]
 
 
 class BaseSearchSchema(
@@ -29,7 +40,7 @@ class BaseSearchSchema(
     fields: Annotated[
         list[SelectableFields] | None,
         Field(
-            description="Fields to include in the response; omit for full document",
+            description="Fields to include in the response; omit for complete data",
             json_schema_extra={"examples": [_DEFAULT_FIELDS]},  # type: ignore
         ),
     ] = None
