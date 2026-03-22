@@ -28,7 +28,6 @@ regex = {version = "1.12.2"}
 time = {version = "0.3", features = ["serde", "serde-human-readable", "macros", "formatting", "parsing"]}
 
 # Database
-mongodb = {version = "3"}
 
 # Schemas
 serde = {version = "1.0", features = ["derive"]}
