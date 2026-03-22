@@ -1,7 +1,5 @@
 use validator::ValidationError;
 
-use super::regex::OBJECT_ID_REGEX;
-
 pub fn string_length<const MIN: usize, const MAX: usize>(
     value: &str,
 ) -> Result<(), ValidationError> {
@@ -67,16 +65,6 @@ pub fn array_length<T, const MIN: usize, const MAX: usize>(
     }
 
     Ok(())
-}
-
-pub fn object_id(id: &str) -> Result<(), ValidationError> {
-    if OBJECT_ID_REGEX.is_match(id) {
-        Ok(())
-    } else {
-        let mut err = ValidationError::new("invalid_object_id");
-        err.message = Some("Must be a 24-character hexadecimal string".into());
-        Err(err)
-    }
 }
 
 pub fn email_strict(email: &str) -> Result<(), ValidationError> {
