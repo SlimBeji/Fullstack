@@ -1,5 +1,4 @@
 use axum::extract::FromRequest;
-use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::{IntoParams, ToSchema};
@@ -12,7 +11,7 @@ use backend::{
         FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery,
     },
     utils::parse_enum_array,
-    validator_::{email_strict, object_id, string_length},
+    validator_::{email_strict, string_length},
 };
 
 // --- Database Schema ---
@@ -21,7 +20,7 @@ use backend::{
 #[serde(rename_all = "camelCase")]
 pub struct UserDB {
     #[serde(rename = "_id")]
-    pub id: ObjectId,
+    pub id: u32,
     pub name: String,
     pub email: String,
     pub is_admin: bool,
@@ -137,9 +136,8 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
 }))]
 #[serde(rename_all = "camelCase")]
 pub struct UserRead {
-    /// The user ID, 24 characters
-    #[validate(custom(function = "object_id"))]
-    pub id: String,
+    /// The user ID
+    pub id: u32,
 
     /// The user name, two characters at least
     #[validate(custom(function = "string_length::<2, 0>"))]
@@ -172,7 +170,7 @@ pub struct UserRead {
 impl UserRead {
     pub fn example() -> Self {
         Self {
-            id: "683b21134e2e5d46978daf1f".to_string(),
+            id: 123456789,
             name: "Slim Beji".to_string(),
             email: "mslimbeji@gmail.com".to_string(),
             is_admin: false,

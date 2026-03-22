@@ -6,7 +6,7 @@ use validator::{Validate, ValidationError};
 use backend::{
     axum_::{ApiError, MultipartForm},
     types_::FileToUpload,
-    validator_::{email_strict, object_id, string_length},
+    validator_::{email_strict, string_length},
 };
 
 // --- Custom Validators ----
@@ -106,10 +106,9 @@ pub struct EncodedTokenSchema {
     #[validate(custom(function = "validate_token"))]
     pub token_type: String,
 
-    /// The user ID, 24 characters
-    #[schema(example = "683b21134e2e5d46978daf1f")]
-    #[validate(custom(function = "object_id"))]
-    pub user_id: String,
+    /// The user ID
+    #[schema(example = "123456789")]
+    pub user_id: u32,
 
     /// The user email
     #[schema(example = "mslimbeji@gmail.com")]
@@ -126,7 +125,7 @@ impl EncodedTokenSchema {
         Self {
             access_token: "a_very_secret_token".to_string(),
             token_type: "bearer".to_string(),
-            user_id: "1234".to_string(),
+            user_id: 123456789,
             email: "mslimbeji@gmail.com".to_string(),
             expires_in: 3600,
         }

@@ -1,5 +1,4 @@
 use axum::extract::FromRequest;
-use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::{IntoParams, ToSchema};
@@ -12,7 +11,7 @@ use backend::{
         FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery,
     },
     utils::parse_enum_array,
-    validator_::{array_length, object_id, string_length},
+    validator_::{array_length, string_length},
 };
 
 // --- Fields ---
@@ -33,14 +32,14 @@ pub struct Location {
 #[serde(rename_all = "camelCase")]
 pub struct PlaceDB {
     #[serde(rename = "_id")]
-    pub id: ObjectId,
+    pub id: u32,
     pub title: String,
     pub description: String,
     pub address: String,
     pub location: Location,
     pub image_url: Option<String>,
     pub embedding: Option<Vec<f64>>,
-    pub creator_id: ObjectId,
+    pub creator_id: u32,
     #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -75,8 +74,7 @@ pub struct PlaceCreate {
     #[validate(custom(function = "array_length::<f64, 384, 384>"))]
     pub embedding: Option<Vec<f64>>,
     pub image_url: String,
-    #[validate(custom(function = "object_id"))]
-    pub creator_id: String,
+    pub creator_id: u32,
 }
 
 // --- Post Schema ---
@@ -123,8 +121,7 @@ pub struct PlacePost {
     pub lat: f64,
     pub lng: f64,
     pub image: Option<FileToUpload>,
-    #[validate(custom(function = "object_id"))]
-    pub creator_id: String,
+    pub creator_id: u32,
 }
 
 impl<S: Send + Sync> FromRequest<S> for PlacePost {
@@ -143,7 +140,7 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
         let lat = multipart_form.get_number("lat")?;
         let lng = multipart_form.get_number("lng")?;
         let image = multipart_form.get_file_optional("image")?;
-        let creator_id = multipart_form.get_text("creatorId")?;
+        let creator_id = multipart_form.get_number("creatorId")?;
 
         Ok(Self {
             title,
@@ -175,9 +172,8 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
 }))]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceRead {
-    /// The ID of the place 24 characters
-    #[validate(custom(function = "object_id"))]
-    pub id: String,
+    /// The ID of the place
+    pub id: u32,
 
     /// The place title/name, 10 characters minimum
     #[validate(custom(function = "string_length::<10, 0>"))]
@@ -197,9 +193,8 @@ pub struct PlaceRead {
     /// local url on the storage
     pub image_url: Option<String>,
 
-    /// The ID of the place creator, 24 characters
-    #[validate(custom(function = "object_id"))]
-    pub creator_id: String,
+    /// The ID of the place creator
+    pub creator_id: u32,
 
     // creation datetime
     #[schema(value_type = String, format = DateTime)]
@@ -215,7 +210,7 @@ pub struct PlaceRead {
 impl PlaceRead {
     pub fn example() -> Self {
         Self {
-            id: "683b21134e2e5d46978daf1f".to_string(),
+            id: 123456789,
             title: "Stamford Bridge".to_string(),
             description: "Stadium of Chelsea football club".to_string(),
             address: "Fulham road".to_string(),
@@ -226,7 +221,7 @@ impl PlaceRead {
             image_url: Some(
                 "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
             ),
-            creator_id: "683b21134e2e5d46978daf1f".to_string(),
+            creator_id: 123456789,
             created_at: OffsetDateTime::now_utc(),
             updated_at: OffsetDateTime::now_utc(),
         }
@@ -378,7 +373,7 @@ pub struct PlaceUpdate {
     pub location: Option<Location>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub creator_id: Option<ObjectId>,
+    pub creator_id: Option<u32>,
 }
 
 // --- Put Schema ---
@@ -415,8 +410,7 @@ pub struct PlacePut {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<Location>,
 
-    /// The ID of the place creator, 24 characters
+    /// The ID of the place creator
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(custom(function = "object_id"))]
-    pub creator_id: Option<String>,
+    pub creator_id: Option<u32>,
 }
