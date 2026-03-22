@@ -8,9 +8,11 @@ use validator::Validate;
 use crate::config::ENV;
 use backend::{
     axum_::{ApiError, MultipartForm},
-    types_::{FileToUpload, FindQuery, PaginatedData, ToFindQuery},
+    types_::{
+        FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery,
+    },
     utils::parse_enum_array,
-    validator_::{FiltersReader, email_strict, object_id, string_length},
+    validator_::{email_strict, object_id, string_length},
 };
 
 // --- Database Schema ---
@@ -238,34 +240,34 @@ pub struct UserFilters {
     pub email: Option<Vec<String>>,
 }
 
-impl ToFindQuery for UserFilters {
-    fn to_find_query(self) -> Result<FindQuery, validator::ValidationErrors> {
+impl ToSearchQuery for UserFilters {
+    fn to_search_query(
+        self,
+    ) -> Result<SearchQuery, validator::ValidationErrors> {
         let page = self.page.unwrap_or(1);
         let size = self.size.unwrap_or(ENV.max_items_per_page);
-        let fields = parse_enum_array(self.fields);
-        let sort = parse_enum_array(self.sort);
+        let select = parse_enum_array(self.fields);
+        let order_by = parse_enum_array(self.sort);
 
         let mut filter_reader = FiltersReader::new();
-        filter_reader.read_object_id_filters("id", &self.id);
+        filter_reader.read_index_filters("id", &self.id);
         filter_reader.read_string_filters(
             "name",
             &self.name,
             &vec![string_length::<2, 0>],
-            false,
         );
         filter_reader.read_string_filters(
             "email",
             &self.email,
             &vec![email_strict],
-            false,
         );
         match filter_reader.eval() {
-            Ok(filters) => Ok(FindQuery {
+            Ok(where_) => Ok(SearchQuery {
                 page,
                 size,
-                sort,
-                fields,
-                filters,
+                order_by,
+                select,
+                where_,
             }),
             Err(errors) => Err(errors),
         }

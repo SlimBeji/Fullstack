@@ -8,9 +8,11 @@ use validator::Validate;
 use crate::config::ENV;
 use backend::{
     axum_::{ApiError, MultipartForm},
-    types_::{FileToUpload, FindQuery, PaginatedData, ToFindQuery},
+    types_::{
+        FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery,
+    },
     utils::parse_enum_array,
-    validator_::{FiltersReader, array_length, object_id, string_length},
+    validator_::{array_length, object_id, string_length},
 };
 
 // --- Fields ---
@@ -234,7 +236,6 @@ impl PlaceRead {
 pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 // --- Filters Schema ---
-// --- Filters Schema ---
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PlaceSelectableFields {
@@ -306,51 +307,50 @@ pub struct PlaceFilters {
     pub location_lng: Option<Vec<String>>,
 }
 
-impl ToFindQuery for PlaceFilters {
-    fn to_find_query(self) -> Result<FindQuery, validator::ValidationErrors> {
+impl ToSearchQuery for PlaceFilters {
+    fn to_search_query(
+        self,
+    ) -> Result<SearchQuery, validator::ValidationErrors> {
         let page = self.page.unwrap_or(1);
         let size = self.size.unwrap_or(ENV.max_items_per_page);
-        let fields = parse_enum_array(self.fields);
-        let sort = parse_enum_array(self.sort);
+        let select = parse_enum_array(self.fields);
+        let order_by = parse_enum_array(self.sort);
 
         let mut filter_reader = FiltersReader::new();
-        filter_reader.read_object_id_filters("id", &self.id);
+        filter_reader.read_index_filters("id", &self.id);
         filter_reader.read_string_filters(
             "title",
             &self.title,
             &vec![string_length::<10, 0>],
-            false,
         );
         filter_reader.read_string_filters(
             "description",
             &self.description,
             &vec![string_length::<10, 0>],
-            false,
         );
         filter_reader.read_string_filters(
             "address",
             &self.address,
             &vec![string_length::<10, 0>],
-            false,
         );
-        filter_reader.read_object_id_filters("creatorId", &self.creator_id);
-        filter_reader.read_numeric_filters(
+        filter_reader.read_index_filters("creatorId", &self.creator_id);
+        filter_reader.read_f64_filters(
             "locationLat",
             &self.location_lat,
             &vec![],
         );
-        filter_reader.read_numeric_filters(
+        filter_reader.read_f64_filters(
             "locationLng",
             &self.location_lng,
             &vec![],
         );
         match filter_reader.eval() {
-            Ok(filters) => Ok(FindQuery {
+            Ok(where_) => Ok(SearchQuery {
                 page,
                 size,
-                sort,
-                fields,
-                filters,
+                order_by,
+                select,
+                where_,
             }),
             Err(errors) => Err(errors),
         }

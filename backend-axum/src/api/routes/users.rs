@@ -48,9 +48,9 @@ async fn get_users(
     data: QueryFilters<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    println!("{:?}", data.query.fields);
-    println!("{:?}", data.query.sort);
-    println!("{:?}", data.query.filters);
+    println!("{:?}", data.query.select);
+    println!("{:?}", data.query.order_by);
+    println!("{:?}", data.query.where_);
     let result = UsersPaginated {
         page: data.query.page,
         total_count: data.query.size,
@@ -81,9 +81,9 @@ async fn query_users(
     data: BodyFilters<UserFilters>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
-    println!("{:?}", data.query.fields);
-    println!("{:?}", data.query.sort);
-    println!("{:?}", data.query.filters);
+    println!("{:?}", data.query.select);
+    println!("{:?}", data.query.order_by);
+    println!("{:?}", data.query.where_);
     let result = UsersPaginated {
         page: data.query.page,
         total_count: data.query.size,
