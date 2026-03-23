@@ -14,6 +14,55 @@ use backend::{
     validator_::{array_length, string_length},
 };
 
+// --- Selectables, Serchables, Sortables ----
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum PlaceSelectableFields {
+    Id,
+    Title,
+    Description,
+    Address,
+    Location,
+    ImageUrl,
+    CreatorId,
+    CreatedAt,
+}
+
+#[allow(dead_code)] // to be removed
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum PlaceSearchableFields {
+    Id,
+    Title,
+    Description,
+    Address,
+    CreatorId,
+    LocationLat,
+    LocationLng,
+    CreatedAt,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub enum PlaceSortableFields {
+    #[serde(rename = "createdAt")]
+    CreatedAtAsc,
+    #[serde(rename = "-createdAt")]
+    CreatedAtDesc,
+    #[serde(rename = "title")]
+    TitleAsc,
+    #[serde(rename = "-title")]
+    TitleDesc,
+    #[serde(rename = "description")]
+    DescriptionAsc,
+    #[serde(rename = "-description")]
+    DescriptionDesc,
+    #[serde(rename = "address")]
+    AddressAsc,
+    #[serde(rename = "-address")]
+    AddressDesc,
+}
+
 // --- Fields ---
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Validate)]
 pub struct Location {
@@ -211,38 +260,6 @@ impl PlaceRead {
 pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 // --- Filters Schema ---
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum PlaceSelectableFields {
-    Id,
-    Title,
-    Description,
-    Address,
-    Location,
-    ImageUrl,
-    CreatorId,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum PlaceSortableFields {
-    #[serde(rename = "createdAt")]
-    CreatedAtAsc,
-    #[serde(rename = "-createdAt")]
-    CreatedAtDesc,
-    #[serde(rename = "title")]
-    TitleAsc,
-    #[serde(rename = "-title")]
-    TitleDesc,
-    #[serde(rename = "description")]
-    DescriptionAsc,
-    #[serde(rename = "-description")]
-    DescriptionDesc,
-    #[serde(rename = "address")]
-    AddressAsc,
-    #[serde(rename = "-address")]
-    AddressDesc,
-}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]

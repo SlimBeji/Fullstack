@@ -14,6 +14,48 @@ use backend::{
     validator_::{email_strict, string_length},
 };
 
+// --- Selectables, Serchables, Sortables ----
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum UserSelectableFields {
+    Id,
+    Name,
+    Email,
+    IsAdmin,
+    ImageUrl,
+    Places,
+    CreatedAt,
+}
+
+#[allow(dead_code)] // to be removed
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum UserSearchableFields {
+    Id,
+    Name,
+    Email,
+    CreatedAt,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub enum UserSortableFields {
+    #[serde(rename = "created_at")]
+    CreatedAtAsc,
+    #[serde(rename = "-created_at")]
+    CreatedAtDesc,
+    #[serde(rename = "name")]
+    NameAsc,
+    #[serde(rename = "-name")]
+    NameDesc,
+    #[serde(rename = "email")]
+    EmailAsc,
+    #[serde(rename = "-email")]
+    EmailDesc,
+}
+
+// --- Fields ----
+
 // --- Database Schema ---
 
 // --- Seed Schema ---
@@ -168,33 +210,6 @@ impl UserRead {
 pub type UsersPaginated = PaginatedData<UserRead>;
 
 // --- Filters Schema ---
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum UserSelectableFields {
-    Id,
-    Name,
-    Email,
-    IsAdmin,
-    ImageUrl,
-    Places,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum UserSortableFields {
-    #[serde(rename = "createdAt")]
-    CreatedAtAsc,
-    #[serde(rename = "-createdAt")]
-    CreatedAtDesc,
-    #[serde(rename = "name")]
-    NameAsc,
-    #[serde(rename = "-name")]
-    NameDesc,
-    #[serde(rename = "email")]
-    EmailAsc,
-    #[serde(rename = "-email")]
-    EmailDesc,
-}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
