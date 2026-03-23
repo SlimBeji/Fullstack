@@ -161,17 +161,21 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
     }
 }
 
-// --- Read Schema ---
+// --- Read Schemas ---
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
 #[schema(example = json!({
-    "id": "683b21134e2e5d46978daf1f",
+    "id": 123456789,
     "name": "Slim Beji",
     "email": "mslimbeji@gmail.com",
     "isAdmin": false,
     "imageUrl": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-    "places": ["683b21134e2e5d46978daf1f"],
-    "createdAt": "2024-01-12T10:15:30.000Z",
-    "updatedAt": "2024-01-12T10:15:30.000Z"
+    "places": [{
+        "id": 123456789,
+        "title": "Stamford Bridge",
+        "address": "Fulham road"
+    }],
+    "createdAt": "2024-01-12T10:15:30.000Z"
 }))]
 pub struct UserRead {
     /// The user ID
@@ -188,21 +192,16 @@ pub struct UserRead {
     /// Whether the user is an admin or not
     pub is_admin: bool,
 
-    /// Local url on the storage
-    pub image_url: Option<String>,
+    /// image url
+    pub image_url: String,
 
-    /// The id of places belonging to the user
-    pub places: Vec<String>,
+    /// places created by the user
+    pub places: Vec<UserPlace>,
 
     // creation datetime
     #[schema(value_type = String, format = DateTime)]
     #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
-
-    // last update datetime
-    #[schema(value_type = String, format = DateTime)]
-    #[serde(with = "time::serde::rfc3339")]
-    pub updated_at: OffsetDateTime,
 }
 
 impl UserRead {
@@ -212,17 +211,17 @@ impl UserRead {
             name: "Slim Beji".to_string(),
             email: "mslimbeji@gmail.com".to_string(),
             is_admin: false,
-            image_url: Some(
-                "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
-            ),
-            places: vec!["683b21134e2e5d46978daf1f".to_string()],
+            image_url: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg"
+                .to_string(),
+            places: vec![UserPlace {
+                id: 123456789,
+                title: "Stamford Bridge".to_string(),
+                address: "Fulham road".to_string(),
+            }],
             created_at: OffsetDateTime::now_utc(),
-            updated_at: OffsetDateTime::now_utc(),
         }
     }
 }
-
-pub type UsersPaginated = PaginatedData<UserRead>;
 
 // --- Filters Schema ---
 
@@ -282,6 +281,8 @@ impl ToSearchQuery for UserFilters {
         }
     }
 }
+
+pub type UsersPaginated = PaginatedData<UserRead>;
 
 // --- Update Schema ---
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]

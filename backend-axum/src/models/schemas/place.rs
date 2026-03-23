@@ -184,10 +184,11 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
     }
 }
 
-// --- Read Schema ---
+// --- Read Schemas ---
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
 #[schema(example = json!({
-    "id": "683b21134e2e5d46978daf1f",
+    "id": 123456789,
     "title": "Stamford Bridge",
     "description": "Stadium of Chelsea football club",
     "address": "Fulham road",
@@ -196,9 +197,8 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
         "lng": -0.19090418688755467
     },
     "image_url": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-    "creatorId": "683b21134e2e5d46978daf1f",
+    "creatorId": 123456789,
     "createdAt": "2024-01-12T10:15:30.000Z",
-    "updatedAt": "2024-01-12T10:15:30.000Z"
 }))]
 pub struct PlaceRead {
     /// The ID of the place
@@ -219,7 +219,7 @@ pub struct PlaceRead {
     /// Location object (can be sent as JSON string)
     pub location: Location,
 
-    /// local url on the storage
+    /// image url
     pub image_url: Option<String>,
 
     /// The ID of the place creator
@@ -229,11 +229,6 @@ pub struct PlaceRead {
     #[schema(value_type = String, format = DateTime)]
     #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
-
-    // last update datetime
-    #[schema(value_type = String, format = DateTime)]
-    #[serde(with = "time::serde::rfc3339")]
-    pub updated_at: OffsetDateTime,
 }
 
 impl PlaceRead {
@@ -252,12 +247,9 @@ impl PlaceRead {
             ),
             creator_id: 123456789,
             created_at: OffsetDateTime::now_utc(),
-            updated_at: OffsetDateTime::now_utc(),
         }
     }
 }
-
-pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 // --- Filters Schema ---
 
@@ -345,6 +337,8 @@ impl ToSearchQuery for PlaceFilters {
         }
     }
 }
+
+pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 // --- Update Schema ---
 #[allow(dead_code)] // to be removed
