@@ -6,7 +6,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     models::schemas::{
-        PlaceFilters, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
+        PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch,
         PlacesPaginated, UserRead,
     },
 };
@@ -35,7 +35,7 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "Place",
     summary = "Search and Retrieve places",
-    params(PlaceFilters),
+    params(PlaceSearch),
     responses((
         status = 200,
         body = PlacesPaginated,
@@ -45,7 +45,7 @@ pub fn routes() -> OpenApiRouter {
 )]
 async fn get_places(
     Auth(user): Auth,
-    data: QueryFilters<PlaceFilters>,
+    data: QueryFilters<PlaceSearch>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
@@ -66,7 +66,7 @@ async fn get_places(
     tag = "Place",
     summary = "Search and Retrieve places",
     request_body(
-        content = PlaceFilters,
+        content = PlaceSearch,
         content_type = "application/json"
     ),
     responses((
@@ -78,7 +78,7 @@ async fn get_places(
 )]
 async fn query_places(
     Auth(user): Auth,
-    data: BodyFilters<PlaceFilters>,
+    data: BodyFilters<PlaceSearch>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);

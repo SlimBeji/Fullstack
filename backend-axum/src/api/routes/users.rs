@@ -6,7 +6,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     models::schemas::{
-        UserFilters, UserPost, UserPostSwagger, UserPut, UserRead,
+        UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
         UsersPaginated,
     },
 };
@@ -35,7 +35,7 @@ pub fn routes() -> OpenApiRouter {
     path = "/",
     tag = "User",
     summary = "Search and Retrieve users",
-    params(UserFilters),
+    params(UserSearch),
     responses((
         status = 200,
         body = UsersPaginated,
@@ -45,7 +45,7 @@ pub fn routes() -> OpenApiRouter {
 )]
 async fn get_users(
     Auth(user): Auth,
-    data: QueryFilters<UserFilters>,
+    data: QueryFilters<UserSearch>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
@@ -66,7 +66,7 @@ async fn get_users(
     tag = "User",
     summary = "Search and Retrieve users",
     request_body(
-        content = UserFilters,
+        content = UserSearch,
         content_type = "application/json"
     ),
     responses((
@@ -78,7 +78,7 @@ async fn get_users(
 )]
 async fn query_users(
     Auth(user): Auth,
-    data: BodyFilters<UserFilters>,
+    data: BodyFilters<UserSearch>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
