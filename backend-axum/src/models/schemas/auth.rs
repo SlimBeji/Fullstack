@@ -10,6 +10,7 @@ use backend::{
 };
 
 // --- Custom Validators ----
+
 pub fn validate_token(t: &str) -> Result<(), ValidationError> {
     if t != "bearer" {
         let mut err = ValidationError::new("invalid_token_type");
@@ -20,6 +21,7 @@ pub fn validate_token(t: &str) -> Result<(), ValidationError> {
 }
 
 // --- Signup Schemas ----
+
 #[allow(dead_code)]
 #[derive(ToSchema)]
 pub struct SignupSchemaSwagger {
@@ -31,7 +33,7 @@ pub struct SignupSchemaSwagger {
     #[schema(example = "mslimbeji@gmail.com")]
     pub email: String,
 
-    /// The user password, 10 characters at least
+    /// The user password, 8 characters at least
     #[schema(example = "very_secret")]
     pub password: String,
 
@@ -48,7 +50,7 @@ pub struct SignupSchema {
     #[validate(custom(function = "email_strict"))]
     pub email: String,
 
-    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[validate(custom(function = "string_length::<8, 0>"))]
     pub password: String,
 
     pub image: Option<FileToUpload>,
@@ -79,6 +81,7 @@ impl<S: Send + Sync> FromRequest<S> for SignupSchema {
 }
 
 // --- Signin Schemas ----
+
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
 pub struct SigninSchema {
     /// The user email (We use username here because of OAuth spec)
@@ -86,13 +89,14 @@ pub struct SigninSchema {
     #[validate(custom(function = "email_strict"))]
     pub username: String,
 
-    /// The user password, 10 characters at least
+    /// The user password, 8 characters at least
     #[schema(example = "very_secret")]
-    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[validate(custom(function = "string_length::<8, 0>"))]
     pub password: String,
 }
 
 // Response Schemas
+
 #[derive(Serialize, Deserialize, ToSchema, Validate)]
 pub struct EncodedTokenSchema {
     /// A generated web token. The 'Bearer ' prefix needs to be added for authentication
