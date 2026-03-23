@@ -45,6 +45,7 @@ const (
 	PlaceSearchCreatorId   PlaceSearchables = "creator_id"
 	PlaceSearchLocationLat PlaceSearchables = "location_lat"
 	PlaceSearchLocationLng PlaceSearchables = "location_lng"
+	PlaceSearchCreatedAt   PlaceSearchables = "created_at"
 )
 
 func (field PlaceSearchables) Validate() bool {

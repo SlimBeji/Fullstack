@@ -37,9 +37,10 @@ func (field UserSelectables) Validate() bool {
 type UserSearchables string
 
 const (
-	UserSearchId    UserSearchables = "id"
-	UserSearchName  UserSearchables = "name"
-	UserSearchEmail UserSearchables = "email"
+	UserSearchId        UserSearchables = "id"
+	UserSearchName      UserSearchables = "name"
+	UserSearchEmail     UserSearchables = "email"
+	UserSearchCreatedAt UserSearchables = "created_at"
 )
 
 func (field UserSearchables) Validate() bool {
