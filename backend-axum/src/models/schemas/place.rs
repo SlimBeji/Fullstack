@@ -45,9 +45,9 @@ pub enum PlaceSearchableFields {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub enum PlaceSortableFields {
-    #[serde(rename = "createdAt")]
+    #[serde(rename = "created_at")]
     CreatedAtAsc,
-    #[serde(rename = "-createdAt")]
+    #[serde(rename = "-created_at")]
     CreatedAtDesc,
     #[serde(rename = "title")]
     TitleAsc,
@@ -170,7 +170,7 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
         let lat = multipart_form.get_number("lat")?;
         let lng = multipart_form.get_number("lng")?;
         let image = multipart_form.get_file_optional("image")?;
-        let creator_id = multipart_form.get_number("creatorId")?;
+        let creator_id = multipart_form.get_number("creator_id")?;
 
         Ok(Self {
             title,
@@ -197,8 +197,8 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
         "lng": -0.19090418688755467
     },
     "image_url": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
-    "creatorId": 123456789,
-    "createdAt": "2024-01-12T10:15:30.000Z",
+    "creator_id": 123456789,
+    "created_at": "2024-01-12T10:15:30.000Z",
 }))]
 pub struct PlaceRead {
     /// The ID of the place
@@ -373,7 +373,7 @@ impl ToSearchQuery for PlaceSearch {
             &self.address,
             &vec![string_length::<10, 0>],
         );
-        filter_reader.read_index_filters("creatorId", &self.creator_id);
+        filter_reader.read_index_filters("creator_id", &self.creator_id);
         filter_reader.read_f64_filters(
             "location_lat",
             &self.location_lat,

@@ -168,14 +168,14 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
     "id": 123456789,
     "name": "Slim Beji",
     "email": "mslimbeji@gmail.com",
-    "isAdmin": false,
-    "imageUrl": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
+    "is_admin": false,
+    "image_url": "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg",
     "places": [{
         "id": 123456789,
         "title": "Stamford Bridge",
         "address": "Fulham road"
     }],
-    "createdAt": "2024-01-12T10:15:30.000Z"
+    "created_at": "2024-01-12T10:15:30.000Z"
 }))]
 pub struct UserRead {
     /// The user ID
