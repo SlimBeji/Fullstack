@@ -238,10 +238,7 @@ pub enum PlaceSelectableFields {
     Title,
     Description,
     Address,
-    #[serde(rename = "location.lat")]
-    LocationLat,
-    #[serde(rename = "location.lng")]
-    LocationLng,
+    Location,
     ImageUrl,
     CreatorId,
 }
