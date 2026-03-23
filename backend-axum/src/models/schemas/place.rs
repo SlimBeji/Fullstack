@@ -92,6 +92,7 @@ pub struct PlaceSeed {
 }
 
 // --- Create Schema ---
+
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Deserialize, Validate)]
 pub struct PlaceCreate {
@@ -99,7 +100,7 @@ pub struct PlaceCreate {
     pub title: String,
     #[validate(custom(function = "string_length::<10, 0>"))]
     pub description: String,
-    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[validate(custom(function = "string_length::<1, 0>"))]
     pub address: String,
     pub location: Location,
     #[validate(custom(function = "array_length::<f64, 384, 384>"))]
@@ -108,7 +109,6 @@ pub struct PlaceCreate {
     pub creator_id: u32,
 }
 
-// --- Post Schema ---
 #[derive(Serialize, ToSchema)]
 pub struct PlacePostSwagger {
     /// The place title/name, 10 characters minimum
@@ -135,9 +135,9 @@ pub struct PlacePostSwagger {
     #[schema(format = "binary", required = false)]
     pub image: String,
 
-    /// The ID of the place creator, 24 characters
-    #[schema(example = "683b21134e2e5d46978daf1f")]
-    pub creator_id: String,
+    /// The ID of the place creator
+    #[schema(example = 123456789)]
+    pub creator_id: u32,
 }
 
 #[derive(Debug, Validate)]

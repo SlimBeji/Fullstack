@@ -86,6 +86,7 @@ pub struct UserSeed {
 }
 
 // --- Create Schema ---
+
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Deserialize, Validate)]
 pub struct UserCreate {
@@ -94,12 +95,11 @@ pub struct UserCreate {
     #[validate(custom(function = "email_strict"))]
     pub email: String,
     pub is_admin: bool,
-    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[validate(custom(function = "string_length::<8, 0>"))]
     pub password: String,
     pub image_url: Option<String>,
 }
 
-// --- Post Schema ---
 #[derive(Serialize, ToSchema)]
 pub struct UserPostSwagger {
     /// The user name, two characters at least
@@ -114,7 +114,7 @@ pub struct UserPostSwagger {
     #[schema(example = false)]
     pub is_admin: bool,
 
-    /// The user password, 10 characters at least
+    /// The user password, 8 characters at least
     #[schema(example = "very_secret")]
     pub password: String,
 
@@ -130,7 +130,7 @@ pub struct UserPost {
     #[validate(custom(function = "email_strict"))]
     pub email: String,
     pub is_admin: bool,
-    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[validate(custom(function = "string_length::<8, 0>"))]
     pub password: String,
     pub image: Option<FileToUpload>,
 }
@@ -147,7 +147,7 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
 
         let name = multipart_form.get_text("name")?;
         let email = multipart_form.get_text("email")?;
-        let is_admin = multipart_form.get_boolean("isAdmin")?;
+        let is_admin = multipart_form.get_boolean("is_admin")?;
         let password = multipart_form.get_text("password")?;
         let image = multipart_form.get_file_optional("image")?;
 
@@ -191,7 +191,7 @@ pub struct UserRead {
     /// Local url on the storage
     pub image_url: Option<String>,
 
-    /// The id of places belonging to the user, 24 characters
+    /// The id of places belonging to the user
     pub places: Vec<String>,
 
     // creation datetime
