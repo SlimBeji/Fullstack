@@ -56,6 +56,22 @@ pub enum UserSortableFields {
 
 // --- Fields ----
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Validate)]
+pub struct UserPlace {
+    /// The ID of the place
+    #[schema(example = 123456789)]
+    pub id: u32,
+
+    /// The place title/name, 10 characters minimum
+    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[schema(example = "Stamford Bridge")]
+    pub title: String,
+
+    /// The place address
+    #[schema(example = "Fulham road")]
+    pub address: String,
+}
+
 // --- Database Schema ---
 
 // --- Seed Schema ---

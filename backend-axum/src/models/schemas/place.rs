@@ -63,7 +63,8 @@ pub enum PlaceSortableFields {
     AddressDesc,
 }
 
-// --- Fields ---
+// --- Fields ----
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Validate)]
 pub struct Location {
     /// The latitude of the place
