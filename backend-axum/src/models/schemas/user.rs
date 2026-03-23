@@ -17,7 +17,6 @@ use backend::{
 // --- Database Schema ---
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct UserDB {
     #[serde(rename = "_id")]
     pub id: u32,
@@ -61,7 +60,6 @@ pub struct UserCreate {
 
 // --- Post Schema ---
 #[derive(Serialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct UserPostSwagger {
     /// The user name, two characters at least
     #[schema(example = "Slim Beji")]
@@ -134,7 +132,6 @@ impl<S: Send + Sync> FromRequest<S> for UserPost {
     "createdAt": "2024-01-12T10:15:30.000Z",
     "updatedAt": "2024-01-12T10:15:30.000Z"
 }))]
-#[serde(rename_all = "camelCase")]
 pub struct UserRead {
     /// The user ID
     pub id: u32,

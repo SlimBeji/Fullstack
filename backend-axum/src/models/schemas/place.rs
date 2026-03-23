@@ -29,7 +29,6 @@ pub struct Location {
 // --- Database Schema ---
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct PlaceDB {
     #[serde(rename = "_id")]
     pub id: u32,
@@ -79,7 +78,6 @@ pub struct PlaceCreate {
 
 // --- Post Schema ---
 #[derive(Serialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PlacePostSwagger {
     /// The place title/name, 10 characters minimum
     #[schema(example = "Stamford Bridge")]
@@ -170,7 +168,6 @@ impl<S: Send + Sync> FromRequest<S> for PlacePost {
     "createdAt": "2024-01-12T10:15:30.000Z",
     "updatedAt": "2024-01-12T10:15:30.000Z"
 }))]
-#[serde(rename_all = "camelCase")]
 pub struct PlaceRead {
     /// The ID of the place
     pub id: u32,
@@ -352,7 +349,6 @@ impl ToSearchQuery for PlaceFilters {
 // --- Update Schema ---
 #[allow(dead_code)] // to be removed
 #[derive(Debug, Serialize, Deserialize, Validate)]
-#[serde(rename_all = "camelCase")]
 pub struct PlaceUpdate {
     #[validate(custom(function = "string_length::<10, 0>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -386,7 +382,6 @@ pub struct PlaceUpdate {
     "creatorId": "683b21134e2e5d46978daf1f"
 }))]
 // using full example because location example does not render well when set separately
-#[serde(rename_all = "camelCase")]
 pub struct PlacePut {
     /// The place title/name, 10 characters minimum
     #[serde(skip_serializing_if = "Option::is_none")]
