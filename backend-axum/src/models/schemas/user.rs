@@ -250,32 +250,51 @@ pub struct UserUpdate {
 
 pub type UserPut = UserUpdate;
 
-// --- Filters Schema ---
+// --- Search Schemas ---
+
+pub type UsersPaginated = PaginatedData<UserRead>;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
-#[serde(rename_all = "snake_case")]
-pub struct UserFilters {
+pub struct UserSearch {
+    /// The page number
     #[param(example = 1)]
     #[schema(example = 1)]
     pub page: Option<usize>,
+
+    /// Items per page
     #[param(example = 100)]
     #[schema(example = 100)]
     pub size: Option<usize>,
+
+    /// Fields to use for sorting. Use the '-' for descending sorting
     pub sort: Option<Vec<UserSortableFields>>,
+
+    /// Fields to include in the response; omit for complete data
     pub fields: Option<Vec<UserSelectableFields>>,
-    #[param(example = json!(["683b21134e2e5d46978daf1f"]))]
-    #[schema(example = json!(["683b21134e2e5d46978daf1f"]))]
+
+    /// The user ID
+    #[param(example = json!(["123456789"]))]
+    #[schema(example = json!(["123456789"]))]
     pub id: Option<Vec<String>>,
+
+    /// The user name, two characters at least
     #[param(example = json!(["eq:Slim Beji"]))]
     #[schema(example = json!(["eq:Slim Beji"]))]
     pub name: Option<Vec<String>>,
+
+    /// The user email
     #[param(example = json!(["eq:mslimbeji@gmail.com"]))]
     #[schema(example = json!(["eq:mslimbeji@gmail.com"]))]
     pub email: Option<Vec<String>>,
+
+    /// creation datetime
+    #[param(example = json!(["gt:2025-09-28"]))]
+    #[schema(example = json!(["gt:2025-09-28"]))]
+    pub created_at: Option<Vec<String>>,
 }
 
-impl ToSearchQuery for UserFilters {
+impl ToSearchQuery for UserSearch {
     fn to_search_query(
         self,
     ) -> Result<SearchQuery, validator::ValidationErrors> {
@@ -296,6 +315,11 @@ impl ToSearchQuery for UserFilters {
             &self.email,
             &vec![email_strict],
         );
+        filter_reader.read_datetime_filters(
+            "created_at",
+            &self.created_at,
+            &vec![],
+        );
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
                 page,
@@ -308,5 +332,3 @@ impl ToSearchQuery for UserFilters {
         }
     }
 }
-
-pub type UsersPaginated = PaginatedData<UserRead>;

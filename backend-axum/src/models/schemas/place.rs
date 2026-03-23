@@ -283,44 +283,71 @@ pub struct PlaceUpdate {
 
 pub type PlacePut = PlaceUpdate;
 
-// --- Filters Schema ---
+// --- Search Schemas ---
+
+pub type PlacesPaginated = PaginatedData<PlaceRead>;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
 #[into_params(parameter_in = Query)]
-#[serde(rename_all = "snake_case")]
-pub struct PlaceFilters {
+pub struct PlaceSearch {
+    /// The page number
     #[param(example = 1)]
     #[schema(example = 1)]
     pub page: Option<usize>,
+
+    /// Items per page
     #[param(example = 100)]
     #[schema(example = 100)]
     pub size: Option<usize>,
+
+    /// Fields to use for sorting. Use the '-' for descending sorting
     pub sort: Option<Vec<PlaceSortableFields>>,
+
+    /// Fields to include in the response; omit for complete data
     pub fields: Option<Vec<PlaceSelectableFields>>,
-    #[param(example = json!(["683b21134e2e5d46978daf1f"]))]
-    #[schema(example = json!(["683b21134e2e5d46978daf1f"]))]
+
+    /// The ID of the place
+    #[param(example = json!(["123456789"]))]
+    #[schema(example = json!(["123456789"]))]
     pub id: Option<Vec<String>>,
+
+    /// The place title/name, 10 characters minimum
     #[param(example = json!(["eq:Some Place"]))]
     #[schema(example = json!(["eq:Some Place"]))]
     pub title: Option<Vec<String>>,
-    #[param(example = json!(["regex:football"]))]
-    #[schema(example = json!(["regex:football"]))]
+
+    /// The place description, 10 characters minimum
+    #[param(example = json!(["like:football"]))]
+    #[schema(example = json!(["like:football"]))]
     pub description: Option<Vec<String>>,
-    #[param(example = json!(["regex:d{1,2} Boulevard"]))]
-    #[schema(example = json!(["regex:d{1,2} Boulevard"]))]
+
+    /// The place address
+    #[param(example = json!(["ilike:boulevard"]))]
+    #[schema(example = json!(["ilike:boulevard"]))]
     pub address: Option<Vec<String>>,
-    #[param(example = json!(["eq:683b21134e2e5d46978daf1f"]))]
-    #[schema(example = json!(["eq:683b21134e2e5d46978daf1f"]))]
+
+    /// The ID of the place creator
+    #[param(example = json!(["in:123456789"]))]
+    #[schema(example = json!(["in:123456789"]))]
     pub creator_id: Option<Vec<String>>,
+
+    /// The latitude of the place
     #[param(example = json!(["gt:3.5"]))]
     #[schema(example = json!(["gt:3.5"]))]
     pub location_lat: Option<Vec<String>>,
+
+    /// The longitude of the place
     #[param(example = json!(["lt:4.5"]))]
     #[schema(example = json!(["lt:4.5"]))]
     pub location_lng: Option<Vec<String>>,
+
+    /// creation datetime
+    #[param(example = json!(["gt:2025-09-28"]))]
+    #[schema(example = json!(["gt:2025-09-28"]))]
+    pub created_at: Option<Vec<String>>,
 }
 
-impl ToSearchQuery for PlaceFilters {
+impl ToSearchQuery for PlaceSearch {
     fn to_search_query(
         self,
     ) -> Result<SearchQuery, validator::ValidationErrors> {
@@ -348,13 +375,18 @@ impl ToSearchQuery for PlaceFilters {
         );
         filter_reader.read_index_filters("creatorId", &self.creator_id);
         filter_reader.read_f64_filters(
-            "locationLat",
+            "location_lat",
             &self.location_lat,
             &vec![],
         );
         filter_reader.read_f64_filters(
-            "locationLng",
+            "location_lng",
             &self.location_lng,
+            &vec![],
+        );
+        filter_reader.read_datetime_filters(
+            "created_at",
+            &self.created_at,
             &vec![],
         );
         match filter_reader.eval() {
@@ -369,5 +401,3 @@ impl ToSearchQuery for PlaceFilters {
         }
     }
 }
-
-pub type PlacesPaginated = PaginatedData<PlaceRead>;
