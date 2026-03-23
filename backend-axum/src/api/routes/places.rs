@@ -171,7 +171,6 @@ async fn update_place(
     println!("{:?}", payload.description);
     println!("{:?}", payload.address);
     println!("{:?}", payload.location);
-    println!("{:?}", payload.creator_id);
     (StatusCode::OK, Json(UserRead::example()))
 }
 

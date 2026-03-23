@@ -223,6 +223,33 @@ impl UserRead {
     }
 }
 
+// --- Update Schema ---
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
+#[schema(example = json!({
+    "name": "Slim Beji",
+    "email": "mslimbeji@gmail.com",
+    "password": "very_secret"
+}))]
+pub struct UserUpdate {
+    /// The user name, two characters at least
+    #[validate(custom(function = "string_length::<2, 0>"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+
+    /// The user email
+    #[validate(custom(function = "email_strict"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
+    /// The user password, 10 characters at least
+    #[validate(custom(function = "string_length::<8, 0>"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub password: Option<String>,
+}
+
+pub type UserPut = UserUpdate;
+
 // --- Filters Schema ---
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
@@ -283,30 +310,3 @@ impl ToSearchQuery for UserFilters {
 }
 
 pub type UsersPaginated = PaginatedData<UserRead>;
-
-// --- Update Schema ---
-#[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
-#[schema(example = json!({
-    "name": "Slim Beji",
-    "email": "mslimbeji@gmail.com",
-    "password": "very_secret"
-}))]
-pub struct UserUpdate {
-    /// The user name, two characters at least
-    #[validate(custom(function = "string_length::<2, 0>"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-
-    /// The user email
-    #[validate(custom(function = "email_strict"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    /// The user password, 10 characters at least
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub password: Option<String>,
-}
-
-// --- Put Schema ---
-pub type UserPut = UserUpdate;

@@ -251,6 +251,38 @@ impl PlaceRead {
     }
 }
 
+// --- Update Schema ---
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
+#[schema(example = json!({
+    "title": "Stamford Bridge",
+    "description": "Stadium of Chelsea football club",
+    "address": "Fulham road",
+    "location": {
+        "lat": 51.48180425016331,
+        "lng": -0.19090418688755467
+    }
+}))]
+// using full example because location example does not render well when set separately
+pub struct PlaceUpdate {
+    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
+    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub location: Option<Location>,
+}
+
+pub type PlacePut = PlaceUpdate;
+
 // --- Filters Schema ---
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, IntoParams)]
@@ -339,64 +371,3 @@ impl ToSearchQuery for PlaceFilters {
 }
 
 pub type PlacesPaginated = PaginatedData<PlaceRead>;
-
-// --- Update Schema ---
-#[allow(dead_code)] // to be removed
-#[derive(Debug, Serialize, Deserialize, Validate)]
-pub struct PlaceUpdate {
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub address: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub location: Option<Location>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub creator_id: Option<u32>,
-}
-
-// --- Put Schema ---
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-#[schema(example = json!({
-    "title": "Stamford Bridge",
-    "description": "Stadium of Chelsea football club",
-    "address": "Fulham road",
-    "location": {
-        "lat": 51.48180425016331,
-        "lng": -0.19090418688755467
-    },
-    "creatorId": "683b21134e2e5d46978daf1f"
-}))]
-// using full example because location example does not render well when set separately
-pub struct PlacePut {
-    /// The place title/name, 10 characters minimum
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    pub title: Option<String>,
-
-    /// The place description, 10 characters minimum
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    pub description: Option<String>,
-
-    /// The place address
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[validate(custom(function = "string_length::<10, 0>"))]
-    pub address: Option<String>,
-
-    /// Location object (can be sent as JSON string)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub location: Option<Location>,
-
-    /// The ID of the place creator
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub creator_id: Option<u32>,
-}
