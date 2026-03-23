@@ -76,20 +76,19 @@ pub struct Location {
     pub lng: f64,
 }
 
-// --- Database Schema ---
+// --- Base Schemas ----
 
-// --- Seed Schema ---
 #[allow(dead_code)] // to be removed
 #[derive(Debug)]
 pub struct PlaceSeed {
-    pub ref_: i32,
-    pub creator_ref: i32,
+    pub ref_: u32,
+    pub creator_ref: u32,
     pub title: String,
     pub description: String,
     pub address: String,
     pub location: Location,
-    pub embedding: Option<Vec<f64>>,
-    pub image_url: Option<String>,
+    pub embedding: Option<Vec<f32>>,
+    pub image_url: String,
 }
 
 // --- Create Schema ---

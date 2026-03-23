@@ -72,18 +72,17 @@ pub struct UserPlace {
     pub address: String,
 }
 
-// --- Database Schema ---
+// --- Base Schemas ----
 
-// --- Seed Schema ---
 #[allow(dead_code)] // to be removed
 #[derive(Debug)]
 pub struct UserSeed {
-    pub ref_: i32,
+    pub ref_: u32,
     pub name: String,
     pub email: String,
     pub is_admin: bool,
     pub password: String,
-    pub image_url: Option<String>,
+    pub image_url: String,
 }
 
 // --- Create Schema ---
