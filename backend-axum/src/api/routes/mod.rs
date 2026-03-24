@@ -1,4 +1,3 @@
-use backend::axum_::url_not_found;
 use utoipa_axum::router::OpenApiRouter;
 
 mod auth;
@@ -15,5 +14,4 @@ pub fn create_router(prefix: &str) -> OpenApiRouter {
         )
         .nest(&format!("{}{}", prefix, users::PATH), users::routes())
         .nest(&format!("{}{}", prefix, places::PATH), places::routes())
-        .fallback(url_not_found)
 }
