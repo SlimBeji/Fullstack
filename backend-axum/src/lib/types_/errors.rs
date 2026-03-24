@@ -159,6 +159,15 @@ impl ApiError {
         }
     }
 
+    pub fn bad_auth_header(detail: impl Into<String>) -> Self {
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: "bad Authorization header".to_string(),
+            details: Some(Value::String(detail.into())),
+            err: None,
+        }
+    }
+
     pub fn unprocessable(
         message: impl Into<String>,
         details: Option<Value>,
@@ -172,43 +181,6 @@ impl ApiError {
             message: message.into(),
             details,
             err,
-        }
-    }
-
-    pub fn bad_form_data(
-        detail: impl Into<String>,
-        err: Box<dyn Error + Send + Sync>,
-    ) -> Self {
-        let message = detail.into();
-        let (msg, info) = message
-            .split_once(":")
-            .unwrap_or(("bad form data", message.as_str()));
-        Self {
-            code: StatusCode::UNPROCESSABLE_ENTITY,
-            message: msg.to_string(),
-            details: Some(Value::String(info.to_string())),
-            err: Some(err),
-        }
-    }
-
-    pub fn bad_auth_header(detail: impl Into<String>) -> Self {
-        Self {
-            code: StatusCode::BAD_REQUEST,
-            message: "bad Authorization header".to_string(),
-            details: Some(Value::String(detail.into())),
-            err: None,
-        }
-    }
-
-    pub fn bad_request(
-        message: impl Into<String>,
-        err: Box<dyn Error + Send + Sync>,
-    ) -> Self {
-        Self {
-            code: StatusCode::BAD_REQUEST,
-            message: message.into(),
-            details: Some(Value::String(err.to_string())),
-            err: Some(err),
         }
     }
 
