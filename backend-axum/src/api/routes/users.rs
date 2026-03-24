@@ -1,5 +1,4 @@
 use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use axum_extra::extract::Query;
 use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -11,7 +10,9 @@ use crate::{
         UsersPaginated,
     },
 };
-use backend::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson};
+use backend::axum_::{
+    BodyFilters, Query, QueryFilters, Validated, ValidatedJson,
+};
 
 pub const PATH: &str = "/users";
 
