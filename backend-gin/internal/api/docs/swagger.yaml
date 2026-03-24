@@ -401,7 +401,7 @@ definitions:
     properties:
       data:
         items:
-          $ref: '#/definitions/schemas.PlaceRead'
+          $ref: '#/definitions/schemas.UserRead'
         type: array
       page:
         example: 1

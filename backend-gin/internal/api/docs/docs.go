@@ -1589,7 +1589,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/schemas.PlaceRead"
+                        "$ref": "#/definitions/schemas.UserRead"
                     }
                 },
                 "page": {

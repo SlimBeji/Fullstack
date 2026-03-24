@@ -150,7 +150,7 @@ type UserPut struct {
 
 // --- Search Schemas ---
 
-type UsersPaginated = types_.PaginatedData[PlaceRead]
+type UsersPaginated = types_.PaginatedData[UserRead]
 
 type UserSearch struct {
 	Page      int                `json:"page" default:"1" validate:"gte=1"`                                                                                                                              // The page number
