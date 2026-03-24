@@ -3,6 +3,7 @@ use serde::de::DeserializeOwned;
 use validator::Validate;
 
 use super::ApiError;
+use super::extract::Query;
 
 // Validated for types that impelments FromRequest+Validate with ApiError rejection
 // Used mainly for multipart/form-data endpoints
@@ -83,6 +84,28 @@ where
                 }
             })?
             .0;
+        ApiError::validate(&inner)?;
+        Ok(Self(inner))
+    }
+}
+
+// ValidatedQuery for simple structs that implements only Validated trait
+// Used mainly to parse query parameters
+#[allow(dead_code)]
+pub struct ValidatedQuery<T>(pub T);
+
+impl<S, T> FromRequest<S> for ValidatedQuery<T>
+where
+    S: Sync + Send,
+    T: DeserializeOwned + Validate,
+{
+    type Rejection = ApiError;
+
+    async fn from_request(
+        req: Request,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        let inner = Query::<T>::from_request(req, state).await?.0;
         ApiError::validate(&inner)?;
         Ok(Self(inner))
     }
