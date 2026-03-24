@@ -43,9 +43,7 @@ where
     ) -> Result<Self, Self::Rejection> {
         let inner = Json::<T>::from_request(req, state)
             .await
-            .map_err(|rejection| {
-                ApiError::bad_request("Invalid json data", Box::new(rejection))
-            })?
+            .map_err(ApiError::from_json_rejection)?
             .0;
         ApiError::validate(&inner)?;
         Ok(Self(inner))
@@ -69,20 +67,7 @@ where
     ) -> Result<Self, Self::Rejection> {
         let inner = Form::<T>::from_request(req, state)
             .await
-            .map_err(|rejection| {
-                let error_msg = rejection.to_string();
-
-                if error_msg.contains("missing field")
-                    || error_msg.contains("Failed to deserialize")
-                {
-                    ApiError::bad_form_data(error_msg, Box::new(rejection))
-                } else {
-                    ApiError::bad_request(
-                        "Invalid form data",
-                        Box::new(rejection),
-                    )
-                }
-            })?
+            .map_err(ApiError::from_form_rejection)?
             .0;
         ApiError::validate(&inner)?;
         Ok(Self(inner))
@@ -105,6 +90,7 @@ where
         req: Request,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
+        // The custom Query from extractors is using ApiError as Rejection type
         let inner = Query::<T>::from_request(req, state).await?.0;
         ApiError::validate(&inner)?;
         Ok(Self(inner))

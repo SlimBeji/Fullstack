@@ -2,6 +2,7 @@ use std::fmt;
 
 use axum::{
     Json,
+    extract::rejection::{FormRejection, JsonRejection},
     http::StatusCode,
     response::{IntoResponse, Response},
 };
@@ -84,17 +85,63 @@ impl ApiError {
         Ok(())
     }
 
-    pub fn from_query_rejection(rejection: QueryRejection) -> Self {
-        let detail = match &rejection {
-            QueryRejection::FailedToDeserializeQueryString(err) => {
-                Value::String(err.to_string())
+    pub fn from_json_rejection(rejection: JsonRejection) -> Self {
+        let (message, detail) = match &rejection {
+            JsonRejection::JsonSyntaxError(err) => {
+                ("bad json syntax", Value::String(err.to_string()))
             }
-            _ => Value::String(rejection.to_string()),
+            JsonRejection::MissingJsonContentType(err) => (
+                "header content must be application/json",
+                Value::String(err.to_string()),
+            ),
+            JsonRejection::JsonDataError(err) => {
+                ("incompatible types", Value::String(err.to_string()))
+            }
+            _ => ("failed to read json", Value::String(rejection.to_string())),
         };
 
         Self {
             code: StatusCode::BAD_REQUEST,
-            message: "could not parse query parameters".into(),
+            message: message.into(),
+            details: Some(detail),
+            err: Some(Box::new(rejection)),
+        }
+    }
+
+    pub fn from_query_rejection(rejection: QueryRejection) -> Self {
+        let (message, detail) = match &rejection {
+            QueryRejection::FailedToDeserializeQueryString(err) => {
+                ("incompatible types", Value::String(err.to_string()))
+            }
+            _ => (
+                "could not parse query parameters",
+                Value::String(rejection.to_string()),
+            ),
+        };
+
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: message.into(),
+            details: Some(detail),
+            err: Some(Box::new(rejection)),
+        }
+    }
+
+    pub fn from_form_rejection(rejection: FormRejection) -> Self {
+        let (message, detail) = match &rejection {
+            FormRejection::InvalidFormContentType(err) => (
+                "header content must be x-www-form-urlencoded",
+                Value::String(err.to_string()),
+            ),
+            FormRejection::FailedToDeserializeForm(err) => {
+                ("incompatible types", Value::String(err.to_string()))
+            }
+            _ => ("failed to read form", Value::String(rejection.to_string())),
+        };
+
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: message.into(),
             details: Some(detail),
             err: Some(Box::new(rejection)),
         }
