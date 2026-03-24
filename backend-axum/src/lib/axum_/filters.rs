@@ -53,12 +53,7 @@ where
     ) -> Result<Self, Self::Rejection> {
         let inner = Json::<T>::from_request(req, state)
             .await
-            .map_err(|rejection| {
-                ApiError::bad_request(
-                    "Invalid body filters",
-                    Box::new(rejection),
-                )
-            })?
+            .map_err(ApiError::from_json_rejection)?
             .0;
         let find_query = inner.to_search_query().map_err(|errors| {
             ApiError::from_validation_errors("bad query parameters", errors)
