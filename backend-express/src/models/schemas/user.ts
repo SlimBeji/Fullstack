@@ -109,6 +109,7 @@ export const userSortableFields = [
 export type UserSortableType = (typeof userSortableFields)[number];
 
 // --- Base Schemas ----
+
 export const UserDBSchema = zod.object({
     id: UserFields.id,
     name: UserFields.name,
@@ -150,6 +151,7 @@ export const UserGetSchema = zod.object({
 });
 
 // --- Update Schemas ---
+
 export const UserUpdateSchema = zod.object({
     name: UserFields.name.optional(),
     email: UserFields.email.optional(),
@@ -165,8 +167,6 @@ export type UserPut = ZodInfer<typeof UserPutSchema>;
 // ---  Search Schemas ----
 
 export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
-
-export type UsersPaginated = ZodInfer<typeof UsersPaginatedSchema>;
 
 export const UserSearchSchema = filtersSchema(
     zod.object({

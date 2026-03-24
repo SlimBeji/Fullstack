@@ -191,8 +191,6 @@ export type PlacePut = ZodInfer<typeof PlacePutSchema>;
 
 export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
-export type PlacesPaginated = ZodInfer<typeof PlacesPaginatedSchema>;
-
 export const PlaceSearchSchema = filtersSchema(
     zod.object({
         id: httpFilters(
