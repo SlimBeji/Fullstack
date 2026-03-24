@@ -5,6 +5,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use axum_extra::extract::QueryRejection;
 use validator::{Validate, ValidationErrors};
 
 use serde_json::{Error as SerdeErr, Value, error::Category, json};
@@ -81,6 +82,22 @@ impl ApiError {
             err: Some(Box::new(e)),
         })?;
         Ok(())
+    }
+
+    pub fn from_query_rejection(rejection: QueryRejection) -> Self {
+        let detail = match &rejection {
+            QueryRejection::FailedToDeserializeQueryString(err) => {
+                Value::String(err.to_string())
+            }
+            _ => Value::String(rejection.to_string()),
+        };
+
+        Self {
+            code: StatusCode::BAD_REQUEST,
+            message: "could not parse query parameters".into(),
+            details: Some(detail),
+            err: Some(Box::new(rejection)),
+        }
     }
 
     pub fn from_validation_errors(
