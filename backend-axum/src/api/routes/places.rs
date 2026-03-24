@@ -17,7 +17,7 @@ pub const PATH: &str = "/places";
 pub fn routes() -> OpenApiRouter {
     let mut router = OpenApiRouter::new()
         .routes(routes!(get_places))
-        .routes(routes!(query_places))
+        .routes(routes!(search_places))
         .routes(routes!(create_place))
         .routes(routes!(get_place))
         .routes(routes!(update_place))
@@ -62,7 +62,7 @@ async fn get_places(
 
 #[utoipa::path(
     post,
-    path = "/query",
+    path = "/search",
     tag = "Place",
     summary = "Search and Retrieve places",
     request_body(
@@ -76,7 +76,7 @@ async fn get_places(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn query_places(
+async fn search_places(
     Auth(user): Auth,
     data: BodyFilters<PlaceSearch>,
 ) -> impl IntoResponse {

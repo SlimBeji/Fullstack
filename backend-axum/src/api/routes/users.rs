@@ -17,7 +17,7 @@ pub const PATH: &str = "/users";
 pub fn routes() -> OpenApiRouter {
     let mut router = OpenApiRouter::new()
         .routes(routes!(get_users))
-        .routes(routes!(query_users))
+        .routes(routes!(search_users))
         .routes(routes!(create_user))
         .routes(routes!(get_user))
         .routes(routes!(update_user))
@@ -62,7 +62,7 @@ async fn get_users(
 
 #[utoipa::path(
     post,
-    path = "/query",
+    path = "/search",
     tag = "User",
     summary = "Search and Retrieve users",
     request_body(
@@ -76,7 +76,7 @@ async fn get_users(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn query_users(
+async fn search_users(
     Auth(user): Auth,
     data: BodyFilters<UserSearch>,
 ) -> impl IntoResponse {
