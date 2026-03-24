@@ -4,7 +4,8 @@ use validator::Validate;
 
 use super::ApiError;
 
-// Validated for types that impelments FromRequest with ApiError rejection
+// Validated for types that impelments FromRequest+Validate with ApiError rejection
+// Used mainly for multipart/form-data endpoints
 pub struct Validated<T>(pub T);
 
 impl<S, T> FromRequest<S> for Validated<T>
@@ -24,7 +25,8 @@ where
     }
 }
 
-// ValidatedJson for simple structs that implements only Validated trait
+// ValidatedJson for simple structs that implements only Validate trait
+// Used for application/json endpoints
 pub struct ValidatedJson<T>(pub T);
 
 impl<S, T> FromRequest<S> for ValidatedJson<T>
@@ -50,6 +52,7 @@ where
 }
 
 // ValidatedForm for simple structs that implements only Validated trait
+// Used mainly for application/x-www-form-urlencoded endpoints
 pub struct ValidatedForm<T>(pub T);
 
 impl<S, T> FromRequest<S> for ValidatedForm<T>
