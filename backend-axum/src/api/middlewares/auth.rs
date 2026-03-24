@@ -1,7 +1,7 @@
 use axum::extract::FromRequestParts;
 
 use crate::models::schemas::UserRead;
-use backend::axum_::ApiError;
+use backend::types_::ApiError;
 
 pub struct Auth(pub UserRead);
 

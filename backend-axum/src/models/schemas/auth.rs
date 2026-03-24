@@ -4,8 +4,8 @@ use utoipa::ToSchema;
 use validator::{Validate, ValidationError};
 
 use backend::{
-    axum_::{ApiError, MultipartForm},
-    types_::FileToUpload,
+    axum_::MultipartForm,
+    types_::{ApiError, FileToUpload},
     validator_::{email_strict, string_length},
 };
 

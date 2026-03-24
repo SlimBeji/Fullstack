@@ -4,8 +4,7 @@ use axum::extract::{FromRequest, Json};
 use axum_extra::extract::Query;
 use serde::de::DeserializeOwned;
 
-use super::super::types_::{SearchQuery, ToSearchQuery};
-use super::ApiError;
+use super::super::types_::{ApiError, SearchQuery, ToSearchQuery};
 
 // Filters from Query parameters
 pub struct QueryFilters<T> {

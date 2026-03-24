@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 use axum::extract::{FromRequest, Request, multipart};
 
-use super::super::types_::FileToUpload;
+use super::super::types_::{ApiError, FileToUpload};
 use super::super::utils;
-use super::ApiError;
 
 pub enum MultipartField {
     Text(String),
