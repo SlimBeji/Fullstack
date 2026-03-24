@@ -75,16 +75,6 @@ impl From<SerdeErr> for ApiError {
 
 #[allow(dead_code)] // to be removed
 impl ApiError {
-    pub fn validate<T: Validate>(inner: &T) -> Result<(), Self> {
-        inner.validate().map_err(|e| Self {
-            code: StatusCode::UNPROCESSABLE_ENTITY,
-            message: "invalid data".to_string(),
-            details: Some(Value::Object(errors_to_serde_map(&e))),
-            err: Some(Box::new(e)),
-        })?;
-        Ok(())
-    }
-
     pub fn from_json_rejection(rejection: JsonRejection) -> Self {
         let (message, detail) = match &rejection {
             JsonRejection::JsonSyntaxError(err) => {
@@ -145,6 +135,16 @@ impl ApiError {
             details: Some(detail),
             err: Some(Box::new(rejection)),
         }
+    }
+
+    pub fn validate<T: Validate>(inner: &T) -> Result<(), Self> {
+        inner.validate().map_err(|e| Self {
+            code: StatusCode::UNPROCESSABLE_ENTITY,
+            message: "invalid data".to_string(),
+            details: Some(Value::Object(errors_to_serde_map(&e))),
+            err: Some(Box::new(e)),
+        })?;
+        Ok(())
     }
 
     pub fn from_validation_errors(
