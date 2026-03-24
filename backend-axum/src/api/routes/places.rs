@@ -1,4 +1,5 @@
 use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
+use axum_extra::extract::Query;
 use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -6,8 +7,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     models::schemas::{
-        PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch,
-        PlacesPaginated, UserRead,
+        PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
+        PlaceSearch, PlacesPaginated, UserRead,
     },
 };
 use backend::axum_::{BodyFilters, QueryFilters, Validated, ValidatedJson};
@@ -134,15 +135,17 @@ async fn create_place(
     path = "/{id}",
     tag = "Place",
     summary = "Search and Retrieve place by id",
-    params(("id" = String, Path, description = "Place ID")),
+    params(("id" = String, Path, description = "Place ID"), PlaceGet),
     responses((status = 200, body = PlaceRead, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
 async fn get_place(
     Auth(user): Auth,
     Path(id): Path<String>,
+    Query(params): Query<PlaceGet>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
+    println!("{:?}", params.fields);
     println!("returning place {}", id);
     (StatusCode::OK, Json(PlaceRead::example()))
 }

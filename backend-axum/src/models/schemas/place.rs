@@ -251,6 +251,14 @@ impl PlaceRead {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, ToSchema, Validate, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct PlaceGet {
+    /// Fields to include in the response; omit for complete data
+    #[param(value_type = Option<Vec<PlaceSelectableFields>>)]
+    pub fields: Option<Vec<PlaceSelectableFields>>,
+}
+
 // --- Update Schema ---
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]

@@ -1,4 +1,5 @@
 use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
+use axum_extra::extract::Query;
 use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -6,7 +7,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     api::middlewares::Auth,
     models::schemas::{
-        UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
+        UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
         UsersPaginated,
     },
 };
@@ -132,15 +133,17 @@ async fn create_user(
     path = "/{id}",
     tag = "User",
     summary = "Search and Retrieve user by id",
-    params(("id" = String, Path, description = "User ID")),
+    params(("id" = String, Path, description = "User ID"), UserGet),
     responses((status = 200, body = UserRead, content_type = "application/json")),
     security(("OAuth2Password" = []))
 )]
 async fn get_user(
     Auth(user): Auth,
     Path(id): Path<String>,
+    Query(params): Query<UserGet>,
 ) -> impl IntoResponse {
     println!("{}", user.name);
+    println!("{:?}", params.fields);
     println!("returning user {}", id);
     (StatusCode::OK, Json(UserRead::example()))
 }

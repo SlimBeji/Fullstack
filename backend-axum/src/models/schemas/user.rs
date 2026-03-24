@@ -223,6 +223,14 @@ impl UserRead {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, ToSchema, Validate, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct UserGet {
+    /// Fields to include in the response; omit for complete data
+    #[param(value_type = Option<Vec<UserSelectableFields>>)]
+    pub fields: Option<Vec<UserSelectableFields>>,
+}
+
 // --- Update Schema ---
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
