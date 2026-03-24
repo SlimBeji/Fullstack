@@ -10,8 +10,9 @@ use crate::{
         PlaceSearch, PlacesPaginated, UserRead,
     },
 };
-use backend::axum_::{
-    BodyFilters, Query, QueryFilters, Validated, ValidatedJson,
+use backend::{
+    axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
+    types_::PaginatedData,
 };
 
 pub const PATH: &str = "/places";
@@ -40,7 +41,7 @@ pub fn routes() -> OpenApiRouter {
     params(PlaceSearch),
     responses((
         status = 200,
-        body = PlacesPaginated,
+        body = PaginatedData<PlaceRead>,
         content_type = "application/json"
     )),
     security(("OAuth2Password" = []))
@@ -73,7 +74,7 @@ async fn get_places(
     ),
     responses((
         status = 200,
-        body = PlacesPaginated,
+        body = PaginatedData<PlaceRead>,
         content_type = "application/json"
     )),
     security(("OAuth2Password" = []))

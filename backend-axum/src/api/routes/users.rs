@@ -10,8 +10,9 @@ use crate::{
         UsersPaginated,
     },
 };
-use backend::axum_::{
-    BodyFilters, Query, QueryFilters, Validated, ValidatedJson,
+use backend::{
+    axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
+    types_::PaginatedData,
 };
 
 pub const PATH: &str = "/users";
@@ -40,7 +41,7 @@ pub fn routes() -> OpenApiRouter {
     params(UserSearch),
     responses((
         status = 200,
-        body = UsersPaginated,
+        body = PaginatedData<UserRead>,
         content_type = "application/json"
     )),
     security(("OAuth2Password" = []))
@@ -73,7 +74,7 @@ async fn get_users(
     ),
     responses((
         status = 200,
-        body = UsersPaginated,
+        body = PaginatedData<UserRead>,
         content_type = "application/json"
     )),
     security(("OAuth2Password" = []))
