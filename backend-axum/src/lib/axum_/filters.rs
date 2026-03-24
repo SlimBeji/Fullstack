@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 
 use axum::extract::{FromRequest, Json};
-use axum_extra::extract::Query;
 use serde::de::DeserializeOwned;
 
 use super::super::types_::{ApiError, SearchQuery, ToSearchQuery};
+use super::extract::Query;
 
 // Filters from Query parameters
 pub struct QueryFilters<T> {
@@ -23,15 +23,7 @@ where
         req: axum::extract::Request,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let inner = Query::<T>::from_request(req, state)
-            .await
-            .map_err(|rejection| {
-                ApiError::bad_request(
-                    "bad query parameters",
-                    Box::new(rejection),
-                )
-            })?
-            .0;
+        let inner = Query::<T>::from_request(req, state).await?.0;
         let find_query = inner.to_search_query().map_err(|errors| {
             ApiError::from_validation_errors("bad query parameters", errors)
         })?;
