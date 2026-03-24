@@ -1120,7 +1120,7 @@ const docTemplate = `{
                     "example": "bearer"
                 },
                 "user_id": {
-                    "description": "The user ID, 24 characters",
+                    "description": "The user ID",
                     "type": "integer",
                     "example": 123456789
                 }

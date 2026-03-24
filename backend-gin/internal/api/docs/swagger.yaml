@@ -51,7 +51,7 @@ definitions:
         example: bearer
         type: string
       user_id:
-        description: The user ID, 24 characters
+        description: The user ID
         example: 123456789
         type: integer
     type: object
