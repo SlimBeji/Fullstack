@@ -79,7 +79,7 @@ export const extractFindQuery = (
     location: "query" | "body"
 ): RequestHandler => {
     return async (req: Request, resp: Response, next: NextFunction) => {
-        const filterFields = Object.keys(zodSchema.keyof().options);
+        const filterFields = Object.keys(zodSchema.shape);
         const body =
             location === "body"
                 ? req.body
