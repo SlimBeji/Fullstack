@@ -193,40 +193,35 @@ export const PlacesPaginatedSchema = paginatedSchema(PlaceReadSchema);
 
 export const PlaceSearchSchema = filtersSchema(
     zod.object({
-        id: httpFilters(
-            PlaceFields.id,
-            { example: 123456789, description: "The ID of the place" },
-            { isIndex: true }
-        ).optional(),
-        title: httpFilters(PlaceFields.title, {
+        id: httpFilters(PlaceFields.id, "index", {
+            example: 123456789,
+            description: "The ID of the place",
+        }).optional(),
+        title: httpFilters(PlaceFields.title, "string", {
             example: "eq:Some Place",
             description: "The place title/name, 10 characters minimum",
         }).optional(),
-        description: httpFilters(PlaceFields.description, {
+        description: httpFilters(PlaceFields.description, "string", {
             example: "like:football",
             description: "The place description, 10 characters minimum",
         }).optional(),
-        address: httpFilters(PlaceFields.address, {
+        address: httpFilters(PlaceFields.address, "string", {
             example: "ilike:boulevard",
             description: "The place address",
         }).optional(),
-        location_lat: httpFilters(PlaceFields.lat, {
+        location_lat: httpFilters(PlaceFields.lat, "numeric", {
             example: "gt:3.5",
             description: "The latitude of the place",
         }).optional(),
-        location_lng: httpFilters(PlaceFields.lng, {
+        location_lng: httpFilters(PlaceFields.lng, "numeric", {
             example: "lt:4.5",
             description: "The longitude of the place",
         }).optional(),
-        creator_id: httpFilters(
-            PlaceFields.creatorId,
-            {
-                example: "in:123456789",
-                description: "The ID of the place creator",
-            },
-            { isIndex: true }
-        ).optional(),
-        created_at: httpFilters(createdAt, {
+        creator_id: httpFilters(PlaceFields.creatorId, "index", {
+            example: "in:123456789",
+            description: "The ID of the place creator",
+        }).optional(),
+        created_at: httpFilters(createdAt, "datetime", {
             example: "gt:2022-05-29",
             description: "creation datetime",
         }).optional(),

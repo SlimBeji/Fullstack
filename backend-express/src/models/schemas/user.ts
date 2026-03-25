@@ -170,20 +170,19 @@ export const UsersPaginatedSchema = paginatedSchema(UserReadSchema);
 
 export const UserSearchSchema = filtersSchema(
     zod.object({
-        id: httpFilters(
-            UserFields.id,
-            { example: 123456789, description: "The user ID" },
-            { isIndex: true }
-        ).optional(),
-        name: httpFilters(UserFields.name, {
+        id: httpFilters(UserFields.id, "index", {
+            example: 123456789,
+            description: "The user ID",
+        }).optional(),
+        name: httpFilters(UserFields.name, "string", {
             example: "eq:Slim Beji",
             description: "The user name, two characters at least",
         }).optional(),
-        email: httpFilters(UserFields.email, {
+        email: httpFilters(UserFields.email, "string", {
             example: "eq:mslimbeji@gmail.com",
             description: "The user email",
         }).optional(),
-        created_at: httpFilters(createdAt, {
+        created_at: httpFilters(createdAt, "datetime", {
             example: "gt:2022-05-29",
             description: "creation datetime",
         }).optional(),

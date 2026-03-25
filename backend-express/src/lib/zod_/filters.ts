@@ -4,9 +4,7 @@ import { Filter, FilterOperation } from "../types";
 import { splitOnce } from "../utils";
 import { zod } from "./base";
 
-type QueryParamTypes = "numeric" | "string" | "boolean" | "date";
-
-type TransformOption = { isIndex?: boolean };
+type QueryParamTypes = "index" | "numeric" | "string" | "boolean" | "datetime";
 
 type OpenapiDoc = { description?: string; example?: any };
 
@@ -29,13 +27,8 @@ const updateContextFromError = (
 const numericQueryParamTransform = (
     field: ZodType,
     value: any,
-    context: RefinementCtx,
-    options?: TransformOption
+    context: RefinementCtx
 ): { op: FilterOperation; val: number | number[] | boolean } | ZodNever => {
-    if (options?.isIndex) {
-        return indexQueryParamTransform(field, value, context);
-    }
-
     if (!value.includes(":")) {
         try {
             return { op: "eq", val: field.parse(Number(value)) as number };
@@ -346,41 +339,25 @@ const dateQueryParamTransform = (
     }
 };
 
-const guessType = (field: ZodTypeAny): QueryParamTypes => {
-    if (field instanceof zod.ZodNumber) {
-        return "numeric";
-    } else if (field instanceof zod.ZodString) {
-        return "string";
-    } else if (field instanceof zod.ZodBoolean) {
-        return "boolean";
-    } else if (field instanceof zod.ZodDate) {
-        return "date";
-    } else if (field instanceof zod.ZodTransformer) {
-        return guessType(field._def.schema);
-    } else if (field instanceof zod.ZodOptional) {
-        return guessType(field._def.innerType);
-    } else {
-        throw new Error(`Could not guess the type of field ${field}`);
-    }
-};
-
 export const httpFilter = (
     field: ZodType,
-    doc?: OpenapiDoc,
-    options?: TransformOption
+    baseType: QueryParamTypes,
+    doc?: OpenapiDoc
 ): ZodType => {
     let transformFunction: (val: any, ctx: RefinementCtx) => any;
-    const baseType = guessType(field);
     if (baseType === "numeric") {
         transformFunction = (val, ctx) =>
-            numericQueryParamTransform(field, val, ctx, options);
+            numericQueryParamTransform(field, val, ctx);
+    } else if (baseType == "index") {
+        transformFunction = (val, ctx) =>
+            indexQueryParamTransform(field, val, ctx);
     } else if (baseType === "string") {
         transformFunction = (val, ctx) =>
             stringQueryParamTransform(field, val, ctx);
     } else if (baseType === "boolean") {
         transformFunction = (val, ctx) =>
             booleanQueryParamTransform(field, val, ctx);
-    } else if (baseType === "date") {
+    } else if (baseType === "datetime") {
         transformFunction = (val, ctx) =>
             dateQueryParamTransform(field, val, ctx);
     } else {
@@ -472,8 +449,8 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
 
 export const httpFilters = (
     field: ZodType,
-    doc?: OpenapiDoc,
-    options?: TransformOption
+    baseType: QueryParamTypes,
+    doc?: OpenapiDoc
 ): ZodType => {
     doc = doc || {};
     let { description, example } = doc;
@@ -489,7 +466,7 @@ export const httpFilters = (
                       ? val
                       : [`${val}`],
             zod
-                .array(httpFilter(field, doc, options) as ZodType<Filter>)
+                .array(httpFilter(field, baseType, doc) as ZodType<Filter>)
                 .transform(toFieldFilter)
         )
         .openapi({
