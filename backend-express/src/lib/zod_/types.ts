@@ -43,7 +43,7 @@ export const zodFile = (
                 throw new ApiError(
                     HttpStatus.UNPROCESSABLE_ENTITY,
                     "Invalid file upload",
-                    result.error.format()
+                    result.error.issues
                 );
             }
             return result.data;

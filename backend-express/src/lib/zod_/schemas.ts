@@ -1,11 +1,11 @@
-import { AnyZodObject } from "zod";
+import { ZodObject } from "zod";
 
 import { zod } from "./base";
 
 export const paginatedSchema = (
-    schema: AnyZodObject,
+    schema: ZodObject,
     description: string = "The page data"
-): AnyZodObject => {
+): ZodObject => {
     return zod.object({
         page: zod
             .number()
@@ -38,13 +38,13 @@ export const getFieldsSectionSchema = (
 };
 
 export const filtersSchema = (
-    baseSchema: AnyZodObject,
+    baseSchema: ZodObject,
     sortables: readonly string[],
     selectables: readonly string[],
     maxItems: number = 100,
     defaultFields: string[] | null = null,
     defaultSort: string[] | null = null
-): AnyZodObject => {
+): ZodObject => {
     defaultSort = defaultSort || ["-created_at"];
     defaultFields = defaultFields || ["id"];
 

@@ -1,4 +1,4 @@
-import { RefinementCtx, ZodNever, ZodTypeAny } from "zod";
+import { RefinementCtx, ZodNever, ZodType } from "zod";
 
 import { Filter, FilterOperation } from "../types";
 import { splitOnce } from "../utils";
@@ -22,12 +22,12 @@ const updateContextFromError = (
         msg = message;
     }
 
-    ctx.addIssue({ code: zod.ZodIssueCode.custom, message: msg });
+    ctx.addIssue({ code: "custom", message: msg });
     return zod.NEVER;
 };
 
 const numericQueryParamTransform = (
-    field: ZodTypeAny,
+    field: ZodType,
     value: any,
     context: RefinementCtx,
     options?: TransformOption
@@ -38,7 +38,7 @@ const numericQueryParamTransform = (
 
     if (!value.includes(":")) {
         try {
-            return { op: "eq", val: field.parse(Number(value)) };
+            return { op: "eq", val: field.parse(Number(value)) as number };
         } catch (err) {
             return updateContextFromError(
                 context,
@@ -57,7 +57,7 @@ const numericQueryParamTransform = (
         case "lt":
         case "lte":
             try {
-                return { op, val: field.parse(Number(val)) };
+                return { op, val: field.parse(Number(val)) as number };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -70,7 +70,7 @@ const numericQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: zod.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) as number[] };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -94,7 +94,7 @@ const numericQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: zod.ZodIssueCode.custom,
+                code: "custom",
                 message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,null`,
             });
             return zod.NEVER;
@@ -102,13 +102,13 @@ const numericQueryParamTransform = (
 };
 
 const indexQueryParamTransform = (
-    field: ZodTypeAny,
+    field: ZodType,
     value: any,
     context: RefinementCtx
 ): { op: FilterOperation; val: number | number[] | boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
-            return { op: "eq", val: field.parse(Number(value)) };
+            return { op: "eq", val: field.parse(Number(value)) as number };
         } catch (err) {
             return updateContextFromError(
                 context,
@@ -123,7 +123,7 @@ const indexQueryParamTransform = (
         case "eq":
         case "ne":
             try {
-                return { op, val: field.parse(Number(val)) };
+                return { op, val: field.parse(Number(val)) as number };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -136,7 +136,7 @@ const indexQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: zod.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) as number[] };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -160,7 +160,7 @@ const indexQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: zod.ZodIssueCode.custom,
+                code: "custom",
                 message: `Unknown operator "${op}". Valid: eq,ne,null,in,nin`,
             });
             return zod.NEVER;
@@ -168,13 +168,13 @@ const indexQueryParamTransform = (
 };
 
 const stringQueryParamTransform = (
-    field: ZodTypeAny,
+    field: ZodType,
     value: any,
     context: RefinementCtx
 ): { op: FilterOperation; val: string | string[] | boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
-            return { op: "eq", val: field.parse(value) };
+            return { op: "eq", val: field.parse(value) as string };
         } catch (err) {
             return updateContextFromError(
                 context,
@@ -189,7 +189,7 @@ const stringQueryParamTransform = (
         case "eq":
         case "ne":
             try {
-                return { op, val: field.parse(val) };
+                return { op, val: field.parse(val) as string };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -202,7 +202,7 @@ const stringQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: zod.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) as string[] };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -230,7 +230,7 @@ const stringQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: zod.ZodIssueCode.custom,
+                code: "custom",
                 message: `Unknown operator "${op}". Valid: eq,ne,in,nin,null,like,ilike`,
             });
             return zod.NEVER;
@@ -238,13 +238,13 @@ const stringQueryParamTransform = (
 };
 
 const booleanQueryParamTransform = (
-    field: ZodTypeAny,
+    field: ZodType,
     value: any,
     context: RefinementCtx
 ): { op: FilterOperation; val: boolean } | ZodNever => {
     if (!value.includes(":")) {
         try {
-            return { op: "eq", val: field.parse(value === "true") };
+            return { op: "eq", val: field.parse(value === "true") as boolean };
         } catch (err) {
             return updateContextFromError(
                 context,
@@ -273,7 +273,7 @@ const booleanQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: zod.ZodIssueCode.custom,
+                code: "custom",
                 message: `Unknown operator "${op}". Valid: eq,ne,null`,
             });
             return zod.NEVER;
@@ -281,7 +281,7 @@ const booleanQueryParamTransform = (
 };
 
 const dateQueryParamTransform = (
-    field: ZodTypeAny,
+    field: ZodType,
     value: any,
     context: RefinementCtx
 ): { op: FilterOperation; val: Date | Date[] | boolean } | ZodNever => {
@@ -302,7 +302,7 @@ const dateQueryParamTransform = (
         case "lte":
             try {
                 const date = new Date(val);
-                return { op, val: field.parse(date) };
+                return { op, val: field.parse(date) as Date };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -315,7 +315,7 @@ const dateQueryParamTransform = (
         case "nin":
             try {
                 const vals = val.split(",");
-                return { op, val: zod.array(field).parse(vals) };
+                return { op, val: zod.array(field).parse(vals) as Date[] };
             } catch (err) {
                 return updateContextFromError(
                     context,
@@ -339,7 +339,7 @@ const dateQueryParamTransform = (
 
         default:
             context.addIssue({
-                code: zod.ZodIssueCode.custom,
+                code: "custom",
                 message: `Unknown operator "${op}". Valid: eq,ne,gt,gte,lt,lte,in,nin,null`,
             });
             return zod.NEVER;
@@ -365,10 +365,10 @@ const guessType = (field: ZodTypeAny): QueryParamTypes => {
 };
 
 export const httpFilter = (
-    field: ZodTypeAny,
+    field: ZodType,
     doc?: OpenapiDoc,
     options?: TransformOption
-): ZodTypeAny => {
+): ZodType => {
     let transformFunction: (val: any, ctx: RefinementCtx) => any;
     const baseType = guessType(field);
     if (baseType === "numeric") {
@@ -409,7 +409,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
         if (usedOperators.includes(f.op) && !duplicate.includes(f.op)) {
             duplicate.push(f.op);
             ctx.addIssue({
-                code: zod.ZodIssueCode.custom,
+                code: "custom",
                 message: `cannot use an operator twice for the same field. ${f.op} used multiple times`,
             });
         }
@@ -422,7 +422,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     // Rule 1: eq should be used exclusively
     if (length >= 2 && eqUsed) {
         ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
+            code: "custom",
             message: `eq can only be used exclusively. ${usedOperators} used at the same time`,
         });
     }
@@ -430,7 +430,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     // Rule 2: if eq not used than null should be used exclusively
     else if (!eqUsed && usedOperators.includes("null") && length >= 2) {
         ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
+            code: "custom",
             message: `null operator should be used exclusively. ${usedOperators} used at the same time`,
         });
     }
@@ -438,7 +438,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     // Rule 3: if eq not used than in should be used exclusively
     else if (!eqUsed && usedOperators.includes("in") && length >= 2) {
         ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
+            code: "custom",
             message: `in operator should be used exclusively. ${usedOperators} used at the same time`,
         });
     }
@@ -446,7 +446,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     // Rule 4: gt/gte cannot be used together
     if (usedOperators.includes("gt") && usedOperators.includes("gte")) {
         ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
+            code: "custom",
             message: `gt and gte operators should not be used together`,
         });
     }
@@ -454,7 +454,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     // Rule 5: lt/lte cannot be used together
     if (usedOperators.includes("lt") && usedOperators.includes("lte")) {
         ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
+            code: "custom",
             message: "lt and lte operators should not be used together",
         });
     }
@@ -462,7 +462,7 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
     // Rule 6: like/ilike cannot be used together
     if (usedOperators.includes("like") && usedOperators.includes("ilike")) {
         ctx.addIssue({
-            code: zod.ZodIssueCode.custom,
+            code: "custom",
             message: "like and ilike operators should not be used together",
         });
     }
@@ -471,10 +471,10 @@ const toFieldFilter = (filters: Filter[], ctx: RefinementCtx): Filter[] => {
 };
 
 export const httpFilters = (
-    field: ZodTypeAny,
+    field: ZodType,
     doc?: OpenapiDoc,
     options?: TransformOption
-): ZodTypeAny => {
+): ZodType => {
     doc = doc || {};
     let { description, example } = doc;
     description = description || "";
@@ -488,7 +488,9 @@ export const httpFilters = (
                     : Array.isArray(val)
                       ? val
                       : [`${val}`],
-            zod.array(httpFilter(field, doc, options)).transform(toFieldFilter)
+            zod
+                .array(httpFilter(field, doc, options) as ZodType<Filter>)
+                .transform(toFieldFilter)
         )
         .openapi({
             description,

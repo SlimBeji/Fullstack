@@ -1,6 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParsedQs } from "qs";
-import { AnyZodObject } from "zod";
+import { ZodObject } from "zod";
 
 import { ApiError, Filter, HttpStatus } from "../types";
 
@@ -75,11 +75,11 @@ const extractFilters = (
 };
 
 export const extractFindQuery = (
-    zodSchema: AnyZodObject,
+    zodSchema: ZodObject,
     location: "query" | "body"
 ): RequestHandler => {
     return async (req: Request, resp: Response, next: NextFunction) => {
-        const filterFields = Object.keys(zodSchema.shape);
+        const filterFields = Object.keys(zodSchema.keyof().options);
         const body =
             location === "body"
                 ? req.body
@@ -90,10 +90,10 @@ export const extractFindQuery = (
             throw new ApiError(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 "Invalid query request",
-                { details: parsing.error.format() }
+                { details: parsing.error.issues }
             );
         }
-        const data = parsing.data;
+        const data = parsing.data as Record<string, Filter[]>;
         req.parsedBody = {
             page: data.page || 1,
             size: data.size,

@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import { AnyZodObject, ZodTypeAny } from "zod";
+import { ZodObject, ZodType } from "zod";
 
 import { ApiError, HttpStatus } from "../types";
 import { isMultipartFormData } from "./helpers";
 
-const isFileField = (field: ZodTypeAny | any): boolean => {
+const isFileField = (field: ZodType | any): boolean => {
     if (field._def?.openapi?.metadata?.format === "binary") {
         return true;
     }
     return false;
 };
 
-const getFileFields = (schema: AnyZodObject): string[] => {
+const getFileFields = (schema: ZodObject): string[] => {
     const fields: string[] = [];
     for (const [key, fieldSchema] of Object.entries(schema.shape)) {
         if (isFileField(fieldSchema)) {
@@ -22,7 +22,7 @@ const getFileFields = (schema: AnyZodObject): string[] => {
     return fields;
 };
 
-const checkBody = (req: Request, schema: AnyZodObject): ApiError | void => {
+const checkBody = (req: Request, schema: ZodObject): ApiError | void => {
     const body = req.body;
     if (!body) {
         return new ApiError(
@@ -35,13 +35,13 @@ const checkBody = (req: Request, schema: AnyZodObject): ApiError | void => {
         return new ApiError(
             HttpStatus.UNPROCESSABLE_ENTITY,
             "request not valid",
-            result.error.format()
+            result.error.issues
         );
     }
     req.parsedBody = result.data;
 };
 
-export const validateBody = (schema: AnyZodObject) => {
+export const validateBody = (schema: ZodObject) => {
     return async function (req: Request, resp: Response, next: NextFunction) {
         const fileFields = getFileFields(schema);
         const isMultipart = isMultipartFormData(req);
@@ -88,14 +88,14 @@ export const validateBody = (schema: AnyZodObject) => {
     };
 };
 
-export const validateQuery = (schema: AnyZodObject) => {
+export const validateQuery = (schema: ZodObject) => {
     return async function (req: Request, _resp: Response, next: NextFunction) {
         const result = schema.safeParse(req.query);
         if (!result.success) {
             const err = new ApiError(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 "request not valid",
-                result.error.format()
+                result.error.issues
             );
             return next(err);
         }
