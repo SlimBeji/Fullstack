@@ -109,7 +109,12 @@ async function createUser(req: Request, res: Response) {
     res.status(200).json(newUser);
 }
 
-userRouter.post("/", Admin, validateBody(UserPostSchema), createUser);
+userRouter.post(
+    "/",
+    Admin,
+    validateBody(UserPostSchema, ["image"]),
+    createUser
+);
 
 swaggerRegistery.registerPath({
     method: "post",

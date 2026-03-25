@@ -1,26 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import { ZodObject, ZodType } from "zod";
+import { ZodObject } from "zod";
 
 import { ApiError, HttpStatus } from "../types";
 import { isMultipartFormData } from "./helpers";
-
-const isFileField = (field: ZodType | any): boolean => {
-    if (field._def?.openapi?.metadata?.format === "binary") {
-        return true;
-    }
-    return false;
-};
-
-const getFileFields = (schema: ZodObject): string[] => {
-    const fields: string[] = [];
-    for (const [key, fieldSchema] of Object.entries(schema.shape)) {
-        if (isFileField(fieldSchema)) {
-            fields.push(key);
-        }
-    }
-    return fields;
-};
 
 const checkBody = (req: Request, schema: ZodObject): ApiError | void => {
     const body = req.body;
@@ -41,9 +24,8 @@ const checkBody = (req: Request, schema: ZodObject): ApiError | void => {
     req.parsedBody = result.data;
 };
 
-export const validateBody = (schema: ZodObject) => {
+export const validateBody = (schema: ZodObject, fileFields: string[] = []) => {
     return async function (req: Request, resp: Response, next: NextFunction) {
-        const fileFields = getFileFields(schema);
         const isMultipart = isMultipartFormData(req);
         if (isMultipart) {
             // Multipart form

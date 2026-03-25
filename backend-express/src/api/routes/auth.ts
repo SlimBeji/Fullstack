@@ -21,7 +21,7 @@ async function signup(req: Request, res: Response) {
     res.status(200).json(tokenData);
 }
 
-authRouter.post("/signup", validateBody(SignupSchema), signup);
+authRouter.post("/signup", validateBody(SignupSchema, ["image"]), signup);
 
 swaggerRegistery.registerPath({
     method: "post",

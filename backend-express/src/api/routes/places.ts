@@ -112,7 +112,7 @@ async function createPlace(req: Request, resp: Response) {
 placeRouter.post(
     "/",
     Authenticated,
-    validateBody(PlacePostSchema),
+    validateBody(PlacePostSchema, ["image"]),
     createPlace
 );
 
