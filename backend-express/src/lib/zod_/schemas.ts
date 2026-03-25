@@ -17,7 +17,7 @@ export const paginatedSchema = (
             description: "Total number of items in the database",
             example: 40,
         }),
-        data: zod.array(schema).openapi(description),
+        data: zod.array(schema).openapi({ description }),
     });
 };
 
