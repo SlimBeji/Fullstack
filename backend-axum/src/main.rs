@@ -3,6 +3,7 @@ use tokio::net::TcpListener;
 mod api;
 mod config;
 mod models;
+mod services;
 
 #[cfg(test)]
 mod tests;
