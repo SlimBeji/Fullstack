@@ -10,6 +10,7 @@ path = "src/main.rs"
 
 [lib]
 name = "backend"
+path = "src/lib.rs"
 
 [dependencies]
 # Axum
