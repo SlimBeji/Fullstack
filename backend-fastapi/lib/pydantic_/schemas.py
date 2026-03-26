@@ -6,14 +6,14 @@ from pydantic.fields import FieldInfo, ModelPrivateAttr
 
 from lib.types_ import SearchQuery, WhereFilters
 
-T = TypeVar("T", bound=str)
+ResponseFields = TypeVar("ResponseFields", bound=str)
 SortableFields = TypeVar("SortableFields", bound=str)
 SelectableFields = TypeVar("SelectableFields", bound=str)
 SearchableFields = TypeVar("SearchableFields", bound=str)
 
 
 FieldsQuery = Annotated[
-    list[T] | None,
+    list[ResponseFields] | None,
     Query(
         description="Fields to include in the response; omit for complete data",
         examples=[["id"]],
