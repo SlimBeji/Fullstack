@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use tokio::net::TcpListener;
 
-use crate::services::instances::AppState;
+use crate::services::{instances::AppState, setup::shutdown_signal};
 
 mod api;
 mod config;
@@ -20,6 +20,12 @@ async fn main() {
         .await
         .expect("Failed to bind listener");
     axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
         .await
         .expect("Failed serve the app");
+
+    if let Ok(state) = Arc::try_unwrap(app_state) {
+        state.close().await
+    };
+    // If Err, than the state is still being used elsewhere (count > 1)
 }
