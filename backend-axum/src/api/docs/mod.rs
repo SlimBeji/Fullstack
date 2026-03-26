@@ -8,8 +8,9 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::config;
+use crate::services::SharedState;
 
-pub fn add_swagger_ui(app: OpenApiRouter) -> Router {
+pub fn add_swagger_ui(app: OpenApiRouter<SharedState>) -> Router<SharedState> {
     let (router, mut openapi) = app.split_for_parts();
     openapi.info = InfoBuilder::new()
         .title("My Axum API")

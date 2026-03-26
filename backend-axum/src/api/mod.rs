@@ -3,13 +3,13 @@ use backend::axum_::url_not_found;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
-use crate::config;
+use crate::{config, services::SharedState};
 
 mod docs;
 mod middlewares;
 mod routes;
 
-pub fn get_app() -> Router {
+pub fn get_app() -> Router<SharedState> {
     let router = routes::create_router("/api");
     let app = docs::add_swagger_ui(router);
     let app = add_trace_layer(app);
@@ -18,7 +18,7 @@ pub fn get_app() -> Router {
         .fallback(url_not_found)
 }
 
-fn add_trace_layer(router: Router) -> Router {
+fn add_trace_layer(router: Router<SharedState>) -> Router<SharedState> {
     tracing_subscriber::fmt()
         .with_max_level(config::ENV.trace_lvl())
         .with_target(false)

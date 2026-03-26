@@ -3,11 +3,11 @@ use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::api::middlewares::Auth;
+use crate::{api::middlewares::Auth, services::SharedState};
 
 pub const PATH: &str = "/hello-world";
 
-pub fn routes() -> OpenApiRouter {
+pub fn routes() -> OpenApiRouter<SharedState> {
     let mut router = OpenApiRouter::new()
         .routes(routes!(hello))
         .routes(routes!(hello_user))

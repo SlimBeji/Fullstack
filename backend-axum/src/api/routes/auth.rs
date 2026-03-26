@@ -2,14 +2,17 @@ use axum::{Json, http::StatusCode, response::IntoResponse};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::models::schemas::{
-    EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
+use crate::{
+    models::schemas::{
+        EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
+    },
+    services::SharedState,
 };
 use backend::axum_::{Validated, ValidatedForm};
 
 pub const PATH: &str = "/auth";
 
-pub fn routes() -> OpenApiRouter {
+pub fn routes() -> OpenApiRouter<SharedState> {
     let mut router = OpenApiRouter::new()
         .routes(routes!(signup_route))
         .routes(routes!(signin_route));

@@ -9,6 +9,7 @@ use crate::{
         PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
         PlaceSearch, PlacesPaginated, UserRead,
     },
+    services::SharedState,
 };
 use backend::{
     axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
@@ -17,7 +18,7 @@ use backend::{
 
 pub const PATH: &str = "/places";
 
-pub fn routes() -> OpenApiRouter {
+pub fn routes() -> OpenApiRouter<SharedState> {
     let mut router = OpenApiRouter::new()
         .routes(routes!(get_places))
         .routes(routes!(search_places))

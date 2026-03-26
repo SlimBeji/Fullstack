@@ -1,11 +1,13 @@
 use utoipa_axum::router::OpenApiRouter;
 
+use crate::services::SharedState;
+
 mod auth;
 mod hello_world;
 mod places;
 mod users;
 
-pub fn create_router(prefix: &str) -> OpenApiRouter {
+pub fn create_router(prefix: &str) -> OpenApiRouter<SharedState> {
     OpenApiRouter::new()
         .nest(&format!("{}{}", prefix, auth::PATH), auth::routes())
         .nest(

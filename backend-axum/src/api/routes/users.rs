@@ -9,6 +9,7 @@ use crate::{
         UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
         UsersPaginated,
     },
+    services::SharedState,
 };
 use backend::{
     axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
@@ -17,7 +18,7 @@ use backend::{
 
 pub const PATH: &str = "/users";
 
-pub fn routes() -> OpenApiRouter {
+pub fn routes() -> OpenApiRouter<SharedState> {
     let mut router = OpenApiRouter::new()
         .routes(routes!(get_users))
         .routes(routes!(search_users))
