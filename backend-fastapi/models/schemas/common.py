@@ -1,9 +1,6 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict
-from pydantic.alias_generators import to_camel
-
 from lib.pydantic_ import FieldMeta
 
 created_at_meta = FieldMeta(
