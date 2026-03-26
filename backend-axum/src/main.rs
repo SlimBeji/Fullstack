@@ -2,15 +2,9 @@ use std::sync::Arc;
 
 use tokio::net::TcpListener;
 
-use crate::services::{instances::AppState, setup::shutdown_signal};
-
-mod api;
-mod config;
-mod models;
-mod services;
-
-#[cfg(test)]
-mod tests;
+use backend::api;
+use backend::config;
+use backend::services::{instances::AppState, setup::shutdown_signal};
 
 #[tokio::main]
 async fn main() {
