@@ -112,7 +112,7 @@ The `/lib` folder acts as the **glue layer** between the application logic and e
 - **/validation\_** – Abstraction layer over validation/serialization libraries to provide consistent schema definitions (e.g., `pydantic_`, `zod_`, `validator_ (go)`, `validator_ (Rust)`)
 - **/orm\_** – Abstraction layer over ORMs to provide consistent database interaction patterns (e.g., `sqlalchemy_`, `typeorm_`, `gorm_`, `seaorm_`)
 
-> **Note:** The naming convention follows Rust's `/lib` folder structure, which is used for reusable library code separate from application-specific logic. The underscore suffix (e.g., `express_`, `pydantic_`) distinguishes these abstraction layers from the underlying libraries they wrap.
+> **Note:** The underscore suffix (e.g., `express_`, `pydantic_`) distinguishes these abstraction layers from the underlying libraries they wrap.
 
 ### 📁 Config
 
