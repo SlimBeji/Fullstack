@@ -89,6 +89,14 @@ impl Settings {
         })
     }
 
+    pub fn get_active_database(&self) -> String {
+        if cfg!(test) {
+            self.database_test_url.clone()
+        } else {
+            self.database_url.clone()
+        }
+    }
+
     pub fn bind_addr(&self) -> String {
         format!("0.0.0.0:{}", self.port)
     }

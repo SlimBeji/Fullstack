@@ -1,3 +1,3 @@
 pub mod pgsql;
 
-pub use pgsql::PgClient;
+pub use pgsql::{PgClient, PgClientConfig};
