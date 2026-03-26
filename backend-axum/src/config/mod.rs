@@ -97,6 +97,14 @@ impl Settings {
         }
     }
 
+    pub fn get_active_redis(&self) -> String {
+        if cfg!(test) {
+            self.redis_test_url.clone()
+        } else {
+            self.redis_url.clone()
+        }
+    }
+
     pub fn bind_addr(&self) -> String {
         format!("0.0.0.0:{}", self.port)
     }
