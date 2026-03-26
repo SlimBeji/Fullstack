@@ -3,18 +3,16 @@ use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{
-    api::middlewares::Auth,
-    models::schemas::{
-        UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
-        UsersPaginated,
-    },
-    services::SharedState,
-};
-use backend::{
+use crate::api::middlewares::Auth;
+use crate::lib_::{
     axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
     types_::PaginatedData,
 };
+use crate::models::schemas::{
+    UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
+    UsersPaginated,
+};
+use crate::services::SharedState;
 
 pub const PATH: &str = "/users";
 

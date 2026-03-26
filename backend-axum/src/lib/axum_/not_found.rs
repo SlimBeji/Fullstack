@@ -1,7 +1,7 @@
 use axum::{http::StatusCode, response::IntoResponse};
 use serde_json::Value;
 
-use crate::types_::ApiError;
+use super::super::types_::ApiError;
 
 pub async fn url_not_found(uri: axum::http::Uri) -> impl IntoResponse {
     ApiError {

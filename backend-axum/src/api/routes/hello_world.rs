@@ -3,7 +3,8 @@ use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{api::middlewares::Auth, services::SharedState};
+use crate::api::middlewares::Auth;
+use crate::services::SharedState;
 
 pub const PATH: &str = "/hello-world";
 
