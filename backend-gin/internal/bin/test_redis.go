@@ -17,7 +17,7 @@ func TestRedis() {
 	result, _ := redis.Get(ctx, "secret_number")
 	fmt.Println(result)
 
-	// Test setting and deleting value
+	// Test getting and deleting value
 	redis.Delete(ctx, "secret_number")
 	result, _ = redis.Get(ctx, "secret_number")
 	fmt.Println(result)
