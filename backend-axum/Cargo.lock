@@ -423,6 +423,7 @@ dependencies = [
  "google-cloud-auth",
  "google-cloud-storage",
  "mime",
+ "mime_guess",
  "once_cell",
  "redis",
  "regex",
