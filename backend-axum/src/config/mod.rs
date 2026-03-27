@@ -34,8 +34,8 @@ pub struct Settings {
     pub gcp_project_id: String,
     pub gcs_bucket_name: String,
     pub gcs_blob_expiration: usize,
-    pub gcs_emulator_priv: String,
-    pub gcs_emulator_pub: String,
+    pub gcs_emulator_priv: Option<String>,
+    pub gcs_emulator_pub: Option<String>,
 }
 
 impl Settings {
@@ -84,8 +84,8 @@ impl Settings {
                 "GCS_BLOB_ACCESS_EXPIRATION",
                 "3600",
             ))?,
-            gcs_emulator_priv: get_env_or("GCS_EMULATOR_PRIVATE_URL", ""),
-            gcs_emulator_pub: get_env_or("GCS_EMULATOR_PUBLIC_URL", ""),
+            gcs_emulator_priv: get_option_env("GCS_EMULATOR_PRIVATE_URL"),
+            gcs_emulator_pub: get_option_env("GCS_EMULATOR_PUBLIC_URL"),
         })
     }
 
@@ -127,6 +127,10 @@ impl Settings {
 
 fn get_env(key: &str) -> Result<String, String> {
     env::var(key).map_err(|_| format!("Missing env variable {}", key))
+}
+
+fn get_option_env(key: &str) -> Option<String> {
+    env::var(key).ok()
 }
 
 fn get_env_or(key: &str, default: &str) -> String {
