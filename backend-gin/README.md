@@ -88,5 +88,4 @@ The following `make` commands help manage the Gin backend:
 
 ## 📌 Notes
 
-- The `lib` folder was renamed to `lib_` to avoid conflict with rust **lib** crate.
 - Swagger documentation is generated using `gin-swagger`. The command `gin-lint` runs under the hood `go swag init` to refresh tge OpenAPI and Swagger files.

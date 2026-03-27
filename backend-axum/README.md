@@ -73,4 +73,6 @@ The following `make` commands help manage the Axum backend:
 
 ## 📌 Notes
 
+- The `lib` folder was renamed to `lib_` to avoid conflict with rust **lib** crate.
+- The `static` folder was renamed to `static_` to avoid conflict with rust **static** keyword.
 - The idiomatic way in **Rust** is to have integration tests in a `/tests` folder next to the `/src` and have unit tests in the same file as the code tested but in order to keep the same foler structure as the other backends, a `/tests` folder containing all tests was placed inside the `/src` folder.
