@@ -203,6 +203,18 @@ impl ApiError {
         }
     }
 
+    pub fn failed_depency(
+        message: impl Into<String>,
+        err: Box<dyn Error + Send + Sync>,
+    ) -> Self {
+        Self {
+            code: StatusCode::FAILED_DEPENDENCY,
+            message: message.into(),
+            details: Some(Value::String(err.to_string())),
+            err: Some(err),
+        }
+    }
+
     pub fn internal_error(
         message: impl Into<String>,
         err: Box<dyn Error + Send + Sync>,
