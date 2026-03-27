@@ -29,16 +29,6 @@ impl CloudStorageConfig {
         self.emulator_private_url.is_some()
             && self.emulator_public_url.is_some()
     }
-
-    pub fn get_emulator_private_url(&self) -> Option<String> {
-        self.emulator_private_url.as_deref().map(|base| {
-            if base.ends_with("/storage/v1/") {
-                base.trim_end_matches("/").to_string()
-            } else {
-                format!("{}/storage/v1", base.trim_end_matches('/'))
-            }
-        })
-    }
 }
 
 pub struct CloudStorage {
@@ -55,7 +45,8 @@ impl CloudStorage {
         let client_config = if config.is_emulator() {
             ClientConfig {
                 storage_endpoint: config
-                    .get_emulator_private_url()
+                    .emulator_private_url
+                    .clone()
                     .expect("failed to get emulator private url"),
                 token_source_provider: None,
                 ..Default::default()
