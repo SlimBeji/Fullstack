@@ -1,4 +1,6 @@
-use std::fmt;
+use std::{fmt, fs, io, path};
+
+use mime_guess::MimeGuess;
 
 #[derive(Clone)]
 pub struct FileToUpload {
@@ -13,5 +15,24 @@ impl fmt::Debug for FileToUpload {
             .field("originalname", &self.originalname)
             .field("mimetype", &self.mimetype)
             .finish()
+    }
+}
+
+impl FileToUpload {
+    pub fn from_path(path: String) -> Result<Self, io::Error> {
+        let data = fs::read(&path)?;
+        let originalname = path::Path::new(&path)
+            .file_name()
+            .map(|v| v.to_string_lossy().to_string())
+            .unwrap_or("file".to_string());
+        let mimetype = MimeGuess::from_path(path)
+            .first_or_octet_stream()
+            .essence_str()
+            .to_string();
+        Ok(Self {
+            originalname,
+            mimetype,
+            data,
+        })
     }
 }
