@@ -1,10 +1,11 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 use tokio::join;
 use tracing::{error, info};
 
 use crate::config::ENV;
 use crate::lib_::clients::{
-    PgClient, PgClientConfig, RedisClient, RedisClientConfig,
+    HuggingFaceClient, HuggingFaceClientConfig, PgClient, PgClientConfig,
+    RedisClient, RedisClientConfig,
 };
 
 // Postgresql
@@ -33,6 +34,19 @@ pub async fn get_redis_client() -> RedisClient {
     RedisClient::new(redis_config)
         .await
         .expect("could not establish connection with redis database")
+}
+
+// HuggingFace
+
+pub async fn get_hf_client() -> HuggingFaceClient {
+    let hf_config = HuggingFaceClientConfig {
+        token: ENV.hf_api_token.clone(),
+        timeout: ENV.default_timeout,
+        embed_model: String::from(""),
+    };
+    HuggingFaceClient::new(hf_config)
+        .await
+        .expect("could not establish connection with HuggingFace client")
 }
 
 // App State
