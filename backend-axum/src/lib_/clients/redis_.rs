@@ -5,7 +5,7 @@ use std::time::Duration;
 #[derive(Debug, Clone)]
 pub struct RedisClientConfig {
     pub url: String,
-    pub expiration: Duration,
+    pub expiration: usize,
 }
 
 pub struct RedisClient {
@@ -23,7 +23,7 @@ impl RedisClient {
 
         Ok(Self {
             client: conn,
-            expiration: config.expiration,
+            expiration: Duration::from_secs(config.expiration as u64),
         })
     }
 

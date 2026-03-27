@@ -11,8 +11,8 @@ pub struct PgClientConfig {
     pub url: String,
     pub max_open_conns: u32,
     pub max_idle_conns: u32,
-    pub conn_max_lifetime: Duration,
-    pub conn_max_idle_time: Duration,
+    pub conn_max_lifetime: usize,
+    pub conn_max_idle_time: usize,
 }
 
 pub struct PgClient {
@@ -25,8 +25,8 @@ impl PgClient {
         opt.max_connections(config.max_open_conns)
             .min_connections(config.max_idle_conns)
             .connect_timeout(Duration::from_secs(CONNECT_TIMEOUT))
-            .idle_timeout(config.conn_max_idle_time)
-            .max_lifetime(config.conn_max_lifetime);
+            .idle_timeout(Duration::from_secs(config.conn_max_idle_time as u64))
+            .max_lifetime(Duration::from_secs(config.conn_max_lifetime as u64));
 
         let db = Database::connect(opt).await?;
         db.ping().await?;

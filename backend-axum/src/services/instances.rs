@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{sync::Arc};
 use tokio::join;
 use tracing::{error, info};
 
@@ -14,8 +14,8 @@ pub async fn get_pgclient() -> PgClient {
         url: ENV.get_active_database(),
         max_idle_conns: 5,
         max_open_conns: 25,
-        conn_max_lifetime: Duration::from_secs(3600),
-        conn_max_idle_time: Duration::from_secs(300),
+        conn_max_lifetime: 3600,
+        conn_max_idle_time: 300,
     };
 
     PgClient::new(pgconfig)
@@ -28,7 +28,7 @@ pub async fn get_pgclient() -> PgClient {
 pub async fn get_redis_client() -> RedisClient {
     let redis_config = RedisClientConfig {
         url: ENV.get_active_redis(),
-        expiration: Duration::from_secs(ENV.redis_expiration as u64),
+        expiration: ENV.redis_expiration,
     };
     RedisClient::new(redis_config)
         .await
