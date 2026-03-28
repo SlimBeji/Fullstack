@@ -19,7 +19,7 @@ impl RedisClient {
         let mut conn = client.get_multiplexed_async_connection().await?;
 
         // Test connection
-        let _: String = redis::cmd("PING").query_async(&mut conn).await?;
+        redis::cmd("PING").query_async::<String>(&mut conn).await?;
 
         Ok(Self {
             client: conn,
