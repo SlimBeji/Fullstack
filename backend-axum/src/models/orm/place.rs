@@ -17,20 +17,32 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
 
-    #[sea_orm(column_type = "TimestampWithTimeZone", indexed)]
+    #[sea_orm(
+        column_type = "TimestampWithTimeZone",
+        indexed,
+        default_expr = "Expr::current_timestamp()"
+    )]
     pub created_at: DateTimeWithTimeZone,
 
-    #[sea_orm(column_type = "TimestampWithTimeZone")]
+    #[sea_orm(
+        column_type = "TimestampWithTimeZone",
+        default_expr = "Expr::current_timestamp()"
+    )]
     pub updated_at: DateTimeWithTimeZone,
 
+    #[sea_orm(column_type = "Text")]
     pub title: String,
+
+    #[sea_orm(column_type = "Text")]
     pub description: String,
+
+    #[sea_orm(column_type = "Text")]
     pub address: String,
 
-    #[sea_orm(default_value = "")]
+    #[sea_orm(column_type = "Text", default_value = "")]
     pub image_url: String,
 
-    #[sea_orm(column_type = "Json")]
+    #[sea_orm(column_type = "JsonBinary")]
     pub location: Location,
 
     #[sea_orm(column_type = "custom(\"vector(384)\")", nullable)]

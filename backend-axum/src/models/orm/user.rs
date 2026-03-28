@@ -8,20 +8,29 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
 
-    #[sea_orm(column_type = "TimestampWithTimeZone", indexed)]
+    #[sea_orm(
+        column_type = "TimestampWithTimeZone",
+        indexed,
+        default_expr = "Expr::current_timestamp()"
+    )]
     pub created_at: DateTimeWithTimeZone,
 
-    #[sea_orm(column_type = "TimestampWithTimeZone")]
+    #[sea_orm(
+        column_type = "TimestampWithTimeZone",
+        default_expr = "Expr::current_timestamp()"
+    )]
     pub updated_at: DateTimeWithTimeZone,
 
+    #[sea_orm(column_type = "Text")]
     pub name: String,
 
-    #[sea_orm(unique)]
+    #[sea_orm(column_type = "Text", unique)]
     pub email: String,
 
+    #[sea_orm(column_type = "Text")]
     pub password: String,
 
-    #[sea_orm(default_value = "")]
+    #[sea_orm(column_type = "Text", default_value = "")]
     pub image_url: String,
 
     #[sea_orm(default_value = false)]
