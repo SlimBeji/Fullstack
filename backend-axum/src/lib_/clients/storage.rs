@@ -198,7 +198,7 @@ impl CloudStorage {
 
     pub async fn upload_from_path(
         &self,
-        path: String,
+        path: &str,
         destination: Option<String>,
     ) -> Result<String, ApiError> {
         let file = FileToUpload::from_path(path).map_err(|e| {

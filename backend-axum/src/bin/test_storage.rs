@@ -9,7 +9,7 @@ async fn main() {
 
     // Test uploading a file
     let filename = storage_client
-        .upload_from_path(path, None)
+        .upload_from_path(&path, None)
         .await
         .expect("failed to upload file");
     println!("{}", filename);

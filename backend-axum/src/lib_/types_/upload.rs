@@ -19,8 +19,8 @@ impl fmt::Debug for FileToUpload {
 }
 
 impl FileToUpload {
-    pub fn from_path(path: String) -> Result<Self, io::Error> {
-        let data = fs::read(&path)?;
+    pub fn from_path(path: &str) -> Result<Self, io::Error> {
+        let data = fs::read(path)?;
         let originalname = path::Path::new(&path)
             .file_name()
             .map(|v| v.to_string_lossy().to_string())
