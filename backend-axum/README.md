@@ -8,7 +8,7 @@ This backend is written in **Rust** and follows the architecture and principles 
 | --------------- | ------------------------------------------------------------------------- |
 | HTTP Server     | [axum](https://github.com/tokio-rs/axum)                                  |
 | ORM             | [seaorm](https://www.sea-ql.org/SeaORM/)                                  |
-| Migrations      | [seaorm](https://www.sea-ql.org/SeaORM/)                                  |
+| Migrations      | [Atlas](https://atlasgo.io/)                                              |
 | Data Validation | [validator](https://github.com/Keats/validator)                           |
 | OpenAPI Docs    | [utoipa](https://github.com/juhaku/utoipa)                                |
 | Background Jobs | [apalis](https://github.com/apalis-dev/apalis)                            |
@@ -70,6 +70,12 @@ The following `make` commands help manage the Axum backend:
 | `make axum-debug`         | Run `debug.rs` inside /bin. Used to debug in development              |
 | `make axum-seed`          | Run `seed.rs` inside /bin. Used to seed the DB in development         |
 | `make axum-dump`          | Run `dump.rs` inside /bin. Used to dump the DB in development         |
+
+## 🦀 Migrations
+
+For the other backends, the standard migration workflow consists of using a tool that reads the model entities, generates a diff between those entities and the current database state, and applies the changes. Unfortunately, **SeaORM** is not mature enough to offer this feature natively, and **Atlas** has no compatibility with Rust — it cannot generate SQL schemas from SeaORM entities.
+
+Because of this limitation, a different approach was taken: each model is represented by two files — _my_model.rs_ containing the SeaORM entity struct, and _my_model.sql_ containing the desired SQL schema. Atlas then diffs the SQL files against the current database state and generates the migration scripts.
 
 ## 📌 Notes
 
