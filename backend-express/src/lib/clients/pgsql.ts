@@ -32,7 +32,7 @@ export class PgClient {
 
     async listTables(): Promise<string[]> {
         const tables = await this.client.query(
-            `SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename != 'migrations'`
+            `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`
         );
         return tables.map((row: { tablename: string }) => row.tablename);
     }
