@@ -10,7 +10,7 @@ CREATE TABLE "places" (
     "location" jsonb NOT NULL,
     "embedding" vector(384) NULL,
     "creator_id" integer NOT NULL,
-    CONSTRAINT "fk_users_places" FOREIGN KEY ("creator_id") REFERENCES "users" ("id") ON UPDATE NO ACTION ON DELETE CASCADE
+    CONSTRAINT "fk_users_places" FOREIGN KEY ("creator_id") REFERENCES "users" ("id") ON UPDATE NO ACTION ON DELETE CASCADE,
     CONSTRAINT "location_structure" CHECK (
         location ? 'lat' AND
         location ? 'lng' AND
