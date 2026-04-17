@@ -143,12 +143,12 @@ gin-bash:
 	docker exec -it gin bash
 
 gin-init:
-	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_dev WITH (FORCE);"
-	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_dev;"
-	docker exec -it pgsql psql -U dev -d atlas_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
-	docker exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_dev WITH (FORCE);"
-	docker exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_dev;"
-	docker exec -it test-pgsql psql -U test -d atlas_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
+	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_gin_dev;"
+	docker exec -it pgsql psql -U dev -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	docker exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
+	docker exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_gin_dev;"
+	docker exec -it test-pgsql psql -U test -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 gin-diff/%:
 	docker exec -it -w /app/internal/models/migrations gin atlas migrate diff $* --env dev
