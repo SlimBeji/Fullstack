@@ -195,6 +195,26 @@ axum-doc:
 axum-bash:
 	docker exec -it axum bash
 
+axum-init:
+	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
+	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_axum_dev;"
+	docker exec -it pgsql psql -U dev -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	docker exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
+	docker exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_axum_dev;"
+	docker exec -it test-pgsql psql -U test -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+axum-diff/%:
+	docker exec -it -w /app/src/models/migrations axum atlas migrate diff $* --env dev
+
+axum-migrate:
+	docker exec -it -w /app/src/models/migrations axum atlas migrate hash --dir file://./
+	docker exec -it -w /app/src/models/migrations axum atlas migrate apply --env dev --allow-dirty
+	docker exec -it -w /app/src/models/migrations axum atlas migrate apply --env test --allow-dirty
+
+axum-revert:
+	docker exec -it -w /app/src/models/migrations axum atlas migrate down --env dev
+	docker exec -it -w /app/src/models/migrations axum atlas migrate down --env test
+
 axum-test:
 	docker exec -it axum cargo test -- --test-threads=1
 
