@@ -142,7 +142,7 @@ gin-build:
 gin-bash:
 	docker exec -it gin bash
 
-gin-init:
+gin-atlas:
 	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
 	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_gin_dev;"
 	docker exec -it pgsql psql -U dev -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
@@ -195,7 +195,7 @@ axum-doc:
 axum-bash:
 	docker exec -it axum bash
 
-axum-init:
+axum-atlas:
 	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
 	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_axum_dev;"
 	docker exec -it pgsql psql -U dev -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
