@@ -64,6 +64,10 @@ The following `make` commands help manage the Axum backend:
 | ------------------------- | --------------------------------------------------------------------- |
 | `make axum-build`         | Build the Docker container for the Axum service.                      |
 | `make axum-bash`          | Open an interactive shell inside the running Axum container.          |
+| `make axum-atlas`         | Setup Atlas clean Dev DB.                                             |
+| `make axum-diff/⟨name⟩`   | Generate a new sql migration file (e.g. `make axum-diff/add_users`).  |
+| `make axum-migrate`       | Apply pending migrations to both dev and test databases.              |
+| `make axum-revert`        | Rollback the last migration on both dev and test databases.           |
 | `make axum-test`          | Run unit tests                                                        |
 | `make axum-lint`          | Run cargo fmt + cargo check to make sure format + compilation is good |
 | `make axum-script/⟨name⟩` | Execute a binary from `bin/` directory                                |
