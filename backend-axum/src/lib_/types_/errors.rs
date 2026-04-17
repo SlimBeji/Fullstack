@@ -21,8 +21,7 @@ pub struct ApiError {
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        let body =
-            Json(json!({"error": self.message, "details": self.details}));
+        let body = Json(json!({"error": self.message, "details": self.details}));
         (self.code, body).into_response()
     }
 }
@@ -145,10 +144,7 @@ impl ApiError {
         Ok(())
     }
 
-    pub fn from_validation_errors(
-        message: impl Into<String>,
-        errors: ValidationErrors,
-    ) -> Self {
+    pub fn from_validation_errors(message: impl Into<String>, errors: ValidationErrors) -> Self {
         Self {
             code: StatusCode::UNPROCESSABLE_ENTITY,
             message: message.into(),
@@ -171,8 +167,7 @@ impl ApiError {
         details: Option<Value>,
         err: Option<Box<dyn Error + Send + Sync>>,
     ) -> Self {
-        let details =
-            details.or(err.as_ref().map(|e| Value::String(e.to_string())));
+        let details = details.or(err.as_ref().map(|e| Value::String(e.to_string())));
 
         Self {
             code: StatusCode::UNPROCESSABLE_ENTITY,
@@ -203,10 +198,7 @@ impl ApiError {
         }
     }
 
-    pub fn failed_depency(
-        message: impl Into<String>,
-        err: Box<dyn Error + Send + Sync>,
-    ) -> Self {
+    pub fn failed_depency(message: impl Into<String>, err: Box<dyn Error + Send + Sync>) -> Self {
         Self {
             code: StatusCode::FAILED_DEPENDENCY,
             message: message.into(),
@@ -215,10 +207,7 @@ impl ApiError {
         }
     }
 
-    pub fn internal_error(
-        message: impl Into<String>,
-        err: Box<dyn Error + Send + Sync>,
-    ) -> Self {
+    pub fn internal_error(message: impl Into<String>, err: Box<dyn Error + Send + Sync>) -> Self {
         Self {
             code: StatusCode::INTERNAL_SERVER_ERROR,
             message: message.into(),

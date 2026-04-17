@@ -59,12 +59,8 @@ pub struct SignupSchema {
 impl<S: Send + Sync> FromRequest<S> for SignupSchema {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
-        let multipart_form =
-            MultipartForm::parse_multipart_request(req, state).await?;
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
+        let multipart_form = MultipartForm::parse_multipart_request(req, state).await?;
 
         let name = multipart_form.get_text("name")?;
         let email = multipart_form.get_text("email")?;

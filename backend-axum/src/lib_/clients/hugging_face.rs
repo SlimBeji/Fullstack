@@ -17,9 +17,7 @@ pub struct HuggingFaceClient {
 }
 
 impl HuggingFaceClient {
-    pub async fn new(
-        config: HuggingFaceClientConfig,
-    ) -> Result<Self, ReqwestError> {
+    pub async fn new(config: HuggingFaceClientConfig) -> Result<Self, ReqwestError> {
         let client = Client::builder()
             .timeout(Duration::from_secs(config.timeout as u64))
             .build()?;
@@ -84,19 +82,17 @@ impl HuggingFaceClient {
             });
         }
 
-        let embedding_response: Vec<Vec<f32>> =
-            resp.json().await.map_err(|e| ApiError {
-                code: StatusCode::FAILED_DEPENDENCY,
-                message: "failed to parse embedding server response".into(),
-                details: Some(Value::String(e.to_string())),
-                err: None,
-            })?;
+        let embedding_response: Vec<Vec<f32>> = resp.json().await.map_err(|e| ApiError {
+            code: StatusCode::FAILED_DEPENDENCY,
+            message: "failed to parse embedding server response".into(),
+            details: Some(Value::String(e.to_string())),
+            err: None,
+        })?;
 
         if embedding_response.is_empty() || embedding_response[0].is_empty() {
             return Err(ApiError {
                 code: StatusCode::FAILED_DEPENDENCY,
-                message: "server response did not return embedding vector"
-                    .into(),
+                message: "server response did not return embedding vector".into(),
                 details: None,
                 err: None,
             });

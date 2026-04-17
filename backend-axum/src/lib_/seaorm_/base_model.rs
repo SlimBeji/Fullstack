@@ -15,13 +15,11 @@ macro_rules! derive_timestamp_update {
                 insert: bool,
             ) -> Result<Self, sea_orm::DbErr> {
                 if insert {
-                    self.created_at = sea_orm::ActiveValue::Set(
-                        crate::lib_::seaorm_::base_model::now(),
-                    );
+                    self.created_at =
+                        sea_orm::ActiveValue::Set(crate::lib_::seaorm_::base_model::now());
                 }
-                self.updated_at = sea_orm::ActiveValue::Set(
-                    crate::lib_::seaorm_::base_model::now(),
-                );
+                self.updated_at =
+                    sea_orm::ActiveValue::Set(crate::lib_::seaorm_::base_model::now());
                 Ok(self)
             }
         }

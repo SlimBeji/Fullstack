@@ -76,17 +76,13 @@ pub fn email_strict(email: &str) -> Result<(), ValidationError> {
 
     let (_, domain) = email.split_once('@').ok_or_else(|| {
         let mut err = ValidationError::new("email_invalid_format");
-        err.message =
-            Some("Email must have a valid format (local@domain)".into());
+        err.message = Some("Email must have a valid format (local@domain)".into());
         err
     })?;
 
     if !domain.contains('.') {
         let mut err = ValidationError::new("email_missing_tld");
-        err.message = Some(
-            "Email domain must contain a top-level domain (e.g., '.com')"
-                .into(),
-        );
+        err.message = Some("Email domain must contain a top-level domain (e.g., '.com')".into());
         return Err(err);
     }
 

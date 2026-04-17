@@ -27,10 +27,7 @@ impl RedisClient {
         })
     }
 
-    pub async fn get(
-        &mut self,
-        key: &str,
-    ) -> Result<Option<String>, RedisError> {
+    pub async fn get(&mut self, key: &str) -> Result<Option<String>, RedisError> {
         self.client.get(key).await
     }
 
@@ -52,11 +49,7 @@ impl RedisClient {
         }
     }
 
-    pub async fn set<T: Serialize>(
-        &mut self,
-        key: &str,
-        val: T,
-    ) -> Result<(), RedisError> {
+    pub async fn set<T: Serialize>(&mut self, key: &str, val: T) -> Result<(), RedisError> {
         let data = serde_json::to_string(&val).map_err(|err| {
             RedisError::from((
                 redis::ErrorKind::Io,

@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::lib_::seaorm_::derive_timestamp_update;
 
-#[derive(
-    Clone, Debug, PartialEq, Serialize, Deserialize, FromJsonQueryResult,
-)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, FromJsonQueryResult)]
 pub struct Location {
     pub lat: f64,
     pub lng: f64,

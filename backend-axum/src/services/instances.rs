@@ -4,9 +4,8 @@ use tracing::{error, info};
 
 use crate::config::ENV;
 use crate::lib_::clients::{
-    CloudStorage, CloudStorageConfig, HuggingFaceClient,
-    HuggingFaceClientConfig, PgClient, PgClientConfig, RedisClient,
-    RedisClientConfig,
+    CloudStorage, CloudStorageConfig, HuggingFaceClient, HuggingFaceClientConfig, PgClient,
+    PgClientConfig, RedisClient, RedisClientConfig,
 };
 
 // Postgresql

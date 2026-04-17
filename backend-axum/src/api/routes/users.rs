@@ -9,8 +9,7 @@ use crate::lib_::{
     types_::PaginatedData,
 };
 use crate::models::schemas::{
-    UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch,
-    UsersPaginated,
+    UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch, UsersPaginated,
 };
 use crate::services::SharedState;
 
@@ -45,10 +44,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn get_users(
-    Auth(user): Auth,
-    data: QueryFilters<UserSearch>,
-) -> impl IntoResponse {
+async fn get_users(Auth(user): Auth, data: QueryFilters<UserSearch>) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
     println!("{:?}", data.query.order_by);
@@ -78,10 +74,7 @@ async fn get_users(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn search_users(
-    Auth(user): Auth,
-    data: BodyFilters<UserSearch>,
-) -> impl IntoResponse {
+async fn search_users(Auth(user): Auth, data: BodyFilters<UserSearch>) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
     println!("{:?}", data.query.order_by);
@@ -191,10 +184,7 @@ async fn update_user(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn delete_user(
-    Auth(user): Auth,
-    Path(id): Path<String>,
-) -> impl IntoResponse {
+async fn delete_user(Auth(user): Auth, Path(id): Path<String>) -> impl IntoResponse {
     println!("{}", user.name);
     (
         StatusCode::OK,

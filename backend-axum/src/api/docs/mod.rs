@@ -1,8 +1,6 @@
 use axum::Router;
 use utoipa::openapi::InfoBuilder;
-use utoipa::openapi::security::{
-    Flow, OAuth2, Password, Scopes, SecurityScheme,
-};
+use utoipa::openapi::security::{Flow, OAuth2, Password, Scopes, SecurityScheme};
 use utoipa::openapi::server::ServerBuilder;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;

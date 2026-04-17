@@ -24,8 +24,8 @@ fn add_trace_layer(router: Router<SharedState>) -> Router<SharedState> {
         .with_target(false)
         .init();
 
-    router.layer(ServiceBuilder::new().layer(
-        TraceLayer::new_for_http().make_span_with(
+    router.layer(
+        ServiceBuilder::new().layer(TraceLayer::new_for_http().make_span_with(
             |request: &axum::http::Request<_>| {
                 tracing::info_span!(
                     "request",
@@ -33,6 +33,6 @@ fn add_trace_layer(router: Router<SharedState>) -> Router<SharedState> {
                     uri = %request.uri(),
                 )
             },
-        ),
-    ))
+        )),
+    )
 }

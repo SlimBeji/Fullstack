@@ -9,9 +9,8 @@ pub async fn shutdown_signal() {
     };
 
     let terminate = async {
-        let mut sigterm =
-            signal::unix::signal(signal::unix::SignalKind::terminate())
-                .expect("failed to install SIGTERM handler");
+        let mut sigterm = signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install SIGTERM handler");
 
         sigterm.recv().await;
     };

@@ -5,9 +5,7 @@ use google_cloud_storage::http::buckets::insert::{
     BucketCreationConfig, InsertBucketParam, InsertBucketRequest,
 };
 use google_cloud_storage::http::objects::delete::DeleteObjectRequest;
-use google_cloud_storage::http::objects::upload::{
-    Media, UploadObjectRequest, UploadType,
-};
+use google_cloud_storage::http::objects::upload::{Media, UploadObjectRequest, UploadType};
 use google_cloud_storage::sign::{SignedURLMethod, SignedURLOptions};
 use std::time::Duration;
 use uuid::Uuid;
@@ -26,8 +24,7 @@ pub struct CloudStorageConfig {
 
 impl CloudStorageConfig {
     pub fn is_emulator(&self) -> bool {
-        self.emulator_private_url.is_some()
-            && self.emulator_public_url.is_some()
+        self.emulator_private_url.is_some() && self.emulator_public_url.is_some()
     }
 }
 
@@ -60,9 +57,7 @@ impl CloudStorage {
                 .await
                 .expect("could not build gcs client")
         } else {
-            return Err(
-                "credentials file required for non-emulator mode".to_string()
-            );
+            return Err("credentials file required for non-emulator mode".to_string());
         };
 
         let is_emulator = config.is_emulator();
@@ -103,16 +98,11 @@ impl CloudStorage {
 
         match result {
             Ok(_) => {
-                println!(
-                    "Created bucket {} in emulator",
-                    self.config.bucket_name
-                );
+                println!("Created bucket {} in emulator", self.config.bucket_name);
                 Ok(())
             }
             Err(e) => {
-                if e.to_string().contains("409")
-                    || e.to_string().contains("already")
-                {
+                if e.to_string().contains("409") || e.to_string().contains("already") {
                     return Ok(());
                 }
                 Err(format!("failed to create emulator bucket: {}", e))
@@ -153,10 +143,7 @@ impl CloudStorage {
             .signed_url(&self.config.bucket_name, filename, None, None, options)
             .await
             .map_err(|err| {
-                ApiError::failed_depency(
-                    "storage server could not sign the url",
-                    Box::new(err),
-                )
+                ApiError::failed_depency("storage server could not sign the url", Box::new(err))
             })
     }
 
@@ -176,8 +163,7 @@ impl CloudStorage {
             .file_stem()
             .map(|s| s.to_string_lossy().to_string())
             .unwrap_or_else(|| "file".into());
-        let filename =
-            format!("{}_{}{}", base, Uuid::new_v4(), ext).to_lowercase();
+        let filename = format!("{}_{}{}", base, Uuid::new_v4(), ext).to_lowercase();
 
         // Upload File
         let req = UploadObjectRequest {
@@ -189,9 +175,7 @@ impl CloudStorage {
         self.client
             .upload_object(&req, file.data, &UploadType::Simple(media))
             .await
-            .map_err(|err| {
-                ApiError::failed_depency("upload failed", Box::new(err))
-            })?;
+            .map_err(|err| ApiError::failed_depency("upload failed", Box::new(err)))?;
 
         Ok(filename)
     }
@@ -201,9 +185,8 @@ impl CloudStorage {
         path: &str,
         destination: Option<String>,
     ) -> Result<String, ApiError> {
-        let file = FileToUpload::from_path(path).map_err(|e| {
-            ApiError::failed_depency("could not read file", Box::new(e))
-        })?;
+        let file = FileToUpload::from_path(path)
+            .map_err(|e| ApiError::failed_depency("could not read file", Box::new(e)))?;
         self.upload_file(file, destination).await
     }
 

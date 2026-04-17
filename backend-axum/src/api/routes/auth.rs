@@ -3,9 +3,7 @@ use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::lib_::axum_::{Validated, ValidatedForm};
-use crate::models::schemas::{
-    EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger,
-};
+use crate::models::schemas::{EncodedTokenSchema, SigninSchema, SignupSchema, SignupSchemaSwagger};
 use crate::services::SharedState;
 
 pub const PATH: &str = "/auth";
@@ -17,8 +15,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
 
     let openapi = router.get_openapi_mut();
     let mut tag = Tag::new("Auth");
-    tag.description =
-        Some("Registration and Authentication endpoints".to_string());
+    tag.description = Some("Registration and Authentication endpoints".to_string());
     openapi.tags = Some(vec![tag]);
     router
 }
@@ -38,9 +35,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
         content_type = "application/json"
     ))
 )]
-async fn signup_route(
-    Validated(payload): Validated<SignupSchema>,
-) -> impl IntoResponse {
+async fn signup_route(Validated(payload): Validated<SignupSchema>) -> impl IntoResponse {
     println!("{:?}", payload.name);
     println!("{:?}", payload.email);
     println!("{:?}", payload.password);
@@ -68,9 +63,7 @@ async fn signup_route(
         content_type = "application/json"
     ))
 )]
-async fn signin_route(
-    ValidatedForm(payload): ValidatedForm<SigninSchema>,
-) -> impl IntoResponse {
+async fn signin_route(ValidatedForm(payload): ValidatedForm<SigninSchema>) -> impl IntoResponse {
     println!("{:?}", payload);
     let response = EncodedTokenSchema::example();
     (StatusCode::OK, Json(response))

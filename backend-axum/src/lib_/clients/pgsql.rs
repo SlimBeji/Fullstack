@@ -1,6 +1,5 @@
 use sea_orm::{
-    ConnectionTrait, Database, DatabaseBackend::Postgres, DatabaseConnection,
-    DbErr, Statement,
+    ConnectionTrait, Database, DatabaseBackend::Postgres, DatabaseConnection, DbErr, Statement,
 };
 use std::time::Duration;
 
@@ -56,9 +55,7 @@ impl PgClient {
     pub async fn reset_table(&self, table: &str) -> Result<(), DbErr> {
         use sea_orm::{ConnectionTrait, Statement};
 
-        let query = format!(
-            r#"TRUNCATE TABLE "public"."{table}" RESTART IDENTITY CASCADE"#
-        );
+        let query = format!(r#"TRUNCATE TABLE "public"."{table}" RESTART IDENTITY CASCADE"#);
         let stmt = Statement::from_string(Postgres, query);
 
         self.db.execute_raw(stmt).await?;

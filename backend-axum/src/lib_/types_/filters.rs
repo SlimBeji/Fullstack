@@ -99,16 +99,12 @@ fn unknown_op_error(op: String) -> ValidationError {
 
 fn parse_str_filter(filter: &str) -> Result<(FilterOp, &str), ValidationError> {
     match filter.split_once(':') {
-        Some((op_str, val)) => {
-            Ok((op_str.parse().map_err(unknown_op_error)?, val))
-        }
+        Some((op_str, val)) => Ok((op_str.parse().map_err(unknown_op_error)?, val)),
         None => Ok((FilterOp::Eq, filter)),
     }
 }
 
-fn parse_datetime_filter(
-    filter: &str,
-) -> Result<(FilterOp, &str), ValidationError> {
+fn parse_datetime_filter(filter: &str) -> Result<(FilterOp, &str), ValidationError> {
     if filter.chars().next().is_some_and(|c| c.is_ascii_digit()) {
         // starting with a number - must be an eq filter
         return Ok((FilterOp::Eq, filter));
@@ -183,16 +179,9 @@ fn parse_u32_vec(val: &str, op: FilterOp) -> Result<Vec<u32>, ValidationError> {
     val.split(',').map(|item| parse_u32(item, op)).collect()
 }
 
-fn parse_datetime(
-    val: &str,
-    op: FilterOp,
-) -> Result<OffsetDateTime, ValidationError> {
+fn parse_datetime(val: &str, op: FilterOp) -> Result<OffsetDateTime, ValidationError> {
     let trimmed = val.trim();
-    OffsetDateTime::parse(
-        trimmed,
-        &time::format_description::well_known::Rfc3339,
-    )
-    .map_err(|_| {
+    OffsetDateTime::parse(trimmed, &time::format_description::well_known::Rfc3339).map_err(|_| {
         validation_err(
             "not_a_datetime",
             format!(
@@ -204,10 +193,7 @@ fn parse_datetime(
     })
 }
 
-fn parse_datetime_vec(
-    val: &str,
-    op: FilterOp,
-) -> Result<Vec<OffsetDateTime>, ValidationError> {
+fn parse_datetime_vec(val: &str, op: FilterOp) -> Result<Vec<OffsetDateTime>, ValidationError> {
     val.split(',')
         .map(|s| parse_datetime(s.trim(), op))
         .collect()
@@ -215,10 +201,7 @@ fn parse_datetime_vec(
 
 // Filter Builders
 
-fn is_usable(
-    key: FilterOp,
-    operators: &mut Vec<FilterOp>,
-) -> Result<(), ValidationError> {
+fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), ValidationError> {
     // Early return: if empty, first operator is always valid
     if operators.is_empty() {
         operators.push(key);
@@ -304,20 +287,14 @@ fn is_usable(
     Ok(())
 }
 
-fn apply_rules<T>(
-    val: &T,
-    rules: &Validators<T>,
-) -> Result<(), ValidationError> {
+fn apply_rules<T>(val: &T, rules: &Validators<T>) -> Result<(), ValidationError> {
     for rule in rules {
         rule(val)?
     }
     Ok(())
 }
 
-fn apply_rules_to_slice<T>(
-    vals: &[T],
-    rules: &Validators<T>,
-) -> Result<(), ValidationError> {
+fn apply_rules_to_slice<T>(vals: &[T], rules: &Validators<T>) -> Result<(), ValidationError> {
     for val in vals {
         for rule in rules {
             rule(val)?
@@ -326,10 +303,7 @@ fn apply_rules_to_slice<T>(
     Ok(())
 }
 
-fn apply_str_rules(
-    val: &str,
-    rules: &Validators<str>,
-) -> Result<(), ValidationError> {
+fn apply_str_rules(val: &str, rules: &Validators<str>) -> Result<(), ValidationError> {
     // In rust, generics must be sized so we cannot use str as T
     // we define apply_str_rules instead of using apply_rules<T>
     for rule in rules {
@@ -366,10 +340,7 @@ pub struct StringFilters {
 }
 
 impl StringFilters {
-    pub fn from_list(
-        filters: &[String],
-        rules: &Validators<str>,
-    ) -> Result<Self, ValidationError> {
+    pub fn from_list(filters: &[String], rules: &Validators<str>) -> Result<Self, ValidationError> {
         let mut result = Self {
             eq: None,
             ne: None,
@@ -398,15 +369,13 @@ impl StringFilters {
                 }
                 FilterOp::In => {
                     is_usable(FilterOp::In, &mut operators)?;
-                    let converted: Vec<String> =
-                        val.split(',').map(|e| e.to_string()).collect();
+                    let converted: Vec<String> = val.split(',').map(|e| e.to_string()).collect();
                     apply_str_rules_to_slice(&converted, rules)?;
                     result.in_ = Some(converted);
                 }
                 FilterOp::Nin => {
                     is_usable(FilterOp::Nin, &mut operators)?;
-                    let converted: Vec<String> =
-                        val.split(',').map(|e| e.to_string()).collect();
+                    let converted: Vec<String> = val.split(',').map(|e| e.to_string()).collect();
                     apply_str_rules_to_slice(&converted, rules)?;
                     result.nin = Some(converted);
                 }
@@ -464,10 +433,7 @@ pub struct F64Filters {
 }
 
 impl F64Filters {
-    pub fn from_list(
-        filters: &[String],
-        rules: &Validators<f64>,
-    ) -> Result<Self, ValidationError> {
+    pub fn from_list(filters: &[String], rules: &Validators<f64>) -> Result<Self, ValidationError> {
         let mut result = Self {
             eq: None,
             ne: None,
@@ -625,10 +591,7 @@ impl IndexFilters {
                         FilterOp::In.as_str(),
                         FilterOp::Nin.as_str(),
                     );
-                    return Err(validation_err(
-                        "unsupported_operator",
-                        message,
-                    ));
+                    return Err(validation_err("unsupported_operator", message));
                 }
             }
         }
@@ -683,10 +646,7 @@ impl BooleanFilters {
                         FilterOp::Ne.as_str(),
                         FilterOp::Null.as_str(),
                     );
-                    return Err(validation_err(
-                        "unsupported_operator",
-                        message,
-                    ));
+                    return Err(validation_err("unsupported_operator", message));
                 }
             }
         }
@@ -798,10 +758,7 @@ impl DateTimeFilters {
                         FilterOp::In.as_str(),
                         FilterOp::Nin.as_str(),
                     );
-                    return Err(validation_err(
-                        "unsupported_operator",
-                        message,
-                    ));
+                    return Err(validation_err("unsupported_operator", message));
                 }
             }
         }
@@ -834,9 +791,7 @@ impl FiltersReader {
         }
     }
 
-    pub fn eval(
-        self,
-    ) -> Result<HashMap<String, FieldFilters>, ValidationErrors> {
+    pub fn eval(self) -> Result<HashMap<String, FieldFilters>, ValidationErrors> {
         if self.errors.is_empty() {
             Ok(self.filters)
         } else {
@@ -882,11 +837,7 @@ impl FiltersReader {
         }
     }
 
-    pub fn read_index_filters(
-        &mut self,
-        key: &'static str,
-        query_params: &Option<Vec<String>>,
-    ) {
+    pub fn read_index_filters(&mut self, key: &'static str, query_params: &Option<Vec<String>>) {
         let Some(query_params) = query_params else {
             return;
         };
@@ -900,11 +851,7 @@ impl FiltersReader {
         }
     }
 
-    pub fn read_boolean_filters(
-        &mut self,
-        key: &'static str,
-        query_params: &Option<Vec<String>>,
-    ) {
+    pub fn read_boolean_filters(&mut self, key: &'static str, query_params: &Option<Vec<String>>) {
         let Some(query_params) = query_params else {
             return;
         };

@@ -6,8 +6,7 @@ use crate::config;
 pub fn cors_layer() -> CorsLayer {
     CorsLayer::new()
         .allow_origin(
-            HeaderValue::from_str(&config::ENV.app_url)
-                .expect("not a valid allow origin value"),
+            HeaderValue::from_str(&config::ENV.app_url).expect("not a valid allow origin value"),
         )
         .allow_methods([
             Method::GET,

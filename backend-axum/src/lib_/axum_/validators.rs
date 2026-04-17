@@ -16,10 +16,7 @@ where
 {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
         let inner = T::from_request(req, state).await?;
         ApiError::validate(&inner)?;
         Ok(Self(inner))
@@ -37,10 +34,7 @@ where
 {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
         let inner = Json::<T>::from_request(req, state)
             .await
             .map_err(ApiError::from_json_rejection)?
@@ -61,10 +55,7 @@ where
 {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
         let inner = Form::<T>::from_request(req, state)
             .await
             .map_err(ApiError::from_form_rejection)?
@@ -86,10 +77,7 @@ where
 {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
         // The custom Query from extractors is using ApiError as Rejection type
         let inner = Query::<T>::from_request(req, state).await?.0;
         ApiError::validate(&inner)?;

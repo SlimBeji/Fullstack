@@ -46,15 +46,9 @@ impl Settings {
             api_url: get_env_or("API_URL", "http://localhost:5002/api"),
             app_url: get_env("APP_URL")?,
             secret_key: get_env("SECRET_KEY")?,
-            file_upload_max_size: env_to_num(&get_env_or(
-                "FILEUPLOAD_MAX_SIZE",
-                "100",
-            ))?,
+            file_upload_max_size: env_to_num(&get_env_or("FILEUPLOAD_MAX_SIZE", "100"))?,
             json_max_size: env_to_num(&get_env_or("JSON_MAX_SIZE", "10240"))?,
-            max_items_per_page: env_to_num(&get_env_or(
-                "MAX_ITEMS_PER_PAGE",
-                "100",
-            ))?,
+            max_items_per_page: env_to_num(&get_env_or("MAX_ITEMS_PER_PAGE", "100"))?,
             god_mode_login: get_env("GOD_MODE_LOGIN")?,
             jwt_expiration: env_to_num(&get_env_or("JWT_EXPIRATION", "3600"))?,
             default_timeout: env_to_num(&get_env_or("DEFAULT_TIMEOUT", "30"))?,
@@ -65,25 +59,16 @@ impl Settings {
             database_test_url: get_env_or("DATABASE_TEST_URL", ""),
             redis_url: get_env("REDIS_URL")?,
             redis_test_url: get_env_or("REDIS_TEST_URL", ""),
-            redis_expiration: env_to_num(&get_env_or(
-                "REDIS_DEFAULT_EXPIRATION",
-                "3600",
-            ))?,
+            redis_expiration: env_to_num(&get_env_or("REDIS_DEFAULT_EXPIRATION", "3600"))?,
 
             // HUGGING FACE config
             hf_api_token: get_env("HF_API_TOKEN")?,
 
             // GCP config
-            google_credentials: get_env_or(
-                "GOOGLE_APPLICATION_CREDENTIALS",
-                "",
-            ),
+            google_credentials: get_env_or("GOOGLE_APPLICATION_CREDENTIALS", ""),
             gcp_project_id: get_env("GCP_PROJECT_ID")?,
             gcs_bucket_name: get_env("GCS_BUCKET_NAME")?,
-            gcs_blob_expiration: env_to_num(&get_env_or(
-                "GCS_BLOB_ACCESS_EXPIRATION",
-                "3600",
-            ))?,
+            gcs_blob_expiration: env_to_num(&get_env_or("GCS_BLOB_ACCESS_EXPIRATION", "3600"))?,
             gcs_emulator_priv: get_option_env("GCS_EMULATOR_PRIVATE_URL"),
             gcs_emulator_pub: get_option_env("GCS_EMULATOR_PUBLIC_URL"),
         })

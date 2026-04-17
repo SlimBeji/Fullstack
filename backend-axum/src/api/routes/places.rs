@@ -9,8 +9,8 @@ use crate::lib_::{
     types_::PaginatedData,
 };
 use crate::models::schemas::{
-    PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch,
-    PlacesPaginated, UserRead,
+    PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch, PlacesPaginated,
+    UserRead,
 };
 use crate::services::SharedState;
 
@@ -45,10 +45,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn get_places(
-    Auth(user): Auth,
-    data: QueryFilters<PlaceSearch>,
-) -> impl IntoResponse {
+async fn get_places(Auth(user): Auth, data: QueryFilters<PlaceSearch>) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
     println!("{:?}", data.query.order_by);
@@ -78,10 +75,7 @@ async fn get_places(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn search_places(
-    Auth(user): Auth,
-    data: BodyFilters<PlaceSearch>,
-) -> impl IntoResponse {
+async fn search_places(Auth(user): Auth, data: BodyFilters<PlaceSearch>) -> impl IntoResponse {
     println!("{}", user.name);
     println!("{:?}", data.query.select);
     println!("{:?}", data.query.order_by);
@@ -193,10 +187,7 @@ async fn update_place(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn delete_place(
-    Auth(user): Auth,
-    Path(id): Path<String>,
-) -> impl IntoResponse {
+async fn delete_place(Auth(user): Auth, Path(id): Path<String>) -> impl IntoResponse {
     println!("{}", user.name);
     (
         StatusCode::OK,

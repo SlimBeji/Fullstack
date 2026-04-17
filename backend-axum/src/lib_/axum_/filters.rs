@@ -19,14 +19,11 @@ where
 {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: axum::extract::Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: axum::extract::Request, state: &S) -> Result<Self, Self::Rejection> {
         let inner = Query::<T>::from_request(req, state).await?.0;
-        let find_query = inner.to_search_query().map_err(|errors| {
-            ApiError::from_validation_errors("bad query parameters", errors)
-        })?;
+        let find_query = inner
+            .to_search_query()
+            .map_err(|errors| ApiError::from_validation_errors("bad query parameters", errors))?;
         Ok(Self {
             query: find_query,
             _marker: PhantomData,
@@ -47,17 +44,14 @@ where
 {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: axum::extract::Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: axum::extract::Request, state: &S) -> Result<Self, Self::Rejection> {
         let inner = Json::<T>::from_request(req, state)
             .await
             .map_err(ApiError::from_json_rejection)?
             .0;
-        let find_query = inner.to_search_query().map_err(|errors| {
-            ApiError::from_validation_errors("bad query parameters", errors)
-        })?;
+        let find_query = inner
+            .to_search_query()
+            .map_err(|errors| ApiError::from_validation_errors("bad query parameters", errors))?;
         Ok(Self {
             query: find_query,
             _marker: PhantomData,

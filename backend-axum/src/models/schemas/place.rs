@@ -7,10 +7,7 @@ use validator::Validate;
 use crate::config::ENV;
 use crate::lib_::{
     axum_::MultipartForm,
-    types_::{
-        ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery,
-        ToSearchQuery,
-    },
+    types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
     utils::parse_enum_array,
     validator_::{array_length, string_length},
 };
@@ -158,12 +155,8 @@ pub struct PlacePost {
 impl<S: Send + Sync> FromRequest<S> for PlacePost {
     type Rejection = ApiError;
 
-    async fn from_request(
-        req: axum::extract::Request,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
-        let multipart_form =
-            MultipartForm::parse_multipart_request(req, state).await?;
+    async fn from_request(req: axum::extract::Request, state: &S) -> Result<Self, Self::Rejection> {
+        let multipart_form = MultipartForm::parse_multipart_request(req, state).await?;
 
         let title = multipart_form.get_text("title")?;
         let description = multipart_form.get_text("description")?;
@@ -243,9 +236,7 @@ impl PlaceRead {
                 lat: 51.48180425016331,
                 lng: -0.19090418688755467,
             },
-            image_url: Some(
-                "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
-            ),
+            image_url: Some("avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string()),
             creator_id: 123456789,
             created_at: OffsetDateTime::now_utc(),
         }
@@ -357,9 +348,7 @@ pub struct PlaceSearch {
 }
 
 impl ToSearchQuery for PlaceSearch {
-    fn to_search_query(
-        self,
-    ) -> Result<SearchQuery, validator::ValidationErrors> {
+    fn to_search_query(self) -> Result<SearchQuery, validator::ValidationErrors> {
         let page = self.page.unwrap_or(1);
         let size = self.size.unwrap_or(ENV.max_items_per_page);
         let select = parse_enum_array(self.fields);
@@ -367,37 +356,17 @@ impl ToSearchQuery for PlaceSearch {
 
         let mut filter_reader = FiltersReader::new();
         filter_reader.read_index_filters("id", &self.id);
-        filter_reader.read_string_filters(
-            "title",
-            &self.title,
-            &vec![string_length::<10, 0>],
-        );
+        filter_reader.read_string_filters("title", &self.title, &vec![string_length::<10, 0>]);
         filter_reader.read_string_filters(
             "description",
             &self.description,
             &vec![string_length::<10, 0>],
         );
-        filter_reader.read_string_filters(
-            "address",
-            &self.address,
-            &vec![string_length::<10, 0>],
-        );
+        filter_reader.read_string_filters("address", &self.address, &vec![string_length::<10, 0>]);
         filter_reader.read_index_filters("creator_id", &self.creator_id);
-        filter_reader.read_f64_filters(
-            "location_lat",
-            &self.location_lat,
-            &vec![],
-        );
-        filter_reader.read_f64_filters(
-            "location_lng",
-            &self.location_lng,
-            &vec![],
-        );
-        filter_reader.read_datetime_filters(
-            "created_at",
-            &self.created_at,
-            &vec![],
-        );
+        filter_reader.read_f64_filters("location_lat", &self.location_lat, &vec![]);
+        filter_reader.read_f64_filters("location_lng", &self.location_lng, &vec![]);
+        filter_reader.read_datetime_filters("created_at", &self.created_at, &vec![]);
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
                 page,
