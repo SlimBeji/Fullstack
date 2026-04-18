@@ -675,8 +675,8 @@ class CrudsClass[
         # Step 5: return paginated result
         return PaginatedDict(
             page=page,
-            totalPages=total_pages,
-            totalCount=total_count,
+            total_pages=total_pages,
+            total_count=total_count,
             data=data,
         )
 

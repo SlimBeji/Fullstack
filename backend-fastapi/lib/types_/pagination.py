@@ -17,8 +17,8 @@ class PaginatedDict(BaseModel):
     """Using camelCase to stay coherent with other backends"""
 
     page: int
-    totalPages: int
-    totalCount: int
+    total_pages: int
+    total_count: int
     data: list[dict]
 
 
@@ -26,6 +26,6 @@ class PaginatedData[ReadSchema: BaseModel](BaseModel):
     """Using camelCase to stay coherent with other backends"""
 
     page: int = Field(examples=[1])
-    totalPages: int = Field(examples=[2])
-    totalCount: int = Field(examples=[40])
+    total_pages: int = Field(examples=[2])
+    total_count: int = Field(examples=[40])
     data: list[ReadSchema]

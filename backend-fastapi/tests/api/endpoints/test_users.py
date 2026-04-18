@@ -13,8 +13,8 @@ async def test_fetch_users(helpers: Helpers):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert "page" in data and data["page"] == 1
-    assert "totalPages" in data
-    assert "totalCount" in data
+    assert "total_pages" in data
+    assert "total_count" in data
     assert "data" in data
 
 
@@ -28,8 +28,8 @@ async def test_query_users(helpers: Helpers):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["page"] == 1
-    assert "totalPages" in data
-    assert data["totalCount"] == 1
+    assert "total_pages" in data
+    assert data["total_count"] == 1
     fetched = data["data"][0]
     assert fetched == {
         "id": 1,

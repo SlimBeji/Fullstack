@@ -27,8 +27,8 @@ async def test_get_places(helpers: Helpers):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["page"] == 1
-    assert "totalPages" in data
-    assert data["totalCount"] == 1
+    assert "total_pages" in data
+    assert data["total_count"] == 1
     assert "data" in data
 
 
@@ -44,8 +44,8 @@ async def test_query_places(helpers: Helpers):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data["page"] == 1
-    assert "totalPages" in data
-    assert data["totalCount"] == 1
+    assert "total_pages" in data
+    assert data["total_count"] == 1
     assert "data" in data
     fetched = data["data"][0]
     assert fetched == dict(
