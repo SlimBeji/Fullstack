@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from lib.types_ import ApiError
 from models.cruds import CrudsUser
 from models.schemas import (
-    ExpiredToken,
-    InvalidToken,
+    ExpiredTokenError,
+    InvalidTokenError,
     UserReadSchema,
     decode_token,
 )
@@ -23,9 +23,9 @@ async def _get_user_from_token(
 ) -> UserReadSchema:
     try:
         payload = decode_token(token)
-    except ExpiredToken:
+    except ExpiredTokenError:
         raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Expired")
-    except InvalidToken:
+    except InvalidTokenError:
         raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Not Valid")
 
     cruds = CrudsUser(session)

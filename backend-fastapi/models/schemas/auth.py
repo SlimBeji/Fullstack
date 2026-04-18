@@ -42,11 +42,11 @@ class TokenPayload(BaseModel):
     email: user.email_annot
 
 
-class InvalidToken(Exception):
+class InvalidTokenError(Exception):
     pass
 
 
-class ExpiredToken(Exception):
+class ExpiredTokenError(Exception):
     pass
 
 
@@ -54,10 +54,10 @@ def decode_token(encoded: str) -> TokenPayload:
     try:
         data = decode_payload(encoded, settings.SECRET_KEY)
         return TokenPayload(**data)
-    except ExpiredSignatureError:
-        raise ExpiredToken("The token has expired")
-    except JWTError:
-        raise InvalidToken("The token is invalid")
+    except ExpiredSignatureError as e:
+        raise ExpiredTokenError("The token has expired") from e
+    except JWTError as e:
+        raise InvalidTokenError("The token is invalid") from e
 
 
 # --- Signup Schemas ----
