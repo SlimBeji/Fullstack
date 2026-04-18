@@ -68,21 +68,19 @@ class BaseSearchSchema[
         cls.model_fields["size"].default = max_size
 
         # Update sort default and examples
-        default_sort = cast(ModelPrivateAttr, cls._DEFAULT_SORT)
         sort_field = cls.model_fields["sort"]
         cls.model_fields["sort"] = FieldInfo(
             annotation=sort_field.annotation,
             default=[],
             description=sort_field.description,
-            json_schema_extra=dict(examples=[default_sort.default]),  # type: ignore
+            json_schema_extra=dict(examples=[cls._DEFAULT_SORT]),  # type: ignore
         )
 
         # Update fields default and examples
-        default_fields = cast(ModelPrivateAttr, cls._DEFAULT_FIELDS)
         fields_field = cls.model_fields["fields"]
         cls.model_fields["fields"] = FieldInfo(
             annotation=fields_field.annotation,
             default=[],
             description=fields_field.description,
-            json_schema_extra=dict(examples=[default_fields.default]),  # type: ignore
+            json_schema_extra=dict(examples=[cls._DEFAULT_FIELDS]),  # type: ignore
         )
