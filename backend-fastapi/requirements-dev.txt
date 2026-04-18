@@ -4,9 +4,7 @@ watchdog
 
 # Linting Packages
 mypy
-black
-isort
-autoflake
+ruff
 
 # Testing
 pytest
