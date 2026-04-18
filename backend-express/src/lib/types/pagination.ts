@@ -1,7 +1,7 @@
 export interface PaginatedData<T> {
     page: number;
-    totalPages: number;
-    totalCount: number;
+    total_pages: number;
+    total_count: number;
     data: T[];
 }
 

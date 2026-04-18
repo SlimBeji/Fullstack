@@ -218,7 +218,7 @@ These literals provide type safety and runtime validation for the Search Schema.
 
 ##### 📃 Paginated Data Schema
 
-Wraps search results with **pagination metadata**: `totalCount`, `page`, `pageSize`, and the `data` array.
+Wraps search results with **pagination metadata**: `total_count`, `page`, `total_pages`, and the `data` array.
 
 #### 📁📁 ORM
 

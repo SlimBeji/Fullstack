@@ -910,7 +910,7 @@ export class CrudsClass<
         const data = await this.searchPartial(normalized);
 
         // Step 4: return paginated result
-        return { page, totalPages, totalCount, data };
+        return { page, total_pages: totalPages, total_count: totalCount, data };
     }
 
     async userPaginate(

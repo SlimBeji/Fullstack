@@ -35,8 +35,8 @@ describe("GET /api/users", () => {
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("page", 1);
-        expect(response.body).toHaveProperty("totalPages");
-        expect(response.body).toHaveProperty("totalCount");
+        expect(response.body).toHaveProperty("total_pages");
+        expect(response.body).toHaveProperty("total_count");
         expect(response.body).toHaveProperty("data");
     });
 });
@@ -54,8 +54,8 @@ describe("POST /api/users/search", () => {
             .expect("Content-Type", /json/)
             .expect(200);
         expect(response.body).toHaveProperty("page", 1);
-        expect(response.body).toHaveProperty("totalPages");
-        expect(response.body).toHaveProperty("totalCount", 1);
+        expect(response.body).toHaveProperty("total_pages");
+        expect(response.body).toHaveProperty("total_count", 1);
         expect(response.body).toHaveProperty("data");
 
         const fetchedData = response.body["data"][0];

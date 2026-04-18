@@ -10,10 +10,10 @@ export const paginatedSchema = (
         page: zod
             .number()
             .openapi({ description: "The returned page number", example: 1 }),
-        totalPages: zod
+        total_pages: zod
             .number()
             .openapi({ description: "The total number of pages", example: 2 }),
-        totalCount: zod.number().openapi({
+        total_count: zod.number().openapi({
             description: "Total number of items in the database",
             example: 40,
         }),
