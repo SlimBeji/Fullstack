@@ -1,8 +1,7 @@
-from typing import Annotated, ClassVar, cast
+from typing import Annotated, cast
 
 from fastapi import Query
 from pydantic import BaseModel, Field
-from pydantic.fields import FieldInfo, ModelPrivateAttr
 
 from lib.types_ import SearchQuery, WhereFilters
 
@@ -20,24 +19,20 @@ class BaseSearchSchema[
     SortableFields: str,
     SearchableFields: str,
 ](BaseModel):
-    _MAX_SIZE: int = 100
-    _DEFAULT_SORT: ClassVar[list[SortableFields]] = ["-created_at"]  # type: ignore
-    _DEFAULT_FIELDS: ClassVar[list[SelectableFields]] = ["id"]  # type: ignore
-
-    page: Annotated[int, Field(1, description="The page number")]
-    size: Annotated[int, Field(_MAX_SIZE, description="Items per page")]
+    page: Annotated[int, Field(description="The page number")] = 1
+    size: Annotated[int, Field(description="Items per page")] = 100
     sort: Annotated[
         list[SortableFields] | None,
         Field(
             description="Fields to use for sorting. Use '-' for descending",
-            json_schema_extra={"examples": [_DEFAULT_SORT]},  # type: ignore
+            json_schema_extra={"examples": [["-created_at"]]},
         ),
     ] = None
     fields: Annotated[
         list[SelectableFields] | None,
         Field(
             description="Fields to include in the response; omit for complete data",
-            json_schema_extra={"examples": [_DEFAULT_FIELDS]},  # type: ignore
+            json_schema_extra={"examples": ["id"]},
         ),
     ] = None
 
@@ -57,30 +52,4 @@ class BaseSearchSchema[
             select=self.fields,
             orderby=self.sort,
             where=cast(WhereFilters[SearchableFields], where),
-        )
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-
-        # Update size default
-        private_max_size = cast(ModelPrivateAttr, cls._MAX_SIZE)
-        max_size = private_max_size.default
-        cls.model_fields["size"].default = max_size
-
-        # Update sort default and examples
-        sort_field = cls.model_fields["sort"]
-        cls.model_fields["sort"] = FieldInfo(
-            annotation=sort_field.annotation,
-            default=[],
-            description=sort_field.description,
-            json_schema_extra=dict(examples=[cls._DEFAULT_SORT]),  # type: ignore
-        )
-
-        # Update fields default and examples
-        fields_field = cls.model_fields["fields"]
-        cls.model_fields["fields"] = FieldInfo(
-            annotation=fields_field.annotation,
-            default=[],
-            description=fields_field.description,
-            json_schema_extra=dict(examples=[cls._DEFAULT_FIELDS]),  # type: ignore
         )

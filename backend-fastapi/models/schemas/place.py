@@ -1,6 +1,6 @@
-from typing import Annotated, ClassVar, Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from config import settings
 from lib.pydantic_ import BaseSearchSchema, FieldMeta, HttpFilters
@@ -230,8 +230,24 @@ class PlaceSearchSchema(
         PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
     ]
 ):
-    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
-    _DEFAULT_FIELDS: ClassVar[list[PlaceSelectableFields]] = ["id", "location"]
+    page: Annotated[int, Field(description="The page number")] = 1
+    size: Annotated[int, Field(description="Items per page")] = (
+        settings.MAX_ITEMS_PER_PAGE
+    )
+    sort: Annotated[
+        list[PlaceSortableFields] | None,
+        Field(
+            description="Fields to use for sorting. Use '-' for descending",
+            json_schema_extra={"examples": [["-created_at"]]},
+        ),
+    ] = None
+    fields: Annotated[
+        list[PlaceSelectableFields] | None,
+        Field(
+            description="Fields to include in the response; omit for complete data",
+            json_schema_extra={"examples": ["id", "location"]},
+        ),
+    ] = None
 
     id: HttpFilters[id_annot]
     title: HttpFilters[title_annot]

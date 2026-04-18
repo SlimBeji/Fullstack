@@ -1,4 +1,4 @@
-from typing import Annotated, ClassVar, Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -170,8 +170,24 @@ class UserSearchSchema(
         UserSelectableFields, UserSortableFields, UserSearchableFields
     ]
 ):
-    _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
-    _DEFAULT_FIELDS: ClassVar[list[UserSelectableFields]] = ["id", "places"]
+    page: Annotated[int, Field(description="The page number")] = 1
+    size: Annotated[int, Field(description="Items per page")] = (
+        settings.MAX_ITEMS_PER_PAGE
+    )
+    sort: Annotated[
+        list[UserSortableFields] | None,
+        Field(
+            description="Fields to use for sorting. Use '-' for descending",
+            json_schema_extra={"examples": [["-created_at"]]},
+        ),
+    ] = None
+    fields: Annotated[
+        list[UserSelectableFields] | None,
+        Field(
+            description="Fields to include in the response; omit for complete data",
+            json_schema_extra={"examples": ["id", "places"]},
+        ),
+    ] = None
 
     id: HttpFilters[id_annot]
     name: HttpFilters[name_annot]
