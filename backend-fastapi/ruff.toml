@@ -5,6 +5,7 @@ target-version = "py311"
 ignore = [
   "C408", # prefer dict() over {} literals
   "E501", # line too long — handled by formatter
+  "B008", # FastAPI uses Depends() in function signatures by design
 ]
 select = [
   "E", # pycodestyle errors
