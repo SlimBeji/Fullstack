@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from .types import CallNext, HttpMiddleware
 
 
-class RequestTooLarge(Exception):
+class RequestTooLargeError(Exception):
     pass
 
 
@@ -23,14 +23,14 @@ def limit_json_size(max_size: int) -> HttpMiddleware:
                     message = await original_receive()
                     received += len(message.get("body", b""))
                     if received > max_size:
-                        raise RequestTooLarge
+                        raise RequestTooLargeError
                     return message
 
                 request._receive = limited_receive
 
         try:
             return await call_next(request)
-        except RequestTooLarge:
+        except RequestTooLargeError:
             return JSONResponse(
                 {"detail": "Request body too large"},
                 status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE,

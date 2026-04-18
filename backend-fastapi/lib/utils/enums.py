@@ -1,7 +1,8 @@
 from enum import Enum
+from enum import StrEnum as BaseStrEnum
 
 
-class StrEnum(str, Enum):
+class StrEnum(BaseStrEnum):
     def __str__(self):
         return self.value
 

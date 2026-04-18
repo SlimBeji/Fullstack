@@ -61,10 +61,7 @@ async def lifespan(app: FastAPI):
 
 
 def create_app(test: bool = False) -> FastAPI:
-    if test:
-        lifespan_param = None
-    else:
-        lifespan_param = lifespan
+    lifespan_param = None if test else lifespan
 
     app = FastAPI(
         title="My FastAPI Pydantic API",

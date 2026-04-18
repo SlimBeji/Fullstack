@@ -267,10 +267,7 @@ class HttpFilters(Generic[T]):
         examples = extra.get("filter_examples", None)
         if examples is None:
             field_info = _get_field_info(item)
-            if field_info is not None:
-                examples = field_info.examples
-            else:
-                examples = []
+            examples = field_info.examples if field_info is not None else []
 
         return Annotated[
             list[HttpFilter[item]] | None,

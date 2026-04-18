@@ -85,7 +85,7 @@ async def update_user(
     cruds: CrudsUser = Depends(get_cruds_user),
 ):
     options = UserOptions(process=True, fields=None)
-    return await cruds.user_put(current_user, user_id, form)
+    return await cruds.user_put(current_user, user_id, form, options=options)
 
 
 @user_router.delete(

@@ -88,8 +88,7 @@ class CloudStorage:
     def _get_emulator_file_url(self, filename: str) -> str:
         api_url = f"{self.emulator_public_url}/download/storage/v1"
         bucket_url = f"{api_url}/b/{self.bucket_name}"
-        download_url = f"{bucket_url}/o/{quote(filename)}?alt=media"
-        return download_url
+        return f"{bucket_url}/o/{quote(filename)}?alt=media"
 
     def get_signed_url(
         self, filename: str, expiration: int | None = None
@@ -100,12 +99,11 @@ class CloudStorage:
         expiration = expiration or self.blob_access_expiration
         blob = self.bucket.blob(filename)
 
-        url = blob.generate_signed_url(
+        return blob.generate_signed_url(
             version="v4",
             expiration=datetime.now(UTC) + timedelta(seconds=expiration),
             method="GET",
         )
-        return url
 
     def upload_file(
         self,
