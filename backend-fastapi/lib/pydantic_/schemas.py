@@ -1,4 +1,4 @@
-from typing import Annotated, Generic, TypeVar, cast
+from typing import Annotated, ClassVar, Generic, TypeVar, cast
 
 from fastapi import Query
 from pydantic import BaseModel, Field
@@ -25,8 +25,8 @@ class BaseSearchSchema(
     BaseModel, Generic[SelectableFields, SortableFields, SearchableFields]
 ):
     _MAX_SIZE: int = 100
-    _DEFAULT_SORT: list[SortableFields] = ["-created_at"]  # type: ignore
-    _DEFAULT_FIELDS: list[SelectableFields] = ["id"]  # type: ignore
+    _DEFAULT_SORT: ClassVar[list[SortableFields]] = ["-created_at"]  # type: ignore
+    _DEFAULT_FIELDS: ClassVar[list[SelectableFields]] = ["id"]  # type: ignore
 
     page: Annotated[int, Field(1, description="The page number")]
     size: Annotated[int, Field(_MAX_SIZE, description="Items per page")]

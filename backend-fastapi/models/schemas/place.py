@@ -1,4 +1,4 @@
-from typing import Annotated, Literal
+from typing import Annotated, ClassVar, Literal
 
 from pydantic import BaseModel
 
@@ -231,7 +231,7 @@ class PlaceSearchSchema(
     ]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
-    _DEFAULT_FIELDS = ["id", "location"]  # type: ignore
+    _DEFAULT_FIELDS: ClassVar[list[PlaceSelectableFields]] = ["id", "location"]
 
     id: HttpFilters[id_annot]
     title: HttpFilters[title_annot]

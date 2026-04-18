@@ -1,4 +1,4 @@
-from typing import Annotated, Literal
+from typing import Annotated, ClassVar, Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -171,7 +171,7 @@ class UserSearchSchema(
     ]
 ):
     _MAX_SIZE = settings.MAX_ITEMS_PER_PAGE
-    _DEFAULT_FIELDS = ["id", "places"]  # type: ignore
+    _DEFAULT_FIELDS: ClassVar[list[UserSelectableFields]] = ["id", "places"]
 
     id: HttpFilters[id_annot]
     name: HttpFilters[name_annot]
