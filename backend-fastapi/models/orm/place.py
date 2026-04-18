@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import ForeignKey, Index, Integer, Text
@@ -28,14 +28,14 @@ class Place(BaseModel):
 
     address: Mapped[str] = mapped_column(Text, nullable=False)
 
-    image_url: Mapped[Optional[str]] = mapped_column(
+    image_url: Mapped[str | None] = mapped_column(
         Text, nullable=False, server_default=""
     )
 
     location: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
     # PgVector
-    embedding: Mapped[Optional[list[float]]] = mapped_column(
+    embedding: Mapped[list[float] | None] = mapped_column(
         Vector(384), nullable=True
     )
 

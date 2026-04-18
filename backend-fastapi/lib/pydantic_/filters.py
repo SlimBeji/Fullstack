@@ -1,10 +1,9 @@
+from collections.abc import Callable
 from datetime import datetime
 from typing import (
     Annotated,
     Any,
-    Callable,
     Generic,
-    Optional,
     TypeVar,
     get_args,
 )
@@ -280,7 +279,7 @@ class HttpFilters(Generic[T]):
                 examples = []
 
         return Annotated[
-            Optional[list[HttpFilter[item]]],
+            list[HttpFilter[item]] | None,
             Field(
                 None,
                 description=description,

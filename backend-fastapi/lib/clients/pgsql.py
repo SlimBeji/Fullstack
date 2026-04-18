@@ -1,5 +1,5 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, List
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
@@ -53,7 +53,7 @@ class PgClient:
         async with self.session_maker() as session:
             yield session
 
-    async def list_tables(self) -> List[str]:
+    async def list_tables(self) -> list[str]:
         async with self.client.connect() as conn:
             result = await conn.execute(
                 text(

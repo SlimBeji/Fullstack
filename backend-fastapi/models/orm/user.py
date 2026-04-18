@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -27,7 +27,7 @@ class User(BaseModel):
 
     password: Mapped[str] = mapped_column(Text, nullable=False)
 
-    image_url: Mapped[Optional[str]] = mapped_column(
+    image_url: Mapped[str | None] = mapped_column(
         Text, nullable=False, server_default=""
     )
 
