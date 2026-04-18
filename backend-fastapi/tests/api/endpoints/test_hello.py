@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-import pytest
 from httpx import AsyncClient
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.cruds import CrudsUser

@@ -3,9 +3,9 @@ from lib.utils import set_test_mode
 set_test_mode()
 
 
+from httpx import ASGITransport, AsyncClient
 import pytest
 import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
 
 from api.app import create_app
 from config import settings

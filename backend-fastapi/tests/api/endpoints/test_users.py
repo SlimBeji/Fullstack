@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-import pytest
 from conftest import Helpers
+import pytest
 
 from static import get_image_path
 

@@ -1,8 +1,8 @@
 import json
 from typing import Any, Literal
 
-import redis.asyncio as async_redis
 from pydantic import BaseModel
+import redis.asyncio as async_redis
 
 from lib.utils.helpers import str_to_bool
 

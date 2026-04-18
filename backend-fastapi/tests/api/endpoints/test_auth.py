@@ -1,5 +1,5 @@
-import pytest
 from httpx import AsyncClient
+import pytest
 
 from static import get_image_path
 

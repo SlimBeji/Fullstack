@@ -1,6 +1,6 @@
+from http import HTTPStatus
 import mimetypes
 import os
-from http import HTTPStatus
 from typing import Any, Self
 
 from pydantic import GetJsonSchemaHandler

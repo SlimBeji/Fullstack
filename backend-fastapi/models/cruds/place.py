@@ -1,5 +1,5 @@
-import json
 from http import HTTPStatus
+import json
 from typing import TypedDict, get_args
 
 from pydantic import BaseModel

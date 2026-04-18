@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from sqlalchemy import Select
 from sqlalchemy.orm import InstrumentedAttribute

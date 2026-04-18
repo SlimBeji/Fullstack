@@ -1,5 +1,5 @@
 import asyncio
-from typing import Callable
+from collections.abc import Callable
 
 from dramatiq import Broker, Message, actor, set_broker
 from dramatiq.asyncio import EventLoopThread, set_event_loop_thread
