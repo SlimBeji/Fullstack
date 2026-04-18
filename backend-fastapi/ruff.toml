@@ -3,6 +3,7 @@ target-version = "py311"
 
 [lint]
 ignore = [
+  "C408", # prefer dict() over {} literals
   "E501", # line too long — handled by formatter
 ]
 select = [
@@ -20,13 +21,15 @@ select = [
   "RET", # flake8-return (unnecessary return statements)
   "RUF", # Ruff-specific rules (catches many bugs)
 ]
-
 # Allow unused variables when underscore-prefixed
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
+[lint.per-file-ignores]
+"**/__init__.py" = ["F403", "F401"] # allow wildcard imports and unused imports in __init__.py
+"**/conftest.py" = ["E402"]
+
 [lint.isort]
 force-sort-within-sections = true
-known-first-party = ["your_package_name"] # <-- replace with your package name
 split-on-trailing-comma = true
 
 [format]
