@@ -87,7 +87,7 @@ async def test_create_place_belonging_to_others(helpers: Helpers):
     with open(get_image_path("place1.jpg"), "rb") as image:
         files = dict(image=image.read())
 
-    headers = dict(Authorization=helpers.admin_token)
+    headers = dict(Authorization=helpers.user_token)
     multipart_data = dict(
         creator_id=str(helpers.admin.id),
         description="A brand new place",
