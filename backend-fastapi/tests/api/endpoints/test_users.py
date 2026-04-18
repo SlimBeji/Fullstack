@@ -10,8 +10,8 @@ from static import get_image_path
 async def test_fetch_users(helpers: Helpers):
     headers = dict(Authorization=helpers.user_token)
     response = await helpers.client.get("/api/users/", headers=headers)
-    assert response.status_code == HTTPStatus.OK
     data = response.json()
+    assert response.status_code == HTTPStatus.OK
     assert "page" in data and data["page"] == 1
     assert "total_pages" in data
     assert "total_count" in data
@@ -25,8 +25,8 @@ async def test_query_users(helpers: Helpers):
     response = await helpers.client.post(
         "/api/users/search", json=payload, headers=headers
     )
-    assert response.status_code == HTTPStatus.OK
     data = response.json()
+    assert response.status_code == HTTPStatus.OK
     assert data["page"] == 1
     assert "total_pages" in data
     assert data["total_count"] == 1

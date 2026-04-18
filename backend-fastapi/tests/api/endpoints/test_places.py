@@ -24,8 +24,8 @@ async def test_get_places(helpers: Helpers):
     response = await helpers.client.get(
         "/api/places/?title=eq:Stamford%20Bridge", headers=headers
     )
-    assert response.status_code == HTTPStatus.OK
     data = response.json()
+    assert response.status_code == HTTPStatus.OK
     assert data["page"] == 1
     assert "total_pages" in data
     assert data["total_count"] == 1
@@ -33,7 +33,7 @@ async def test_get_places(helpers: Helpers):
 
 
 @pytest.mark.asyncio
-async def test_query_places(helpers: Helpers):
+async def test_search_places(helpers: Helpers):
     payload = dict(title=["Stamford Bridge"], fields=["location"])
     headers = dict(Authorization=helpers.user_token)
     response = await helpers.client.post(
@@ -41,8 +41,8 @@ async def test_query_places(helpers: Helpers):
         json=payload,
         headers=headers,
     )
-    assert response.status_code == HTTPStatus.OK
     data = response.json()
+    assert response.status_code == HTTPStatus.OK
     assert data["page"] == 1
     assert "total_pages" in data
     assert data["total_count"] == 1
