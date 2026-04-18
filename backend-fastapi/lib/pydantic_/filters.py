@@ -36,8 +36,8 @@ def _numeric_filter_validator(
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
     if op in ["in", "nin"]:
-        l = raw.split(",")
-        val = [adapter.validate_python(item) for item in l]
+        raw_values = raw.split(",")
+        val = [adapter.validate_python(item) for item in raw_values]
         return Filter(op=op, val=val)
     if op == "null":
         val = check_bool(raw)
@@ -55,8 +55,8 @@ def _index_filter_validator(
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
     if op in ["in", "nin"]:
-        l = raw.split(",")
-        val = [adapter.validate_python(item) for item in l]
+        raw_values = raw.split(",")
+        val = [adapter.validate_python(item) for item in raw_values]
         return Filter(op=op, val=val)
     if op == "null":
         val = check_bool(raw)
@@ -76,8 +76,8 @@ def _string_filter_validator(
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
     if op in ["in", "nin"]:
-        l = raw.split(",")
-        val = [adapter.validate_python(item) for item in l]
+        raw_values = raw.split(",")
+        val = [adapter.validate_python(item) for item in raw_values]
         return Filter(op=op, val=val)
     if op == "null":
         val = check_bool(raw)
@@ -109,8 +109,8 @@ def _datetime_filter_validator(
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
     if op in ["in", "nin"]:
-        l = raw.split(",")
-        val = [adapter.validate_python(item) for item in l]
+        raw_values = raw.split(",")
+        val = [adapter.validate_python(item) for item in raw_values]
         return Filter(op=op, val=val)
     if op == "null":
         val = check_bool(raw)
