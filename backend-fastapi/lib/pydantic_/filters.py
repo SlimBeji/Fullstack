@@ -143,7 +143,7 @@ def _extract_raw_filter(value: str) -> tuple[FilterOperation, Any]:
 def _make_filter_validator(real_type: Any):
     base_class = get_args(real_type)[0]
     annotations = _get_field_info(real_type)
-    json_schema_extra = getattr(annotations, "json_schema_extra") or {}
+    json_schema_extra = annotations.json_schema_extra or {}
     is_index: bool = json_schema_extra.get("is_index", False)
     adapter = TypeAdapter(real_type)
 

@@ -76,4 +76,4 @@ async def dump_db(verbose: bool = False) -> None:
     await redis_client.flushall()
     if verbose:
         print("✅ Cache DB flushed")
-        print(("✅ Finished. You may exit"))
+        print("✅ Finished. You may exit")

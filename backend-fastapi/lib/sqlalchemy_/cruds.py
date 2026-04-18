@@ -267,7 +267,7 @@ class CrudsClass(
 
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
-                f"Could not create {self.model_name} object: {str(err)}!",
+                f"Could not create {self.model_name} object: {err!s}!",
             )
 
     async def before_create(self, data: Create) -> CreateContext:
@@ -431,7 +431,7 @@ class CrudsClass(
                 raise err
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
-                f"Could not update {self.model_name} object: {str(err)}!",
+                f"Could not update {self.model_name} object: {err!s}!",
             )
 
     async def before_update(self, id: int, data: Update) -> UpdateContext:
@@ -501,7 +501,7 @@ class CrudsClass(
 
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
-                f"Could not delete {self.model_name} object: {str(err)}!",
+                f"Could not delete {self.model_name} object: {err!s}!",
             )
 
     async def before_delete(self, id: int) -> DeleteContext:
