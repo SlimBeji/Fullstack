@@ -40,7 +40,9 @@ async def test_query_users(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_create_user_as_admin(helpers: Helpers):
-    files = dict(image=open(get_image_path("avatar1.jpg"), "rb"))
+    with open(get_image_path("avatar1.jpg"), "rb") as image:
+        files = dict(image=image.read())
+
     headers = dict(Authorization=helpers.admin_token)
     data = dict(
         name="Test Van Test",
@@ -60,7 +62,9 @@ async def test_create_user_as_admin(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_create_user_as_non_admin(helpers: Helpers):
-    files = dict(image=open(get_image_path("avatar2.jpg"), "rb"))
+    with open(get_image_path("avatar1.jpg"), "rb") as image:
+        files = dict(image=image.read())
+
     headers = dict(Authorization=helpers.user_token)
     data = dict(
         name="Test Van Test II",

@@ -55,9 +55,10 @@ async def test_query_places(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_create_place(helpers: Helpers):
-    files = dict(image=open(get_image_path("place1.jpg"), "rb"))
-    headers = dict(Authorization=helpers.admin_token)
+    with open(get_image_path("place1.jpg"), "rb") as image:
+        files = dict(image=image.read())
 
+    headers = dict(Authorization=helpers.admin_token)
     multipart_data = dict(
         creator_id=str(helpers.admin.id),
         description="A brand new place",
@@ -83,8 +84,10 @@ async def test_create_place(helpers: Helpers):
 
 @pytest.mark.asyncio
 async def test_create_place_belonging_to_others(helpers: Helpers):
-    files = dict(image=open(get_image_path("place1.jpg"), "rb"))
-    headers = dict(Authorization=helpers.user_token)
+    with open(get_image_path("place1.jpg"), "rb") as image:
+        files = dict(image=image.read())
+
+    headers = dict(Authorization=helpers.admin_token)
     multipart_data = dict(
         creator_id=str(helpers.admin.id),
         description="A brand new place",

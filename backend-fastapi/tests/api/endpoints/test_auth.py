@@ -6,7 +6,9 @@ from static import get_image_path
 
 @pytest.mark.asyncio
 async def test_signup(client: AsyncClient):
-    files = dict(image=open(get_image_path("avatar1.jpg"), "rb"))
+    with open(get_image_path("avatar1.jpg"), "rb") as image:
+        files = dict(image=image.read())
+
     data = dict(
         name="Didier Drogba",
         email="new_user@gmail.com",
