@@ -43,27 +43,27 @@ class RedisClient:
     async def flushall(self) -> None:
         await self.client.flushall()
 
-    async def get(self, key: str, format: OutputFormat = "") -> Any:
+    async def get(self, key: str, format_: OutputFormat = "") -> Any:
         raw: bytes = await self.client.get(key)
         if raw is None:
             return None
 
         stored = raw.decode()
-        if isinstance(format, type) and issubclass(format, BaseModel):
+        if isinstance(format_, type) and issubclass(format_, BaseModel):
             try:
-                return format.model_validate_json(stored)
+                return format_.model_validate_json(stored)
             except Exception:
                 # Value become not valid, purge it and return None
                 await self.delete(key)
                 return None
 
-        elif format == "json":
+        elif format_ == "json":
             return json.loads(stored)
-        elif format == "int":
+        elif format_ == "int":
             return int(stored)
-        elif format == "float":
+        elif format_ == "float":
             return float(stored)
-        elif format == "bool":
+        elif format_ == "bool":
             return str_to_bool(str(stored))
         return stored
 

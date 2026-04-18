@@ -98,16 +98,16 @@ class CrudsPlace(
     # Create
 
     async def after_create(
-        self, id: int, data: PlaceCreateSchema, context: PlaceCreateContext
+        self, id_: int, data: PlaceCreateSchema, context: PlaceCreateContext
     ) -> None:
-        place_embedding(id)
+        place_embedding(id_)
 
     async def seed(
         self, data: PlaceCreateSchema, embedding: list[float]
     ) -> int:
-        id = await self.create(data)
-        await self.update_embedding(id, embedding)
-        return id
+        id_ = await self.create(data)
+        await self.update_embedding(id_, embedding)
+        return id_
 
     async def post_to_create(self, data: PlacePostSchema) -> PlaceCreateSchema:
         json = data.model_dump(exclude_none=True, exclude_unset=True)
@@ -163,15 +163,15 @@ class CrudsPlace(
     # Update
 
     async def before_update(
-        self, id: int, data: PlaceUpdateSchema
+        self, id_: int, data: PlaceUpdateSchema
     ) -> PlaceUpdateContext:
         stmt = select(self.model.title, self.model.description).where(
-            self.model.id == id
+            self.model.id == id_
         )
         result = await self.session.execute(stmt)
         record = result.one_or_none()
         if record is None:
-            raise self.not_found_error(id)
+            raise self.not_found_error(id_)
 
         title_changed = bool(data.title and data.title != record.title)
         description_changed = bool(
@@ -182,20 +182,20 @@ class CrudsPlace(
         )
 
     async def after_update(
-        self, id: int, data: PlaceUpdateSchema, context: PlaceUpdateContext
+        self, id_: int, data: PlaceUpdateSchema, context: PlaceUpdateContext
     ) -> None:
         if context.trigger_embedding:
-            place_embedding(id)
+            place_embedding(id_)
 
     async def auth_put(
-        self, user: UserReadSchema, id: int | str, form: PlacePutSchema
+        self, user: UserReadSchema, id_: int | str, form: PlacePutSchema
     ) -> None:
         if user.is_admin:
             return
 
-        id = self.parse_id(id)
+        id_ = self.parse_id(id_)
         where: WhereFilters[PlaceSearchableFields] = {
-            "id": self.eq(id),
+            "id": self.eq(id_),
             "creator_id": self.eq(user.id),
         }
         exists = await self.exists(where)
@@ -203,21 +203,21 @@ class CrudsPlace(
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
                 "Access denied",
-                dict(message=f"Cannot access place {id}"),
+                dict(message=f"Cannot access place {id_}"),
             )
 
-    async def update_embedding(self, id: int, embedding: list[float]) -> None:
+    async def update_embedding(self, id_: int, embedding: list[float]) -> None:
         stmt = (
             update(self.model)
-            .where(self.model.id == id)
+            .where(self.model.id == id_)
             .values(embedding=text(f"'{json.dumps(embedding)}'::vector"))
         )
         await self.session.execute(stmt)
         await self.session.commit()
 
-    async def embed(self, id: int) -> list[float]:
+    async def embed(self, id_: int) -> list[float]:
         stmt = select(self.model.title, self.model.description).where(
-            self.model.id == id
+            self.model.id == id_
         )
         result = await self.session.execute(stmt)
         row = result.one_or_none()
@@ -225,47 +225,47 @@ class CrudsPlace(
         if not row:
             raise ApiError(
                 HTTPStatus.NOT_FOUND,
-                f"No place with id {id} found in the database",
+                f"No place with id {id_} found in the database",
             )
 
         text = f"{row.title} - {row.description}"
         embedding = await hf_client.embed_text(text)
 
         try:
-            await self.update_embedding(id, embedding)
+            await self.update_embedding(id_, embedding)
         except Exception as err:
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 "embedding failed",
-                dict(place_id=id, message=str(err)),
+                dict(place_id=id_, message=str(err)),
             )
 
         return embedding
 
     # Delete
 
-    async def before_delete(self, id: int) -> PlaceDeleteContext:
+    async def before_delete(self, id_: int) -> PlaceDeleteContext:
         stmt = select(self.model.id, self.model.image_url).where(
-            self.model.id == id
+            self.model.id == id_
         )
         result = await self.session.execute(stmt)
         record = result.one_or_none()
         if record is None:
-            raise self.not_found_error(id)
+            raise self.not_found_error(id_)
 
         return PlaceDeleteContext(image_url=record.image_url)
 
-    async def after_delete(self, id: int, context: PlaceDeleteContext) -> None:
+    async def after_delete(self, id_: int, context: PlaceDeleteContext) -> None:
         if context.image_url:
             cloud_storage.delete_file(context.image_url)
 
-    async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
+    async def auth_delete(self, user: UserReadSchema, id_: int | str) -> None:
         if user.is_admin:
             return
 
-        id = self.parse_id(id)
+        id_ = self.parse_id(id_)
         where: WhereFilters[PlaceSearchableFields] = {
-            "id": self.eq(id),
+            "id": self.eq(id_),
             "creator_id": self.eq(user.id),
         }
         exists = await self.exists(where)
@@ -273,5 +273,5 @@ class CrudsPlace(
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
                 "Access denied",
-                dict(message=f"cannot access place {id}"),
+                dict(message=f"cannot access place {id_}"),
             )

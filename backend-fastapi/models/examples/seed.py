@@ -29,8 +29,8 @@ async def seed_users(cruds: CrudsUser, users: list[UserSeedSchema]) -> None:
         data["password"] = hash_input(
             data["password"], settings.DEFAULT_HASH_SALT
         )
-        id = await cruds.create(UserCreateSchema(**data))
-        USER_REF_MAPPING[user.ref] = id
+        id_ = await cruds.create(UserCreateSchema(**data))
+        USER_REF_MAPPING[user.ref] = id_
 
 
 async def seed_places(cruds: CrudsPlace, places: list[PlaceSeedSchema]) -> None:
@@ -45,8 +45,8 @@ async def seed_places(cruds: CrudsPlace, places: list[PlaceSeedSchema]) -> None:
         data["image_url"] = image_url
         data["creator_id"] = creator_id
         embedding = data.pop("embedding")
-        id = await cruds.seed(PlaceCreateSchema(**data), embedding)
-        PLACE_REF_MAPPING[place.ref] = id
+        id_ = await cruds.seed(PlaceCreateSchema(**data), embedding)
+        PLACE_REF_MAPPING[place.ref] = id_
 
 
 async def seed_db(verbose: bool = False) -> None:

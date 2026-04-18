@@ -206,8 +206,8 @@ def _field_filters_validator(filters: list[Filter]):
     duplicate: list[str] = []
 
     # Rule 0: make sure no operator is used twice
-    for filter in filters:
-        op = filter["op"]
+    for filter_ in filters:
+        op = filter_["op"]
         if op in used_operators and op not in duplicate:
             duplicate.append(op)
             errors.append(

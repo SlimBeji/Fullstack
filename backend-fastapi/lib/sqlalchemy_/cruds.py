@@ -105,23 +105,23 @@ class CrudsClass(
     def model_name(self) -> str:
         return self.model.__name__
 
-    def parse_id(self, id: int | str) -> int:
-        if isinstance(id, int):
-            return id
+    def parse_id(self, id_: int | str) -> int:
+        if isinstance(id_, int):
+            return id_
 
-        trimmed = id.strip()
+        trimmed = id_.strip()
         if not trimmed.isdigit():
             raise ApiError(
                 HTTPStatus.BAD_REQUEST,
-                f'Invalid ID: "{id}" is not a valid integer',
+                f'Invalid ID: "{id_}" is not a valid integer',
             )
 
         return int(trimmed)
 
-    def not_found_error(self, id: int | str) -> ApiError:
+    def not_found_error(self, id_: int | str) -> ApiError:
         return ApiError(
             HTTPStatus.NOT_FOUND,
-            f"No record with id {id} found in {self.model_name}s",
+            f"No record with id {id_} found in {self.model_name}s",
         )
 
     # Serialization and Post-Processing
@@ -275,7 +275,7 @@ class CrudsClass(
         return self.create_context_schema.model_construct()
 
     async def after_create(
-        self, id: int, data: Create, context: CreateContext
+        self, id_: int, data: Create, context: CreateContext
     ) -> None:
         """Overload this to run code after create"""
 
@@ -290,8 +290,8 @@ class CrudsClass(
     async def post(self, form: Post, options: Options | None = None) -> Read:
         """create from a post form"""
         data = await self.post_to_create(form)
-        id = await self.create(data)
-        return await self.get(id, options)
+        id_ = await self.create(data)
+        return await self.get(id_, options)
 
     async def user_post(
         self, user: User, form: Post, options: Options | None = None
@@ -315,9 +315,9 @@ class CrudsClass(
         except Exception as err:
             raise ApiError(HTTPStatus.INTERNAL_SERVER_ERROR, str(err))
 
-    async def read(self, id: int | str) -> DbModel | None:
+    async def read(self, id_: int | str) -> DbModel | None:
         """Return the DbModel if found else null"""
-        parsed_id = self.parse_id(id)
+        parsed_id = self.parse_id(id_)
         stmt = select(self.model).where(self.model.id == parsed_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
@@ -335,7 +335,7 @@ class CrudsClass(
 
     async def _get_raw(
         self,
-        id: int | str,
+        id_: int | str,
         *,
         fields: list[Selectables] | None = None,
         user: User | None = None,
@@ -345,7 +345,7 @@ class CrudsClass(
         query = SearchQuery[Selectables, Sortables, Searchables](
             select=fields or self.default_select,
             where=cast(
-                WhereFilters[Searchables], {"id": self.eq(self.parse_id(id))}
+                WhereFilters[Searchables], {"id": self.eq(self.parse_id(id_))}
             ),
         )
 
@@ -357,50 +357,50 @@ class CrudsClass(
         result = await self.session.execute(stmt)
         record = result.scalar_one()
         if not record:
-            raise self.not_found_error(id)
+            raise self.not_found_error(id_)
 
         # scalar_one() should return a DbModel
         return record  # type: ignore
 
-    async def get(self, id: int | str, options: Options | None = None) -> Read:
+    async def get(self, id_: int | str, options: Options | None = None) -> Read:
         options = options or cast(Options, {})
         process = options.get("process", False)
-        obj = await self._get_raw(id)
+        obj = await self._get_raw(id_)
         result = self._serialize_to_read(obj)
         if process:
             result = await self.post_process(result)
         return result
 
     async def user_get(
-        self, user: User, id: int | str, options: Options | None = None
+        self, user: User, id_: int | str, options: Options | None = None
     ) -> Read:
         options = options or cast(Options, {})
         process = options.get("process", False)
-        obj = await self._get_raw(id, user=user)
+        obj = await self._get_raw(id_, user=user)
         result = self._serialize_to_read(obj)
         if process:
             result = await self.post_process(result)
         return result
 
     async def get_partial(
-        self, id: int | str, options: Options | None = None
+        self, id_: int | str, options: Options | None = None
     ) -> dict:
         options = options or cast(Options, {})
         fields = options.get("fields", self.default_select)
         process = options.get("process", False)
-        obj = await self._get_raw(id, fields=fields)
+        obj = await self._get_raw(id_, fields=fields)
         result = self._serialize_to_dict(obj)
         if process:
             result = await self.post_process_dict(result)
         return result
 
     async def user_get_partial(
-        self, user: User, id: int | str, options: Options | None = None
+        self, user: User, id_: int | str, options: Options | None = None
     ) -> dict:
         options = options or cast(Options, {})
         process = options.get("process", False)
         fields = options.get("fields", self.default_select)
-        obj = await self._get_raw(id, fields=fields, user=user)
+        obj = await self._get_raw(id_, fields=fields, user=user)
         result = self._serialize_to_dict(obj)
         if process:
             result = await self.post_process_dict(result)
@@ -408,9 +408,9 @@ class CrudsClass(
 
     # Update
 
-    async def update(self, id: int | str, data: Update) -> None:
+    async def update(self, id_: int | str, data: Update) -> None:
         """update from a Update form"""
-        key = self.parse_id(id)
+        key = self.parse_id(id_)
         try:
             context = await self.before_update(key, data)
             stmt = (
@@ -421,7 +421,7 @@ class CrudsClass(
             )
             result = await self.session.execute(stmt)
             if result.scalar_one_or_none() is None:
-                raise self.not_found_error(id)
+                raise self.not_found_error(id_)
             await self.after_update(key, data, context)
             await self.session.commit()
 
@@ -434,16 +434,16 @@ class CrudsClass(
                 f"Could not update {self.model_name} object: {err!s}!",
             )
 
-    async def before_update(self, id: int, data: Update) -> UpdateContext:
+    async def before_update(self, id_: int, data: Update) -> UpdateContext:
         """Overload this to run code before update"""
         return self.update_context_schema.model_construct()
 
     async def after_update(
-        self, id: int, data: Update, context: UpdateContext
+        self, id_: int, data: Update, context: UpdateContext
     ) -> None:
         """Overload this to run code after update"""
 
-    async def auth_put(self, user: User, id: int | str, form: Put) -> None:
+    async def auth_put(self, user: User, id_: int | str, form: Put) -> None:
         """
         Raise an ApiError if user lacks authorization
         # Must have access to the records
@@ -457,29 +457,29 @@ class CrudsClass(
         return self.update_schema.model_validate(data_dict)
 
     async def put(
-        self, id: int | str, form: Put, options: Options | None = None
+        self, id_: int | str, form: Put, options: Options | None = None
     ) -> Read:
         """update from a put form"""
         data = await self.put_to_update(form)
-        await self.update(id, data)
-        return await self.get(id, options)
+        await self.update(id_, data)
+        return await self.get(id_, options)
 
     async def user_put(
         self,
         user: User,
-        id: int | str,
+        id_: int | str,
         form: Put,
         options: Options | None = None,
     ) -> Read:
         """check user authorization with respect to the data before the put"""
-        await self.auth_put(user, id, form)
-        return await self.put(id, form, options)
+        await self.auth_put(user, id_, form)
+        return await self.put(id_, form, options)
 
     # Delete
 
-    async def delete(self, id: int | str) -> None:
+    async def delete(self, id_: int | str) -> None:
         """delete object by id"""
-        key = self.parse_id(id)
+        key = self.parse_id(id_)
         try:
             context = await self.before_delete(key)
             stmt = (
@@ -504,21 +504,21 @@ class CrudsClass(
                 f"Could not delete {self.model_name} object: {err!s}!",
             )
 
-    async def before_delete(self, id: int) -> DeleteContext:
+    async def before_delete(self, id_: int) -> DeleteContext:
         """Overload this to run code before delete"""
         return self.delete_context_schema.model_construct()
 
-    async def after_delete(self, id: int, context: DeleteContext) -> None:
+    async def after_delete(self, id_: int, context: DeleteContext) -> None:
         """Overload this to run code after delete"""
 
-    async def auth_delete(self, user: User, id: int | str) -> None:
+    async def auth_delete(self, user: User, id_: int | str) -> None:
         """Raise an ApiError if user lacks authorization"""
         raise NotImplementedError
 
-    async def user_delete(self, user: User, id: int | str) -> None:
+    async def user_delete(self, user: User, id_: int | str) -> None:
         """check if user is authorized to delete the object"""
-        await self.auth_delete(user, id)
-        await self.delete(id)
+        await self.auth_delete(user, id_)
+        await self.delete(id_)
 
     # Search
 

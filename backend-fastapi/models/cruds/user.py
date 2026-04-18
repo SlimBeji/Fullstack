@@ -169,26 +169,26 @@ class CrudsUser(
             return None
         return record  # type : ignore
 
-    def cache_key(self, id: int | str) -> str:
-        return f"user_read_{id}"
+    def cache_key(self, id_: int | str) -> str:
+        return f"user_read_{id_}"
 
-    async def get_cache(self, id: int | str) -> UserReadSchema:
-        key = self.cache_key(id)
+    async def get_cache(self, id_: int | str) -> UserReadSchema:
+        key = self.cache_key(id_)
         value = await redis_client.get(key, format=UserReadSchema)
         if value:
             return value
 
         # Value not found or old value deprecated/correupted
-        value = await self.get(id)
+        value = await self.get(id_)
         await redis_client.set(key, value)
         return value
 
     # Update
 
     async def after_update(
-        self, id: int, data: UserUpdateSchema, context: UserUpdateContext
+        self, id_: int, data: UserUpdateSchema, context: UserUpdateContext
     ) -> None:
-        await redis_client.delete(self.cache_key(id))
+        await redis_client.delete(self.cache_key(id_))
 
     async def put_to_update(self, data: UserPutSchema) -> UserUpdateSchema:
         data_dict = data.model_dump(exclude_unset=True)
@@ -201,36 +201,36 @@ class CrudsUser(
         return self.update_schema.model_validate(data_dict)
 
     async def auth_put(
-        self, user: UserReadSchema, id: int | str, form: UserPutSchema
+        self, user: UserReadSchema, id_: int | str, form: UserPutSchema
     ) -> None:
         if user.is_admin:
             return
 
-        if user.id != self.parse_id(id):
+        if user.id != self.parse_id(id_):
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                f"Access to user with id {id} not granted",
+                f"Access to user with id {id_} not granted",
             )
 
     # Delete
 
-    async def before_delete(self, id: int) -> UserDeleteContext:
+    async def before_delete(self, id_: int) -> UserDeleteContext:
         stmt = select(self.model.id, self.model.image_url).where(
-            self.model.id == id
+            self.model.id == id_
         )
         result = await self.session.execute(stmt)
         record = result.one_or_none()
         if record is None:
-            raise self.not_found_error(id)
+            raise self.not_found_error(id_)
 
         return UserDeleteContext(image_url=record.image_url)
 
-    async def after_delete(self, id: int, context: UserDeleteContext) -> None:
-        await redis_client.delete(self.cache_key(id))
+    async def after_delete(self, id_: int, context: UserDeleteContext) -> None:
+        await redis_client.delete(self.cache_key(id_))
         if context.image_url:
             cloud_storage.delete_file(context.image_url)
 
-    async def auth_delete(self, user: UserReadSchema, id: int | str) -> None:
+    async def auth_delete(self, user: UserReadSchema, id_: int | str) -> None:
         if user.is_admin:
             return
 

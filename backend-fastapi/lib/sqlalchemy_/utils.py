@@ -67,10 +67,10 @@ def apply_select(
 def _apply_single_where(
     query: Select,
     column: InstrumentedAttribute,  # the actual column to filter
-    filter: Filter,  # the filter to apply
+    filter_: Filter,  # the filter to apply
 ) -> Select:
-    op = filter["op"]
-    val = filter["val"]
+    op = filter_["op"]
+    val = filter_["val"]
 
     if op == "eq":
         query = query.where(column == val)
@@ -112,7 +112,7 @@ def apply_where(
         if not field_filters:
             continue
         column = map_func(field)
-        for filter in field_filters:
-            query = _apply_single_where(query, column, filter)
+        for filter_ in field_filters:
+            query = _apply_single_where(query, column, filter_)
 
     return query

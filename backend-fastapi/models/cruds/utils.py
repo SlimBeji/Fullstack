@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..orm import User
 
 
-async def user_exists(session: AsyncSession, id: int | str) -> bool:
-    stmt = select(User.id).where(User.id == id)
+async def user_exists(session: AsyncSession, id_: int | str) -> bool:
+    stmt = select(User.id).where(User.id == id_)
     result = await session.execute(stmt)
     return result.scalar_one_or_none() is not None
