@@ -71,7 +71,7 @@ class RedisClient:
         self, key: str, val: Any, expiration: int | None = None
     ) -> None:
         expiration = expiration or self.default_expirartion
-        if isinstance(val, dict) or isinstance(val, list):
+        if isinstance(val, (dict, list)):
             val = json.dumps(val)
         elif isinstance(val, BaseModel):
             val = val.model_dump_json()

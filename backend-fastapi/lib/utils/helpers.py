@@ -111,7 +111,7 @@ def flatten_json(
                 )
 
             for index, item in enumerate(value):
-                if isinstance(item, dict) or isinstance(item, list):
+                if isinstance(item, (dict, list)):
                     result.update(
                         flatten_json(item, accept_arrays, f"{new_key}.{index}")
                     )

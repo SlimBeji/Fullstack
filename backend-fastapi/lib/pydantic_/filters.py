@@ -153,7 +153,7 @@ def _make_filter_validator(real_type: Any):
     def validator(value: str | dict) -> Filter:
         if isinstance(value, str):
             op, raw_val = _extract_raw_filter(value)
-        elif isinstance(value, int) or isinstance(value, float):
+        elif isinstance(value, (int, float)):
             return _numeric_filter_validator(
                 "eq", str(value), adapter, is_index
             )
