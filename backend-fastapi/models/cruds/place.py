@@ -91,10 +91,9 @@ class CrudsPlace(
     def map_where(self, field: str) -> InstrumentedAttribute:
         if field == "location_lat":
             return self.model.location["lat"].astext.cast(Float)  # type: ignore
-        elif field == "location_lng":
+        if field == "location_lng":
             return self.model.location["lng"].astext.cast(Float)  # type: ignore
-        else:
-            return super().map_where(field)
+        return super().map_where(field)
 
     # Create
 

@@ -35,18 +35,17 @@ def _numeric_filter_validator(
     if op in ["eq", "ne", "gt", "gte", "lt", "lte"]:
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
-    elif op in ["in", "nin"]:
+    if op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
         return Filter(op=op, val=val)
-    elif op == "null":
+    if op == "null":
         val = check_bool(raw)
         return Filter(op=op, val=val)
-    else:
-        raise PydanticCustomError(
-            "invalid numeric operation",
-            f"{op} is not a valid operation for numeric fields - Valid: eq,ne,gt,gte,lt,lte,in,nin,null",
-        )
+    raise PydanticCustomError(
+        "invalid numeric operation",
+        f"{op} is not a valid operation for numeric fields - Valid: eq,ne,gt,gte,lt,lte,in,nin,null",
+    )
 
 
 def _index_filter_validator(
@@ -55,18 +54,17 @@ def _index_filter_validator(
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
-    elif op in ["in", "nin"]:
+    if op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
         return Filter(op=op, val=val)
-    elif op == "null":
+    if op == "null":
         val = check_bool(raw)
         return Filter(op=op, val=val)
-    else:
-        raise PydanticCustomError(
-            "invalid ObjectId operation",
-            f"{op} is not a valid operation for linked fields - Valid: eq,ne,null,in,nin",
-        )
+    raise PydanticCustomError(
+        "invalid ObjectId operation",
+        f"{op} is not a valid operation for linked fields - Valid: eq,ne,null,in,nin",
+    )
 
 
 def _string_filter_validator(
@@ -77,20 +75,19 @@ def _string_filter_validator(
     if op in ["eq", "ne"]:
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
-    elif op in ["in", "nin"]:
+    if op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
         return Filter(op=op, val=val)
-    elif op == "null":
+    if op == "null":
         val = check_bool(raw)
         return Filter(op=op, val=val)
-    elif op in ["like", "ilike"]:
+    if op in ["like", "ilike"]:
         return Filter(op=op, val=raw)
-    else:
-        raise PydanticCustomError(
-            "invalid string operation",
-            f"{op} is not a valid operation for string fields - Valid: eq,ne,in,nin,null,like,ilike",
-        )
+    raise PydanticCustomError(
+        "invalid string operation",
+        f"{op} is not a valid operation for string fields - Valid: eq,ne,in,nin,null,like,ilike",
+    )
 
 
 def _boolean_filter_validator(
@@ -99,11 +96,10 @@ def _boolean_filter_validator(
     if op in ["eq", "ne", "null"]:
         val = check_bool(raw)
         return Filter(op=op, val=val)
-    else:
-        raise PydanticCustomError(
-            "invalid boolean operation",
-            f"{op} is not a valid operation for boolean fields - Valid: eq,ne,null",
-        )
+    raise PydanticCustomError(
+        "invalid boolean operation",
+        f"{op} is not a valid operation for boolean fields - Valid: eq,ne,null",
+    )
 
 
 def _datetime_filter_validator(
@@ -112,18 +108,17 @@ def _datetime_filter_validator(
     if op in ["eq", "ne", "gt", "gte", "lt", "lte"]:
         val = adapter.validate_python(raw)
         return Filter(op=op, val=val)
-    elif op in ["in", "nin"]:
+    if op in ["in", "nin"]:
         l = raw.split(",")
         val = [adapter.validate_python(item) for item in l]
         return Filter(op=op, val=val)
-    elif op == "null":
+    if op == "null":
         val = check_bool(raw)
         return Filter(op=op, val=val)
-    else:
-        raise PydanticCustomError(
-            "invalid datetime operation",
-            f"{op} is not a valid operation for datetime fields - Valid: eq,ne,gt,gte,lt,lte,in,nin,null",
-        )
+    raise PydanticCustomError(
+        "invalid datetime operation",
+        f"{op} is not a valid operation for datetime fields - Valid: eq,ne,gt,gte,lt,lte,in,nin,null",
+    )
 
 
 def _get_field_info(field) -> FieldInfo | None:
@@ -175,15 +170,14 @@ def _make_filter_validator(real_type: Any):
 
         if base_class in [int, float]:
             return _numeric_filter_validator(op, raw_val, adapter, is_index)
-        elif base_class in [str, EmailStr]:
+        if base_class in [str, EmailStr]:
             return _string_filter_validator(op, raw_val, adapter)
-        elif base_class in [bool]:
+        if base_class in [bool]:
             return _boolean_filter_validator(op, raw_val, adapter)
-        elif base_class in [datetime]:
+        if base_class in [datetime]:
             return _datetime_filter_validator(op, raw_val, adapter)
-        else:
-            # This should not be reached. Linting purposes
-            raise RuntimeError(f"Unknow base type {base_class}")
+        # This should not be reached. Linting purposes
+        raise RuntimeError(f"Unknow base type {base_class}")
 
     return validator
 

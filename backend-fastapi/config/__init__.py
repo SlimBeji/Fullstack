@@ -70,15 +70,13 @@ class Settings(BaseSettings):
     def pg_url(self) -> str:
         if self.is_test:
             return self.async_db_test_url
-        else:
-            return self.async_db_url
+        return self.async_db_url
 
     @property
     def redis_url(self) -> str:
         if self.is_test:
             return self.REDIS_TEST_URL
-        else:
-            return self.REDIS_URL
+        return self.REDIS_URL
 
 
 settings = Settings()  # type: ignore[call-arg]
