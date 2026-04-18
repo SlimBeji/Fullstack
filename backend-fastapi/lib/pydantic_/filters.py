@@ -3,8 +3,6 @@ from datetime import datetime
 from typing import (
     Annotated,
     Any,
-    Generic,
-    TypeVar,
     get_args,
 )
 
@@ -20,8 +18,6 @@ from pydantic_core import PydanticCustomError
 
 from lib.types_ import Filter, FilterOperation
 from lib.utils import check_bool
-
-T = TypeVar("T")
 
 check_filter_op: Callable = TypeAdapter(FilterOperation).validate_python
 
@@ -182,7 +178,7 @@ def _make_filter_validator(real_type: Any):
     return validator
 
 
-class HttpFilter(Generic[T]):
+class HttpFilter[T]:
     def __class_getitem__(cls, item):
         field_info = _get_field_info(item)
         extra = getattr(field_info, "json_schema_extra", None) or {}
@@ -259,7 +255,7 @@ def _ensure_list(value: Any) -> list | None:
     return [value]
 
 
-class HttpFilters(Generic[T]):
+class HttpFilters[T]:
     def __class_getitem__(cls, item):
         field_info = _get_field_info(item)
         description = getattr(field_info, "description", "")

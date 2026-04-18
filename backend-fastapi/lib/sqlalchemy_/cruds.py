@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Mapping
 from http import HTTPStatus
-from typing import Any, Generic, TypeVar, cast, get_args
+from typing import Any, cast, get_args
 
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy import Select, delete, func, select, update
@@ -21,40 +21,23 @@ from .model import BaseModel
 from .types import SelectField
 from .utils import apply_order_by, apply_select, apply_where
 
-DbModel = TypeVar("DbModel", bound=BaseModel)
-User = TypeVar("User", bound=PydanticBaseModel)
-Create = TypeVar("Create", bound=PydanticBaseModel)
-CreateContext = TypeVar("CreateContext", bound=PydanticBaseModel)
-Post = TypeVar("Post", bound=PydanticBaseModel)
-Read = TypeVar("Read", bound=PydanticBaseModel)
-Options = TypeVar("Options", bound=Mapping)
-Selectables = TypeVar("Selectables", bound=str)
-Sortables = TypeVar("Sortables", bound=str)
-Searchables = TypeVar("Searchables", bound=str)
-Update = TypeVar("Update", bound=PydanticBaseModel)
-UpdateContext = TypeVar("UpdateContext", bound=PydanticBaseModel)
-Put = TypeVar("Put", bound=PydanticBaseModel)
-DeleteContext = TypeVar("DeleteContext", bound=PydanticBaseModel)
 
-
-class CrudsClass(
-    Generic[
-        DbModel,  # The Database model interface
-        User,  # The User read schema used for authorization
-        Create,  # Creation Interface
-        CreateContext,  # Creation Hooks context
-        Post,  # HTTP Post form
-        Read,  # The Read interface
-        Options,  # General options for HTTP methods/actions
-        Selectables,  # Literal of Selectable fields
-        Sortables,  # Literal of fields we can use OrderBy on
-        Searchables,  # List of keys we can search on
-        Update,  # Update Interface
-        UpdateContext,  # Update hooks context
-        Put,  # HTTP Put form
-        DeleteContext,  # Delete hooks context
-    ]
-):
+class CrudsClass[
+    DbModel: BaseModel,  # The Database model interface
+    User: PydanticBaseModel,  # The User read schema used for authorization
+    Create: PydanticBaseModel,  # Creation Interface
+    CreateContext: PydanticBaseModel,  # Creation Hooks context
+    Post: PydanticBaseModel,  # HTTP Post form
+    Read: PydanticBaseModel,  # The Read interface
+    Options: Mapping,  # General options for HTTP methods/actions
+    Selectables: str,  # Literal of Selectable fields
+    Sortables: str,  # Literal of fields we can use OrderBy on
+    Searchables: str,  # List of keys we can search on
+    Update: PydanticBaseModel,  # Update Interface
+    UpdateContext: PydanticBaseModel,  # Update hooks context
+    Put: PydanticBaseModel,  # HTTP Put form
+    DeleteContext: PydanticBaseModel,  # Delete hooks context
+]:
     # Constructor, Properties & Helpers
 
     MAX_ITEMS_PER_PAGE = 100

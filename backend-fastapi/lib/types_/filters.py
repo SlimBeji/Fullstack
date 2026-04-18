@@ -1,10 +1,6 @@
-from typing import Any, Generic, Literal, TypedDict, TypeVar
+from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel
-
-Selectables = TypeVar("Selectables", bound=str)
-Sortables = TypeVar("Sortables", bound=str)
-Searchables = TypeVar("Searchables", bound=str)
 
 # ---- Public Types for searching data ----
 
@@ -32,7 +28,9 @@ class Filter(TypedDict):
 type WhereFilters[Searchables: str] = dict[Searchables, list[Filter]]
 
 
-class SearchQuery(BaseModel, Generic[Selectables, Sortables, Searchables]):
+class SearchQuery[Selectables: str, Sortables: str, Searchables: str](
+    BaseModel
+):
     page: int = 1
     size: int | None = None
     orderby: list[Sortables] | None = None

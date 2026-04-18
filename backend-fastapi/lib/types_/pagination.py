@@ -1,9 +1,6 @@
 from dataclasses import dataclass
-from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
-
-ReadSchema = TypeVar("ReadSchema", bound=BaseModel)
 
 
 @dataclass
@@ -25,7 +22,7 @@ class PaginatedDict(BaseModel):
     data: list[dict]
 
 
-class PaginatedData(BaseModel, Generic[ReadSchema]):
+class PaginatedData[ReadSchema: BaseModel](BaseModel):
     """Using camelCase to stay coherent with other backends"""
 
     page: int = Field(examples=[1])

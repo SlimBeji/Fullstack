@@ -1,4 +1,4 @@
-from typing import Annotated, ClassVar, Generic, TypeVar, cast
+from typing import Annotated, ClassVar, cast
 
 from fastapi import Query
 from pydantic import BaseModel, Field
@@ -6,14 +6,8 @@ from pydantic.fields import FieldInfo, ModelPrivateAttr
 
 from lib.types_ import SearchQuery, WhereFilters
 
-ResponseFields = TypeVar("ResponseFields", bound=str)
-SortableFields = TypeVar("SortableFields", bound=str)
-SelectableFields = TypeVar("SelectableFields", bound=str)
-SearchableFields = TypeVar("SearchableFields", bound=str)
-
-
 FieldsQuery = Annotated[
-    list[ResponseFields] | None,
+    list[str] | None,
     Query(
         description="Fields to include in the response; omit for complete data",
         examples=[["id"]],
@@ -21,9 +15,11 @@ FieldsQuery = Annotated[
 ]
 
 
-class BaseSearchSchema(
-    BaseModel, Generic[SelectableFields, SortableFields, SearchableFields]
-):
+class BaseSearchSchema[
+    SelectableFields: str,
+    SortableFields: str,
+    SearchableFields: str,
+](BaseModel):
     _MAX_SIZE: int = 100
     _DEFAULT_SORT: ClassVar[list[SortableFields]] = ["-created_at"]  # type: ignore
     _DEFAULT_FIELDS: ClassVar[list[SelectableFields]] = ["id"]  # type: ignore
