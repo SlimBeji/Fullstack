@@ -250,10 +250,10 @@ definitions:
       page:
         example: 1
         type: integer
-      totalCount:
+      total_count:
         example: 40
         type: integer
-      totalPages:
+      total_pages:
         example: 2
         type: integer
     type: object
@@ -406,10 +406,10 @@ definitions:
       page:
         example: 1
         type: integer
-      totalCount:
+      total_count:
         example: 40
         type: integer
-      totalPages:
+      total_pages:
         example: 2
         type: integer
     type: object

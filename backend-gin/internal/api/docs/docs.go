@@ -1390,11 +1390,11 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "totalCount": {
+                "total_count": {
                     "type": "integer",
                     "example": 40
                 },
-                "totalPages": {
+                "total_pages": {
                     "type": "integer",
                     "example": 2
                 }
@@ -1596,11 +1596,11 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "totalCount": {
+                "total_count": {
                     "type": "integer",
                     "example": 40
                 },
-                "totalPages": {
+                "total_pages": {
                     "type": "integer",
                     "example": 2
                 }
