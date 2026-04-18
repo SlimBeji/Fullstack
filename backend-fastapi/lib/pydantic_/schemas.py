@@ -6,8 +6,8 @@ from pydantic.fields import FieldInfo, ModelPrivateAttr
 
 from lib.types_ import SearchQuery, WhereFilters
 
-FieldsQuery = Annotated[
-    list[str] | None,
+type FieldsQuery[T: str] = Annotated[
+    list[T] | None,
     Query(
         description="Fields to include in the response; omit for complete data",
         examples=[["id"]],

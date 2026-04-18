@@ -33,7 +33,7 @@ class RedisClient:
         # Connect to the redis database
         if self._client is None:
             self._client = async_redis.Redis.from_url(self.uri)
-            await self._client.ping()
+            await self._client.ping()  # type: ignore[misc]
 
     async def close(self) -> None:
         if self._client:

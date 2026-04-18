@@ -174,7 +174,7 @@ class CrudsUser(
 
     async def get_cache(self, id_: int | str) -> UserReadSchema:
         key = self.cache_key(id_)
-        value = await redis_client.get(key, format=UserReadSchema)
+        value = await redis_client.get(key, format_=UserReadSchema)
         if value:
             return value
 
