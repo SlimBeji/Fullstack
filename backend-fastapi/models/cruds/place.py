@@ -238,7 +238,7 @@ class CrudsPlace(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 "embedding failed",
                 dict(place_id=id_, message=str(err)),
-            )
+            ) from err
 
         return embedding
 

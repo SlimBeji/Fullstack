@@ -161,12 +161,12 @@ def _make_filter_validator(real_type: Any):
             try:
                 op = value["op"]
                 raw_val = value["val"]
-            except KeyError:
+            except KeyError as err:
                 raise PydanticCustomError(
                     "Invalid Field Filter",
                     "Field Filter {value} is not valid. It must define the op and val fields",
                     dict(value=value),
-                )
+                ) from err
 
         if base_class in [int, float]:
             return _numeric_filter_validator(op, raw_val, adapter, is_index)

@@ -47,8 +47,8 @@ class HuggingFaceClient:
             response.raise_for_status()
             embedding_response: list[list[float]] = response.json()
             return embedding_response[0]
-        except Exception:
+        except Exception as err:
             raise ApiError(
                 HTTPStatus.FAILED_DEPENDENCY,
                 f"An unexpected error occured while embedding text {text}",
-            )
+            ) from err

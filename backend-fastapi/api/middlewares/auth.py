@@ -23,10 +23,10 @@ async def _get_user_from_token(
 ) -> UserReadSchema:
     try:
         payload = decode_token(token)
-    except ExpiredTokenError:
-        raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Expired")
-    except InvalidTokenError:
-        raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Not Valid")
+    except ExpiredTokenError as err:
+        raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Expired") from err
+    except InvalidTokenError as err:
+        raise ApiError(HTTPStatus.UNAUTHORIZED, "Token Not Valid") from err
 
     cruds = CrudsUser(session)
     user = await cruds.get_cache(payload.user_id)

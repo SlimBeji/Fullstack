@@ -263,12 +263,14 @@ class CrudsClass(
                 isinstance(err, IntegrityError)
                 and "duplicate key" in str(err.orig).lower()
             ):
-                raise ApiError(HTTPStatus.CONFLICT, "Record already exists")
+                raise ApiError(
+                    HTTPStatus.CONFLICT, "Record already exists"
+                ) from err
 
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not create {self.model_name} object: {err!s}!",
-            )
+            ) from err
 
     async def before_create(self, data: Create) -> CreateContext:
         """Overload this to run code before create"""
@@ -313,7 +315,7 @@ class CrudsClass(
             result = await self.session.execute(stmt)
             return result.scalar() is not None
         except Exception as err:
-            raise ApiError(HTTPStatus.INTERNAL_SERVER_ERROR, str(err))
+            raise ApiError(HTTPStatus.INTERNAL_SERVER_ERROR, str(err)) from err
 
     async def read(self, id_: int | str) -> DbModel | None:
         """Return the DbModel if found else null"""
@@ -432,7 +434,7 @@ class CrudsClass(
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not update {self.model_name} object: {err!s}!",
-            )
+            ) from err
 
     async def before_update(self, id_: int, data: Update) -> UpdateContext:
         """Overload this to run code before update"""
@@ -502,7 +504,7 @@ class CrudsClass(
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not delete {self.model_name} object: {err!s}!",
-            )
+            ) from err
 
     async def before_delete(self, id_: int) -> DeleteContext:
         """Overload this to run code before delete"""
