@@ -15,6 +15,7 @@ import (
 type QueryBuilder interface {
 	GetDB(ctx context.Context) *gorm.DB
 	GetModel(ctx context.Context) *gorm.DB
+	ModelName() string
 	DefaultSelect() []string
 	DefaultOrderBy() []string
 	MaxItemsPerPage() int
