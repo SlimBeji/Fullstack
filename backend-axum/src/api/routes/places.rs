@@ -51,8 +51,8 @@ async fn get_places(Auth(user): Auth, data: QueryFilters<PlaceSearch>) -> impl I
     println!("{:?}", data.query.order_by);
     println!("{:?}", data.query.where_);
     let result = PlacesPaginated {
-        page: data.query.page,
-        total_count: data.query.size,
+        page: data.query.page.unwrap(),
+        total_count: data.query.size.unwrap(),
         total_pages: 1,
         data: vec![PlaceRead::example()],
     };
@@ -81,8 +81,8 @@ async fn search_places(Auth(user): Auth, data: BodyFilters<PlaceSearch>) -> impl
     println!("{:?}", data.query.order_by);
     println!("{:?}", data.query.where_);
     let result = PlacesPaginated {
-        page: data.query.page,
-        total_count: data.query.size,
+        page: data.query.page.unwrap(),
+        total_count: data.query.size.unwrap(),
         total_pages: 1,
         data: vec![PlaceRead::example()],
     };

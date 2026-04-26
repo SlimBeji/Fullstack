@@ -50,8 +50,8 @@ async fn get_users(Auth(user): Auth, data: QueryFilters<UserSearch>) -> impl Int
     println!("{:?}", data.query.order_by);
     println!("{:?}", data.query.where_);
     let result = UsersPaginated {
-        page: data.query.page,
-        total_count: data.query.size,
+        page: data.query.page.unwrap(),
+        total_count: data.query.size.unwrap(),
         total_pages: 1,
         data: vec![UserRead::example()],
     };
@@ -80,8 +80,8 @@ async fn search_users(Auth(user): Auth, data: BodyFilters<UserSearch>) -> impl I
     println!("{:?}", data.query.order_by);
     println!("{:?}", data.query.where_);
     let result = UsersPaginated {
-        page: data.query.page,
-        total_count: data.query.size,
+        page: data.query.page.unwrap(),
+        total_count: data.query.size.unwrap(),
         total_pages: 1,
         data: vec![UserRead::example()],
     };

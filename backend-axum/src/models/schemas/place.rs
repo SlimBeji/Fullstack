@@ -369,11 +369,11 @@ impl ToSearchQuery for PlaceSearch {
         filter_reader.read_datetime_filters("created_at", &self.created_at, &vec![]);
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
-                page,
-                size,
-                order_by,
-                select,
-                where_,
+                page: Some(page),
+                size: Some(size),
+                order_by: Some(order_by),
+                select: Some(select),
+                where_: Some(where_),
             }),
             Err(errors) => Err(errors),
         }

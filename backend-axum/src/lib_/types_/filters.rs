@@ -889,11 +889,11 @@ pub type WhereFilters = HashMap<String, FieldFilters>;
 
 #[derive(Debug)]
 pub struct SearchQuery {
-    pub page: usize,
-    pub size: usize,
-    pub order_by: Vec<String>,
-    pub select: Vec<String>,
-    pub where_: WhereFilters,
+    pub page: Option<usize>,
+    pub size: Option<usize>,
+    pub order_by: Option<Vec<String>>,
+    pub select: Option<Vec<String>>,
+    pub where_: Option<WhereFilters>,
 }
 
 pub trait ToSearchQuery {
