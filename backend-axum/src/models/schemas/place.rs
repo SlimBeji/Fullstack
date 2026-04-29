@@ -13,7 +13,7 @@ use crate::lib_::{
 
 // --- Selectables, Serchables, Sortables ----
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PlaceSelectableFields {
     Id,
@@ -27,7 +27,7 @@ pub enum PlaceSelectableFields {
 }
 
 #[allow(dead_code)] // to be removed
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PlaceSearchableFields {
     Id,
@@ -40,7 +40,7 @@ pub enum PlaceSearchableFields {
     CreatedAt,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
 pub enum PlaceSortableFields {
     #[serde(rename = "created_at")]
     CreatedAtAsc,
