@@ -14,7 +14,7 @@ pub struct SearchQuery<Selectable, Sortable> {
 }
 
 impl<Selectable, Sortable> SearchQuery<Selectable, Sortable> {
-    pub fn id(id: u32) -> Self {
+    pub fn id(id: i32) -> Self {
         let id_filter = IndexFilters {
             eq: Some(id),
             ne: None,

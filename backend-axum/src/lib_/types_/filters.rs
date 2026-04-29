@@ -154,7 +154,7 @@ fn parse_f64_vec(val: &str, op: FilterOp) -> Result<Vec<f64>, ValidationError> {
     val.split(',').map(|item| parse_f64(item, op)).collect()
 }
 
-fn parse_u32(val: &str, op: FilterOp) -> Result<u32, ValidationError> {
+fn parse_i32(val: &str, op: FilterOp) -> Result<i32, ValidationError> {
     let err_fn = || {
         validation_err(
             "not_a_number",
@@ -171,12 +171,12 @@ fn parse_u32(val: &str, op: FilterOp) -> Result<u32, ValidationError> {
         return Err(err_fn());
     }
 
-    let num: u32 = trimmed.parse().map_err(|_| err_fn())?;
+    let num: i32 = trimmed.parse().map_err(|_| err_fn())?;
     Ok(num)
 }
 
-fn parse_u32_vec(val: &str, op: FilterOp) -> Result<Vec<u32>, ValidationError> {
-    val.split(',').map(|item| parse_u32(item, op)).collect()
+fn parse_i32_vec(val: &str, op: FilterOp) -> Result<Vec<i32>, ValidationError> {
+    val.split(',').map(|item| parse_i32(item, op)).collect()
 }
 
 fn parse_datetime(val: &str, op: FilterOp) -> Result<OffsetDateTime, ValidationError> {
@@ -530,11 +530,11 @@ impl F64Filters {
 
 #[derive(Debug)]
 pub struct IndexFilters {
-    pub eq: Option<u32>,
-    pub ne: Option<u32>,
+    pub eq: Option<i32>,
+    pub ne: Option<i32>,
     pub null: Option<bool>,
-    pub in_: Option<Vec<u32>>,
-    pub nin: Option<Vec<u32>>,
+    pub in_: Option<Vec<i32>>,
+    pub nin: Option<Vec<i32>>,
 }
 
 impl IndexFilters {
@@ -553,13 +553,13 @@ impl IndexFilters {
             match op {
                 FilterOp::Eq => {
                     is_usable(FilterOp::Eq, &mut operators)?;
-                    let converted = parse_u32(val, FilterOp::Eq)?;
+                    let converted = parse_i32(val, FilterOp::Eq)?;
                     // no validation for indexes
                     result.eq = Some(converted);
                 }
                 FilterOp::Ne => {
                     is_usable(FilterOp::Ne, &mut operators)?;
-                    let converted = parse_u32(val, FilterOp::Ne)?;
+                    let converted = parse_i32(val, FilterOp::Ne)?;
                     // no validation for indexes
                     result.ne = Some(converted);
                 }
@@ -571,13 +571,13 @@ impl IndexFilters {
                 }
                 FilterOp::In => {
                     is_usable(FilterOp::In, &mut operators)?;
-                    let converted = parse_u32_vec(val, FilterOp::In)?;
+                    let converted = parse_i32_vec(val, FilterOp::In)?;
                     // no validation for indexes
                     result.in_ = Some(converted);
                 }
                 FilterOp::Nin => {
                     is_usable(FilterOp::Nin, &mut operators)?;
-                    let converted = parse_u32_vec(val, FilterOp::Nin)?;
+                    let converted = parse_i32_vec(val, FilterOp::Nin)?;
                     // no validation for indexes
                     result.nin = Some(converted);
                 }
