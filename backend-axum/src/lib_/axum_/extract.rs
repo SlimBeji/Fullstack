@@ -2,7 +2,7 @@ use axum::extract::FromRequest;
 use axum_extra::extract::Query as AxumExtraQuery;
 use serde::de::DeserializeOwned;
 
-use super::super::types_::ApiError;
+use crate::lib_::types_::ApiError;
 
 pub struct Query<T>(pub T);
 

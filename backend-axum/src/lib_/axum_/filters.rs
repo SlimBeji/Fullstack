@@ -3,8 +3,8 @@ use std::marker::PhantomData;
 use axum::extract::{FromRequest, Json};
 use serde::de::DeserializeOwned;
 
-use super::super::types_::{ApiError, SearchQuery, ToSearchQuery};
 use super::extract::Query;
+use crate::lib_::types_::{ApiError, SearchQuery, ToSearchQuery};
 
 // Filters from Query parameters
 pub struct QueryFilters<T> {

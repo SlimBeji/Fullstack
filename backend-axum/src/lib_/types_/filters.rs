@@ -2,7 +2,7 @@ use std::{collections::HashMap, str::FromStr};
 use time::OffsetDateTime;
 use validator::{ValidationError, ValidationErrors};
 
-use super::super::utils::parse_bool as parse_bool_utils;
+use crate::lib_::utils::parse_bool as parse_bool_utils;
 
 // Basic PGSQL operations for querying
 

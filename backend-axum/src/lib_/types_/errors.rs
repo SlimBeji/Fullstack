@@ -10,7 +10,7 @@ use std::error::Error;
 use std::fmt;
 use validator::{Validate, ValidationErrors};
 
-use super::super::validator_::errors_to_serde_map;
+use crate::lib_::validator_::errors_to_serde_map;
 
 pub struct ApiError {
     pub code: StatusCode,

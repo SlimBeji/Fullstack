@@ -5,7 +5,7 @@ use sea_orm::{
 };
 use serde_json::Value;
 
-use super::super::types_::{ApiError, SearchQuery};
+use crate::lib_::types_::{ApiError, SearchQuery};
 
 // Cruds generci struct
 pub struct CrudsBase<E: EntityTrait> {
