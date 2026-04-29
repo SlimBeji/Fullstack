@@ -7,7 +7,7 @@ use serde_json::Value;
 
 use crate::lib_::types_::{ApiError, SearchQuery};
 
-// Cruds generci struct
+// Cruds generic struct
 pub struct CrudsBase<E: EntityTrait> {
     _entity: PhantomData<E>,
     pub db: DatabaseConnection,
