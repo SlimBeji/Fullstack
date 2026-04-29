@@ -44,62 +44,73 @@ where
 }
 
 // CrudsTools
-pub trait CrudsTools<Entity, Selectable, Sortable>
+pub trait CrudsTools
 where
-    Entity: EntityTrait,
+    <Self::Entity as EntityTrait>::Model: Send + Sync,
+    <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType: From<u32>,
 {
-    fn get_base(&self) -> &CrudsBase<Entity, Selectable, Sortable>;
+    type Entity: EntityTrait; // The SearOrm Entity
+    type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
+    type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
+
+    fn get_base(&self) -> &CrudsBase<Self::Entity, Self::Selectable, Self::Sortable>;
     fn get_modelname() -> &'static str;
 }
 
 // Read traits
 #[async_trait]
-pub trait Read<User, Entity, Fetch, Read, Selectable, Sortable>:
-    CrudsTools<Entity, Selectable, Sortable>
-where
-    // User object for authentication and authorization
-    User: Send + Sync + 'static,
-    // The SearOrm Entity
-    Entity: EntityTrait,
-    Entity::Model: Send + Sync,
-    <Entity::PrimaryKey as PrimaryKeyTrait>::ValueType: From<u32>,
-    // The Data fetched
-    Fetch: Send + Sync,
-    // The Read Struct
-    Read: Send + Sync,
-{
-    async fn auth_get(user: User, search: SearchQuery) -> SearchQuery;
+pub trait Read: CrudsTools {
+    type User: Send + Sync + 'static; // User object for authentication and authorization
+    type Fetch: Send + Sync; // The Data fetched
+    type Read: Send + Sync; // The Read Struct
 
-    fn to_read(model: Fetch) -> Result<Read, ApiError>;
+    async fn auth_get(
+        user: Self::User,
+        search: SearchQuery<Self::Selectable, Self::Sortable>,
+    ) -> SearchQuery<Self::Selectable, Self::Sortable>;
 
-    fn to_json(model: Fetch) -> Result<Value, ApiError>;
+    fn to_read(model: Self::Fetch) -> Result<Self::Read, ApiError>;
 
-    async fn post_process(data: &Read) -> Result<(), ApiError>;
+    fn to_json(model: Self::Fetch) -> Result<Value, ApiError>;
+
+    async fn post_process(data: &Self::Read) -> Result<(), ApiError>;
 
     async fn post_process_partial(data: &Value) -> Result<(), ApiError>;
 
-    async fn get_raw(&self, query: SearchQuery) -> Result<Fetch, ApiError>;
+    async fn get_raw(
+        &self,
+        query: SearchQuery<Self::Selectable, Self::Sortable>,
+    ) -> Result<Self::Fetch, ApiError>;
 
-    async fn get_raw_for_read(&self, query: SearchQuery) -> Result<Fetch, ApiError> {
-        //query.select = Some(self.get_base().default_select);
+    async fn get_raw_for_read(
+        &self,
+        mut query: SearchQuery<Self::Selectable, Self::Sortable>,
+    ) -> Result<Self::Fetch, ApiError> {
+        query.select = Some(self.get_base().default_select.clone());
         self.get_raw(query).await
     }
 
-    async fn read(&self, id: u32) -> Result<Option<Entity::Model>, ApiError> {
+    async fn read(
+        &self,
+        id: u32,
+    ) -> Result<Option<<Self::Entity as EntityTrait>::Model>, ApiError> {
         let base = self.get_base();
-        Entity::find_by_id(id).one(&base.db).await.map_err(|e| {
-            ApiError::internal_error(
-                format!(
-                    "could not extract {} with id {} from database",
-                    Self::get_modelname(),
-                    id
-                ),
-                Box::new(e),
-            )
-        })
+        Self::Entity::find_by_id(id)
+            .one(&base.db)
+            .await
+            .map_err(|e| {
+                ApiError::internal_error(
+                    format!(
+                        "could not extract {} with id {} from database",
+                        Self::get_modelname(),
+                        id
+                    ),
+                    Box::new(e),
+                )
+            })
     }
 
-    async fn get(&self, id: u32) -> Result<Read, ApiError> {
+    async fn get(&self, id: u32) -> Result<Self::Read, ApiError> {
         let query = SearchQuery::id(id);
         let raw = self.get_raw_for_read(query).await?;
         let data = Self::to_read(raw)?;
@@ -107,7 +118,7 @@ where
         Ok(data)
     }
 
-    async fn user_get(&self, user: User, id: u32) -> Result<Read, ApiError> {
+    async fn user_get(&self, user: Self::User, id: u32) -> Result<Self::Read, ApiError> {
         let query = Self::auth_get(user, SearchQuery::id(id)).await;
         let raw = self.get_raw_for_read(query).await?;
         let data = Self::to_read(raw)?;
@@ -123,7 +134,7 @@ where
         Ok(data)
     }
 
-    async fn user_get_partial(&self, user: User, id: u32) -> Result<Value, ApiError> {
+    async fn user_get_partial(&self, user: Self::User, id: u32) -> Result<Value, ApiError> {
         let query = Self::auth_get(user, SearchQuery::id(id)).await;
         let raw = self.get_raw(query).await?;
         let data = Self::to_json(raw)?;
