@@ -896,6 +896,27 @@ pub struct SearchQuery {
     pub where_: Option<WhereFilters>,
 }
 
+impl SearchQuery {
+    pub fn id(id: u32) -> Self {
+        let id_filter = IndexFilters {
+            eq: Some(id),
+            ne: None,
+            null: None,
+            in_: None,
+            nin: None,
+        };
+        let filter = FieldFilters::Index(id_filter);
+        let filters = HashMap::from([("id".to_string(), filter)]);
+        Self {
+            page: None,
+            size: None,
+            order_by: None,
+            select: None,
+            where_: Some(filters),
+        }
+    }
+}
+
 pub trait ToSearchQuery {
     fn to_search_query(self) -> Result<SearchQuery, ValidationErrors>;
 }
