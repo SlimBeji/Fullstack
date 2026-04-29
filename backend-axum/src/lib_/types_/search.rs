@@ -5,15 +5,15 @@ use validator::ValidationErrors;
 use super::filters::{FieldFilters, IndexFilters, WhereFilters};
 
 #[derive(Debug)]
-pub struct SearchQuery {
+pub struct SearchQuery<Selectable, Sortable> {
     pub page: Option<usize>,
     pub size: Option<usize>,
-    pub order_by: Option<Vec<String>>,
-    pub select: Option<Vec<String>>,
+    pub select: Option<Vec<Selectable>>,
+    pub order_by: Option<Vec<Sortable>>,
     pub where_: Option<WhereFilters>,
 }
 
-impl SearchQuery {
+impl<Selectable, Sortable> SearchQuery<Selectable, Sortable> {
     pub fn id(id: u32) -> Self {
         let id_filter = IndexFilters {
             eq: Some(id),
@@ -35,5 +35,10 @@ impl SearchQuery {
 }
 
 pub trait ToSearchQuery {
-    fn to_search_query(self) -> Result<SearchQuery, ValidationErrors>;
+    type Selectable;
+    type Sortable;
+
+    fn to_search_query(
+        self,
+    ) -> Result<SearchQuery<Self::Selectable, Self::Sortable>, ValidationErrors>;
 }

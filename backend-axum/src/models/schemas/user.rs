@@ -8,7 +8,6 @@ use crate::config::ENV;
 use crate::lib_::{
     axum_::MultipartForm,
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
-    utils::parse_enum_array,
     validator_::{email_strict, string_length},
 };
 
@@ -296,11 +295,14 @@ pub struct UserSearch {
 }
 
 impl ToSearchQuery for UserSearch {
-    fn to_search_query(self) -> Result<SearchQuery, validator::ValidationErrors> {
+    type Selectable = UserSelectableFields;
+    type Sortable = UserSortableFields;
+
+    fn to_search_query(
+        self,
+    ) -> Result<SearchQuery<Self::Selectable, Self::Sortable>, validator::ValidationErrors> {
         let page = self.page.unwrap_or(1);
         let size = self.size.unwrap_or(ENV.max_items_per_page);
-        let select = parse_enum_array(self.fields);
-        let order_by = parse_enum_array(self.sort);
 
         let mut filter_reader = FiltersReader::new();
         filter_reader.read_index_filters("id", &self.id);
@@ -311,8 +313,8 @@ impl ToSearchQuery for UserSearch {
             Ok(where_) => Ok(SearchQuery {
                 page: Some(page),
                 size: Some(size),
-                order_by: Some(order_by),
-                select: Some(select),
+                select: self.fields,
+                order_by: self.sort,
                 where_: Some(where_),
             }),
             Err(errors) => Err(errors),
