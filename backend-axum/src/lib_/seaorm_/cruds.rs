@@ -1,27 +1,33 @@
 use std::marker::PhantomData;
 
 use sea_orm::{
-    DatabaseConnection, EntityTrait, Order, PrimaryKeyTrait, prelude::async_trait::async_trait,
+    DatabaseConnection, EntityTrait, PrimaryKeyTrait, prelude::async_trait::async_trait,
 };
 use serde_json::Value;
 
 use crate::lib_::types_::{ApiError, SearchQuery};
 
 // Cruds generic struct
-pub struct CrudsBase<E: EntityTrait> {
-    _entity: PhantomData<E>,
+pub struct CrudsBase<Entity, Selectable, Sortable>
+where
+    Entity: EntityTrait,
+{
+    _entity: PhantomData<Entity>,
     pub db: DatabaseConnection,
     pub max_items_per_page: usize,
-    pub default_select: Vec<E::Column>,
-    pub default_order_by: Vec<(E::Column, Order)>,
+    pub default_select: Vec<Selectable>,
+    pub default_order_by: Vec<Sortable>,
 }
 
-impl<E: EntityTrait> CrudsBase<E> {
-    pub fn new(
+impl<Entity, Selectable, Sortable> CrudsBase<Entity, Selectable, Sortable>
+where
+    Entity: EntityTrait,
+{
+    pub fn build(
         db: DatabaseConnection,
         max_items_per_page: usize,
-        default_select: Vec<E::Column>,
-        default_order_by: Vec<(E::Column, Order)>,
+        default_select: Vec<Selectable>,
+        default_order_by: Vec<Sortable>,
     ) -> Self {
         Self {
             _entity: PhantomData,
@@ -33,22 +39,23 @@ impl<E: EntityTrait> CrudsBase<E> {
     }
 
     pub fn tablename(&self) -> &'static str {
-        E::default().table_name()
+        Entity::default().table_name()
     }
 }
 
 // CrudsTools
-pub trait CrudsTools<E>
+pub trait CrudsTools<Entity, Selectable, Sortable>
 where
-    E: EntityTrait,
+    Entity: EntityTrait,
 {
-    fn get_base(&self) -> &CrudsBase<E>;
+    fn get_base(&self) -> &CrudsBase<Entity, Selectable, Sortable>;
     fn get_modelname() -> &'static str;
 }
 
 // Read traits
 #[async_trait]
-pub trait Read<User, Entity, Fetch, Read>: CrudsTools<Entity>
+pub trait Read<User, Entity, Fetch, Read, Selectable, Sortable>:
+    CrudsTools<Entity, Selectable, Sortable>
 where
     // User object for authentication and authorization
     User: Send + Sync + 'static,
