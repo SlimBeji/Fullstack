@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use axum::http::StatusCode;
 use sea_orm::{
     DatabaseConnection, EntityTrait, PrimaryKeyTrait, prelude::async_trait::async_trait,
 };
@@ -7,35 +8,46 @@ use serde_json::Value;
 
 use crate::lib_::types_::{ApiError, SearchQuery};
 
+// State contract
+pub trait CrudAppStateTrait {
+    fn get_db(&self) -> &DatabaseConnection;
+}
+
 // Cruds generic struct
-pub struct CrudsBase<Entity, Selectable, Sortable>
+pub struct CrudsBase<State, Entity, Selectable, Sortable>
 where
+    State: CrudAppStateTrait,
     Entity: EntityTrait,
 {
     _entity: PhantomData<Entity>,
-    pub db: DatabaseConnection,
+    pub app_state: State,
     pub max_items_per_page: usize,
     pub default_select: Vec<Selectable>,
     pub default_order_by: Vec<Sortable>,
 }
 
-impl<Entity, Selectable, Sortable> CrudsBase<Entity, Selectable, Sortable>
+impl<State, Entity, Selectable, Sortable> CrudsBase<State, Entity, Selectable, Sortable>
 where
+    State: CrudAppStateTrait,
     Entity: EntityTrait,
 {
     pub fn build(
-        db: DatabaseConnection,
+        app_state: State,
         max_items_per_page: usize,
         default_select: Vec<Selectable>,
         default_order_by: Vec<Sortable>,
     ) -> Self {
         Self {
             _entity: PhantomData,
-            db,
+            app_state,
             max_items_per_page,
             default_select,
             default_order_by,
         }
+    }
+
+    pub fn get_db(&self) -> &DatabaseConnection {
+        self.app_state.get_db()
     }
 
     pub fn tablename(&self) -> &'static str {
@@ -49,11 +61,12 @@ where
     <Self::Entity as EntityTrait>::Model: Send + Sync,
     <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType: From<i32>,
 {
+    type State: CrudAppStateTrait + Send + Sync; // The app state
     type Entity: EntityTrait; // The SearOrm Entity
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
     type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
 
-    fn get_base(&self) -> &CrudsBase<Self::Entity, Self::Selectable, Self::Sortable>;
+    fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity, Self::Selectable, Self::Sortable>;
     fn get_modelname() -> &'static str;
 }
 
@@ -93,7 +106,7 @@ pub trait Read: CrudsTools {
     ) -> Result<Option<<Self::Entity as EntityTrait>::Model>, ApiError> {
         let base = self.get_base();
         Self::Entity::find_by_id(id)
-            .one(&base.db)
+            .one(base.get_db())
             .await
             .map_err(|e| {
                 ApiError::internal_error(

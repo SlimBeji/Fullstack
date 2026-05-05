@@ -1,3 +1,4 @@
+use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use tokio::join;
 use tracing::{error, info};
@@ -7,6 +8,7 @@ use crate::lib_::clients::{
     CloudStorage, CloudStorageConfig, HuggingFaceClient, HuggingFaceClientConfig, PgClient,
     PgClientConfig, RedisClient, RedisClientConfig,
 };
+use crate::lib_::seaorm_::cruds::CrudAppStateTrait;
 
 // Postgresql
 
@@ -101,6 +103,12 @@ impl AppState {
             error!("failed to close Storage Client: {}", e);
         }
         info!("all services closed");
+    }
+}
+
+impl CrudAppStateTrait for AppState {
+    fn get_db(&self) -> &DatabaseConnection {
+        &self.pg.db
     }
 }
 
