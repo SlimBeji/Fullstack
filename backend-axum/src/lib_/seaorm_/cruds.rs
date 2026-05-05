@@ -64,10 +64,7 @@ pub trait Read: CrudsTools {
     type Fetch: Send + Sync; // The Data fetched
     type Read: Send + Sync; // The Read Struct
 
-    async fn auth_get(
-        user: Self::User,
-        search: SearchQuery<Self::Selectable, Self::Sortable>,
-    ) -> SearchQuery<Self::Selectable, Self::Sortable>;
+    async fn auth_get(user: Self::User, search: &mut SearchQuery<Self::Selectable, Self::Sortable>);
 
     fn to_read(model: Self::Fetch) -> Result<Self::Read, ApiError>;
 
@@ -119,7 +116,8 @@ pub trait Read: CrudsTools {
     }
 
     async fn user_get(&self, user: Self::User, id: u32) -> Result<Self::Read, ApiError> {
-        let query = Self::auth_get(user, SearchQuery::id(id)).await;
+        let mut query = SearchQuery::id(id);
+        Self::auth_get(user, &mut query).await;
         let raw = self.get_raw_for_read(query).await?;
         let data = Self::to_read(raw)?;
         Self::post_process(&data).await?;
@@ -135,7 +133,8 @@ pub trait Read: CrudsTools {
     }
 
     async fn user_get_partial(&self, user: Self::User, id: u32) -> Result<Value, ApiError> {
-        let query = Self::auth_get(user, SearchQuery::id(id)).await;
+        let mut query = SearchQuery::id(id);
+        Self::auth_get(user, &mut query).await;
         let raw = self.get_raw(query).await?;
         let data = Self::to_json(raw)?;
         Self::post_process_partial(&data).await?;
