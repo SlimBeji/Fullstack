@@ -94,9 +94,9 @@ pub trait Read: CrudsTools {
 
     fn to_json(data: Self::Fetch) -> Result<Value, ApiError>;
 
-    async fn post_process(data: &Self::Read) -> Result<(), ApiError>;
+    async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError>;
 
-    async fn post_process_partial(data: &Value) -> Result<(), ApiError>;
+    async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError>;
 
     async fn get_raw(
         &self,
@@ -134,8 +134,8 @@ pub trait Read: CrudsTools {
     async fn get(&self, id: u32) -> Result<Self::Read, ApiError> {
         let query = SearchQuery::id(id);
         let raw = self.get_raw_for_read(query).await?;
-        let data = Self::to_read(raw)?;
-        Self::post_process(&data).await?;
+        let mut data = Self::to_read(raw)?;
+        self.post_process(&mut data).await?;
         Ok(data)
     }
 
@@ -143,16 +143,16 @@ pub trait Read: CrudsTools {
         let mut query = SearchQuery::id(id);
         Self::auth_get(user, &mut query).await;
         let raw = self.get_raw_for_read(query).await?;
-        let data = Self::to_read(raw)?;
-        Self::post_process(&data).await?;
+        let mut data = Self::to_read(raw)?;
+        self.post_process(&mut data).await?;
         Ok(data)
     }
 
     async fn get_partial(&self, id: u32) -> Result<Value, ApiError> {
         let query = SearchQuery::id(id);
         let raw = self.get_raw(query).await?;
-        let data = Self::to_json(raw)?;
-        Self::post_process_partial(&data).await?;
+        let mut data = Self::to_json(raw)?;
+        self.post_process_partial(&mut data).await?;
         Ok(data)
     }
 
@@ -160,8 +160,8 @@ pub trait Read: CrudsTools {
         let mut query = SearchQuery::id(id);
         Self::auth_get(user, &mut query).await;
         let raw = self.get_raw(query).await?;
-        let data = Self::to_json(raw)?;
-        Self::post_process_partial(&data).await?;
+        let mut data = Self::to_json(raw)?;
+        self.post_process_partial(&mut data).await?;
         Ok(data)
     }
 }
