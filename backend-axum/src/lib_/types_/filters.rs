@@ -777,6 +777,19 @@ pub enum FieldFilters {
     DateTime(DateTimeFilters),
 }
 
+impl FieldFilters {
+    pub fn id(id: u32) -> Self {
+        let filter = IndexFilters {
+            eq: Some(id as i32),
+            ne: None,
+            null: None,
+            in_: None,
+            nin: None,
+        };
+        Self::Index(filter)
+    }
+}
+
 #[derive(Default)]
 pub struct FiltersReader {
     filters: HashMap<String, FieldFilters>,

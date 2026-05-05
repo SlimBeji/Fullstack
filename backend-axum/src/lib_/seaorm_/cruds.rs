@@ -110,7 +110,7 @@ pub trait Read: CrudsTools {
             })
     }
 
-    async fn get(&self, id: i32) -> Result<Self::Read, ApiError> {
+    async fn get(&self, id: u32) -> Result<Self::Read, ApiError> {
         let query = SearchQuery::id(id);
         let raw = self.get_raw_for_read(query).await?;
         let data = Self::to_read(raw)?;
@@ -118,7 +118,7 @@ pub trait Read: CrudsTools {
         Ok(data)
     }
 
-    async fn user_get(&self, user: Self::User, id: i32) -> Result<Self::Read, ApiError> {
+    async fn user_get(&self, user: Self::User, id: u32) -> Result<Self::Read, ApiError> {
         let query = Self::auth_get(user, SearchQuery::id(id)).await;
         let raw = self.get_raw_for_read(query).await?;
         let data = Self::to_read(raw)?;
@@ -126,7 +126,7 @@ pub trait Read: CrudsTools {
         Ok(data)
     }
 
-    async fn get_partial(&self, id: i32) -> Result<Value, ApiError> {
+    async fn get_partial(&self, id: u32) -> Result<Value, ApiError> {
         let query = SearchQuery::id(id);
         let raw = self.get_raw(query).await?;
         let data = Self::to_json(raw)?;
@@ -134,7 +134,7 @@ pub trait Read: CrudsTools {
         Ok(data)
     }
 
-    async fn user_get_partial(&self, user: Self::User, id: i32) -> Result<Value, ApiError> {
+    async fn user_get_partial(&self, user: Self::User, id: u32) -> Result<Value, ApiError> {
         let query = Self::auth_get(user, SearchQuery::id(id)).await;
         let raw = self.get_raw(query).await?;
         let data = Self::to_json(raw)?;

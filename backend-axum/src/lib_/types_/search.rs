@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use validator::ValidationErrors;
 
-use super::filters::{FieldFilters, IndexFilters, WhereFilters};
+use super::filters::{FieldFilters, WhereFilters};
 
 #[derive(Debug)]
 pub struct SearchQuery<Selectable, Sortable> {
@@ -14,15 +14,8 @@ pub struct SearchQuery<Selectable, Sortable> {
 }
 
 impl<Selectable, Sortable> SearchQuery<Selectable, Sortable> {
-    pub fn id(id: i32) -> Self {
-        let id_filter = IndexFilters {
-            eq: Some(id),
-            ne: None,
-            null: None,
-            in_: None,
-            nin: None,
-        };
-        let filter = FieldFilters::Index(id_filter);
+    pub fn id(id: u32) -> Self {
+        let filter = FieldFilters::id(id);
         let filters = HashMap::from([("id".to_string(), filter)]);
         Self {
             page: None,
