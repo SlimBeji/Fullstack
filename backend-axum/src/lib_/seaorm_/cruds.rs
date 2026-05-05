@@ -68,6 +68,17 @@ where
 
     fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity, Self::Selectable, Self::Sortable>;
     fn get_modelname() -> &'static str;
+    fn serialization_error() -> ApiError {
+        ApiError {
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+            message: "serialization failure".to_string(),
+            details: Some(Value::String(format!(
+                "could not serialie {} record",
+                Self::get_modelname()
+            ))),
+            err: None,
+        }
+    }
 }
 
 // Read traits
