@@ -50,7 +50,7 @@ pub async fn get_storage_client() -> CloudStorage {
     let storage_config = CloudStorageConfig {
         project_id: ENV.gcp_project_id.clone(),
         bucket_name: ENV.gcs_bucket_name.clone(),
-        access_expiration: ENV.gcs_blob_expiration as u64,
+        access_expiration: ENV.gcs_blob_expiration,
         credentials_file,
         emulator_private_url: ENV.gcs_emulator_priv.clone(),
         emulator_public_url: ENV.gcs_emulator_pub.clone(),

@@ -16,7 +16,7 @@ use crate::lib_::types_::{ApiError, FileToUpload};
 pub struct CloudStorageConfig {
     pub project_id: String,
     pub bucket_name: String,
-    pub access_expiration: u64,
+    pub access_expiration: usize,
     pub credentials_file: Option<String>,
     pub emulator_public_url: Option<String>,
     pub emulator_private_url: Option<String>,
@@ -126,7 +126,7 @@ impl CloudStorage {
     pub async fn get_signed_url(
         &self,
         filename: &str,
-        expiration: Option<u64>,
+        expiration: Option<usize>,
     ) -> Result<String, ApiError> {
         if self.config.is_emulator() {
             return Ok(self.get_emulator_file_url(filename));
@@ -135,7 +135,7 @@ impl CloudStorage {
         let exp = expiration.unwrap_or(self.config.access_expiration);
         let options = SignedURLOptions {
             method: SignedURLMethod::GET,
-            expires: Duration::from_secs(exp),
+            expires: Duration::from_secs(exp as u64),
             ..Default::default()
         };
 
