@@ -66,9 +66,9 @@ pub trait Read: CrudsTools {
 
     async fn auth_get(user: Self::User, search: &mut SearchQuery<Self::Selectable, Self::Sortable>);
 
-    fn to_read(model: Self::Fetch) -> Result<Self::Read, ApiError>;
+    fn to_read(data: Self::Fetch) -> Result<Self::Read, ApiError>;
 
-    fn to_json(model: Self::Fetch) -> Result<Value, ApiError>;
+    fn to_json(data: Self::Fetch) -> Result<Value, ApiError>;
 
     async fn post_process(data: &Self::Read) -> Result<(), ApiError>;
 
