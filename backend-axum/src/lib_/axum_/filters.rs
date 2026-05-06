@@ -8,7 +8,7 @@ use crate::lib_::types_::{ApiError, SearchQuery, ToSearchQuery};
 
 // Filters from Query parameters
 pub struct QueryFilters<T: ToSearchQuery> {
-    pub query: SearchQuery<T::Selectable, T::Sortable>,
+    pub query: SearchQuery<T::Selectable, T::Searchable, T::Sortable>,
     _marker: PhantomData<T>,
 }
 
@@ -33,7 +33,7 @@ where
 
 // Filters from JSON Body
 pub struct BodyFilters<T: ToSearchQuery> {
-    pub query: SearchQuery<T::Selectable, T::Sortable>,
+    pub query: SearchQuery<T::Selectable, T::Searchable, T::Sortable>,
     _marker: PhantomData<T>,
 }
 

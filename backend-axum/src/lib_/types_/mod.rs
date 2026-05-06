@@ -8,6 +8,7 @@ pub use errors::ApiError;
 pub use filters::FieldFilters;
 pub use filters::FilterOp;
 pub use filters::FiltersReader;
+pub use filters::SearchableTrait;
 pub use filters::WhereFilters;
 pub use pagination::PaginatedData;
 pub use search::SearchQuery;

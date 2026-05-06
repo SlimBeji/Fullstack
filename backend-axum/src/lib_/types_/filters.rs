@@ -1,4 +1,4 @@
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, hash::Hash, str::FromStr};
 use time::OffsetDateTime;
 use validator::{ValidationError, ValidationErrors};
 
@@ -790,13 +790,22 @@ impl FieldFilters {
     }
 }
 
+pub trait SearchableTrait: Eq + Hash + Clone + Into<&'static str> {
+    fn id() -> Self;
+}
+
+pub type WhereFilters<Searchable: SearchableTrait> = HashMap<Searchable, FieldFilters>;
+
 #[derive(Default)]
-pub struct FiltersReader {
-    filters: HashMap<String, FieldFilters>,
+pub struct FiltersReader<Searchable> {
+    filters: WhereFilters<Searchable>,
     errors: ValidationErrors,
 }
 
-impl FiltersReader {
+impl<Searchable> FiltersReader<Searchable>
+where
+    Searchable: SearchableTrait,
+{
     pub fn new() -> Self {
         Self {
             filters: HashMap::new(),
@@ -804,7 +813,7 @@ impl FiltersReader {
         }
     }
 
-    pub fn eval(self) -> Result<HashMap<String, FieldFilters>, ValidationErrors> {
+    pub fn eval(self) -> Result<WhereFilters<Searchable>, ValidationErrors> {
         if self.errors.is_empty() {
             Ok(self.filters)
         } else {
@@ -814,7 +823,7 @@ impl FiltersReader {
 
     pub fn read_string_filters(
         &mut self,
-        key: &'static str,
+        key: Searchable,
         query_params: &Option<Vec<String>>,
         rules: &Validators<str>,
     ) {
@@ -824,16 +833,15 @@ impl FiltersReader {
 
         match StringFilters::from_list(query_params, rules) {
             Ok(inner) => {
-                self.filters
-                    .insert(key.to_string(), FieldFilters::String(inner));
+                self.filters.insert(key, FieldFilters::String(inner));
             }
-            Err(inner) => self.errors.add(key, inner),
+            Err(inner) => self.errors.add(key.into(), inner),
         }
     }
 
     pub fn read_f64_filters(
         &mut self,
-        key: &'static str,
+        key: Searchable,
         query_params: &Option<Vec<String>>,
         rules: &Validators<f64>,
     ) {
@@ -843,44 +851,41 @@ impl FiltersReader {
 
         match F64Filters::from_list(query_params, rules) {
             Ok(inner) => {
-                self.filters
-                    .insert(key.to_string(), FieldFilters::F64(inner));
+                self.filters.insert(key, FieldFilters::F64(inner));
             }
-            Err(inner) => self.errors.add(key, inner),
+            Err(inner) => self.errors.add(key.into(), inner),
         }
     }
 
-    pub fn read_index_filters(&mut self, key: &'static str, query_params: &Option<Vec<String>>) {
+    pub fn read_index_filters(&mut self, key: Searchable, query_params: &Option<Vec<String>>) {
         let Some(query_params) = query_params else {
             return;
         };
 
         match IndexFilters::from_list(query_params) {
             Ok(inner) => {
-                self.filters
-                    .insert(key.to_string(), FieldFilters::Index(inner));
+                self.filters.insert(key, FieldFilters::Index(inner));
             }
-            Err(inner) => self.errors.add(key, inner),
+            Err(inner) => self.errors.add(key.into(), inner),
         }
     }
 
-    pub fn read_boolean_filters(&mut self, key: &'static str, query_params: &Option<Vec<String>>) {
+    pub fn read_boolean_filters(&mut self, key: Searchable, query_params: &Option<Vec<String>>) {
         let Some(query_params) = query_params else {
             return;
         };
 
         match BooleanFilters::from_list(query_params) {
             Ok(inner) => {
-                self.filters
-                    .insert(key.to_string(), FieldFilters::Boolean(inner));
+                self.filters.insert(key, FieldFilters::Boolean(inner));
             }
-            Err(inner) => self.errors.add(key, inner),
+            Err(inner) => self.errors.add(key.into(), inner),
         }
     }
 
     pub fn read_datetime_filters(
         &mut self,
-        key: &'static str,
+        key: Searchable,
         query_params: &Option<Vec<String>>,
         rules: &Validators<OffsetDateTime>,
     ) {
@@ -890,12 +895,9 @@ impl FiltersReader {
 
         match DateTimeFilters::from_list(query_params, rules) {
             Ok(inner) => {
-                self.filters
-                    .insert(key.to_string(), FieldFilters::DateTime(inner));
+                self.filters.insert(key, FieldFilters::DateTime(inner));
             }
-            Err(inner) => self.errors.add(key, inner),
+            Err(inner) => self.errors.add(key.into(), inner),
         }
     }
 }
-
-pub type WhereFilters = HashMap<String, FieldFilters>;

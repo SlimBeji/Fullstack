@@ -2,21 +2,26 @@ use std::collections::HashMap;
 
 use validator::ValidationErrors;
 
+use crate::lib_::types_::SearchableTrait;
+
 use super::filters::{FieldFilters, WhereFilters};
 
 #[derive(Debug)]
-pub struct SearchQuery<Selectable, Sortable> {
+pub struct SearchQuery<Selectable, Searchable, Sortable> {
     pub page: Option<usize>,
     pub size: Option<usize>,
     pub select: Option<Vec<Selectable>>,
     pub order_by: Option<Vec<Sortable>>,
-    pub where_: Option<WhereFilters>,
+    pub where_: Option<WhereFilters<Searchable>>,
 }
 
-impl<Selectable, Sortable> SearchQuery<Selectable, Sortable> {
+impl<Selectable, Searchable, Sortable> SearchQuery<Selectable, Searchable, Sortable>
+where
+    Searchable: SearchableTrait,
+{
     pub fn id(id: u32) -> Self {
         let filter = FieldFilters::id(id);
-        let filters = HashMap::from([("id".to_string(), filter)]);
+        let filters = HashMap::from([(Searchable::id(), filter)]);
         Self {
             page: None,
             size: None,
@@ -27,11 +32,15 @@ impl<Selectable, Sortable> SearchQuery<Selectable, Sortable> {
     }
 }
 
-pub trait ToSearchQuery {
+pub trait ToSearchQuery
+where
+    Self::Searchable: SearchableTrait,
+{
     type Selectable;
+    type Searchable;
     type Sortable;
 
     fn to_search_query(
         self,
-    ) -> Result<SearchQuery<Self::Selectable, Self::Sortable>, ValidationErrors>;
+    ) -> Result<SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>, ValidationErrors>;
 }
