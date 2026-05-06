@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 
 use sea_orm::prelude::async_trait::async_trait;
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
 
 use crate::config;
-use crate::lib_::seaorm_::cruds::{CrudsBase, CrudsTools, Read};
+use crate::lib_::seaorm_::cruds::{CrudAppStateTrait, CrudsBase, CrudsTools, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
-use crate::models::orm::user;
+use crate::models::orm::{place, user};
 use crate::models::schemas::UserRead;
 use crate::models::schemas::user::{UserPlace, UserSelectableFields, UserSortableFields};
 use crate::services::instances::AppState;
@@ -162,5 +163,61 @@ impl Read for CrudsUser {
         );
 
         Ok(())
+    }
+
+    async fn get_raw(
+        &self,
+        _: SearchQuery<Self::Selectable, Self::Sortable>,
+    ) -> Result<Self::Fetch, ApiError> {
+        // extract the user Value
+        let user = user::Entity::find()
+            .select_only()
+            .columns([
+                user::Column::Id,
+                user::Column::Name,
+                user::Column::Email,
+                user::Column::IsAdmin,
+                user::Column::ImageUrl,
+                user::Column::CreatedAt,
+            ])
+            .into_json()
+            .one(self.app_state.get_db())
+            .await
+            .map_err(|e| {
+                ApiError::internal_error(
+                    format!("failed to extract {} data", Self::get_modelname()),
+                    Box::new(e),
+                )
+            })?
+            .ok_or(Self::not_found())?;
+
+        // extract the user Id
+        let id = UserFetch::extract(utils::get_id_from_json("id", &user))?;
+
+        // extract the places
+        let places = place::Entity::find()
+            .select_only()
+            .columns([
+                place::Column::CreatorId,
+                place::Column::Id,
+                place::Column::Title,
+                place::Column::Address,
+            ])
+            .filter(place::Column::CreatorId.eq(id as i32))
+            .into_json()
+            .all(self.app_state.get_db())
+            .await
+            .map_err(|e| {
+                ApiError::internal_error(
+                    format!("failed to extract {} data", Self::get_modelname()),
+                    Box::new(e),
+                )
+            })?;
+
+        // Returning the result
+        Ok(UserFetch {
+            users: vec![user],
+            places,
+        })
     }
 }
