@@ -794,7 +794,7 @@ pub trait SearchableTrait: Eq + Hash + Clone + Into<&'static str> {
     fn id() -> Self;
 }
 
-pub type WhereFilters<Searchable: SearchableTrait> = HashMap<Searchable, FieldFilters>;
+pub type WhereFilters<Searchable> = HashMap<Searchable, FieldFilters>;
 
 #[derive(Default)]
 pub struct FiltersReader<Searchable> {

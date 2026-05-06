@@ -32,6 +32,9 @@ where
     }
 }
 
+pub type SearchQueryResult<Selectable, Searchable, Sortable> =
+    Result<SearchQuery<Selectable, Searchable, Sortable>, ValidationErrors>;
+
 pub trait ToSearchQuery
 where
     Self::Searchable: SearchableTrait,
@@ -42,5 +45,5 @@ where
 
     fn to_search_query(
         self,
-    ) -> Result<SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>, ValidationErrors>;
+    ) -> SearchQueryResult<Self::Selectable, Self::Searchable, Self::Sortable>;
 }
