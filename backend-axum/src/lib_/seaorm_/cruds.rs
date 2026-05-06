@@ -67,7 +67,9 @@ where
     type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
 
     fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity, Self::Selectable, Self::Sortable>;
+
     fn get_modelname() -> &'static str;
+
     fn serialization_error() -> ApiError {
         ApiError {
             code: StatusCode::INTERNAL_SERVER_ERROR,
@@ -76,6 +78,28 @@ where
                 "could not serialie {} record",
                 Self::get_modelname()
             ))),
+            err: None,
+        }
+    }
+
+    fn not_found() -> ApiError {
+        ApiError {
+            code: StatusCode::NOT_FOUND,
+            message: format!("{} object not found", Self::get_modelname()),
+            details: None,
+            err: None,
+        }
+    }
+
+    fn update_not_found_with_id(err: ApiError, id: u32) -> ApiError {
+        if err.code != StatusCode::NOT_FOUND {
+            return err;
+        }
+
+        ApiError {
+            code: StatusCode::NOT_FOUND,
+            message: err.message,
+            details: Some(Value::String(format!("no record with id {} found", id))),
             err: None,
         }
     }
@@ -133,7 +157,10 @@ pub trait Read: CrudsTools {
 
     async fn get(&self, id: u32) -> Result<Self::Read, ApiError> {
         let query = SearchQuery::id(id);
-        let raw = self.get_raw_for_read(query).await?;
+        let raw = self
+            .get_raw_for_read(query)
+            .await
+            .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
         self.post_process(&mut data).await?;
         Ok(data)
@@ -142,7 +169,10 @@ pub trait Read: CrudsTools {
     async fn user_get(&self, user: Self::User, id: u32) -> Result<Self::Read, ApiError> {
         let mut query = SearchQuery::id(id);
         Self::auth_get(user, &mut query).await;
-        let raw = self.get_raw_for_read(query).await?;
+        let raw = self
+            .get_raw_for_read(query)
+            .await
+            .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
         self.post_process(&mut data).await?;
         Ok(data)
@@ -150,7 +180,10 @@ pub trait Read: CrudsTools {
 
     async fn get_partial(&self, id: u32) -> Result<Value, ApiError> {
         let query = SearchQuery::id(id);
-        let raw = self.get_raw(query).await?;
+        let raw = self
+            .get_raw(query)
+            .await
+            .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
         self.post_process_partial(&mut data).await?;
         Ok(data)
@@ -159,7 +192,10 @@ pub trait Read: CrudsTools {
     async fn user_get_partial(&self, user: Self::User, id: u32) -> Result<Value, ApiError> {
         let mut query = SearchQuery::id(id);
         Self::auth_get(user, &mut query).await;
-        let raw = self.get_raw(query).await?;
+        let raw = self
+            .get_raw(query)
+            .await
+            .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
         self.post_process_partial(&mut data).await?;
         Ok(data)
