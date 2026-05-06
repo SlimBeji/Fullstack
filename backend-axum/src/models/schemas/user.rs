@@ -1,5 +1,6 @@
 use axum::extract::FromRequest;
 use serde::{Deserialize, Serialize};
+use strum::IntoStaticStr;
 use time::OffsetDateTime;
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
@@ -14,8 +15,9 @@ use crate::lib_::{
 
 // --- Selectables, Serchables, Sortables ----
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum UserSelectableFields {
     Id,
     Name,
@@ -26,23 +28,12 @@ pub enum UserSelectableFields {
     CreatedAt,
 }
 
-impl From<UserSelectableFields> for &'static str {
-    fn from(field: UserSelectableFields) -> &'static str {
-        match field {
-            UserSelectableFields::Id => "id",
-            UserSelectableFields::Name => "name",
-            UserSelectableFields::Email => "email",
-            UserSelectableFields::IsAdmin => "is_admin",
-            UserSelectableFields::ImageUrl => "image_url",
-            UserSelectableFields::Places => "places",
-            UserSelectableFields::CreatedAt => "created_at",
-        }
-    }
-}
-
 #[allow(dead_code)] // to be removed
-#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Copy, Clone, PartialEq, Eq, Hash, IntoStaticStr, Serialize, Deserialize, ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum UserSearchableFields {
     Id,
     Name,
@@ -53,17 +44,6 @@ pub enum UserSearchableFields {
 impl SearchableTrait for UserSearchableFields {
     fn id() -> Self {
         Self::Id
-    }
-}
-
-impl From<UserSearchableFields> for &'static str {
-    fn from(field: UserSearchableFields) -> &'static str {
-        match field {
-            UserSearchableFields::Id => "id",
-            UserSearchableFields::Name => "name",
-            UserSearchableFields::Email => "email",
-            UserSearchableFields::CreatedAt => "created_at",
-        }
     }
 }
 

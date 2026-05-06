@@ -1,5 +1,6 @@
 use axum::extract::FromRequest;
 use serde::{Deserialize, Serialize};
+use strum::IntoStaticStr;
 use time::OffsetDateTime;
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
@@ -14,8 +15,9 @@ use crate::lib_::{
 
 // --- Selectables, Serchables, Sortables ----
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum PlaceSelectableFields {
     Id,
     Title,
@@ -27,23 +29,10 @@ pub enum PlaceSelectableFields {
     CreatedAt,
 }
 
-impl From<PlaceSelectableFields> for &'static str {
-    fn from(value: PlaceSelectableFields) -> Self {
-        match value {
-            PlaceSelectableFields::Id => "id",
-            PlaceSelectableFields::Title => "title",
-            PlaceSelectableFields::Description => "description",
-            PlaceSelectableFields::Address => "address",
-            PlaceSelectableFields::Location => "location",
-            PlaceSelectableFields::ImageUrl => "image_url",
-            PlaceSelectableFields::CreatorId => "creator_id",
-            PlaceSelectableFields::CreatedAt => "created_at",
-        }
-    }
-}
-
 #[allow(dead_code)] // to be removed
-#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Copy, Clone, PartialEq, Eq, Hash, IntoStaticStr, Serialize, Deserialize, ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum PlaceSearchableFields {
     Id,
@@ -59,21 +48,6 @@ pub enum PlaceSearchableFields {
 impl SearchableTrait for PlaceSearchableFields {
     fn id() -> Self {
         Self::Id
-    }
-}
-
-impl From<PlaceSearchableFields> for &'static str {
-    fn from(field: PlaceSearchableFields) -> &'static str {
-        match field {
-            PlaceSearchableFields::Id => "id",
-            PlaceSearchableFields::Title => "title",
-            PlaceSearchableFields::Description => "description",
-            PlaceSearchableFields::Address => "address",
-            PlaceSearchableFields::CreatorId => "creator_id",
-            PlaceSearchableFields::LocationLat => "location_lat",
-            PlaceSearchableFields::LocationLng => "location_lng",
-            PlaceSearchableFields::CreatedAt => "created_at",
-        }
     }
 }
 
