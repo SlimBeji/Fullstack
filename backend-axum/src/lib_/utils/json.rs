@@ -64,3 +64,7 @@ pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<Option<OffsetDa
 
     Ok(Some(datetime))
 }
+
+pub fn unwrap_json_value<T, E>(result: Result<Option<T>, String>, err: E) -> Result<T, E> {
+    result.ok().flatten().ok_or(err)
+}

@@ -50,16 +50,14 @@ impl CrudsTools for CrudsUser {
     }
 }
 
-struct UserFetch {
+pub struct UserFetch {
     users: Vec<Value>,
     places: Vec<Value>,
 }
 
 impl UserFetch {
     fn extract<T>(result: Result<Option<T>, String>) -> Result<T, ApiError> {
-        result
-            .map_err(|_| CrudsUser::serialization_error())?
-            .ok_or(CrudsUser::serialization_error())
+        utils::unwrap_json_value(result, CrudsUser::serialization_error())
     }
 
     fn read_user(&self) -> Result<UserRead, ApiError> {

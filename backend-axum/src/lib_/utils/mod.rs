@@ -7,3 +7,4 @@ pub use json::get_datetime_from_json;
 pub use json::get_id_from_json;
 pub use json::get_string_from_json;
 pub use json::parse_enum_array;
+pub use json::unwrap_json_value;
