@@ -10,7 +10,9 @@ use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
 use crate::models::schemas::UserRead;
-use crate::models::schemas::user::{UserPlace, UserSelectableFields, UserSortableFields};
+use crate::models::schemas::user::{
+    UserPlace, UserSearchableFields, UserSelectableFields, UserSortableFields,
+};
 use crate::services::instances::AppState;
 
 pub type CrudsUser = CrudsBase<AppState, user::Entity, UserSelectableFields, UserSortableFields>;
@@ -40,6 +42,7 @@ impl CrudsTools for CrudsUser {
     type State = AppState;
     type Entity = user::Entity;
     type Selectable = UserSelectableFields;
+    type Searchable = UserSearchableFields;
     type Sortable = UserSortableFields;
 
     fn get_base(&self) -> &CrudsUser {
@@ -120,10 +123,10 @@ impl Read for CrudsUser {
 
     async fn auth_get(
         user: Self::User,
-        search: &mut SearchQuery<Self::Selectable, Self::Sortable>,
+        search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) {
         let mut where_ = search.where_.take().unwrap_or(HashMap::new());
-        where_.insert("id".to_string(), FieldFilters::id(user.id));
+        where_.insert(UserSearchableFields::Id, FieldFilters::id(user.id));
         search.where_ = Some(where_);
     }
 
@@ -167,7 +170,7 @@ impl Read for CrudsUser {
 
     async fn get_raw(
         &self,
-        _: SearchQuery<Self::Selectable, Self::Sortable>,
+        _: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Fetch, ApiError> {
         // extract the user Value
         let user = user::Entity::find()

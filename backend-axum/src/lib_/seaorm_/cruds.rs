@@ -6,7 +6,7 @@ use sea_orm::{
 };
 use serde_json::Value;
 
-use crate::lib_::types_::{ApiError, SearchQuery};
+use crate::lib_::types_::{ApiError, SearchQuery, SearchableTrait};
 
 // State contract
 pub trait CrudAppStateTrait {
@@ -64,6 +64,7 @@ where
     type State: CrudAppStateTrait + Send + Sync; // The app state
     type Entity: EntityTrait; // The SearOrm Entity
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
+    type Searchable: Send + Sync + Copy + SearchableTrait + 'static; // The enum for searchable fields
     type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
 
     fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity, Self::Selectable, Self::Sortable>;
@@ -112,7 +113,10 @@ pub trait Read: CrudsTools {
     type Fetch: Send + Sync; // The Data fetched
     type Read: Send + Sync; // The Read Struct
 
-    async fn auth_get(user: Self::User, search: &mut SearchQuery<Self::Selectable, Self::Sortable>);
+    async fn auth_get(
+        user: Self::User,
+        search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    );
 
     fn to_read(data: Self::Fetch) -> Result<Self::Read, ApiError>;
 
@@ -124,12 +128,12 @@ pub trait Read: CrudsTools {
 
     async fn get_raw(
         &self,
-        query: SearchQuery<Self::Selectable, Self::Sortable>,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Fetch, ApiError>;
 
     async fn get_raw_for_read(
         &self,
-        mut query: SearchQuery<Self::Selectable, Self::Sortable>,
+        mut query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Fetch, ApiError> {
         query.select = Some(self.get_base().default_select.clone());
         self.get_raw(query).await
