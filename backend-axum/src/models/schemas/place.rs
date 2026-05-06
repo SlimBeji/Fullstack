@@ -5,6 +5,7 @@ use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::config::ENV;
+use crate::lib_::types_::SearchableTrait;
 use crate::lib_::{
     axum_::MultipartForm,
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
@@ -27,7 +28,7 @@ pub enum PlaceSelectableFields {
 }
 
 #[allow(dead_code)] // to be removed
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum PlaceSearchableFields {
     Id,
@@ -38,6 +39,27 @@ pub enum PlaceSearchableFields {
     LocationLat,
     LocationLng,
     CreatedAt,
+}
+
+impl SearchableTrait for PlaceSearchableFields {
+    fn id() -> Self {
+        Self::Id
+    }
+}
+
+impl From<PlaceSearchableFields> for &'static str {
+    fn from(field: PlaceSearchableFields) -> &'static str {
+        match field {
+            PlaceSearchableFields::Id => "id",
+            PlaceSearchableFields::Title => "title",
+            PlaceSearchableFields::Description => "description",
+            PlaceSearchableFields::Address => "address",
+            PlaceSearchableFields::CreatorId => "creator_id",
+            PlaceSearchableFields::LocationLat => "location_lat",
+            PlaceSearchableFields::LocationLng => "location_lng",
+            PlaceSearchableFields::CreatedAt => "created_at",
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
@@ -348,27 +370,51 @@ pub struct PlaceSearch {
 
 impl ToSearchQuery for PlaceSearch {
     type Selectable = PlaceSelectableFields;
+    type Searchable = PlaceSearchableFields;
     type Sortable = PlaceSortableFields;
 
     fn to_search_query(
         self,
-    ) -> Result<SearchQuery<Self::Selectable, Self::Sortable>, validator::ValidationErrors> {
+    ) -> Result<
+        SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        validator::ValidationErrors,
+    > {
         let page = self.page.unwrap_or(1);
         let size = self.size.unwrap_or(ENV.max_items_per_page);
 
         let mut filter_reader = FiltersReader::new();
-        filter_reader.read_index_filters("id", &self.id);
-        filter_reader.read_string_filters("title", &self.title, &vec![string_length::<10, 0>]);
+        filter_reader.read_index_filters(PlaceSearchableFields::Id, &self.id);
         filter_reader.read_string_filters(
-            "description",
+            PlaceSearchableFields::Title,
+            &self.title,
+            &vec![string_length::<10, 0>],
+        );
+        filter_reader.read_string_filters(
+            PlaceSearchableFields::Description,
             &self.description,
             &vec![string_length::<10, 0>],
         );
-        filter_reader.read_string_filters("address", &self.address, &vec![string_length::<10, 0>]);
-        filter_reader.read_index_filters("creator_id", &self.creator_id);
-        filter_reader.read_f64_filters("location_lat", &self.location_lat, &vec![]);
-        filter_reader.read_f64_filters("location_lng", &self.location_lng, &vec![]);
-        filter_reader.read_datetime_filters("created_at", &self.created_at, &vec![]);
+        filter_reader.read_string_filters(
+            PlaceSearchableFields::Address,
+            &self.address,
+            &vec![string_length::<10, 0>],
+        );
+        filter_reader.read_index_filters(PlaceSearchableFields::CreatorId, &self.creator_id);
+        filter_reader.read_f64_filters(
+            PlaceSearchableFields::LocationLat,
+            &self.location_lat,
+            &vec![],
+        );
+        filter_reader.read_f64_filters(
+            PlaceSearchableFields::LocationLng,
+            &self.location_lng,
+            &vec![],
+        );
+        filter_reader.read_datetime_filters(
+            PlaceSearchableFields::CreatedAt,
+            &self.created_at,
+            &vec![],
+        );
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
                 page: Some(page),

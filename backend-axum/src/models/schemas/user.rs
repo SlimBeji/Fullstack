@@ -5,6 +5,7 @@ use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::config::ENV;
+use crate::lib_::types_::SearchableTrait;
 use crate::lib_::{
     axum_::MultipartForm,
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
@@ -26,13 +27,30 @@ pub enum UserSelectableFields {
 }
 
 #[allow(dead_code)] // to be removed
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum UserSearchableFields {
     Id,
     Name,
     Email,
     CreatedAt,
+}
+
+impl SearchableTrait for UserSearchableFields {
+    fn id() -> Self {
+        Self::Id
+    }
+}
+
+impl From<UserSearchableFields> for &'static str {
+    fn from(field: UserSearchableFields) -> &'static str {
+        match field {
+            UserSearchableFields::Id => "id",
+            UserSearchableFields::Name => "name",
+            UserSearchableFields::Email => "email",
+            UserSearchableFields::CreatedAt => "created_at",
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
@@ -296,19 +314,35 @@ pub struct UserSearch {
 
 impl ToSearchQuery for UserSearch {
     type Selectable = UserSelectableFields;
+    type Searchable = UserSearchableFields;
     type Sortable = UserSortableFields;
 
     fn to_search_query(
         self,
-    ) -> Result<SearchQuery<Self::Selectable, Self::Sortable>, validator::ValidationErrors> {
+    ) -> Result<
+        SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        validator::ValidationErrors,
+    > {
         let page = self.page.unwrap_or(1);
         let size = self.size.unwrap_or(ENV.max_items_per_page);
 
         let mut filter_reader = FiltersReader::new();
-        filter_reader.read_index_filters("id", &self.id);
-        filter_reader.read_string_filters("name", &self.name, &vec![string_length::<2, 0>]);
-        filter_reader.read_string_filters("email", &self.email, &vec![email_strict]);
-        filter_reader.read_datetime_filters("created_at", &self.created_at, &vec![]);
+        filter_reader.read_index_filters(UserSearchableFields::Id, &self.id);
+        filter_reader.read_string_filters(
+            UserSearchableFields::Name,
+            &self.name,
+            &vec![string_length::<2, 0>],
+        );
+        filter_reader.read_string_filters(
+            UserSearchableFields::Email,
+            &self.email,
+            &vec![email_strict],
+        );
+        filter_reader.read_datetime_filters(
+            UserSearchableFields::CreatedAt,
+            &self.created_at,
+            &vec![],
+        );
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
                 page: Some(page),
