@@ -26,6 +26,20 @@ pub enum UserSelectableFields {
     CreatedAt,
 }
 
+impl From<UserSelectableFields> for &'static str {
+    fn from(field: UserSelectableFields) -> &'static str {
+        match field {
+            UserSelectableFields::Id => "id",
+            UserSelectableFields::Name => "name",
+            UserSelectableFields::Email => "email",
+            UserSelectableFields::IsAdmin => "is_admin",
+            UserSelectableFields::ImageUrl => "image_url",
+            UserSelectableFields::Places => "places",
+            UserSelectableFields::CreatedAt => "created_at",
+        }
+    }
+}
+
 #[allow(dead_code)] // to be removed
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]

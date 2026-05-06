@@ -10,6 +10,7 @@ use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
 use crate::models::schemas::UserRead;
+use crate::models::schemas::place::PlaceSelectableFields;
 use crate::models::schemas::user::{
     UserPlace, UserSearchableFields, UserSelectableFields, UserSortableFields,
 };
@@ -67,12 +68,30 @@ impl UserFetch {
     fn read_user(&self) -> Result<UserRead, ApiError> {
         let value = self.users.first().ok_or(CrudsUser::serialization_error())?;
 
-        let id = Self::extract(utils::get_id_from_json("id", value))?;
-        let name = Self::extract(utils::get_string_from_json("name", value))?;
-        let email = Self::extract(utils::get_string_from_json("email", value))?;
-        let is_admin = Self::extract(utils::get_bool_from_json("is_admin", value))?;
-        let image_url = Self::extract(utils::get_string_from_json("image_url", value))?;
-        let created_at = Self::extract(utils::get_datetime_from_json("created_at", value))?;
+        let id = Self::extract(utils::get_id_from_json(
+            UserSelectableFields::Id.into(),
+            value,
+        ))?;
+        let name = Self::extract(utils::get_string_from_json(
+            UserSelectableFields::Name.into(),
+            value,
+        ))?;
+        let email = Self::extract(utils::get_string_from_json(
+            UserSelectableFields::Email.into(),
+            value,
+        ))?;
+        let is_admin = Self::extract(utils::get_bool_from_json(
+            UserSelectableFields::IsAdmin.into(),
+            value,
+        ))?;
+        let image_url = Self::extract(utils::get_string_from_json(
+            UserSelectableFields::ImageUrl.into(),
+            value,
+        ))?;
+        let created_at = Self::extract(utils::get_datetime_from_json(
+            UserSelectableFields::CreatedAt.into(),
+            value,
+        ))?;
 
         Ok(UserRead {
             id,
@@ -86,14 +105,27 @@ impl UserFetch {
     }
 
     fn read_place(&self, user: &UserRead, value: &Value) -> Result<UserPlace, ApiError> {
-        let user_id = Self::extract(utils::get_id_from_json("creator_id", value))?;
+        let user_id = Self::extract(utils::get_id_from_json(
+            PlaceSelectableFields::CreatorId.into(),
+            value,
+        ))?;
         if user_id != user.id {
             return Err(CrudsUser::serialization_error());
         }
 
-        let id = Self::extract(utils::get_id_from_json("id", value))?;
-        let title = Self::extract(utils::get_string_from_json("title", value))?;
-        let address = Self::extract(utils::get_string_from_json("address", value))?;
+        let id = Self::extract(utils::get_id_from_json(
+            PlaceSelectableFields::Id.into(),
+            value,
+        ))?;
+        let title = Self::extract(utils::get_string_from_json(
+            PlaceSelectableFields::Title.into(),
+            value,
+        ))?;
+        let address = Self::extract(utils::get_string_from_json(
+            PlaceSelectableFields::Address.into(),
+            value,
+        ))?;
+
         Ok(UserPlace { id, title, address })
     }
 
@@ -110,7 +142,9 @@ impl UserFetch {
             .first()
             .ok_or(CrudsUser::serialization_error())?
             .clone();
-        user["places"] = Value::Array(self.places.clone());
+
+        let key: &'static str = UserSelectableFields::Places.into();
+        user[key] = Value::Array(self.places.clone());
         Ok(user)
     }
 }
@@ -151,14 +185,15 @@ impl Read for CrudsUser {
     }
 
     async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError> {
-        let result = utils::get_string_from_json("image_url", data)
+        let result = utils::get_string_from_json(UserSelectableFields::ImageUrl.into(), data)
             .map_err(|_| Self::serialization_error())?;
 
         let Some(image_url) = result else {
             return Ok(());
         };
 
-        data["image_url"] = Value::String(
+        let key: &'static str = UserSelectableFields::ImageUrl.into();
+        data[key] = Value::String(
             self.app_state
                 .storage
                 .get_signed_url(&image_url, None)
@@ -195,7 +230,10 @@ impl Read for CrudsUser {
             .ok_or(Self::not_found())?;
 
         // extract the user Id
-        let id = UserFetch::extract(utils::get_id_from_json("id", &user))?;
+        let id = UserFetch::extract(utils::get_id_from_json(
+            UserSelectableFields::Id.into(),
+            &user,
+        ))?;
 
         // extract the places
         let places = place::Entity::find()
