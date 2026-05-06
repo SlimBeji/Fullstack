@@ -1,4 +1,5 @@
 use axum::extract::FromRequest;
+use sea_orm::sea_query::Expr;
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
 use time::OffsetDateTime;
@@ -12,6 +13,7 @@ use crate::lib_::{
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
     validator_::{email_strict, string_length},
 };
+use crate::models::orm::user;
 
 // --- Selectables, Serchables, Sortables ----
 
@@ -44,6 +46,15 @@ pub enum UserSearchableFields {
 impl SearchableTrait for UserSearchableFields {
     fn id() -> Self {
         Self::Id
+    }
+
+    fn to_expr(&self) -> Expr {
+        match self {
+            Self::Id => Expr::col(user::Column::Id),
+            Self::Name => Expr::col(user::Column::Name),
+            Self::Email => Expr::col(user::Column::Email),
+            Self::CreatedAt => Expr::col(user::Column::CreatedAt),
+        }
     }
 }
 

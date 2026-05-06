@@ -1,4 +1,6 @@
 use axum::extract::FromRequest;
+use sea_orm::sea_query::Expr;
+use sea_orm::sea_query::extension::postgres::PgExpr;
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
 use time::OffsetDateTime;
@@ -12,6 +14,7 @@ use crate::lib_::{
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
     validator_::{array_length, string_length},
 };
+use crate::models::orm::place;
 
 // --- Selectables, Serchables, Sortables ----
 
@@ -48,6 +51,19 @@ pub enum PlaceSearchableFields {
 impl SearchableTrait for PlaceSearchableFields {
     fn id() -> Self {
         Self::Id
+    }
+
+    fn to_expr(&self) -> Expr {
+        match self {
+            Self::Id => Expr::col(place::Column::Id),
+            Self::Title => Expr::col(place::Column::Title),
+            Self::Description => Expr::col(place::Column::Description),
+            Self::Address => Expr::col(place::Column::Address),
+            Self::CreatorId => Expr::col(place::Column::CreatorId),
+            Self::LocationLat => Expr::col(place::Column::Location).cast_json_field("lat"),
+            Self::LocationLng => Expr::col(place::Column::Location).cast_json_field("lng"),
+            Self::CreatedAt => Expr::col(place::Column::CreatedAt),
+        }
     }
 }
 

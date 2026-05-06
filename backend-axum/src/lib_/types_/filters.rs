@@ -1,3 +1,4 @@
+use sea_orm::sea_query::Expr;
 use std::{collections::HashMap, hash::Hash, str::FromStr};
 use time::OffsetDateTime;
 use validator::{ValidationError, ValidationErrors};
@@ -792,6 +793,7 @@ impl FieldFilters {
 
 pub trait SearchableTrait: Eq + Hash + Clone + Into<&'static str> {
     fn id() -> Self;
+    fn to_expr(&self) -> Expr;
 }
 
 pub type WhereFilters<Searchable> = HashMap<Searchable, FieldFilters>;
