@@ -16,6 +16,8 @@ use crate::models::schemas::user::{
 };
 use crate::services::instances::AppState;
 
+// The Basic Cruds struct
+
 pub type CrudsUser = CrudsBase<AppState, user::Entity, UserSelectableFields, UserSortableFields>;
 
 impl CrudsUser {
@@ -39,6 +41,8 @@ impl CrudsUser {
     }
 }
 
+// The General Crud Tools Trait
+
 impl CrudsTools for CrudsUser {
     type State = AppState;
     type Entity = user::Entity;
@@ -54,6 +58,8 @@ impl CrudsTools for CrudsUser {
         "User"
     }
 }
+
+// The Read Trait
 
 pub struct UserFetch {
     users: Vec<Value>,
