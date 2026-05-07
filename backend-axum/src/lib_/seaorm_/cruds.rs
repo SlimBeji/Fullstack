@@ -2,74 +2,66 @@ use std::marker::PhantomData;
 
 use axum::http::StatusCode;
 use sea_orm::{
-    DatabaseConnection, EntityTrait, PrimaryKeyTrait, prelude::async_trait::async_trait,
+    ColumnTrait, Condition, DatabaseConnection, EntityName, EntityTrait, PrimaryKeyTrait,
+    QueryFilter, QuerySelect, Select, prelude::async_trait::async_trait,
 };
 use serde_json::Value;
 
-use crate::lib_::types_::{ApiError, SearchQuery, SearchableTrait};
+use crate::lib_::{
+    seaorm_::to_condition,
+    types_::{ApiError, SearchQuery, SearchableTrait},
+};
 
-// State contract
+// Cruds general tools
 pub trait CrudAppStateTrait {
     fn get_db(&self) -> &DatabaseConnection;
 }
 
-// Cruds generic struct
-pub struct CrudsBase<State, Entity, Selectable, Sortable>
+pub struct CrudsBase<State, Entity>
 where
     State: CrudAppStateTrait,
     Entity: EntityTrait,
 {
     _entity: PhantomData<Entity>,
     pub app_state: State,
-    pub max_items_per_page: usize,
-    pub default_select: Vec<Selectable>,
-    pub default_order_by: Vec<Sortable>,
 }
 
-impl<State, Entity, Selectable, Sortable> CrudsBase<State, Entity, Selectable, Sortable>
-where
-    State: CrudAppStateTrait,
-    Entity: EntityTrait,
-{
-    pub fn build(
-        app_state: State,
-        max_items_per_page: usize,
-        default_select: Vec<Selectable>,
-        default_order_by: Vec<Sortable>,
-    ) -> Self {
-        Self {
-            _entity: PhantomData,
-            app_state,
-            max_items_per_page,
-            default_select,
-            default_order_by,
-        }
-    }
-
-    pub fn get_db(&self) -> &DatabaseConnection {
-        self.app_state.get_db()
-    }
-
-    pub fn tablename(&self) -> &'static str {
-        Entity::default().table_name()
-    }
-}
-
-// CrudsTools
 pub trait CrudsTools
 where
     <Self::Entity as EntityTrait>::Model: Send + Sync,
     <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType: From<i32>,
 {
+    // Associated types
+
     type State: CrudAppStateTrait + Send + Sync; // The app state
     type Entity: EntityTrait; // The SearOrm Entity
+    type Column: ColumnTrait; // The SeaOrm associated Column type
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
     type Searchable: Send + Sync + Copy + SearchableTrait + 'static; // The enum for searchable fields
     type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
 
-    fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity, Self::Selectable, Self::Sortable>;
+    // Constructor and properties
+
+    fn new(app_state: Self::State) -> CrudsBase<Self::State, Self::Entity> {
+        CrudsBase {
+            _entity: PhantomData,
+            app_state,
+        }
+    }
+
+    fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity>;
+
+    fn get_db(&self) -> &DatabaseConnection {
+        self.get_base().app_state.get_db()
+    }
 
     fn get_modelname() -> &'static str;
+
+    fn tablename(&self) -> &'static str {
+        Self::Entity::default().table_name()
+    }
+
+    // Error handling helpers
 
     fn serialization_error() -> ApiError {
         ApiError {
@@ -104,6 +96,48 @@ where
             err: None,
         }
     }
+
+    // Query building helpers
+
+    fn get_max_items_per_page() -> usize;
+
+    fn get_default_select() -> Vec<Self::Selectable>;
+
+    fn get_select(
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Vec<Self::Selectable> {
+        let Some(select) = query.select.clone() else {
+            return Self::get_default_select();
+        };
+        select
+    }
+
+    fn to_columns(selects: Vec<Self::Selectable>) -> Vec<Self::Column>;
+
+    fn get_condition(
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Option<Condition> {
+        query.where_.as_ref().map(|w| to_condition(w))
+    }
+
+    fn get_pagination(
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> (usize, usize) {
+        let page = query.page.unwrap_or(1);
+        let size = query.size.unwrap_or(Self::get_max_items_per_page());
+        (page, size)
+    }
+
+    fn to_select_one(
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Select<Self::Entity> {
+        let columns = Self::to_columns(Self::get_select(&query));
+        let mut q = Self::Entity::find().select_only().columns(columns);
+        if let Some(condition) = Self::get_condition(&query) {
+            q = q.filter(condition);
+        }
+        q
+    }
 }
 
 // Read traits
@@ -135,7 +169,7 @@ pub trait Read: CrudsTools {
         &self,
         mut query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Fetch, ApiError> {
-        query.select = Some(self.get_base().default_select.clone());
+        query.select = Some(Self::get_default_select());
         self.get_raw(query).await
     }
 
@@ -143,9 +177,8 @@ pub trait Read: CrudsTools {
         &self,
         id: i32,
     ) -> Result<Option<<Self::Entity as EntityTrait>::Model>, ApiError> {
-        let base = self.get_base();
         Self::Entity::find_by_id(id)
-            .one(base.get_db())
+            .one(self.get_db())
             .await
             .map_err(|e| {
                 ApiError::internal_error(
