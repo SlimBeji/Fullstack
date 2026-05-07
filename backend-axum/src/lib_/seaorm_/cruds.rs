@@ -2,8 +2,8 @@ use std::marker::PhantomData;
 
 use axum::http::StatusCode;
 use sea_orm::{
-    ColumnTrait, Condition, DatabaseConnection, EntityName, EntityTrait, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, Select, prelude::async_trait::async_trait,
+    ColumnTrait, Condition, DatabaseConnection, DbErr, EntityName, EntityTrait, PrimaryKeyTrait,
+    QueryFilter, QuerySelect, prelude::async_trait::async_trait,
 };
 use serde_json::Value;
 
@@ -26,6 +26,15 @@ where
     pub app_state: State,
 }
 
+impl<State: CrudAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
+    pub fn new(app_state: State) -> Self {
+        Self {
+            _entity: PhantomData,
+            app_state,
+        }
+    }
+}
+
 pub trait CrudsTools
 where
     <Self::Entity as EntityTrait>::Model: Send + Sync,
@@ -40,14 +49,7 @@ where
     type Searchable: Send + Sync + Copy + SearchableTrait + 'static; // The enum for searchable fields
     type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
 
-    // Constructor and properties
-
-    fn new(app_state: Self::State) -> CrudsBase<Self::State, Self::Entity> {
-        CrudsBase {
-            _entity: PhantomData,
-            app_state,
-        }
-    }
+    // Properties
 
     fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity>;
 
@@ -117,7 +119,7 @@ where
     fn get_condition(
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Option<Condition> {
-        query.where_.as_ref().map(|w| to_condition(w))
+        query.where_.as_ref().map(to_condition)
     }
 
     fn get_pagination(
@@ -126,17 +128,6 @@ where
         let page = query.page.unwrap_or(1);
         let size = query.size.unwrap_or(Self::get_max_items_per_page());
         (page, size)
-    }
-
-    fn to_select_one(
-        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Select<Self::Entity> {
-        let columns = Self::to_columns(Self::get_select(&query));
-        let mut q = Self::Entity::find().select_only().columns(columns);
-        if let Some(condition) = Self::get_condition(&query) {
-            q = q.filter(condition);
-        }
-        q
     }
 }
 
@@ -159,6 +150,18 @@ pub trait Read: CrudsTools {
     async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError>;
 
     async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError>;
+
+    async fn to_select_one(
+        &self,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Option<Value>, DbErr> {
+        let columns = Self::to_columns(Self::get_select(query));
+        let mut q = Self::Entity::find().select_only().columns(columns);
+        if let Some(condition) = Self::get_condition(query) {
+            q = q.filter(condition);
+        }
+        q.into_json().one(self.get_db()).await
+    }
 
     async fn get_raw(
         &self,

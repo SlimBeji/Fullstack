@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use sea_orm::prelude::async_trait::async_trait;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
 
 use crate::config;
-use crate::lib_::seaorm_::cruds::{CrudAppStateTrait, CrudsBase, CrudsTools, Read};
+use crate::lib_::seaorm_::{CrudAppStateTrait, CrudsBase, CrudsTools, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
@@ -18,37 +16,21 @@ use crate::services::instances::AppState;
 
 // The Basic Cruds struct
 
-pub type CrudsUser = CrudsBase<AppState, user::Entity, UserSelectableFields, UserSortableFields>;
+type UserSearch = SearchQuery<UserSelectableFields, UserSearchableFields, UserSortableFields>;
 
-impl CrudsUser {
-    pub fn new(app_state: AppState) -> Self {
-        let default_select = vec![
-            UserSelectableFields::Id,
-            UserSelectableFields::Name,
-            UserSelectableFields::Email,
-            UserSelectableFields::IsAdmin,
-            UserSelectableFields::ImageUrl,
-            UserSelectableFields::Places,
-            UserSelectableFields::CreatedAt,
-        ];
-        let default_order_by = vec![UserSortableFields::CreatedAtDesc];
-        CrudsBase::<AppState, user::Entity, UserSelectableFields, UserSortableFields>::build(
-            app_state,
-            config::ENV.max_items_per_page,
-            default_select,
-            default_order_by,
-        )
-    }
-}
-
-// The General Crud Tools Trait
+pub type CrudsUser = CrudsBase<AppState, user::Entity>;
 
 impl CrudsTools for CrudsUser {
+    // Associated types
+
     type State = AppState;
     type Entity = user::Entity;
+    type Column = user::Column;
     type Selectable = UserSelectableFields;
     type Searchable = UserSearchableFields;
     type Sortable = UserSortableFields;
+
+    // Constructor and properties
 
     fn get_base(&self) -> &CrudsUser {
         self
@@ -56,6 +38,40 @@ impl CrudsTools for CrudsUser {
 
     fn get_modelname() -> &'static str {
         "User"
+    }
+
+    // Query building helpers
+
+    fn get_max_items_per_page() -> usize {
+        config::ENV.max_items_per_page
+    }
+
+    fn get_default_select() -> Vec<Self::Selectable> {
+        vec![
+            UserSelectableFields::Id,
+            UserSelectableFields::Name,
+            UserSelectableFields::Email,
+            UserSelectableFields::IsAdmin,
+            UserSelectableFields::ImageUrl,
+            UserSelectableFields::Places,
+            UserSelectableFields::CreatedAt,
+        ]
+    }
+
+    fn to_columns(selects: Vec<Self::Selectable>) -> Vec<Self::Column> {
+        let mut result = vec![];
+        for select in selects {
+            match select {
+                UserSelectableFields::Id => result.push(user::Column::Id),
+                UserSelectableFields::Name => result.push(user::Column::Name),
+                UserSelectableFields::Email => result.push(user::Column::Email),
+                UserSelectableFields::IsAdmin => result.push(user::Column::IsAdmin),
+                UserSelectableFields::ImageUrl => result.push(user::Column::ImageUrl),
+                UserSelectableFields::Places => {}
+                UserSelectableFields::CreatedAt => result.push(user::Column::CreatedAt),
+            }
+        }
+        result
     }
 }
 
@@ -161,11 +177,8 @@ impl Read for CrudsUser {
     type Fetch = UserFetch;
     type Read = UserRead;
 
-    async fn auth_get(
-        user: Self::User,
-        search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) {
-        let mut where_ = search.where_.take().unwrap_or(HashMap::new());
+    async fn auth_get(user: Self::User, search: &mut UserSearch) {
+        let mut where_ = search.where_.take().unwrap_or_default();
         where_.insert(UserSearchableFields::Id, FieldFilters::id(user.id));
         search.where_ = Some(where_);
     }
@@ -209,23 +222,10 @@ impl Read for CrudsUser {
         Ok(())
     }
 
-    async fn get_raw(
-        &self,
-        _: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Self::Fetch, ApiError> {
+    async fn get_raw(&self, query: UserSearch) -> Result<Self::Fetch, ApiError> {
         // extract the user Value
-        let user = user::Entity::find()
-            .select_only()
-            .columns([
-                user::Column::Id,
-                user::Column::Name,
-                user::Column::Email,
-                user::Column::IsAdmin,
-                user::Column::ImageUrl,
-                user::Column::CreatedAt,
-            ])
-            .into_json()
-            .one(self.app_state.get_db())
+        let user = self
+            .to_select_one(&query)
             .await
             .map_err(|e| {
                 ApiError::internal_error(
