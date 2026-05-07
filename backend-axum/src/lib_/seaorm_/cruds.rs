@@ -99,6 +99,13 @@ where
         }
     }
 
+    fn db_error(e: DbErr) -> ApiError {
+        ApiError::internal_error(
+            format!("failed to extract {} data", Self::get_modelname()),
+            Box::new(e),
+        )
+    }
+
     // Query building helpers
 
     fn get_max_items_per_page() -> usize;
@@ -154,13 +161,19 @@ pub trait Read: CrudsTools {
     async fn to_select_one(
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Option<Value>, DbErr> {
+    ) -> Result<Value, ApiError> {
         let columns = Self::to_columns(Self::get_select(query));
         let mut q = Self::Entity::find().select_only().columns(columns);
         if let Some(condition) = Self::get_condition(query) {
             q = q.filter(condition);
         }
-        q.into_json().one(self.get_db()).await
+        let value = q
+            .into_json()
+            .one(self.get_db())
+            .await
+            .map_err(Self::db_error)?
+            .ok_or(Self::not_found())?;
+        Ok(value)
     }
 
     async fn get_raw(
