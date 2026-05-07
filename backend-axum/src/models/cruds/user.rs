@@ -271,10 +271,7 @@ impl Read for CrudsUser {
         }
 
         // Step 3: extract the ids
-        let id = UserFetch::extract(utils::get_id_from_json(
-            UserSelectableFields::Id.into(),
-            &user,
-        ))?;
+        let id = Self::get_id_from_json(UserSelectableFields::Id.into(), &user)?;
 
         // Step 4: extract the places
         let places = self.fetch_user_places(vec![id]).await?;

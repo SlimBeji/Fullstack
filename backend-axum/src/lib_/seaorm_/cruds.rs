@@ -10,6 +10,7 @@ use serde_json::Value;
 use crate::lib_::{
     seaorm_::to_condition,
     types_::{ApiError, SearchQuery, SearchableTrait},
+    utils,
 };
 
 // Cruds general tools
@@ -135,6 +136,13 @@ where
         let page = query.page.unwrap_or(1);
         let size = query.size.unwrap_or(Self::get_max_items_per_page());
         (page, size)
+    }
+
+    // Data extraction
+
+    fn get_id_from_json(key: &str, value: &Value) -> Result<u32, ApiError> {
+        let result = utils::get_id_from_json(key, value);
+        utils::unwrap_json_value(result, Self::serialization_error())
     }
 }
 
