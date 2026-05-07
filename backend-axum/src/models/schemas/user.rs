@@ -17,7 +17,7 @@ use crate::models::orm::user;
 
 // --- Selectables, Serchables, Sortables ----
 
-#[derive(Debug, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum UserSelectableFields {
