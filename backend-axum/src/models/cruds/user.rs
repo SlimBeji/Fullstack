@@ -3,7 +3,7 @@ use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
 
 use crate::config;
-use crate::lib_::seaorm_::{CrudAppStateTrait, CrudsBase, CrudsTools, Read};
+use crate::lib_::seaorm_::{CrudsBase, CrudsTools, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
@@ -19,6 +19,34 @@ use crate::services::instances::AppState;
 type UserSearch = SearchQuery<UserSelectableFields, UserSearchableFields, UserSortableFields>;
 
 pub type CrudsUser = CrudsBase<AppState, user::Entity>;
+
+impl CrudsUser {
+    // Read helpers
+
+    fn should_fetch_place(&self, query: &UserSearch) -> bool {
+        Self::get_select(query).contains(&UserSelectableFields::Places)
+    }
+
+    async fn fetch_user_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
+        let ids_i32: Vec<i32> = ids.into_iter().map(|x| x as i32).collect();
+        let places = place::Entity::find()
+            .select_only()
+            .columns([
+                place::Column::CreatorId,
+                place::Column::Id,
+                place::Column::Title,
+                place::Column::Address,
+            ])
+            .filter(place::Column::CreatorId.is_in(ids_i32))
+            .into_json()
+            .all(self.get_db())
+            .await
+            .map_err(Self::db_error)?;
+        Ok(places)
+    }
+}
+
+// The CrudTools Trait
 
 impl CrudsTools for CrudsUser {
     // Associated types
@@ -79,7 +107,7 @@ impl CrudsTools for CrudsUser {
 
 pub struct UserFetch {
     users: Vec<Value>,
-    places: Vec<Value>,
+    places: Option<Vec<Value>>,
 }
 
 impl UserFetch {
@@ -152,7 +180,12 @@ impl UserFetch {
     }
 
     fn read_user_places(&self, user: &UserRead) -> Result<Vec<UserPlace>, ApiError> {
-        self.places
+        let Some(places) = &self.places else {
+            // read_user_places should never be called if places is None
+            return Err(CrudsUser::serialization_error());
+        };
+
+        places
             .iter()
             .map(|value| self.read_place(user, value))
             .collect()
@@ -165,8 +198,11 @@ impl UserFetch {
             .ok_or(CrudsUser::serialization_error())?
             .clone();
 
-        let key: &'static str = UserSelectableFields::Places.into();
-        user[key] = Value::Array(self.places.clone());
+        if let Some(places) = &self.places {
+            let key: &'static str = UserSelectableFields::Places.into();
+            user[key] = Value::Array(places.clone());
+        }
+
         Ok(user)
     }
 }
@@ -223,48 +259,30 @@ impl Read for CrudsUser {
     }
 
     async fn get_raw(&self, query: UserSearch) -> Result<Self::Fetch, ApiError> {
-        // extract the user Value
-        let user = self
-            .to_select_one(&query)
-            .await
-            .map_err(|e| {
-                ApiError::internal_error(
-                    format!("failed to extract {} data", Self::get_modelname()),
-                    Box::new(e),
-                )
-            })?
-            .ok_or(Self::not_found())?;
+        // Step 1: fetch the user
+        let user = self.to_select_one(&query).await?;
 
-        // extract the user Id
+        // Step 2: check if places is required or return early
+        if !self.should_fetch_place(&query) {
+            return Ok(UserFetch {
+                users: vec![user],
+                places: None,
+            });
+        }
+
+        // Step 3: extract the ids
         let id = UserFetch::extract(utils::get_id_from_json(
             UserSelectableFields::Id.into(),
             &user,
         ))?;
 
-        // extract the places
-        let places = place::Entity::find()
-            .select_only()
-            .columns([
-                place::Column::CreatorId,
-                place::Column::Id,
-                place::Column::Title,
-                place::Column::Address,
-            ])
-            .filter(place::Column::CreatorId.eq(id as i32))
-            .into_json()
-            .all(self.app_state.get_db())
-            .await
-            .map_err(|e| {
-                ApiError::internal_error(
-                    format!("failed to extract {} data", Self::get_modelname()),
-                    Box::new(e),
-                )
-            })?;
+        // Step 4: extract the places
+        let places = self.fetch_user_places(vec![id]).await?;
 
-        // Returning the result
+        // Step 5: Returning the result
         Ok(UserFetch {
             users: vec![user],
-            places,
+            places: Some(places),
         })
     }
 }
