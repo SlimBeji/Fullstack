@@ -3,7 +3,7 @@ use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
 
 use crate::config;
-use crate::lib_::seaorm_::{CrudsBase, CrudsTools, Read};
+use crate::lib_::seaorm_::{CrudsBase, CrudsUtils, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
@@ -48,7 +48,7 @@ impl CrudsUser {
 
 // The CrudTools Trait
 
-impl CrudsTools for CrudsUser {
+impl CrudsUtils for CrudsUser {
     // Associated types
 
     type State = AppState;

@@ -35,7 +35,7 @@ impl<State: CrudAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
     }
 }
 
-pub trait CrudsTools
+pub trait CrudsUtils
 where
     <Self::Entity as EntityTrait>::Model: Send + Sync,
     <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType: From<i32>,
@@ -140,7 +140,7 @@ where
 
 // Read traits
 #[async_trait]
-pub trait Read: CrudsTools {
+pub trait Read: CrudsUtils {
     type User: Send + Sync + 'static; // User object for authentication and authorization
     type Fetch: Send + Sync; // The Data fetched
     type Read: Send + Sync; // The Read Struct
