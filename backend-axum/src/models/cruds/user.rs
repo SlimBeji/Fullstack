@@ -8,29 +8,27 @@ use crate::lib_::seaorm_::{CrudsBase, CrudsUtils, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
-use crate::models::schemas::UserRead;
-use crate::models::schemas::place::PlaceSelectableFields;
-use crate::models::schemas::user::{
-    UserPlace, UserSearchableFields, UserSelectableFields, UserSortableFields,
+use crate::models::schemas::{
+    PlaceSelectable, UserPlace, UserRead, UserSearchable, UserSelectable, UserSortable,
 };
 use crate::services::instances::AppState;
 
 // Cruds types
 
-type UserSearch = SearchQuery<UserSelectableFields, UserSearchableFields, UserSortableFields>;
+type UserSearch = SearchQuery<UserSelectable, UserSearchable, UserSortable>;
 
 #[derive(Default)]
 pub struct UserOptions {
     pub process: Option<bool>,
-    pub fields: Option<Vec<UserSelectableFields>>,
+    pub fields: Option<Vec<UserSelectable>>,
 }
 
-impl CrudsOptionsTrait<UserSelectableFields> for UserOptions {
+impl CrudsOptionsTrait<UserSelectable> for UserOptions {
     fn process(&self) -> bool {
         self.process.is_some_and(|v| v)
     }
 
-    fn fields(&self) -> Option<Vec<UserSelectableFields>> {
+    fn fields(&self) -> Option<Vec<UserSelectable>> {
         self.fields.clone()
     }
 }
@@ -43,7 +41,7 @@ impl CrudsUser {
     // Read helpers
 
     fn should_fetch_place(&self, query: &UserSearch) -> bool {
-        Self::get_select(query).contains(&UserSelectableFields::Places)
+        Self::get_select(query).contains(&UserSelectable::Places)
     }
 
     async fn fetch_user_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
@@ -73,9 +71,9 @@ impl CrudsUtils for CrudsUser {
     type State = AppState;
     type Entity = user::Entity;
     type Column = user::Column;
-    type Selectable = UserSelectableFields;
-    type Searchable = UserSearchableFields;
-    type Sortable = UserSortableFields;
+    type Selectable = UserSelectable;
+    type Searchable = UserSearchable;
+    type Sortable = UserSortable;
     type Options = UserOptions;
 
     // Constructor and properties
@@ -96,13 +94,13 @@ impl CrudsUtils for CrudsUser {
 
     fn get_default_select() -> Vec<Self::Selectable> {
         vec![
-            UserSelectableFields::Id,
-            UserSelectableFields::Name,
-            UserSelectableFields::Email,
-            UserSelectableFields::IsAdmin,
-            UserSelectableFields::ImageUrl,
-            UserSelectableFields::Places,
-            UserSelectableFields::CreatedAt,
+            UserSelectable::Id,
+            UserSelectable::Name,
+            UserSelectable::Email,
+            UserSelectable::IsAdmin,
+            UserSelectable::ImageUrl,
+            UserSelectable::Places,
+            UserSelectable::CreatedAt,
         ]
     }
 
@@ -110,13 +108,13 @@ impl CrudsUtils for CrudsUser {
         let mut result = vec![];
         for select in selects {
             match select {
-                UserSelectableFields::Id => result.push(user::Column::Id),
-                UserSelectableFields::Name => result.push(user::Column::Name),
-                UserSelectableFields::Email => result.push(user::Column::Email),
-                UserSelectableFields::IsAdmin => result.push(user::Column::IsAdmin),
-                UserSelectableFields::ImageUrl => result.push(user::Column::ImageUrl),
-                UserSelectableFields::Places => {}
-                UserSelectableFields::CreatedAt => result.push(user::Column::CreatedAt),
+                UserSelectable::Id => result.push(user::Column::Id),
+                UserSelectable::Name => result.push(user::Column::Name),
+                UserSelectable::Email => result.push(user::Column::Email),
+                UserSelectable::IsAdmin => result.push(user::Column::IsAdmin),
+                UserSelectable::ImageUrl => result.push(user::Column::ImageUrl),
+                UserSelectable::Places => {}
+                UserSelectable::CreatedAt => result.push(user::Column::CreatedAt),
             }
         }
         result
@@ -138,28 +136,25 @@ impl UserFetch {
     fn read_user(&self) -> Result<UserRead, ApiError> {
         let value = self.users.first().ok_or(CrudsUser::serialization_error())?;
 
-        let id = Self::extract(utils::get_id_from_json(
-            UserSelectableFields::Id.into(),
-            value,
-        ))?;
+        let id = Self::extract(utils::get_id_from_json(UserSelectable::Id.into(), value))?;
         let name = Self::extract(utils::get_string_from_json(
-            UserSelectableFields::Name.into(),
+            UserSelectable::Name.into(),
             value,
         ))?;
         let email = Self::extract(utils::get_string_from_json(
-            UserSelectableFields::Email.into(),
+            UserSelectable::Email.into(),
             value,
         ))?;
         let is_admin = Self::extract(utils::get_bool_from_json(
-            UserSelectableFields::IsAdmin.into(),
+            UserSelectable::IsAdmin.into(),
             value,
         ))?;
         let image_url = Self::extract(utils::get_string_from_json(
-            UserSelectableFields::ImageUrl.into(),
+            UserSelectable::ImageUrl.into(),
             value,
         ))?;
         let created_at = Self::extract(utils::get_datetime_from_json(
-            UserSelectableFields::CreatedAt.into(),
+            UserSelectable::CreatedAt.into(),
             value,
         ))?;
 
@@ -176,23 +171,20 @@ impl UserFetch {
 
     fn read_place(&self, user: &UserRead, value: &Value) -> Result<UserPlace, ApiError> {
         let user_id = Self::extract(utils::get_id_from_json(
-            PlaceSelectableFields::CreatorId.into(),
+            PlaceSelectable::CreatorId.into(),
             value,
         ))?;
         if user_id != user.id {
             return Err(CrudsUser::serialization_error());
         }
 
-        let id = Self::extract(utils::get_id_from_json(
-            PlaceSelectableFields::Id.into(),
-            value,
-        ))?;
+        let id = Self::extract(utils::get_id_from_json(PlaceSelectable::Id.into(), value))?;
         let title = Self::extract(utils::get_string_from_json(
-            PlaceSelectableFields::Title.into(),
+            PlaceSelectable::Title.into(),
             value,
         ))?;
         let address = Self::extract(utils::get_string_from_json(
-            PlaceSelectableFields::Address.into(),
+            PlaceSelectable::Address.into(),
             value,
         ))?;
 
@@ -219,7 +211,7 @@ impl UserFetch {
             .clone();
 
         if let Some(places) = &self.places {
-            let key: &'static str = UserSelectableFields::Places.into();
+            let key: &'static str = UserSelectable::Places.into();
             user[key] = Value::Array(places.clone());
         }
 
@@ -235,7 +227,7 @@ impl Read for CrudsUser {
 
     async fn auth_get(user: Self::User, search: &mut UserSearch) {
         let mut where_ = search.where_.take().unwrap_or_default();
-        where_.insert(UserSearchableFields::Id, FieldFilters::id(user.id));
+        where_.insert(UserSearchable::Id, FieldFilters::id(user.id));
         search.where_ = Some(where_);
     }
 
@@ -260,14 +252,14 @@ impl Read for CrudsUser {
     }
 
     async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError> {
-        let result = utils::get_string_from_json(UserSelectableFields::ImageUrl.into(), data)
+        let result = utils::get_string_from_json(UserSelectable::ImageUrl.into(), data)
             .map_err(|_| Self::serialization_error())?;
 
         let Some(image_url) = result else {
             return Ok(());
         };
 
-        let key: &'static str = UserSelectableFields::ImageUrl.into();
+        let key: &'static str = UserSelectable::ImageUrl.into();
         data[key] = Value::String(
             self.app_state
                 .storage
@@ -291,7 +283,7 @@ impl Read for CrudsUser {
         }
 
         // Step 3: extract the ids
-        let id = Self::get_id_from_json(UserSelectableFields::Id.into(), &user)?;
+        let id = Self::get_id_from_json(UserSelectable::Id.into(), &user)?;
 
         // Step 4: extract the places
         let places = self.fetch_user_places(vec![id]).await?;

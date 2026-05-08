@@ -20,7 +20,7 @@ use crate::models::orm::user;
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
-pub enum UserSelectableFields {
+pub enum UserSelectable {
     Id,
     Name,
     Email,
@@ -36,14 +36,14 @@ pub enum UserSelectableFields {
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
-pub enum UserSearchableFields {
+pub enum UserSearchable {
     Id,
     Name,
     Email,
     CreatedAt,
 }
 
-impl SearchableTrait for UserSearchableFields {
+impl SearchableTrait for UserSearchable {
     fn id() -> Self {
         Self::Id
     }
@@ -59,7 +59,7 @@ impl SearchableTrait for UserSearchableFields {
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
-pub enum UserSortableFields {
+pub enum UserSortable {
     #[serde(rename = "created_at")]
     CreatedAtAsc,
     #[serde(rename = "-created_at")]
@@ -242,8 +242,8 @@ impl UserRead {
 #[into_params(parameter_in = Query)]
 pub struct UserGet {
     /// Fields to include in the response; omit for complete data
-    #[param(value_type = Option<Vec<UserSelectableFields>>)]
-    pub fields: Option<Vec<UserSelectableFields>>,
+    #[param(value_type = Option<Vec<UserSelectable>>)]
+    pub fields: Option<Vec<UserSelectable>>,
 }
 
 // --- Update Schema ---
@@ -291,10 +291,10 @@ pub struct UserSearch {
     pub size: Option<usize>,
 
     /// Fields to use for sorting. Use the '-' for descending sorting
-    pub sort: Option<Vec<UserSortableFields>>,
+    pub sort: Option<Vec<UserSortable>>,
 
     /// Fields to include in the response; omit for complete data
-    pub fields: Option<Vec<UserSelectableFields>>,
+    pub fields: Option<Vec<UserSelectable>>,
 
     /// The user ID
     #[param(example = json!(["123456789"]))]
@@ -318,9 +318,9 @@ pub struct UserSearch {
 }
 
 impl ToSearchQuery for UserSearch {
-    type Selectable = UserSelectableFields;
-    type Searchable = UserSearchableFields;
-    type Sortable = UserSortableFields;
+    type Selectable = UserSelectable;
+    type Searchable = UserSearchable;
+    type Sortable = UserSortable;
 
     fn to_search_query(
         self,
@@ -332,22 +332,14 @@ impl ToSearchQuery for UserSearch {
         let size = self.size.unwrap_or(ENV.max_items_per_page);
 
         let mut filter_reader = FiltersReader::new();
-        filter_reader.read_index_filters(UserSearchableFields::Id, &self.id);
+        filter_reader.read_index_filters(UserSearchable::Id, &self.id);
         filter_reader.read_string_filters(
-            UserSearchableFields::Name,
+            UserSearchable::Name,
             &self.name,
             &vec![string_length::<2, 0>],
         );
-        filter_reader.read_string_filters(
-            UserSearchableFields::Email,
-            &self.email,
-            &vec![email_strict],
-        );
-        filter_reader.read_datetime_filters(
-            UserSearchableFields::CreatedAt,
-            &self.created_at,
-            &vec![],
-        );
+        filter_reader.read_string_filters(UserSearchable::Email, &self.email, &vec![email_strict]);
+        filter_reader.read_datetime_filters(UserSearchable::CreatedAt, &self.created_at, &vec![]);
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
                 page: Some(page),

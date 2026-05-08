@@ -2,7 +2,7 @@ use backend::{
     lib_::seaorm_::cruds::Read,
     models::{
         cruds::{CrudsUser, UserOptions},
-        schemas::user::UserSelectableFields,
+        schemas::UserSelectable,
     },
     services::instances::AppState,
 };
@@ -14,9 +14,9 @@ async fn main() {
     let options = UserOptions {
         process: Some(false),
         fields: Some(vec![
-            UserSelectableFields::Id,
-            UserSelectableFields::Name,
-            UserSelectableFields::Places,
+            UserSelectable::Id,
+            UserSelectable::Name,
+            UserSelectable::Places,
         ]),
     };
     let user = cruds_user

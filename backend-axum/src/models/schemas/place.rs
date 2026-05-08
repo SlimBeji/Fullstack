@@ -21,7 +21,7 @@ use crate::models::orm::place;
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
-pub enum PlaceSelectableFields {
+pub enum PlaceSelectable {
     Id,
     Title,
     Description,
@@ -37,7 +37,7 @@ pub enum PlaceSelectableFields {
     Debug, Copy, Clone, PartialEq, Eq, Hash, IntoStaticStr, Serialize, Deserialize, ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
-pub enum PlaceSearchableFields {
+pub enum PlaceSearchable {
     Id,
     Title,
     Description,
@@ -48,7 +48,7 @@ pub enum PlaceSearchableFields {
     CreatedAt,
 }
 
-impl SearchableTrait for PlaceSearchableFields {
+impl SearchableTrait for PlaceSearchable {
     fn id() -> Self {
         Self::Id
     }
@@ -68,7 +68,7 @@ impl SearchableTrait for PlaceSearchableFields {
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, ToSchema)]
-pub enum PlaceSortableFields {
+pub enum PlaceSortable {
     #[serde(rename = "created_at")]
     CreatedAtAsc,
     #[serde(rename = "-created_at")]
@@ -273,8 +273,8 @@ impl PlaceRead {
 #[into_params(parameter_in = Query)]
 pub struct PlaceGet {
     /// Fields to include in the response; omit for complete data
-    #[param(value_type = Option<Vec<PlaceSelectableFields>>)]
-    pub fields: Option<Vec<PlaceSelectableFields>>,
+    #[param(value_type = Option<Vec<PlaceSelectable>>)]
+    pub fields: Option<Vec<PlaceSelectable>>,
 }
 
 // --- Update Schema ---
@@ -327,10 +327,10 @@ pub struct PlaceSearch {
     pub size: Option<usize>,
 
     /// Fields to use for sorting. Use the '-' for descending sorting
-    pub sort: Option<Vec<PlaceSortableFields>>,
+    pub sort: Option<Vec<PlaceSortable>>,
 
     /// Fields to include in the response; omit for complete data
-    pub fields: Option<Vec<PlaceSelectableFields>>,
+    pub fields: Option<Vec<PlaceSelectable>>,
 
     /// The ID of the place
     #[param(example = json!(["123456789"]))]
@@ -374,9 +374,9 @@ pub struct PlaceSearch {
 }
 
 impl ToSearchQuery for PlaceSearch {
-    type Selectable = PlaceSelectableFields;
-    type Searchable = PlaceSearchableFields;
-    type Sortable = PlaceSortableFields;
+    type Selectable = PlaceSelectable;
+    type Searchable = PlaceSearchable;
+    type Sortable = PlaceSortable;
 
     fn to_search_query(
         self,
@@ -388,38 +388,26 @@ impl ToSearchQuery for PlaceSearch {
         let size = self.size.unwrap_or(ENV.max_items_per_page);
 
         let mut filter_reader = FiltersReader::new();
-        filter_reader.read_index_filters(PlaceSearchableFields::Id, &self.id);
+        filter_reader.read_index_filters(PlaceSearchable::Id, &self.id);
         filter_reader.read_string_filters(
-            PlaceSearchableFields::Title,
+            PlaceSearchable::Title,
             &self.title,
             &vec![string_length::<10, 0>],
         );
         filter_reader.read_string_filters(
-            PlaceSearchableFields::Description,
+            PlaceSearchable::Description,
             &self.description,
             &vec![string_length::<10, 0>],
         );
         filter_reader.read_string_filters(
-            PlaceSearchableFields::Address,
+            PlaceSearchable::Address,
             &self.address,
             &vec![string_length::<10, 0>],
         );
-        filter_reader.read_index_filters(PlaceSearchableFields::CreatorId, &self.creator_id);
-        filter_reader.read_f64_filters(
-            PlaceSearchableFields::LocationLat,
-            &self.location_lat,
-            &vec![],
-        );
-        filter_reader.read_f64_filters(
-            PlaceSearchableFields::LocationLng,
-            &self.location_lng,
-            &vec![],
-        );
-        filter_reader.read_datetime_filters(
-            PlaceSearchableFields::CreatedAt,
-            &self.created_at,
-            &vec![],
-        );
+        filter_reader.read_index_filters(PlaceSearchable::CreatorId, &self.creator_id);
+        filter_reader.read_f64_filters(PlaceSearchable::LocationLat, &self.location_lat, &vec![]);
+        filter_reader.read_f64_filters(PlaceSearchable::LocationLng, &self.location_lng, &vec![]);
+        filter_reader.read_datetime_filters(PlaceSearchable::CreatedAt, &self.created_at, &vec![]);
         match filter_reader.eval() {
             Ok(where_) => Ok(SearchQuery {
                 page: Some(page),
