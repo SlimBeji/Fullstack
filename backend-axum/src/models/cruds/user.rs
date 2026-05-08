@@ -3,6 +3,7 @@ use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
 
 use crate::config;
+use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
 use crate::lib_::seaorm_::{CrudsBase, CrudsUtils, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
@@ -14,9 +15,27 @@ use crate::models::schemas::user::{
 };
 use crate::services::instances::AppState;
 
-// The Basic Cruds struct
+// Cruds types
 
 type UserSearch = SearchQuery<UserSelectableFields, UserSearchableFields, UserSortableFields>;
+
+#[derive(Default)]
+pub struct UserOptions {
+    pub process: Option<bool>,
+    pub fields: Option<Vec<UserSelectableFields>>,
+}
+
+impl CrudsOptionsTrait<UserSelectableFields> for UserOptions {
+    fn process(&self) -> bool {
+        self.process.is_some_and(|v| v)
+    }
+
+    fn fields(&self) -> Option<Vec<UserSelectableFields>> {
+        self.fields.clone()
+    }
+}
+
+// The Basic Cruds struct
 
 pub type CrudsUser = CrudsBase<AppState, user::Entity>;
 
@@ -46,7 +65,7 @@ impl CrudsUser {
     }
 }
 
-// The CrudTools Trait
+// The CrudUtils Trait
 
 impl CrudsUtils for CrudsUser {
     // Associated types
@@ -57,6 +76,7 @@ impl CrudsUtils for CrudsUser {
     type Selectable = UserSelectableFields;
     type Searchable = UserSearchableFields;
     type Sortable = UserSortableFields;
+    type Options = UserOptions;
 
     // Constructor and properties
 

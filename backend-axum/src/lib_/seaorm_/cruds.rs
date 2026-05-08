@@ -13,10 +13,18 @@ use crate::lib_::{
     utils,
 };
 
-// Cruds general tools
+// Traits for types used in CRUDS
+
 pub trait CrudAppStateTrait {
     fn get_db(&self) -> &DatabaseConnection;
 }
+
+pub trait CrudsOptionsTrait<Selectable> {
+    fn process(&self) -> bool;
+    fn fields(&self) -> Option<Vec<Selectable>>;
+}
+
+// Base CRUDS type
 
 pub struct CrudsBase<State, Entity>
 where
@@ -36,6 +44,8 @@ impl<State: CrudAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
     }
 }
 
+// Utils tarit
+
 pub trait CrudsUtils
 where
     <Self::Entity as EntityTrait>::Model: Send + Sync,
@@ -49,6 +59,7 @@ where
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
     type Searchable: Send + Sync + Copy + SearchableTrait + 'static; // The enum for searchable fields
     type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
+    type Options: Send + Sync + Default + CrudsOptionsTrait<Self::Selectable>; // Common options for cruds methods
 
     // Properties
 
@@ -146,7 +157,8 @@ where
     }
 }
 
-// Read traits
+// Read trait
+
 #[async_trait]
 pub trait Read: CrudsUtils {
     type User: Send + Sync + 'static; // User object for authentication and authorization
@@ -199,9 +211,9 @@ pub trait Read: CrudsUtils {
 
     async fn read(
         &self,
-        id: i32,
+        id: u32,
     ) -> Result<Option<<Self::Entity as EntityTrait>::Model>, ApiError> {
-        Self::Entity::find_by_id(id)
+        Self::Entity::find_by_id(id as i32)
             .one(self.get_db())
             .await
             .map_err(|e| {
@@ -216,18 +228,25 @@ pub trait Read: CrudsUtils {
             })
     }
 
-    async fn get(&self, id: u32) -> Result<Self::Read, ApiError> {
+    async fn get(&self, id: u32, options: Option<Self::Options>) -> Result<Self::Read, ApiError> {
         let query = SearchQuery::id(id);
         let raw = self
             .get_raw_for_read(query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
-        self.post_process(&mut data).await?;
+        if options.is_some_and(|o| o.process()) {
+            self.post_process(&mut data).await?;
+        }
         Ok(data)
     }
 
-    async fn user_get(&self, user: Self::User, id: u32) -> Result<Self::Read, ApiError> {
+    async fn user_get(
+        &self,
+        user: Self::User,
+        id: u32,
+        options: Option<Self::Options>,
+    ) -> Result<Self::Read, ApiError> {
         let mut query = SearchQuery::id(id);
         Self::auth_get(user, &mut query).await;
         let raw = self
@@ -235,30 +254,51 @@ pub trait Read: CrudsUtils {
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
-        self.post_process(&mut data).await?;
+        if options.is_some_and(|o| o.process()) {
+            self.post_process(&mut data).await?;
+        }
         Ok(data)
     }
 
-    async fn get_partial(&self, id: u32) -> Result<Value, ApiError> {
-        let query = SearchQuery::id(id);
+    async fn get_partial(
+        &self,
+        id: u32,
+        options: Option<Self::Options>,
+    ) -> Result<Value, ApiError> {
+        let mut query = SearchQuery::id(id);
+        if let Some(fields) = &options {
+            query.select = fields.fields()
+        }
         let raw = self
             .get_raw(query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
-        self.post_process_partial(&mut data).await?;
+        if options.is_some_and(|o| o.process()) {
+            self.post_process_partial(&mut data).await?;
+        }
         Ok(data)
     }
 
-    async fn user_get_partial(&self, user: Self::User, id: u32) -> Result<Value, ApiError> {
+    async fn user_get_partial(
+        &self,
+        user: Self::User,
+        id: u32,
+        options: Option<Self::Options>,
+    ) -> Result<Value, ApiError> {
         let mut query = SearchQuery::id(id);
+        if let Some(fields) = &options {
+            query.select = fields.fields()
+        }
         Self::auth_get(user, &mut query).await;
         let raw = self
             .get_raw(query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
-        self.post_process_partial(&mut data).await?;
+        if options.is_some_and(|o| o.process()) {
+            self.post_process_partial(&mut data).await?;
+        }
         Ok(data)
     }
 }
