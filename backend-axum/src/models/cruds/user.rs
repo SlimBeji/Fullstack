@@ -58,7 +58,7 @@ impl CrudsUser {
             .into_json()
             .all(self.get_db())
             .await
-            .map_err(Self::db_error)?;
+            .map_err(Self::read_error)?;
         Ok(places)
     }
 }
@@ -84,6 +84,10 @@ impl CrudsUtils for CrudsUser {
 
     fn get_modelname() -> &'static str {
         "User"
+    }
+
+    fn extract_id(value: i32) -> u32 {
+        value as u32
     }
 
     // Query building helpers

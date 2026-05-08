@@ -2,8 +2,10 @@ use std::marker::PhantomData;
 
 use axum::http::StatusCode;
 use sea_orm::{
-    ColumnTrait, Condition, DatabaseConnection, DbErr, EntityName, EntityTrait, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, prelude::async_trait::async_trait,
+    ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection,
+    DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel, PrimaryKeyTrait,
+    QueryFilter, QuerySelect, RuntimeErr, TransactionError, TransactionTrait,
+    prelude::async_trait::async_trait,
 };
 use serde_json::Value;
 
@@ -75,6 +77,10 @@ where
         Self::Entity::default().table_name()
     }
 
+    fn extract_id(
+        value: <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType,
+    ) -> u32;
+
     // Error handling helpers
 
     fn serialization_error() -> ApiError {
@@ -111,9 +117,28 @@ where
         }
     }
 
-    fn db_error(e: DbErr) -> ApiError {
+    fn read_error(e: DbErr) -> ApiError {
         ApiError::internal_error(
-            format!("failed to extract {} data", Self::get_modelname()),
+            format!("failed to read {} data", Self::get_modelname()),
+            Box::new(e),
+        )
+    }
+
+    fn create_error(e: DbErr) -> ApiError {
+        if let DbErr::Query(RuntimeErr::SqlxError(ref sqlx_err)) = e
+            && let Some(pg_err) = sqlx_err.as_database_error()
+            && pg_err.code().as_deref() == Some("23505")
+        {
+            return ApiError {
+                code: StatusCode::CONFLICT,
+                message: format!("{} already exists", Self::get_modelname()),
+                details: None,
+                err: None,
+            };
+        }
+
+        ApiError::internal_error(
+            format!("failed to create {} data", Self::get_modelname()),
             Box::new(e),
         )
     }
@@ -191,7 +216,7 @@ pub trait Read: CrudsUtils {
             .into_json()
             .one(self.get_db())
             .await
-            .map_err(Self::db_error)?
+            .map_err(Self::read_error)?
             .ok_or(Self::not_found())?;
         Ok(value)
     }
@@ -300,5 +325,64 @@ pub trait Read: CrudsUtils {
             self.post_process_partial(&mut data).await?;
         }
         Ok(data)
+    }
+}
+
+// Create trait
+
+#[async_trait]
+pub trait Create: Read
+where
+    <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self::ActiveModel>,
+{
+    type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'static; // SeaOrm active model for data creation/update
+    type Post: Send + Sync; // The post form received via HTTP
+    type Create: Send + Sync + 'static; // The create struct used internally
+    type CreateHooksData: Send + Sync; // The data used in pre/post create hooks
+
+    async fn auth_post(&self, user: &Self::User, form: &Self::Post) -> Result<(), ApiError>;
+
+    async fn post_to_create(form: Self::Post) -> Result<Self::Create, ApiError>;
+
+    fn create_to_model(data: &Self::Create) -> Self::ActiveModel;
+
+    async fn before_create(
+        tx: &DatabaseTransaction,
+        data: &Self::Create,
+    ) -> Result<Self::CreateHooksData, ApiError>;
+
+    async fn after_create(
+        tx: &DatabaseTransaction,
+        id: u32,
+        data: Self::Create,
+        hooks_data: Self::CreateHooksData,
+    ) -> Result<(), ApiError>;
+
+    async fn create(&self, data: Self::Create) -> Result<u32, ApiError> {
+        let model = Self::create_to_model(&data);
+
+        let result = self
+            .get_db()
+            .transaction::<_, u32, ApiError>(|tx| {
+                Box::pin(async move {
+                    let hooks_data = Self::before_create(tx, &data).await?;
+                    let result = Self::Entity::insert(model)
+                        .exec(tx)
+                        .await
+                        .map_err(Self::create_error)?;
+                    let id = Self::extract_id(result.last_insert_id);
+                    Self::after_create(tx, id, data, hooks_data).await?;
+                    Ok(id)
+                })
+            })
+            .await
+            .map_err(|e| match e {
+                TransactionError::Connection(db_err) => Self::create_error(db_err),
+                TransactionError::Transaction(api_err) => api_err,
+            })?;
+
+        // better handling of the errors
+
+        Ok(result)
     }
 }
