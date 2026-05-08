@@ -4,7 +4,7 @@ use strum::{Display, EnumString, IntoStaticStr, VariantNames};
 use time::OffsetDateTime;
 use validator::{ValidationError, ValidationErrors};
 
-use crate::lib_::utils::parse_bool as parse_bool_utils;
+use crate::lib_::utils::{parse_bool as parse_bool_utils, parse_datetime as parse_datetime_utils};
 
 // Basic PGSQL operations for querying
 
@@ -127,8 +127,7 @@ fn parse_u32_vec(val: &str, op: FilterOp) -> Result<Vec<u32>, ValidationError> {
 }
 
 fn parse_datetime(val: &str, op: FilterOp) -> Result<OffsetDateTime, ValidationError> {
-    let trimmed = val.trim();
-    OffsetDateTime::parse(trimmed, &time::format_description::well_known::Rfc3339).map_err(|_| {
+    parse_datetime_utils(val).map_err(|_| {
         validation_err(
             "not_a_datetime",
             format!(

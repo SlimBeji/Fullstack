@@ -2,6 +2,7 @@ pub mod helpers;
 pub mod json;
 
 pub use helpers::parse_bool;
+pub use helpers::parse_datetime;
 pub use json::get_bool_from_json;
 pub use json::get_datetime_from_json;
 pub use json::get_id_from_json;
