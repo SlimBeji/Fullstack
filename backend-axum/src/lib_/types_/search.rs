@@ -15,6 +15,18 @@ pub struct SearchQuery<Selectable, Searchable, Sortable> {
     pub where_: Option<WhereFilters<Searchable>>,
 }
 
+impl<Selectable, Searchable, Sortable> Default for SearchQuery<Selectable, Searchable, Sortable> {
+    fn default() -> Self {
+        Self {
+            page: None,
+            size: None,
+            select: None,
+            order_by: None,
+            where_: None,
+        }
+    }
+}
+
 impl<Selectable, Searchable, Sortable> SearchQuery<Selectable, Searchable, Sortable>
 where
     Searchable: SearchableTrait,
@@ -23,11 +35,8 @@ where
         let filter = FieldFilters::id(id);
         let filters = HashMap::from([(Searchable::id(), filter)]);
         Self {
-            page: None,
-            size: None,
-            order_by: None,
-            select: None,
             where_: Some(filters),
+            ..Default::default()
         }
     }
 }

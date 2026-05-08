@@ -1,5 +1,6 @@
 use sea_orm::sea_query::Expr;
-use std::{collections::HashMap, hash::Hash, str::FromStr};
+use std::{collections::HashMap, hash::Hash};
+use strum::{Display, EnumString, IntoStaticStr, VariantNames};
 use time::OffsetDateTime;
 use validator::{ValidationError, ValidationErrors};
 
@@ -7,7 +8,10 @@ use crate::lib_::utils::parse_bool as parse_bool_utils;
 
 // Basic PGSQL operations for querying
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(
+    Debug, Display, EnumString, IntoStaticStr, VariantNames, Clone, Copy, PartialEq, Eq, Hash,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum FilterOp {
     Eq,
     Ne,
@@ -22,51 +26,6 @@ pub enum FilterOp {
     Ilike,
 }
 
-impl FilterOp {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            FilterOp::Eq => "eq",
-            FilterOp::Ne => "ne",
-            FilterOp::Null => "null",
-            FilterOp::In => "in",
-            FilterOp::Nin => "nin",
-            FilterOp::Lt => "lt",
-            FilterOp::Lte => "lte",
-            FilterOp::Gt => "gt",
-            FilterOp::Gte => "gte",
-            FilterOp::Like => "like",
-            FilterOp::Ilike => "ilike",
-        }
-    }
-}
-
-impl std::fmt::Display for FilterOp {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl FromStr for FilterOp {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "eq" => Ok(FilterOp::Eq),
-            "ne" => Ok(FilterOp::Ne),
-            "null" => Ok(FilterOp::Null),
-            "in" => Ok(FilterOp::In),
-            "nin" => Ok(FilterOp::Nin),
-            "lt" => Ok(FilterOp::Lt),
-            "lte" => Ok(FilterOp::Lte),
-            "gt" => Ok(FilterOp::Gt),
-            "gte" => Ok(FilterOp::Gte),
-            "like" => Ok(FilterOp::Like),
-            "ilike" => Ok(FilterOp::Ilike),
-            _ => Err(s.into()),
-        }
-    }
-}
-
 // Validation Helpers
 
 pub type Validators<T> = Vec<fn(&T) -> Result<(), ValidationError>>;
@@ -77,21 +36,11 @@ fn validation_err(code: &'static str, message: String) -> ValidationError {
     err
 }
 
-fn unknown_op_error(op: String) -> ValidationError {
+fn unknown_op_error(op: &str) -> ValidationError {
     let message = format!(
-        "unknown operator {} - use one of the following: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+        "unknown operator '{}' - use one of: {}",
         op,
-        FilterOp::Eq.as_str(),
-        FilterOp::Ne.as_str(),
-        FilterOp::Null.as_str(),
-        FilterOp::In.as_str(),
-        FilterOp::Nin.as_str(),
-        FilterOp::Lt.as_str(),
-        FilterOp::Lte.as_str(),
-        FilterOp::Gt.as_str(),
-        FilterOp::Gte.as_str(),
-        FilterOp::Like.as_str(),
-        FilterOp::Ilike.as_str()
+        FilterOp::VARIANTS.join(", ")
     );
     validation_err("unknown_operator", message)
 }
@@ -100,7 +49,7 @@ fn unknown_op_error(op: String) -> ValidationError {
 
 fn parse_str_filter(filter: &str) -> Result<(FilterOp, &str), ValidationError> {
     match filter.split_once(':') {
-        Some((op_str, val)) => Ok((op_str.parse().map_err(unknown_op_error)?, val)),
+        Some((op_str, val)) => Ok((op_str.parse().map_err(|_| unknown_op_error(op_str))?, val)),
         None => Ok((FilterOp::Eq, filter)),
     }
 }
@@ -119,8 +68,7 @@ fn parse_bool(val: &str, op: FilterOp) -> Result<bool, ValidationError> {
     parse_bool_utils(val).map_err(|_| {
         let message = format!(
             "{} is not a boolean - cannot be used with operator {}",
-            val,
-            op.as_str()
+            val, op
         );
         validation_err("not_a_boolean", message)
     })
@@ -132,8 +80,7 @@ fn parse_f64(val: &str, op: FilterOp) -> Result<f64, ValidationError> {
             "not_a_number",
             format!(
                 "{} is not a float - cannot be used with operator {}",
-                val,
-                op.as_str()
+                val, op
             ),
         )
     };
@@ -155,14 +102,13 @@ fn parse_f64_vec(val: &str, op: FilterOp) -> Result<Vec<f64>, ValidationError> {
     val.split(',').map(|item| parse_f64(item, op)).collect()
 }
 
-fn parse_i32(val: &str, op: FilterOp) -> Result<i32, ValidationError> {
+fn parse_u32(val: &str, op: FilterOp) -> Result<u32, ValidationError> {
     let err_fn = || {
         validation_err(
             "not_a_number",
             format!(
                 "{} is not a valid positive integer - cannot be used with operator {}",
-                val,
-                op.as_str()
+                val, op
             ),
         )
     };
@@ -172,12 +118,12 @@ fn parse_i32(val: &str, op: FilterOp) -> Result<i32, ValidationError> {
         return Err(err_fn());
     }
 
-    let num: i32 = trimmed.parse().map_err(|_| err_fn())?;
+    let num: u32 = trimmed.parse().map_err(|_| err_fn())?;
     Ok(num)
 }
 
-fn parse_i32_vec(val: &str, op: FilterOp) -> Result<Vec<i32>, ValidationError> {
-    val.split(',').map(|item| parse_i32(item, op)).collect()
+fn parse_u32_vec(val: &str, op: FilterOp) -> Result<Vec<u32>, ValidationError> {
+    val.split(',').map(|item| parse_u32(item, op)).collect()
 }
 
 fn parse_datetime(val: &str, op: FilterOp) -> Result<OffsetDateTime, ValidationError> {
@@ -187,8 +133,7 @@ fn parse_datetime(val: &str, op: FilterOp) -> Result<OffsetDateTime, ValidationE
             "not_a_datetime",
             format!(
                 "{} is not a valid datetime - cannot be used with operator {}",
-                val,
-                op.as_str()
+                val, op
             ),
         )
     })
@@ -209,7 +154,8 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
         return Ok(());
     }
 
-    // From here on, length is guaranteed >= 2
+    // From here on, we may end up with two operators
+    // Need to checl their compatibility
 
     // Rule 0: No operator used twice
     if operators.contains(&key) {
@@ -224,7 +170,7 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     if key == FilterOp::Eq || operators.contains(&FilterOp::Eq) {
         let message = format!(
             "{} can only be used exclusively, but found: {:?}",
-            FilterOp::Eq.as_str(),
+            FilterOp::Eq,
             operators
         );
         return Err(validation_err("incompatible_operators", message));
@@ -233,7 +179,7 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     else if key == FilterOp::Null || operators.contains(&FilterOp::Null) {
         let message = format!(
             "{} operator should be used exclusively, but found: {:?}",
-            FilterOp::Null.as_str(),
+            FilterOp::Null,
             operators
         );
         return Err(validation_err("incompatible_operators", message));
@@ -242,7 +188,7 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     else if key == FilterOp::In || operators.contains(&FilterOp::In) {
         let message = format!(
             "{} operator should be used exclusively, but found: {:?}",
-            FilterOp::In.as_str(),
+            FilterOp::In,
             operators
         );
         return Err(validation_err("incompatible_operators", message));
@@ -254,8 +200,8 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     {
         let message = format!(
             "{} and {} operators should not be used together",
-            FilterOp::Gt.as_str(),
-            FilterOp::Gte.as_str()
+            FilterOp::Gt,
+            FilterOp::Gte
         );
         return Err(validation_err("incompatible_operators", message));
     }
@@ -266,8 +212,8 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     {
         let message = format!(
             "{} and {} operators should not be used together",
-            FilterOp::Lt.as_str(),
-            FilterOp::Lte.as_str()
+            FilterOp::Lt,
+            FilterOp::Lte
         );
         return Err(validation_err("incompatible_operators", message));
     }
@@ -278,8 +224,8 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     {
         let message = format!(
             "{} and {} operators should not be used together",
-            FilterOp::Ilike.as_str(),
-            FilterOp::Like.as_str()
+            FilterOp::Ilike,
+            FilterOp::Like
         );
         return Err(validation_err("incompatible_operators", message));
     }
@@ -329,7 +275,7 @@ fn apply_str_rules_to_slice(
 
 // String Filters
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct StringFilters {
     pub eq: Option<String>,
     pub ne: Option<String>,
@@ -342,15 +288,7 @@ pub struct StringFilters {
 
 impl StringFilters {
     pub fn from_list(filters: &[String], rules: &Validators<str>) -> Result<Self, ValidationError> {
-        let mut result = Self {
-            eq: None,
-            ne: None,
-            like: None,
-            ilike: None,
-            null: None,
-            in_: None,
-            nin: None,
-        };
+        let mut result = Self::default();
 
         let mut operators = vec![];
         for filter in filters {
@@ -402,13 +340,13 @@ impl StringFilters {
                     let message = format!(
                         "wrong string filter operation: {} is not among {},{},{},{},{},{},{}",
                         op,
-                        FilterOp::Eq.as_str(),
-                        FilterOp::Ne.as_str(),
-                        FilterOp::In.as_str(),
-                        FilterOp::Nin.as_str(),
-                        FilterOp::Null.as_str(),
-                        FilterOp::Like.as_str(),
-                        FilterOp::Ilike.as_str(),
+                        FilterOp::Eq,
+                        FilterOp::Ne,
+                        FilterOp::In,
+                        FilterOp::Nin,
+                        FilterOp::Null,
+                        FilterOp::Like,
+                        FilterOp::Ilike,
                     );
                     return Err(validation_err("unknown_operator", message));
                 }
@@ -420,7 +358,7 @@ impl StringFilters {
 
 // F64 Filters
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct F64Filters {
     pub eq: Option<f64>,
     pub ne: Option<f64>,
@@ -435,17 +373,7 @@ pub struct F64Filters {
 
 impl F64Filters {
     pub fn from_list(filters: &[String], rules: &Validators<f64>) -> Result<Self, ValidationError> {
-        let mut result = Self {
-            eq: None,
-            ne: None,
-            gt: None,
-            gte: None,
-            lt: None,
-            lte: None,
-            null: None,
-            in_: None,
-            nin: None,
-        };
+        let mut result = Self::default();
 
         let mut operators = vec![];
         for filter in filters {
@@ -509,15 +437,15 @@ impl F64Filters {
                     let message = format!(
                         "wrong float64 filter operation: {} is not among {},{},{},{},{},{},{},{},{}",
                         op,
-                        FilterOp::Eq.as_str(),
-                        FilterOp::Ne.as_str(),
-                        FilterOp::Gt.as_str(),
-                        FilterOp::Gte.as_str(),
-                        FilterOp::Lt.as_str(),
-                        FilterOp::Lte.as_str(),
-                        FilterOp::Null.as_str(),
-                        FilterOp::In.as_str(),
-                        FilterOp::Nin.as_str(),
+                        FilterOp::Eq,
+                        FilterOp::Ne,
+                        FilterOp::Gt,
+                        FilterOp::Gte,
+                        FilterOp::Lt,
+                        FilterOp::Lte,
+                        FilterOp::Null,
+                        FilterOp::In,
+                        FilterOp::Nin,
                     );
                     return Err(validation_err("unknown_operator", message));
                 }
@@ -529,24 +457,18 @@ impl F64Filters {
 
 // Index Filters
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct IndexFilters {
-    pub eq: Option<i32>,
-    pub ne: Option<i32>,
+    pub eq: Option<u32>,
+    pub ne: Option<u32>,
     pub null: Option<bool>,
-    pub in_: Option<Vec<i32>>,
-    pub nin: Option<Vec<i32>>,
+    pub in_: Option<Vec<u32>>,
+    pub nin: Option<Vec<u32>>,
 }
 
 impl IndexFilters {
     pub fn from_list(filters: &[String]) -> Result<Self, ValidationError> {
-        let mut result = Self {
-            eq: None,
-            ne: None,
-            null: None,
-            in_: None,
-            nin: None,
-        };
+        let mut result = Self::default();
 
         let mut operators = vec![];
         for filter in filters {
@@ -554,13 +476,13 @@ impl IndexFilters {
             match op {
                 FilterOp::Eq => {
                     is_usable(FilterOp::Eq, &mut operators)?;
-                    let converted = parse_i32(val, FilterOp::Eq)?;
+                    let converted = parse_u32(val, FilterOp::Eq)?;
                     // no validation for indexes
                     result.eq = Some(converted);
                 }
                 FilterOp::Ne => {
                     is_usable(FilterOp::Ne, &mut operators)?;
-                    let converted = parse_i32(val, FilterOp::Ne)?;
+                    let converted = parse_u32(val, FilterOp::Ne)?;
                     // no validation for indexes
                     result.ne = Some(converted);
                 }
@@ -572,13 +494,13 @@ impl IndexFilters {
                 }
                 FilterOp::In => {
                     is_usable(FilterOp::In, &mut operators)?;
-                    let converted = parse_i32_vec(val, FilterOp::In)?;
+                    let converted = parse_u32_vec(val, FilterOp::In)?;
                     // no validation for indexes
                     result.in_ = Some(converted);
                 }
                 FilterOp::Nin => {
                     is_usable(FilterOp::Nin, &mut operators)?;
-                    let converted = parse_i32_vec(val, FilterOp::Nin)?;
+                    let converted = parse_u32_vec(val, FilterOp::Nin)?;
                     // no validation for indexes
                     result.nin = Some(converted);
                 }
@@ -586,11 +508,11 @@ impl IndexFilters {
                     let message = format!(
                         "wrong index filter operation: {} is not allowed for indexes, not among {},{},{},{},{}",
                         op,
-                        FilterOp::Eq.as_str(),
-                        FilterOp::Ne.as_str(),
-                        FilterOp::Null.as_str(),
-                        FilterOp::In.as_str(),
-                        FilterOp::Nin.as_str(),
+                        FilterOp::Eq,
+                        FilterOp::Ne,
+                        FilterOp::Null,
+                        FilterOp::In,
+                        FilterOp::Nin,
                     );
                     return Err(validation_err("unsupported_operator", message));
                 }
@@ -602,7 +524,7 @@ impl IndexFilters {
 
 // Boolean Filters
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BooleanFilters {
     pub eq: Option<bool>,
     pub ne: Option<bool>,
@@ -611,11 +533,7 @@ pub struct BooleanFilters {
 
 impl BooleanFilters {
     pub fn from_list(filters: &[String]) -> Result<Self, ValidationError> {
-        let mut result = Self {
-            eq: None,
-            ne: None,
-            null: None,
-        };
+        let mut result = Self::default();
 
         let mut operators = vec![];
         for filter in filters {
@@ -643,9 +561,9 @@ impl BooleanFilters {
                     let message = format!(
                         "wrong boolean filter operation: {} is not allowed for booleans, not among {},{},{}",
                         op,
-                        FilterOp::Eq.as_str(),
-                        FilterOp::Ne.as_str(),
-                        FilterOp::Null.as_str(),
+                        FilterOp::Eq,
+                        FilterOp::Ne,
+                        FilterOp::Null,
                     );
                     return Err(validation_err("unsupported_operator", message));
                 }
@@ -657,7 +575,7 @@ impl BooleanFilters {
 
 // Datetime Filters
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DateTimeFilters {
     pub eq: Option<OffsetDateTime>,
     pub ne: Option<OffsetDateTime>,
@@ -675,17 +593,7 @@ impl DateTimeFilters {
         filters: &[String],
         rules: &Validators<OffsetDateTime>,
     ) -> Result<Self, ValidationError> {
-        let mut result = Self {
-            eq: None,
-            ne: None,
-            gt: None,
-            gte: None,
-            lt: None,
-            lte: None,
-            null: None,
-            in_: None,
-            nin: None,
-        };
+        let mut result = Self::default();
 
         let mut operators = vec![];
         for filter in filters {
@@ -749,15 +657,15 @@ impl DateTimeFilters {
                     let message = format!(
                         "wrong datetime filter operation: {} is not among {},{},{},{},{},{},{},{},{}",
                         op,
-                        FilterOp::Eq.as_str(),
-                        FilterOp::Ne.as_str(),
-                        FilterOp::Gt.as_str(),
-                        FilterOp::Gte.as_str(),
-                        FilterOp::Lt.as_str(),
-                        FilterOp::Lte.as_str(),
-                        FilterOp::Null.as_str(),
-                        FilterOp::In.as_str(),
-                        FilterOp::Nin.as_str(),
+                        FilterOp::Eq,
+                        FilterOp::Ne,
+                        FilterOp::Gt,
+                        FilterOp::Gte,
+                        FilterOp::Lt,
+                        FilterOp::Lte,
+                        FilterOp::Null,
+                        FilterOp::In,
+                        FilterOp::Nin,
                     );
                     return Err(validation_err("unsupported_operator", message));
                 }
@@ -780,28 +688,26 @@ pub enum FieldFilters {
 
 impl FieldFilters {
     pub fn id(id: u32) -> Self {
-        let filter = IndexFilters {
-            eq: Some(id as i32),
-            ne: None,
-            null: None,
-            in_: None,
-            nin: None,
-        };
-        Self::Index(filter)
+        Self::Index(IndexFilters {
+            eq: Some(id),
+            ..Default::default()
+        })
     }
 }
 
-pub trait SearchableTrait: Eq + Hash + Clone + Into<&'static str> {
-    fn id() -> Self;
-    fn to_expr(&self) -> Expr;
-}
-
 pub type WhereFilters<Searchable> = HashMap<Searchable, FieldFilters>;
+
+// Helper for reading filters
 
 #[derive(Default)]
 pub struct FiltersReader<Searchable> {
     filters: WhereFilters<Searchable>,
     errors: ValidationErrors,
+}
+
+pub trait SearchableTrait: Eq + Hash + Clone + Into<&'static str> {
+    fn id() -> Self;
+    fn to_expr(&self) -> Expr;
 }
 
 impl<Searchable> FiltersReader<Searchable>
