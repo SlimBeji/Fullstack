@@ -4,8 +4,7 @@ use axum::http::StatusCode;
 use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection,
     DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, RuntimeErr, TransactionError, TransactionTrait,
-    prelude::async_trait::async_trait,
+    QueryFilter, QuerySelect, RuntimeErr, TransactionTrait, prelude::async_trait::async_trait,
 };
 use serde_json::Value;
 
@@ -355,14 +354,14 @@ pub trait Create: Read {
     fn create_to_model(data: &Self::Create) -> Self::ActiveModel;
 
     async fn before_create(
+        &self,
         tx: &DatabaseTransaction,
-        state: &Self::State,
         data: &Self::Create,
     ) -> Result<Self::CreateContext, ApiError>;
 
     async fn after_create(
+        &self,
         tx: &DatabaseTransaction,
-        state: &Self::State,
         id: u32,
         data: Self::Create,
         hooks_data: Self::CreateContext,
@@ -370,29 +369,30 @@ pub trait Create: Read {
 
     async fn create(&self, data: Self::Create) -> Result<u32, ApiError> {
         let model = Self::create_to_model(&data);
-        let state = self.get_base().app_state.clone();
+        let tx = self.get_db().begin().await.map_err(Self::create_error)?;
 
-        let result = self
-            .get_db()
-            .transaction::<_, u32, ApiError>(|tx| {
-                Box::pin(async move {
-                    let hooks_data = Self::before_create(tx, &state, &data).await?;
-                    let result = Self::Entity::insert(model)
-                        .exec(tx)
-                        .await
-                        .map_err(Self::create_error)?;
-                    let id = Self::extract_id(result.last_insert_id);
-                    Self::after_create(tx, &state, id, data, hooks_data).await?;
-                    Ok(id)
-                })
-            })
-            .await
-            .map_err(|e| match e {
-                TransactionError::Connection(db_err) => Self::create_error(db_err),
-                TransactionError::Transaction(api_err) => api_err,
-            })?;
+        let result = async {
+            let hooks_data = self.before_create(&tx, &data).await?;
+            let result = Self::Entity::insert(model)
+                .exec(&tx)
+                .await
+                .map_err(Self::create_error)?;
+            let id = Self::extract_id(result.last_insert_id);
+            self.after_create(&tx, id, data, hooks_data).await?;
+            Ok(id)
+        }
+        .await;
 
-        Ok(result)
+        match result {
+            Ok(id) => {
+                tx.commit().await.map_err(Self::create_error)?;
+                Ok(id)
+            }
+            Err(e) => {
+                let _ = tx.rollback().await;
+                Err(e)
+            }
+        }
     }
 
     async fn post(
@@ -431,15 +431,15 @@ pub trait Update: Read {
     fn update_to_model(id: u32, data: &Self::Update) -> Self::ActiveModel;
 
     async fn before_update(
+        &self,
         tx: &DatabaseTransaction,
-        state: &Self::State,
         id: u32,
         data: &Self::Update,
     ) -> Result<Self::UpdateContext, ApiError>;
 
     async fn after_update(
+        &self,
         tx: &DatabaseTransaction,
-        state: &Self::State,
         id: u32,
         data: Self::Update,
         hooks_data: Self::UpdateContext,
@@ -447,29 +447,33 @@ pub trait Update: Read {
 
     async fn update(&self, id: u32, data: Self::Update) -> Result<(), ApiError> {
         let model = Self::update_to_model(id, &data);
-        let state = self.get_base().app_state.clone();
-
-        self.get_db()
-            .transaction::<_, u32, ApiError>(|tx| {
-                Box::pin(async move {
-                    let hooks_data = Self::before_update(tx, &state, id, &data).await?;
-
-                    Self::Entity::update(model)
-                        .exec(tx)
-                        .await
-                        .map_err(|e| Self::update_error(id, e))?;
-
-                    Self::after_update(tx, &state, id, data, hooks_data).await?;
-                    Ok(id)
-                })
-            })
+        let tx = self
+            .get_db()
+            .begin()
             .await
-            .map_err(|e| match e {
-                TransactionError::Connection(db_err) => Self::update_error(id, db_err),
-                TransactionError::Transaction(api_err) => api_err,
-            })?;
+            .map_err(|e| Self::update_error(id, e))?;
 
-        Ok(())
+        let result: Result<(), ApiError> = async {
+            let hooks_data = self.before_update(&tx, id, &data).await?;
+            Self::Entity::update(model)
+                .exec(&tx)
+                .await
+                .map_err(|e| Self::update_error(id, e))?;
+            self.after_update(&tx, id, data, hooks_data).await?;
+            Ok(())
+        }
+        .await;
+
+        match result {
+            Ok(_) => {
+                tx.commit().await.map_err(|e| Self::update_error(id, e))?;
+                Ok(())
+            }
+            Err(e) => {
+                let _ = tx.rollback().await;
+                Err(e)
+            }
+        }
     }
 
     async fn put(

@@ -364,16 +364,16 @@ impl Create for CrudsUser {
     }
 
     async fn before_create(
+        &self,
         _: &DatabaseTransaction,
-        _: &Self::State,
         _: &Self::Create,
     ) -> Result<Self::CreateContext, ApiError> {
         Ok(Self::CreateContext {})
     }
 
     async fn after_create(
+        &self,
         _: &DatabaseTransaction,
-        _: &Self::State,
         _: u32,
         _: Self::Create,
         _: Self::CreateContext,
@@ -435,8 +435,8 @@ impl Update for CrudsUser {
     }
 
     async fn before_update(
+        &self,
         _: &DatabaseTransaction,
-        _: &Self::State,
         _: u32,
         _: &Self::Update,
     ) -> Result<Self::UpdateContext, ApiError> {
@@ -444,13 +444,13 @@ impl Update for CrudsUser {
     }
 
     async fn after_update(
+        &self,
         _: &DatabaseTransaction,
-        state: &Self::State,
         id: u32,
         _: Self::Update,
         _: Self::UpdateContext,
     ) -> Result<(), ApiError> {
-        state
+        self.app_state
             .redis
             .delete(Self::cahce_key(id).as_str())
             .await
