@@ -148,6 +148,13 @@ where
         )
     }
 
+    fn update_error(id: u32, e: DbErr) -> ApiError {
+        ApiError::internal_error(
+            format!("failed to update {} record {}", Self::get_modelname(), id),
+            Box::new(e),
+        )
+    }
+
     // Query building helpers
 
     fn get_max_items_per_page() -> usize;
@@ -382,8 +389,6 @@ pub trait Create: Read {
                 TransactionError::Transaction(api_err) => api_err,
             })?;
 
-        // better handling of the errors
-
         Ok(result)
     }
 
@@ -405,5 +410,81 @@ pub trait Create: Read {
     ) -> Result<Self::Read, ApiError> {
         self.auth_post(&user, &form).await?;
         self.post(form, options).await
+    }
+}
+
+// Update trait
+
+#[async_trait]
+pub trait Update: Read {
+    type Put: Send + Sync; // The put form received via HTTP
+    type Update: Send + Sync + 'static; // The update struct used internally
+    type UpdateContext: Send + Sync; // The data used in pre/post update hooks
+
+    async fn auth_put(&self, user: &Self::User, id: u32, form: &Self::Put) -> Result<(), ApiError>;
+
+    async fn put_to_update(&self, form: Self::Put) -> Result<Self::Update, ApiError>;
+
+    fn update_to_model(id: u32, data: &Self::Update) -> Self::ActiveModel;
+
+    async fn before_update(
+        tx: &DatabaseTransaction,
+        id: u32,
+        data: &Self::Update,
+    ) -> Result<Self::UpdateContext, ApiError>;
+
+    async fn after_update(
+        tx: &DatabaseTransaction,
+        id: u32,
+        data: Self::Update,
+        hooks_data: Self::UpdateContext,
+    ) -> Result<(), ApiError>;
+
+    async fn update(&self, id: u32, data: Self::Update) -> Result<(), ApiError> {
+        let model = Self::update_to_model(id, &data);
+
+        self.get_db()
+            .transaction::<_, u32, ApiError>(|tx| {
+                Box::pin(async move {
+                    let hooks_data = Self::before_update(tx, id, &data).await?;
+
+                    Self::Entity::update(model)
+                        .exec(tx)
+                        .await
+                        .map_err(|e| Self::update_error(id, e))?;
+
+                    Self::after_update(tx, id, data, hooks_data).await?;
+                    Ok(id)
+                })
+            })
+            .await
+            .map_err(|e| match e {
+                TransactionError::Connection(db_err) => Self::update_error(id, db_err),
+                TransactionError::Transaction(api_err) => api_err,
+            })?;
+
+        Ok(())
+    }
+
+    async fn put(
+        &self,
+        id: u32,
+        form: Self::Put,
+        options: Option<Self::Options>,
+    ) -> Result<Self::Read, ApiError> {
+        let data = self.put_to_update(form).await?;
+        self.update(id, data).await?;
+        self.get(id, options).await
+    }
+
+    async fn user_put(
+        &self,
+        user: Self::User,
+        id: u32,
+        form: Self::Put,
+        options: Option<Self::Options>,
+    ) -> Result<Self::Read, ApiError> {
+        self.auth_put(&user, id, &form).await?;
+        self.put(id, form, options).await
     }
 }
