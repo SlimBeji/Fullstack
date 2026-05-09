@@ -48,6 +48,10 @@ utoipa-axum = "0.2"
 utoipa-swagger-ui = {version = "9", features = ["axum", "vendored"]}
 validator = {version = "0.18", features = ["derive"]}
 
+# Encryption
+bcrypt = "0.15"
+jsonwebtoken = "9.3.0"
+
 # GCS
 google-cloud-auth = {version = "0.16", default-features = false, features = ["rustls-tls"]}
 google-cloud-storage = {version = "0.20", default-features = false, features = ["rustls-tls", "auth"]}
