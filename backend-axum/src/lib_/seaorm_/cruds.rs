@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use std::{marker::PhantomData, sync::Arc};
 
 use axum::http::StatusCode;
 use sea_orm::{
@@ -37,11 +37,11 @@ where
     Entity: EntityTrait,
 {
     _entity: PhantomData<Entity>,
-    pub app_state: State,
+    pub app_state: Arc<State>,
 }
 
 impl<State: CrudsAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
-    pub fn new(app_state: State) -> Self {
+    pub fn new(app_state: Arc<State>) -> Self {
         Self {
             _entity: PhantomData,
             app_state,

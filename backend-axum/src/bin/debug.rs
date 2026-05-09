@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use backend::{
     lib_::{
         seaorm_::{Create, cruds::Read},
@@ -15,7 +17,7 @@ use backend::{
 async fn main() {
     // Initialisation
     let app_state = AppState::new().await;
-    let cruds_user = CrudsUser::new(app_state);
+    let cruds_user = CrudsUser::new(Arc::new(app_state));
 
     // Creating a record
     let avatar = FileToUpload::from_path(get_image_path("avatar1.jpg").as_str())
