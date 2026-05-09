@@ -248,7 +248,7 @@ pub struct UserGet {
 
 // --- Update Schema ---
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Validate)]
+#[derive(Debug, Default, Serialize, Deserialize, ToSchema, Validate)]
 #[schema(example = json!({
     "name": "Slim Beji",
     "email": "mslimbeji@gmail.com",
