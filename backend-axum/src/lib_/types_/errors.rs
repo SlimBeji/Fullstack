@@ -75,7 +75,7 @@ impl ApiError {
     pub fn unauthorized(detail: String) -> Self {
         Self {
             code: StatusCode::UNAUTHORIZED,
-            message: "Not Authenticated".into(),
+            message: "Not Authorized".into(),
             details: Some(Value::String(detail)),
             err: None,
         }
