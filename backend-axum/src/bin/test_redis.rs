@@ -3,7 +3,7 @@ use backend::services::instances::get_redis_client;
 #[tokio::main]
 async fn main() {
     // Get redis client
-    let mut redis_client = get_redis_client().await;
+    let redis_client = get_redis_client().await;
 
     // Test setting and retrieving value
     redis_client

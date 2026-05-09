@@ -27,15 +27,15 @@ impl RedisClient {
         })
     }
 
-    pub async fn get(&mut self, key: &str) -> Result<Option<String>, RedisError> {
-        self.client.get(key).await
+    pub async fn get(&self, key: &str) -> Result<Option<String>, RedisError> {
+        self.client.clone().get(key).await
     }
 
     pub async fn get_struct<T: DeserializeOwned>(
-        &mut self,
+        &self,
         key: &str,
     ) -> Result<Option<T>, RedisError> {
-        let search: Option<String> = self.client.get(key).await?;
+        let search: Option<String> = self.client.clone().get(key).await?;
         if let Some(raw) = search {
             serde_json::from_str::<T>(&raw).map(Some).map_err(|err| {
                 RedisError::from((
@@ -49,7 +49,7 @@ impl RedisClient {
         }
     }
 
-    pub async fn set<T: Serialize>(&mut self, key: &str, val: T) -> Result<(), RedisError> {
+    pub async fn set<T: Serialize>(&self, key: &str, val: T) -> Result<(), RedisError> {
         let data = serde_json::to_string(&val).map_err(|err| {
             RedisError::from((
                 redis::ErrorKind::Io,
@@ -58,16 +58,17 @@ impl RedisClient {
             ))
         })?;
         self.client
+            .clone()
             .set_ex(key, data, self.expiration.as_secs())
             .await
     }
 
-    pub async fn delete(&mut self, key: &str) -> Result<(), RedisError> {
-        self.client.del(key).await
+    pub async fn delete(&self, key: &str) -> Result<(), RedisError> {
+        self.client.clone().del(key).await
     }
 
-    pub async fn flush_all(&mut self) -> Result<(), RedisError> {
-        self.client.flushall().await
+    pub async fn flush_all(&self) -> Result<(), RedisError> {
+        self.client.clone().flushall().await
     }
 
     pub async fn close(self) -> Result<(), RedisError> {
