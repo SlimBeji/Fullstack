@@ -1,4 +1,3 @@
-use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use tokio::join;
 use tracing::{error, info};
@@ -8,7 +7,7 @@ use crate::lib_::clients::{
     CloudStorage, CloudStorageConfig, HuggingFaceClient, HuggingFaceClientConfig, PgClient,
     PgClientConfig, RedisClient, RedisClientConfig,
 };
-use crate::lib_::seaorm_::cruds::CrudAppStateTrait;
+use crate::lib_::seaorm_::cruds::CrudsAppStateTrait;
 
 // Postgresql
 
@@ -106,9 +105,17 @@ impl AppState {
     }
 }
 
-impl CrudAppStateTrait for AppState {
-    fn get_db(&self) -> &DatabaseConnection {
-        &self.pg.db
+impl CrudsAppStateTrait for AppState {
+    fn get_pg(&self) -> &PgClient {
+        &self.pg
+    }
+
+    fn get_redis(&self) -> &RedisClient {
+        &self.redis
+    }
+
+    fn get_storage(&self) -> &CloudStorage {
+        &self.storage
     }
 }
 

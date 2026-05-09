@@ -10,6 +10,7 @@ use sea_orm::{
 use serde_json::Value;
 
 use crate::lib_::{
+    clients::{CloudStorage, PgClient, RedisClient},
     seaorm_::to_condition,
     types_::{ApiError, SearchQuery, SearchableTrait},
     utils,
@@ -17,8 +18,10 @@ use crate::lib_::{
 
 // Traits for types used in CRUDS
 
-pub trait CrudAppStateTrait {
-    fn get_db(&self) -> &DatabaseConnection;
+pub trait CrudsAppStateTrait {
+    fn get_pg(&self) -> &PgClient;
+    fn get_redis(&self) -> &RedisClient;
+    fn get_storage(&self) -> &CloudStorage;
 }
 
 pub trait CrudsOptionsTrait<Selectable> {
@@ -30,14 +33,14 @@ pub trait CrudsOptionsTrait<Selectable> {
 
 pub struct CrudsBase<State, Entity>
 where
-    State: CrudAppStateTrait,
+    State: CrudsAppStateTrait,
     Entity: EntityTrait,
 {
     _entity: PhantomData<Entity>,
     pub app_state: State,
 }
 
-impl<State: CrudAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
+impl<State: CrudsAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
     pub fn new(app_state: State) -> Self {
         Self {
             _entity: PhantomData,
@@ -55,7 +58,7 @@ where
 {
     // Associated types
 
-    type State: CrudAppStateTrait + Send + Sync; // The app state
+    type State: CrudsAppStateTrait + Send + Sync; // The app state
     type Entity: EntityTrait; // The SearOrm Entity
     type Column: ColumnTrait; // The SeaOrm associated Column type
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
@@ -68,7 +71,7 @@ where
     fn get_base(&self) -> &CrudsBase<Self::State, Self::Entity>;
 
     fn get_db(&self) -> &DatabaseConnection {
-        self.get_base().app_state.get_db()
+        &self.get_base().app_state.get_pg().db
     }
 
     fn get_modelname() -> &'static str;
