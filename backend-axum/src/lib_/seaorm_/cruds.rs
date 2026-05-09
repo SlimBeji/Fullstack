@@ -345,7 +345,7 @@ where
 
     async fn auth_post(&self, user: &Self::User, form: &Self::Post) -> Result<(), ApiError>;
 
-    async fn post_to_create(form: Self::Post) -> Result<Self::Create, ApiError>;
+    async fn post_to_create(&self, form: Self::Post) -> Result<Self::Create, ApiError>;
 
     fn create_to_model(data: &Self::Create) -> Self::ActiveModel;
 
@@ -394,7 +394,7 @@ where
         form: Self::Post,
         options: Option<Self::Options>,
     ) -> Result<Self::Read, ApiError> {
-        let data = Self::post_to_create(form).await?;
+        let data = self.post_to_create(form).await?;
         let id = self.create(data).await?;
         self.get(id, options).await
     }
