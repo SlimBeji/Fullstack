@@ -324,7 +324,9 @@ impl Create for CrudsUser {
 
     async fn post_to_create(form: Self::Post) -> Result<Self::Create, ApiError> {
         // Hash the password
-        let hashed_pwd = form.password;
+        let hashed_pwd = utils::hash_input(&form.password, config::ENV.default_hash_salt as u32)
+            .map_err(|err| ApiError::internal_error("failed to hash password", Box::new(err)))?;
+
         // Upload the image
         let image_url = Some("image_url".to_string());
 
