@@ -72,6 +72,7 @@ impl CrudsUtils for CrudsUser {
 
     type State = AppState;
     type Entity = user::Entity;
+    type ActiveModel = user::ActiveModel;
     type Column = user::Column;
     type Selectable = UserSelectable;
     type Searchable = UserSearchable;
@@ -308,7 +309,6 @@ pub struct UserCreateContext {}
 
 #[async_trait]
 impl Create for CrudsUser {
-    type ActiveModel = user::ActiveModel;
     type Post = UserPost;
     type Create = UserCreate;
     type CreateContext = UserCreateContext;

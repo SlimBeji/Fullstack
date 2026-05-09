@@ -55,11 +55,13 @@ pub trait CrudsUtils
 where
     <Self::Entity as EntityTrait>::Model: Send + Sync,
     <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType: From<i32>,
+    <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self::ActiveModel>,
 {
     // Associated types
 
     type State: CrudsAppStateTrait + Send + Sync; // The app state
     type Entity: EntityTrait; // The SearOrm Entity
+    type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'static; // SeaOrm active model for data creation/update
     type Column: ColumnTrait; // The SeaOrm associated Column type
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
     type Searchable: Send + Sync + Copy + SearchableTrait + 'static; // The enum for searchable fields
@@ -334,11 +336,7 @@ pub trait Read: CrudsUtils {
 // Create trait
 
 #[async_trait]
-pub trait Create: Read
-where
-    <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self::ActiveModel>,
-{
-    type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'static; // SeaOrm active model for data creation/update
+pub trait Create: Read {
     type Post: Send + Sync; // The post form received via HTTP
     type Create: Send + Sync + 'static; // The create struct used internally
     type CreateContext: Send + Sync; // The data used in pre/post create hooks
