@@ -5,7 +5,7 @@ use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
-use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Read, Update};
+use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Delete, Read, Update};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
@@ -457,6 +457,72 @@ impl Update for CrudsUser {
             .map_err(|e| {
                 ApiError::internal_error("failed to delete old cache value", Box::new(e))
             })?;
+        Ok(())
+    }
+}
+
+// The Delete Trait
+
+pub struct UserDeleteContext {
+    pub image_url: String,
+}
+
+#[async_trait]
+impl Delete for CrudsUser {
+    type DeleteContext = UserDeleteContext;
+
+    async fn auth_delete(&self, user: &Self::User, _: u32) -> Result<(), ApiError> {
+        if user.is_admin {
+            return Ok(());
+        }
+
+        Err(ApiError::unauthorized(
+            "Only admins can delete users".to_string(),
+        ))
+    }
+
+    async fn before_delete(
+        &self,
+        tx: &DatabaseTransaction,
+        id: u32,
+    ) -> Result<UserDeleteContext, ApiError> {
+        let result = user::Entity::find_by_id(id as i32)
+            .select_only()
+            .column(user::Column::ImageUrl)
+            .into_json()
+            .one(tx)
+            .await
+            .map_err(|e| Self::delete_error(id, e))?
+            .ok_or(Self::not_found())?;
+
+        let key: &str = UserSelectable::ImageUrl.into();
+        let image_url = result[key]
+            .as_str()
+            .ok_or(Self::serialization_error())?
+            .to_string();
+        Ok(UserDeleteContext { image_url })
+    }
+
+    async fn after_delete(
+        &self,
+        _: &DatabaseTransaction,
+        id: u32,
+        data: Self::DeleteContext,
+    ) -> Result<(), ApiError> {
+        // Delete user from redis cache
+        self.app_state
+            .redis
+            .delete(Self::cahce_key(id).as_str())
+            .await
+            .map_err(|e| {
+                ApiError::internal_error("failed to delete old cache value", Box::new(e))
+            })?;
+
+        // Delete imageUrl
+        if !data.image_url.is_empty() {
+            self.app_state.storage.delete_file(&data.image_url).await?;
+        }
+
         Ok(())
     }
 }

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use backend::{
     lib_::{
-        seaorm_::{Create, Update, cruds::Read},
+        seaorm_::{Create, Delete, Update, cruds::Read},
         types_::FileToUpload,
     },
     models::{
@@ -59,5 +59,12 @@ async fn main() {
         .get_partial(record.id, Some(options))
         .await
         .expect("could not extract user");
-    println!("Fetched user: {:?}", user)
+    println!("Fetched user: {:?}", user);
+
+    // Delete a record
+    cruds_user
+        .delete(record.id)
+        .await
+        .expect("failed to delete");
+    println!("Deleted user {}", record.id)
 }
