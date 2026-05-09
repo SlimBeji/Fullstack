@@ -360,6 +360,7 @@ impl Create for CrudsUser {
 
     async fn before_create(
         _: &DatabaseTransaction,
+        _: &Self::State,
         _: &Self::Create,
     ) -> Result<Self::CreateContext, ApiError> {
         Ok(Self::CreateContext {})
@@ -367,6 +368,7 @@ impl Create for CrudsUser {
 
     async fn after_create(
         _: &DatabaseTransaction,
+        _: &Self::State,
         _: u32,
         _: Self::Create,
         _: Self::CreateContext,

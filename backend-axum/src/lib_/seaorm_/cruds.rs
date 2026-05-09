@@ -59,7 +59,7 @@ where
 {
     // Associated types
 
-    type State: CrudsAppStateTrait + Send + Sync; // The app state
+    type State: CrudsAppStateTrait + Send + Sync + 'static; // The app state
     type Entity: EntityTrait; // The SearOrm Entity
     type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'static; // SeaOrm active model for data creation/update
     type Column: ColumnTrait; // The SeaOrm associated Column type
@@ -356,11 +356,13 @@ pub trait Create: Read {
 
     async fn before_create(
         tx: &DatabaseTransaction,
+        state: &Self::State,
         data: &Self::Create,
     ) -> Result<Self::CreateContext, ApiError>;
 
     async fn after_create(
         tx: &DatabaseTransaction,
+        state: &Self::State,
         id: u32,
         data: Self::Create,
         hooks_data: Self::CreateContext,
@@ -368,18 +370,19 @@ pub trait Create: Read {
 
     async fn create(&self, data: Self::Create) -> Result<u32, ApiError> {
         let model = Self::create_to_model(&data);
+        let state = self.get_base().app_state.clone();
 
         let result = self
             .get_db()
             .transaction::<_, u32, ApiError>(|tx| {
                 Box::pin(async move {
-                    let hooks_data = Self::before_create(tx, &data).await?;
+                    let hooks_data = Self::before_create(tx, &state, &data).await?;
                     let result = Self::Entity::insert(model)
                         .exec(tx)
                         .await
                         .map_err(Self::create_error)?;
                     let id = Self::extract_id(result.last_insert_id);
-                    Self::after_create(tx, id, data, hooks_data).await?;
+                    Self::after_create(tx, &state, id, data, hooks_data).await?;
                     Ok(id)
                 })
             })
@@ -429,12 +432,14 @@ pub trait Update: Read {
 
     async fn before_update(
         tx: &DatabaseTransaction,
+        state: &Self::State,
         id: u32,
         data: &Self::Update,
     ) -> Result<Self::UpdateContext, ApiError>;
 
     async fn after_update(
         tx: &DatabaseTransaction,
+        state: &Self::State,
         id: u32,
         data: Self::Update,
         hooks_data: Self::UpdateContext,
@@ -442,18 +447,19 @@ pub trait Update: Read {
 
     async fn update(&self, id: u32, data: Self::Update) -> Result<(), ApiError> {
         let model = Self::update_to_model(id, &data);
+        let state = self.get_base().app_state.clone();
 
         self.get_db()
             .transaction::<_, u32, ApiError>(|tx| {
                 Box::pin(async move {
-                    let hooks_data = Self::before_update(tx, id, &data).await?;
+                    let hooks_data = Self::before_update(tx, &state, id, &data).await?;
 
                     Self::Entity::update(model)
                         .exec(tx)
                         .await
                         .map_err(|e| Self::update_error(id, e))?;
 
-                    Self::after_update(tx, id, data, hooks_data).await?;
+                    Self::after_update(tx, &state, id, data, hooks_data).await?;
                     Ok(id)
                 })
             })
