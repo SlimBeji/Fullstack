@@ -486,14 +486,9 @@ impl Delete for CrudsUser {
         tx: &DatabaseTransaction,
         id: u32,
     ) -> Result<UserDeleteContext, ApiError> {
-        let result = user::Entity::find_by_id(id as i32)
-            .select_only()
-            .column(user::Column::ImageUrl)
-            .into_json()
-            .one(tx)
-            .await
-            .map_err(|e| Self::delete_error(id, e))?
-            .ok_or(Self::not_found())?;
+        let result = self
+            .get_row_by_id(tx, id, vec![user::Column::ImageUrl])
+            .await?;
 
         let key: &str = UserSelectable::ImageUrl.into();
         let image_url = result[key]

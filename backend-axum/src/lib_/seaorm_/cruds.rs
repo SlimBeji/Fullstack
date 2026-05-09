@@ -2,9 +2,10 @@ use std::{marker::PhantomData, sync::Arc};
 
 use axum::http::StatusCode;
 use sea_orm::{
-    ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection,
-    DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, RuntimeErr, TransactionTrait, prelude::async_trait::async_trait,
+    ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, ConnectionTrait,
+    DatabaseConnection, DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel,
+    PrimaryKeyTrait, QueryFilter, QuerySelect, RuntimeErr, TransactionTrait,
+    prelude::async_trait::async_trait,
 };
 use serde_json::Value;
 
@@ -220,6 +221,25 @@ pub trait Read: CrudsUtils {
     async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError>;
 
     async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError>;
+
+    async fn get_row_by_id(
+        &self,
+        conn: &impl ConnectionTrait,
+        id: u32,
+        columns: Vec<Self::Column>,
+    ) -> Result<Value, ApiError> {
+        let mut q = Self::Entity::find_by_id(id as i32).select_only();
+
+        for col in columns {
+            q = q.column(col);
+        }
+
+        q.into_json()
+            .one(conn)
+            .await
+            .map_err(Self::read_error)?
+            .ok_or(Self::not_found())
+    }
 
     async fn to_select_one(
         &self,
