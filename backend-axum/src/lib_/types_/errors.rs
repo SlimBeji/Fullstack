@@ -72,6 +72,15 @@ impl From<SerdeErr> for ApiError {
 
 #[allow(dead_code)] // to be removed
 impl ApiError {
+    pub fn unauthorized(detail: String) -> Self {
+        Self {
+            code: StatusCode::UNAUTHORIZED,
+            message: "Not Authenticated".into(),
+            details: Some(Value::String(detail)),
+            err: None,
+        }
+    }
+
     pub fn from_json_rejection(rejection: JsonRejection) -> Self {
         let (message, detail) = match &rejection {
             JsonRejection::JsonSyntaxError(err) => {

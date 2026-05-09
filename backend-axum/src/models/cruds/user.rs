@@ -1,15 +1,17 @@
+use sea_orm::ActiveValue::Set;
 use sea_orm::prelude::async_trait::async_trait;
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QuerySelect};
+use sea_orm::{ColumnTrait, DatabaseTransaction, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
-use crate::lib_::seaorm_::{CrudsBase, CrudsUtils, Read};
+use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Read};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
+use crate::models::schemas::user::UserCreate;
 use crate::models::schemas::{
-    PlaceSelectable, UserPlace, UserRead, UserSearchable, UserSelectable, UserSortable,
+    PlaceSelectable, UserPlace, UserPost, UserRead, UserSearchable, UserSelectable, UserSortable,
 };
 use crate::services::instances::AppState;
 
@@ -297,5 +299,68 @@ impl Read for CrudsUser {
             users: vec![user],
             places: Some(places),
         })
+    }
+}
+
+// The Create Trait
+
+pub struct UserCreateContext {}
+
+#[async_trait]
+impl Create for CrudsUser {
+    type ActiveModel = user::ActiveModel;
+    type Post = UserPost;
+    type Create = UserCreate;
+    type CreateContext = UserCreateContext;
+
+    async fn auth_post(&self, user: &Self::User, _: &Self::Post) -> Result<(), ApiError> {
+        if user.is_admin {
+            return Ok(());
+        }
+        Err(ApiError::unauthorized(
+            "Only admins can delete users".into(),
+        ))
+    }
+
+    async fn post_to_create(form: Self::Post) -> Result<Self::Create, ApiError> {
+        // Hash the password
+        let hashed_pwd = form.password;
+        // Upload the image
+        let image_url = Some("image_url".to_string());
+
+        Ok(UserCreate {
+            name: form.name,
+            email: form.email,
+            is_admin: form.is_admin,
+            password: hashed_pwd,
+            image_url,
+        })
+    }
+
+    fn create_to_model(data: &Self::Create) -> Self::ActiveModel {
+        Self::ActiveModel {
+            name: Set(data.name.clone()),
+            email: Set(data.email.clone()),
+            password: Set(data.password.clone()),
+            image_url: Set(data.image_url.clone().unwrap_or_default()),
+            is_admin: Set(data.is_admin),
+            ..Default::default()
+        }
+    }
+
+    async fn before_create(
+        _: &DatabaseTransaction,
+        _: &Self::Create,
+    ) -> Result<Self::CreateContext, ApiError> {
+        Ok(Self::CreateContext {})
+    }
+
+    async fn after_create(
+        _: &DatabaseTransaction,
+        _: u32,
+        _: Self::Create,
+        _: Self::CreateContext,
+    ) -> Result<(), ApiError> {
+        Ok(())
     }
 }

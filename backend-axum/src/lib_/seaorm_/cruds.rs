@@ -338,7 +338,7 @@ where
     type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send + 'static; // SeaOrm active model for data creation/update
     type Post: Send + Sync; // The post form received via HTTP
     type Create: Send + Sync + 'static; // The create struct used internally
-    type CreateHooksData: Send + Sync; // The data used in pre/post create hooks
+    type CreateContext: Send + Sync; // The data used in pre/post create hooks
 
     async fn auth_post(&self, user: &Self::User, form: &Self::Post) -> Result<(), ApiError>;
 
@@ -349,13 +349,13 @@ where
     async fn before_create(
         tx: &DatabaseTransaction,
         data: &Self::Create,
-    ) -> Result<Self::CreateHooksData, ApiError>;
+    ) -> Result<Self::CreateContext, ApiError>;
 
     async fn after_create(
         tx: &DatabaseTransaction,
         id: u32,
         data: Self::Create,
-        hooks_data: Self::CreateHooksData,
+        hooks_data: Self::CreateContext,
     ) -> Result<(), ApiError>;
 
     async fn create(&self, data: Self::Create) -> Result<u32, ApiError> {
@@ -384,5 +384,25 @@ where
         // better handling of the errors
 
         Ok(result)
+    }
+
+    async fn post(
+        &self,
+        form: Self::Post,
+        options: Option<Self::Options>,
+    ) -> Result<Self::Read, ApiError> {
+        let data = Self::post_to_create(form).await?;
+        let id = self.create(data).await?;
+        self.get(id, options).await
+    }
+
+    async fn user_post(
+        &self,
+        user: Self::User,
+        form: Self::Post,
+        options: Option<Self::Options>,
+    ) -> Result<Self::Read, ApiError> {
+        self.auth_post(&user, &form).await?;
+        self.post(form, options).await
     }
 }
