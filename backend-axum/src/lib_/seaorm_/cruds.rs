@@ -154,6 +154,13 @@ where
         )
     }
 
+    fn delete_error(id: u32, e: DbErr) -> ApiError {
+        ApiError::internal_error(
+            format!("failed to delete {} record {}", Self::get_modelname(), id),
+            Box::new(e),
+        )
+    }
+
     // Query building helpers
 
     fn get_max_items_per_page() -> usize;
@@ -496,5 +503,65 @@ pub trait Update: Read {
     ) -> Result<Self::Read, ApiError> {
         self.auth_put(&user, id, &form).await?;
         self.put(id, form, options).await
+    }
+}
+
+// Delete trait
+
+#[async_trait]
+pub trait Delete: Read {
+    type DeleteContext: Send + Sync; // The data used in pre/post delete hooks
+
+    async fn auth_delete(&self, user: &Self::User, id: u32) -> Result<(), ApiError>;
+
+    async fn before_delete(
+        &self,
+        tx: &DatabaseTransaction,
+        id: u32,
+    ) -> Result<Self::DeleteContext, ApiError>;
+
+    async fn after_delete(
+        &self,
+        tx: &DatabaseTransaction,
+        id: u32,
+        hooks_data: Self::DeleteContext,
+    ) -> Result<(), ApiError>;
+
+    async fn delete(&self, id: u32) -> Result<(), ApiError> {
+        let tx = self
+            .get_db()
+            .begin()
+            .await
+            .map_err(|e| Self::delete_error(id, e))?;
+
+        let result: Result<(), ApiError> = async {
+            let hooks_data = self.before_delete(&tx, id).await?;
+            let delete_result = Self::Entity::delete_by_id(id as i32)
+                .exec(&tx)
+                .await
+                .map_err(|e| Self::delete_error(id, e))?;
+            if delete_result.rows_affected == 0 {
+                return Err(Self::not_found());
+            }
+            self.after_delete(&tx, id, hooks_data).await?;
+            Ok(())
+        }
+        .await;
+
+        match result {
+            Ok(_) => {
+                tx.commit().await.map_err(|e| Self::delete_error(id, e))?;
+                Ok(())
+            }
+            Err(e) => {
+                let _ = tx.rollback().await;
+                Err(e)
+            }
+        }
+    }
+
+    async fn user_delete(&self, user: &Self::User, id: u32) -> Result<(), ApiError> {
+        self.auth_delete(user, id).await?;
+        self.delete(id).await
     }
 }
