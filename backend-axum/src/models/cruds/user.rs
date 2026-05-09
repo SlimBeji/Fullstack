@@ -5,13 +5,14 @@ use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
-use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Read};
+use crate::lib_::seaorm_::{Create, CrudsAppStateTrait, CrudsBase, CrudsUtils, Read, Update};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
-use crate::models::schemas::user::UserCreate;
+use crate::models::schemas::user::{UserCreate, UserUpdate};
 use crate::models::schemas::{
-    PlaceSelectable, UserPlace, UserPost, UserRead, UserSearchable, UserSelectable, UserSortable,
+    PlaceSelectable, UserPlace, UserPost, UserPut, UserRead, UserSearchable, UserSelectable,
+    UserSortable,
 };
 use crate::services::instances::AppState;
 
@@ -62,6 +63,10 @@ impl CrudsUser {
             .await
             .map_err(Self::read_error)?;
         Ok(places)
+    }
+
+    fn cahce_key(id: u32) -> String {
+        format!("user_read_{}", id)
     }
 }
 
@@ -373,6 +378,85 @@ impl Create for CrudsUser {
         _: Self::Create,
         _: Self::CreateContext,
     ) -> Result<(), ApiError> {
+        Ok(())
+    }
+}
+
+// The Update Trait
+
+pub struct UserUpdateContext {}
+
+#[async_trait]
+impl Update for CrudsUser {
+    type Put = UserPut;
+    type Update = UserUpdate;
+    type UpdateContext = UserUpdateContext;
+
+    async fn auth_put(&self, user: &Self::User, id: u32, _: &Self::Put) -> Result<(), ApiError> {
+        if user.is_admin || user.id == id {
+            return Ok(());
+        }
+
+        Err(ApiError::unauthorized(format!(
+            "Access to user with id {} not granted",
+            id
+        )))
+    }
+
+    async fn put_to_update(&self, form: Self::Put) -> Result<Self::Update, ApiError> {
+        let mut data = form;
+        if let Some(plain) = &data.password {
+            let hashed_pwd = utils::hash_input(plain, config::ENV.default_hash_salt as u32)
+                .map_err(|err| {
+                    ApiError::internal_error("failed to hash password", Box::new(err))
+                })?;
+            data.password = Some(hashed_pwd);
+        }
+        Ok(data)
+    }
+
+    fn update_to_model(id: u32, data: &Self::Update) -> Self::ActiveModel {
+        let mut model = user::ActiveModel {
+            id: Set(id as i32),
+            ..Default::default()
+        };
+
+        if let Some(name) = &data.name {
+            model.name = Set(name.clone());
+        }
+        if let Some(email) = &data.email {
+            model.email = Set(email.clone());
+        }
+        if let Some(password) = &data.password {
+            model.password = Set(password.clone());
+        }
+
+        model
+    }
+
+    async fn before_update(
+        _: &DatabaseTransaction,
+        _: &Self::State,
+        _: u32,
+        _: &Self::Update,
+    ) -> Result<Self::UpdateContext, ApiError> {
+        Ok(UserUpdateContext {})
+    }
+
+    async fn after_update(
+        _: &DatabaseTransaction,
+        state: &Self::State,
+        id: u32,
+        _: Self::Update,
+        _: Self::UpdateContext,
+    ) -> Result<(), ApiError> {
+        state
+            .redis
+            .delete(Self::cahce_key(id).as_str())
+            .await
+            .map_err(|e| {
+                ApiError::internal_error("failed to delete old cache value", Box::new(e))
+            })?;
         Ok(())
     }
 }
