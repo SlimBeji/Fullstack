@@ -383,18 +383,19 @@ If no operator is provided, `eq` (equals) is assumed. For nested fields, aliases
 
 **Supported operators:**
 
-| Operator | Meaning                  | Example                    |
-| -------- | ------------------------ | -------------------------- |
-| `eq`     | Equals                   | `age=eq:30`                |
-| `ne`     | Not equals               | `status=ne:inactive`       |
-| `gt`     | Greater than             | `age=gt:18`                |
-| `gte`    | Greater or equal         | `age=gte:21`               |
-| `lt`     | Less than                | `price=lt:100`             |
-| `lte`    | Less or equal            | `age=lte:65`               |
-| `in`     | In list                  | `status=in:active,pending` |
-| `nin`    | Not in list              | `role=nin:admin,moderator` |
-| `like`   | Pattern match (SQL LIKE) | `name=like:John%`          |
-| `regex`  | Regex match              | `email=regex:.*@gmail.com` |
+| Operator | Meaning                         | Example                    |
+| -------- | ------------------------------- | -------------------------- |
+| `eq`     | Equals                          | `age=eq:30`                |
+| `ne`     | Not equals                      | `status=null:false`        |
+| `null`   | Wether the field is null or not | `status=ne:inactive`       |
+| `in`     | In list                         | `status=in:active,pending` |
+| `nin`    | Not in list                     | `role=nin:admin,moderator` |
+| `gt`     | Greater than                    | `age=gt:18`                |
+| `gte`    | Greater or equal                | `age=gte:21`               |
+| `lt`     | Less than                       | `price=lt:100`             |
+| `lte`    | Less or equal                   | `age=lte:65`               |
+| `like`   | Pattern match (SQL LIKE)        | `name=like:John%`          |
+| `ilike`  | Pattern match (SQL ILIKE)       | `email=ilike:.*@gmail.com` |
 
 **Example GET request:**
 
