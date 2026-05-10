@@ -241,7 +241,7 @@ pub trait Read: CrudsUtils {
             .ok_or(Self::not_found())
     }
 
-    async fn to_select_one(
+    async fn select_one(
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Value, ApiError> {

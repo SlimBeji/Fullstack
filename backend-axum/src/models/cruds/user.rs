@@ -254,7 +254,7 @@ impl Read for CrudsUser {
 
     async fn get_raw(&self, query: UserSearch) -> Result<Self::Fetch, ApiError> {
         // Step 1: fetch the user
-        let user = self.to_select_one(&query).await?;
+        let user = self.select_one(&query).await?;
 
         // Step 2: check if places is required or return early
         if !self.should_fetch_place(&query) {
