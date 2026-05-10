@@ -40,36 +40,6 @@ impl CrudsOptionsTrait<UserSelectable> for UserOptions {
 
 pub type CrudsUser = CrudsBase<AppState, user::Entity>;
 
-impl CrudsUser {
-    // Read helpers
-
-    fn should_fetch_place(&self, query: &UserSearch) -> bool {
-        Self::selectables(query).contains(&UserSelectable::Places)
-    }
-
-    async fn fetch_user_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
-        let ids_i32: Vec<i32> = ids.into_iter().map(|x| x as i32).collect();
-        let places = place::Entity::find()
-            .select_only()
-            .columns([
-                place::Column::CreatorId,
-                place::Column::Id,
-                place::Column::Title,
-                place::Column::Address,
-            ])
-            .filter(place::Column::CreatorId.is_in(ids_i32))
-            .into_json()
-            .all(self.get_db())
-            .await
-            .map_err(Self::read_error)?;
-        Ok(places)
-    }
-
-    fn cahce_key(id: u32) -> String {
-        format!("user_read_{}", id)
-    }
-}
-
 // The CrudUtils Trait
 
 impl CrudsUtils for CrudsUser {
@@ -305,6 +275,34 @@ impl Read for CrudsUser {
             users: vec![user],
             places: Some(places),
         })
+    }
+}
+
+impl CrudsUser {
+    fn should_fetch_place(&self, query: &UserSearch) -> bool {
+        Self::selectables(query).contains(&UserSelectable::Places)
+    }
+
+    async fn fetch_user_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
+        let ids_i32: Vec<i32> = ids.into_iter().map(|x| x as i32).collect();
+        let places = place::Entity::find()
+            .select_only()
+            .columns([
+                place::Column::CreatorId,
+                place::Column::Id,
+                place::Column::Title,
+                place::Column::Address,
+            ])
+            .filter(place::Column::CreatorId.is_in(ids_i32))
+            .into_json()
+            .all(self.get_db())
+            .await
+            .map_err(Self::read_error)?;
+        Ok(places)
+    }
+
+    fn cahce_key(id: u32) -> String {
+        format!("user_read_{}", id)
     }
 }
 
