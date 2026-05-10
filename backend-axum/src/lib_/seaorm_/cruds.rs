@@ -168,7 +168,7 @@ where
 
     fn get_default_select() -> Vec<Self::Selectable>;
 
-    fn get_select(
+    fn selectables(
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Vec<Self::Selectable> {
         let Some(select) = query.select.clone() else {
@@ -245,7 +245,7 @@ pub trait Read: CrudsUtils {
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Value, ApiError> {
-        let columns = Self::to_columns(Self::get_select(query));
+        let columns = Self::to_columns(Self::selectables(query));
         let mut q = Self::Entity::find().select_only().columns(columns);
         if let Some(condition) = Self::get_condition(query) {
             q = q.filter(condition);

@@ -44,7 +44,7 @@ impl CrudsUser {
     // Read helpers
 
     fn should_fetch_place(&self, query: &UserSearch) -> bool {
-        Self::get_select(query).contains(&UserSelectable::Places)
+        Self::selectables(query).contains(&UserSelectable::Places)
     }
 
     async fn fetch_user_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
