@@ -100,6 +100,15 @@ where
         }
     }
 
+    fn id_not_found(id: u32) -> ApiError {
+        ApiError {
+            code: StatusCode::NOT_FOUND,
+            message: format!("{} object not found", Self::get_modelname()),
+            details: Some(Value::String(format!("no record with id {} found", id))),
+            err: None,
+        }
+    }
+
     fn not_found() -> ApiError {
         ApiError {
             code: StatusCode::NOT_FOUND,
@@ -576,7 +585,7 @@ pub trait Delete: Read {
                 .await
                 .map_err(|e| Self::delete_error(id, e))?;
             if delete_result.rows_affected == 0 {
-                return Err(Self::not_found());
+                return Err(Self::id_not_found(id));
             }
             self.after_delete(&tx, id, hooks_data).await?;
             Ok(())
