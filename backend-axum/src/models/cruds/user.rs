@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use sea_orm::ActiveValue::Set;
 use sea_orm::prelude::async_trait::async_trait;
 use sea_orm::{ColumnTrait, DatabaseTransaction, EntityTrait, QueryFilter, QuerySelect};
@@ -115,9 +117,7 @@ impl UserFetch {
         utils::unwrap_json_value(result, CrudsUser::serialization_error())
     }
 
-    fn read_user(&self) -> Result<UserRead, ApiError> {
-        let value = self.users.first().ok_or(CrudsUser::serialization_error())?;
-
+    fn to_user(value: &Value) -> Result<UserRead, ApiError> {
         let id = Self::extract(utils::get_id_from_json(UserSelectable::Id.into(), value))?;
         let name = Self::extract(utils::get_string_from_json(
             UserSelectable::Name.into(),
@@ -151,15 +151,7 @@ impl UserFetch {
         })
     }
 
-    fn read_place(&self, user: &UserRead, value: &Value) -> Result<UserPlace, ApiError> {
-        let user_id = Self::extract(utils::get_id_from_json(
-            PlaceSelectable::CreatorId.into(),
-            value,
-        ))?;
-        if user_id != user.id {
-            return Err(CrudsUser::serialization_error());
-        }
-
+    fn to_place(value: &Value) -> Result<UserPlace, ApiError> {
         let id = Self::extract(utils::get_id_from_json(PlaceSelectable::Id.into(), value))?;
         let title = Self::extract(utils::get_string_from_json(
             PlaceSelectable::Title.into(),
@@ -173,31 +165,68 @@ impl UserFetch {
         Ok(UserPlace { id, title, address })
     }
 
-    fn read_user_places(&self, user: &UserRead) -> Result<Vec<UserPlace>, ApiError> {
-        let Some(places) = &self.places else {
-            // read_user_places should never be called if places is None
-            return Err(CrudsUser::serialization_error());
-        };
-
-        places
-            .iter()
-            .map(|value| self.read_place(user, value))
-            .collect()
-    }
-
-    fn to_json(&self) -> Result<Value, ApiError> {
-        let mut user = self
-            .users
-            .first()
-            .ok_or(CrudsUser::serialization_error())?
-            .clone();
-
-        if let Some(places) = &self.places {
-            let key: &'static str = UserSelectable::Places.into();
-            user[key] = Value::Array(places.clone());
+    fn to_place_value_map(places: Vec<Value>) -> Result<HashMap<u32, Vec<Value>>, ApiError> {
+        let mut map: HashMap<u32, Vec<Value>> = HashMap::new();
+        for place in places {
+            let creator_id = Self::extract(utils::get_id_from_json(
+                PlaceSelectable::CreatorId.into(),
+                &place,
+            ))?;
+            map.entry(creator_id).or_default().push(place.clone());
         }
 
-        Ok(user)
+        Ok(map)
+    }
+
+    fn read(self) -> Result<Vec<UserRead>, ApiError> {
+        // Step 1: extract the users in a vec
+        let mut users = self
+            .users
+            .iter()
+            .map(Self::to_user)
+            .collect::<Result<Vec<UserRead>, ApiError>>()?;
+
+        // Step 2: early return if no places attached
+        let Some(place_values) = self.places else {
+            return Ok(users);
+        };
+
+        // Step 3: get the places sorted by creator_id in a hash_map
+        let mut places_map = Self::to_place_value_map(place_values)?;
+
+        // Step 4: append places to their creators
+        for user in &mut users {
+            let user_places = places_map.remove(&user.id).unwrap_or_default();
+            user.places = user_places
+                .iter()
+                .map(Self::to_place)
+                .collect::<Result<Vec<UserPlace>, ApiError>>()?;
+        }
+
+        Ok(users)
+    }
+
+    fn read_json(self) -> Result<Vec<Value>, ApiError> {
+        // Step 1: extract the users in a vec
+        let mut users = self.users;
+
+        // Step 2: early return if no places attached
+        let Some(place_values) = self.places else {
+            return Ok(users);
+        };
+
+        // Step 3: get the places sorted by creator_id in a hash_map
+        let mut places_map = Self::to_place_value_map(place_values)?;
+
+        // Step 4: append places to their creators
+        let key: &str = UserSelectable::Places.into();
+        for user in &mut users {
+            let user_id = Self::extract(utils::get_id_from_json(UserSelectable::Id.into(), user))?;
+            let user_places = places_map.remove(&user_id).unwrap_or_default();
+            user[key] = Value::Array(user_places);
+        }
+
+        Ok(users)
     }
 }
 
@@ -214,14 +243,15 @@ impl Read for CrudsUser {
     }
 
     fn to_read(data: Self::Fetch) -> Result<Self::Read, ApiError> {
-        let mut user = data.read_user()?;
-        let places = data.read_user_places(&user)?;
-        user.places = places;
+        let users = data.read()?;
+        let user = users.into_iter().next().ok_or(CrudsUser::not_found())?;
         Ok(user)
     }
 
     fn to_json(data: Self::Fetch) -> Result<Value, ApiError> {
-        data.to_json()
+        let users = data.read_json()?;
+        let user = users.into_iter().next().ok_or(CrudsUser::not_found())?;
+        Ok(user)
     }
 
     async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError> {
