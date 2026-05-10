@@ -4,7 +4,7 @@ use axum::http::StatusCode;
 use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, ConnectionTrait,
     DatabaseConnection, DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel,
-    PrimaryKeyTrait, QueryFilter, QuerySelect, RuntimeErr, TransactionTrait,
+    PaginatorTrait, PrimaryKeyTrait, QueryFilter, QuerySelect, RuntimeErr, TransactionTrait,
     prelude::async_trait::async_trait,
 };
 use serde_json::Value;
@@ -583,5 +583,51 @@ pub trait Delete: Read {
     async fn user_delete(&self, user: &Self::User, id: u32) -> Result<(), ApiError> {
         self.auth_delete(user, id).await?;
         self.delete(id).await
+    }
+}
+
+// Search trait
+
+#[async_trait]
+pub trait Search: Read {
+    async fn count(
+        &self,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<usize, ApiError> {
+        let mut q = Self::Entity::find();
+        if let Some(condition) = Self::get_condition(query) {
+            q = q.filter(condition);
+        }
+        let count = q.count(self.get_db()).await.map_err(Self::read_error)?;
+        Ok(count as usize)
+    }
+
+    async fn select_many(
+        &self,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Vec<Value>, ApiError> {
+        // Selecting columns
+        let columns = Self::to_columns(Self::selectables(query));
+        let mut q = Self::Entity::find().select_only().columns(columns);
+
+        // Applying filters
+        if let Some(condition) = Self::get_condition(query) {
+            q = q.filter(condition);
+        }
+
+        // Applying sorting
+
+        // Applying pagination
+        let (page, size) = Self::get_pagination(query);
+        let offset = (page - 1) * size;
+        q = q.offset(offset as u64).limit(size as u64);
+
+        // Making the request
+        let values = q
+            .into_json()
+            .all(self.get_db())
+            .await
+            .map_err(Self::read_error)?;
+        Ok(values)
     }
 }

@@ -5,7 +5,7 @@ use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
-use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Delete, Read, Update};
+use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Delete, Read, Search, Update};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
@@ -519,3 +519,7 @@ impl Delete for CrudsUser {
         Ok(())
     }
 }
+
+// The search Trait
+
+impl Search for CrudsUser {}
