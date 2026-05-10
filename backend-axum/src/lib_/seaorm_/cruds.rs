@@ -211,6 +211,8 @@ pub trait RecordReader {
         utils::unwrap_json_value(result, Self::Cruds::serialization_error())
     }
 
+    fn build_with_no_relations(records: Vec<Value>) -> Self;
+
     fn read(self) -> Result<Vec<Self::Read>, ApiError>;
 
     fn read_json(self) -> Result<Vec<Value>, ApiError>;
@@ -231,10 +233,39 @@ pub trait Read: CrudsUtils {
 
     async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError>;
 
+    async fn fetch_relations(
+        &self,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        data: &mut Self::Reader,
+    ) -> Result<(), ApiError>;
+
+    async fn select_one(
+        &self,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Value, ApiError> {
+        let columns = Self::to_columns(Self::selectables(query));
+        let mut q = Self::Entity::find().select_only().columns(columns);
+        if let Some(condition) = Self::get_condition(query) {
+            q = q.filter(condition);
+        }
+        let value = q
+            .into_json()
+            .one(self.get_db())
+            .await
+            .map_err(Self::read_error)?
+            .ok_or(Self::not_found())?;
+        Ok(value)
+    }
+
     async fn get_raw(
         &self,
         query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Self::Reader, ApiError>;
+    ) -> Result<Self::Reader, ApiError> {
+        let records = vec![self.select_one(&query).await?];
+        let mut data = Self::Reader::build_with_no_relations(records);
+        self.fetch_relations(query, &mut data).await?;
+        Ok(data)
+    }
 
     async fn get_row_by_id(
         &self,
@@ -253,24 +284,6 @@ pub trait Read: CrudsUtils {
             .await
             .map_err(Self::read_error)?
             .ok_or(Self::not_found())
-    }
-
-    async fn select_one(
-        &self,
-        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Value, ApiError> {
-        let columns = Self::to_columns(Self::selectables(query));
-        let mut q = Self::Entity::find().select_only().columns(columns);
-        if let Some(condition) = Self::get_condition(query) {
-            q = q.filter(condition);
-        }
-        let value = q
-            .into_json()
-            .one(self.get_db())
-            .await
-            .map_err(Self::read_error)?
-            .ok_or(Self::not_found())?;
-        Ok(value)
     }
 
     fn to_read(data: Self::Reader) -> Result<Self::Read, ApiError> {
@@ -592,18 +605,6 @@ pub trait Delete: Read {
 
 #[async_trait]
 pub trait Search: Read {
-    async fn count(
-        &self,
-        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<usize, ApiError> {
-        let mut q = Self::Entity::find();
-        if let Some(condition) = Self::get_condition(query) {
-            q = q.filter(condition);
-        }
-        let count = q.count(self.get_db()).await.map_err(Self::read_error)?;
-        Ok(count as usize)
-    }
-
     async fn select_many(
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
@@ -631,5 +632,27 @@ pub trait Search: Read {
             .await
             .map_err(Self::read_error)?;
         Ok(values)
+    }
+
+    async fn get_raws(
+        &self,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Self::Reader, ApiError> {
+        let records = self.select_many(&query).await?;
+        let mut data = Self::Reader::build_with_no_relations(records);
+        self.fetch_relations(query, &mut data).await?;
+        Ok(data)
+    }
+
+    async fn count(
+        &self,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<usize, ApiError> {
+        let mut q = Self::Entity::find();
+        if let Some(condition) = Self::get_condition(query) {
+            q = q.filter(condition);
+        }
+        let count = q.count(self.get_db()).await.map_err(Self::read_error)?;
+        Ok(count as usize)
     }
 }

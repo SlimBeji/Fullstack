@@ -181,6 +181,13 @@ impl RecordReader for UserReader {
     type Read = UserRead;
     type Cruds = CrudsUser;
 
+    fn build_with_no_relations(records: Vec<Value>) -> Self {
+        Self {
+            users: records,
+            places: None,
+        }
+    }
+
     fn read(self) -> Result<Vec<UserRead>, ApiError> {
         // Step 1: extract the users in a vec
         let mut users = self
@@ -273,29 +280,27 @@ impl Read for CrudsUser {
         Ok(())
     }
 
-    async fn get_raw(&self, query: UserSearch) -> Result<Self::Reader, ApiError> {
-        // Step 1: fetch the user
-        let user = self.select_one(&query).await?;
-
-        // Step 2: check if places is required or return early
+    async fn fetch_relations(
+        &self,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        data: &mut Self::Reader,
+    ) -> Result<(), ApiError> {
+        // Step 1: check if places is required or return early
         if !self.should_fetch_place(&query) {
-            return Ok(UserReader {
-                users: vec![user],
-                places: None,
-            });
+            return Ok(());
         }
 
-        // Step 3: extract the ids
-        let id = Self::get_id_from_json(UserSelectable::Id.into(), &user)?;
+        // Step 2: extract the ids
+        let ids = data
+            .users
+            .iter()
+            .map(|v| Self::get_id_from_json(UserSelectable::Id.into(), v))
+            .collect::<Result<Vec<u32>, ApiError>>()?;
 
-        // Step 4: extract the places
-        let places = self.fetch_user_places(vec![id]).await?;
-
-        // Step 5: Returning the result
-        Ok(UserReader {
-            users: vec![user],
-            places: Some(places),
-        })
+        // Step 3: extract the places
+        let places = self.fetch_users_places(ids).await?;
+        data.places = Some(places);
+        Ok(())
     }
 }
 
@@ -304,7 +309,7 @@ impl CrudsUser {
         Self::selectables(query).contains(&UserSelectable::Places)
     }
 
-    async fn fetch_user_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
+    async fn fetch_users_places(&self, ids: Vec<u32>) -> Result<Vec<Value>, ApiError> {
         let ids_i32: Vec<i32> = ids.into_iter().map(|x| x as i32).collect();
         let places = place::Entity::find()
             .select_only()
@@ -543,4 +548,5 @@ impl Delete for CrudsUser {
 
 // The search Trait
 
+#[async_trait]
 impl Search for CrudsUser {}
