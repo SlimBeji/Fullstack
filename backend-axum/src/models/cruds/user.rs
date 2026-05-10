@@ -7,7 +7,9 @@ use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
-use crate::lib_::seaorm_::{Create, CrudsBase, CrudsUtils, Delete, Read, Search, Update};
+use crate::lib_::seaorm_::{
+    Create, CrudsBase, CrudsUtils, Delete, Read, RecordReader, Search, Update,
+};
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
@@ -107,16 +109,12 @@ impl CrudsUtils for CrudsUser {
 
 // The Read Trait
 
-pub struct UserFetch {
+pub struct UserReader {
     users: Vec<Value>,
     places: Option<Vec<Value>>,
 }
 
-impl UserFetch {
-    fn extract<T>(result: Result<Option<T>, String>) -> Result<T, ApiError> {
-        utils::unwrap_json_value(result, CrudsUser::serialization_error())
-    }
-
+impl UserReader {
     fn to_user(value: &Value) -> Result<UserRead, ApiError> {
         let id = Self::extract(utils::get_id_from_json(UserSelectable::Id.into(), value))?;
         let name = Self::extract(utils::get_string_from_json(
@@ -177,6 +175,11 @@ impl UserFetch {
 
         Ok(map)
     }
+}
+
+impl RecordReader for UserReader {
+    type Read = UserRead;
+    type Cruds = CrudsUser;
 
     fn read(self) -> Result<Vec<UserRead>, ApiError> {
         // Step 1: extract the users in a vec
@@ -233,25 +236,13 @@ impl UserFetch {
 #[async_trait]
 impl Read for CrudsUser {
     type User = UserRead;
-    type Fetch = UserFetch;
     type Read = UserRead;
+    type Reader = UserReader;
 
     async fn auth_get(user: Self::User, search: &mut UserSearch) {
         let mut where_ = search.where_.take().unwrap_or_default();
         where_.insert(UserSearchable::Id, FieldFilters::id(user.id));
         search.where_ = Some(where_);
-    }
-
-    fn to_read(data: Self::Fetch) -> Result<Self::Read, ApiError> {
-        let users = data.read()?;
-        let user = users.into_iter().next().ok_or(CrudsUser::not_found())?;
-        Ok(user)
-    }
-
-    fn to_json(data: Self::Fetch) -> Result<Value, ApiError> {
-        let users = data.read_json()?;
-        let user = users.into_iter().next().ok_or(CrudsUser::not_found())?;
-        Ok(user)
     }
 
     async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError> {
@@ -282,13 +273,13 @@ impl Read for CrudsUser {
         Ok(())
     }
 
-    async fn get_raw(&self, query: UserSearch) -> Result<Self::Fetch, ApiError> {
+    async fn get_raw(&self, query: UserSearch) -> Result<Self::Reader, ApiError> {
         // Step 1: fetch the user
         let user = self.select_one(&query).await?;
 
         // Step 2: check if places is required or return early
         if !self.should_fetch_place(&query) {
-            return Ok(UserFetch {
+            return Ok(UserReader {
                 users: vec![user],
                 places: None,
             });
@@ -301,7 +292,7 @@ impl Read for CrudsUser {
         let places = self.fetch_user_places(vec![id]).await?;
 
         // Step 5: Returning the result
-        Ok(UserFetch {
+        Ok(UserReader {
             users: vec![user],
             places: Some(places),
         })

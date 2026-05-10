@@ -203,24 +203,38 @@ where
 
 // Read trait
 
+pub trait RecordReader {
+    type Cruds: CrudsUtils; // Utils with error handling
+    type Read: Send + Sync; // The Read Struct
+
+    fn extract<T>(result: Result<Option<T>, String>) -> Result<T, ApiError> {
+        utils::unwrap_json_value(result, Self::Cruds::serialization_error())
+    }
+
+    fn read(self) -> Result<Vec<Self::Read>, ApiError>;
+
+    fn read_json(self) -> Result<Vec<Value>, ApiError>;
+}
+
 #[async_trait]
 pub trait Read: CrudsUtils {
     type User: Send + Sync + 'static; // User object for authentication and authorization
-    type Fetch: Send + Sync; // The Data fetched
     type Read: Send + Sync; // The Read Struct
+    type Reader: Send + Sync + RecordReader<Read = Self::Read>; // Container that stores fetched data and reads it
 
     async fn auth_get(
         user: Self::User,
         search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     );
 
-    fn to_read(data: Self::Fetch) -> Result<Self::Read, ApiError>;
-
-    fn to_json(data: Self::Fetch) -> Result<Value, ApiError>;
-
     async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError>;
 
     async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError>;
+
+    async fn get_raw(
+        &self,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Self::Reader, ApiError>;
 
     async fn get_row_by_id(
         &self,
@@ -259,36 +273,24 @@ pub trait Read: CrudsUtils {
         Ok(value)
     }
 
-    async fn get_raw(
-        &self,
-        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Self::Fetch, ApiError>;
+    fn to_read(data: Self::Reader) -> Result<Self::Read, ApiError> {
+        let users = data.read()?;
+        let user = users.into_iter().next().ok_or(Self::not_found())?;
+        Ok(user)
+    }
+
+    fn to_json(data: Self::Reader) -> Result<Value, ApiError> {
+        let users = data.read_json()?;
+        let user = users.into_iter().next().ok_or(Self::not_found())?;
+        Ok(user)
+    }
 
     async fn get_raw_for_read(
         &self,
         mut query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Self::Fetch, ApiError> {
+    ) -> Result<Self::Reader, ApiError> {
         query.select = Some(Self::get_default_select());
         self.get_raw(query).await
-    }
-
-    async fn read(
-        &self,
-        id: u32,
-    ) -> Result<Option<<Self::Entity as EntityTrait>::Model>, ApiError> {
-        Self::Entity::find_by_id(id as i32)
-            .one(self.get_db())
-            .await
-            .map_err(|e| {
-                ApiError::internal_error(
-                    format!(
-                        "could not extract {} with id {} from database",
-                        Self::get_modelname(),
-                        id
-                    ),
-                    Box::new(e),
-                )
-            })
     }
 
     async fn get(&self, id: u32, options: Option<Self::Options>) -> Result<Self::Read, ApiError> {
