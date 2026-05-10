@@ -282,11 +282,11 @@ impl Read for CrudsUser {
 
     async fn fetch_relations(
         &self,
-        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         data: &mut Self::Reader,
     ) -> Result<(), ApiError> {
         // Step 1: check if places is required or return early
-        if !self.should_fetch_place(&query) {
+        if !self.should_fetch_place(query) {
             return Ok(());
         }
 

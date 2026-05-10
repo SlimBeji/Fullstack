@@ -244,7 +244,7 @@ pub trait Read: CrudsUtils {
 
     async fn fetch_relations(
         &self,
-        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         data: &mut Self::Reader,
     ) -> Result<(), ApiError>;
 
@@ -268,9 +268,9 @@ pub trait Read: CrudsUtils {
 
     async fn get_raw(
         &self,
-        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Reader, ApiError> {
-        let records = vec![self.select_one(&query).await?];
+        let records = vec![self.select_one(query).await?];
         let mut data = Self::Reader::build_with_no_relations(records);
         self.fetch_relations(query, &mut data).await?;
         Ok(data)
@@ -309,16 +309,16 @@ pub trait Read: CrudsUtils {
 
     async fn get_raw_for_read(
         &self,
-        mut query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Reader, ApiError> {
         query.select = Some(Self::get_default_select());
         self.get_raw(query).await
     }
 
     async fn get(&self, id: u32, options: Option<Self::Options>) -> Result<Self::Read, ApiError> {
-        let query = SearchQuery::id(id);
+        let mut query = SearchQuery::id(id);
         let raw = self
-            .get_raw_for_read(query)
+            .get_raw_for_read(&mut query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
@@ -337,7 +337,7 @@ pub trait Read: CrudsUtils {
         let mut query = SearchQuery::id(id);
         Self::auth_get(user, &mut query).await;
         let raw = self
-            .get_raw_for_read(query)
+            .get_raw_for_read(&mut query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
@@ -357,7 +357,7 @@ pub trait Read: CrudsUtils {
             query.select = fields.fields()
         }
         let raw = self
-            .get_raw(query)
+            .get_raw(&query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
@@ -379,7 +379,7 @@ pub trait Read: CrudsUtils {
         }
         Self::auth_get(user, &mut query).await;
         let raw = self
-            .get_raw(query)
+            .get_raw(&query)
             .await
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
@@ -645,9 +645,9 @@ pub trait Search: Read {
 
     async fn get_raws(
         &self,
-        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<Self::Reader, ApiError> {
-        let records = self.select_many(&query).await?;
+        let records = self.select_many(query).await?;
         let mut data = Self::Reader::build_with_no_relations(records);
         self.fetch_relations(query, &mut data).await?;
         Ok(data)
