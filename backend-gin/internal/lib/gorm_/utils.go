@@ -2,27 +2,12 @@ package gorm_
 
 import (
 	"backend/internal/lib/types_"
-	"context"
 	"fmt"
 	"sort"
 	"strings"
 
 	"gorm.io/gorm"
 )
-
-// Query Helpers
-
-type CrudsUtils interface {
-	GetDB(ctx context.Context) *gorm.DB
-	GetModel(ctx context.Context) *gorm.DB
-	ModelName() string
-	DefaultSelect() []string
-	DefaultOrderBy() []string
-	MaxItemsPerPage() int
-	MapSelect(field string) []SelectField
-	MapWhere(field string) string
-	MapOrderBy(field string) string
-}
 
 func parseOrderBy(input string) OrderBy {
 	if strings.HasPrefix(input, "-") {
@@ -208,79 +193,4 @@ func ApplyWhere(
 	}
 
 	return db, nil
-}
-
-func BuildSelectQuery(
-	ctx context.Context,
-	crud CrudsUtils,
-	query types_.SearchQuery,
-) (*gorm.DB, error) {
-	qb := crud.GetModel(ctx)
-
-	// Apply select
-	selectFields := query.Select
-	if len(selectFields) == 0 {
-		selectFields = crud.DefaultSelect()
-	}
-	qb = ApplySelect(qb, selectFields, crud.MapSelect)
-
-	// Apply where
-	if len(query.Where) > 0 {
-		var err error
-		qb, err = ApplyWhere(qb, query.Where, crud.MapWhere)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Apply orderby
-	orderBy := query.OrderBy
-	if len(orderBy) == 0 {
-		orderBy = crud.DefaultOrderBy()
-	}
-	qb = ApplyOrderBy(qb, orderBy, crud.MapOrderBy)
-
-	// Apply limit
-	if query.Size > 0 {
-		qb = qb.Limit(query.Size)
-	}
-
-	// Apply offset (pagination)
-	if query.Page > 0 {
-		size := query.Size
-		if size == 0 {
-			size = crud.MaxItemsPerPage()
-		}
-		offset := (query.Page - 1) * size
-		qb = qb.Offset(offset)
-	}
-
-	return qb, nil
-}
-
-func Exists(
-	ctx context.Context,
-	crud CrudsUtils,
-	where types_.WhereFilters,
-) (bool, error) {
-	qb := crud.GetModel(ctx)
-
-	// Select only ID (minimal query)
-	qb = qb.Select("id")
-
-	// Apply where filters
-	var err error
-	qb, err = ApplyWhere(qb, where, crud.MapWhere)
-	if err != nil {
-		return false, err
-	}
-
-	// Check if any record exists
-	var count int64
-	err = qb.Limit(1).Count(&count).Error
-	if err != nil {
-		return false, err
-	}
-
-	return count > 0, nil
 }
