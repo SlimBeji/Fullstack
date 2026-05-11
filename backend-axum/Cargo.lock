@@ -434,6 +434,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
+ "sqlx",
  "strum 0.26.3",
  "time",
  "tokio",
