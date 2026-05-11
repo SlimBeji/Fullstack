@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
+use axum::http::StatusCode;
 use sea_orm::ActiveValue::Set;
+use sea_orm::DbErr;
 use sea_orm::prelude::async_trait::async_trait;
 use sea_orm::{ColumnTrait, DatabaseTransaction, EntityTrait, QueryFilter, QuerySelect};
 use serde_json::Value;
@@ -70,6 +72,17 @@ impl CrudsUtils for CrudsUser {
 
     fn extract_id(value: i32) -> u32 {
         value as u32
+    }
+
+    // Error handling helpers
+
+    fn duplicate_error(e: DbErr) -> ApiError {
+        ApiError {
+            code: StatusCode::CONFLICT,
+            message: format!("{} with same email already exists", Self::get_modelname()),
+            details: Self::extract_pg_detail(&e),
+            err: Some(Box::new(e)),
+        }
     }
 
     // Query building helpers

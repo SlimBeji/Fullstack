@@ -5,9 +5,10 @@ use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, ConnectionTrait,
     DatabaseConnection, DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel,
     PaginatorTrait, PrimaryKeyTrait, QueryFilter, QuerySelect, RuntimeErr, TransactionTrait,
-    prelude::async_trait::async_trait,
+    prelude::async_trait::async_trait, sqlx,
 };
 use serde_json::Value;
+use sqlx::postgres::PgDatabaseError;
 
 use crate::lib_::{
     clients::{CloudStorage, PgClient, RedisClient},
@@ -88,6 +89,19 @@ where
 
     // Error handling helpers
 
+    fn extract_pg_detail(e: &DbErr) -> Option<Value> {
+        let DbErr::Query(RuntimeErr::SqlxError(sqlx_err)) = e else {
+            return None;
+        };
+        let sqlx::Error::Database(db_err) = sqlx_err.as_ref() else {
+            return None;
+        };
+        db_err
+            .downcast_ref::<PgDatabaseError>()
+            .detail()
+            .map(|s| Value::String(s.to_string()))
+    }
+
     fn serialization_error() -> ApiError {
         ApiError {
             code: StatusCode::INTERNAL_SERVER_ERROR,
@@ -138,17 +152,28 @@ where
         )
     }
 
-    fn create_error(e: DbErr) -> ApiError {
-        if let DbErr::Query(RuntimeErr::SqlxError(ref sqlx_err)) = e
+    fn is_duplicate_error(e: &DbErr) -> bool {
+        if let DbErr::Query(RuntimeErr::SqlxError(sqlx_err)) = e
             && let Some(pg_err) = sqlx_err.as_database_error()
             && pg_err.code().as_deref() == Some("23505")
         {
-            return ApiError {
-                code: StatusCode::CONFLICT,
-                message: format!("{} already exists", Self::get_modelname()),
-                details: None,
-                err: None,
-            };
+            return true;
+        }
+        false
+    }
+
+    fn duplicate_error(e: DbErr) -> ApiError {
+        ApiError {
+            code: StatusCode::CONFLICT,
+            message: format!("{} already exists", Self::get_modelname()),
+            details: Self::extract_pg_detail(&e),
+            err: Some(Box::new(e)),
+        }
+    }
+
+    fn create_error(e: DbErr) -> ApiError {
+        if Self::is_duplicate_error(&e) {
+            return Self::duplicate_error(e);
         }
 
         ApiError::internal_error(
@@ -158,6 +183,10 @@ where
     }
 
     fn update_error(id: u32, e: DbErr) -> ApiError {
+        if Self::is_duplicate_error(&e) {
+            return Self::duplicate_error(e);
+        }
+
         ApiError::internal_error(
             format!("failed to update {} record {}", Self::get_modelname(), id),
             Box::new(e),
