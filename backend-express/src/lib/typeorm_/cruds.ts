@@ -65,10 +65,19 @@ export class CrudsClass<
         return parsed;
     }
 
+    // Error Handling
+
     notFoundError(id: number | string): ApiError {
         return new ApiError(
             HttpStatus.NOT_FOUND,
             `No record with id ${id} found in ${this.modelName}s`
+        );
+    }
+
+    duplicateError(_err: QueryFailedError, _data: Create | Update): ApiError {
+        return new ApiError(
+            HttpStatus.CONFLICT,
+            `${this.modelName} record already exists`
         );
     }
 
@@ -155,10 +164,9 @@ export class CrudsClass<
                 err instanceof QueryFailedError &&
                 err.driverError?.code === "23505"
             ) {
-                throw new ApiError(
-                    HttpStatus.CONFLICT,
-                    "Record already exists"
-                );
+                throw this.duplicateError(err, data);
+            } else if (err instanceof ApiError) {
+                throw err;
             } else if (err instanceof Error) {
                 const status = HttpStatus.INTERNAL_SERVER_ERROR;
                 const message = `Could not create ${this.modelName} object: ${err.message}!`;
@@ -520,7 +528,12 @@ export class CrudsClass<
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
-            if (err instanceof ApiError) {
+            if (
+                err instanceof QueryFailedError &&
+                err.driverError?.code === "23505"
+            ) {
+                throw this.duplicateError(err, data);
+            } else if (err instanceof ApiError) {
                 throw err;
             } else if (err instanceof Error) {
                 throw new ApiError(

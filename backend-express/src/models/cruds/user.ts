@@ -1,4 +1,4 @@
-import { EntityManager } from "typeorm";
+import { EntityManager, QueryFailedError } from "typeorm";
 
 import { env } from "@/config";
 import { CrudsClass, SelectField } from "@/lib/typeorm_";
@@ -55,6 +55,21 @@ export class CrudsUser extends CrudsClass<
     UserDeleteContext
 > {
     MAX_ITEMS_PER_PAGE = env.MAX_ITEMS_PER_PAGE;
+
+    // Error Handling
+
+    duplicateError(
+        err: QueryFailedError,
+        data: UserCreate | UserUpdate
+    ): ApiError {
+        if (data.email) {
+            return new ApiError(
+                HttpStatus.CONFLICT,
+                `${this.modelName} with email ${data.email} already exists`
+            );
+        }
+        return super.duplicateError(err, data);
+    }
 
     // Post-Processing
 
