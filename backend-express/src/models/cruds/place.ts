@@ -106,7 +106,7 @@ export class CrudsPlace extends CrudsClass<
 
     async authPost(user: UserRead, data: PlacePost): Promise<void> {
         if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authorized");
         }
 
         if (user.is_admin) {
@@ -174,7 +174,7 @@ export class CrudsPlace extends CrudsClass<
         _data: PlacePut
     ): Promise<void> {
         if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authorized");
         }
 
         if (user.is_admin) return;
@@ -260,7 +260,7 @@ export class CrudsPlace extends CrudsClass<
 
     async authDelete(user: UserRead, id: number | string): Promise<void> {
         if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authorized");
         }
 
         if (user.is_admin) return;

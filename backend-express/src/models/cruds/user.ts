@@ -98,7 +98,7 @@ export class CrudsUser extends CrudsClass<
     async authPost(user: UserRead, _data: UserPost): Promise<void> {
         // only admins can create users
         if (user && user.is_admin) return;
-        throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
+        throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authorized", {
             message: "Only admins can delete users",
         });
     }
@@ -184,7 +184,7 @@ export class CrudsUser extends CrudsClass<
     ): Promise<void> {
         // Only the user and admins can update their informations
         if (!user) {
-            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated");
+            throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authorized");
         }
 
         if (user.is_admin) return;
@@ -240,7 +240,7 @@ export class CrudsUser extends CrudsClass<
             return;
         }
 
-        throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authenticated", {
+        throw new ApiError(HttpStatus.UNAUTHORIZED, "Not Authorized", {
             message: "Only admins can delete users",
         });
     }
