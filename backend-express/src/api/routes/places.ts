@@ -24,7 +24,7 @@ export const placeRouter = Router();
 async function getPlaces(req: Request, resp: Response) {
     // All places are public
     const query = req.parsedBody as PlaceSearchQuery;
-    resp.status(200).json(await crudsPlace.paginate(query));
+    resp.status(200).json(await crudsPlace.paginate(query, { process: true }));
 }
 
 placeRouter.get(
@@ -59,7 +59,7 @@ swaggerRegistery.registerPath({
 async function searchPlaces(req: Request, resp: Response) {
     // All places are public
     const query = req.parsedBody as PlaceSearchQuery;
-    resp.status(200).json(await crudsPlace.paginate(query));
+    resp.status(200).json(await crudsPlace.paginate(query, { process: true }));
 }
 
 placeRouter.post(

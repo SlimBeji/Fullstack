@@ -891,7 +891,8 @@ export class CrudsClass<
     }
 
     async paginate(
-        query: SearchQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        options: Options = {} as Options
     ): Promise<PaginatedData<Partial<Read>>> {
         // The inputs should be validated in the HTTP layer
         // The selectable fields should include only fields
@@ -907,7 +908,7 @@ export class CrudsClass<
         const normalized = { ...query, page, size };
 
         // Step 3: fetching results
-        const data = await this.searchPartial(normalized);
+        const data = await this.searchPartial(normalized, options);
 
         // Step 4: return paginated result
         return { page, total_pages: totalPages, total_count: totalCount, data };
@@ -915,9 +916,10 @@ export class CrudsClass<
 
     async userPaginate(
         user: User,
-        query: SearchQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectables, Sortables, Searchables>,
+        options: Options = {} as Options
     ): Promise<PaginatedData<Partial<Read>>> {
         query = this.authGet(user, query);
-        return await this.paginate(query);
+        return await this.paginate(query, options);
     }
 }

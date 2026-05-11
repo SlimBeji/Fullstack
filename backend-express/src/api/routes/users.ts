@@ -24,7 +24,7 @@ export const userRouter = Router();
 async function getUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsedBody as UserSearchQuery;
-    res.status(200).json(await crudsUser.paginate(query));
+    res.status(200).json(await crudsUser.paginate(query, { process: true }));
 }
 
 userRouter.get(
@@ -60,7 +60,7 @@ swaggerRegistery.registerPath({
 async function searchUsers(req: Request, res: Response) {
     // All users are public
     const query = req.parsedBody as UserSearchQuery;
-    res.status(200).json(await crudsUser.paginate(query));
+    res.status(200).json(await crudsUser.paginate(query, { process: true }));
 }
 
 userRouter.post(
