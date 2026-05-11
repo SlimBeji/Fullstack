@@ -9,6 +9,7 @@ import {
 
 import { ApiError, HttpStatus, PaginationData } from "../types";
 import { Filter, PaginatedData, SearchQuery, WhereFilters } from "../types";
+import { processBatchWithSemaphore } from "../utils";
 import { AbstractEntity, SelectField } from "./types";
 import { applyOrderBy, applySelect, applyWhere } from "./utils";
 
@@ -80,19 +81,13 @@ export class CrudsClass<
 
     async postProcessBatch<T extends Partial<Read> | Read>(
         raw: T[],
-        batchSize = 50
+        maxWorkers = 50
     ): Promise<T[]> {
-        // Post process a batch asynchronously
-        // Process in chunks to avoid rate limits
-        const results: T[] = [];
-        for (let i = 0; i < raw.length; i += batchSize) {
-            const chunk = raw.slice(i, i + batchSize);
-            const processed = await Promise.all(
-                chunk.map((item) => this.postProcess(item))
-            );
-            results.push(...processed);
-        }
-        return results;
+        return await processBatchWithSemaphore(
+            raw,
+            (i) => this.postProcess(i),
+            maxWorkers
+        );
     }
 
     // Query Building
