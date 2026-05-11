@@ -200,7 +200,7 @@ class CrudsClass[
 
     # Create
 
-    def to_model(self, data: Create) -> DbModel:
+    def create_to_model(self, data: Create) -> DbModel:
         """Overload this when subclassing if required"""
         d = data.model_dump(exclude_unset=True, exclude_none=True)
         return self.model(**d)
@@ -209,7 +209,7 @@ class CrudsClass[
         """Create from a create form, return id"""
         try:
             context = await self.before_create(data)
-            entity = self.to_model(data)
+            entity = self.create_to_model(data)
             self.session.add(entity)
             await self.session.flush()
             entity_id = cast(int, entity.id)
