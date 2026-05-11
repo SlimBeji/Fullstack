@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import Mapping
 from http import HTTPStatus
 from typing import Any, cast, get_args
@@ -17,6 +16,7 @@ from ..types_ import (
     SearchQuery,
     WhereFilters,
 )
+from ..utils import process_batch_with_semaphore
 from .model import BaseModel
 from .types import SelectField
 from .utils import apply_order_by, apply_select, apply_where
@@ -41,7 +41,7 @@ class CrudsClass[
     # Constructor, Properties & Helpers
 
     MAX_ITEMS_PER_PAGE = 100
-    POST_PROCESSING_BATCH_SIZE = 50
+    POST_PROCESSING_WORKERS = 50
 
     def __init__(
         self,
@@ -125,34 +125,14 @@ class CrudsClass[
         return raw
 
     async def post_process_batch(self, raw: list[Read]) -> list[Read]:
-        """
-        Post process a batch asynchronously
-        Process in chunks to avoid rate limits
-        """
-        batch_size = self.POST_PROCESSING_BATCH_SIZE
-        results: list[Read] = []
-        for i in range(0, len(raw), batch_size):
-            chunk = raw[i : i + batch_size]
-            processed = await asyncio.gather(
-                *(self.post_process(item) for item in chunk)
-            )
-            results.extend(processed)
-        return results
+        return await process_batch_with_semaphore(
+            raw, self.post_process, self.POST_PROCESSING_WORKERS
+        )
 
     async def post_process_dict_batch(self, raw: list[dict]) -> list[dict]:
-        """
-        Post process a batch asynchronously
-        Process in chunks to avoid rate limits
-        """
-        batch_size = self.POST_PROCESSING_BATCH_SIZE
-        results: list[dict] = []
-        for i in range(0, len(raw), batch_size):
-            chunk = raw[i : i + batch_size]
-            processed = await asyncio.gather(
-                *(self.post_process_dict(item) for item in chunk)
-            )
-            results.extend(processed)
-        return results
+        return await process_batch_with_semaphore(
+            raw, self.post_process_dict, self.POST_PROCESSING_WORKERS
+        )
 
     # Query Building
 
