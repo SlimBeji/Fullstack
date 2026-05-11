@@ -15,7 +15,7 @@ import (
 // Read Helpers
 
 type RecordRead[User any, Model BaseModelReader, Read any] interface {
-	QueryBuilder
+	CrudsUtils
 	AuthGet(context.Context, User, types_.SearchQuery) types_.SearchQuery
 	ToRead(*Model) Read
 	ToJSON(Model, []string) (map[string]any, error)

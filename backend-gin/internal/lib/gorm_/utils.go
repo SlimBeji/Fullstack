@@ -12,7 +12,7 @@ import (
 
 // Query Helpers
 
-type QueryBuilder interface {
+type CrudsUtils interface {
 	GetDB(ctx context.Context) *gorm.DB
 	GetModel(ctx context.Context) *gorm.DB
 	ModelName() string
@@ -212,7 +212,7 @@ func ApplyWhere(
 
 func BuildSelectQuery(
 	ctx context.Context,
-	crud QueryBuilder,
+	crud CrudsUtils,
 	query types_.SearchQuery,
 ) (*gorm.DB, error) {
 	qb := crud.GetModel(ctx)
@@ -260,7 +260,7 @@ func BuildSelectQuery(
 
 func Exists(
 	ctx context.Context,
-	crud QueryBuilder,
+	crud CrudsUtils,
 	where types_.WhereFilters,
 ) (bool, error) {
 	qb := crud.GetModel(ctx)
