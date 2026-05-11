@@ -140,7 +140,7 @@ class CrudsPlace(
         if user.id != form.creator_id:
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                "Access denied",
+                "Not Authorized",
                 dict(message=f"Cannot add places to user {form.creator_id}"),
             )
 
@@ -202,7 +202,7 @@ class CrudsPlace(
         if not exists:
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                "Access denied",
+                "Not Authorized",
                 dict(message=f"Cannot access place {id_}"),
             )
 
@@ -272,6 +272,6 @@ class CrudsPlace(
         if not exists:
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                "Access denied",
+                "Not Authorized",
                 dict(message=f"cannot access place {id_}"),
             )

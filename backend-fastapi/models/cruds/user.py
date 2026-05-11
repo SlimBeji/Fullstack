@@ -121,7 +121,7 @@ class CrudsUser(
             return
         raise ApiError(
             HTTPStatus.UNAUTHORIZED,
-            "Not Authenticated",
+            "Not Authorized",
             dict(message="Only admins can delete users"),
         )
 
@@ -209,7 +209,8 @@ class CrudsUser(
         if user.id != self.parse_id(id_):
             raise ApiError(
                 HTTPStatus.UNAUTHORIZED,
-                f"Access to user with id {id_} not granted",
+                "Not Authorized",
+                dict(message=f"Access to user with id {id_} not granted"),
             )
 
     # Delete
@@ -236,7 +237,7 @@ class CrudsUser(
 
         raise ApiError(
             HTTPStatus.UNAUTHORIZED,
-            "Not Authenticated",
+            "Not Authorized",
             dict(message="Only admins can delete users"),
         )
 
