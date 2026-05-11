@@ -127,7 +127,7 @@ export class CrudsClass<
 
     // Create
 
-    toModel(data: Create): DbModel {
+    createToModel(data: Create): DbModel {
         // Overload this when subclassing if required
         return data as any as DbModel;
     }
@@ -143,7 +143,7 @@ export class CrudsClass<
             const context = await this.beforeCreate(manager, data);
             const result = await manager.insert(
                 this.repository.target,
-                this.toModel(data)
+                this.createToModel(data)
             );
             const id = result.identifiers[0].id;
             await this.afterCreate(manager, id, data, context);
