@@ -16,15 +16,3 @@ export type Filter = { op: FilterOperation; val: any };
 export type WhereFilters<T extends string> = {
     [K in T]?: Filter[];
 };
-
-export interface SearchQuery<
-    Selectables extends string,
-    Sortables extends string,
-    Searchables extends string,
-> {
-    page?: number;
-    size?: number;
-    orderby?: Sortables[];
-    select?: Selectables[];
-    where?: WhereFilters<Searchables>;
-}
