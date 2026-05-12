@@ -20,10 +20,10 @@ export class CrudsClass<
     CreateContext extends object, // Creation Hooks context
     Post extends object, // HTTP Post Interface
     Read extends object, // The Read interface
-    Options extends { process?: boolean; fields?: Selectables[] }, // General options for HTTP methods/actions
-    Selectables extends string, // Literal of Selectable fields
-    Sortables extends string, // Literal of fields we can use OrderBy on
-    Searchables extends string, // List of keys we can search on
+    Options extends { process?: boolean; fields?: Selectable[] }, // General options for HTTP methods/actions
+    Selectable extends string, // Literal of Selectable fields
+    Sortable extends string, // Literal of fields we can use OrderBy on
+    Searchable extends string, // List of keys we can search on
     Update extends object, // Update Interface
     UpdateContext extends object, // Update hooks context
     Put extends object, // HTTP Put Interface
@@ -38,8 +38,8 @@ export class CrudsClass<
     constructor(
         public datasource: DataSource,
         public modelName: string,
-        public defaultSelect: readonly Selectables[],
-        public defaultOrderby: readonly Sortables[]
+        public defaultSelect: readonly Selectable[],
+        public defaultOrderby: readonly Sortable[]
     ) {
         this.repository = this.datasource.getRepository(this.modelName);
     }
@@ -229,14 +229,14 @@ export class CrudsClass<
 
     authGet(
         _user: User,
-        _query: SearchQuery<Selectables, Sortables, Searchables>
-    ): SearchQuery<Selectables, Sortables, Searchables> {
+        _query: SearchQuery<Selectable, Sortable, Searchable>
+    ): SearchQuery<Selectable, Sortable, Searchable> {
         // Update the where statement to add ownership filters
         // check the select clause to see if some fields are accessible or not by the user
         throw new Error(`authGet not implemented for ${this.modelName}`);
     }
 
-    async exists(where: WhereFilters<Searchables>): Promise<boolean> {
+    async exists(where: WhereFilters<Searchable>): Promise<boolean> {
         // A utility function to quickly check if a record exists
         // May be useful for auth methods
         try {
@@ -272,8 +272,8 @@ export class CrudsClass<
 
     private async getWithoutJoins(
         query: SelectQueryBuilder<DbModel>,
-        where: WhereFilters<Searchables> | undefined,
-        orderby: Sortables[] | undefined
+        where: WhereFilters<Searchable> | undefined,
+        orderby: Sortable[] | undefined
     ): Promise<DbModel | null> {
         /* Since we dont have joins, we can call getOne()
         safely without risking truncating child data */
@@ -296,8 +296,8 @@ export class CrudsClass<
 
     private async getWithJoins(
         query: SelectQueryBuilder<DbModel>,
-        where: WhereFilters<Searchables> | undefined,
-        orderby: Sortables[] | undefined
+        where: WhereFilters<Searchable> | undefined,
+        orderby: Sortable[] | undefined
     ): Promise<DbModel | null> {
         /* We have joins so we can't call getOne(), We call getMany() to
         make sure we fetch all child data and return first element if found*/
@@ -324,8 +324,8 @@ export class CrudsClass<
 
     private async getInTwoSteps(
         query: SelectQueryBuilder<DbModel>,
-        where: WhereFilters<Searchables> | undefined,
-        orderby: Sortables[] | undefined
+        where: WhereFilters<Searchable> | undefined,
+        orderby: Sortable[] | undefined
     ): Promise<DbModel | null> {
         /* The where clause might be slow and we want to avoid scanning
         the whole table just to get one element. We run a first getOne()
@@ -357,7 +357,7 @@ export class CrudsClass<
         // Update the main query to filter on the id
         const idWhere = {
             id: this.eq(idRecord.id),
-        } as WhereFilters<Searchables>;
+        } as WhereFilters<Searchable>;
         query = applyWhere(query, idWhere, (item) => this.mapWhere(item));
 
         // Call getMany
@@ -369,7 +369,7 @@ export class CrudsClass<
     }
 
     async getOne(
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         twoSteps: boolean = true
     ): Promise<DbModel | null> {
         /*
@@ -423,12 +423,12 @@ export class CrudsClass<
     async getRaw(
         id: number | string,
         user: User | null,
-        fields: Selectables[] | null
+        fields: Selectable[] | null
     ): Promise<DbModel> {
         // Raise a 404 Not Found ApiError if not found
-        let query: SearchQuery<Selectables, Sortables, Searchables> = {
+        let query: SearchQuery<Selectable, Sortable, Searchable> = {
             select: fields || [...this.defaultSelect],
-            where: { id: this.eq(id) } as WhereFilters<Searchables>,
+            where: { id: this.eq(id) } as WhereFilters<Searchable>,
         };
 
         // Apply ownership if needed
@@ -687,10 +687,10 @@ export class CrudsClass<
     // Search
 
     async count(
-        query: SearchQuery<Selectables, Sortables, Searchables>
+        query: SearchQuery<Selectable, Sortable, Searchable>
     ): Promise<number> {
         // count the number of rows
-        const where = query.where || ({} as WhereFilters<Searchables>);
+        const where = query.where || ({} as WhereFilters<Searchable>);
         let ormQuery = this.repository.createQueryBuilder(this.tablename);
         ormQuery = applyWhere(ormQuery, where, (item) => this.mapWhere(item));
         return await ormQuery.getCount();
@@ -698,8 +698,8 @@ export class CrudsClass<
 
     private async getManyWithoutJoins(
         query: SelectQueryBuilder<DbModel>,
-        where: WhereFilters<Searchables> | undefined,
-        orderby: Sortables[] | undefined,
+        where: WhereFilters<Searchable> | undefined,
+        orderby: Sortable[] | undefined,
         size: number | undefined,
         page: number | undefined
     ): Promise<DbModel[]> {
@@ -733,8 +733,8 @@ export class CrudsClass<
 
     private async getManyWithJoins(
         query: SelectQueryBuilder<DbModel>,
-        where: WhereFilters<Searchables> | undefined,
-        orderby: Sortables[] | undefined,
+        where: WhereFilters<Searchable> | undefined,
+        orderby: Sortable[] | undefined,
         size: number | undefined,
         page: number | undefined
     ): Promise<DbModel[]> {
@@ -793,7 +793,7 @@ export class CrudsClass<
     }
 
     async getMany(
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         user: User | null
     ): Promise<DbModel[]> {
         /*
@@ -847,12 +847,12 @@ export class CrudsClass<
     }
 
     async search(
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         options: Options = {} as Options
     ): Promise<Read[]> {
         query.select = [...this.defaultSelect];
         const record = (await this.getMany(query, null)) as any as Read[];
-        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        // By selecting only Selectable, we are guarenteed to have Partial<Read>
         if (options.process) {
             return await this.postProcessBatch(record);
         }
@@ -861,12 +861,12 @@ export class CrudsClass<
 
     async userSearch(
         user: User,
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         options: Options = {} as Options
     ): Promise<Read[]> {
         query.select = [...this.defaultSelect];
         const record = (await this.getMany(query, user)) as any as Read[];
-        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        // By selecting only Selectable, we are guarenteed to have Partial<Read>
         if (options.process) {
             return await this.postProcessBatch(record);
         }
@@ -874,11 +874,11 @@ export class CrudsClass<
     }
 
     async searchPartial(
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         options: Options = {} as Options
     ): Promise<Partial<Read>[]> {
         const record = (await this.getMany(query, null)) as any as Read[];
-        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        // By selecting only Selectable, we are guarenteed to have Partial<Read>
         if (options.process) {
             return await this.postProcessBatch(record);
         }
@@ -887,11 +887,11 @@ export class CrudsClass<
 
     async userSearchPartial(
         user: User,
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         options: Options = {} as Options
     ): Promise<Partial<Read>[]> {
         const record = (await this.getMany(query, user)) as any as Read[];
-        // By selecting only Selectables, we are guarenteed to have Partial<Read>
+        // By selecting only Selectable, we are guarenteed to have Partial<Read>
         if (options.process) {
             return await this.postProcessBatch(record);
         }
@@ -899,7 +899,7 @@ export class CrudsClass<
     }
 
     async paginate(
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         options: Options = {} as Options
     ): Promise<PaginatedData<Partial<Read>>> {
         // The inputs should be validated in the HTTP layer
@@ -924,7 +924,7 @@ export class CrudsClass<
 
     async userPaginate(
         user: User,
-        query: SearchQuery<Selectables, Sortables, Searchables>,
+        query: SearchQuery<Selectable, Sortable, Searchable>,
         options: Options = {} as Options
     ): Promise<PaginatedData<Partial<Read>>> {
         query = this.authGet(user, query);

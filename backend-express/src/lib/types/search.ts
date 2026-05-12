@@ -1,13 +1,13 @@
 import { WhereFilters } from "./filters";
 
 export interface SearchQuery<
-    Selectables extends string,
-    Sortables extends string,
-    Searchables extends string,
+    Selectable extends string,
+    Sortable extends string,
+    Searchable extends string,
 > {
     page?: number;
     size?: number;
-    orderby?: Sortables[];
-    select?: Selectables[];
-    where?: WhereFilters<Searchables>;
+    orderby?: Sortable[];
+    select?: Selectable[];
+    where?: WhereFilters<Searchable>;
 }
