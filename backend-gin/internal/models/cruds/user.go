@@ -224,7 +224,7 @@ func (cu *CRUDSUser) BuildQuery(
 
 // Create
 
-func (cu *CRUDSUser) ToModel(data schemas.UserCreate) orm.User {
+func (cu *CRUDSUser) CreateToModel(data schemas.UserCreate) orm.User {
 	return orm.User{
 		Name:     data.Name,
 		Email:    data.Email,

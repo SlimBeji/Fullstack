@@ -210,7 +210,7 @@ func (cp *CRUDSPlace) BuildQuery(
 
 // Create
 
-func (cp *CRUDSPlace) ToModel(data schemas.PlaceCreate) orm.Place {
+func (cp *CRUDSPlace) CreateToModel(data schemas.PlaceCreate) orm.Place {
 	return orm.Place{
 		Title:       data.Title,
 		Description: data.Description,

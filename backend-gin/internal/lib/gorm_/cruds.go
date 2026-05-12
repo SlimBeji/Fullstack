@@ -205,7 +205,7 @@ type RecordCreate[
 	Post any,
 ] interface {
 	RecordRead[User, Model, Read]
-	ToModel(Create) Model
+	CreateToModel(Create) Model
 	PostToCreate(context.Context, Post) (Create, error)
 	AuthPost(context.Context, User, Post) error
 	BeforeCreate(*gorm.DB, Create) (HooksData, error)
@@ -221,7 +221,7 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksDa
 
 	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Convert Create to Model
-		entity := crud.ToModel(data)
+		entity := crud.CreateToModel(data)
 
 		// Before create hook
 		hooksData, err := crud.BeforeCreate(tx, data)
