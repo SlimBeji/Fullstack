@@ -286,7 +286,7 @@ func (cp *CRUDSPlace) AuthPost(
 		message := fmt.Sprintf("Cannot add places to user %d", data.CreatorID)
 		return types_.APIError{
 			Code:    http.StatusUnauthorized,
-			Message: "Access denied",
+			Message: "Not Authorized",
 			Details: map[string]any{"message": message},
 		}
 	}
@@ -497,7 +497,7 @@ func (cp *CRUDSPlace) AuthPut(
 		message := fmt.Sprintf("Cannot access place %d", id)
 		return types_.APIError{
 			Code:    http.StatusUnauthorized,
-			Message: "Access denied",
+			Message: "Not Authorized",
 			Details: map[string]any{"message": message},
 		}
 	}
@@ -644,7 +644,7 @@ func (cp *CRUDSPlace) AuthDelete(
 		message := fmt.Sprintf("Cannot access place %d", id)
 		return types_.APIError{
 			Code:    http.StatusUnauthorized,
-			Message: "Access denied",
+			Message: "Not Authorized",
 			Details: map[string]any{"message": message},
 		}
 	}

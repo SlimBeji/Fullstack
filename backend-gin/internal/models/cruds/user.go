@@ -284,7 +284,7 @@ func (cu *CRUDSUser) AuthPost(
 	}
 	return types_.APIError{
 		Code:    http.StatusUnauthorized,
-		Message: "Not Authenticated",
+		Message: "Not Authorized",
 		Details: map[string]any{"message": "Only admins can delete users"},
 	}
 }
@@ -556,9 +556,11 @@ func (cu *CRUDSUser) AuthPut(
 	}
 
 	if user.ID != id {
+		var message = fmt.Sprintf("Access to user with id %d not granted", id)
 		return types_.APIError{
 			Code:    http.StatusUnauthorized,
-			Message: fmt.Sprintf("Access to user with id %d not granted", id),
+			Message: "Not Authorized",
+			Details: map[string]any{"message": message},
 		}
 	}
 	return nil
@@ -623,7 +625,7 @@ func (cu *CRUDSUser) AuthDelete(
 	}
 	return types_.APIError{
 		Code:    http.StatusUnauthorized,
-		Message: "Not Authenticated",
+		Message: "Not Authorized",
 		Details: map[string]any{"message": "Only admins can delete users"},
 	}
 }
