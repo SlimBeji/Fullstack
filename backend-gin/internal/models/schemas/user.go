@@ -10,21 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// --- Selectables, Serchables, Sortables ----
+// --- Selectable, Serchable, Sortable ----
 
-type UserSelectables string
+type UserSelectable string
 
 const (
-	UserSelectId        UserSelectables = "id"
-	UserSelectName      UserSelectables = "name"
-	UserSelectEmail     UserSelectables = "email"
-	UserSelectIsAdmin   UserSelectables = "is_admin"
-	UserSelectImageURL  UserSelectables = "image_url"
-	UserSelectPlaces    UserSelectables = "places"
-	UserSelectCreatedAt UserSelectables = "created_at"
+	UserSelectId        UserSelectable = "id"
+	UserSelectName      UserSelectable = "name"
+	UserSelectEmail     UserSelectable = "email"
+	UserSelectIsAdmin   UserSelectable = "is_admin"
+	UserSelectImageURL  UserSelectable = "image_url"
+	UserSelectPlaces    UserSelectable = "places"
+	UserSelectCreatedAt UserSelectable = "created_at"
 )
 
-func (field UserSelectables) Validate() bool {
+func (field UserSelectable) Validate() bool {
 	switch field {
 	case UserSelectId, UserSelectName, UserSelectEmail, UserSelectIsAdmin,
 		UserSelectImageURL, UserSelectPlaces, UserSelectCreatedAt:
@@ -34,16 +34,16 @@ func (field UserSelectables) Validate() bool {
 	}
 }
 
-type UserSearchables string
+type UserSearchable string
 
 const (
-	UserSearchId        UserSearchables = "id"
-	UserSearchName      UserSearchables = "name"
-	UserSearchEmail     UserSearchables = "email"
-	UserSearchCreatedAt UserSearchables = "created_at"
+	UserSearchId        UserSearchable = "id"
+	UserSearchName      UserSearchable = "name"
+	UserSearchEmail     UserSearchable = "email"
+	UserSearchCreatedAt UserSearchable = "created_at"
 )
 
-func (field UserSearchables) Validate() bool {
+func (field UserSearchable) Validate() bool {
 	switch field {
 	case UserSearchId, UserSearchName, UserSearchEmail:
 		return true
@@ -52,18 +52,18 @@ func (field UserSearchables) Validate() bool {
 	}
 }
 
-type UserSortables string
+type UserSortable string
 
 const (
-	UserSortCreatedAtAsc  UserSortables = "created_at"
-	UserSortCreatedAtDesc UserSortables = "-created_at"
-	UserSortNameAsc       UserSortables = "name"
-	UserSortNameDesc      UserSortables = "-name"
-	UserSortEmailAsc      UserSortables = "email"
-	UserSortEmailDesc     UserSortables = "-email"
+	UserSortCreatedAtAsc  UserSortable = "created_at"
+	UserSortCreatedAtDesc UserSortable = "-created_at"
+	UserSortNameAsc       UserSortable = "name"
+	UserSortNameDesc      UserSortable = "-name"
+	UserSortEmailAsc      UserSortable = "email"
+	UserSortEmailDesc     UserSortable = "-email"
 )
 
-func (field UserSortables) Validate() bool {
+func (field UserSortable) Validate() bool {
 	switch field {
 	case UserSortCreatedAtAsc, UserSortCreatedAtDesc,
 		UserSortNameAsc, UserSortNameDesc,

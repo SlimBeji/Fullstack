@@ -10,22 +10,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// --- Selectables, Serchables, Sortables ----
+// --- Selectable, Serchable, Sortable ----
 
-type PlaceSelectables string
+type PlaceSelectable string
 
 const (
-	PlaceSelectId          PlaceSelectables = "id"
-	PlaceSelectTitle       PlaceSelectables = "title"
-	PlaceSelectDescription PlaceSelectables = "description"
-	PlaceSelectAddress     PlaceSelectables = "address"
-	PlaceSelectLocation    PlaceSelectables = "location"
-	PlaceSelectImageURL    PlaceSelectables = "image_url"
-	PlaceSelectCreatorId   PlaceSelectables = "creator_id"
-	PlaceSelectCreatedAt   PlaceSelectables = "created_at"
+	PlaceSelectId          PlaceSelectable = "id"
+	PlaceSelectTitle       PlaceSelectable = "title"
+	PlaceSelectDescription PlaceSelectable = "description"
+	PlaceSelectAddress     PlaceSelectable = "address"
+	PlaceSelectLocation    PlaceSelectable = "location"
+	PlaceSelectImageURL    PlaceSelectable = "image_url"
+	PlaceSelectCreatorId   PlaceSelectable = "creator_id"
+	PlaceSelectCreatedAt   PlaceSelectable = "created_at"
 )
 
-func (field PlaceSelectables) Validate() bool {
+func (field PlaceSelectable) Validate() bool {
 	switch field {
 	case PlaceSelectId, PlaceSelectTitle, PlaceSelectDescription, PlaceSelectAddress,
 		PlaceSelectLocation, PlaceSelectImageURL, PlaceSelectCreatorId, PlaceSelectCreatedAt:
@@ -35,20 +35,20 @@ func (field PlaceSelectables) Validate() bool {
 	}
 }
 
-type PlaceSearchables string
+type PlaceSearchable string
 
 const (
-	PlaceSearchId          PlaceSearchables = "id"
-	PlaceSearchTitle       PlaceSearchables = "title"
-	PlaceSearchDescription PlaceSearchables = "description"
-	PlaceSearchAddress     PlaceSearchables = "address"
-	PlaceSearchCreatorId   PlaceSearchables = "creator_id"
-	PlaceSearchLocationLat PlaceSearchables = "location_lat"
-	PlaceSearchLocationLng PlaceSearchables = "location_lng"
-	PlaceSearchCreatedAt   PlaceSearchables = "created_at"
+	PlaceSearchId          PlaceSearchable = "id"
+	PlaceSearchTitle       PlaceSearchable = "title"
+	PlaceSearchDescription PlaceSearchable = "description"
+	PlaceSearchAddress     PlaceSearchable = "address"
+	PlaceSearchCreatorId   PlaceSearchable = "creator_id"
+	PlaceSearchLocationLat PlaceSearchable = "location_lat"
+	PlaceSearchLocationLng PlaceSearchable = "location_lng"
+	PlaceSearchCreatedAt   PlaceSearchable = "created_at"
 )
 
-func (field PlaceSearchables) Validate() bool {
+func (field PlaceSearchable) Validate() bool {
 	switch field {
 	case PlaceSearchId, PlaceSearchTitle, PlaceSearchDescription, PlaceSearchAddress,
 		PlaceSearchCreatorId, PlaceSearchLocationLat, PlaceSearchLocationLng:
@@ -58,20 +58,20 @@ func (field PlaceSearchables) Validate() bool {
 	}
 }
 
-type PlaceSortables string
+type PlaceSortable string
 
 const (
-	PlaceSortCreatedAtAsc    PlaceSortables = "created_at"
-	PlaceSortCreatedAtDesc   PlaceSortables = "-created_at"
-	PlaceSortTitleAsc        PlaceSortables = "title"
-	PlaceSortTitleDesc       PlaceSortables = "-title"
-	PlaceSortDescriptionAsc  PlaceSortables = "description"
-	PlaceSortDescriptionDesc PlaceSortables = "-description"
-	PlaceSortAddressAsc      PlaceSortables = "address"
-	PlaceSortAddressDesc     PlaceSortables = "-address"
+	PlaceSortCreatedAtAsc    PlaceSortable = "created_at"
+	PlaceSortCreatedAtDesc   PlaceSortable = "-created_at"
+	PlaceSortTitleAsc        PlaceSortable = "title"
+	PlaceSortTitleDesc       PlaceSortable = "-title"
+	PlaceSortDescriptionAsc  PlaceSortable = "description"
+	PlaceSortDescriptionDesc PlaceSortable = "-description"
+	PlaceSortAddressAsc      PlaceSortable = "address"
+	PlaceSortAddressDesc     PlaceSortable = "-address"
 )
 
-func (field PlaceSortables) Validate() bool {
+func (field PlaceSortable) Validate() bool {
 	switch field {
 	case PlaceSortCreatedAtAsc, PlaceSortCreatedAtDesc,
 		PlaceSortTitleAsc, PlaceSortTitleDesc,
