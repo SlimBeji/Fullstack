@@ -3,6 +3,7 @@ from typing import NotRequired, TypedDict, get_args
 
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import or_
 
@@ -70,6 +71,18 @@ class CrudsUser(
         super().__init__(
             session, User, list(get_args(UserSelectableFields)), ["-created_at"]
         )
+
+    # Error handling
+
+    def duplicate_error(
+        self, data: UserCreateSchema | UserUpdateSchema, _err: IntegrityError
+    ) -> ApiError:
+        if data.email:
+            return ApiError(
+                HTTPStatus.CONFLICT,
+                f"{self.model_name} with email {data.email} already exists",
+            )
+        return super().duplicate_error(data, _err)
 
     # Serialization and Post-Processing
 

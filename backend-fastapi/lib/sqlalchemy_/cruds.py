@@ -101,11 +101,18 @@ class CrudsClass[
 
         return int(trimmed)
 
+    # Error handling
+
     def not_found_error(self, id_: int | str) -> ApiError:
         return ApiError(
             HTTPStatus.NOT_FOUND,
             f"No record with id {id_} found in {self.model_name}s",
         )
+
+    def duplicate_error(
+        self, _data: Create | Update, _err: IntegrityError
+    ) -> ApiError:
+        return ApiError(HTTPStatus.CONFLICT, "Record already exists")
 
     # Serialization and Post-Processing
 
@@ -226,9 +233,7 @@ class CrudsClass[
                 isinstance(err, IntegrityError)
                 and "duplicate key" in str(err.orig).lower()
             ):
-                raise ApiError(
-                    HTTPStatus.CONFLICT, "Record already exists"
-                ) from err
+                raise self.duplicate_error(data, err) from err
 
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -392,8 +397,16 @@ class CrudsClass[
 
         except Exception as err:
             await self.session.rollback()
+
             if isinstance(err, ApiError):
                 raise err
+
+            if (
+                isinstance(err, IntegrityError)
+                and "duplicate key" in str(err.orig).lower()
+            ):
+                raise self.duplicate_error(data, err) from err
+
             raise ApiError(
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 f"Could not update {self.model_name} object: {err!s}!",
