@@ -30,9 +30,9 @@ class CrudsClass[
     Post: PydanticBaseModel,  # HTTP Post form
     Read: PydanticBaseModel,  # The Read interface
     Options: Mapping,  # General options for HTTP methods/actions
-    Selectables: str,  # Literal of Selectable fields
-    Sortables: str,  # Literal of fields we can use OrderBy on
-    Searchables: str,  # List of keys we can search on
+    Selectable: str,  # Literal of Selectable fields
+    Sortable: str,  # Literal of fields we can use OrderBy on
+    Searchable: str,  # List of keys we can search on
     Update: PydanticBaseModel,  # Update Interface
     UpdateContext: PydanticBaseModel,  # Update hooks context
     Put: PydanticBaseModel,  # HTTP Put form
@@ -47,8 +47,8 @@ class CrudsClass[
         self,
         session: AsyncSession,
         model: type[DbModel],
-        default_select: list[Selectables],
-        default_orderby: list[Sortables],
+        default_select: list[Selectable],
+        default_orderby: list[Sortable],
     ):
         self.session = session
         self.model = model
@@ -68,9 +68,9 @@ class CrudsClass[
         self.post_schema: type[Post] = types[4]  # Post PydanticBaseModel
         self.read_schema: type[Read] = types[5]  # Read PydanticBaseModel
         # self.options_type: type[Options] = types[6] # Options type
-        # self.selectables_type: type[Selectables] = types[7]  # Selectables type
-        # self.sortables_type: type[Sortables] = types[8]  # Sortables type
-        # self.searchables_type: type[Searchables] = types[9]  # Searchables type
+        # self.selectables_type: type[Selectable] = types[7]  # Selectable type
+        # self.sortables_type: type[Sortable] = types[8]  # Sortable type
+        # self.searchables_type: type[Searchable] = types[9]  # Searchable type
         self.update_schema: type[Update] = types[10]  # Update PydanticBaseModel
         self.update_context_schema: type[UpdateContext] = types[
             11
@@ -171,7 +171,7 @@ class CrudsClass[
         return [{"op": "in", "val": val}]
 
     def build_select_query(
-        self, query: SearchQuery[Selectables, Sortables, Searchables]
+        self, query: SearchQuery[Selectable, Sortable, Searchable]
     ) -> Select:
         stmt = select(self.model)
 
@@ -272,7 +272,7 @@ class CrudsClass[
 
     # Read
 
-    async def exists(self, where: WhereFilters[Searchables]) -> bool:
+    async def exists(self, where: WhereFilters[Searchable]) -> bool:
         """
         A utility function to quickly check if a record exists
         May be useful for auth methods
@@ -295,8 +295,8 @@ class CrudsClass[
     def auth_get(
         self,
         user: User,
-        query: SearchQuery[Selectables, Sortables, Searchables],
-    ) -> SearchQuery[Selectables, Sortables, Searchables]:
+        query: SearchQuery[Selectable, Sortable, Searchable],
+    ) -> SearchQuery[Selectable, Sortable, Searchable]:
         """
         Update the where statement to add ownership filters
         check the select clause to see if some fields are accessible or not by the user
@@ -307,15 +307,15 @@ class CrudsClass[
         self,
         id_: int | str,
         *,
-        fields: list[Selectables] | None = None,
+        fields: list[Selectable] | None = None,
         user: User | None = None,
     ) -> DbModel:
         """Raise a 404 Not Found ApiError if not found"""
 
-        query = SearchQuery[Selectables, Sortables, Searchables](
+        query = SearchQuery[Selectable, Sortable, Searchable](
             select=fields or self.default_select,
             where=cast(
-                WhereFilters[Searchables], {"id": self.eq(self.parse_id(id_))}
+                WhereFilters[Searchable], {"id": self.eq(self.parse_id(id_))}
             ),
         )
 
@@ -501,10 +501,10 @@ class CrudsClass[
     # Search
 
     async def count(
-        self, query: SearchQuery[Selectables, Sortables, Searchables]
+        self, query: SearchQuery[Selectable, Sortable, Searchable]
     ) -> int:
         """count the number of rows"""
-        where = query.where or cast(WhereFilters[Searchables], {})
+        where = query.where or cast(WhereFilters[Searchable], {})
         stmt = select(self.model.id)
         stmt = apply_where(stmt, where, self.map_where)
         count_stmt = select(func.count()).select_from(stmt.subquery())
@@ -513,7 +513,7 @@ class CrudsClass[
 
     async def _get_many(
         self,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         user: User | None = None,
     ) -> list[DbModel]:
         """privvate method to search records, returns a list of DbModel"""
@@ -524,17 +524,17 @@ class CrudsClass[
         if not query.orderby or len(query.orderby) == 0:
             query.orderby = list(self.default_orderby)
         if not query.where or len(query.where) == 0:
-            query.where = cast(WhereFilters[Searchables], {})
+            query.where = cast(WhereFilters[Searchable], {})
         if not query.page:
             query.page = 1
         if not query.size:
             query.size = self.MAX_ITEMS_PER_PAGE
 
         # Fetch the ids with pagination
-        filter_query = SearchQuery[Selectables, Sortables, Searchables](
+        filter_query = SearchQuery[Selectable, Sortable, Searchable](
             page=query.page,
             size=query.size,
-            select=cast(list[Selectables], ["id"]),
+            select=cast(list[Selectable], ["id"]),
             where=query.where,
             orderby=query.orderby,
         )
@@ -551,11 +551,11 @@ class CrudsClass[
             return []
 
         # Fetching the records with the id in ids
-        fetch_query = SearchQuery[Selectables, Sortables, Searchables](
+        fetch_query = SearchQuery[Selectable, Sortable, Searchable](
             page=1,
             size=len(ids),
             select=query.select,
-            where=cast(WhereFilters[Searchables], {"id": self.in_(ids)}),
+            where=cast(WhereFilters[Searchable], {"id": self.in_(ids)}),
             orderby=query.orderby,
         )
         stmt = self.build_select_query(fetch_query)
@@ -564,7 +564,7 @@ class CrudsClass[
 
     async def search(
         self,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         options: Options | None = None,
     ) -> list[Read]:
         """
@@ -583,7 +583,7 @@ class CrudsClass[
     async def user_search(
         self,
         user: User,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         options: Options | None = None,
     ) -> list[Read]:
         """
@@ -601,7 +601,7 @@ class CrudsClass[
 
     async def search_partial(
         self,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         options: Options | None = None,
     ) -> list[dict]:
         """
@@ -619,7 +619,7 @@ class CrudsClass[
     async def user_search_partial(
         self,
         user: User,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         options: Options | None = None,
     ) -> list[dict]:
         """
@@ -636,7 +636,7 @@ class CrudsClass[
 
     async def paginate(
         self,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         options: Options | None = None,
     ) -> PaginatedDict:
         # The inputs should be validated in the HTTP layer
@@ -676,7 +676,7 @@ class CrudsClass[
     async def user_paginate(
         self,
         user: User,
-        query: SearchQuery[Selectables, Sortables, Searchables],
+        query: SearchQuery[Selectable, Sortable, Searchable],
         options: Options | None = None,
     ) -> PaginatedDict:
         query = self.auth_get(user, query)

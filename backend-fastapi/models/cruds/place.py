@@ -16,10 +16,10 @@ from models.schemas import (
     PlacePostSchema,
     PlacePutSchema,
     PlaceReadSchema,
-    PlaceSearchableFields,
+    PlaceSearchable,
     PlaceSearchQuery,
-    PlaceSelectableFields,
-    PlaceSortableFields,
+    PlaceSelectable,
+    PlaceSortable,
     PlaceUpdateSchema,
     UserReadSchema,
 )
@@ -30,7 +30,7 @@ from .utils import user_exists
 
 class PlaceOptions(TypedDict):
     process: bool | None
-    fields: NotRequired[list[PlaceSelectableFields] | None]
+    fields: NotRequired[list[PlaceSelectable] | None]
 
 
 class PlaceCreateContext(BaseModel):
@@ -54,9 +54,9 @@ class CrudsPlace(
         PlacePostSchema,
         PlaceReadSchema,
         PlaceOptions,
-        PlaceSelectableFields,
-        PlaceSortableFields,
-        PlaceSearchableFields,
+        PlaceSelectable,
+        PlaceSortable,
+        PlaceSearchable,
         PlaceUpdateSchema,
         PlaceUpdateContext,
         PlacePutSchema,
@@ -69,7 +69,7 @@ class CrudsPlace(
         super().__init__(
             session,
             Place,
-            list(get_args(PlaceSelectableFields)),
+            list(get_args(PlaceSelectable)),
             ["-created_at"],
         )
 
@@ -194,7 +194,7 @@ class CrudsPlace(
             return
 
         id_ = self.parse_id(id_)
-        where: WhereFilters[PlaceSearchableFields] = {
+        where: WhereFilters[PlaceSearchable] = {
             "id": self.eq(id_),
             "creator_id": self.eq(user.id),
         }
@@ -264,7 +264,7 @@ class CrudsPlace(
             return
 
         id_ = self.parse_id(id_)
-        where: WhereFilters[PlaceSearchableFields] = {
+        where: WhereFilters[PlaceSearchable] = {
             "id": self.eq(id_),
             "creator_id": self.eq(user.id),
         }

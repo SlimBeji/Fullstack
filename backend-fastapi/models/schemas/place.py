@@ -90,7 +90,7 @@ location_annot = Annotated[Location, location_meta.info]
 
 # --- Selectables, Serchables, Sortables ----
 
-PlaceSelectableFields = Literal[
+PlaceSelectable = Literal[
     "id",
     "title",
     "description",
@@ -101,7 +101,7 @@ PlaceSelectableFields = Literal[
     "created_at",
 ]
 
-PlaceSearchableFields = Literal[
+PlaceSearchable = Literal[
     "id",
     "title",
     "description",
@@ -112,7 +112,7 @@ PlaceSearchableFields = Literal[
     "created_at",
 ]
 
-PlaceSortableFields = Literal[
+PlaceSortable = Literal[
     "created_at",
     "-created_at",
     "title",
@@ -226,23 +226,21 @@ PlacesPaginatedSchema = PaginatedData[PlaceReadSchema] | PaginatedDict
 
 
 class PlaceSearchSchema(
-    BaseSearchSchema[
-        PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
-    ]
+    BaseSearchSchema[PlaceSelectable, PlaceSortable, PlaceSearchable]
 ):
     page: Annotated[int, Field(description="The page number")] = 1
     size: Annotated[int, Field(description="Items per page")] = (
         settings.MAX_ITEMS_PER_PAGE
     )
     sort: Annotated[
-        list[PlaceSortableFields] | None,
+        list[PlaceSortable] | None,
         Field(
             description="Fields to use for sorting. Use '-' for descending",
             json_schema_extra={"examples": [["-created_at"]]},
         ),
     ] = None
     fields: Annotated[
-        list[PlaceSelectableFields] | None,
+        list[PlaceSelectable] | None,
         Field(
             description="Fields to include in the response; omit for complete data",
             json_schema_extra={"examples": ["id", "location"]},
@@ -259,6 +257,4 @@ class PlaceSearchSchema(
     created_at: HttpFilters[created_at_annot]
 
 
-PlaceSearchQuery = SearchQuery[
-    PlaceSelectableFields, PlaceSortableFields, PlaceSearchableFields
-]
+PlaceSearchQuery = SearchQuery[PlaceSelectable, PlaceSortable, PlaceSearchable]

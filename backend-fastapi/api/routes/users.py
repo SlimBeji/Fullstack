@@ -10,7 +10,7 @@ from models.schemas import (
     UserPutSchema,
     UserReadSchema,
     UserSearchSchema,
-    UserSelectableFields,
+    UserSelectable,
     UsersPaginatedSchema,
 )
 
@@ -67,7 +67,7 @@ async def create_user(
     response_model=UserReadSchema | dict,
 )
 async def get_user(
-    fields: FieldsQuery[UserSelectableFields] = None,
+    fields: FieldsQuery[UserSelectable] = None,
     user_id: str = user_id_param,
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),

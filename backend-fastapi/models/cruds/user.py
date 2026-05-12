@@ -20,10 +20,10 @@ from models.schemas import (
     UserPostSchema,
     UserPutSchema,
     UserReadSchema,
-    UserSearchableFields,
+    UserSearchable,
     UserSearchQuery,
-    UserSelectableFields,
-    UserSortableFields,
+    UserSelectable,
+    UserSortable,
     UserUpdateSchema,
     create_token,
 )
@@ -32,7 +32,7 @@ from services.instances import cloud_storage, redis_client
 
 class UserOptions(TypedDict):
     process: bool | None
-    fields: NotRequired[list[UserSelectableFields] | None]
+    fields: NotRequired[list[UserSelectable] | None]
 
 
 class UserCreateContext(BaseModel):
@@ -56,9 +56,9 @@ class CrudsUser(
         UserPostSchema,
         UserReadSchema,
         UserOptions,
-        UserSelectableFields,
-        UserSortableFields,
-        UserSearchableFields,
+        UserSelectable,
+        UserSortable,
+        UserSearchable,
         UserUpdateSchema,
         UserUpdateContext,
         UserPutSchema,
@@ -69,7 +69,7 @@ class CrudsUser(
 
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, User, list(get_args(UserSelectableFields)), ["-created_at"]
+            session, User, list(get_args(UserSelectable)), ["-created_at"]
         )
 
     # Error handling

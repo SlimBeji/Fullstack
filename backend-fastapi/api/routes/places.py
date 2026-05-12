@@ -10,7 +10,7 @@ from models.schemas import (
     PlacePutSchema,
     PlaceReadSchema,
     PlaceSearchSchema,
-    PlaceSelectableFields,
+    PlaceSelectable,
     PlacesPaginatedSchema,
     UserReadSchema,
 )
@@ -72,7 +72,7 @@ async def create_place(
     response_model=PlaceReadSchema | dict,
 )
 async def get_place(
-    fields: FieldsQuery[PlaceSelectableFields] = None,
+    fields: FieldsQuery[PlaceSelectable] = None,
     place_id: str = place_id_param,
     cruds: CrudsPlace = Depends(get_cruds_place),
     _: UserReadSchema = Depends(get_current_user),

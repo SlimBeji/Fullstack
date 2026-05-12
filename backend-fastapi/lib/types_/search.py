@@ -3,11 +3,9 @@ from pydantic import BaseModel
 from .filters import WhereFilters
 
 
-class SearchQuery[Selectables: str, Sortables: str, Searchables: str](
-    BaseModel
-):
+class SearchQuery[Selectable: str, Sortable: str, Searchable: str](BaseModel):
     page: int = 1
     size: int | None = None
-    orderby: list[Sortables] | None = None
-    select: list[Selectables] | None = None
-    where: WhereFilters[Searchables] | None = None
+    orderby: list[Sortable] | None = None
+    select: list[Selectable] | None = None
+    where: WhereFilters[Searchable] | None = None

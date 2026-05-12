@@ -15,21 +15,21 @@ type FieldsQuery[T: str] = Annotated[
 
 
 class BaseSearchSchema[
-    SelectableFields: str,
-    SortableFields: str,
-    SearchableFields: str,
+    Selectable: str,
+    Sortable: str,
+    Searchable: str,
 ](BaseModel):
     page: Annotated[int, Field(description="The page number")] = 1
     size: Annotated[int, Field(description="Items per page")] = 100
     sort: Annotated[
-        list[SortableFields] | None,
+        list[Sortable] | None,
         Field(
             description="Fields to use for sorting. Use '-' for descending",
             json_schema_extra={"examples": [["-created_at"]]},
         ),
     ] = None
     fields: Annotated[
-        list[SelectableFields] | None,
+        list[Selectable] | None,
         Field(
             description="Fields to include in the response; omit for complete data",
             json_schema_extra={"examples": ["id"]},
@@ -38,7 +38,7 @@ class BaseSearchSchema[
 
     def to_search(
         self,
-    ) -> SearchQuery[SelectableFields, SortableFields, SearchableFields]:
+    ) -> SearchQuery[Selectable, Sortable, Searchable]:
         where = {}
         for field_name in self.__class__.model_fields:
             if field_name not in ["page", "size", "sort", "fields"]:
@@ -46,10 +46,10 @@ class BaseSearchSchema[
                 if val is not None:
                     where[field_name] = val
 
-        return SearchQuery[SelectableFields, SortableFields, SearchableFields](
+        return SearchQuery[Selectable, Sortable, Searchable](
             page=self.page,
             size=self.size,
             select=self.fields,
             orderby=self.sort,
-            where=cast(WhereFilters[SearchableFields], where),
+            where=cast(WhereFilters[Searchable], where),
         )
