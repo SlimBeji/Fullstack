@@ -31,7 +31,7 @@ async def get_users(
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    options = UserOptions(process=True, fields=None)
+    options = UserOptions(process=True)
     return await cruds.paginate(query.to_search(), options)
 
 
@@ -45,7 +45,8 @@ async def get_users_from_post(
     cruds: CrudsUser = Depends(get_cruds_user),
     _: UserReadSchema = Depends(get_current_user),
 ):
-    return await cruds.paginate(query.to_search())
+    options = UserOptions(process=True)
+    return await cruds.paginate(query.to_search(), options)
 
 
 @user_router.post("/", summary="User creation", response_model=UserReadSchema)

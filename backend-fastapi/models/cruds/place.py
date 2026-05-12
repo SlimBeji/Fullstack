@@ -1,6 +1,6 @@
 from http import HTTPStatus
 import json
-from typing import TypedDict, get_args
+from typing import NotRequired, TypedDict, get_args
 
 from pydantic import BaseModel
 from sqlalchemy import Float, select, text, update
@@ -30,7 +30,7 @@ from .utils import user_exists
 
 class PlaceOptions(TypedDict):
     process: bool | None
-    fields: list[PlaceSelectableFields] | None
+    fields: NotRequired[list[PlaceSelectableFields] | None]
 
 
 class PlaceCreateContext(BaseModel):

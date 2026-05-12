@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import TypedDict, get_args
+from typing import NotRequired, TypedDict, get_args
 
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -31,7 +31,7 @@ from services.instances import cloud_storage, redis_client
 
 class UserOptions(TypedDict):
     process: bool | None
-    fields: list[UserSelectableFields] | None
+    fields: NotRequired[list[UserSelectableFields] | None]
 
 
 class UserCreateContext(BaseModel):
