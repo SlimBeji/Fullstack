@@ -26,7 +26,7 @@ impl<T: Display> Display for BatchError<T> {
 
 impl<T: std::error::Error> std::error::Error for BatchError<T> {}
 
-pub async fn batch_process<Input, Output, Error, Callback, Fut>(
+pub async fn batch_process_with_semaphore<Input, Output, Error, Callback, Fut>(
     batch: Vec<Input>,
     transform: Callback,
     max_workers: usize,
@@ -64,6 +64,48 @@ where
             Ok((i, Ok(val))) => results[i] = Some(val),
             Ok((i, Err(e))) => errors.push((i, e)),
             Err(err) => return Err(BatchError::Panic(err)),
+        }
+    }
+
+    if !errors.is_empty() {
+        return Err(BatchError::TransformFailed(errors));
+    }
+
+    Ok(results.into_iter().flatten().collect())
+}
+
+pub async fn batch_process_in_chunks<Input, Output, Error, Callback, Fut>(
+    batch: Vec<Input>,
+    transform: Callback,
+    chunk_size: usize,
+) -> Result<Vec<Output>, BatchError<Error>>
+where
+    Input: Send + 'static,
+    Output: Send + 'static,
+    Error: Send + 'static,
+    Callback: Fn(Input) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = Result<Output, Error>> + Send,
+{
+    let length = batch.len();
+    let transform = Arc::new(transform);
+
+    let mut results: Vec<Option<Output>> = (0..length).map(|_| None).collect();
+    let mut errors: Vec<(usize, Error)> = Vec::new();
+    let mut batch = batch.into_iter().enumerate().peekable();
+
+    while batch.peek().is_some() {
+        let mut join_set = JoinSet::new();
+        for (i, item) in batch.by_ref().take(chunk_size) {
+            let transform = transform.clone();
+            join_set.spawn(async move { (i, transform(item).await) });
+        }
+
+        while let Some(res) = join_set.join_next().await {
+            match res {
+                Ok((i, Ok(val))) => results[i] = Some(val),
+                Ok((i, Err(e))) => errors.push((i, e)),
+                Err(err) => return Err(BatchError::Panic(err)),
+            }
         }
     }
 
