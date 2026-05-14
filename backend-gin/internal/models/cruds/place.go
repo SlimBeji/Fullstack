@@ -99,6 +99,13 @@ func (cp *CRUDSPlace) DefaultOrderBy() []string {
 	return cp.defaultOrderBy
 }
 
+func (cp *CRUDSPlace) DuplicateError(data any) types_.APIError {
+	return types_.APIError{
+		Code:    http.StatusConflict,
+		Message: "Record already exists",
+	}
+}
+
 // Serialization and Post-Processing
 
 func (cp *CRUDSPlace) ToRead(dbModel *orm.Place) schemas.PlaceRead {

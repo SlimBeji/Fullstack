@@ -24,6 +24,7 @@ type CrudsUtils interface {
 	MapSelect(field string) []SelectField
 	MapWhere(field string) string
 	MapOrderBy(field string) string
+	DuplicateError(data any) types_.APIError
 }
 
 func BuildSelectQuery(
@@ -246,13 +247,15 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksDa
 	})
 
 	if err != nil {
+		// Return APIError
+		if errors.As(err, &types_.APIError{}) {
+			return 0, err
+		}
+
 		// Check for duplicate key error
 		if strings.Contains(err.Error(), "duplicate key") ||
 			strings.Contains(err.Error(), "UNIQUE constraint") {
-			return 0, types_.APIError{
-				Code:    http.StatusConflict,
-				Message: "Record already exists",
-			}
+			return 0, cruds.DuplicateError(data)
 		}
 
 		return 0, types_.APIError{
@@ -335,9 +338,17 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, HooksDa
 	})
 
 	if err != nil {
+		// Return APIError
 		if errors.As(err, &types_.APIError{}) {
 			return err
 		}
+
+		// Check for duplicate key error
+		if strings.Contains(err.Error(), "duplicate key") ||
+			strings.Contains(err.Error(), "UNIQUE constraint") {
+			return cruds.DuplicateError(data)
+		}
+
 		return types_.APIError{
 			Code:    http.StatusInternalServerError,
 			Message: fmt.Sprintf("Could not update %s object: %v", cruds.ModelName(), err),

@@ -96,6 +96,23 @@ func (cu *CRUDSUser) DefaultOrderBy() []string {
 	return cu.defaultOrderBy
 }
 
+func (cu *CRUDSUser) DuplicateError(data any) types_.APIError {
+	message := "Record already exists"
+	switch val := data.(type) {
+	case schemas.UserCreate:
+		message = fmt.Sprintf("%s with email %s already exists", cu.ModelName(), val.Email)
+	case schemas.UserUpdate:
+		email, ok := val[string(schemas.UserSelectEmail)]
+		if ok {
+			message = fmt.Sprintf("%s with email %s already exists", cu.ModelName(), email)
+		}
+	}
+	return types_.APIError{
+		Code:    http.StatusConflict,
+		Message: message,
+	}
+}
+
 // Serialization and Post-Processing
 
 func (cu *CRUDSUser) ToRead(dbModel *orm.User) schemas.UserRead {
