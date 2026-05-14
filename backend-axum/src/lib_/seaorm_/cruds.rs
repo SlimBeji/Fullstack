@@ -145,13 +145,6 @@ where
         }
     }
 
-    fn read_error(e: DbErr) -> ApiError {
-        ApiError::internal_error(
-            format!("failed to read {} data", Self::get_modelname()),
-            Box::new(e),
-        )
-    }
-
     fn is_duplicate_error(e: &DbErr) -> bool {
         if let DbErr::Query(RuntimeErr::SqlxError(sqlx_err)) = e
             && let Some(pg_err) = sqlx_err.as_database_error()
@@ -162,42 +155,13 @@ where
         false
     }
 
-    fn duplicate_error(e: DbErr) -> ApiError {
+    fn default_duplicate_error(e: DbErr) -> ApiError {
         ApiError {
             code: StatusCode::CONFLICT,
             message: format!("{} already exists", Self::get_modelname()),
             details: Self::extract_pg_detail(&e),
             err: Some(Box::new(e)),
         }
-    }
-
-    fn create_error(e: DbErr) -> ApiError {
-        if Self::is_duplicate_error(&e) {
-            return Self::duplicate_error(e);
-        }
-
-        ApiError::internal_error(
-            format!("failed to create {} data", Self::get_modelname()),
-            Box::new(e),
-        )
-    }
-
-    fn update_error(id: u32, e: DbErr) -> ApiError {
-        if Self::is_duplicate_error(&e) {
-            return Self::duplicate_error(e);
-        }
-
-        ApiError::internal_error(
-            format!("failed to update {} record {}", Self::get_modelname(), id),
-            Box::new(e),
-        )
-    }
-
-    fn delete_error(id: u32, e: DbErr) -> ApiError {
-        ApiError::internal_error(
-            format!("failed to delete {} record {}", Self::get_modelname(), id),
-            Box::new(e),
-        )
     }
 
     // Query building helpers
@@ -267,9 +231,20 @@ pub trait Read: CrudsUtils {
         search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     );
 
-    async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError>;
+    async fn post_process(&self, _: &mut Self::Read) -> Result<(), ApiError> {
+        Ok(())
+    }
 
-    async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError>;
+    async fn post_process_partial(&self, _: &mut Value) -> Result<(), ApiError> {
+        Ok(())
+    }
+
+    fn read_error(e: DbErr) -> ApiError {
+        ApiError::internal_error(
+            format!("failed to read {} data", Self::get_modelname()),
+            Box::new(e),
+        )
+    }
 
     async fn fetch_relations(
         &self,
@@ -433,6 +408,21 @@ pub trait Create: Read {
 
     fn create_to_model(data: &Self::Create) -> Self::ActiveModel;
 
+    fn create_error(data: &Self::Create, e: DbErr) -> ApiError {
+        if Self::is_duplicate_error(&e) {
+            return Self::create_duplicate_error(data, e);
+        }
+
+        ApiError::internal_error(
+            format!("failed to create {} data", Self::get_modelname()),
+            Box::new(e),
+        )
+    }
+
+    fn create_duplicate_error(_data: &Self::Create, e: DbErr) -> ApiError {
+        Self::default_duplicate_error(e)
+    }
+
     async fn before_create(
         &self,
         tx: &DatabaseTransaction,
@@ -443,29 +433,35 @@ pub trait Create: Read {
         &self,
         tx: &DatabaseTransaction,
         id: u32,
-        data: Self::Create,
+        data: &Self::Create,
         hooks_data: Self::CreateContext,
     ) -> Result<(), ApiError>;
 
     async fn create(&self, data: Self::Create) -> Result<u32, ApiError> {
         let model = Self::create_to_model(&data);
-        let tx = self.get_db().begin().await.map_err(Self::create_error)?;
+        let tx = self
+            .get_db()
+            .begin()
+            .await
+            .map_err(|e| Self::create_error(&data, e))?;
 
         let result = async {
             let hooks_data = self.before_create(&tx, &data).await?;
             let result = Self::Entity::insert(model)
                 .exec(&tx)
                 .await
-                .map_err(Self::create_error)?;
+                .map_err(|e| Self::create_error(&data, e))?;
             let id = Self::extract_id(result.last_insert_id);
-            self.after_create(&tx, id, data, hooks_data).await?;
+            self.after_create(&tx, id, &data, hooks_data).await?;
             Ok(id)
         }
         .await;
 
         match result {
             Ok(id) => {
-                tx.commit().await.map_err(Self::create_error)?;
+                tx.commit()
+                    .await
+                    .map_err(|e| Self::create_error(&data, e))?;
                 Ok(id)
             }
             Err(e) => {
@@ -510,6 +506,21 @@ pub trait Update: Read {
 
     fn update_to_model(id: u32, data: &Self::Update) -> Self::ActiveModel;
 
+    fn update_error(id: u32, data: &Self::Update, e: DbErr) -> ApiError {
+        if Self::is_duplicate_error(&e) {
+            return Self::update_duplicate_error(id, data, e);
+        }
+
+        ApiError::internal_error(
+            format!("failed to update {} record {}", Self::get_modelname(), id),
+            Box::new(e),
+        )
+    }
+
+    fn update_duplicate_error(_id: u32, _data: &Self::Update, e: DbErr) -> ApiError {
+        Self::default_duplicate_error(e)
+    }
+
     async fn before_update(
         &self,
         tx: &DatabaseTransaction,
@@ -521,7 +532,7 @@ pub trait Update: Read {
         &self,
         tx: &DatabaseTransaction,
         id: u32,
-        data: Self::Update,
+        data: &Self::Update,
         hooks_data: Self::UpdateContext,
     ) -> Result<(), ApiError>;
 
@@ -531,22 +542,24 @@ pub trait Update: Read {
             .get_db()
             .begin()
             .await
-            .map_err(|e| Self::update_error(id, e))?;
+            .map_err(|e| Self::update_error(id, &data, e))?;
 
         let result: Result<(), ApiError> = async {
             let hooks_data = self.before_update(&tx, id, &data).await?;
             Self::Entity::update(model)
                 .exec(&tx)
                 .await
-                .map_err(|e| Self::update_error(id, e))?;
-            self.after_update(&tx, id, data, hooks_data).await?;
+                .map_err(|e| Self::update_error(id, &data, e))?;
+            self.after_update(&tx, id, &data, hooks_data).await?;
             Ok(())
         }
         .await;
 
         match result {
             Ok(_) => {
-                tx.commit().await.map_err(|e| Self::update_error(id, e))?;
+                tx.commit()
+                    .await
+                    .map_err(|e| Self::update_error(id, &data, e))?;
                 Ok(())
             }
             Err(e) => {
@@ -599,6 +612,13 @@ pub trait Delete: Read {
         id: u32,
         hooks_data: Self::DeleteContext,
     ) -> Result<(), ApiError>;
+
+    fn delete_error(id: u32, e: DbErr) -> ApiError {
+        ApiError::internal_error(
+            format!("failed to delete {} record {}", Self::get_modelname(), id),
+            Box::new(e),
+        )
+    }
 
     async fn delete(&self, id: u32) -> Result<(), ApiError> {
         let tx = self

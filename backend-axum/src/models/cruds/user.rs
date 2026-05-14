@@ -74,17 +74,6 @@ impl CrudsUtils for CrudsUser {
         value as u32
     }
 
-    // Error handling helpers
-
-    fn duplicate_error(e: DbErr) -> ApiError {
-        ApiError {
-            code: StatusCode::CONFLICT,
-            message: format!("{} with same email already exists", Self::get_modelname()),
-            details: Self::extract_pg_detail(&e),
-            err: Some(Box::new(e)),
-        }
-    }
-
     // Query building helpers
 
     fn get_max_items_per_page() -> usize {
@@ -400,6 +389,19 @@ impl Create for CrudsUser {
         }
     }
 
+    fn create_duplicate_error(data: &Self::Create, e: DbErr) -> ApiError {
+        ApiError {
+            code: StatusCode::CONFLICT,
+            message: format!(
+                "A {} with email={} already exists",
+                Self::get_modelname(),
+                data.email
+            ),
+            details: None,
+            err: Some(Box::new(e)),
+        }
+    }
+
     async fn before_create(
         &self,
         _: &DatabaseTransaction,
@@ -412,7 +414,7 @@ impl Create for CrudsUser {
         &self,
         _: &DatabaseTransaction,
         _: u32,
-        _: Self::Create,
+        _: &Self::Create,
         _: Self::CreateContext,
     ) -> Result<(), ApiError> {
         Ok(())
@@ -471,6 +473,23 @@ impl Update for CrudsUser {
         model
     }
 
+    fn update_duplicate_error(_id: u32, data: &Self::Update, e: DbErr) -> ApiError {
+        let Some(email) = &data.email else {
+            return Self::default_duplicate_error(e);
+        };
+
+        ApiError {
+            code: StatusCode::CONFLICT,
+            message: format!(
+                "A {} with email={} already exists",
+                Self::get_modelname(),
+                email
+            ),
+            details: None,
+            err: Some(Box::new(e)),
+        }
+    }
+
     async fn before_update(
         &self,
         _: &DatabaseTransaction,
@@ -484,7 +503,7 @@ impl Update for CrudsUser {
         &self,
         _: &DatabaseTransaction,
         id: u32,
-        _: Self::Update,
+        _: &Self::Update,
         _: Self::UpdateContext,
     ) -> Result<(), ApiError> {
         self.app_state
