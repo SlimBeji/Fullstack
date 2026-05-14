@@ -511,7 +511,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 
 	// Step 6: Post-process if requested
 	if process {
-		processed, err := utils.BatchProcess(
+		processed, err := utils.BatchProcessWithSemaphore(
 			results,
 			func(item Read) (Read, error) {
 				err := cruds.PostProcess(ctx, &item)
@@ -581,7 +581,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 
 	// Step 6: Post-process if requested
 	if process {
-		processed, err := utils.BatchProcess(
+		processed, err := utils.BatchProcessWithSemaphore(
 			results,
 			func(item map[string]any) (map[string]any, error) {
 				err := cruds.PostProcessPartial(ctx, item)
@@ -640,23 +640,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 		return zero, err
 	}
 
-	// Step 6: Post-process if requested
-	if process {
-		processed, err := utils.BatchProcess(
-			data,
-			func(item map[string]any) (map[string]any, error) {
-				err := cruds.PostProcessPartial(ctx, item)
-				return item, err
-			},
-			workers,
-		)
-		if err != nil {
-			return zero, err
-		}
-		data = processed
-	}
-
-	// Step 7: Return paginated result
+	// Step 6: Return paginated result
 	return types_.PaginatedDict{
 		Page:       page,
 		TotalPages: totalPages,
