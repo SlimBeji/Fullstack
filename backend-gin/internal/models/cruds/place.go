@@ -694,27 +694,57 @@ func (cp *CRUDSPlace) UserDelete(
 // Search
 
 func (cp *CRUDSPlace) Search(
-	ctx context.Context, query types_.SearchQuery,
+	ctx context.Context, query types_.SearchQuery, options *PlaceOptions,
 ) ([]schemas.PlaceRead, error) {
-	return gorm_.GetMany(ctx, cp, query, nil)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetMany(
+		ctx, cp, query, nil, process, MaxPlaceConcurentProcessing,
+	)
 }
 
 func (cp *CRUDSPlace) UserSearch(
-	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context,
+	user schemas.UserRead,
+	query types_.SearchQuery,
+	options *PlaceOptions,
 ) ([]schemas.PlaceRead, error) {
-	return gorm_.GetMany(ctx, cp, query, &user)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetMany(
+		ctx, cp, query, &user, process, MaxPlaceConcurentProcessing,
+	)
 }
 
 func (cp *CRUDSPlace) SearchPartial(
-	ctx context.Context, query types_.SearchQuery,
+	ctx context.Context, query types_.SearchQuery, options *PlaceOptions,
 ) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(ctx, cp, query, nil)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetManyPartial(
+		ctx, cp, query, nil, process, MaxPlaceConcurentProcessing,
+	)
 }
 
 func (cp *CRUDSPlace) UserSearchPartial(
-	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context,
+	user schemas.UserRead,
+	query types_.SearchQuery,
+	options *PlaceOptions,
 ) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(ctx, cp, query, &user)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetManyPartial(
+		ctx, cp, query, &user, process, MaxPlaceConcurentProcessing,
+	)
 }
 
 func (cp *CRUDSPlace) Paginate(

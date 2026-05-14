@@ -463,6 +463,8 @@ func GetMany[User any, Model BaseModelReader, Read any](
 	crud RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
+	process bool,
+	workers int,
 ) ([]Read, error) {
 	// Force default select for full Model
 	query.Select = crud.DefaultSelect()
@@ -501,6 +503,23 @@ func GetMany[User any, Model BaseModelReader, Read any](
 	for i, model := range models {
 		results[i] = crud.ToRead(&model)
 	}
+
+	// Step 6: Post-process if requested
+	if process {
+		processed, err := utils.BatchProcess(
+			results,
+			func(item Read) (Read, error) {
+				err := crud.PostProcess(ctx, &item)
+				return item, err
+			},
+			workers,
+		)
+		if err != nil {
+			return nil, err
+		}
+		results = processed
+	}
+
 	return results, nil
 }
 
@@ -509,6 +528,8 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 	crud RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
+	process bool,
+	workers int,
 ) ([]map[string]any, error) {
 	// Apply defaults
 	if len(query.Select) == 0 {
@@ -542,7 +563,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 		return nil, err
 	}
 
-	// Convert to Read schemas
+	// Convert to map
 	results := make([]map[string]any, len(models))
 	finalFields := GetSelectedFields(query.Select, crud.MapSelect)
 	for i, model := range models {
@@ -551,6 +572,22 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 			return results, err
 		}
 		results[i] = partial
+	}
+
+	// Step 6: Post-process if requested
+	if process {
+		processed, err := utils.BatchProcess(
+			results,
+			func(item map[string]any) (map[string]any, error) {
+				err := crud.PostProcessPartial(ctx, item)
+				return item, err
+			},
+			workers,
+		)
+		if err != nil {
+			return nil, err
+		}
+		results = processed
 	}
 
 	return results, nil
@@ -593,7 +630,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 	query.Size = size
 
 	// Step 5: Fetch results (without auth since already applied)
-	data, err := GetManyPartial(ctx, crud, query, nil)
+	data, err := GetManyPartial(ctx, crud, query, nil, process, workers)
 	if err != nil {
 		return zero, err
 	}

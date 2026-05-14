@@ -684,27 +684,59 @@ func (cu *CRUDSUser) UserDelete(
 // Search
 
 func (cu *CRUDSUser) Search(
-	ctx context.Context, query types_.SearchQuery,
+	ctx context.Context, query types_.SearchQuery, options *UserOptions,
 ) ([]schemas.UserRead, error) {
-	return gorm_.GetMany(ctx, cu, query, nil)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetMany(
+		ctx, cu, query, nil, process, MaxUserConcurentProcessing,
+	)
 }
 
 func (cu *CRUDSUser) UserSearch(
-	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context,
+	user schemas.UserRead,
+	query types_.SearchQuery,
+	options *UserOptions,
 ) ([]schemas.UserRead, error) {
-	return gorm_.GetMany(ctx, cu, query, &user)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetMany(
+		ctx, cu, query, &user, process, MaxUserConcurentProcessing,
+	)
 }
 
 func (cu *CRUDSUser) SearchPartial(
-	ctx context.Context, query types_.SearchQuery,
+	ctx context.Context,
+	query types_.SearchQuery,
+	options *UserOptions,
 ) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(ctx, cu, query, nil)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetManyPartial(
+		ctx, cu, query, nil, process, MaxUserConcurentProcessing,
+	)
 }
 
 func (cu *CRUDSUser) UserSearchPartial(
-	ctx context.Context, user schemas.UserRead, query types_.SearchQuery,
+	ctx context.Context,
+	user schemas.UserRead,
+	query types_.SearchQuery,
+	options *UserOptions,
 ) ([]map[string]any, error) {
-	return gorm_.GetManyPartial(ctx, cu, query, &user)
+	process := false
+	if options != nil {
+		process = options.Process
+	}
+	return gorm_.GetManyPartial(
+		ctx, cu, query, &user, process, MaxUserConcurentProcessing,
+	)
 }
 
 func (cu *CRUDSUser) Paginate(

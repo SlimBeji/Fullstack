@@ -29,7 +29,7 @@ func getPlaceExamples() ([]schemas.PlaceRead, error) {
 			"title": {{Op: "eq", Val: "Stamford Bridge"}},
 		},
 	}
-	data, err := cp.Search(context.Background(), searchQuery)
+	data, err := cp.Search(context.Background(), searchQuery, nil)
 	if err != nil {
 		return []schemas.PlaceRead{}, errors.New(
 			"could not extract examples for testing places endpoints",
