@@ -400,9 +400,14 @@ func DeleteRecord[User any, Model BaseModelReader, Read any, HooksData any](
 
 		// Delete from database
 		var model Model
-		result := tx.Delete(&model, id) // How to delete record by id ??
+		result := tx.Delete(&model, id)
 		if result.Error != nil {
 			return result.Error
+		}
+
+		// Check if record was found and deleted
+		if result.RowsAffected == 0 {
+			return types_.NotFoundError(crud.ModelName(), id)
 		}
 
 		// After delete hook
