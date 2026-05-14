@@ -28,22 +28,22 @@ type CrudsUtils interface {
 
 func BuildSelectQuery(
 	ctx context.Context,
-	crud CrudsUtils,
+	cruds CrudsUtils,
 	query types_.SearchQuery,
 ) (*gorm.DB, error) {
-	qb := crud.GetModel(ctx)
+	qb := cruds.GetModel(ctx)
 
 	// Apply select
 	selectFields := query.Select
 	if len(selectFields) == 0 {
-		selectFields = crud.DefaultSelect()
+		selectFields = cruds.DefaultSelect()
 	}
-	qb = ApplySelect(qb, selectFields, crud.MapSelect)
+	qb = ApplySelect(qb, selectFields, cruds.MapSelect)
 
 	// Apply where
 	if len(query.Where) > 0 {
 		var err error
-		qb, err = ApplyWhere(qb, query.Where, crud.MapWhere)
+		qb, err = ApplyWhere(qb, query.Where, cruds.MapWhere)
 		if err != nil {
 			return nil, err
 		}
@@ -52,9 +52,9 @@ func BuildSelectQuery(
 	// Apply orderby
 	orderBy := query.OrderBy
 	if len(orderBy) == 0 {
-		orderBy = crud.DefaultOrderBy()
+		orderBy = cruds.DefaultOrderBy()
 	}
-	qb = ApplyOrderBy(qb, orderBy, crud.MapOrderBy)
+	qb = ApplyOrderBy(qb, orderBy, cruds.MapOrderBy)
 
 	// Apply limit
 	if query.Size > 0 {
@@ -65,7 +65,7 @@ func BuildSelectQuery(
 	if query.Page > 0 {
 		size := query.Size
 		if size == 0 {
-			size = crud.MaxItemsPerPage()
+			size = cruds.MaxItemsPerPage()
 		}
 		offset := (query.Page - 1) * size
 		qb = qb.Offset(offset)
@@ -76,17 +76,17 @@ func BuildSelectQuery(
 
 func Exists(
 	ctx context.Context,
-	crud CrudsUtils,
+	cruds CrudsUtils,
 	where types_.WhereFilters,
 ) (bool, error) {
-	qb := crud.GetModel(ctx)
+	qb := cruds.GetModel(ctx)
 
 	// Select only ID (minimal query)
 	qb = qb.Select("id")
 
 	// Apply where filters
 	var err error
-	qb, err = ApplyWhere(qb, where, crud.MapWhere)
+	qb, err = ApplyWhere(qb, where, cruds.MapWhere)
 	if err != nil {
 		return false, err
 	}
@@ -113,10 +113,10 @@ type RecordRead[User any, Model BaseModelReader, Read any] interface {
 }
 
 func Read[User any, Model BaseModelReader, Read any](
-	ctx context.Context, crud RecordRead[User, Model, Read], id uint,
+	ctx context.Context, cruds RecordRead[User, Model, Read], id uint,
 ) (*Model, error) {
 	var result Model
-	err := crud.GetModel(ctx).First(&result, id).Error
+	err := cruds.GetModel(ctx).First(&result, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // Not found
@@ -128,7 +128,7 @@ func Read[User any, Model BaseModelReader, Read any](
 
 func getRaw[User any, Model BaseModelReader, Read any](
 	ctx context.Context,
-	crud RecordRead[User, Model, Read],
+	cruds RecordRead[User, Model, Read],
 	id uint,
 	fields []string,
 	user *User,
@@ -145,11 +145,11 @@ func getRaw[User any, Model BaseModelReader, Read any](
 
 	// Apply auth if user provided
 	if user != nil {
-		query = crud.AuthGet(ctx, *user, query)
+		query = cruds.AuthGet(ctx, *user, query)
 	}
 
 	// Build and execute query
-	qb, err := BuildSelectQuery(ctx, crud, query)
+	qb, err := BuildSelectQuery(ctx, cruds, query)
 	if err != nil {
 		return zero, err
 	}
@@ -160,38 +160,38 @@ func getRaw[User any, Model BaseModelReader, Read any](
 }
 
 func Get[User any, Model BaseModelReader, Read any](
-	ctx context.Context, crud RecordRead[User, Model, Read], id uint, user *User,
+	ctx context.Context, cruds RecordRead[User, Model, Read], id uint, user *User,
 ) (Read, error) {
 	var zero Read
-	model, err := getRaw(ctx, crud, id, []string{}, user)
+	model, err := getRaw(ctx, cruds, id, []string{}, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return zero, types_.NotFoundError(crud.ModelName(), id)
+			return zero, types_.NotFoundError(cruds.ModelName(), id)
 		}
 		return zero, err
 	}
 
-	return crud.ToRead(&model), nil
+	return cruds.ToRead(&model), nil
 }
 
 func GetPartial[User any, Model BaseModelReader, Read any](
 	ctx context.Context,
-	crud RecordRead[User, Model, Read],
+	cruds RecordRead[User, Model, Read],
 	id uint,
 	fields []string,
 	user *User,
 ) (map[string]any, error) {
 	result := make(map[string]any)
-	model, err := getRaw(ctx, crud, id, fields, user)
+	model, err := getRaw(ctx, cruds, id, fields, user)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return result, types_.NotFoundError(crud.ModelName(), id)
+			return result, types_.NotFoundError(cruds.ModelName(), id)
 		}
 		return result, err
 	}
 
-	finalFields := GetSelectedFields(fields, crud.MapSelect)
-	return crud.ToJSON(model, finalFields)
+	finalFields := GetSelectedFields(fields, cruds.MapSelect)
+	return cruds.ToJSON(model, finalFields)
 }
 
 // Create Helpers
@@ -214,17 +214,17 @@ type RecordCreate[
 
 func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksData any, Post any](
 	ctx context.Context,
-	crud RecordCreate[User, Model, Read, Create, HooksData, Post],
+	cruds RecordCreate[User, Model, Read, Create, HooksData, Post],
 	data Create,
 ) (uint, error) {
 	var createdID uint
 
-	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
+	err := cruds.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Convert Create to Model
-		entity := crud.CreateToModel(data)
+		entity := cruds.CreateToModel(data)
 
 		// Before create hook
-		hooksData, err := crud.BeforeCreate(tx, data)
+		hooksData, err := cruds.BeforeCreate(tx, data)
 		if err != nil {
 			return err
 		}
@@ -238,7 +238,7 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksDa
 		createdID = entity.GetId()
 
 		// After create hook
-		if err := crud.AfterCreate(tx, createdID, data, hooksData); err != nil {
+		if err := cruds.AfterCreate(tx, createdID, data, hooksData); err != nil {
 			return err
 		}
 
@@ -257,7 +257,7 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksDa
 
 		return 0, types_.APIError{
 			Code:    http.StatusInternalServerError,
-			Message: fmt.Sprintf("Could not create %s object: %v", crud.ModelName(), err),
+			Message: fmt.Sprintf("Could not create %s object: %v", cruds.ModelName(), err),
 		}
 	}
 
@@ -266,23 +266,23 @@ func CreateRecord[User any, Model BaseModelReader, Read any, Create any, HooksDa
 
 func PostRecord[User any, Model BaseModelReader, Read any, Create any, HooksData any, Post any](
 	ctx context.Context,
-	crud RecordCreate[User, Model, Read, Create, HooksData, Post],
+	cruds RecordCreate[User, Model, Read, Create, HooksData, Post],
 	form Post,
 	user *User,
 ) (uint, error) {
 	if user != nil {
-		err := crud.AuthPost(ctx, *user, form)
+		err := cruds.AuthPost(ctx, *user, form)
 		if err != nil {
 			return 0, err
 		}
 	}
 
-	data, err := crud.PostToCreate(ctx, form)
+	data, err := cruds.PostToCreate(ctx, form)
 	if err != nil {
 		return 0, err
 	}
 
-	return CreateRecord(ctx, crud, data)
+	return CreateRecord(ctx, cruds, data)
 }
 
 // Update Helpers
@@ -304,13 +304,13 @@ type RecordUpdate[
 
 func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, HooksData any, Put any](
 	ctx context.Context,
-	crud RecordUpdate[User, Model, Read, Update, HooksData, Put],
+	cruds RecordUpdate[User, Model, Read, Update, HooksData, Put],
 	id uint,
 	data Update,
 ) error {
-	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
+	err := cruds.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Before update hook
-		hooksData, err := crud.BeforeUpdate(tx, id, data)
+		hooksData, err := cruds.BeforeUpdate(tx, id, data)
 		if err != nil {
 			return err
 		}
@@ -323,11 +323,11 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, HooksDa
 
 		// Check if record exists
 		if result.RowsAffected == 0 {
-			return types_.NotFoundError(crud.ModelName(), id)
+			return types_.NotFoundError(cruds.ModelName(), id)
 		}
 
 		// After update hook
-		if err := crud.AfterUpdate(tx, id, data, hooksData); err != nil {
+		if err := cruds.AfterUpdate(tx, id, data, hooksData); err != nil {
 			return err
 		}
 
@@ -340,7 +340,7 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, HooksDa
 		}
 		return types_.APIError{
 			Code:    http.StatusInternalServerError,
-			Message: fmt.Sprintf("Could not update %s object: %v", crud.ModelName(), err),
+			Message: fmt.Sprintf("Could not update %s object: %v", cruds.ModelName(), err),
 		}
 	}
 
@@ -349,24 +349,24 @@ func UpdateRecord[User any, Model BaseModelReader, Read any, Update any, HooksDa
 
 func PutRecord[User any, Model BaseModelReader, Read any, Update any, HooksData any, Put any](
 	ctx context.Context,
-	crud RecordUpdate[User, Model, Read, Update, HooksData, Put],
+	cruds RecordUpdate[User, Model, Read, Update, HooksData, Put],
 	id uint,
 	form Put,
 	user *User,
 ) error {
 	if user != nil {
-		err := crud.AuthPut(ctx, *user, id, form)
+		err := cruds.AuthPut(ctx, *user, id, form)
 		if err != nil {
 			return err
 		}
 	}
 
-	data, err := crud.PutToUpdate(ctx, form)
+	data, err := cruds.PutToUpdate(ctx, form)
 	if err != nil {
 		return err
 	}
 
-	return UpdateRecord(ctx, crud, id, data)
+	return UpdateRecord(ctx, cruds, id, data)
 }
 
 // Delete Helpers
@@ -380,20 +380,20 @@ type RecordDelete[User any, Model BaseModelReader, Read any, HooksData any] inte
 
 func DeleteRecord[User any, Model BaseModelReader, Read any, HooksData any](
 	ctx context.Context,
-	crud RecordDelete[User, Model, Read, HooksData],
+	cruds RecordDelete[User, Model, Read, HooksData],
 	id uint,
 	user *User,
 ) error {
 	// Check authoriztion
 	if user != nil {
-		if err := crud.AuthDelete(ctx, *user, id); err != nil {
+		if err := cruds.AuthDelete(ctx, *user, id); err != nil {
 			return err
 		}
 	}
 
-	err := crud.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
+	err := cruds.GetDB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Before delete hook
-		hooksData, err := crud.BeforeDelete(tx, id)
+		hooksData, err := cruds.BeforeDelete(tx, id)
 		if err != nil {
 			return err
 		}
@@ -407,11 +407,11 @@ func DeleteRecord[User any, Model BaseModelReader, Read any, HooksData any](
 
 		// Check if record was found and deleted
 		if result.RowsAffected == 0 {
-			return types_.NotFoundError(crud.ModelName(), id)
+			return types_.NotFoundError(cruds.ModelName(), id)
 		}
 
 		// After delete hook
-		if err := crud.AfterDelete(tx, id, hooksData); err != nil {
+		if err := cruds.AfterDelete(tx, id, hooksData); err != nil {
 			return err
 		}
 
@@ -424,7 +424,7 @@ func DeleteRecord[User any, Model BaseModelReader, Read any, HooksData any](
 		}
 		return types_.APIError{
 			Code:    http.StatusInternalServerError,
-			Message: fmt.Sprintf("Could not delete %s object: %v", crud.ModelName(), err),
+			Message: fmt.Sprintf("Could not delete %s object: %v", cruds.ModelName(), err),
 		}
 	}
 
@@ -439,15 +439,15 @@ type RecordsSearch[User any, Model BaseModelReader, Read any] interface {
 
 func Count[User any, Model BaseModelReader, Read any](
 	ctx context.Context,
-	crud RecordsSearch[User, Model, Read],
+	cruds RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 ) (int64, error) {
-	qb := crud.GetModel(ctx)
+	qb := cruds.GetModel(ctx)
 
 	// Apply where filters
 	if len(query.Where) > 0 {
 		var err error
-		qb, err = ApplyWhere(qb, query.Where, crud.MapWhere)
+		qb, err = ApplyWhere(qb, query.Where, cruds.MapWhere)
 		if err != nil {
 			return 0, err
 		}
@@ -465,33 +465,33 @@ func Count[User any, Model BaseModelReader, Read any](
 
 func GetMany[User any, Model BaseModelReader, Read any](
 	ctx context.Context,
-	crud RecordsSearch[User, Model, Read],
+	cruds RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
 	process bool,
 	workers int,
 ) ([]Read, error) {
 	// Force default select for full Model
-	query.Select = crud.DefaultSelect()
+	query.Select = cruds.DefaultSelect()
 
 	// Apply defaults
 	if len(query.OrderBy) == 0 {
-		query.OrderBy = crud.DefaultOrderBy()
+		query.OrderBy = cruds.DefaultOrderBy()
 	}
 	if query.Page == 0 {
 		query.Page = 1
 	}
 	if query.Size == 0 {
-		query.Size = crud.MaxItemsPerPage()
+		query.Size = cruds.MaxItemsPerPage()
 	}
 
 	// Apply auth filter if user provided
 	if user != nil {
-		query = crud.AuthGet(ctx, *user, query)
+		query = cruds.AuthGet(ctx, *user, query)
 	}
 
 	// Build query
-	qb, err := BuildSelectQuery(ctx, crud, query)
+	qb, err := BuildSelectQuery(ctx, cruds, query)
 	if err != nil {
 		return nil, err
 	}
@@ -506,7 +506,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 	// Convert to Read schemas
 	results := make([]Read, len(models))
 	for i, model := range models {
-		results[i] = crud.ToRead(&model)
+		results[i] = cruds.ToRead(&model)
 	}
 
 	// Step 6: Post-process if requested
@@ -514,7 +514,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 		processed, err := utils.BatchProcess(
 			results,
 			func(item Read) (Read, error) {
-				err := crud.PostProcess(ctx, &item)
+				err := cruds.PostProcess(ctx, &item)
 				return item, err
 			},
 			workers,
@@ -530,7 +530,7 @@ func GetMany[User any, Model BaseModelReader, Read any](
 
 func GetManyPartial[User any, Model BaseModelReader, Read any](
 	ctx context.Context,
-	crud RecordsSearch[User, Model, Read],
+	cruds RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
 	process bool,
@@ -538,25 +538,25 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 ) ([]map[string]any, error) {
 	// Apply defaults
 	if len(query.Select) == 0 {
-		query.Select = crud.DefaultSelect()
+		query.Select = cruds.DefaultSelect()
 	}
 	if len(query.OrderBy) == 0 {
-		query.OrderBy = crud.DefaultOrderBy()
+		query.OrderBy = cruds.DefaultOrderBy()
 	}
 	if query.Page == 0 {
 		query.Page = 1
 	}
 	if query.Size == 0 {
-		query.Size = crud.MaxItemsPerPage()
+		query.Size = cruds.MaxItemsPerPage()
 	}
 
 	// Apply auth filter if user provided
 	if user != nil {
-		query = crud.AuthGet(ctx, *user, query)
+		query = cruds.AuthGet(ctx, *user, query)
 	}
 
 	// Build query
-	qb, err := BuildSelectQuery(ctx, crud, query)
+	qb, err := BuildSelectQuery(ctx, cruds, query)
 	if err != nil {
 		return nil, err
 	}
@@ -570,9 +570,9 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 
 	// Convert to map
 	results := make([]map[string]any, len(models))
-	finalFields := GetSelectedFields(query.Select, crud.MapSelect)
+	finalFields := GetSelectedFields(query.Select, cruds.MapSelect)
 	for i, model := range models {
-		partial, err := crud.ToJSON(model, finalFields)
+		partial, err := cruds.ToJSON(model, finalFields)
 		if err != nil {
 			return results, err
 		}
@@ -584,7 +584,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 		processed, err := utils.BatchProcess(
 			results,
 			func(item map[string]any) (map[string]any, error) {
-				err := crud.PostProcessPartial(ctx, item)
+				err := cruds.PostProcessPartial(ctx, item)
 				return item, err
 			},
 			workers,
@@ -600,7 +600,7 @@ func GetManyPartial[User any, Model BaseModelReader, Read any](
 
 func Paginate[User any, Model BaseModelReader, Read any](
 	ctx context.Context,
-	crud RecordsSearch[User, Model, Read],
+	cruds RecordsSearch[User, Model, Read],
 	query types_.SearchQuery,
 	user *User,
 	process bool,
@@ -610,11 +610,11 @@ func Paginate[User any, Model BaseModelReader, Read any](
 
 	// Step 1: Apply auth filter if user provided
 	if user != nil {
-		query = crud.AuthGet(ctx, *user, query)
+		query = cruds.AuthGet(ctx, *user, query)
 	}
 
 	// Step 2: Count total results
-	totalCount, err := Count(ctx, crud, query)
+	totalCount, err := Count(ctx, cruds, query)
 	if err != nil {
 		return zero, err
 	}
@@ -626,7 +626,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 	}
 	size := query.Size
 	if size == 0 {
-		size = crud.MaxItemsPerPage()
+		size = cruds.MaxItemsPerPage()
 	}
 	totalPages := (int(totalCount) + size - 1) / size
 
@@ -635,7 +635,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 	query.Size = size
 
 	// Step 5: Fetch results (without auth since already applied)
-	data, err := GetManyPartial(ctx, crud, query, nil, process, workers)
+	data, err := GetManyPartial(ctx, cruds, query, nil, process, workers)
 	if err != nil {
 		return zero, err
 	}
@@ -645,7 +645,7 @@ func Paginate[User any, Model BaseModelReader, Read any](
 		processed, err := utils.BatchProcess(
 			data,
 			func(item map[string]any) (map[string]any, error) {
-				err := crud.PostProcessPartial(ctx, item)
+				err := cruds.PostProcessPartial(ctx, item)
 				return item, err
 			},
 			workers,
