@@ -14,7 +14,7 @@ use crate::lib_::{
     clients::{CloudStorage, PgClient, RedisClient},
     seaorm_::to_condition,
     types_::{ApiError, SearchQuery, SearchableTrait, SortableTrait},
-    utils,
+    utils::{self, batch_process_with_semaphore},
 };
 
 // Traits for types used in CRUDS
@@ -675,6 +675,8 @@ pub trait Delete: Read {
 
 #[async_trait]
 pub trait Search: Read {
+    const MAX_WORKERS: usize = 50;
+
     async fn select_many(
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
@@ -720,6 +722,14 @@ pub trait Search: Read {
         Ok(data)
     }
 
+    async fn get_raws_for_read(
+        &self,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Self::Reader, ApiError> {
+        query.select = Some(Self::get_default_select());
+        self.get_raws(query).await
+    }
+
     async fn count(
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
@@ -730,5 +740,81 @@ pub trait Search: Read {
         }
         let count = q.count(self.get_db()).await.map_err(Self::read_error)?;
         Ok(count as usize)
+    }
+
+    async fn batch_post_process(&self, data: Vec<Self::Read>) -> Result<Vec<Self::Read>, ApiError> {
+        // Clone self so it can be moved safely
+        let this = self.clone();
+
+        // Move the outer this inside the transform closue
+        let transform = move |item| {
+            // Cloning the outer self to an inner self so it can be moved inside the async callback
+            let this = this.clone();
+            async move { this.post_process(item).await }
+        };
+
+        batch_process_with_semaphore(data, transform, Self::MAX_WORKERS)
+            .await
+            .map_err(|err| Self::serialization_error(Some(Box::new(err))))
+    }
+
+    async fn batch_post_process_partial(&self, data: Vec<Value>) -> Result<Vec<Value>, ApiError> {
+        // Clone self so it can be moved safely
+        let this = self.clone();
+
+        // Move the outer this inside the transform closue
+        let transform = move |item| {
+            // Cloning the outer self to an inner self so it can be moved inside the async callback
+            let this = this.clone();
+            async move { this.post_process_partial(item).await }
+        };
+
+        batch_process_with_semaphore(data, transform, Self::MAX_WORKERS)
+            .await
+            .map_err(|err| Self::serialization_error(Some(Box::new(err))))
+    }
+
+    async fn search(
+        &self,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        options: Option<Self::Options>,
+    ) -> Result<Vec<Self::Read>, ApiError> {
+        let mut data = self.get_raws_for_read(query).await?.read()?;
+        if options.is_some_and(|o| o.process()) {
+            data = self.batch_post_process(data).await?;
+        }
+        Ok(data)
+    }
+
+    async fn user_search(
+        &self,
+        user: &Self::User,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        options: Option<Self::Options>,
+    ) -> Result<Vec<Self::Read>, ApiError> {
+        Self::auth_get(user, query).await?;
+        self.search(query, options).await
+    }
+
+    async fn search_partial(
+        &self,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        options: Option<Self::Options>,
+    ) -> Result<Vec<Value>, ApiError> {
+        let mut data = self.get_raws(query).await?.read_json()?;
+        if options.is_some_and(|o| o.process()) {
+            data = self.batch_post_process_partial(data).await?;
+        }
+        Ok(data)
+    }
+
+    async fn user_search_partial(
+        &self,
+        user: &Self::User,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        options: Option<Self::Options>,
+    ) -> Result<Vec<Value>, ApiError> {
+        Self::auth_get(user, query).await?;
+        self.search_partial(query, options).await
     }
 }
