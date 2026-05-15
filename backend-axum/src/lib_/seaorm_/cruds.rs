@@ -239,9 +239,9 @@ pub trait Read: CrudsUtils {
     type Reader: Send + Sync + RecordReader<Read = Self::Read>; // Container that stores fetched data and reads it
 
     async fn auth_get(
-        user: Self::User,
+        user: &Self::User,
         search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    );
+    ) -> Result<(), ApiError>;
 
     async fn post_process(&self, data: Self::Read) -> Result<Self::Read, ApiError> {
         Ok(data)
@@ -346,12 +346,12 @@ pub trait Read: CrudsUtils {
 
     async fn user_get(
         &self,
-        user: Self::User,
+        user: &Self::User,
         id: u32,
         options: Option<Self::Options>,
     ) -> Result<Self::Read, ApiError> {
         let mut query = SearchQuery::id(id);
-        Self::auth_get(user, &mut query).await;
+        Self::auth_get(user, &mut query).await?;
         let raw = self
             .get_raw_for_read(&mut query)
             .await
@@ -385,7 +385,7 @@ pub trait Read: CrudsUtils {
 
     async fn user_get_partial(
         &self,
-        user: Self::User,
+        user: &Self::User,
         id: u32,
         options: Option<Self::Options>,
     ) -> Result<Value, ApiError> {
@@ -393,7 +393,7 @@ pub trait Read: CrudsUtils {
         if let Some(fields) = &options {
             query.select = fields.fields()
         }
-        Self::auth_get(user, &mut query).await;
+        Self::auth_get(user, &mut query).await?;
         let raw = self
             .get_raw(&query)
             .await
