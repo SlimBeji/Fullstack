@@ -258,21 +258,21 @@ impl Read for CrudsUser {
         search.where_ = Some(where_);
     }
 
-    async fn post_process(&self, data: &mut Self::Read) -> Result<(), ApiError> {
+    async fn post_process(&self, mut data: Self::Read) -> Result<Self::Read, ApiError> {
         data.image_url = self
             .app_state
             .storage
             .get_signed_url(&data.image_url, None)
             .await?;
-        Ok(())
+        Ok(data)
     }
 
-    async fn post_process_partial(&self, data: &mut Value) -> Result<(), ApiError> {
-        let result = utils::get_string_from_json(UserSelectable::ImageUrl.into(), data)
+    async fn post_process_partial(&self, mut data: Value) -> Result<Value, ApiError> {
+        let result = utils::get_string_from_json(UserSelectable::ImageUrl.into(), &data)
             .map_err(|_| Self::serialization_error())?;
 
         let Some(image_url) = result else {
-            return Ok(());
+            return Ok(data);
         };
 
         let key: &'static str = UserSelectable::ImageUrl.into();
@@ -283,7 +283,7 @@ impl Read for CrudsUser {
                 .await?,
         );
 
-        Ok(())
+        Ok(data)
     }
 
     async fn fetch_relations(

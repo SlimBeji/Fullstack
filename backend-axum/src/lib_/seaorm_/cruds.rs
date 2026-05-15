@@ -233,12 +233,12 @@ pub trait Read: CrudsUtils {
         search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     );
 
-    async fn post_process(&self, _: &mut Self::Read) -> Result<(), ApiError> {
-        Ok(())
+    async fn post_process(&self, data: Self::Read) -> Result<Self::Read, ApiError> {
+        Ok(data)
     }
 
-    async fn post_process_partial(&self, _: &mut Value) -> Result<(), ApiError> {
-        Ok(())
+    async fn post_process_partial(&self, data: Value) -> Result<Value, ApiError> {
+        Ok(data)
     }
 
     fn read_error(e: DbErr) -> ApiError {
@@ -329,7 +329,7 @@ pub trait Read: CrudsUtils {
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
         if options.is_some_and(|o| o.process()) {
-            self.post_process(&mut data).await?;
+            data = self.post_process(data).await?;
         }
         Ok(data)
     }
@@ -348,7 +348,7 @@ pub trait Read: CrudsUtils {
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_read(raw)?;
         if options.is_some_and(|o| o.process()) {
-            self.post_process(&mut data).await?;
+            data = self.post_process(data).await?;
         }
         Ok(data)
     }
@@ -368,7 +368,7 @@ pub trait Read: CrudsUtils {
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
         if options.is_some_and(|o| o.process()) {
-            self.post_process_partial(&mut data).await?;
+            data = self.post_process_partial(data).await?;
         }
         Ok(data)
     }
@@ -390,7 +390,7 @@ pub trait Read: CrudsUtils {
             .map_err(|err| Self::update_not_found_with_id(err, id))?;
         let mut data = Self::to_json(raw)?;
         if options.is_some_and(|o| o.process()) {
-            self.post_process_partial(&mut data).await?;
+            data = self.post_process_partial(data).await?;
         }
         Ok(data)
     }
