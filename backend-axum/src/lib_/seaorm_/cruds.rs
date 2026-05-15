@@ -4,8 +4,8 @@ use axum::http::StatusCode;
 use sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, ConnectionTrait,
     DatabaseConnection, DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel,
-    PaginatorTrait, PrimaryKeyTrait, QueryFilter, QuerySelect, RuntimeErr, TransactionTrait,
-    prelude::async_trait::async_trait, sqlx,
+    PaginatorTrait, PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect, RuntimeErr,
+    TransactionTrait, prelude::async_trait::async_trait, sqlx,
 };
 use serde_json::Value;
 use sqlx::postgres::PgDatabaseError;
@@ -13,7 +13,7 @@ use sqlx::postgres::PgDatabaseError;
 use crate::lib_::{
     clients::{CloudStorage, PgClient, RedisClient},
     seaorm_::to_condition,
-    types_::{ApiError, SearchQuery, SearchableTrait},
+    types_::{ApiError, SearchQuery, SearchableTrait, SortableTrait},
     utils,
 };
 
@@ -66,7 +66,7 @@ where
     type Column: ColumnTrait; // The SeaOrm associated Column type
     type Selectable: Send + Sync + Copy + 'static; // The enum for selectable fields
     type Searchable: Send + Sync + Copy + SearchableTrait + 'static; // The enum for searchable fields
-    type Sortable: Send + Sync + Copy + 'static; // The enum for sortable fields
+    type Sortable: Send + Sync + Copy + SortableTrait + 'static; // The enum for sortable fields
     type Options: Send + Sync + Default + CrudsOptionsTrait<Self::Selectable>; // Common options for cruds methods
 
     // Properties
@@ -677,6 +677,12 @@ pub trait Search: Read {
         }
 
         // Applying sorting
+        if let Some(sorting) = &query.order_by {
+            for sort in sorting {
+                let (expr, order) = sort.to_sort();
+                q = q.order_by(expr, order);
+            }
+        }
 
         // Applying pagination
         let (page, size) = Self::get_pagination(query);
