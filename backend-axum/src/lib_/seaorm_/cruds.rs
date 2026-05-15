@@ -32,7 +32,6 @@ pub trait CrudsOptionsTrait<Selectable> {
 
 // Base CRUDS type
 
-#[derive(Clone)]
 pub struct CrudsBase<State, Entity>
 where
     State: CrudsAppStateTrait,
@@ -40,6 +39,15 @@ where
 {
     _entity: PhantomData<Entity>,
     pub app_state: Arc<State>,
+}
+
+impl<State: CrudsAppStateTrait, Entity: EntityTrait> Clone for CrudsBase<State, Entity> {
+    fn clone(&self) -> Self {
+        Self {
+            _entity: PhantomData,
+            app_state: self.app_state.clone(),
+        }
+    }
 }
 
 impl<State: CrudsAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
@@ -55,6 +63,7 @@ impl<State: CrudsAppStateTrait, Entity: EntityTrait> CrudsBase<State, Entity> {
 
 pub trait CrudsUtils
 where
+    Self: Clone + Send + 'static,
     <Self::Entity as EntityTrait>::Model: Send + Sync,
     <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType: From<i32>,
     <Self::Entity as EntityTrait>::Model: IntoActiveModel<Self::ActiveModel>,
