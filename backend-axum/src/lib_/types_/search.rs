@@ -1,10 +1,15 @@
 use std::collections::HashMap;
 
+use sea_orm::{Order, sea_query::Expr};
 use validator::ValidationErrors;
 
 use crate::lib_::types_::SearchableTrait;
 
 use super::filters::{FieldFilters, WhereFilters};
+
+pub trait SortableTrait {
+    fn to_sort(&self) -> (Expr, Order);
+}
 
 #[derive(Debug)]
 pub struct SearchQuery<Selectable, Searchable, Sortable> {
@@ -30,6 +35,7 @@ impl<Selectable, Searchable, Sortable> Default for SearchQuery<Selectable, Searc
 impl<Selectable, Searchable, Sortable> SearchQuery<Selectable, Searchable, Sortable>
 where
     Searchable: SearchableTrait,
+    Sortable: SortableTrait,
 {
     pub fn id(id: u32) -> Self {
         let filter = FieldFilters::id(id);
@@ -47,6 +53,7 @@ pub type SearchQueryResult<Selectable, Searchable, Sortable> =
 pub trait ToSearchQuery
 where
     Self::Searchable: SearchableTrait,
+    Self::Sortable: SortableTrait,
 {
     type Selectable;
     type Searchable;

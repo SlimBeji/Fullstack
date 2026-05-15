@@ -1,4 +1,5 @@
 use axum::extract::FromRequest;
+use sea_orm::Order;
 use sea_orm::sea_query::Expr;
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
@@ -7,7 +8,7 @@ use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::config::ENV;
-use crate::lib_::types_::SearchableTrait;
+use crate::lib_::types_::{SearchableTrait, SortableTrait};
 use crate::lib_::{
     axum_::MultipartForm,
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
@@ -72,6 +73,19 @@ pub enum UserSortable {
     EmailAsc,
     #[serde(rename = "-email")]
     EmailDesc,
+}
+
+impl SortableTrait for UserSortable {
+    fn to_sort(&self) -> (Expr, sea_orm::Order) {
+        match &self {
+            Self::CreatedAtAsc => (Expr::col(user::Column::CreatedAt), Order::Asc),
+            Self::CreatedAtDesc => (Expr::col(user::Column::CreatedAt), Order::Desc),
+            Self::NameAsc => (Expr::col(user::Column::Name), Order::Asc),
+            Self::NameDesc => (Expr::col(user::Column::Name), Order::Desc),
+            Self::EmailAsc => (Expr::col(user::Column::Email), Order::Asc),
+            Self::EmailDesc => (Expr::col(user::Column::Email), Order::Desc),
+        }
+    }
 }
 
 // --- Fields ----

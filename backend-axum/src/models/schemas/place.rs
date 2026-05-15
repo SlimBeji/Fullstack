@@ -1,4 +1,5 @@
 use axum::extract::FromRequest;
+use sea_orm::Order;
 use sea_orm::sea_query::Expr;
 use sea_orm::sea_query::extension::postgres::PgExpr;
 use serde::{Deserialize, Serialize};
@@ -8,7 +9,7 @@ use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::config::ENV;
-use crate::lib_::types_::SearchableTrait;
+use crate::lib_::types_::{SearchableTrait, SortableTrait};
 use crate::lib_::{
     axum_::MultipartForm,
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
@@ -85,6 +86,21 @@ pub enum PlaceSortable {
     AddressAsc,
     #[serde(rename = "-address")]
     AddressDesc,
+}
+
+impl SortableTrait for PlaceSortable {
+    fn to_sort(&self) -> (Expr, Order) {
+        match self {
+            Self::CreatedAtAsc => (Expr::col(place::Column::CreatedAt), Order::Asc),
+            Self::CreatedAtDesc => (Expr::col(place::Column::CreatedAt), Order::Desc),
+            Self::TitleAsc => (Expr::col(place::Column::Title), Order::Asc),
+            Self::TitleDesc => (Expr::col(place::Column::Title), Order::Desc),
+            Self::DescriptionAsc => (Expr::col(place::Column::Description), Order::Asc),
+            Self::DescriptionDesc => (Expr::col(place::Column::Description), Order::Desc),
+            Self::AddressAsc => (Expr::col(place::Column::Address), Order::Asc),
+            Self::AddressDesc => (Expr::col(place::Column::Address), Order::Desc),
+        }
+    }
 }
 
 // --- Fields ----

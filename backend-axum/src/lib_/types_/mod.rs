@@ -12,5 +12,6 @@ pub use filters::SearchableTrait;
 pub use filters::WhereFilters;
 pub use pagination::PaginatedData;
 pub use search::SearchQuery;
+pub use search::SortableTrait;
 pub use search::ToSearchQuery;
 pub use upload::FileToUpload;
