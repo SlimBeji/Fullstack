@@ -269,7 +269,7 @@ impl Read for CrudsUser {
 
     async fn post_process_partial(&self, mut data: Value) -> Result<Value, ApiError> {
         let result = utils::get_string_from_json(UserSelectable::ImageUrl.into(), &data)
-            .map_err(|_| Self::serialization_error())?;
+            .map_err(|_| Self::serialization_error(None))?;
 
         let Some(image_url) = result else {
             return Ok(data);
@@ -553,7 +553,7 @@ impl Delete for CrudsUser {
         let key: &str = UserSelectable::ImageUrl.into();
         let image_url = result[key]
             .as_str()
-            .ok_or(Self::serialization_error())?
+            .ok_or(Self::serialization_error(None))?
             .to_string();
         Ok(UserDeleteContext { image_url })
     }

@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, sync::Arc};
+use std::{error::Error, marker::PhantomData, sync::Arc};
 
 use axum::http::StatusCode;
 use sea_orm::{
@@ -103,15 +103,15 @@ where
             .map(|s| Value::String(s.to_string()))
     }
 
-    fn serialization_error() -> ApiError {
+    fn serialization_error(err: Option<Box<dyn Error + Send + Sync>>) -> ApiError {
         ApiError {
             code: StatusCode::INTERNAL_SERVER_ERROR,
             message: "serialization failure".to_string(),
             details: Some(Value::String(format!(
-                "could not serialie {} record",
+                "could not serialie {} record(s)",
                 Self::get_modelname()
             ))),
-            err: None,
+            err,
         }
     }
 
@@ -202,7 +202,7 @@ where
 
     fn get_id_from_json(key: &str, value: &Value) -> Result<u32, ApiError> {
         let result = utils::get_id_from_json(key, value);
-        utils::unwrap_json_value(result, Self::serialization_error())
+        utils::unwrap_json_value(result, Self::serialization_error(None))
     }
 }
 
@@ -213,7 +213,7 @@ pub trait RecordReader {
     type Read: Send + Sync; // The Read Struct
 
     fn extract<T>(result: Result<Option<T>, String>) -> Result<T, ApiError> {
-        utils::unwrap_json_value(result, Self::Cruds::serialization_error())
+        utils::unwrap_json_value(result, Self::Cruds::serialization_error(None))
     }
 
     fn build_with_no_relations(records: Vec<Value>) -> Self;
