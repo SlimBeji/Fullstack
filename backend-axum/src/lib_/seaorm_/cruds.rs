@@ -32,6 +32,7 @@ pub trait CrudsOptionsTrait<Selectable> {
 
 // Base CRUDS type
 
+#[derive(Clone)]
 pub struct CrudsBase<State, Entity>
 where
     State: CrudsAppStateTrait,
