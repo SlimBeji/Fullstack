@@ -195,6 +195,8 @@ where
         (page, size)
     }
 
+    fn get_default_sort() -> Vec<Self::Sortable>;
+
     // Data extraction
 
     fn get_id_from_json(key: &str, value: &Value) -> Result<u32, ApiError> {
@@ -677,11 +679,11 @@ pub trait Search: Read {
         }
 
         // Applying sorting
-        if let Some(sorting) = &query.order_by {
-            for sort in sorting {
-                let (expr, order) = sort.to_sort();
-                q = q.order_by(expr, order);
-            }
+        let default_order_by = Self::get_default_sort();
+        let sorting = query.order_by.as_ref().unwrap_or(&default_order_by);
+        for item in sorting {
+            let (expr, order) = item.to_sort();
+            q = q.order_by(expr, order);
         }
 
         // Applying pagination

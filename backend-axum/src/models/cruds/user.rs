@@ -107,6 +107,10 @@ impl CrudsUtils for CrudsUser {
         }
         result
     }
+
+    fn get_default_sort() -> Vec<Self::Sortable> {
+        vec![UserSortable::CreatedAtDesc]
+    }
 }
 
 // The Read Trait
