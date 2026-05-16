@@ -37,13 +37,20 @@ impl RedisClient {
     ) -> Result<Option<T>, RedisError> {
         let search: Option<String> = self.client.clone().get(key).await?;
         if let Some(raw) = search {
-            serde_json::from_str::<T>(&raw).map(Some).map_err(|err| {
+            let result = serde_json::from_str::<T>(&raw).map(Some).map_err(|err| {
                 RedisError::from((
                     redis::ErrorKind::Io,
                     "could not deserialize data",
                     err.to_string(),
                 ))
-            })
+            });
+
+            // Delete key if failed to deserialize
+            if result.is_err() {
+                self.delete(key).await?;
+            }
+
+            result
         } else {
             Ok(None)
         }
