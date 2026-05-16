@@ -252,11 +252,11 @@ impl Read for CrudsUser {
     type Read = UserRead;
     type Reader = UserReader;
 
-    async fn auth_get(user: &Self::User, search: &mut UserSearch) -> Result<(), ApiError> {
+    async fn auth_get(user: &Self::User, mut search: UserSearch) -> Result<UserSearch, ApiError> {
         let mut where_ = search.where_.take().unwrap_or_default();
         where_.insert(UserSearchable::Id, FieldFilters::id(user.id));
         search.where_ = Some(where_);
-        Ok(())
+        Ok(search)
     }
 
     async fn post_process(&self, mut data: Self::Read) -> Result<Self::Read, ApiError> {

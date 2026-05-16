@@ -240,8 +240,8 @@ pub trait Read: CrudsUtils {
 
     async fn auth_get(
         user: &Self::User,
-        search: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<(), ApiError>;
+        search: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>, ApiError>;
 
     async fn post_process(&self, data: Self::Read) -> Result<Self::Read, ApiError> {
         Ok(data)
@@ -350,8 +350,7 @@ pub trait Read: CrudsUtils {
         id: u32,
         options: Option<Self::Options>,
     ) -> Result<Self::Read, ApiError> {
-        let mut query = SearchQuery::id(id);
-        Self::auth_get(user, &mut query).await?;
+        let mut query = Self::auth_get(user, SearchQuery::id(id)).await?;
         let raw = self
             .get_raw_for_read(&mut query)
             .await
@@ -389,11 +388,10 @@ pub trait Read: CrudsUtils {
         id: u32,
         options: Option<Self::Options>,
     ) -> Result<Value, ApiError> {
-        let mut query = SearchQuery::id(id);
+        let mut query = Self::auth_get(user, SearchQuery::id(id)).await?;
         if let Some(fields) = &options {
             query.select = fields.fields()
         }
-        Self::auth_get(user, &mut query).await?;
         let raw = self
             .get_raw(&query)
             .await
@@ -776,10 +774,10 @@ pub trait Search: Read {
 
     async fn search(
         &self,
-        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        mut query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         options: Option<Self::Options>,
     ) -> Result<Vec<Self::Read>, ApiError> {
-        let mut data = self.get_raws_for_read(query).await?.read()?;
+        let mut data = self.get_raws_for_read(&mut query).await?.read()?;
         if options.is_some_and(|o| o.process()) {
             data = self.batch_post_process(data).await?;
         }
@@ -789,19 +787,19 @@ pub trait Search: Read {
     async fn user_search(
         &self,
         user: &Self::User,
-        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         options: Option<Self::Options>,
     ) -> Result<Vec<Self::Read>, ApiError> {
-        Self::auth_get(user, query).await?;
+        let query = Self::auth_get(user, query).await?;
         self.search(query, options).await
     }
 
     async fn search_partial(
         &self,
-        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         options: Option<Self::Options>,
     ) -> Result<Vec<Value>, ApiError> {
-        let mut data = self.get_raws(query).await?.read_json()?;
+        let mut data = self.get_raws(&query).await?.read_json()?;
         if options.is_some_and(|o| o.process()) {
             data = self.batch_post_process_partial(data).await?;
         }
@@ -811,10 +809,10 @@ pub trait Search: Read {
     async fn user_search_partial(
         &self,
         user: &Self::User,
-        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         options: Option<Self::Options>,
     ) -> Result<Vec<Value>, ApiError> {
-        Self::auth_get(user, query).await?;
+        let query = Self::auth_get(user, query).await?;
         self.search_partial(query, options).await
     }
 }
