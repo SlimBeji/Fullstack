@@ -13,7 +13,7 @@ use sqlx::postgres::PgDatabaseError;
 use crate::lib_::{
     clients::{CloudStorage, PgClient, RedisClient},
     seaorm_::to_condition,
-    types_::{ApiError, PaginatedData, SearchQuery, SearchableTrait, SortableTrait},
+    types_::{ApiError, PaginatedData, SearchQuery, SearchableTrait, SortableTrait, WhereFilters},
     utils::{self, batch_process_with_semaphore},
 };
 
@@ -92,6 +92,8 @@ where
     fn tablename(&self) -> &'static str {
         Self::Entity::default().table_name()
     }
+
+    fn get_primary_key(&self) -> Self::Column;
 
     fn extract_id(
         value: <<Self::Entity as EntityTrait>::PrimaryKey as PrimaryKeyTrait>::ValueType,
@@ -280,6 +282,18 @@ pub trait Read: CrudsUtils {
             .map_err(Self::read_error)?
             .ok_or(Self::not_found())?;
         Ok(value)
+    }
+
+    async fn exists(&self, filters: WhereFilters<Self::Searchable>) -> Result<bool, ApiError> {
+        let result = Self::Entity::find()
+            .select_only()
+            .column(self.get_primary_key())
+            .filter(to_condition(&filters))
+            .one(self.get_db())
+            .await
+            .map_err(|err| ApiError::internal_error("connection lost", Box::new(err)))?;
+
+        Ok(result.is_some())
     }
 
     async fn get_raw(

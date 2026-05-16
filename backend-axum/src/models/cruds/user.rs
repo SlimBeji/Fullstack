@@ -70,6 +70,10 @@ impl CrudsUtils for CrudsUser {
         "User"
     }
 
+    fn get_primary_key(&self) -> Self::Column {
+        user::Column::Id
+    }
+
     fn extract_id(value: i32) -> u32 {
         value as u32
     }
