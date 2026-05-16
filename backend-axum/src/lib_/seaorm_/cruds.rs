@@ -306,6 +306,14 @@ pub trait Read: CrudsUtils {
         Ok(data)
     }
 
+    async fn get_raw_for_read(
+        &self,
+        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+    ) -> Result<Self::Reader, ApiError> {
+        query.select = Some(Self::get_default_select());
+        self.get_raw(query).await
+    }
+
     async fn get_row_by_id(
         &self,
         conn: &impl ConnectionTrait,
@@ -335,14 +343,6 @@ pub trait Read: CrudsUtils {
         let users = data.read_json()?;
         let user = users.into_iter().next().ok_or(Self::not_found())?;
         Ok(user)
-    }
-
-    async fn get_raw_for_read(
-        &self,
-        query: &mut SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
-    ) -> Result<Self::Reader, ApiError> {
-        query.select = Some(Self::get_default_select());
-        self.get_raw(query).await
     }
 
     async fn get(&self, id: u32, options: Option<Self::Options>) -> Result<Self::Read, ApiError> {
