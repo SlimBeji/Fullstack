@@ -9,6 +9,7 @@ use sea_orm::{
 };
 use serde_json::Value;
 use sqlx::postgres::PgDatabaseError;
+use time::OffsetDateTime;
 
 use crate::lib_::{
     clients::{CloudStorage, PgClient, RedisClient},
@@ -212,8 +213,27 @@ where
     // Data extraction
 
     fn get_id_from_json(key: &str, value: &Value) -> Result<u32, ApiError> {
-        let result = utils::get_id_from_json(key, value);
-        utils::unwrap_json_value(result, Self::serialization_error(None))
+        let result = utils::get_id_from_json(key, value)
+            .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
+        Ok(result)
+    }
+
+    fn get_string_from_json(key: &str, value: &Value) -> Result<String, ApiError> {
+        let result = utils::get_string_from_json(key, value)
+            .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
+        Ok(result)
+    }
+
+    fn get_bool_from_json(key: &str, value: &Value) -> Result<bool, ApiError> {
+        let result = utils::get_bool_from_json(key, value)
+            .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
+        Ok(result)
+    }
+
+    fn get_datetime_from_json(key: &str, value: &Value) -> Result<OffsetDateTime, ApiError> {
+        let result = utils::get_datetime_from_json(key, value)
+            .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
+        Ok(result)
     }
 }
 
@@ -222,10 +242,6 @@ where
 pub trait RecordReader {
     type Cruds: CrudsUtils; // Utils with error handling
     type Read: Send + Sync; // The Read Struct
-
-    fn extract<T>(result: Result<Option<T>, String>) -> Result<T, ApiError> {
-        utils::unwrap_json_value(result, Self::Cruds::serialization_error(None))
-    }
 
     fn build_with_no_relations(records: Vec<Value>) -> Self;
 
