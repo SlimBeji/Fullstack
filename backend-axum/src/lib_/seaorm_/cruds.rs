@@ -13,7 +13,7 @@ use sqlx::postgres::PgDatabaseError;
 use crate::lib_::{
     clients::{CloudStorage, PgClient, RedisClient},
     seaorm_::to_condition,
-    types_::{ApiError, SearchQuery, SearchableTrait, SortableTrait},
+    types_::{ApiError, PaginatedData, SearchQuery, SearchableTrait, SortableTrait},
     utils::{self, batch_process_with_semaphore},
 };
 
@@ -814,5 +814,32 @@ pub trait Search: Read {
     ) -> Result<Vec<Value>, ApiError> {
         let query = Self::auth_get(user, query).await?;
         self.search_partial(query, options).await
+    }
+
+    async fn paginate(
+        &self,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        options: Option<Self::Options>,
+    ) -> Result<PaginatedData<Value>, ApiError> {
+        let total_count = self.count(&query).await?;
+        let (page, size) = Self::get_pagination(&query);
+        let total_pages = total_count.div_ceil(size);
+        let data = self.search_partial(query, options).await?;
+        Ok(PaginatedData {
+            page,
+            total_pages,
+            total_count,
+            data,
+        })
+    }
+
+    async fn user_paginate(
+        &self,
+        user: &Self::User,
+        query: SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        options: Option<Self::Options>,
+    ) -> Result<PaginatedData<Value>, ApiError> {
+        let query = Self::auth_get(user, query).await?;
+        self.paginate(query, options).await
     }
 }
