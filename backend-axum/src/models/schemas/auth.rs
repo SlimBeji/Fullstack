@@ -102,7 +102,7 @@ pub struct SigninSchema {
 // Response Schemas
 
 #[derive(Serialize, Deserialize, ToSchema, Validate)]
-pub struct EncodedTokenSchema {
+pub struct EncodedToken {
     /// A generated web token. The 'Bearer ' prefix needs to be added for authentication
     #[schema(
         example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODIyNDVhOWY2YTU5ZjVlNjM2Y2NmYjEiLCJlbWFpbCI6ImJlamkuc2xpbUB5YWhvby5mciIsImlhdCI6MTc0NzMzNjUxMCwiZXhwIjoxNzQ3MzQwMTEwfQ.C4DCJKvGWhpHClpqmxHyxKLPYDOZDUlr-LA_2IflTXM"
@@ -128,7 +128,7 @@ pub struct EncodedTokenSchema {
     pub expires_in: u16,
 }
 
-impl EncodedTokenSchema {
+impl EncodedToken {
     pub fn example() -> Self {
         Self {
             access_token: "a_very_secret_token".to_string(),

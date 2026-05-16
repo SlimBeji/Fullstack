@@ -17,8 +17,8 @@ use crate::lib_::utils;
 use crate::models::orm::{place, user};
 use crate::models::schemas::user::{UserCreate, UserUpdate};
 use crate::models::schemas::{
-    EncodedTokenSchema, PlaceSelectable, UserPlace, UserPost, UserPut, UserRead, UserSearchable,
-    UserSelectable, UserSortable,
+    EncodedToken, PlaceSelectable, SignupSchema, UserPlace, UserPost, UserPut, UserRead,
+    UserSearchable, UserSelectable, UserSortable,
 };
 use crate::services::instances::AppState;
 
@@ -660,7 +660,7 @@ impl Search for CrudsUser {}
 impl CrudsUser {
     pub async fn get_bearer(&self, email: &str) -> Result<String, ApiError> {
         let user = self.get_by_email(email).await?;
-        let token = EncodedTokenSchema::create(user.id, &user.email).map_err(|err| {
+        let token = EncodedToken::create(user.id, &user.email).map_err(|err| {
             ApiError::internal_error(
                 format!("failed to create token for user {}", email),
                 Box::new(err),
