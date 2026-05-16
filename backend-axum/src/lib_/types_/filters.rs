@@ -808,3 +808,16 @@ where
         }
     }
 }
+
+// Helpers
+
+pub fn where_str_eq<Searchable: Eq + Hash>(
+    key: Searchable,
+    value: &str,
+) -> WhereFilters<Searchable> {
+    let field_filters = FieldFilters::String(StringFilters {
+        eq: Some(value.to_string()),
+        ..Default::default()
+    });
+    HashMap::from([(key, field_filters)])
+}

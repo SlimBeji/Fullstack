@@ -10,6 +10,7 @@ pub use filters::FilterOp;
 pub use filters::FiltersReader;
 pub use filters::SearchableTrait;
 pub use filters::WhereFilters;
+pub use filters::where_str_eq;
 pub use pagination::PaginatedData;
 pub use search::SearchQuery;
 pub use search::SortableTrait;
