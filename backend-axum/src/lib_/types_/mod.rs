@@ -5,14 +5,10 @@ pub mod search;
 pub mod upload;
 
 pub use errors::ApiError;
-pub use filters::FieldFilters;
-pub use filters::FilterOp;
-pub use filters::FiltersReader;
-pub use filters::SearchableTrait;
-pub use filters::WhereFilters;
-pub use filters::where_str_eq;
+pub use filters::{
+    FieldFilters, FilterOp, FiltersReader, SearchableTrait, WhereFilters, where_str_eq,
+};
+
 pub use pagination::PaginatedData;
-pub use search::SearchQuery;
-pub use search::SortableTrait;
-pub use search::ToSearchQuery;
+pub use search::{SearchQuery, SortableTrait, ToSearchQuery};
 pub use upload::FileToUpload;
