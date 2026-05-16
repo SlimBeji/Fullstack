@@ -284,11 +284,11 @@ pub trait Read: CrudsUtils {
         Ok(value)
     }
 
-    async fn exists(&self, filters: WhereFilters<Self::Searchable>) -> Result<bool, ApiError> {
+    async fn exists(&self, filters: &WhereFilters<Self::Searchable>) -> Result<bool, ApiError> {
         let result = Self::Entity::find()
             .select_only()
             .column(self.get_primary_key())
-            .filter(to_condition(&filters))
+            .filter(to_condition(filters))
             .one(self.get_db())
             .await
             .map_err(|err| ApiError::internal_error("connection lost", Box::new(err)))?;
