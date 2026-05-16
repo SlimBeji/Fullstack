@@ -659,14 +659,19 @@ impl Search for CrudsUser {}
 // Auth helpers
 
 impl CrudsUser {
+    fn token_err(email: &str, err: jsonwebtoken::errors::Error) -> ApiError {
+        ApiError {
+            code: StatusCode::INTERNAL_SERVER_ERROR,
+            message: format!("failed to create token for user {}", email),
+            details: None,
+            err: Some(Box::new(err)),
+        }
+    }
+
     pub async fn get_bearer(&self, email: &str) -> Result<String, ApiError> {
         let user = self.get_by_email(email).await?;
-        let token = EncodedToken::create(user.id, &user.email).map_err(|err| {
-            ApiError::internal_error(
-                format!("failed to create token for user {}", email),
-                Box::new(err),
-            )
-        })?;
+        let token = EncodedToken::create(user.id, &user.email)
+            .map_err(|err| Self::token_err(email, err))?;
         Ok(format!("Bearer {}", token.access_token))
     }
 
@@ -682,12 +687,7 @@ impl CrudsUser {
         };
         let create = self.post_to_create(post).await?;
         let id = self.create(create).await?;
-        let token = EncodedToken::create(id, &email).map_err(|err| {
-            ApiError::internal_error(
-                format!("failed to create token for user {}", &email),
-                Box::new(err),
-            )
-        })?;
+        let token = EncodedToken::create(id, &email).map_err(|err| Self::token_err(&email, err))?;
         Ok(token)
     }
 
@@ -722,12 +722,8 @@ impl CrudsUser {
             return Err(auth_error());
         }
 
-        let token = EncodedToken::create(id, &form.username).map_err(|err| {
-            ApiError::internal_error(
-                format!("failed to create token for user {}", &form.username),
-                Box::new(err),
-            )
-        })?;
+        let token = EncodedToken::create(id, &form.username)
+            .map_err(|err| Self::token_err(&form.username, err))?;
         Ok(token)
     }
 }
