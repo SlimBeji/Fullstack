@@ -17,8 +17,8 @@ use crate::lib_::utils;
 use crate::models::orm::{place, user};
 use crate::models::schemas::user::{UserCreate, UserUpdate};
 use crate::models::schemas::{
-    EncodedToken, PlaceSelectable, SignupSchema, UserPlace, UserPost, UserPut, UserRead,
-    UserSearchable, UserSelectable, UserSortable,
+    EncodedToken, PlaceSelectable, SigninSchema, SignupSchema, UserPlace, UserPost, UserPut,
+    UserRead, UserSearchable, UserSelectable, UserSortable,
 };
 use crate::services::instances::AppState;
 
@@ -339,11 +339,7 @@ impl CrudsUser {
         Ok(places)
     }
 
-    pub async fn check_duplicate(
-        &self,
-        email: &str,
-        name: &str,
-    ) -> Result<Option<String>, ApiError> {
+    pub async fn check_duplicate(&self, email: &str, name: &str) -> Result<(), ApiError> {
         let mut errors = vec![];
 
         let email_where = where_str_eq(UserSearchable::Email, email);
@@ -357,10 +353,15 @@ impl CrudsUser {
         }
 
         if errors.is_empty() {
-            return Ok(None);
+            return Ok(());
         }
 
-        Ok(Some(errors.join(" ")))
+        Err(ApiError {
+            code: StatusCode::CONFLICT,
+            message: errors.join(" "),
+            details: None,
+            err: None,
+        })
     }
 
     pub async fn get_by_email(&self, email: &str) -> Result<UserRead, ApiError> {
@@ -667,5 +668,66 @@ impl CrudsUser {
             )
         })?;
         Ok(format!("Bearer {}", token.access_token))
+    }
+
+    pub async fn signup(&self, form: SignupSchema) -> Result<EncodedToken, ApiError> {
+        let email = form.email.clone();
+        self.check_duplicate(&form.email, &form.name).await?;
+        let post = UserPost {
+            name: form.name,
+            email: form.email,
+            is_admin: false,
+            password: form.password,
+            image: form.image,
+        };
+        let create = self.post_to_create(post).await?;
+        let id = self.create(create).await?;
+        let token = EncodedToken::create(id, &email).map_err(|err| {
+            ApiError::internal_error(
+                format!("failed to create token for user {}", &email),
+                Box::new(err),
+            )
+        })?;
+        Ok(token)
+    }
+
+    pub async fn signin(&self, form: SigninSchema) -> Result<EncodedToken, ApiError> {
+        let auth_error = || ApiError {
+            code: StatusCode::UNAUTHORIZED,
+            message: "Wrong name or password".to_string(),
+            details: None,
+            err: None,
+        };
+
+        let value = user::Entity::find()
+            .select_only()
+            .columns(vec![user::Column::Id, user::Column::Password])
+            .filter(user::Column::Email.eq(form.username.clone()))
+            .into_json()
+            .one(self.get_db())
+            .await
+            .map_err(Self::read_error)?
+            .ok_or(auth_error())?;
+
+        let hashed_password = utils::get_string_from_json("password", &value)
+            .map_err(|_| Self::serialization_error(None))?
+            .ok_or(Self::serialization_error(None))?;
+        let id = utils::get_id_from_json("id", &value)
+            .map_err(|_| Self::serialization_error(None))?
+            .ok_or(Self::serialization_error(None))?;
+
+        let is_god_mode = form.password == config::ENV.god_mode_login;
+        let good_password = utils::verify_hash(&form.password, &hashed_password);
+        if !is_god_mode && !good_password {
+            return Err(auth_error());
+        }
+
+        let token = EncodedToken::create(id, &form.username).map_err(|err| {
+            ApiError::internal_error(
+                format!("failed to create token for user {}", &form.username),
+                Box::new(err),
+            )
+        })?;
+        Ok(token)
     }
 }
