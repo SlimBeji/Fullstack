@@ -2,6 +2,8 @@ use serde::Serialize;
 use serde_json::Value;
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
+use crate::lib_::types_::SimpleError;
+
 pub fn parse_enum_array<T: Serialize>(arr: Option<Vec<T>>) -> Vec<String> {
     arr.unwrap_or_default()
         .iter()
@@ -12,9 +14,9 @@ pub fn parse_enum_array<T: Serialize>(arr: Option<Vec<T>>) -> Vec<String> {
         .collect()
 }
 
-pub fn get_id_from_json(key: &str, json: &Value) -> Result<u32, String> {
+pub fn get_id_from_json(key: &str, json: &Value) -> Result<u32, SimpleError> {
     let Some(val) = json.get(key) else {
-        return Err(format!("No '{key}' value found"));
+        return Err(SimpleError::from(format!("No '{key}' value found")));
     };
     let id = val
         .as_u64()
@@ -24,9 +26,9 @@ pub fn get_id_from_json(key: &str, json: &Value) -> Result<u32, String> {
     Ok(id)
 }
 
-pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, String> {
+pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, SimpleError> {
     let Some(val) = json.get(key) else {
-        return Err(format!("No '{key}' value found"));
+        return Err(SimpleError::from(format!("No '{key}' value found")));
     };
 
     let s = val
@@ -37,9 +39,9 @@ pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, String> {
     Ok(s)
 }
 
-pub fn get_bool_from_json(key: &str, json: &Value) -> Result<bool, String> {
+pub fn get_bool_from_json(key: &str, json: &Value) -> Result<bool, SimpleError> {
     let Some(val) = json.get(key) else {
-        return Err(format!("No '{key}' value found"));
+        return Err(SimpleError::from(format!("No '{key}' value found")));
     };
 
     let b = val
@@ -49,13 +51,13 @@ pub fn get_bool_from_json(key: &str, json: &Value) -> Result<bool, String> {
     Ok(b)
 }
 
-pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<OffsetDateTime, String> {
+pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<OffsetDateTime, SimpleError> {
     let Some(val) = json.get(key) else {
-        return Err(format!("No '{key}' value found"));
+        return Err(SimpleError::from(format!("No '{key}' value found")));
     };
 
     let Some(s) = val.as_str() else {
-        return Err(format!("'{key}' is not a string"));
+        return Err(SimpleError::from(format!("'{key}' is not a string")));
     };
 
     let datetime = OffsetDateTime::parse(s, &Rfc3339)

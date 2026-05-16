@@ -24,6 +24,18 @@ impl fmt::Display for SimpleError {
 
 impl Error for SimpleError {}
 
+impl From<&str> for SimpleError {
+    fn from(s: &str) -> Self {
+        Self(s.to_string())
+    }
+}
+
+impl From<String> for SimpleError {
+    fn from(s: String) -> Self {
+        Self(s)
+    }
+}
+
 // ApiError
 pub struct ApiError {
     pub code: StatusCode,
