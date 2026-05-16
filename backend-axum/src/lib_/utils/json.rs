@@ -12,22 +12,21 @@ pub fn parse_enum_array<T: Serialize>(arr: Option<Vec<T>>) -> Vec<String> {
         .collect()
 }
 
-pub fn get_id_from_json(key: &str, json: &Value) -> Result<Option<u32>, String> {
+pub fn get_id_from_json(key: &str, json: &Value) -> Result<u32, String> {
     let Some(val) = json.get(key) else {
-        return Ok(None);
+        return Err(format!("No '{key}' value found"));
     };
-
     let id = val
         .as_u64()
         .map(|v| v as u32)
         .ok_or_else(|| format!("'{key}' is not a valid integer"))?;
 
-    Ok(Some(id))
+    Ok(id)
 }
 
-pub fn get_string_from_json(key: &str, json: &Value) -> Result<Option<String>, String> {
+pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, String> {
     let Some(val) = json.get(key) else {
-        return Ok(None);
+        return Err(format!("No '{key}' value found"));
     };
 
     let s = val
@@ -35,24 +34,24 @@ pub fn get_string_from_json(key: &str, json: &Value) -> Result<Option<String>, S
         .map(|v| v.to_string())
         .ok_or_else(|| format!("'{key}' is not a string"))?;
 
-    Ok(Some(s))
+    Ok(s)
 }
 
-pub fn get_bool_from_json(key: &str, json: &Value) -> Result<Option<bool>, String> {
+pub fn get_bool_from_json(key: &str, json: &Value) -> Result<bool, String> {
     let Some(val) = json.get(key) else {
-        return Ok(None);
+        return Err(format!("No '{key}' value found"));
     };
 
     let b = val
         .as_bool()
         .ok_or_else(|| format!("'{key}' is not a boolean"))?;
 
-    Ok(Some(b))
+    Ok(b)
 }
 
-pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<Option<OffsetDateTime>, String> {
+pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<OffsetDateTime, String> {
     let Some(val) = json.get(key) else {
-        return Ok(None);
+        return Err(format!("No '{key}' value found"));
     };
 
     let Some(s) = val.as_str() else {
@@ -62,9 +61,5 @@ pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<Option<OffsetDa
     let datetime = OffsetDateTime::parse(s, &Rfc3339)
         .map_err(|e| format!("'{key}' is not a valid datetime: {e}"))?;
 
-    Ok(Some(datetime))
-}
-
-pub fn unwrap_json_value<T, E>(result: Result<Option<T>, String>, err: E) -> Result<T, E> {
-    result.ok().flatten().ok_or(err)
+    Ok(datetime)
 }
