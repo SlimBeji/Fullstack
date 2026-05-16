@@ -1,12 +1,20 @@
+use std::collections::HashMap;
+
 use axum::extract::{FromRequest, Request};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use time::Duration;
 use utoipa::ToSchema;
 use validator::{Validate, ValidationError};
 
-use crate::lib_::{
-    axum_::MultipartForm,
-    types_::{ApiError, FileToUpload},
-    validator_::{email_strict, string_length},
+use crate::{
+    config,
+    lib_::{
+        axum_::MultipartForm,
+        types_::{ApiError, FileToUpload},
+        utils::encode_payload,
+        validator_::{email_strict, string_length},
+    },
 };
 
 // --- Custom Validators ----
@@ -129,5 +137,23 @@ impl EncodedTokenSchema {
             email: "mslimbeji@gmail.com".to_string(),
             expires_in: 3600,
         }
+    }
+
+    pub fn create(id: u32, email: &str) -> Result<Self, jsonwebtoken::errors::Error> {
+        let mut payload = HashMap::new();
+        payload.insert("user_id".to_string(), Value::Number(id.into()));
+        payload.insert("email".to_string(), Value::String(email.into()));
+        let access_token = encode_payload(
+            payload,
+            &config::ENV.secret_key,
+            Duration::seconds(config::ENV.jwt_expiration as i64),
+        )?;
+        Ok(Self {
+            access_token,
+            token_type: "bearer".to_string(),
+            user_id: id,
+            email: email.to_string(),
+            expires_in: 3600,
+        })
     }
 }

@@ -17,8 +17,8 @@ use crate::lib_::utils;
 use crate::models::orm::{place, user};
 use crate::models::schemas::user::{UserCreate, UserUpdate};
 use crate::models::schemas::{
-    PlaceSelectable, UserPlace, UserPost, UserPut, UserRead, UserSearchable, UserSelectable,
-    UserSortable,
+    EncodedTokenSchema, PlaceSelectable, UserPlace, UserPost, UserPut, UserRead, UserSearchable,
+    UserSelectable, UserSortable,
 };
 use crate::services::instances::AppState;
 
@@ -363,14 +363,20 @@ impl CrudsUser {
         Ok(Some(errors.join(" ")))
     }
 
-    pub async fn get_by_email(&self, email: &str) -> Result<Option<UserRead>, ApiError> {
+    pub async fn get_by_email(&self, email: &str) -> Result<UserRead, ApiError> {
         let mut query = UserSearch {
             where_: Some(where_str_eq(UserSearchable::Email, email)),
             ..Default::default()
         };
         let raw = self.get_raw_for_read(&mut query).await?;
         let data = raw.read()?;
-        Ok(data.into_iter().next())
+        let user = data.into_iter().next().ok_or(ApiError {
+            code: StatusCode::NOT_FOUND,
+            message: format!("No user with email {} found in the database", email),
+            details: None,
+            err: None,
+        })?;
+        Ok(user)
     }
 
     fn cahce_key(id: u32) -> String {
@@ -648,3 +654,18 @@ impl Delete for CrudsUser {
 
 #[async_trait]
 impl Search for CrudsUser {}
+
+// Auth helpers
+
+impl CrudsUser {
+    pub async fn get_bearer(&self, email: &str) -> Result<String, ApiError> {
+        let user = self.get_by_email(email).await?;
+        let token = EncodedTokenSchema::create(user.id, &user.email).map_err(|err| {
+            ApiError::internal_error(
+                format!("failed to create token for user {}", email),
+                Box::new(err),
+            )
+        })?;
+        Ok(format!("Bearer {}", token.access_token))
+    }
+}
