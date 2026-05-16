@@ -2,30 +2,14 @@ pub mod auth;
 pub mod place;
 pub mod user;
 
-pub use auth::EncodedToken;
-pub use auth::SigninSchema;
-pub use auth::SignupSchema;
-pub use auth::SignupSchemaSwagger;
+pub use auth::{EncodedToken, SigninSchema, SignupSchema, SignupSchemaSwagger};
 
-pub use user::UserGet;
-pub use user::UserPlace;
-pub use user::UserPost;
-pub use user::UserPostSwagger;
-pub use user::UserPut;
-pub use user::UserRead;
-pub use user::UserSearch;
-pub use user::UserSearchable;
-pub use user::UserSelectable;
-pub use user::UserSortable;
-pub use user::UsersPaginated;
+pub use user::{
+    UserGet, UserPlace, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch, UserSearchable,
+    UserSelectable, UserSortable, UsersPaginated,
+};
 
-pub use place::PlaceGet;
-pub use place::PlacePost;
-pub use place::PlacePostSwagger;
-pub use place::PlacePut;
-pub use place::PlaceRead;
-pub use place::PlaceSearch;
-pub use place::PlaceSearchable;
-pub use place::PlaceSelectable;
-pub use place::PlaceSortable;
-pub use place::PlacesPaginated;
+pub use place::{
+    PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch, PlaceSearchable,
+    PlaceSelectable, PlaceSortable, PlacesPaginated,
+};
