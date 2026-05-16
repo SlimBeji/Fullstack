@@ -12,7 +12,7 @@ use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
 use crate::lib_::seaorm_::{
     Create, CrudsBase, CrudsUtils, Delete, Read, RecordReader, Search, Update,
 };
-use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
+use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery, where_str_eq};
 use crate::lib_::utils;
 use crate::models::orm::{place, user};
 use crate::models::schemas::user::{UserCreate, UserUpdate};
@@ -315,6 +315,7 @@ impl Read for CrudsUser {
     }
 }
 
+// Helpers
 impl CrudsUser {
     fn should_fetch_place(&self, query: &UserSearch) -> bool {
         Self::selectables(query).contains(&UserSelectable::Places)
@@ -338,8 +339,64 @@ impl CrudsUser {
         Ok(places)
     }
 
+    pub async fn check_duplicate(
+        &self,
+        email: &str,
+        name: &str,
+    ) -> Result<Option<String>, ApiError> {
+        let mut errors = vec![];
+
+        let email_where = where_str_eq(UserSearchable::Email, email);
+        if self.exists(&email_where).await? {
+            errors.push(format!("email {} already in user", email));
+        }
+
+        let name_where = where_str_eq(UserSearchable::Name, name);
+        if self.exists(&name_where).await? {
+            errors.push(format!("username {} already in user", name));
+        }
+
+        if errors.is_empty() {
+            return Ok(None);
+        }
+
+        Ok(Some(errors.join(" ")))
+    }
+
+    pub async fn get_by_email(&self, email: &str) -> Result<Option<UserRead>, ApiError> {
+        let mut query = UserSearch {
+            where_: Some(where_str_eq(UserSearchable::Email, email)),
+            ..Default::default()
+        };
+        let raw = self.get_raw_for_read(&mut query).await?;
+        let data = raw.read()?;
+        Ok(data.into_iter().next())
+    }
+
     fn cahce_key(id: u32) -> String {
         format!("user_read_{}", id)
+    }
+
+    pub async fn get_cache(&self, id: u32) -> Result<UserRead, ApiError> {
+        let key = Self::cahce_key(id);
+        let result = self
+            .app_state
+            .redis
+            .get_struct::<UserRead>(&key)
+            .await
+            .ok()
+            .flatten();
+
+        // User present in cache
+        if let Some(user) = result {
+            return Ok(user);
+        }
+
+        // Fetch new data and store it in cache
+        let user = self.get(id, None).await?;
+        // Ignore the error if couldn't store in cache - we should log ideally
+        self.app_state.redis.set(&key, &user).await.ok();
+        Ok(user)
     }
 }
 
