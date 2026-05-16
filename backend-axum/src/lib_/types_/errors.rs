@@ -12,6 +12,19 @@ use validator::{Validate, ValidationErrors};
 
 use crate::lib_::validator_::errors_to_serde_map;
 
+// SimpleError
+#[derive(Debug)]
+pub struct SimpleError(String);
+
+impl fmt::Display for SimpleError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl Error for SimpleError {}
+
+// ApiError
 pub struct ApiError {
     pub code: StatusCode,
     pub message: String,

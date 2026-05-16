@@ -4,7 +4,7 @@ pub mod pagination;
 pub mod search;
 pub mod upload;
 
-pub use errors::ApiError;
+pub use errors::{ApiError, SimpleError};
 pub use filters::{
     FieldFilters, FilterOp, FiltersReader, SearchableTrait, WhereFilters, where_str_eq,
 };
