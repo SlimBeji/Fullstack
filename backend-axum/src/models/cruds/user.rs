@@ -24,9 +24,9 @@ use crate::services::instances::AppState;
 
 // Cruds types
 
-type UserSearch = SearchQuery<UserSelectable, UserSearchable, UserSortable>;
+pub type UserSearch = SearchQuery<UserSelectable, UserSearchable, UserSortable>;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct UserOptions {
     pub process: Option<bool>,
     pub fields: Option<Vec<UserSelectable>>,

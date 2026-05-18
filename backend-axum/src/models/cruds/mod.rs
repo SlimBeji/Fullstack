@@ -1,4 +1,5 @@
+pub mod place;
 pub mod user;
 
-pub use user::CrudsUser;
-pub use user::UserOptions;
+pub use place::{CrudsPlace, PlaceOptions, PlaceSearch};
+pub use user::{CrudsUser, UserOptions, UserSearch};
