@@ -8,9 +8,9 @@ use sea_orm::{DbErr, IdenStatic};
 use serde_json::Value;
 
 use crate::config;
-use crate::lib_::seaorm_::cruds::CrudsOptionsTrait;
 use crate::lib_::seaorm_::{
-    Create, CrudsBase, CrudsUtils, Delete, Read, RecordReader, Search, Update,
+    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Delete, Read, RecordReader, Search, Update,
+    impl_cruds_boilerplate,
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery, where_str_eq};
 use crate::lib_::utils;
@@ -49,34 +49,15 @@ pub type CrudsUser = CrudsBase<AppState, user::Entity>;
 // The CrudUtils Trait
 
 impl CrudsUtils for CrudsUser {
-    // Associated types
-
-    type State = AppState;
-    type Entity = user::Entity;
-    type ActiveModel = user::ActiveModel;
-    type Column = user::Column;
-    type Selectable = UserSelectable;
-    type Searchable = UserSearchable;
-    type Sortable = UserSortable;
-    type Options = UserOptions;
-
-    // Constructor and properties
-
-    fn get_base(&self) -> &CrudsUser {
-        self
-    }
-
-    fn get_modelname() -> &'static str {
-        "User"
-    }
-
-    fn get_primary_key(&self) -> Self::Column {
-        user::Column::Id
-    }
-
-    fn extract_id(value: i32) -> u32 {
-        value as u32
-    }
+    impl_cruds_boilerplate!(
+        model: user,
+        name: "User",
+        primary_key: user::Column::Id,
+        selectable: UserSelectable,
+        searchable: UserSearchable,
+        sortable: UserSortable,
+        options: UserOptions,
+    );
 
     // Query building helpers
 
