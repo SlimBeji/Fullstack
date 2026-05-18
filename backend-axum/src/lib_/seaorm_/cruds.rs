@@ -218,6 +218,12 @@ where
         Ok(result)
     }
 
+    fn get_f64_from_json(key: &str, value: &Value) -> Result<f64, ApiError> {
+        let result = utils::get_f64_from_json(key, value)
+            .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
+        Ok(result)
+    }
+
     fn get_string_from_json(key: &str, value: &Value) -> Result<String, ApiError> {
         let result = utils::get_string_from_json(key, value)
             .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
@@ -232,6 +238,12 @@ where
 
     fn get_datetime_from_json(key: &str, value: &Value) -> Result<OffsetDateTime, ApiError> {
         let result = utils::get_datetime_from_json(key, value)
+            .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
+        Ok(result)
+    }
+
+    fn get_value_from_json<'a>(key: &str, value: &'a Value) -> Result<&'a Value, ApiError> {
+        let result = utils::get_value_from_json(key, value)
             .map_err(|e| Self::serialization_error(Some(Box::new(e))))?;
         Ok(result)
     }

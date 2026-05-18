@@ -38,6 +38,28 @@ pub fn get_opt_id_from_json(key: &str, json: &Value) -> Result<Option<u32>, Simp
     Ok(Some(id))
 }
 
+pub fn get_f64_from_json(key: &str, json: &Value) -> Result<f64, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Err(SimpleError::from(format!("No '{key}' value found")));
+    };
+    let id = val
+        .as_f64()
+        .ok_or_else(|| format!("'{key}' is not a valid float"))?;
+
+    Ok(id)
+}
+
+pub fn get_opt_f64_from_json(key: &str, json: &Value) -> Result<Option<f64>, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Ok(None);
+    };
+    let id = val
+        .as_f64()
+        .ok_or_else(|| format!("'{key}' is not a valid float"))?;
+
+    Ok(Some(id))
+}
+
 pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, SimpleError> {
     let Some(val) = json.get(key) else {
         return Err(SimpleError::from(format!("No '{key}' value found")));
@@ -113,4 +135,11 @@ pub fn get_opt_datetime_from_json(
         .map_err(|e| format!("'{key}' is not a valid datetime: {e}"))?;
 
     Ok(Some(datetime))
+}
+
+pub fn get_value_from_json<'a>(key: &str, json: &'a Value) -> Result<&'a Value, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Err(SimpleError::from(format!("No '{key}' value found")));
+    };
+    Ok(val)
 }
