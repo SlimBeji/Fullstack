@@ -26,11 +26,22 @@ pub fn get_id_from_json(key: &str, json: &Value) -> Result<u32, SimpleError> {
     Ok(id)
 }
 
+pub fn get_opt_id_from_json(key: &str, json: &Value) -> Result<Option<u32>, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Ok(None);
+    };
+    let id = val
+        .as_u64()
+        .map(|v| v as u32)
+        .ok_or_else(|| format!("'{key}' is not a valid integer"))?;
+
+    Ok(Some(id))
+}
+
 pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, SimpleError> {
     let Some(val) = json.get(key) else {
         return Err(SimpleError::from(format!("No '{key}' value found")));
     };
-
     let s = val
         .as_str()
         .map(|v| v.to_string())
@@ -39,11 +50,22 @@ pub fn get_string_from_json(key: &str, json: &Value) -> Result<String, SimpleErr
     Ok(s)
 }
 
+pub fn get_opt_string_from_json(key: &str, json: &Value) -> Result<Option<String>, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Ok(None);
+    };
+    let s = val
+        .as_str()
+        .map(|v| v.to_string())
+        .ok_or_else(|| format!("'{key}' is not a string"))?;
+
+    Ok(Some(s))
+}
+
 pub fn get_bool_from_json(key: &str, json: &Value) -> Result<bool, SimpleError> {
     let Some(val) = json.get(key) else {
         return Err(SimpleError::from(format!("No '{key}' value found")));
     };
-
     let b = val
         .as_bool()
         .ok_or_else(|| format!("'{key}' is not a boolean"))?;
@@ -51,17 +73,44 @@ pub fn get_bool_from_json(key: &str, json: &Value) -> Result<bool, SimpleError> 
     Ok(b)
 }
 
+pub fn get_opt_bool_from_json(key: &str, json: &Value) -> Result<Option<bool>, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Ok(None);
+    };
+    let b = val
+        .as_bool()
+        .ok_or_else(|| format!("'{key}' is not a boolean"))?;
+
+    Ok(Some(b))
+}
+
 pub fn get_datetime_from_json(key: &str, json: &Value) -> Result<OffsetDateTime, SimpleError> {
     let Some(val) = json.get(key) else {
         return Err(SimpleError::from(format!("No '{key}' value found")));
     };
-
     let Some(s) = val.as_str() else {
         return Err(SimpleError::from(format!("'{key}' is not a string")));
     };
-
     let datetime = OffsetDateTime::parse(s, &Rfc3339)
         .map_err(|e| format!("'{key}' is not a valid datetime: {e}"))?;
 
     Ok(datetime)
+}
+
+pub fn get_opt_datetime_from_json(
+    key: &str,
+    json: &Value,
+) -> Result<Option<OffsetDateTime>, SimpleError> {
+    let Some(val) = json.get(key) else {
+        return Ok(None);
+    };
+    let Some(s) = val.as_str() else {
+        return Err(SimpleError::from(format!(
+            "'{key}' is not a valid datetime"
+        )));
+    };
+    let datetime = OffsetDateTime::parse(s, &Rfc3339)
+        .map_err(|e| format!("'{key}' is not a valid datetime: {e}"))?;
+
+    Ok(Some(datetime))
 }
