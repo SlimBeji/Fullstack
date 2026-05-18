@@ -1,17 +1,18 @@
+use sea_orm::ActiveValue::Set;
+use sea_orm::DatabaseTransaction;
 use sea_orm::entity::prelude::async_trait::async_trait;
 use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::{
-    CrudsBase, CrudsOptionsTrait, CrudsUtils, Read, RecordReader, impl_cruds_boilerplate,
+    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Read, RecordReader, impl_cruds_boilerplate,
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::orm::place;
-use crate::models::schemas::place::Location;
 use crate::models::schemas::{
-    LOCATION_LAT, LOCATION_LNG, PlaceRead, PlaceSearchable, PlaceSelectable, PlaceSortable,
-    UserRead,
+    LOCATION_LAT, LOCATION_LNG, Location, PlaceCreate, PlacePost, PlaceRead, PlaceSearchable,
+    PlaceSelectable, PlaceSortable, UserRead,
 };
 use crate::services::instances::AppState;
 
@@ -189,6 +190,80 @@ impl Read for CrudsPlace {
         &self,
         _: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
         _: &mut Self::Reader,
+    ) -> Result<(), ApiError> {
+        Ok(())
+    }
+}
+
+// The Create Trait
+
+pub struct PlaceCreateContext {}
+
+#[async_trait]
+impl Create for CrudsPlace {
+    type Post = PlacePost;
+    type Create = PlaceCreate;
+    type CreateContext = PlaceCreateContext;
+
+    async fn auth_post(&self, _: &Self::User, _: &Self::Post) -> Result<(), ApiError> {
+        Ok(())
+    }
+
+    async fn post_to_create(&self, form: Self::Post) -> Result<Self::Create, ApiError> {
+        let mut image_url = "".to_string();
+        if let Some(file_to_upload) = form.image {
+            image_url = self
+                .get_base()
+                .app_state
+                .storage
+                .upload_file(file_to_upload, None)
+                .await?;
+        }
+
+        Ok(PlaceCreate {
+            title: form.title,
+            description: form.description,
+            address: form.address,
+            location: Location {
+                lat: form.lat,
+                lng: form.lng,
+            },
+            image_url: Some(image_url),
+            embedding: None,
+            creator_id: form.creator_id,
+        })
+    }
+
+    fn create_to_model(data: &Self::Create) -> Self::ActiveModel {
+        let location = place::Location {
+            lat: data.location.lat,
+            lng: data.location.lng,
+        };
+        Self::ActiveModel {
+            title: Set(data.title.clone()),
+            description: Set(data.description.clone()),
+            address: Set(data.address.clone()),
+            image_url: Set(data.image_url.clone().unwrap_or_default()),
+            location: Set(location),
+            creator_id: Set(data.creator_id as i32),
+            ..Default::default()
+        }
+    }
+
+    async fn before_create(
+        &self,
+        _: &DatabaseTransaction,
+        _: &Self::Create,
+    ) -> Result<Self::CreateContext, ApiError> {
+        Ok(Self::CreateContext {})
+    }
+
+    async fn after_create(
+        &self,
+        _: &DatabaseTransaction,
+        _: u32,
+        _: &Self::Create,
+        _: Self::CreateContext,
     ) -> Result<(), ApiError> {
         Ok(())
     }
