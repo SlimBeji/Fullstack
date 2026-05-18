@@ -3,8 +3,9 @@ use std::collections::HashMap;
 use axum::http::StatusCode;
 use sea_orm::ActiveValue::Set;
 use sea_orm::prelude::async_trait::async_trait;
-use sea_orm::{ColumnTrait, DatabaseTransaction, EntityTrait, QueryFilter, QuerySelect};
-use sea_orm::{DbErr, IdenStatic};
+use sea_orm::{
+    ColumnTrait, DatabaseTransaction, DbErr, EntityTrait, IdenStatic, QueryFilter, QuerySelect,
+};
 use serde_json::Value;
 
 use crate::config;
