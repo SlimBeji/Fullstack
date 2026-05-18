@@ -256,7 +256,7 @@ pub struct PlaceRead {
     pub location: Location,
 
     /// image url
-    pub image_url: Option<String>,
+    pub image_url: String,
 
     /// The ID of the place creator
     pub creator_id: u32,
@@ -278,7 +278,7 @@ impl PlaceRead {
                 lat: 51.48180425016331,
                 lng: -0.19090418688755467,
             },
-            image_url: Some("avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string()),
+            image_url: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
             creator_id: 123456789,
             created_at: OffsetDateTime::now_utc(),
         }
