@@ -1,15 +1,17 @@
+use sea_orm::entity::prelude::async_trait::async_trait;
 use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::{
-    CrudsBase, CrudsOptionsTrait, CrudsUtils, RecordReader, impl_cruds_boilerplate,
+    CrudsBase, CrudsOptionsTrait, CrudsUtils, Read, RecordReader, impl_cruds_boilerplate,
 };
-use crate::lib_::types_::{ApiError, SearchQuery};
-
+use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
+use crate::lib_::utils;
 use crate::models::orm::place;
 use crate::models::schemas::place::Location;
 use crate::models::schemas::{
     LOCATION_LAT, LOCATION_LNG, PlaceRead, PlaceSearchable, PlaceSelectable, PlaceSortable,
+    UserRead,
 };
 use crate::services::instances::AppState;
 
@@ -141,5 +143,53 @@ impl RecordReader for PlaceReader {
 
     fn read_json(self) -> Result<Vec<Value>, ApiError> {
         Ok(self.places)
+    }
+}
+
+#[async_trait]
+impl Read for CrudsPlace {
+    type User = UserRead;
+    type Read = PlaceRead;
+    type Reader = PlaceReader;
+
+    async fn auth_get(user: &Self::User, mut search: PlaceSearch) -> Result<PlaceSearch, ApiError> {
+        let mut where_ = search.where_.take().unwrap_or_default();
+        where_.insert(PlaceSearchable::CreatorId, FieldFilters::id(user.id));
+        search.where_ = Some(where_);
+        Ok(search)
+    }
+
+    async fn post_process(&self, mut data: Self::Read) -> Result<Self::Read, ApiError> {
+        data.image_url = self
+            .app_state
+            .storage
+            .get_signed_url(&data.image_url, None)
+            .await?;
+        Ok(data)
+    }
+
+    async fn post_process_partial(&self, mut data: Value) -> Result<Value, ApiError> {
+        let key: &'static str = PlaceSelectable::ImageUrl.into();
+        let result = utils::get_opt_string_from_json(key, &data)
+            .map_err(|err| Self::serialization_error(Some(Box::new(err))))?;
+        let Some(image_url) = result else {
+            return Ok(data);
+        };
+
+        data[key] = Value::String(
+            self.app_state
+                .storage
+                .get_signed_url(&image_url, None)
+                .await?,
+        );
+        Ok(data)
+    }
+
+    async fn fetch_relations(
+        &self,
+        _: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
+        _: &mut Self::Reader,
+    ) -> Result<(), ApiError> {
+        Ok(())
     }
 }
