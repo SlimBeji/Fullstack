@@ -1,3 +1,5 @@
+use chrono::Utc;
+use sea_orm::prelude::DateTimeWithTimeZone;
 use sea_orm::sea_query::extension::postgres::PgExpr;
 use sea_orm::{
     Condition,
@@ -179,4 +181,8 @@ pub fn to_condition<Searchable: SearchableTrait>(filters: &WhereFilters<Searchab
     }
 
     condition
+}
+
+pub fn now() -> DateTimeWithTimeZone {
+    Utc::now().fixed_offset()
 }

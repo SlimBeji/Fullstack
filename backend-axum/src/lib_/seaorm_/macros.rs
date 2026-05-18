@@ -1,3 +1,22 @@
+macro_rules! derive_timestamp_update {
+    ($active_model:ty) => {
+        #[async_trait::async_trait]
+        impl sea_orm::ActiveModelBehavior for $active_model {
+            async fn before_save<C: sea_orm::ConnectionTrait>(
+                mut self,
+                _db: &C,
+                insert: bool,
+            ) -> Result<Self, sea_orm::DbErr> {
+                if insert {
+                    self.created_at = sea_orm::ActiveValue::Set(crate::lib_::seaorm_::utils::now());
+                }
+                self.updated_at = sea_orm::ActiveValue::Set(crate::lib_::seaorm_::utils::now());
+                Ok(self)
+            }
+        }
+    };
+}
+
 macro_rules! impl_cruds_boilerplate {
     (
         model: $model:ident,
@@ -35,4 +54,5 @@ macro_rules! impl_cruds_boilerplate {
     };
 }
 
+pub(crate) use derive_timestamp_update;
 pub(crate) use impl_cruds_boilerplate;
