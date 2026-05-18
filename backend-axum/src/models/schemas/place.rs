@@ -150,7 +150,7 @@ pub struct PlaceCreate {
     pub location: Location,
     #[validate(custom(function = "array_length::<f64, 384, 384>"))]
     pub embedding: Option<Vec<f64>>,
-    pub image_url: String,
+    pub image_url: Option<String>,
     pub creator_id: u32,
 }
 
