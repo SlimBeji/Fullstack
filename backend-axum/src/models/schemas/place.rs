@@ -17,6 +17,11 @@ use crate::lib_::{
 };
 use crate::models::orm::place;
 
+// --- Consts ---
+
+pub const LOCATION_LAT: &str = "lat";
+pub const LOCATION_LNG: &str = "lng";
+
 // --- Selectables, Serchables, Sortables ----
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
@@ -61,8 +66,8 @@ impl SearchableTrait for PlaceSearchable {
             Self::Description => Expr::col(place::Column::Description),
             Self::Address => Expr::col(place::Column::Address),
             Self::CreatorId => Expr::col(place::Column::CreatorId),
-            Self::LocationLat => Expr::col(place::Column::Location).cast_json_field("lat"),
-            Self::LocationLng => Expr::col(place::Column::Location).cast_json_field("lng"),
+            Self::LocationLat => Expr::col(place::Column::Location).cast_json_field(LOCATION_LAT),
+            Self::LocationLng => Expr::col(place::Column::Location).cast_json_field(LOCATION_LNG),
             Self::CreatedAt => Expr::col(place::Column::CreatedAt),
         }
     }
@@ -104,9 +109,6 @@ impl SortableTrait for PlaceSortable {
 }
 
 // --- Fields ----
-
-pub const LOCATION_LAT: &str = "lat";
-pub const LOCATION_LNG: &str = "lng";
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Validate)]
 pub struct Location {
