@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use axum::http::StatusCode;
 use sea_orm::ActiveValue::Set;
-use sea_orm::DbErr;
 use sea_orm::prelude::async_trait::async_trait;
 use sea_orm::{ColumnTrait, DatabaseTransaction, EntityTrait, QueryFilter, QuerySelect};
+use sea_orm::{DbErr, IdenStatic};
 use serde_json::Value;
 
 use crate::config;
@@ -126,27 +126,13 @@ pub struct UserReader {
 
 impl UserReader {
     fn to_user(value: &Value) -> Result<UserRead, ApiError> {
-        let id = Self::extract(utils::get_id_from_json(UserSelectable::Id.into(), value))?;
-        let name = Self::extract(utils::get_string_from_json(
-            UserSelectable::Name.into(),
-            value,
-        ))?;
-        let email = Self::extract(utils::get_string_from_json(
-            UserSelectable::Email.into(),
-            value,
-        ))?;
-        let is_admin = Self::extract(utils::get_bool_from_json(
-            UserSelectable::IsAdmin.into(),
-            value,
-        ))?;
-        let image_url = Self::extract(utils::get_string_from_json(
-            UserSelectable::ImageUrl.into(),
-            value,
-        ))?;
-        let created_at = Self::extract(utils::get_datetime_from_json(
-            UserSelectable::CreatedAt.into(),
-            value,
-        ))?;
+        let id = CrudsUser::get_id_from_json(UserSelectable::Id.into(), value)?;
+        let name = CrudsUser::get_string_from_json(UserSelectable::Name.into(), value)?;
+        let email = CrudsUser::get_string_from_json(UserSelectable::Email.into(), value)?;
+        let is_admin = CrudsUser::get_bool_from_json(UserSelectable::IsAdmin.into(), value)?;
+        let image_url = CrudsUser::get_string_from_json(UserSelectable::ImageUrl.into(), value)?;
+        let created_at =
+            CrudsUser::get_datetime_from_json(UserSelectable::CreatedAt.into(), value)?;
 
         Ok(UserRead {
             id,
@@ -160,26 +146,17 @@ impl UserReader {
     }
 
     fn to_place(value: &Value) -> Result<UserPlace, ApiError> {
-        let id = Self::extract(utils::get_id_from_json(PlaceSelectable::Id.into(), value))?;
-        let title = Self::extract(utils::get_string_from_json(
-            PlaceSelectable::Title.into(),
-            value,
-        ))?;
-        let address = Self::extract(utils::get_string_from_json(
-            PlaceSelectable::Address.into(),
-            value,
-        ))?;
-
+        let id = CrudsUser::get_id_from_json(PlaceSelectable::Id.into(), value)?;
+        let title = CrudsUser::get_string_from_json(PlaceSelectable::Title.into(), value)?;
+        let address = CrudsUser::get_string_from_json(PlaceSelectable::Address.into(), value)?;
         Ok(UserPlace { id, title, address })
     }
 
     fn to_place_value_map(places: Vec<Value>) -> Result<HashMap<u32, Vec<Value>>, ApiError> {
         let mut map: HashMap<u32, Vec<Value>> = HashMap::new();
         for place in places {
-            let creator_id = Self::extract(utils::get_id_from_json(
-                PlaceSelectable::CreatorId.into(),
-                &place,
-            ))?;
+            let creator_id =
+                CrudsUser::get_id_from_json(PlaceSelectable::CreatorId.into(), &place)?;
             map.entry(creator_id).or_default().push(place.clone());
         }
 
@@ -241,7 +218,7 @@ impl RecordReader for UserReader {
         // Step 4: append places to their creators
         let key: &str = UserSelectable::Places.into();
         for user in &mut users {
-            let user_id = Self::extract(utils::get_id_from_json(UserSelectable::Id.into(), user))?;
+            let user_id = CrudsUser::get_id_from_json(UserSelectable::Id.into(), user)?;
             let user_places = places_map.remove(&user_id).unwrap_or_default();
             user[key] = Value::Array(user_places);
         }
@@ -273,9 +250,8 @@ impl Read for CrudsUser {
     }
 
     async fn post_process_partial(&self, mut data: Value) -> Result<Value, ApiError> {
-        let result = utils::get_string_from_json(UserSelectable::ImageUrl.into(), &data)
-            .map_err(|_| Self::serialization_error(None))?;
-
+        let result = utils::get_opt_string_from_json(UserSelectable::ImageUrl.into(), &data)
+            .map_err(|err| Self::serialization_error(Some(Box::new(err))))?;
         let Some(image_url) = result else {
             return Ok(data);
         };
@@ -708,13 +684,8 @@ impl CrudsUser {
             .await
             .map_err(Self::read_error)?
             .ok_or(auth_error())?;
-
-        let hashed_password = utils::get_string_from_json("password", &value)
-            .map_err(|_| Self::serialization_error(None))?
-            .ok_or(Self::serialization_error(None))?;
-        let id = utils::get_id_from_json("id", &value)
-            .map_err(|_| Self::serialization_error(None))?
-            .ok_or(Self::serialization_error(None))?;
+        let hashed_password = Self::get_string_from_json(user::Column::Password.as_str(), &value)?;
+        let id = Self::get_id_from_json(user::Column::Id.as_str(), &value)?;
 
         let is_god_mode = form.password == config::ENV.god_mode_login;
         let good_password = utils::verify_hash(&form.password, &hashed_password);
