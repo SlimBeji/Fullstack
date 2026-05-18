@@ -10,6 +10,6 @@ pub use user::{
 };
 
 pub use place::{
-    PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch, PlaceSearchable,
-    PlaceSelectable, PlaceSortable, PlacesPaginated,
+    LOCATION_LAT, LOCATION_LNG, PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead,
+    PlaceSearch, PlaceSearchable, PlaceSelectable, PlaceSortable, PlacesPaginated,
 };

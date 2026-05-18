@@ -105,6 +105,9 @@ impl SortableTrait for PlaceSortable {
 
 // --- Fields ----
 
+pub const LOCATION_LAT: &str = "lat";
+pub const LOCATION_LNG: &str = "lng";
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Validate)]
 pub struct Location {
     /// The latitude of the place

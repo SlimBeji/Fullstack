@@ -1,9 +1,16 @@
+use serde_json::Value;
+
 use crate::config;
-use crate::lib_::seaorm_::{CrudsBase, CrudsOptionsTrait, CrudsUtils, impl_cruds_boilerplate};
-use crate::lib_::types_::SearchQuery;
+use crate::lib_::seaorm_::{
+    CrudsBase, CrudsOptionsTrait, CrudsUtils, RecordReader, impl_cruds_boilerplate,
+};
+use crate::lib_::types_::{ApiError, SearchQuery};
 
 use crate::models::orm::place;
-use crate::models::schemas::{PlaceSearchable, PlaceSelectable, PlaceSortable};
+use crate::models::schemas::place::Location;
+use crate::models::schemas::{
+    LOCATION_LAT, LOCATION_LNG, PlaceRead, PlaceSearchable, PlaceSelectable, PlaceSortable,
+};
 use crate::services::instances::AppState;
 
 // Cruds types
@@ -81,5 +88,58 @@ impl CrudsUtils for CrudsPlace {
 
     fn get_default_sort() -> Vec<Self::Sortable> {
         vec![PlaceSortable::CreatedAtDesc]
+    }
+}
+
+// The Read Trait
+
+pub struct PlaceReader {
+    places: Vec<Value>,
+}
+
+impl PlaceReader {
+    fn to_place(value: &Value) -> Result<PlaceRead, ApiError> {
+        let id = CrudsPlace::get_id_from_json(PlaceSelectable::Id.into(), value)?;
+        let title = CrudsPlace::get_string_from_json(PlaceSelectable::Title.into(), value)?;
+        let description =
+            CrudsPlace::get_string_from_json(PlaceSelectable::Description.into(), value)?;
+        let address = CrudsPlace::get_string_from_json(PlaceSelectable::Address.into(), value)?;
+        let image_url = CrudsPlace::get_string_from_json(PlaceSelectable::ImageUrl.into(), value)?;
+        let creator_id = CrudsPlace::get_id_from_json(PlaceSelectable::CreatorId.into(), value)?;
+        let created_at =
+            CrudsPlace::get_datetime_from_json(PlaceSelectable::CreatedAt.into(), value)?;
+
+        let location_raw =
+            CrudsPlace::get_value_from_json(PlaceSelectable::Location.into(), value)?;
+        let lat = CrudsPlace::get_f64_from_json(LOCATION_LAT, location_raw)?;
+        let lng = CrudsPlace::get_f64_from_json(LOCATION_LNG, location_raw)?;
+
+        Ok(PlaceRead {
+            id,
+            title,
+            description,
+            address,
+            location: Location { lat, lng },
+            image_url,
+            creator_id,
+            created_at,
+        })
+    }
+}
+
+impl RecordReader for PlaceReader {
+    type Read = PlaceRead;
+    type Cruds = CrudsPlace;
+
+    fn build_with_no_relations(records: Vec<Value>) -> Self {
+        Self { places: records }
+    }
+
+    fn read(self) -> Result<Vec<Self::Read>, ApiError> {
+        self.places.iter().map(Self::to_place).collect()
+    }
+
+    fn read_json(self) -> Result<Vec<Value>, ApiError> {
+        Ok(self.places)
     }
 }
