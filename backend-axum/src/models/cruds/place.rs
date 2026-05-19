@@ -10,7 +10,7 @@ use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::{
-    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Delete, Read, RecordReader, Update,
+    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Delete, Read, RecordReader, Search, Update,
     impl_cruds_boilerplate,
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
@@ -475,3 +475,8 @@ impl Delete for CrudsPlace {
         Ok(())
     }
 }
+
+// The search Trait
+
+#[async_trait]
+impl Search for CrudsPlace {}
