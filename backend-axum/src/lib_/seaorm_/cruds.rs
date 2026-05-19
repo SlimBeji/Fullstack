@@ -317,6 +317,7 @@ pub trait Read: CrudsUtils {
             .select_only()
             .column(self.get_primary_key())
             .filter(to_condition(filters))
+            .into_json()
             .one(self.get_db())
             .await
             .map_err(|err| ApiError::internal_error("connection lost", Box::new(err)))?;
