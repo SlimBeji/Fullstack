@@ -1,3 +1,4 @@
+use reqwest::StatusCode;
 use sea_orm::ActiveValue::Set;
 use sea_orm::DatabaseTransaction;
 use sea_orm::entity::prelude::async_trait::async_trait;
@@ -9,6 +10,7 @@ use crate::lib_::seaorm_::{
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
+use crate::models::cruds::user_exists;
 use crate::models::orm::place;
 use crate::models::schemas::{
     LOCATION_LAT, LOCATION_LNG, Location, PlaceCreate, PlacePost, PlaceRead, PlaceSearchable,
@@ -205,7 +207,37 @@ impl Create for CrudsPlace {
     type Create = PlaceCreate;
     type CreateContext = PlaceCreateContext;
 
-    async fn auth_post(&self, _: &Self::User, _: &Self::Post) -> Result<(), ApiError> {
+    async fn auth_post(&self, user: &Self::User, form: &Self::Post) -> Result<(), ApiError> {
+        // For admins, we need to check the creator does exists
+        if user.is_admin {
+            if user_exists(self.get_db(), form.creator_id).await? {
+                return Ok(());
+            } else {
+                return Err(ApiError {
+                    code: StatusCode::NOT_FOUND,
+                    message: "User not found".to_string(),
+                    details: Some(Value::String(format!(
+                        "cannot set creator_id to {}. no user with id {} found in the database",
+                        form.creator_id, form.creator_id
+                    ))),
+                    err: None,
+                });
+            }
+        }
+
+        // for normal users, we check they are posting with their actual id
+        if user.id != form.creator_id {
+            return Err(ApiError {
+                code: StatusCode::UNAUTHORIZED,
+                message: "Not Authorized".to_string(),
+                details: Some(Value::String(format!(
+                    "cannot add places to user {}",
+                    form.creator_id
+                ))),
+                err: None,
+            });
+        }
+
         Ok(())
     }
 
