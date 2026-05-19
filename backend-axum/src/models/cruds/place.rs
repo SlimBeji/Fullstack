@@ -487,7 +487,7 @@ impl CrudsPlace {
     async fn update_embedding(&self, id: u32, vector: Vec<f32>) -> Result<(), ApiError> {
         let model = place::ActiveModel {
             id: Set(id as i32),
-            embedding: Set(Some(vector)),
+            embedding: Set(Some(vector.into())),
             ..Default::default()
         };
         place::Entity::update(model)

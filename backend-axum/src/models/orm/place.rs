@@ -44,7 +44,7 @@ pub struct Model {
     pub location: Location,
 
     #[sea_orm(column_type = "custom(\"vector(384)\")", nullable)]
-    pub embedding: Option<Vec<f32>>,
+    pub embedding: Option<PgVector>,
 
     #[sea_orm(indexed)]
     pub creator_id: i32,

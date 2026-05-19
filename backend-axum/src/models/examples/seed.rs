@@ -108,9 +108,10 @@ async fn seed_places(state: Arc<AppState>, refs: &mut RecordsMap) -> Result<(), 
 
             // Step 4: create the record
             let id = cruds
-                .create(data)
+                .seed(data, place.embedding)
                 .await
-                .expect("failed to create a user record");
+                .expect("failed to create a place record");
+
             (place.ref_, id)
         });
     }
