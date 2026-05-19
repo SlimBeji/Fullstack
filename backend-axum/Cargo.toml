@@ -37,7 +37,7 @@ urlencoding = "2.1"
 # Database
 chrono = "0.4" # needed by seaorm though we are using time elsewhere
 redis = {version = "1.0.5", features = ["tokio-comp"]} 
-sea-orm = {version = "2.0.0-rc.37", features = ["sqlx-postgres", "runtime-tokio-rustls"]} 
+sea-orm = {version = "2.0.0-rc.37", features = ["sqlx-postgres", "runtime-tokio-rustls", "postgres-vector"]} 
 sqlx = {version = "0.8", features = ["postgres"]} 
 
 # Schemas
