@@ -20,7 +20,7 @@ macro_rules! derive_timestamp_update {
 macro_rules! impl_cruds_boilerplate {
     (
         model: $model:ident,
-        name: $name:literal,
+        name: $name:ident,
         primary_key: $pk:expr,
         selectable: $selectable:ty,
         searchable: $searchable:ty,

@@ -16,7 +16,7 @@ use crate::lib_::seaorm_::{
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::cruds::user_exists;
-use crate::models::orm::place;
+use crate::models::orm::{PLACE_MODEL, place};
 use crate::models::schemas::place::PlaceUpdate;
 use crate::models::schemas::{
     LOCATION_LAT, LOCATION_LNG, Location, PlaceCreate, PlacePost, PlacePut, PlaceRead,
@@ -53,7 +53,7 @@ pub type CrudsPlace = CrudsBase<AppState, place::Entity>;
 impl CrudsUtils for CrudsPlace {
     impl_cruds_boilerplate!(
         model: place,
-        name: "Place",
+        name: PLACE_MODEL,
         primary_key: place::Column::Id,
         selectable: PlaceSelectable,
         searchable: PlaceSearchable,

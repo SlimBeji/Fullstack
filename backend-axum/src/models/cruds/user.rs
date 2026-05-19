@@ -15,7 +15,7 @@ use crate::lib_::seaorm_::{
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery, where_str_eq};
 use crate::lib_::utils;
-use crate::models::orm::{place, user};
+use crate::models::orm::{USER_MODEL, place, user};
 use crate::models::schemas::user::{UserCreate, UserUpdate};
 use crate::models::schemas::{
     EncodedToken, PlaceSelectable, SigninSchema, SignupSchema, UserPlace, UserPost, UserPut,
@@ -52,7 +52,7 @@ pub type CrudsUser = CrudsBase<AppState, user::Entity>;
 impl CrudsUtils for CrudsUser {
     impl_cruds_boilerplate!(
         model: user,
-        name: "User",
+        name: USER_MODEL,
         primary_key: user::Column::Id,
         selectable: UserSelectable,
         searchable: UserSearchable,
