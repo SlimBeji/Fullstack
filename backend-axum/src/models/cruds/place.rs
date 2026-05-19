@@ -480,3 +480,50 @@ impl Delete for CrudsPlace {
 
 #[async_trait]
 impl Search for CrudsPlace {}
+
+// Embeding Helpers
+
+impl CrudsPlace {
+    async fn update_embedding(&self, id: u32, vector: Vec<f32>) -> Result<(), ApiError> {
+        let model = place::ActiveModel {
+            id: Set(id as i32),
+            embedding: Set(Some(vector)),
+            ..Default::default()
+        };
+        place::Entity::update(model)
+            .exec(self.get_db())
+            .await
+            .map_err(|e| {
+                ApiError::internal_error(
+                    "failed to update place embedding".to_string(),
+                    Box::new(e),
+                )
+            })?;
+        Ok(())
+    }
+
+    pub async fn seed(&self, data: PlaceCreate, vector: Vec<f32>) -> Result<u32, ApiError> {
+        let id = self.create(data).await?;
+        self.update_embedding(id, vector).await?;
+        Ok(id)
+    }
+
+    pub async fn embed(&self, id: u32) -> Result<Vec<f32>, ApiError> {
+        // Fetch the title + description
+        let value = place::Entity::find()
+            .select_only()
+            .columns(vec![place::Column::Title, place::Column::Description])
+            .filter(place::Column::Id.eq(id as i32))
+            .into_json()
+            .one(self.get_db())
+            .await
+            .map_err(Self::read_error)?
+            .ok_or(Self::id_not_found(id))?;
+
+        // Run embdding
+        let title = Self::get_string_from_json(place::Column::Title.as_str(), &value)?;
+        let description = Self::get_string_from_json(place::Column::Description.as_str(), &value)?;
+        let text = format!("{} - {}", title, description);
+        self.app_state.hf.embed_text(&text).await
+    }
+}

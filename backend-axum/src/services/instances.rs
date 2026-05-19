@@ -78,6 +78,7 @@ pub struct AppState {
     pub pg: PgClient,
     pub redis: RedisClient,
     pub storage: CloudStorage,
+    pub hf: HuggingFaceClient,
 }
 
 impl AppState {
@@ -85,7 +86,13 @@ impl AppState {
         let pg = get_pgclient().await;
         let redis = get_redis_client().await;
         let storage = get_storage_client().await;
-        Self { pg, redis, storage }
+        let hf = get_hf_client().await;
+        Self {
+            pg,
+            redis,
+            storage,
+            hf,
+        }
     }
 
     pub async fn close(self) {
