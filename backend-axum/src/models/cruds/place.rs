@@ -1,20 +1,26 @@
+use std::collections::HashMap;
+
 use reqwest::StatusCode;
 use sea_orm::ActiveValue::Set;
-use sea_orm::DatabaseTransaction;
 use sea_orm::entity::prelude::async_trait::async_trait;
+use sea_orm::{
+    ColumnTrait, DatabaseTransaction, EntityTrait, IdenStatic, QueryFilter, QuerySelect,
+};
 use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::{
-    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Read, RecordReader, impl_cruds_boilerplate,
+    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Read, RecordReader, Update,
+    impl_cruds_boilerplate,
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
 use crate::lib_::utils;
 use crate::models::cruds::user_exists;
 use crate::models::orm::place;
+use crate::models::schemas::place::PlaceUpdate;
 use crate::models::schemas::{
-    LOCATION_LAT, LOCATION_LNG, Location, PlaceCreate, PlacePost, PlaceRead, PlaceSearchable,
-    PlaceSelectable, PlaceSortable, UserRead,
+    LOCATION_LAT, LOCATION_LNG, Location, PlaceCreate, PlacePost, PlacePut, PlaceRead,
+    PlaceSearchable, PlaceSelectable, PlaceSortable, UserRead,
 };
 use crate::services::instances::AppState;
 
@@ -297,6 +303,114 @@ impl Create for CrudsPlace {
         _: &Self::Create,
         _: Self::CreateContext,
     ) -> Result<(), ApiError> {
+        Ok(())
+    }
+}
+
+// The Update Trait
+
+pub struct PlaceUpdateContext {
+    trigger_embedding: bool,
+}
+
+#[async_trait]
+impl Update for CrudsPlace {
+    type Put = PlacePut;
+    type Update = PlaceUpdate;
+    type UpdateContext = PlaceUpdateContext;
+
+    async fn auth_put(&self, user: &Self::User, id: u32, _: &Self::Put) -> Result<(), ApiError> {
+        // No checks for admins
+        if user.is_admin {
+            return Ok(());
+        }
+
+        // For normal users, we check the place is owned by the user
+        let mut where_ = HashMap::new();
+        where_.insert(PlaceSearchable::Id, FieldFilters::id_eq(id));
+        where_.insert(PlaceSearchable::CreatorId, FieldFilters::id_eq(user.id));
+        if !self.exists(&where_).await? {
+            return Err(ApiError::unauthorized(format!(
+                "Access to place with id {} not granted",
+                id
+            )));
+        }
+
+        Ok(())
+    }
+
+    async fn put_to_update(&self, form: Self::Put) -> Result<Self::Update, ApiError> {
+        Ok(form)
+    }
+
+    fn update_to_model(id: u32, data: &Self::Update) -> Self::ActiveModel {
+        let mut model = place::ActiveModel {
+            id: Set(id as i32),
+            ..Default::default()
+        };
+
+        if let Some(title) = &data.title {
+            model.title = Set(title.clone());
+        }
+        if let Some(description) = &data.description {
+            model.description = Set(description.clone());
+        }
+        if let Some(address) = &data.address {
+            model.address = Set(address.clone());
+        }
+        if let Some(location) = &data.location {
+            model.location = Set(place::Location {
+                lat: location.lat,
+                lng: location.lng,
+            })
+        }
+
+        model
+    }
+
+    async fn before_update(
+        &self,
+        db: &DatabaseTransaction,
+        id: u32,
+        data: &Self::Update,
+    ) -> Result<Self::UpdateContext, ApiError> {
+        let value = place::Entity::find()
+            .select_only()
+            .columns(vec![place::Column::Title, place::Column::Description])
+            .filter(place::Column::Id.eq(id as i32))
+            .into_json()
+            .one(db)
+            .await
+            .map_err(|e| Self::update_error(id, data, e))?
+            .ok_or(Self::id_not_found(id))?;
+
+        let mut title_changed = false;
+        let title = Self::get_string_from_json(place::Column::Title.as_str(), &value)?;
+        if let Some(new_title) = &data.title {
+            title_changed = title.as_str() != new_title;
+        }
+
+        let mut description_changed = false;
+        let description = Self::get_string_from_json(place::Column::Description.as_str(), &value)?;
+        if let Some(new_description) = &data.description {
+            description_changed = description.as_str() != new_description;
+        }
+
+        Ok(PlaceUpdateContext {
+            trigger_embedding: title_changed || description_changed,
+        })
+    }
+
+    async fn after_update(
+        &self,
+        _: &DatabaseTransaction,
+        _: u32,
+        _: &Self::Update,
+        hooks_data: Self::UpdateContext,
+    ) -> Result<(), ApiError> {
+        if hooks_data.trigger_embedding {
+            println!("trigger the place embeddign here")
+        }
         Ok(())
     }
 }
