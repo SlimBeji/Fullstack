@@ -157,7 +157,7 @@ impl Read for CrudsPlace {
 
     async fn auth_get(user: &Self::User, mut search: PlaceSearch) -> Result<PlaceSearch, ApiError> {
         let mut where_ = search.where_.take().unwrap_or_default();
-        where_.insert(PlaceSearchable::CreatorId, FieldFilters::id(user.id));
+        where_.insert(PlaceSearchable::CreatorId, FieldFilters::id_eq(user.id));
         search.where_ = Some(where_);
         Ok(search)
     }

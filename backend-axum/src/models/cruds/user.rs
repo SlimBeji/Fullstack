@@ -217,7 +217,7 @@ impl Read for CrudsUser {
 
     async fn auth_get(user: &Self::User, mut search: UserSearch) -> Result<UserSearch, ApiError> {
         let mut where_ = search.where_.take().unwrap_or_default();
-        where_.insert(UserSearchable::Id, FieldFilters::id(user.id));
+        where_.insert(UserSearchable::Id, FieldFilters::id_eq(user.id));
         search.where_ = Some(where_);
         Ok(search)
     }

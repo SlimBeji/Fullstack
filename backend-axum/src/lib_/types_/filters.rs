@@ -686,7 +686,7 @@ pub enum FieldFilters {
 }
 
 impl FieldFilters {
-    pub fn id(id: u32) -> Self {
+    pub fn id_eq(id: u32) -> Self {
         Self::Index(IndexFilters {
             eq: Some(id),
             ..Default::default()

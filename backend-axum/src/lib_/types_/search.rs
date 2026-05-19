@@ -38,7 +38,7 @@ where
     Sortable: SortableTrait,
 {
     pub fn id(id: u32) -> Self {
-        let filter = FieldFilters::id(id);
+        let filter = FieldFilters::id_eq(id);
         let filters = HashMap::from([(Searchable::id(), filter)]);
         Self {
             where_: Some(filters),
