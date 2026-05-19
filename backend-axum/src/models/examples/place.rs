@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub fn get_place_seeds() -> Vec<PlaceSeed> {
-    let embdding1: &[f32] = &[
+    let embdding1: &[f64] = &[
         0.0236833356320858,
         0.027439933270215988,
         -0.0015803936403244734,
@@ -390,7 +390,7 @@ pub fn get_place_seeds() -> Vec<PlaceSeed> {
         0.018523074686527252,
         -0.009179787710309029,
     ];
-    let embdding2: &[f32] = &[
+    let embdding2: &[f64] = &[
         0.024137089028954506,
         -0.058630652725696564,
         -0.06225750595331192,
@@ -783,7 +783,7 @@ pub fn get_place_seeds() -> Vec<PlaceSeed> {
             creator_ref: 1,
             title: "Stamford Bridge".to_string(),
             description: "Chelsea FC Stadium".to_string(),
-            embedding: embdding1.to_vec(),
+            embedding: embdding1.iter().map(|&x| x as f32).collect(),
             image_url: get_image_path("place1.jpg"),
             address: "Fulham Road, London".to_string(),
             location: Location {
@@ -796,7 +796,7 @@ pub fn get_place_seeds() -> Vec<PlaceSeed> {
             creator_ref: 1,
             title: "Cobham Training Facility".to_string(),
             description: "Chelsea training facility".to_string(),
-            embedding: embdding2.to_vec(),
+            embedding: embdding2.iter().map(|&x| x as f32).collect(),
             image_url: get_image_path("place1.jpg"),
             address: "64 Stoke Rd, Stoke D'Abernon, Cobham KT11 3PT".to_string(),
             location: Location {
