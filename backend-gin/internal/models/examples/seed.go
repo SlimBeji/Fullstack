@@ -149,7 +149,7 @@ func SeedDb(verbose ...bool) error {
 		}
 		return err
 	} else if isVerbose {
-		fmt.Println("✅ Collection User seeded!")
+		fmt.Println("✅ Users data seeded!")
 	}
 
 	if err := seedPlaces(ctx, refs, isVerbose); err != nil {
@@ -158,7 +158,7 @@ func SeedDb(verbose ...bool) error {
 		}
 		return err
 	} else if isVerbose {
-		fmt.Println("✅ Collection Place seeded!")
+		fmt.Println("✅ Places data seeded!")
 	}
 
 	if isVerbose {
