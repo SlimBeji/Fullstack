@@ -10,7 +10,7 @@ use serde_json::Value;
 
 use crate::config;
 use crate::lib_::seaorm_::{
-    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Read, RecordReader, Update,
+    Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Delete, Read, RecordReader, Update,
     impl_cruds_boilerplate,
 };
 use crate::lib_::types_::{ApiError, FieldFilters, SearchQuery};
@@ -410,6 +410,67 @@ impl Update for CrudsPlace {
     ) -> Result<(), ApiError> {
         if hooks_data.trigger_embedding {
             println!("trigger the place embeddign here")
+        }
+        Ok(())
+    }
+}
+
+// The Delete Trait
+
+pub struct PlaceDeleteContext {
+    pub image_url: String,
+}
+
+#[async_trait]
+impl Delete for CrudsPlace {
+    type DeleteContext = PlaceDeleteContext;
+
+    async fn auth_delete(&self, user: &Self::User, id: u32) -> Result<(), ApiError> {
+        // No checks for admins
+        if user.is_admin {
+            return Ok(());
+        }
+
+        // For normal users, we check the place is owned by the user
+        let mut where_ = HashMap::new();
+        where_.insert(PlaceSearchable::Id, FieldFilters::id_eq(id));
+        where_.insert(PlaceSearchable::CreatorId, FieldFilters::id_eq(user.id));
+        if !self.exists(&where_).await? {
+            return Err(ApiError::unauthorized(format!(
+                "Access to place with id {} not granted",
+                id
+            )));
+        }
+
+        Ok(())
+    }
+
+    async fn before_delete(
+        &self,
+        tx: &DatabaseTransaction,
+        id: u32,
+    ) -> Result<PlaceDeleteContext, ApiError> {
+        let value = place::Entity::find()
+            .filter(place::Column::Id.eq(id as i32))
+            .select_only()
+            .column(place::Column::ImageUrl)
+            .into_json()
+            .one(tx)
+            .await
+            .map_err(Self::read_error)?
+            .ok_or(Self::id_not_found(id))?;
+        let image_url = Self::get_string_from_json(place::Column::ImageUrl.as_str(), &value)?;
+        Ok(PlaceDeleteContext { image_url })
+    }
+
+    async fn after_delete(
+        &self,
+        _: &DatabaseTransaction,
+        _: u32,
+        data: Self::DeleteContext,
+    ) -> Result<(), ApiError> {
+        if !data.image_url.is_empty() {
+            self.app_state.storage.delete_file(&data.image_url).await?;
         }
         Ok(())
     }
