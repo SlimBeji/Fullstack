@@ -132,7 +132,7 @@ pub struct PlaceSeed {
     pub description: String,
     pub address: String,
     pub location: Location,
-    pub embedding: Option<Vec<f32>>,
+    pub embedding: Vec<f32>,
     pub image_url: String,
 }
 
