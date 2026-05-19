@@ -610,7 +610,7 @@ impl Delete for CrudsUser {
     }
 }
 
-// The search Trait
+// The Search Trait
 
 #[async_trait]
 impl Search for CrudsUser {}

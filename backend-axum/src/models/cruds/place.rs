@@ -476,7 +476,7 @@ impl Delete for CrudsPlace {
     }
 }
 
-// The search Trait
+// The Search Trait
 
 #[async_trait]
 impl Search for CrudsPlace {}
