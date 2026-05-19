@@ -2,10 +2,10 @@ use std::{error::Error, marker::PhantomData, sync::Arc};
 
 use axum::http::StatusCode;
 use sea_orm::{
-    ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, ConnectionTrait,
-    DatabaseConnection, DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel,
-    PaginatorTrait, PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect, RuntimeErr,
-    TransactionTrait, prelude::async_trait::async_trait, sqlx,
+    ActiveModelBehavior, ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection,
+    DatabaseTransaction, DbErr, EntityName, EntityTrait, IntoActiveModel, PaginatorTrait,
+    PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect, RuntimeErr, TransactionTrait,
+    prelude::async_trait::async_trait, sqlx,
 };
 use serde_json::Value;
 use sqlx::postgres::PgDatabaseError;
@@ -341,25 +341,6 @@ pub trait Read: CrudsUtils {
     ) -> Result<Self::Reader, ApiError> {
         query.select = Some(Self::get_default_select());
         self.get_raw(query).await
-    }
-
-    async fn get_row_by_id(
-        &self,
-        conn: &impl ConnectionTrait,
-        id: u32,
-        columns: Vec<Self::Column>,
-    ) -> Result<Value, ApiError> {
-        let mut q = Self::Entity::find_by_id(id as i32).select_only();
-
-        for col in columns {
-            q = q.column(col);
-        }
-
-        q.into_json()
-            .one(conn)
-            .await
-            .map_err(Self::read_error)?
-            .ok_or(Self::not_found())
     }
 
     fn to_read(data: Self::Reader) -> Result<Self::Read, ApiError> {
