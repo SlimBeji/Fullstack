@@ -1,4 +1,4 @@
 pub mod auth;
 pub mod cors;
 
-pub use auth::Auth;
+pub use auth::{Admin, Auth};
