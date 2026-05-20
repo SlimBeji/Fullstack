@@ -1,8 +1,11 @@
-use axum::{Json, http::StatusCode, response::IntoResponse};
+use axum::extract::State;
+use axum::{Json, response::IntoResponse};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::lib_::axum_::{Validated, ValidatedForm};
+use crate::lib_::types_::ApiError;
+use crate::models::cruds::CrudsUser;
 use crate::models::schemas::{EncodedToken, SigninSchema, SignupSchema, SignupSchemaSwagger};
 use crate::services::SharedState;
 
@@ -35,17 +38,12 @@ pub fn routes() -> OpenApiRouter<SharedState> {
         content_type = "application/json"
     ))
 )]
-async fn signup_route(Validated(payload): Validated<SignupSchema>) -> impl IntoResponse {
-    println!("{:?}", payload.name);
-    println!("{:?}", payload.email);
-    println!("{:?}", payload.password);
-    if let Some(image) = payload.image {
-        println!("{}", image.originalname);
-        println!("{}", image.mimetype);
-        println!("{}", image.data.len());
-    }
-    let response = EncodedToken::example();
-    (StatusCode::OK, Json(response))
+async fn signup_route(
+    State(state): State<SharedState>,
+    Validated(payload): Validated<SignupSchema>,
+) -> Result<impl IntoResponse, ApiError> {
+    let cruds = CrudsUser::new(state);
+    Ok(Json(cruds.signup(payload).await?))
 }
 
 #[utoipa::path(
@@ -63,8 +61,10 @@ async fn signup_route(Validated(payload): Validated<SignupSchema>) -> impl IntoR
         content_type = "application/json"
     ))
 )]
-async fn signin_route(ValidatedForm(payload): ValidatedForm<SigninSchema>) -> impl IntoResponse {
-    println!("{:?}", payload);
-    let response = EncodedToken::example();
-    (StatusCode::OK, Json(response))
+async fn signin_route(
+    State(state): State<SharedState>,
+    ValidatedForm(payload): ValidatedForm<SigninSchema>,
+) -> Result<impl IntoResponse, ApiError> {
+    let cruds = CrudsUser::new(state);
+    Ok(Json(cruds.signin(payload).await?))
 }

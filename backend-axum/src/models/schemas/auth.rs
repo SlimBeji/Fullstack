@@ -154,16 +154,6 @@ pub struct EncodedToken {
 }
 
 impl EncodedToken {
-    pub fn example() -> Self {
-        Self {
-            access_token: "a_very_secret_token".to_string(),
-            token_type: "bearer".to_string(),
-            user_id: 123456789,
-            email: "mslimbeji@gmail.com".to_string(),
-            expires_in: 3600,
-        }
-    }
-
     pub fn create(id: u32, email: &str) -> Result<Self, jsonwebtoken::errors::Error> {
         let mut payload = HashMap::new();
         payload.insert("user_id".to_string(), Value::Number(id.into()));
