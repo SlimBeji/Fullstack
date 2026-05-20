@@ -191,6 +191,5 @@ async fn delete_user(
 ) -> Result<Json<Value>, ApiError> {
     let cruds = CrudsUser::new(state);
     cruds.user_delete(&user, id).await?;
-    println!("{}", user.name);
     Ok(Json(json!({"message": format!("Deleted user {}", id)})))
 }
