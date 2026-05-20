@@ -1,16 +1,19 @@
-use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use serde_json::json;
+use axum::extract::State;
+use axum::{Json, extract::Path};
+use serde_json::{Value, json};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::api::middlewares::Auth;
+use crate::lib_::seaorm_::{Create, Delete, Read, Search, Update};
+use crate::lib_::types_::ApiError;
 use crate::lib_::{
     axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
     types_::PaginatedData,
 };
+use crate::models::cruds::{CrudsPlace, PlaceOptions};
 use crate::models::schemas::{
-    PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch, PlacesPaginated,
-    UserRead,
+    PlaceGet, PlacePost, PlacePostSwagger, PlacePut, PlaceRead, PlaceSearch,
 };
 use crate::services::SharedState;
 
@@ -45,18 +48,17 @@ pub fn routes() -> OpenApiRouter<SharedState> {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn get_places(Auth(user): Auth, data: QueryFilters<PlaceSearch>) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", data.query.select);
-    println!("{:?}", data.query.order_by);
-    println!("{:?}", data.query.where_);
-    let result = PlacesPaginated {
-        page: data.query.page.unwrap(),
-        total_count: data.query.size.unwrap(),
-        total_pages: 1,
-        data: vec![PlaceRead::example()],
+async fn get_places(
+    State(state): State<SharedState>,
+    Auth(_): Auth,
+    data: QueryFilters<PlaceSearch>,
+) -> Result<Json<PaginatedData<Value>>, ApiError> {
+    let options = PlaceOptions {
+        process: Some(false),
+        ..Default::default()
     };
-    (StatusCode::OK, Json(result))
+    let cruds = CrudsPlace::new(state);
+    Ok(Json(cruds.paginate(data.query, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -75,18 +77,17 @@ async fn get_places(Auth(user): Auth, data: QueryFilters<PlaceSearch>) -> impl I
     )),
     security(("OAuth2Password" = []))
 )]
-async fn search_places(Auth(user): Auth, data: BodyFilters<PlaceSearch>) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", data.query.select);
-    println!("{:?}", data.query.order_by);
-    println!("{:?}", data.query.where_);
-    let result = PlacesPaginated {
-        page: data.query.page.unwrap(),
-        total_count: data.query.size.unwrap(),
-        total_pages: 1,
-        data: vec![PlaceRead::example()],
+async fn search_places(
+    State(state): State<SharedState>,
+    Auth(_): Auth,
+    data: BodyFilters<PlaceSearch>,
+) -> Result<Json<PaginatedData<Value>>, ApiError> {
+    let options = PlaceOptions {
+        process: Some(false),
+        ..Default::default()
     };
-    (StatusCode::OK, Json(result))
+    let cruds = CrudsPlace::new(state);
+    Ok(Json(cruds.paginate(data.query, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -106,23 +107,16 @@ async fn search_places(Auth(user): Auth, data: BodyFilters<PlaceSearch>) -> impl
     security(("OAuth2Password" = []))
 )]
 async fn create_place(
+    State(state): State<SharedState>,
     Auth(user): Auth,
     Validated(payload): Validated<PlacePost>,
-) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", payload.title);
-    println!("{:?}", payload.description);
-    println!("{:?}", payload.address);
-    println!("{:?}", payload.lat);
-    println!("{:?}", payload.lng);
-    println!("{:?}", payload.creator_id);
-    if let Some(image) = payload.image {
-        println!("{}", image.originalname);
-        println!("{}", image.mimetype);
-        println!("{}", image.data.len());
-    }
-    let response = PlaceRead::example();
-    (StatusCode::OK, Json(response))
+) -> Result<Json<PlaceRead>, ApiError> {
+    let options = PlaceOptions {
+        process: Some(false),
+        ..Default::default()
+    };
+    let cruds = CrudsPlace::new(state);
+    Ok(Json(cruds.user_post(&user, payload, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -135,14 +129,17 @@ async fn create_place(
     security(("OAuth2Password" = []))
 )]
 async fn get_place(
-    Auth(user): Auth,
-    Path(id): Path<String>,
+    State(state): State<SharedState>,
+    Auth(_): Auth,
+    Path(id): Path<u32>,
     Query(params): Query<PlaceGet>,
-) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", params.fields);
-    println!("returning place {}", id);
-    (StatusCode::OK, Json(PlaceRead::example()))
+) -> Result<Json<Value>, ApiError> {
+    let options = PlaceOptions {
+        process: Some(false),
+        fields: params.fields,
+    };
+    let cruds = CrudsPlace::new(state);
+    Ok(Json(cruds.get_partial(id, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -159,17 +156,19 @@ async fn get_place(
     security(("OAuth2Password" = []))
 )]
 async fn update_place(
+    State(state): State<SharedState>,
     Auth(user): Auth,
-    Path(id): Path<String>,
+    Path(id): Path<u32>,
     ValidatedJson(payload): ValidatedJson<PlacePut>,
-) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{}", id);
-    println!("{:?}", payload.title);
-    println!("{:?}", payload.description);
-    println!("{:?}", payload.address);
-    println!("{:?}", payload.location);
-    (StatusCode::OK, Json(UserRead::example()))
+) -> Result<Json<PlaceRead>, ApiError> {
+    let options = PlaceOptions {
+        process: Some(false),
+        ..Default::default()
+    };
+    let cruds = CrudsPlace::new(state);
+    Ok(Json(
+        cruds.user_put(&user, id, payload, Some(options)).await?,
+    ))
 }
 
 #[utoipa::path(
@@ -187,10 +186,12 @@ async fn update_place(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn delete_place(Auth(user): Auth, Path(id): Path<String>) -> impl IntoResponse {
-    println!("{}", user.name);
-    (
-        StatusCode::OK,
-        Json(json!({"message": format!("Deleted place {}", id)})),
-    )
+async fn delete_place(
+    State(state): State<SharedState>,
+    Auth(user): Auth,
+    Path(id): Path<u32>,
+) -> Result<Json<Value>, ApiError> {
+    let cruds = CrudsPlace::new(state);
+    cruds.user_delete(&user, id).await?;
+    Ok(Json(json!({"message": format!("Deleted place {}", id)})))
 }
