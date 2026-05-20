@@ -3,7 +3,7 @@ use serde_json::json;
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::api::middlewares::Auth;
+use crate::api::middlewares::{Admin, Auth};
 use crate::services::SharedState;
 
 pub const PATH: &str = "/hello-world";
@@ -69,12 +69,12 @@ async fn hello_user(Auth(user): Auth) -> impl IntoResponse {
         status = 200,
         content_type = "application/json",
         example = json!({
-            "message": "Hello Slim Beji!"
+            "message": "Hello Admin Slim Beji!"
         })
     )),
     security(("OAuth2Password" = []))
 )]
-async fn hello_admin(Auth(user): Auth) -> impl IntoResponse {
+async fn hello_admin(Admin(user): Admin) -> impl IntoResponse {
     Json(json!({
         "message": format!("Hello Admin {}!", user.name)
     }))
