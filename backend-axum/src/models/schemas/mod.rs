@@ -2,7 +2,7 @@ pub mod auth;
 pub mod place;
 pub mod user;
 
-pub use auth::{EncodedToken, SigninSchema, SignupSchema, SignupSchemaSwagger};
+pub use auth::{EncodedToken, SigninSchema, SignupSchema, SignupSchemaSwagger, TokenPayload};
 
 pub use user::{
     UserGet, UserPlace, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch, UserSearchable,

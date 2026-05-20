@@ -11,8 +11,8 @@ use crate::{
     config,
     lib_::{
         axum_::MultipartForm,
-        types_::{ApiError, FileToUpload},
-        utils::encode_payload,
+        types_::{ApiError, FileToUpload, SimpleError},
+        utils::{decode_payload, encode_payload},
         validator_::{email_strict, string_length},
     },
 };
@@ -26,6 +26,31 @@ pub fn validate_token(t: &str) -> Result<(), ValidationError> {
         return Err(err);
     }
     Ok(())
+}
+
+// --- Token Payload ----
+
+pub struct TokenPayload {
+    pub user_id: u32,
+    pub email: String,
+}
+
+impl TokenPayload {
+    pub fn decode(encoded: &str) -> Result<Self, SimpleError> {
+        let decoded = decode_payload(encoded, &config::ENV.secret_key)?;
+        let user_id = decoded
+            .get("user_id")
+            .and_then(|v| v.as_u64())
+            .ok_or(SimpleError::from("Token Not Valid"))? as u32;
+        // .as_u64()
+        // .ok_or(SimpleError::from("Token Not Valid"))? as u32;
+        let email = decoded
+            .get("email")
+            .and_then(|v| v.as_str())
+            .ok_or(SimpleError::from("Token Not Valid"))?
+            .to_string();
+        Ok(Self { user_id, email })
+    }
 }
 
 // --- Signup Schemas ----
