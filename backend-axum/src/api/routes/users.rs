@@ -48,7 +48,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
 )]
 async fn get_users(
     State(state): State<SharedState>,
-    Auth(user): Auth,
+    Auth(_): Auth,
     search: QueryFilters<UserSearch>,
 ) -> Result<Json<PaginatedData<Value>>, ApiError> {
     let options = UserOptions {
@@ -56,11 +56,7 @@ async fn get_users(
         ..Default::default()
     };
     let cruds = CrudsUser::new(state);
-    Ok(Json(
-        cruds
-            .user_paginate(&user, search.query, Some(options))
-            .await?,
-    ))
+    Ok(Json(cruds.paginate(search.query, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -81,7 +77,7 @@ async fn get_users(
 )]
 async fn search_users(
     State(state): State<SharedState>,
-    Auth(user): Auth,
+    Auth(_): Auth,
     search: BodyFilters<UserSearch>,
 ) -> Result<Json<PaginatedData<Value>>, ApiError> {
     let options = UserOptions {
@@ -89,11 +85,7 @@ async fn search_users(
         ..Default::default()
     };
     let cruds = CrudsUser::new(state);
-    Ok(Json(
-        cruds
-            .user_paginate(&user, search.query, Some(options))
-            .await?,
-    ))
+    Ok(Json(cruds.paginate(search.query, Some(options)).await?))
 }
 
 #[utoipa::path(
