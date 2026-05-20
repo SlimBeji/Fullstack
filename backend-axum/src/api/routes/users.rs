@@ -1,16 +1,18 @@
-use axum::{Json, extract::Path, http::StatusCode, response::IntoResponse};
-use serde_json::json;
+use axum::extract::State;
+use axum::{Json, extract::Path};
+use serde_json::{Value, json};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::api::middlewares::Auth;
+use crate::lib_::seaorm_::{Create, Delete, Read, Search, Update};
+use crate::lib_::types_::ApiError;
 use crate::lib_::{
     axum_::{BodyFilters, Query, QueryFilters, Validated, ValidatedJson},
     types_::PaginatedData,
 };
-use crate::models::schemas::{
-    UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch, UsersPaginated,
-};
+use crate::models::cruds::{CrudsUser, UserOptions};
+use crate::models::schemas::{UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch};
 use crate::services::SharedState;
 
 pub const PATH: &str = "/users";
@@ -44,18 +46,21 @@ pub fn routes() -> OpenApiRouter<SharedState> {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn get_users(Auth(user): Auth, data: QueryFilters<UserSearch>) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", data.query.select);
-    println!("{:?}", data.query.order_by);
-    println!("{:?}", data.query.where_);
-    let result = UsersPaginated {
-        page: data.query.page.unwrap(),
-        total_count: data.query.size.unwrap(),
-        total_pages: 1,
-        data: vec![UserRead::example()],
+async fn get_users(
+    State(state): State<SharedState>,
+    Auth(user): Auth,
+    search: QueryFilters<UserSearch>,
+) -> Result<Json<PaginatedData<Value>>, ApiError> {
+    let options = UserOptions {
+        process: Some(true),
+        ..Default::default()
     };
-    (StatusCode::OK, Json(result))
+    let cruds = CrudsUser::new(state);
+    Ok(Json(
+        cruds
+            .user_paginate(&user, search.query, Some(options))
+            .await?,
+    ))
 }
 
 #[utoipa::path(
@@ -74,18 +79,21 @@ async fn get_users(Auth(user): Auth, data: QueryFilters<UserSearch>) -> impl Int
     )),
     security(("OAuth2Password" = []))
 )]
-async fn search_users(Auth(user): Auth, data: BodyFilters<UserSearch>) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", data.query.select);
-    println!("{:?}", data.query.order_by);
-    println!("{:?}", data.query.where_);
-    let result = UsersPaginated {
-        page: data.query.page.unwrap(),
-        total_count: data.query.size.unwrap(),
-        total_pages: 1,
-        data: vec![UserRead::example()],
+async fn search_users(
+    State(state): State<SharedState>,
+    Auth(user): Auth,
+    search: BodyFilters<UserSearch>,
+) -> Result<Json<PaginatedData<Value>>, ApiError> {
+    let options = UserOptions {
+        process: Some(true),
+        ..Default::default()
     };
-    (StatusCode::OK, Json(result))
+    let cruds = CrudsUser::new(state);
+    Ok(Json(
+        cruds
+            .user_paginate(&user, search.query, Some(options))
+            .await?,
+    ))
 }
 
 #[utoipa::path(
@@ -105,21 +113,16 @@ async fn search_users(Auth(user): Auth, data: BodyFilters<UserSearch>) -> impl I
     security(("OAuth2Password" = []))
 )]
 async fn create_user(
+    State(state): State<SharedState>,
     Auth(user): Auth,
     Validated(payload): Validated<UserPost>,
-) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", payload.name);
-    println!("{:?}", payload.email);
-    println!("{:?}", payload.is_admin);
-    println!("{:?}", payload.password);
-    if let Some(image) = payload.image {
-        println!("{}", image.originalname);
-        println!("{}", image.mimetype);
-        println!("{}", image.data.len());
-    }
-    let response = UserRead::example();
-    (StatusCode::OK, Json(response))
+) -> Result<Json<UserRead>, ApiError> {
+    let options = UserOptions {
+        process: Some(true),
+        ..Default::default()
+    };
+    let cruds = CrudsUser::new(state);
+    Ok(Json(cruds.user_post(&user, payload, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -132,14 +135,17 @@ async fn create_user(
     security(("OAuth2Password" = []))
 )]
 async fn get_user(
-    Auth(user): Auth,
-    Path(id): Path<String>,
+    State(state): State<SharedState>,
+    Auth(_): Auth,
+    Path(id): Path<u32>,
     Query(params): Query<UserGet>,
-) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{:?}", params.fields);
-    println!("returning user {}", id);
-    (StatusCode::OK, Json(UserRead::example()))
+) -> Result<Json<Value>, ApiError> {
+    let options = UserOptions {
+        process: Some(true),
+        fields: params.fields,
+    };
+    let cruds = CrudsUser::new(state);
+    Ok(Json(cruds.get_partial(id, Some(options)).await?))
 }
 
 #[utoipa::path(
@@ -156,17 +162,19 @@ async fn get_user(
     security(("OAuth2Password" = []))
 )]
 async fn update_user(
+    State(state): State<SharedState>,
     Auth(user): Auth,
-    Path(id): Path<String>,
+    Path(id): Path<u32>,
     ValidatedJson(payload): ValidatedJson<UserPut>,
-) -> impl IntoResponse {
-    println!("{}", user.name);
-    println!("{}", id);
-    println!("{:?}", payload.name);
-    println!("{:?}", payload.email);
-    println!("{:?}", payload.password);
-    let response = UserRead::example();
-    (StatusCode::OK, Json(response))
+) -> Result<Json<UserRead>, ApiError> {
+    let options = UserOptions {
+        process: Some(true),
+        ..Default::default()
+    };
+    let cruds = CrudsUser::new(state);
+    Ok(Json(
+        cruds.user_put(&user, id, payload, Some(options)).await?,
+    ))
 }
 
 #[utoipa::path(
@@ -184,10 +192,13 @@ async fn update_user(
     )),
     security(("OAuth2Password" = []))
 )]
-async fn delete_user(Auth(user): Auth, Path(id): Path<String>) -> impl IntoResponse {
+async fn delete_user(
+    State(state): State<SharedState>,
+    Auth(user): Auth,
+    Path(id): Path<u32>,
+) -> Result<Json<Value>, ApiError> {
+    let cruds = CrudsUser::new(state);
+    cruds.user_delete(&user, id).await?;
     println!("{}", user.name);
-    (
-        StatusCode::OK,
-        Json(json!({"message": format!("Deleted user {}", id)})),
-    )
+    Ok(Json(json!({"message": format!("Deleted user {}", id)})))
 }
