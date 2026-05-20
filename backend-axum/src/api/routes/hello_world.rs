@@ -1,5 +1,5 @@
-use axum::{Json, response::IntoResponse};
-use serde_json::json;
+use axum::Json;
+use serde_json::{Value, json};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -34,7 +34,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
         })
     ))
 )]
-async fn hello() -> impl IntoResponse {
+async fn hello() -> Json<Value> {
     Json(json!({
         "message": "Hello World!"
     }))
@@ -54,7 +54,7 @@ async fn hello() -> impl IntoResponse {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn hello_user(Auth(user): Auth) -> impl IntoResponse {
+async fn hello_user(Auth(user): Auth) -> Json<Value> {
     Json(json!({
         "message": format!("Hello {}!", user.name)
     }))
@@ -74,7 +74,7 @@ async fn hello_user(Auth(user): Auth) -> impl IntoResponse {
     )),
     security(("OAuth2Password" = []))
 )]
-async fn hello_admin(Admin(user): Admin) -> impl IntoResponse {
+async fn hello_admin(Admin(user): Admin) -> Json<Value> {
     Json(json!({
         "message": format!("Hello Admin {}!", user.name)
     }))

@@ -1,5 +1,5 @@
+use axum::Json;
 use axum::extract::State;
-use axum::{Json, response::IntoResponse};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -41,7 +41,7 @@ pub fn routes() -> OpenApiRouter<SharedState> {
 async fn signup_route(
     State(state): State<SharedState>,
     Validated(payload): Validated<SignupSchema>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<Json<EncodedToken>, ApiError> {
     let cruds = CrudsUser::new(state);
     Ok(Json(cruds.signup(payload).await?))
 }
@@ -64,7 +64,7 @@ async fn signup_route(
 async fn signin_route(
     State(state): State<SharedState>,
     ValidatedForm(payload): ValidatedForm<SigninSchema>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<Json<EncodedToken>, ApiError> {
     let cruds = CrudsUser::new(state);
     Ok(Json(cruds.signin(payload).await?))
 }
