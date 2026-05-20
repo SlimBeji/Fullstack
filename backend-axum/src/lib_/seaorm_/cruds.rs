@@ -517,11 +517,11 @@ pub trait Create: Read {
 
     async fn user_post(
         &self,
-        user: Self::User,
+        user: &Self::User,
         form: Self::Post,
         options: Option<Self::Options>,
     ) -> Result<Self::Read, ApiError> {
-        self.auth_post(&user, &form).await?;
+        self.auth_post(user, &form).await?;
         self.post(form, options).await
     }
 }
@@ -616,12 +616,12 @@ pub trait Update: Read {
 
     async fn user_put(
         &self,
-        user: Self::User,
+        user: &Self::User,
         id: u32,
         form: Self::Put,
         options: Option<Self::Options>,
     ) -> Result<Self::Read, ApiError> {
-        self.auth_put(&user, id, &form).await?;
+        self.auth_put(user, id, &form).await?;
         self.put(id, form, options).await
     }
 }
