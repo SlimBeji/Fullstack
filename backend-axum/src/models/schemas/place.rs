@@ -272,24 +272,6 @@ pub struct PlaceRead {
     pub created_at: OffsetDateTime,
 }
 
-impl PlaceRead {
-    pub fn example() -> Self {
-        Self {
-            id: 123456789,
-            title: "Stamford Bridge".to_string(),
-            description: "Stadium of Chelsea football club".to_string(),
-            address: "Fulham road".to_string(),
-            location: Location {
-                lat: 51.48180425016331,
-                lng: -0.19090418688755467,
-            },
-            image_url: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
-            creator_id: 123456789,
-            created_at: OffsetDateTime::now_utc(),
-        }
-    }
-}
-
 #[derive(Debug, Default, Serialize, Deserialize, ToSchema, Validate, IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct PlaceGet {

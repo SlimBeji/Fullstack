@@ -234,24 +234,6 @@ pub struct UserRead {
     pub created_at: OffsetDateTime,
 }
 
-impl UserRead {
-    pub fn example() -> Self {
-        Self {
-            id: 123456789,
-            name: "Slim Beji".to_string(),
-            email: "mslimbeji@gmail.com".to_string(),
-            is_admin: false,
-            image_url: "avatar2_80e32f88-c9a5-4fcd-8a56-76b5889440cd.jpg".to_string(),
-            places: vec![UserPlace {
-                id: 123456789,
-                title: "Stamford Bridge".to_string(),
-                address: "Fulham road".to_string(),
-            }],
-            created_at: OffsetDateTime::now_utc(),
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, ToSchema, Validate, IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct UserGet {
