@@ -1,5 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { AxiosError, HttpStatusCode } from "axios";
+import { SvelteURLSearchParams } from "svelte/reactivity";
 import { writable } from "svelte/store";
 
 import type { HeaderContent, HttpMethods } from "@/types";
@@ -68,6 +69,8 @@ export function useHttp(options: useHttpOptions = {}) {
         let contentType: HeaderContent = "application/json";
         if (data instanceof FormData) {
             contentType = "multipart/form-data";
+        } else if (data instanceof SvelteURLSearchParams) {
+            contentType = "application/x-www-form-urlencoded";
         }
         const webClient = getClient(contentType);
 

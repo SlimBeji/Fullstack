@@ -1,4 +1,6 @@
 <script lang="ts">
+import { SvelteURLSearchParams } from "svelte/reactivity";
+
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/lib";
@@ -43,15 +45,17 @@ const text = $derived(
 
 // Handlers
 const onSignin = async (): Promise<void> => {
-    const formData = new FormData();
-    formData.append("username", $email.value);
-    formData.append("password", $password.value);
-    const resp = await sendRequest("/auth/signin", "post", formData, false);
+    // use URLSearchParams for application/x-www-form-urlencoded
+    const body = new SvelteURLSearchParams();
+    body.append("username", $email.value);
+    body.append("password", $password.value);
+    const resp = await sendRequest("/auth/signin", "post", body, false);
     const data = resp.data as SigninResponse;
     authStore.login(data);
 };
 
 const onSignup = async (): Promise<void> => {
+    // use FormData for multipart/form-data
     const formData = new FormData();
     formData.append("name", $username.value);
     formData.append("email", $email.value);
