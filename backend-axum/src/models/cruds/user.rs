@@ -87,7 +87,7 @@ impl CrudsUtils for CrudsUser {
                 UserSelectable::Email => result.push(user::Column::Email),
                 UserSelectable::IsAdmin => result.push(user::Column::IsAdmin),
                 UserSelectable::ImageUrl => result.push(user::Column::ImageUrl),
-                UserSelectable::Places => {}
+                UserSelectable::Places => result.push(user::Column::Id),
                 UserSelectable::CreatedAt => result.push(user::Column::CreatedAt),
             }
         }
