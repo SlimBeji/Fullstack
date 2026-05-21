@@ -31,7 +31,6 @@ pub enum UserSelectable {
     CreatedAt,
 }
 
-#[allow(dead_code)] // to be removed
 #[derive(
     Debug, Copy, Clone, PartialEq, Eq, Hash, IntoStaticStr, Serialize, Deserialize, ToSchema,
 )]
@@ -108,7 +107,6 @@ pub struct UserPlace {
 
 // --- Base Schemas ----
 
-#[allow(dead_code)] // to be removed
 #[derive(Debug)]
 pub struct UserSeed {
     pub ref_: u32,
@@ -121,7 +119,6 @@ pub struct UserSeed {
 
 // --- Create Schema ---
 
-#[allow(dead_code)] // to be removed
 #[derive(Debug, Deserialize, Validate)]
 pub struct UserCreate {
     #[validate(custom(function = "string_length::<2, 0>"))]

@@ -3,7 +3,6 @@ use std::{env, str::FromStr};
 use serde::Deserialize;
 use std::sync::LazyLock;
 
-#[allow(dead_code)] // to be removed
 #[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
     // Env Config

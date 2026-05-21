@@ -98,7 +98,6 @@ impl From<SerdeErr> for ApiError {
     }
 }
 
-#[allow(dead_code)] // to be removed
 impl ApiError {
     pub fn unauthorized(detail: String) -> Self {
         Self {

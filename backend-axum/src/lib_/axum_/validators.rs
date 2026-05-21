@@ -67,7 +67,6 @@ where
 
 // ValidatedQuery for simple structs that implements only Validated trait
 // Used mainly to parse query parameters
-#[allow(dead_code)]
 pub struct ValidatedQuery<T>(pub T);
 
 impl<S, T> FromRequest<S> for ValidatedQuery<T>

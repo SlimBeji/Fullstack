@@ -55,7 +55,6 @@ impl TokenPayload {
 
 // --- Signup Schemas ----
 
-#[allow(dead_code)]
 #[derive(ToSchema)]
 pub struct SignupSchemaSwagger {
     /// The user name, two characters at least

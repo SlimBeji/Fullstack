@@ -61,7 +61,6 @@ pub struct MultipartForm {
     inner: HashMap<String, MultipartField>,
 }
 
-#[allow(dead_code)]
 impl MultipartForm {
     fn new(inner: HashMap<String, MultipartField>) -> Self {
         Self { inner }
