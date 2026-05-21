@@ -25,7 +25,8 @@ impl PgClient {
             .min_connections(config.max_idle_conns)
             .connect_timeout(Duration::from_secs(CONNECT_TIMEOUT))
             .idle_timeout(Duration::from_secs(config.conn_max_idle_time as u64))
-            .max_lifetime(Duration::from_secs(config.conn_max_lifetime as u64));
+            .max_lifetime(Duration::from_secs(config.conn_max_lifetime as u64))
+            .sqlx_logging(false);
 
         let db = Database::connect(opt).await?;
         db.ping().await?;

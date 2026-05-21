@@ -20,7 +20,7 @@ tokio = {version = "1", features = ["full"]}
 tower = "0.4"
 tower-http = {version = "0.5", features = ["trace", "cors"]}
 tracing = "0.1"
-tracing-subscriber = "0.3"
+tracing-subscriber = {version = "0.3", features = ["env-filter", "json"]}
 
 # Rust Tools
 once_cell = {version = "1.21.3"}
@@ -38,7 +38,7 @@ urlencoding = "2.1"
 # Database
 chrono = "0.4" # needed by seaorm though we are using time elsewhere
 redis = {version = "1.0.5", features = ["tokio-comp"]} 
-sea-orm = {version = "2.0.0-rc.37", features = ["sqlx-postgres", "runtime-tokio-rustls", "postgres-vector"]} 
+sea-orm = {version = "2.0.0-rc.37", features = ["sqlx-postgres", "runtime-tokio-rustls", "postgres-vector", "debug-print"]} 
 sqlx = {version = "0.8", features = ["postgres"]} 
 
 # Schemas

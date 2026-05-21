@@ -109,10 +109,10 @@ impl Settings {
     }
 
     pub fn trace_lvl(&self) -> tracing::Level {
-        if self.env == "dev" {
-            tracing::Level::TRACE
+        if self.is_production() {
+            tracing::Level::WARN
         } else {
-            tracing::Level::INFO
+            tracing::Level::DEBUG
         }
     }
 
