@@ -25,13 +25,17 @@ pub fn add_swagger_ui(app: OpenApiRouter<SharedState>) -> Router<SharedState> {
             .build(),
     ]);
 
-    openapi.components.as_mut().unwrap().add_security_scheme(
-        "OAuth2Password",
-        SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
-            "/api/auth/signin",
-            Scopes::new(),
-        ))])),
-    );
+    openapi
+        .components
+        .as_mut()
+        .expect("failed to extract openapi components")
+        .add_security_scheme(
+            "OAuth2Password",
+            SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
+                "/api/auth/signin",
+                Scopes::new(),
+            ))])),
+        );
 
     Router::new()
         .merge(router)
