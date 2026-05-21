@@ -17,7 +17,7 @@ pub struct Settings {
     pub god_mode_login: String,
     pub jwt_expiration: usize,
     pub default_timeout: usize,
-    pub env: String,
+    env: String, // use self.is_production instead
 
     // DATABASE config
     pub database_url: String,
@@ -40,7 +40,7 @@ pub struct Settings {
 
 impl Settings {
     fn new() -> Result<Self, String> {
-        Ok(Settings {
+        let settings = Settings {
             // Env Config
             port: env_to_num(&get_env_or("PORT", "5002"))?,
             api_url: get_env_or("API_URL", "http://localhost:5002/api"),
@@ -72,7 +72,13 @@ impl Settings {
             gcs_blob_expiration: env_to_num(&get_env_or("GCS_BLOB_ACCESS_EXPIRATION", "3600"))?,
             gcs_emulator_priv: get_option_env("GCS_EMULATOR_PRIVATE_URL"),
             gcs_emulator_pub: get_option_env("GCS_EMULATOR_PUBLIC_URL"),
-        })
+        };
+
+        if settings.env != "dev" && settings.env != "production" {
+            panic!("ENV variable should be 'dev' or 'production'")
+        }
+
+        Ok(settings)
     }
 
     pub fn get_active_database(&self) -> String {
@@ -108,6 +114,10 @@ impl Settings {
         } else {
             tracing::Level::INFO
         }
+    }
+
+    pub fn is_production(&self) -> bool {
+        self.env == "production"
     }
 }
 
