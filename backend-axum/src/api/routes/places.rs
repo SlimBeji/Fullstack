@@ -54,7 +54,7 @@ async fn get_places(
     data: QueryFilters<PlaceSearch>,
 ) -> Result<Json<PaginatedData<Value>>, ApiError> {
     let options = PlaceOptions {
-        process: Some(false),
+        process: Some(true),
         ..Default::default()
     };
     let cruds = CrudsPlace::new(state);
@@ -83,7 +83,7 @@ async fn search_places(
     data: BodyFilters<PlaceSearch>,
 ) -> Result<Json<PaginatedData<Value>>, ApiError> {
     let options = PlaceOptions {
-        process: Some(false),
+        process: Some(true),
         ..Default::default()
     };
     let cruds = CrudsPlace::new(state);
