@@ -756,7 +756,9 @@ pub trait Search: Read {
         &self,
         query: &SearchQuery<Self::Selectable, Self::Searchable, Self::Sortable>,
     ) -> Result<usize, ApiError> {
-        let mut q = Self::Entity::find();
+        let mut q = Self::Entity::find()
+            .select_only()
+            .column(self.get_primary_key());
         if let Some(condition) = Self::get_condition(query) {
             q = q.filter(condition);
         }
