@@ -46,8 +46,11 @@ pub struct ApiError {
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        let body = Json(json!({"error": self.message, "details": self.details}));
-        (self.code, body).into_response()
+        let body = match self.details {
+            Some(details) => json!({"error": self.message, "details": details}),
+            None => json!({"error": self.message}),
+        };
+        (self.code, Json(body)).into_response()
     }
 }
 
