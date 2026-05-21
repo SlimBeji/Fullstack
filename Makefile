@@ -2,6 +2,9 @@
 fix-permission:
 	sudo find . ! -path './pgsql/*' -exec chown $$USER:$$USER {} +
 
+clean-docker:
+	docker system volume
+
 # Docker commands
 run:
 	docker-compose down
