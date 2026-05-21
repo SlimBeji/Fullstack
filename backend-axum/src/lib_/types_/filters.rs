@@ -325,13 +325,13 @@ impl StringFilters {
                 }
                 FilterOp::Like => {
                     is_usable(FilterOp::Like, &mut operators)?;
-                    let converted = val.to_string();
+                    let converted = format!("%{val}%");
                     // No validation for like - it contains partial data
                     result.like = Some(converted);
                 }
                 FilterOp::Ilike => {
                     is_usable(FilterOp::Ilike, &mut operators)?;
-                    let converted = val.to_string();
+                    let converted = format!("%{val}%");
                     // No validation for like - it contains partial data
                     result.ilike = Some(converted);
                 }
