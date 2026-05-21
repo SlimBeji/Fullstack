@@ -13,9 +13,12 @@ pub fn get_app() -> Router<SharedState> {
     let router = routes::create_router("/api");
     let app = docs::add_swagger_ui(router);
     let app = add_trace_layer(app);
-    app.layer(middlewares::cors::cors_layer())
-        .layer(DefaultBodyLimit::max(config::ENV.json_max_size))
-        .fallback(url_not_found)
+    app.layer(
+        ServiceBuilder::new()
+            .layer(middlewares::cors::cors_layer())
+            .layer(DefaultBodyLimit::max(config::ENV.json_max_size)),
+    )
+    .fallback(url_not_found)
 }
 
 fn add_trace_layer(router: Router<SharedState>) -> Router<SharedState> {
