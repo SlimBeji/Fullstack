@@ -223,6 +223,10 @@ impl Read for CrudsUser {
     }
 
     async fn post_process(&self, mut data: Self::Read) -> Result<Self::Read, ApiError> {
+        if data.image_url.is_empty() {
+            return Ok(data);
+        }
+
         data.image_url = self
             .app_state
             .storage
@@ -237,6 +241,9 @@ impl Read for CrudsUser {
         let Some(image_url) = result else {
             return Ok(data);
         };
+        if image_url.is_empty() {
+            return Ok(data);
+        }
 
         let key: &'static str = UserSelectable::ImageUrl.into();
         data[key] = Value::String(
