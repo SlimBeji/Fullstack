@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use axum::extract::{FromRequest, Request, multipart};
+use axum::extract::Request;
+use multer;
 
 use crate::lib_::types_::{ApiError, FileToUpload};
 use crate::lib_::utils;
@@ -11,7 +12,7 @@ pub enum MultipartField {
 }
 
 impl MultipartField {
-    async fn file_from_field(name: &str, field: multipart::Field<'_>) -> Result<Self, ApiError> {
+    async fn file_from_field(name: &str, field: multer::Field<'_>) -> Result<Self, ApiError> {
         let originalname = field
             .file_name()
             .ok_or(ApiError::bad_multipart_field(
@@ -39,7 +40,7 @@ impl MultipartField {
         }))
     }
 
-    async fn text_from_field(name: &str, field: multipart::Field<'_>) -> Result<Self, ApiError> {
+    async fn text_from_field(name: &str, field: multer::Field<'_>) -> Result<Self, ApiError> {
         let text = field
             .text()
             .await
@@ -47,12 +48,10 @@ impl MultipartField {
         Ok(Self::Text(text))
     }
 
-    async fn from_field(name: &str, field: multipart::Field<'_>) -> Result<Self, ApiError> {
+    async fn from_field(name: &str, field: multer::Field<'_>) -> Result<Self, ApiError> {
         if field.file_name().is_some() {
-            // File variant
             Self::file_from_field(name, field).await
         } else {
-            // Text variant
             Self::text_from_field(name, field).await
         }
     }
@@ -175,18 +174,30 @@ impl MultipartForm {
 
     pub async fn parse_multipart_request<S>(
         req: Request,
-        state: &S,
+        _state: &S,
     ) -> Result<MultipartForm, ApiError>
     where
         S: Send + Sync,
     {
-        let mut multipart = multipart::Multipart::from_request(req, state)
-            .await
-            .map_err(|e| {
-                ApiError::multipart_parsing_error("Could not parse multipart request", Box::new(e))
+        // Extract and sanitize boundary from Content-Type
+        let boundary = req
+            .headers()
+            .get("content-type")
+            .and_then(|v| v.to_str().ok())
+            .and_then(|ct| multer::parse_boundary(ct).ok())
+            .ok_or_else(|| {
+                ApiError::multipart_parsing_error(
+                    "Could not process multipart request",
+                    "Missing or invalid Content-Type boundary".into(),
+                )
             })?;
-        let mut map = HashMap::new();
 
+        // Convert body into a stream multer can consume
+        let stream = req.into_body().into_data_stream();
+        let mut multipart = multer::Multipart::new(stream, boundary);
+
+        // Read the fields
+        let mut map = HashMap::new();
         while let Some(field) = multipart.next_field().await.map_err(|e| {
             ApiError::multipart_parsing_error("Could not process multipart request", Box::new(e))
         })? {
@@ -198,6 +209,7 @@ impl MultipartForm {
                 MultipartField::from_field(&name, field).await?,
             );
         }
+
         Ok(MultipartForm::new(map))
     }
 }
