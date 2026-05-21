@@ -90,7 +90,7 @@ async fn seed_places(state: Arc<AppState>, refs: &mut RecordsMap) -> Result<(), 
             let post_form = PlacePost {
                 creator_id: *creator_id,
                 title: place.title.clone(),
-                description: place.address.clone(),
+                description: place.description.clone(),
                 address: place.address.clone(),
                 lat: place.location.lat,
                 lng: place.location.lng,

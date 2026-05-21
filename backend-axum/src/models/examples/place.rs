@@ -797,7 +797,7 @@ pub fn get_place_seeds() -> Vec<PlaceSeed> {
             title: "Cobham Training Facility".to_string(),
             description: "Chelsea training facility".to_string(),
             embedding: embdding2.iter().map(|&x| x as f32).collect(),
-            image_url: get_image_path("place1.jpg"),
+            image_url: get_image_path("place2.jpg"),
             address: "64 Stoke Rd, Stoke D'Abernon, Cobham KT11 3PT".to_string(),
             location: Location {
                 lat: 51.31735558375386,
