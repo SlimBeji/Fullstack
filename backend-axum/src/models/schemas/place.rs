@@ -13,7 +13,7 @@ use crate::lib_::types_::{SearchableTrait, SortableTrait};
 use crate::lib_::{
     axum_::MultipartForm,
     types_::{ApiError, FileToUpload, FiltersReader, PaginatedData, SearchQuery, ToSearchQuery},
-    validator_::{array_length, string_length},
+    validator_::{array_length, deserialize_f64_or_string, string_length},
 };
 use crate::models::orm::place;
 
@@ -113,10 +113,12 @@ impl SortableTrait for PlaceSortable {
 pub struct Location {
     /// The latitude of the place
     #[schema(example = 51.48180425016331)]
+    #[serde(deserialize_with = "deserialize_f64_or_string")]
     pub lat: f64,
 
     /// The longitude of the place
     #[schema(example = -0.19090418688755467)]
+    #[serde(deserialize_with = "deserialize_f64_or_string")]
     pub lng: f64,
 }
 
