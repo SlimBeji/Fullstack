@@ -119,15 +119,17 @@ const text = computed(() => {
 
 // Handlers
 const onSignin = async (): Promise<void> => {
-    const formData = new FormData();
-    formData.append("username", fields.email.value);
-    formData.append("password", fields.password.value);
-    const resp = await sendRequest("/auth/signin", "post", formData, false);
+    // use URLSearchParams for application/x-www-form-urlencoded
+    const body = new URLSearchParams();
+    body.append("username", fields.email.value);
+    body.append("password", fields.password.value);
+    const resp = await sendRequest("/auth/signin", "post", body, false);
     const data = resp.data as SigninResponse;
     authStore.login(data);
 };
 
 const onSignup = async (): Promise<void> => {
+    // use FormData for multipart/form-data
     const formData = new FormData();
     formData.append("name", fields.username.value);
     formData.append("email", fields.email.value);

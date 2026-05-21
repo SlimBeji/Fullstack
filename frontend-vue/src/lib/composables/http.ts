@@ -68,6 +68,8 @@ export const useHttp = (options: useHttpOptions = {}) => {
         let contentType: HeaderContent = "application/json";
         if (data instanceof FormData) {
             contentType = "multipart/form-data";
+        } else if (data instanceof URLSearchParams) {
+            contentType = "application/x-www-form-urlencoded";
         }
         const webClient = getClient(contentType);
 
