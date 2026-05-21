@@ -40,15 +40,17 @@ const AuthForm: React.FC = () => {
     }
 
     const onSignin = async (): Promise<void> => {
-        const formData = new FormData();
-        formData.append("username", state.fields.email.value);
-        formData.append("password", state.fields.password.value);
-        const resp = await sendRequest("/auth/signin", "post", formData, false);
+        // use URLSearchParams for application/x-www-form-urlencoded
+        const body = new URLSearchParams();
+        body.append("username", state.fields.email.value);
+        body.append("password", state.fields.password.value);
+        const resp = await sendRequest("/auth/signin", "post", body, false);
         const data = resp.data as SigninResponse;
         dispatch(authSlice.actions.login(data));
     };
 
     const onSignup = async (): Promise<void> => {
+        // use FormData for multipart/form-data
         const formData = new FormData();
         formData.append("name", state.fields.username.value);
         formData.append("email", state.fields.email.value);
