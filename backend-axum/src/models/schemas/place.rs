@@ -1,7 +1,7 @@
 use axum::extract::FromRequest;
 use sea_orm::Order;
-use sea_orm::sea_query::Expr;
 use sea_orm::sea_query::extension::postgres::PgExpr;
+use sea_orm::sea_query::{Alias, Expr, ExprTrait};
 use serde::{Deserialize, Serialize};
 use strum::IntoStaticStr;
 use time::OffsetDateTime;
@@ -65,8 +65,12 @@ impl SearchableTrait for PlaceSearchable {
             Self::Description => Expr::col(place::Column::Description),
             Self::Address => Expr::col(place::Column::Address),
             Self::CreatorId => Expr::col(place::Column::CreatorId),
-            Self::LocationLat => Expr::col(place::Column::Location).cast_json_field(LOCATION_LAT),
-            Self::LocationLng => Expr::col(place::Column::Location).cast_json_field(LOCATION_LNG),
+            Self::LocationLat => Expr::col(place::Column::Location)
+                .get_json_field(LOCATION_LAT)
+                .cast_as(Alias::new("DOUBLE PRECISION")),
+            Self::LocationLng => Expr::col(place::Column::Location)
+                .get_json_field(LOCATION_LNG)
+                .cast_as(Alias::new("DOUBLE PRECISION")),
             Self::CreatedAt => Expr::col(place::Column::CreatedAt),
         }
     }
