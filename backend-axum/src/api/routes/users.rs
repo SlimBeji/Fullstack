@@ -15,7 +15,7 @@ use crate::models::cruds::{CrudsUser, UserOptions};
 use crate::models::schemas::{UserGet, UserPost, UserPostSwagger, UserPut, UserRead, UserSearch};
 use crate::services::SharedState;
 
-pub const PATH: &str = "/users";
+pub const PATH: &str = "/users/";
 
 pub fn routes() -> OpenApiRouter<SharedState> {
     let mut router = OpenApiRouter::new()

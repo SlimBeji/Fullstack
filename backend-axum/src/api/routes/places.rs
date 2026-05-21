@@ -17,7 +17,7 @@ use crate::models::schemas::{
 };
 use crate::services::SharedState;
 
-pub const PATH: &str = "/places";
+pub const PATH: &str = "/places/";
 
 pub fn routes() -> OpenApiRouter<SharedState> {
     let mut router = OpenApiRouter::new()
