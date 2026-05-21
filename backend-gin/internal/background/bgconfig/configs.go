@@ -4,4 +4,4 @@ import (
 	"time"
 )
 
-const MaxAge = 7 * 20 * time.Hour
+const MaxAge = 7 * 24 * time.Hour
