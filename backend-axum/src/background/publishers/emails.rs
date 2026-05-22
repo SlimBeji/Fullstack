@@ -1,5 +1,5 @@
 use crate::{
-    background::bgconfig::EmailJob,
+    background::bgconfig::{EmailJob, SendEmailTask},
     lib_::{clients::TaskPublisher, types_::ApiError},
 };
 
@@ -11,7 +11,7 @@ pub async fn send_newsletter(
     if cfg!(test) {
         return Ok(());
     }
-    let job = EmailJob::Send { name, email };
+    let job = EmailJob::Send(SendEmailTask { name, email });
     publisher.push(job).await.map_err(|err| {
         ApiError::internal_error("failed to trigger send_newsletter task", Box::new(err))
     })
