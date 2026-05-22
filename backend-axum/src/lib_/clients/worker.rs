@@ -10,7 +10,7 @@ use serde_json::Value;
 
 #[derive(Clone)]
 pub struct TaskPublisher {
-    client: ConnectionManager,
+    pub client: ConnectionManager,
 }
 
 impl TaskPublisher {
