@@ -14,7 +14,7 @@ async fn handle_send_newslettter(payload: SendEmailTask) -> Result<(), HandlerEr
     Ok(())
 }
 
-pub async fn handle_email_tasks(_: Data<SharedState>, job: EmailJob) -> Result<(), HandlerError> {
+pub async fn handle_email_tasks(job: EmailJob, _: Data<SharedState>) -> Result<(), HandlerError> {
     match job {
         EmailJob::Send(payload) => handle_send_newslettter(payload).await,
     }

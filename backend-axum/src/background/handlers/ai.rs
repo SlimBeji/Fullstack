@@ -21,7 +21,7 @@ async fn handle_place_embedding(
     Ok(())
 }
 
-pub async fn handle_ai_jobs(data: Data<SharedState>, job: AIJob) -> Result<(), HandlerError> {
+pub async fn handle_ai_tasks(job: AIJob, data: Data<SharedState>) -> Result<(), HandlerError> {
     let state = (*data).clone();
     match job {
         AIJob::PlaceEmbedding(payload) => handle_place_embedding(state, payload).await,
