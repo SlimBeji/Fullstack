@@ -3,5 +3,5 @@ pub mod payload;
 pub mod queues;
 
 pub use configs::MAX_AGE;
-pub use payload::{AIJob, EmailJob};
-pub use queues::{AI_QUEUE, EMAIL_QUEUE};
+pub use payload::{PlaceEmbeddingTask, SendEmailTask};
+pub use queues::{AI_QUEUE, AIJob, EMAIL_QUEUE, EmailJob};

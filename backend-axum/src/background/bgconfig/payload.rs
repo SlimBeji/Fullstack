@@ -1,13 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", content = "payload")]
-pub enum AIJob {
-    PlaceEmbedding(u32),
+pub struct SendEmailTask {
+    pub name: String,
+    pub email: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type", content = "payload")]
-pub enum EmailJob {
-    Send { name: String, email: String },
+pub struct PlaceEmbeddingTask {
+    pub id: u32,
 }
