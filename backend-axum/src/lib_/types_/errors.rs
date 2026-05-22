@@ -44,13 +44,20 @@ pub struct ApiError {
     pub err: Option<Box<dyn Error + Send + Sync>>,
 }
 
-impl IntoResponse for ApiError {
-    fn into_response(self) -> Response {
-        let body = match self.details {
+impl ApiError {
+    pub fn into_json(self) -> Value {
+        match self.details {
             Some(details) => json!({"message": self.message, "error": true, "details": details}),
             None => json!({"message": self.message, "error": true}),
-        };
-        (self.code, Json(body)).into_response()
+        }
+    }
+}
+
+impl IntoResponse for ApiError {
+    fn into_response(self) -> Response {
+        let code = self.code;
+        let body = self.into_json();
+        (code, Json(body)).into_response()
     }
 }
 
