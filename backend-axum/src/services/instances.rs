@@ -5,7 +5,7 @@ use tracing::{error, info};
 use crate::config::ENV;
 use crate::lib_::clients::{
     CloudStorage, CloudStorageConfig, HuggingFaceClient, HuggingFaceClientConfig, PgClient,
-    PgClientConfig, RedisClient, RedisClientConfig,
+    PgClientConfig, RedisClient, RedisClientConfig, TaskPublisher,
 };
 use crate::lib_::seaorm_::cruds::CrudsAppStateTrait;
 
@@ -72,6 +72,15 @@ pub async fn get_hf_client() -> HuggingFaceClient {
         .expect("could not establish connection with HuggingFace client")
 }
 
+// Task Publisher
+
+pub async fn get_publisher() -> TaskPublisher {
+    let broker_url = ENV.get_active_redis();
+    TaskPublisher::new(&broker_url)
+        .await
+        .expect("could not establish connection with the task publisher broker")
+}
+
 // App State
 
 pub struct AppState {
@@ -79,6 +88,7 @@ pub struct AppState {
     pub redis: RedisClient,
     pub storage: CloudStorage,
     pub hf: HuggingFaceClient,
+    pub publisher: TaskPublisher,
 }
 
 impl AppState {
@@ -87,17 +97,23 @@ impl AppState {
         let redis = get_redis_client().await;
         let storage = get_storage_client().await;
         let hf = get_hf_client().await;
+        let publisher = get_publisher().await;
         Self {
             pg,
             redis,
             storage,
             hf,
+            publisher,
         }
     }
 
     pub async fn close(self) {
-        let (pg_result, redis_result, storage_result) =
-            join!(self.pg.close(), self.redis.close(), self.storage.close());
+        let (pg_result, redis_result, storage_result, publisher_result) = join!(
+            self.pg.close(),
+            self.redis.close(),
+            self.storage.close(),
+            self.publisher.close()
+        );
 
         if let Err(e) = pg_result {
             error!("failed to close PstgreSQL: {}", e);
@@ -107,6 +123,9 @@ impl AppState {
         }
         if let Err(e) = storage_result {
             error!("failed to close Storage Client: {}", e);
+        }
+        if let Err(e) = publisher_result {
+            error!("failed to close Publisher Client: {}", e);
         }
         info!("all services closed");
     }
