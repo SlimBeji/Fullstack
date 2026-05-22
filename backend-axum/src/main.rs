@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use backend::background::handlers::create_worker;
 use tokio::net::TcpListener;
 
 use backend::api;
@@ -8,16 +9,47 @@ use backend::services::{instances::AppState, setup::shutdown_signal};
 
 #[tokio::main]
 async fn main() {
+    // Creating state, worker, app and http listener
     let app_state = Arc::new(AppState::new().await);
+    let worker = create_worker(app_state.clone());
     let app = api::get_app().with_state(app_state.clone());
     let listener = TcpListener::bind(config::ENV.bind_addr())
         .await
         .expect("Failed to bind listener");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .expect("Failed serve the app");
 
+    // Create channel for termination
+    let (tx, _) = tokio::sync::broadcast::channel::<()>(1);
+    let mut axum_shutdown = tx.subscribe();
+    let mut worker_shutdown = tx.subscribe();
+
+    // Start Axum server
+    let axum_handle = tokio::spawn(async move {
+        axum::serve(listener, app)
+            .with_graceful_shutdown(async move {
+                let _ = axum_shutdown.recv().await;
+            })
+            .await
+    });
+
+    // Start Apalis Worker
+    let worker_handle = tokio::spawn(async move {
+        tokio::select! {
+            res = worker.run() => res,
+            _ = worker_shutdown.recv() => Ok(()), // Stop if termination signal received
+        }
+    });
+
+    // Poll Worker and HttpServer while waiting for shutdown_signal
+    tokio::select! {
+        _ = shutdown_signal() => {}
+        _ = axum_handle => {}
+        _ = worker_handle => {}
+    }
+
+    // Send termination signal to the sibscrivers
+    let _ = tx.send(());
+
+    // Gracefull cleaning of the state
     if let Ok(state) = Arc::try_unwrap(app_state) {
         state.close().await
     };
