@@ -1,7 +1,12 @@
+use std::{error::Error, fmt};
+
 use apalis::prelude::*;
 use apalis_redis::{ConnectionManager, RedisStorage};
 use redis::RedisError;
 use serde::{Serialize, de::DeserializeOwned};
+use serde_json::Value;
+
+// Task Publisher
 
 #[derive(Clone)]
 pub struct TaskPublisher {
@@ -26,3 +31,23 @@ impl TaskPublisher {
         Ok(())
     }
 }
+
+// Task Handler
+
+#[derive(Debug, Serialize)]
+pub struct HandlerError {
+    pub taskname: String,
+    pub message: String,
+    pub details: Value,
+}
+
+impl fmt::Display for HandlerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let result = serde_json::to_string(self)
+            .unwrap_or(format!("TaskError {} - {}", self.taskname, self.message));
+
+        write!(f, "{result}")
+    }
+}
+
+impl Error for HandlerError {}

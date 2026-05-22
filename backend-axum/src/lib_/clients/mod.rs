@@ -8,4 +8,4 @@ pub use hugging_face::{HuggingFaceClient, HuggingFaceClientConfig};
 pub use pgsql::{PgClient, PgClientConfig};
 pub use redis_::{RedisClient, RedisClientConfig};
 pub use storage::{CloudStorage, CloudStorageConfig};
-pub use worker::TaskPublisher;
+pub use worker::{HandlerError, TaskPublisher};
