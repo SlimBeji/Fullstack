@@ -41,6 +41,10 @@ redis = {version = "1.0.5", features = ["tokio-comp"]}
 sea-orm = {version = "2.0.0-rc.37", features = ["sqlx-postgres", "runtime-tokio-rustls", "postgres-vector", "debug-print"]} 
 sqlx = {version = "0.8", features = ["postgres"]} 
 
+# Task Processing
+apalis = {version = "1.0.0-rc.8"}
+apalis-redis = {version = "1.0.0-rc.8"}
+
 # Schemas
 serde = {version = "1.0", features = ["derive"]}
 serde_json = "1.0"
