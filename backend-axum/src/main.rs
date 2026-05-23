@@ -23,7 +23,7 @@ async fn main() {
     let mut worker_shutdown = tx.subscribe();
 
     // Start Axum server
-    let axum_handle = tokio::spawn(async move {
+    let mut axum_handle = tokio::spawn(async move {
         axum::serve(listener, app)
             .with_graceful_shutdown(async move {
                 let _ = axum_shutdown.recv().await;
@@ -32,7 +32,7 @@ async fn main() {
     });
 
     // Start Apalis Worker
-    let worker_handle = tokio::spawn(async move {
+    let mut worker_handle = tokio::spawn(async move {
         tokio::select! {
             res = worker.run() => res,
             _ = worker_shutdown.recv() => Ok(()), // Stop if termination signal received
@@ -42,12 +42,14 @@ async fn main() {
     // Poll Worker and HttpServer while waiting for shutdown_signal
     tokio::select! {
         _ = shutdown_signal() => {}
-        _ = axum_handle => {}
-        _ = worker_handle => {}
+        _ = &mut axum_handle => {}
+        _ = &mut worker_handle => {}
     }
 
-    // Send termination signal to the sibscrivers
+    // Send termination signal to the sibscribers and await future
     let _ = tx.send(());
+    let _ = axum_handle.await;
+    let _ = worker_handle.await;
 
     // Gracefull cleaning of the state
     if let Ok(state) = Arc::try_unwrap(app_state) {
