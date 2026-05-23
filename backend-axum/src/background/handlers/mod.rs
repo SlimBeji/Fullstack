@@ -19,7 +19,9 @@ macro_rules! redis_worker {
         move |_| {
             let storage = RedisStorage::<$job>::new(state.publisher.client.clone());
 
-            WorkerBuilder::new($queue)
+            // We try to use different Worker names on each start to avoid name collision
+            // with past workers after restart before they got removed
+            WorkerBuilder::new(format!("{}-{}", $queue, uuid::Uuid::new_v4()))
                 .backend(storage)
                 .data(state.clone())
                 .build($handler)
