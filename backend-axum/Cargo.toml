@@ -45,7 +45,8 @@ sea-orm = {version = "2.0.0-rc.37", features = ["sqlx-postgres", "runtime-tokio-
 sqlx = {version = "0.8", features = ["postgres"]} 
 
 # Task Processing
-apalis = {version = "1.0.0-rc.8"}
+apalis = {version = "1.0.0-rc.8", features = ["retry"]}
+apalis-cron = {version = "1.0.0-rc.8"}
 apalis-redis = {version = "1.0.0-rc.8"}
 
 # Schemas
