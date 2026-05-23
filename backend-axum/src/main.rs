@@ -52,8 +52,12 @@ async fn main() {
 
     // Send termination signal to the sibscribers and await future
     let _ = tx.send(());
-    let _ = axum_handle.await;
-    let _ = worker_handle.await;
+    if !axum_handle.is_finished() {
+        let _ = axum_handle.await;
+    }
+    if !worker_handle.is_finished() {
+        let _ = worker_handle.await;
+    }
 
     // Gracefull cleaning of the state
     if let Ok(state) = Arc::try_unwrap(app_state) {
