@@ -5,13 +5,12 @@ FROM rust:alpine
 WORKDIR /app
 
 # Install system dependencies
-RUN apk add --no-cache wget musl-dev
+RUN apk add --no-cache wget musl-dev mold clang
 
 # Install cargo-watch for hot reload
 RUN cargo install cargo-watch
 # Install rustfmt and clippy for code formatting
-RUN rustup component add rustfmt
-RUN rustup component add clippy
+RUN rustup component add rustfmt clippy
 # Install sea-orm-cli
 RUN cargo install sea-orm-cli --no-default-features --features runtime-tokio-rustls
 # Install atlas

@@ -108,6 +108,10 @@ services:
             - 5003:5003
         volumes:
             - ./backend-axum:/app
+            - axum-cargo-cache:/usr/local/cargo/registry
+            - axum-cargo-git:/usr/local/cargo/git
+            - axum-target-cache:/app/target
+
         env_file:
             - ./backend-axum/axum.env
         depends_on:
@@ -205,3 +209,6 @@ volumes:
     pgadmin:
     redisinsight:
     pgsql-test:
+    axum-cargo-cache:
+    axum-cargo-git:
+    axum-target-cache:

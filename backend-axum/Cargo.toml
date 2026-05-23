@@ -12,6 +12,9 @@ path = "src/main.rs"
 name = "backend"
 path = "src/lib.rs"
 
+[profile.dev]
+debug = 1
+
 [dependencies]
 # Axum
 axum = {version = "0.8", features = ["multipart"]}
