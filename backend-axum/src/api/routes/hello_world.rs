@@ -1,9 +1,12 @@
 use axum::Json;
+use axum::extract::State;
 use serde_json::{Value, json};
 use utoipa::openapi::Tag;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::api::middlewares::{Admin, Auth};
+use crate::background::publishers;
+use crate::lib_::types_::ApiError;
 use crate::services::SharedState;
 
 pub const PATH: &str = "/hello-world";
@@ -34,10 +37,16 @@ pub fn routes() -> OpenApiRouter<SharedState> {
         })
     ))
 )]
-async fn hello() -> Json<Value> {
-    Json(json!({
+async fn hello(State(state): State<SharedState>) -> Result<Json<Value>, ApiError> {
+    publishers::send_newsletter(
+        &state.publisher,
+        "Slim".to_string(),
+        "mslimbeji@gmail.com".to_string(),
+    )
+    .await?;
+    Ok(Json(json!({
         "message": "Hello World!"
-    }))
+    })))
 }
 
 #[utoipa::path(
