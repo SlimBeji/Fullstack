@@ -1,4 +1,4 @@
-use apalis::prelude::Data;
+use apalis::prelude::*;
 
 use crate::{
     background::bgconfig::{AIJob, PlaceEmbeddingTask},

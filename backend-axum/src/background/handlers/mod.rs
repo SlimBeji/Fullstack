@@ -1,4 +1,5 @@
-use apalis::prelude::{Monitor, WorkerBuilder};
+use apalis::layers::retry::RetryPolicy;
+use apalis::prelude::*;
 use apalis_redis::RedisStorage;
 
 use crate::{
@@ -13,7 +14,7 @@ pub mod ai;
 pub mod email;
 
 macro_rules! redis_worker {
-    ($state:expr, $queue:expr, $job:ty, $handler:path) => {{
+    ($state:expr, $queue:expr, $job:ty, $handler:path, $retry:expr) => {{
         let state = $state.clone();
 
         move |_| {
@@ -23,6 +24,7 @@ macro_rules! redis_worker {
             // with past workers after restart before they got removed
             WorkerBuilder::new(format!("{}-{}", $queue, uuid::Uuid::new_v4()))
                 .backend(storage)
+                .retry(RetryPolicy::retries($retry))
                 .data(state.clone())
                 .build($handler)
         }
@@ -35,7 +37,8 @@ pub fn create_worker(state: SharedState) -> Monitor {
             state,
             EMAIL_QUEUE,
             EmailJob,
-            handle_email_tasks
+            handle_email_tasks,
+            3
         ))
-        .register(redis_worker!(state, AI_QUEUE, AIJob, handle_ai_tasks))
+        .register(redis_worker!(state, AI_QUEUE, AIJob, handle_ai_tasks, 5))
 }
