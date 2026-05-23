@@ -19,6 +19,9 @@ This backend is written in **Rust** and follows the architecture and principles 
 The Axum backend relies on a `axum.env` file for configuration.
 
 ```
+# RUST
+RUST_LOG=debug,apalis=warn
+
 # ENV
 PORT=5003
 API_URL=http://localhost:5003/api
@@ -51,6 +54,8 @@ GCS_EMULATOR_PRIVATE_URL=http://gcs:4443
 GCS_EMULATOR_PUBLIC_URL=http://localhost:4443
 GCS_BLOB_ACCESS_EXPIRATION=3600
 ```
+
+> The specific `RUST_LOG=debug,apalis=warn` was added to filter logs to be displayed by the tracing module.
 
 ## 🧹 Linting
 
