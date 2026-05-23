@@ -12,7 +12,7 @@ This backend is written in **Rust** and follows the architecture and principles 
 | Data Validation | [validator](https://github.com/Keats/validator)                           |
 | OpenAPI Docs    | [utoipa](https://github.com/juhaku/utoipa)                                |
 | Background Jobs | [apalis](https://github.com/apalis-dev/apalis)                            |
-| Task Scheduling | [tokio-cron-scheduler](https://github.com/mvniekerk/tokio-cron-scheduler) |
+| Task Scheduling | [apalis-cron](https://github.com/apalis-dev/apalis-cron) |
 
 ## 🔐 Environment Variables
 
