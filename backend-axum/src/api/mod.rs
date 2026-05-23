@@ -22,19 +22,6 @@ pub fn get_app() -> Router<SharedState> {
 }
 
 fn add_trace_layer(router: Router<SharedState>) -> Router<SharedState> {
-    if config::ENV.is_production() {
-        tracing_subscriber::fmt()
-            .json()
-            .with_max_level(config::ENV.trace_lvl())
-            .init();
-    } else {
-        tracing_subscriber::fmt()
-            .with_max_level(config::ENV.trace_lvl())
-            .with_target(false)
-            .pretty()
-            .init();
-    }
-
     router.layer(
         ServiceBuilder::new().layer(TraceLayer::new_for_http().make_span_with(
             |request: &axum::http::Request<_>| {

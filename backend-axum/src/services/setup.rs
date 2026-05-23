@@ -1,6 +1,23 @@
 use tokio::signal;
 use tracing::info;
 
+use crate::config;
+
+pub fn init_tracing() {
+    if config::ENV.is_production() {
+        tracing_subscriber::fmt()
+            .json()
+            .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+            .init();
+    } else {
+        tracing_subscriber::fmt()
+            .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+            .with_target(false)
+            .pretty()
+            .init();
+    }
+}
+
 pub async fn shutdown_signal() {
     let ctrl_c = async {
         signal::ctrl_c()

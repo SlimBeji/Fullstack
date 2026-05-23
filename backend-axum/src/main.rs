@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use backend::background::handlers::create_worker;
+use backend::services::setup;
 use tokio::net::TcpListener;
 
 use backend::api;
@@ -9,6 +10,9 @@ use backend::services::{instances::AppState, setup::shutdown_signal};
 
 #[tokio::main]
 async fn main() {
+    // Init tracing
+    setup::init_tracing();
+
     // Creating state, worker, app and http listener
     let app_state = Arc::new(AppState::new().await);
     let worker = create_worker(app_state.clone());
