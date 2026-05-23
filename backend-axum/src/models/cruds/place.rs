@@ -8,6 +8,7 @@ use sea_orm::{
 };
 use serde_json::Value;
 
+use crate::background::publishers;
 use crate::config;
 use crate::lib_::seaorm_::{
     Create, CrudsBase, CrudsOptionsTrait, CrudsUtils, Delete, Read, RecordReader, Search, Update,
@@ -306,11 +307,11 @@ impl Create for CrudsPlace {
     async fn after_create(
         &self,
         _: &DatabaseTransaction,
-        _: u32,
+        id: u32,
         _: &Self::Create,
         _: Self::CreateContext,
     ) -> Result<(), ApiError> {
-        Ok(())
+        publishers::place_embedding(&self.app_state.publisher, id).await
     }
 }
 
@@ -411,12 +412,12 @@ impl Update for CrudsPlace {
     async fn after_update(
         &self,
         _: &DatabaseTransaction,
-        _: u32,
+        id: u32,
         _: &Self::Update,
         hooks_data: Self::UpdateContext,
     ) -> Result<(), ApiError> {
         if hooks_data.trigger_embedding {
-            println!("trigger the place embeddign here")
+            return publishers::place_embedding(&self.app_state.publisher, id).await;
         }
         Ok(())
     }
