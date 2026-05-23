@@ -108,14 +108,6 @@ impl Settings {
             .to_string()
     }
 
-    pub fn trace_lvl(&self) -> tracing::Level {
-        if self.is_production() {
-            tracing::Level::WARN
-        } else {
-            tracing::Level::DEBUG
-        }
-    }
-
     pub fn is_production(&self) -> bool {
         self.env == "production"
     }
