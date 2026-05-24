@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::background::bgconfig::{PlaceEmbeddingTask, SendEmailTask};
 
+// DONT FORGET TO VACUUM EACH NEW JOB TYPE IN crons::vacuum
+
 // --- Email tasks ---------
 
 pub const EMAIL_QUEUE: &str = "emails";

@@ -27,11 +27,19 @@ impl TaskPublisher {
         RedisStorage::<T>::new(self.client.clone()).push(job).await
     }
 
-    pub async fn vaccum<T>(&self) -> Result<(), TaskSinkError<RedisError>>
+    pub async fn vaccum<T>(&self) -> Result<(), HandlerError>
     where
         T: Serialize + DeserializeOwned + Send + Sync + Unpin + 'static,
     {
-        RedisStorage::<T>::new(self.client.clone()).vacuum().await?;
+        let type_name = std::any::type_name::<T>();
+        RedisStorage::<T>::new(self.client.clone())
+            .vacuum()
+            .await
+            .map_err(|err| HandlerError {
+                taskname: "vacuum_apalis".to_string(),
+                message: format!("failed to vacuum {type_name} data"),
+                details: Value::String(err.to_string()),
+            })?;
         Ok(())
     }
 
