@@ -5,13 +5,16 @@ use apalis::prelude::*;
 use apalis_cron::CronStream;
 use cron::Schedule;
 
-use crate::services::SharedState;
-
 use crate::background::crons::emails::{
     SEND_NEWSLETTER_CRON, SEND_NEWSLETTER_TASKNAME, send_newsletter_task,
 };
+use crate::background::crons::vacuuming::{
+    VACUUM_APALIS_CRON, VACUUM_APALIS_TASKNAME, vacuum_apalis,
+};
+use crate::services::SharedState;
 
 pub mod emails;
+pub mod vacuuming;
 
 macro_rules! redis_scheduler {
     ($state:expr, $name:expr, $cron:expr, $handler:path, $retry:expr) => {{
@@ -33,11 +36,19 @@ macro_rules! redis_scheduler {
 }
 
 pub fn create_scheduler(state: SharedState) -> Monitor {
-    Monitor::new().register(redis_scheduler!(
-        state,
-        SEND_NEWSLETTER_TASKNAME,
-        SEND_NEWSLETTER_CRON,
-        send_newsletter_task,
-        3
-    ))
+    Monitor::new()
+        .register(redis_scheduler!(
+            state,
+            SEND_NEWSLETTER_TASKNAME,
+            SEND_NEWSLETTER_CRON,
+            send_newsletter_task,
+            3
+        ))
+        .register(redis_scheduler!(
+            state,
+            VACUUM_APALIS_TASKNAME,
+            VACUUM_APALIS_CRON,
+            vacuum_apalis,
+            1
+        ))
 }
