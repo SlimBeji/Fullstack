@@ -48,6 +48,7 @@ sqlx = {version = "0.8", features = ["postgres"]}
 apalis = {version = "1.0.0-rc.8", features = ["retry"]}
 apalis-cron = {version = "1.0.0-rc.8"}
 apalis-redis = {version = "1.0.0-rc.8"}
+cron = "0.16"
 
 # Schemas
 serde = {version = "1.0", features = ["derive"]}
