@@ -507,6 +507,7 @@ name = "backend-axum"
 version = "0.1.0"
 dependencies = [
  "apalis",
+ "apalis-core",
  "apalis-cron",
  "apalis-redis",
  "axum",

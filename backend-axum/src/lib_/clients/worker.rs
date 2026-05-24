@@ -1,6 +1,7 @@
 use std::{error::Error, fmt};
 
 use apalis::prelude::*;
+use apalis_core::backend::Vacuum;
 use apalis_redis::{ConnectionManager, RedisStorage};
 use redis::RedisError;
 use serde::{Serialize, de::DeserializeOwned};
@@ -24,6 +25,14 @@ impl TaskPublisher {
         T: Serialize + DeserializeOwned + Send + Sync + Unpin + 'static,
     {
         RedisStorage::<T>::new(self.client.clone()).push(job).await
+    }
+
+    pub async fn vaccum<T>(&self) -> Result<(), TaskSinkError<RedisError>>
+    where
+        T: Serialize + DeserializeOwned + Send + Sync + Unpin + 'static,
+    {
+        RedisStorage::<T>::new(self.client.clone()).vacuum().await?;
+        Ok(())
     }
 
     pub async fn close(self) -> Result<(), RedisError> {
