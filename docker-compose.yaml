@@ -111,7 +111,6 @@ services:
             - axum-cargo-cache:/usr/local/cargo/registry
             - axum-cargo-git:/usr/local/cargo/git
             - axum-target-cache:/app/target
-
         env_file:
             - ./backend-axum/axum.env
         depends_on:
@@ -150,19 +149,19 @@ services:
             POSTGRES_DB: test
 
     pgadmin:
-        container_name: pgadmin
         image: dpage/pgadmin4
+        container_name: pgadmin
         environment:
             PGADMIN_DEFAULT_EMAIL: mslimbeji@gmail.com
             PGADMIN_DEFAULT_PASSWORD: very_secret
+            PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: '40'
+            PGADMIN_CONFIG_FILE_LOG_LEVEL: '40'
         depends_on:
             - pgsql
         volumes:
             - pgadmin:/var/lib/pgadmin
         ports:
             - 5050:80
-        logging:
-            driver: 'none'
 
     gcs:
         image: fsouza/fake-gcs-server
