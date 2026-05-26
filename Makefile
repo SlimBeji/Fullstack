@@ -2,236 +2,228 @@
 fix-permission:
 	sudo find . ! -path './pgsql/*' -exec chown $$USER:$$USER {} +
 
-clean-docker:
-	docker system volume
+podman-stat:
+	podman system df
 
-# Docker commands
-run:
-	docker-compose down
-	docker-compose up --attach axum
+podman-clean:
+	podman system prune -a --volumes
 
-build:
-	docker-compose build
-	cd frontend-react; npm install
-	cd backend-express; npm install
+stop:
+	podman-compose down
 
-# DB commands
-dump-mongo: fix-permission
-	rm -rf db/
+run: stop
+	podman-compose up -d && podman-compose logs -f axum
 
 # React commands
 react-build:
-	docker-compose build react
+	podman-compose build react
 	cd frontend-react; npm install
 
 react-bash:
-	docker exec -it react bash
+	podman exec -it react bash
 
 react-lint:
-	docker exec -it react npx tsc -b --noEmit
-	docker exec -it react npx eslint "src/**/*.ts" --fix
-	docker exec -it react npx eslint "src/**/*.tsx" --fix
-	docker exec -it react npx prettier --write . | grep -v "(unchanged)"
+	podman exec -it react npx tsc -b --noEmit
+	podman exec -it react npx eslint "src/**/*.ts" --fix
+	podman exec -it react npx eslint "src/**/*.tsx" --fix
+	podman exec -it react npx prettier --write . | grep -v "(unchanged)"
 
 # Vue commands
 vue-build:
-	docker-compose build vue
+	pdoman-compose build vue
 	cd frontend-vue; npm install
 
 vue-bash:
-	docker exec -it vue bash
+	podman exec -it vue bash
 
 vue-lint:
-	docker exec -it vue npm run lint
-	docker exec -it vue npm run format | grep -v "(unchanged)"
+	podman exec -it vue npm run lint
+	podman exec -it vue npm run format | grep -v "(unchanged)"
 
 # Svelte commands
 svelte-build:
-	docker-compose build svelte
+	podman-compose build svelte
 	cd frontend-svelte; npm install
 
 svelte-bash:
-	docker exec -it svelte bash
+	podman exec -it svelte bash
 
 svelte-lint:
-	docker exec -it svelte npm run lint
-	docker exec -it svelte npm run format | grep -v "(unchanged)"
+	podman exec -it svelte npm run lint
+	podman exec -it svelte npm run format | grep -v "(unchanged)"
 
 # Express commands
 express-build:
-	docker-compose build express
+	podman-compose build express
 	cd backend-express; npm install
 
 express-bash:
-	docker exec -it express bash
+	podman exec -it express bash
 
 express-diff/%:
-	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:generate $* -d ../orm/data-source.ts
+	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:generate $* -d ../orm/data-source.ts
 
 express-migrate:
-	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source.ts
-	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source-test.ts
+	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source.ts
+	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source-test.ts
 
 express-revert:
-	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source.ts
-	docker exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source-test.ts
+	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source.ts
+	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source-test.ts
 
 express-test:
-	docker exec -it express npm test
+	pdoman exec -it express npm test
 
 express-lint:
-	docker exec -it express npx tsc -b --noEmit
-	docker exec -it express npx eslint "src/**/*.ts" --fix
-	docker exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
+	podman exec -it express npx tsc -b --noEmit
+	podman exec -it express npx eslint "src/**/*.ts" --fix
+	podman exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
 
 express-script/%:
-	docker exec -it express npx tsx -r tsconfig-paths/register src/bin/$*
+	podman exec -it express npx tsx -r tsconfig-paths/register src/bin/$*
 
 express-debug:
-	docker exec -it express npx ts-node -r tsconfig-paths/register src/bin/debug.ts
+	podman exec -it express npx ts-node -r tsconfig-paths/register src/bin/debug.ts
 
 express-seed:
-	docker exec -it express npx ts-node -r tsconfig-paths/register src/bin/seedDb.ts
+	podman exec -it express npx ts-node -r tsconfig-paths/register src/bin/seedDb.ts
 
 express-dump:
-	docker exec -it express npx ts-node -r tsconfig-paths/register src/bin/dumpDb.ts
+	podman exec -it express npx ts-node -r tsconfig-paths/register src/bin/dumpDb.ts
 
 # FastAPI commands
 fastapi-build:
-	docker-compose build fastapi
+	podman-compose build fastapi
 
 fastapi-bash:
-	docker exec -it fastapi bash
+	podman exec -it fastapi bash
 
 fastapi-alembic:
-	docker exec -it -w /app/models/migrations fastapi alembic init alembic
+	podman exec -it -w /app/models/migrations fastapi alembic init alembic
 
 fastapi-diff/%:
-	docker exec -it -w /app/models/migrations fastapi alembic revision --autogenerate -m $*
+	podman exec -it -w /app/models/migrations fastapi alembic revision --autogenerate -m $*
 
 fastapi-migrate:
-	docker exec -it -w /app/models/migrations fastapi alembic upgrade head
-	docker exec -it -w /app/models/migrations fastapi sh -c "ALEMBICENV=test alembic upgrade head"
+	podman exec -it -w /app/models/migrations fastapi alembic upgrade head
+	podman exec -it -w /app/models/migrations fastapi sh -c "ALEMBICENV=test alembic upgrade head"
 
 fastapi-revert:
-	docker exec -it -w /app/models/migrations fastapi alembic downgrade -1
-	docker exec -it -w /app/models/migrations fastapi sh -c "ALEMBICENV=test alembic downgrade -1"
+	podman exec -it -w /app/models/migrations fastapi alembic downgrade -1
+	podman exec -it -w /app/models/migrations fastapi sh -c "ALEMBICENV=test alembic downgrade -1"
 
 fastapi-test:
-	docker exec -it fastapi pytest /app/tests
+	podman exec -it fastapi pytest /app/tests
 
 fastapi-lint:
-	docker exec -it fastapi ruff check . --fix
-	docker exec -it fastapi ruff format .
-	docker exec -it fastapi mypy .
+	podman exec -it fastapi ruff check . --fix
+	podman exec -it fastapi ruff format .
+	podman exec -it fastapi mypy .
 
 fastapi-script/%:
-	docker exec -it fastapi python /app/bin/$*
+	podman exec -it fastapi python /app/bin/$*
 
 fastapi-debug:
-	docker exec -it fastapi python /app/bin/debug.py
+	podman exec -it fastapi python /app/bin/debug.py
 
 fastapi-seed:
-	docker exec -it fastapi python /app/bin/seed_db.py
+	podman exec -it fastapi python /app/bin/seed_db.py
 
 fastapi-dump:
-	docker exec -it fastapi python /app/bin/dump_db.py
+	podman exec -it fastapi python /app/bin/dump_db.py
 
 # Gin commands
 gin-build:
-	docker-compose build gin
+	podman-compose build gin
 
 gin-bash:
-	docker exec -it gin bash
+	podman exec -it gin bash
 
 gin-atlas:
-	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
-	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_gin_dev;"
-	docker exec -it pgsql psql -U dev -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
-	docker exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
-	docker exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_gin_dev;"
-	docker exec -it test-pgsql psql -U test -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	podman exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
+	podman exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_gin_dev;"
+	podman exec -it pgsql psql -U dev -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	podman exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_gin_dev WITH (FORCE);"
+	podman exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_gin_dev;"
+	podman exec -it test-pgsql psql -U test -d atlas_gin_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 gin-diff/%:
-	docker exec -it -w /app/internal/models/migrations gin atlas migrate diff $* --env dev
+	podman exec -it -w /app/internal/models/migrations gin atlas migrate diff $* --env dev
 
 gin-migrate:
-	docker exec -it -w /app/internal/models/migrations gin atlas migrate hash --dir file://./
-	docker exec -it -w /app/internal/models/migrations gin atlas migrate apply --env dev --allow-dirty
-	docker exec -it -w /app/internal/models/migrations gin atlas migrate apply --env test --allow-dirty
+	podman exec -it -w /app/internal/models/migrations gin atlas migrate hash --dir file://./
+	podman exec -it -w /app/internal/models/migrations gin atlas migrate apply --env dev --allow-dirty
+	podman exec -it -w /app/internal/models/migrations gin atlas migrate apply --env test --allow-dirty
 
 gin-revert:
-	docker exec -it -w /app/internal/models/migrations gin atlas migrate down --env dev
-	docker exec -it -w /app/internal/models/migrations gin atlas migrate down --env test
+	podman exec -it -w /app/internal/models/migrations gin atlas migrate down --env dev
+	podman exec -it -w /app/internal/models/migrations gin atlas migrate down --env test
 
 gin-test:
-	docker exec -it gin go test -failfast /app/internal/tests/... -p=1
+	podman exec -it gin go test -failfast /app/internal/tests/... -p=1
 
 gin-swagger:
-	docker exec -it gin swag init -g ./app.go -o internal/api/docs -q
+	podman exec -it gin swag init -g ./app.go -o internal/api/docs -q
 
 gin-lint: gin-swagger
-	docker exec -it gin go fmt .
-	docker exec -it gin go vet .
-	docker exec -it gin go build .
+	podman exec -it gin go fmt .
+	podman exec -it gin go vet .
+	podman exec -it gin go build .
 
 gin-script/%:
-	docker exec -it gin go run /app/cmd/scripts $*
+	podman exec -it gin go run /app/cmd/scripts $*
 
 gin-debug:
-	docker exec -it gin go run /app/cmd/scripts debug
+	podman exec -it gin go run /app/cmd/scripts debug
 
 gin-seed:
-	docker exec -it gin go run /app/cmd/scripts seed
+	podman exec -it gin go run /app/cmd/scripts seed
 
 gin-dump:
-	docker exec -it gin go run /app/cmd/scripts dump
+	podman exec -it gin go run /app/cmd/scripts dump
 
 # Axum commands
 axum-build:
-	docker-compose build axum
-
-axum-doc:
-	cd backend-axum; cargo doc --open
+	podman-compose build axum
 
 axum-bash:
-	docker exec -it axum bash
+	podman exec -it axum bash
 
 axum-atlas:
-	docker exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
-	docker exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_axum_dev;"
-	docker exec -it pgsql psql -U dev -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
-	docker exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
-	docker exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_axum_dev;"
-	docker exec -it test-pgsql psql -U test -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	podman exec -it pgsql psql -U dev -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
+	podman exec -it pgsql psql -U dev -c "CREATE DATABASE atlas_axum_dev;"
+	podman exec -it pgsql psql -U dev -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
+	podman exec -it test-pgsql psql -U test -c "DROP DATABASE IF EXISTS atlas_axum_dev WITH (FORCE);"
+	podman exec -it test-pgsql psql -U test -c "CREATE DATABASE atlas_axum_dev;"
+	podman exec -it test-pgsql psql -U test -d atlas_axum_dev -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 axum-diff/%:
-	docker exec -it -w /app/src/models/migrations axum atlas migrate diff $* --env dev
+	podman exec -it -w /app/src/models/migrations axum atlas migrate diff $* --env dev
 
 axum-migrate:
-	docker exec -it -w /app/src/models/migrations axum atlas migrate hash --dir file://./
-	docker exec -it -w /app/src/models/migrations axum atlas migrate apply --env dev --allow-dirty
-	docker exec -it -w /app/src/models/migrations axum atlas migrate apply --env test --allow-dirty
+	podman exec -it -w /app/src/models/migrations axum atlas migrate hash --dir file://./
+	podman exec -it -w /app/src/models/migrations axum atlas migrate apply --env dev --allow-dirty
+	podman exec -it -w /app/src/models/migrations axum atlas migrate apply --env test --allow-dirty
 
 axum-revert:
-	docker exec -it -w /app/src/models/migrations axum atlas migrate down --env dev
-	docker exec -it -w /app/src/models/migrations axum atlas migrate down --env test
+	podman exec -it -w /app/src/models/migrations axum atlas migrate down --env dev
+	podman exec -it -w /app/src/models/migrations axum atlas migrate down --env test
 
 axum-test:
-	docker exec -it axum cargo test -- --test-threads=1
+	podman exec -it axum cargo test -- --test-threads=1
 
 axum-lint:
-	docker exec -it axum cargo fmt
-	docker exec -it axum cargo clippy
+	podman exec -it axum cargo fmt
+	podman exec -it axum cargo clippy
 
 axum-script/%:
-	docker exec -it axum cargo run --bin $*
+	podman exec -it axum cargo run --bin $*
 
 axum-debug:
-	docker exec -it axum cargo run --bin debug
+	podman exec -it axum cargo run --bin debug
 
 axum-seed:
-	docker exec -it axum cargo run --bin seed
+	podman exec -it axum cargo run --bin seed
 
 axum-dump:
-	docker exec -it axum cargo run --bin dump
+	podman exec -it axum cargo run --bin dump
