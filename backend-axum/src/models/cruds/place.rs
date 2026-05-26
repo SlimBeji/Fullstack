@@ -511,7 +511,14 @@ impl CrudsPlace {
     }
 
     pub async fn seed(&self, data: PlaceCreate, vector: Vec<f32>) -> Result<u32, ApiError> {
-        let id = self.create(data).await?;
+        let model = Self::create_to_model(&data);
+        let insert_result = place::Entity::insert(model)
+            .exec(self.get_db())
+            .await
+            .map_err(|err| {
+                ApiError::internal_error("failed to seed place".to_string(), Box::new(err))
+            })?;
+        let id = insert_result.last_insert_id as u32;
         self.update_embedding(id, vector).await?;
         Ok(id)
     }
