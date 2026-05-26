@@ -156,6 +156,7 @@ services:
             PGADMIN_DEFAULT_PASSWORD: very_secret
             PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: '40'
             PGADMIN_CONFIG_FILE_LOG_LEVEL: '40'
+            GUNICORN_ACCESS_LOGFILE: '/dev/null'
         depends_on:
             - pgsql
         volumes:
