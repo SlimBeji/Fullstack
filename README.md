@@ -15,9 +15,9 @@ This setup allows for:
 - Experimenting with new technologies in a real-world scenario
 - Understanding how to build scalable, interchangeable services
 
-## 🐳 Dockerized Setup
+## 🐳 Containerized Setup
 
-Each application (frontend/backend) is **containerized using Docker** and organized in its own dedicated folder:
+Each application (frontend/backend) is **containerized using Podman** and organized in its own dedicated folder:
 
 - Backend apps: `/backend-express`, `/backend-fastapi`, `/backend-gin`, `/backend-axum`
 - Frontend apps: `/frontend-react`, `/frontend-vue`, `/frontend-svelte`, `/frontend-angular`
@@ -26,10 +26,10 @@ The `backend-` and `frontend-` prefixes group related applications together for 
 
 ### 🔗 Shared Services
 
-The `docker-compose.yaml` file orchestrates the following shared services:
+The `podman-compose.yaml` file orchestrates the following shared services:
 
 - **PostgreSQL**: Primary relational database
-- **pgAdmin**: Web-based PostgreSQL administration interface
+- **PgAdmin**: Web-based PostgreSQL administration interface
 - **Redis**: In-memory data store for caching and message brokering
 - **RedisInsight**: Web UI for monitoring and managing Redis
 - **Fake GCS Server**: Local emulator for Google Cloud Storage ([`fsouza/fake-gcs-server`](https://github.com/fsouza/fake-gcs-server))
@@ -105,7 +105,7 @@ Reusable and abstracted modules that serve as the **foundation layer** of the ap
 
 The `/lib` folder acts as the **glue layer** between the application logic and external dependencies — providing consistent interfaces for HTTP frameworks, data validation libraries, PostgreSQL ORMs, and third-party services.
 
-- **/utils** – Generic helper functions independent of any framework (e.g., date/string formatting, file I/O, encryption, hashing)
+- **/utils** – Generic helper functions independent of any framework (e.g., date/string formatting, file I/O, encryption, hashing, concurency)
 - **/types** – Reusable type definitions shared across the project (e.g., pagination parameters, file upload schemas, error responses)
 - **/clients** – Wrappers around external services and APIs (e.g., Redis, Google Cloud Storage, task queues, HuggingFace, third-party APIs)
 - **/framework\_** – Abstraction layer over web frameworks to normalize routing, middleware, and request handling (e.g., `fastapi_`, `express_`, `gin_`, `axum_`)
@@ -144,7 +144,7 @@ The `/services` folder is split into two submodules to prevent circular imports:
     - `start()` or `connect()` – Initialize the service connection
     - `close()` or `disconnect()` – Gracefully shutdown the service
 
-- **setup** – Contains orchestration logic to manage the lifecycle of all service instances. This module:
+- **setup** – Contains orchestration logic to manage the lifecycle of all service instances together. This module:
     - Calls `start()`/`connect()` on all instances during application startup
     - Calls `close()`/`disconnect()` on all instances during application shutdown
 
@@ -163,7 +163,41 @@ Well-designed data models are critical for:
 
 The `/models` folder is organized into subfolders that separate concerns by lifecycle stage:
 
+#### 📁📁 ORM
+
+When creating or updating a model, the first thing to think about is how it is represented in the database.
+
+The `/orm` folder contains the **DB implementation of each model** using the chosen ORM (SQLAlchemy, TypeORM, GORM, or SeaORM).
+
+ORMs are preferred over raw SQL queries because they offer:
+
+- **Type safety** – Catch errors at compile/transpile time, or via static analysis tools (e.g., MyPy for Python)
+- **Easier refactoring** – Rename fields once, changes propagate everywhere
+- **Cross-dialect compatibility** – Same code works across PostgreSQL versions
+
+#### 📁📁 Migrations
+
+The `/migrations` folder contains **database migration files** that track and apply schema changes over time.
+
+Each migration file:
+
+- Creates or alters tables based on ORM definitions
+- Adds/removes columns, indexes, and constraints
+- Ensures database schema stays in sync with code
+- Provides rollback capability for reverting changes
+
+Migration workflows vary by stack:
+
+- **TypeScript/Express** – TypeORM handles both ORM and migrations
+- **Python/FastAPI** – Alembic manages migrations for SQLAlchemy
+- **Go/Gin** – Atlas (provides TypeORM/Alembic-like declarative migrations for GORM)
+- **Rust/Axum** – sea-orm-migration (official SeaORM migration tool via `sea-orm-cli`)
+
 #### 📁📁 Schemas
+
+Once the database representation is settled and the database updated, the next step is defining how the model is represented in the codebase itself.
+
+The ORM defines how data is stored, while schemas define how data flows through the application
 
 Schema definitions are organized by their **specific purpose in the application lifecycle** — from creation and storage to retrieval and querying.
 
@@ -220,33 +254,8 @@ These literals provide type safety and runtime validation for the Search Schema.
 
 Wraps search results with **pagination metadata**: `total_count`, `page`, `total_pages`, and the `data` array.
 
-#### 📁📁 ORM
 
-The `/orm` folder contains the **implementation of each model** using the chosen ORM (SQLAlchemy, TypeORM, GORM, or SeaORM).
 
-ORMs are preferred over raw SQL queries because they offer:
-
-- **Type safety** – Catch errors at compile/transpile time, or via static analysis tools (e.g., MyPy for Python)
-- **Easier refactoring** – Rename fields once, changes propagate everywhere
-- **Cross-dialect compatibility** – Same code works across PostgreSQL versions
-
-#### 📁📁 Migrations
-
-The `/migrations` folder contains **database migration files** that track and apply schema changes over time.
-
-Each migration file:
-
-- Creates or alters tables based on ORM definitions
-- Adds/removes columns, indexes, and constraints
-- Ensures database schema stays in sync with code
-- Provides rollback capability for reverting changes
-
-Migration workflows vary by stack:
-
-- **TypeScript/Express** – TypeORM handles both ORM and migrations
-- **Python/FastAPI** – Alembic manages migrations for SQLAlchemy
-- **Go/Gin** – Atlas (provides TypeORM/Alembic-like declarative migrations for GORM)
-- **Rust/Axum** – sea-orm-migration (official SeaORM migration tool via `sea-orm-cli`)
 
 #### 📁📁 CRUDS
 
@@ -265,7 +274,7 @@ For each model, a corresponding **CRUDS class** is created to encapsulate all **
 CRUDS operations are organized into **four layers**:
 
 1. **Core methods** (e.g. `create`, `read`, `update`, `delete`, `search`) – Direct database operations using the ORM
-2. **HTTP methods** (`post`, `get`, `put`, `delete`, `paginate`) – Methods exposed via HTTP endpoints (`delete` stays the same as the core method)
+2. **HTTP methods** (`post`, `get`, `put`, `delete`, `paginate` using a **GET**) – Methods exposed via HTTP endpoints (`delete` stays the same as the core method)
 3. **Authorization hooks** (`authPost`, `authGet`, `authPut`, `authDelete`) – Validate user permissions and throw 401/403 errors when unauthorized (The search API uses the same `authGet` as the GET API)
 4. **User methods** (`userPost`, `userGet`, `userPut`, `userDelete`, `userPaginate`) – Combine authorization + HTTP methods for authenticated endpoints. The **user method** calls its corresponding **auth method** for validation, then executes the **core/HTTP method** to perform the actual operation.
 
@@ -630,8 +639,3 @@ It helps separate focus areas from the rest of the UI.
 ```css
 --color-backdrop: var(--color-stone-300);
 ```
-
-## 🚀 Next Steps
-
-- Add the **Rust/Axum** backend (ongoing)
-- Add an **Angular** SPA frontend
