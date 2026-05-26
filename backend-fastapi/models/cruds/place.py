@@ -1,6 +1,6 @@
 from http import HTTPStatus
 import json
-from typing import NotRequired, TypedDict, get_args
+from typing import NotRequired, TypedDict, cast, get_args
 
 from pydantic import BaseModel
 from sqlalchemy import Float, select, text, update
@@ -105,9 +105,12 @@ class CrudsPlace(
     async def seed(
         self, data: PlaceCreateSchema, embedding: list[float]
     ) -> int:
-        id_ = await self.create(data)
-        await self.update_embedding(id_, embedding)
-        return id_
+        entity = self.create_to_model(data)
+        self.session.add(entity)
+        await self.session.flush()
+        entity_id = cast(int, entity.id)
+        await self.update_embedding(entity_id, embedding)
+        return entity_id
 
     async def post_to_create(self, data: PlacePostSchema) -> PlaceCreateSchema:
         json = data.model_dump(exclude_none=True, exclude_unset=True)
