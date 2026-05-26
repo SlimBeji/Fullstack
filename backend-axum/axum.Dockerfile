@@ -5,7 +5,7 @@ FROM rust:alpine
 WORKDIR /app
 
 # Install system dependencies
-RUN apk add --no-cache wget musl-dev mold clang
+RUN apk add --no-cache bash wget musl-dev mold clang
 
 # Configure clang + mold as linker
 ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=clang
