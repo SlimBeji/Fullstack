@@ -309,11 +309,11 @@ func (cp *CRUDSPlace) Create(
 func (cp *CRUDSPlace) Seed(
 	ctx context.Context, data schemas.PlaceCreate, embedding []float32,
 ) (uint, error) {
-	id, err := gorm_.CreateRecord(ctx, cp, data)
-	if err != nil {
+	model := cp.CreateToModel(data)
+	if err := cp.GetDB(ctx).Create(&model).Error; err != nil {
 		return 0, err
 	}
-	return id, cp.UpdateEmbedding(ctx, id, embedding)
+	return model.ID, cp.UpdateEmbedding(ctx, model.ID, embedding)
 }
 
 func (cp *CRUDSPlace) Post(
