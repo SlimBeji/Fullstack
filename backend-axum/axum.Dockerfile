@@ -7,6 +7,10 @@ WORKDIR /app
 # Install system dependencies
 RUN apk add --no-cache wget musl-dev mold clang
 
+# Configure clang + mold as linker
+ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=clang
+ENV RUSTFLAGS="-C link-arg=-fuse-ld=mold"
+
 # Install cargo-watch for hot reload
 RUN cargo install cargo-watch
 # Install rustfmt and clippy for code formatting
