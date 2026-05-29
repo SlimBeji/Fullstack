@@ -60,7 +60,7 @@ services:
             - pgsql
             - test-pgsql
             - gcs
-        command: npm start
+        command: bun run start
         restart: on-failure
 
     fastapi:

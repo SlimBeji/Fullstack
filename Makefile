@@ -12,7 +12,7 @@ stop:
 	podman-compose down
 
 run: stop
-	podman-compose up -d && podman-compose logs -f axum
+	podman-compose up
 
 # React commands
 react-build:
@@ -30,7 +30,7 @@ react-lint:
 
 # Vue commands
 vue-build:
-	pdoman-compose build vue
+	podman-compose build vue
 	cd frontend-vue; npm install
 
 vue-bash:
