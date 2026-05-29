@@ -1,6 +1,11 @@
 import { Request, Response, Router } from "express";
 
-import { extractFindQuery, validateBody, validateQuery } from "@/lib/express_";
+import {
+    extractFindQuery,
+    getParamId,
+    validateBody,
+    validateQuery,
+} from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsUser } from "@/models/cruds";
 import {
@@ -148,7 +153,8 @@ swaggerRegistery.registerPath({
 // Get User Endpoint
 async function getUser(req: Request, res: Response) {
     // All users are public
-    const user = await crudsUser.getPartial(req.params.userId, {
+    const userId = getParamId(req, "userId");
+    const user = await crudsUser.getPartial(userId, {
         fields: req.parsedQuery.fields,
         process: true,
     });
@@ -192,12 +198,10 @@ swaggerRegistery.registerPath({
 async function editUser(req: Request, res: Response) {
     const parsed = req.parsedBody as UserPut;
     const currentUser = getCurrentUser(req);
-    const updatedUser = await crudsUser.userPut(
-        currentUser,
-        req.params.userId,
-        parsed,
-        { process: true }
-    );
+    const userId = getParamId(req, "userId");
+    const updatedUser = await crudsUser.userPut(currentUser, userId, parsed, {
+        process: true,
+    });
     res.status(200).json(updatedUser);
 }
 
@@ -245,7 +249,8 @@ swaggerRegistery.registerPath({
 // Delete User Endpoint
 async function deleteUser(req: Request, res: Response) {
     const currentUser = getCurrentUser(req);
-    await crudsUser.userDelete(currentUser, req.params.userId);
+    const userId = getParamId(req, "userId");
+    await crudsUser.userDelete(currentUser, userId);
     res.status(200).json({
         message: `Deleted user ${req.params.userId}`,
     });

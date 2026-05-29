@@ -1,6 +1,11 @@
 import { Request, Response, Router } from "express";
 
-import { extractFindQuery, validateBody, validateQuery } from "@/lib/express_";
+import {
+    extractFindQuery,
+    getParamId,
+    validateBody,
+    validateQuery,
+} from "@/lib/express_";
 import { zod } from "@/lib/zod_";
 import { crudsPlace } from "@/models/cruds";
 import {
@@ -148,7 +153,8 @@ swaggerRegistery.registerPath({
 // Get a place by ID
 async function getPlace(req: Request, res: Response) {
     // All places are public
-    const place = await crudsPlace.getPartial(req.params.placeId, {
+    const placeId = getParamId(req, "placeId");
+    const place = await crudsPlace.getPartial(placeId, {
         fields: req.parsedQuery.fields,
         process: true,
     });
@@ -192,9 +198,10 @@ swaggerRegistery.registerPath({
 async function editPlace(req: Request, res: Response) {
     const parsed = req.parsedBody as PlacePut;
     const currentUser = getCurrentUser(req);
+    const placeId = getParamId(req, "placeId");
     const updatedPlace = await crudsPlace.userPut(
         currentUser,
-        req.params.placeId,
+        placeId,
         parsed,
         { process: true }
     );
@@ -245,7 +252,8 @@ swaggerRegistery.registerPath({
 // Delete Places
 async function deletePlace(req: Request, res: Response) {
     const currentUser = getCurrentUser(req);
-    await crudsPlace.userDelete(currentUser, req.params.placeId);
+    const placeId = getParamId(req, "placeId");
+    await crudsPlace.userDelete(currentUser, placeId);
     res.status(200).json({
         message: `Deleted place ${req.params.placeId}`,
     });
