@@ -1,8 +1,4 @@
-import dotenv from "dotenv";
-
 import { getEnvVar } from "@/lib/utils";
-
-dotenv.config();
 
 export const env = {
     // ENV config

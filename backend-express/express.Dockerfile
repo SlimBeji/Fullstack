@@ -1,5 +1,5 @@
 # Base Image
-FROM node:22
+FROM oven/bun:1.3.14
 
 # Create Working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY ./backend-express/package.json /app/package.json
 
 # Installing dependencies
-RUN npm install
+RUN bun install
 
 # Copy Code
 COPY ./backend-express /app
