@@ -37,8 +37,8 @@ vue-bash:
 	podman exec -it vue bash
 
 vue-lint:
-	podman exec -it vue npm run lint
-	podman exec -it vue npm run format | grep -v "(unchanged)"
+	podman exec -it vue bun run lint
+	podman exec -it vue bun run format | grep -v "(unchanged)"
 
 # Svelte commands
 svelte-build:
