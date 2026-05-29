@@ -93,7 +93,11 @@ export class CrudsPlace extends CrudsClass<
     async seed(data: PlaceCreate, embedding: number[]): Promise<number> {
         // Used when seeding the dev/test database
         // Avoid triggering the place embedding
-        const id = await super.create(data);
+        const result = await this.datasource.manager.insert(
+            this.repository.target,
+            this.createToModel(data)
+        );
+        const id = result.identifiers[0].id;
         await this.updateEmbedding(id, embedding);
         return id;
     }
