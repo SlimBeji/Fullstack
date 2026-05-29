@@ -61,35 +61,35 @@ express-bash:
 	podman exec -it express bash
 
 express-diff/%:
-	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:generate $* -d ../orm/data-source.ts
+	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:generate $* -d ../orm/data-source.ts
 
 express-migrate:
-	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source.ts
-	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:run -d ../orm/data-source-test.ts
+	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:run -d /app/src/models/orm/data-source.ts
+	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:run -d /app/src/models/orm/data-source-test.ts
 
 express-revert:
-	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source.ts
-	podman exec -it -w /app/src/models/migrations express npx ts-node --esm ../../../node_modules/typeorm/cli.js migration:revert -d ../orm/data-source-test.ts
+	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:revert -d /app/src/models/orm/data-source.ts
+	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:revert -d /app/src/models/orm/data-source-test.ts
 
 express-test:
-	pdoman exec -it express npm test
+	podman exec -it express bun run test
 
 express-lint:
-	podman exec -it express npx tsc -b --noEmit
-	podman exec -it express npx eslint "src/**/*.ts" --fix
-	podman exec -it express npx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)"
+	podman exec -it express bunx tsc -b --noEmit
+	podman exec -it express bunx eslint "src/**/*.ts" --fix
+	podman exec -it express bunx prettier --write "src/**/*.{ts,js,json,css,html}" | grep -v "(unchanged)" || true
 
 express-script/%:
-	podman exec -it express npx tsx -r tsconfig-paths/register src/bin/$*
+	podman exec -it express bun src/bin/$*
 
 express-debug:
-	podman exec -it express npx ts-node -r tsconfig-paths/register src/bin/debug.ts
+	podman exec -it express bun src/bin/debug.ts
 
 express-seed:
-	podman exec -it express npx ts-node -r tsconfig-paths/register src/bin/seedDb.ts
+	podman exec -it express bun src/bin/seedDb.ts
 
 express-dump:
-	podman exec -it express npx ts-node -r tsconfig-paths/register src/bin/dumpDb.ts
+	podman exec -it express bun src/bin/dumpDb.ts
 
 # FastAPI commands
 fastapi-build:
