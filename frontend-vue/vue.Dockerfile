@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copying requirements
 COPY ./frontend-vue/package.json /app/package.json
+COPY ./frontend-vue/bun.lock /app/bun.lock
 
 # Installing dependencies
 RUN bun install

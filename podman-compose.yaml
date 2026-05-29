@@ -23,7 +23,6 @@ services:
             - 8001:5173
         volumes:
             - ./frontend-vue:/app
-            - /app/node_modules
         env_file:
             - ./frontend-vue/vue.env
         command: bun run dev
