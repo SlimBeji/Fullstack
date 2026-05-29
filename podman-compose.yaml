@@ -26,7 +26,7 @@ services:
             - /app/node_modules
         env_file:
             - ./frontend-vue/vue.env
-        command: npm run dev
+        command: bun run dev
         restart: on-failure
 
     svelte:

@@ -1,5 +1,5 @@
 # Base Image
-FROM oven/bun:1.3.14
+FROM oven/bun:1.3
 
 # Create Working directory
 WORKDIR /app
