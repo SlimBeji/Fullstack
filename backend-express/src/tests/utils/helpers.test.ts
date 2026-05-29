@@ -1,3 +1,5 @@
+import { describe, expect, it } from "bun:test";
+
 import { parseDotNotation } from "@/lib/utils";
 
 describe("parseDotNotation helper method", () => {
