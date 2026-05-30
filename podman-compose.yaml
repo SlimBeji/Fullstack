@@ -10,7 +10,7 @@ services:
             - ./frontend-react:/app
         env_file:
             - ./frontend-react/react.env
-        command: npm run dev
+        command: bun run dev
         restart: on-failure
 
     vue:
