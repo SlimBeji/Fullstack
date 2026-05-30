@@ -38,6 +38,7 @@ vue-bash:
 	podman exec -it vue bash
 
 vue-lint:
+	podman exec -it vue bunx tsc -b --noEmit
 	podman exec -it vue bun run lint
 	podman exec -it vue bun run format | grep -v "(unchanged)"
 
