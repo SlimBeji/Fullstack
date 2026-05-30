@@ -2,6 +2,8 @@
 
 This backend is written in **TypeScript** and follows the architecture and principles defined in the root `README.md`.
 
+**Bun** is used as javascript runtime.
+
 ## 🛠️ Tech Stack
 
 | Purpose         | Library Used                                                                                                                               |
