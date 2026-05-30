@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copying requirements
 COPY ./backend-express/package.json /app/package.json
+COPY ./backend-express/bun.lock /app/bun.lock
 
 # Installing dependencies
 RUN bun install

@@ -54,8 +54,8 @@ svelte-lint:
 
 # Express commands
 express-build:
+	rm -rf frontend-vue/node_modules
 	podman-compose build express
-	cd backend-express; npm install
 
 express-bash:
 	podman exec -it express bash
