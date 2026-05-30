@@ -39,7 +39,7 @@ const router = createRouter({
     ],
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
     const authStore = useAuthStore();
     if (!authStore.isLoggedIn) {
         // Check the local storage if no token found
