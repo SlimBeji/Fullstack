@@ -2,21 +2,21 @@
     "extends": "@tsconfig/svelte/tsconfig.json",
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-        "target": "ES2022",
+        "target": "es2023",
         "useDefineForClassFields": true,
         "verbatimModuleSyntax": true,
         "paths": {
             "@/*": ["./src/*"]
         },
-        "module": "ESNext",
+        "module": "esnext",
         "types": ["svelte", "vite/client"],
         "noEmit": true,
         /**
-         * Typecheck JS in `.svelte` and `.js` files by default.
-         * Disable checkJs if you'd like to use dynamic types in JS.
-         * Note that setting allowJs false does not prevent the use
-         * of JS in `.svelte` files.
-         */
+        * Typecheck JS in `.svelte` and `.js` files by default.
+        * Disable checkJs if you'd like to use dynamic types in JS.
+        * Note that setting allowJs false does not prevent the use
+        * of JS in `.svelte` files.
+        */
         "allowJs": true,
         "checkJs": true,
         "moduleDetection": "force"

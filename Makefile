@@ -44,15 +44,17 @@ vue-lint:
 
 # Svelte commands
 svelte-build:
+	rm -rf frontend-svelte/node_modules
 	podman-compose build svelte
-	cd frontend-svelte; npm install
+	cd frontend-svelte; bun install
 
 svelte-bash:
 	podman exec -it svelte bash
 
 svelte-lint:
-	podman exec -it svelte npm run lint
-	podman exec -it svelte npm run format | grep -v "(unchanged)"
+	podman exec -it svelte bunx tsc -b --noEmit
+	podman exec -it svelte bun run lint
+	podman exec -it svelte bun run format | grep -v "(unchanged)"
 
 # Express commands
 express-build:

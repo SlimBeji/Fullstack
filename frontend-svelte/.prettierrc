@@ -5,7 +5,6 @@
     "semi": true,
     "singleQuote": false,
     "svelteSortOrder": "scripts-markup-styles-options",
-    "svelteStrictMode": true,
     "svelteAllowShorthand": true,
     "svelteIndentScriptAndStyle": false
 }
