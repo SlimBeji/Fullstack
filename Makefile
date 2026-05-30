@@ -32,6 +32,7 @@ react-lint:
 vue-build:
 	rm -rf frontend-vue/node_modules
 	podman-compose build vue
+	cd frontend-vue; bun install
 
 vue-bash:
 	podman exec -it vue bash
