@@ -2,6 +2,10 @@
 
 This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
+```
+bunx create-vite frontend-svelte
+```
+
 ## 🔐 Environment Variables
 
 The Svelte client relies on a `svelte.env` file for configuration.
@@ -12,7 +16,7 @@ VITE_BACKEND_URL=http://localhost:5001/api
 
 ## 🧠 State Management
 
-The app uses **Svelte stores** for state management, providing a simple and reactive way to share data between components.  
+The app uses **Svelte stores** for state management, providing a simple and reactive way to share data between components.
 Stores such as `writable`, `readable`, and `derived` make it easy to centralize and organize state without the need for an external library.
 
 ## 🗂️ Project Structure (`/src`)

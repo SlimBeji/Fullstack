@@ -3,7 +3,7 @@
 This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
 ```
-bunx create-vite my-app
+bunx create-vite frontend-vue
 ```
 
 ## 🔐 Environment Variables
