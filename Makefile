@@ -62,15 +62,15 @@ express-bash:
 	podman exec -it express bash
 
 express-diff/%:
-	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:generate $* -d ../orm/data-source.ts
+	podman exec -it express bun /app/node_modules/typeorm/cli.js migration:generate $* -d /app/src/models/orm/data-source.ts
 
 express-migrate:
-	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:run -d /app/src/models/orm/data-source.ts
-	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:run -d /app/src/models/orm/data-source-test.ts
+	podman exec -it express bun /app/node_modules/typeorm/cli.js migration:run -d /app/src/models/orm/data-source.ts
+	podman exec -it express bun /app/node_modules/typeorm/cli.js migration:run -d /app/src/models/orm/data-source-test.ts
 
 express-revert:
-	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:revert -d /app/src/models/orm/data-source.ts
-	podman exec -it express bun /app/src/node_modules/typeorm/cli.js migration:revert -d /app/src/models/orm/data-source-test.ts
+	podman exec -it express bun /app/node_modules/typeorm/cli.js migration:revert -d /app/src/models/orm/data-source.ts
+	podman exec -it express bun /app/node_modules/typeorm/cli.js migration:revert -d /app/src/models/orm/data-source-test.ts
 
 express-test:
 	podman exec -it express bun run test
