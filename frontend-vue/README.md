@@ -2,6 +2,10 @@
 
 This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
+```
+bunx create-vite my-app
+```
+
 ## 🔐 Environment Variables
 
 The Vue client relies on a `vue.env` file for configuration.
