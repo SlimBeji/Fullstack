@@ -1,5 +1,6 @@
 import { Job } from "bullmq";
 
+import { isTest } from "@/lib/utils";
 import { crudsPlace } from "@/models/cruds";
 
 import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../bgconfig";
@@ -7,6 +8,7 @@ import { PlaceEmbeddingData, TASK_PLACE_EMBEDDING } from "../bgconfig";
 // Create Tasks
 
 async function placeEmbeddingTask(job: Job<PlaceEmbeddingData>): Promise<void> {
+    if (isTest()) return;
     const { placeId } = job.data;
     const result = await crudsPlace.embed(placeId);
     console.log(result);

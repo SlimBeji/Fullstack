@@ -1,3 +1,3 @@
 export const isTest = (): boolean => {
-    return !!process.env.JEST_WORKER_ID;
+    return process.env.NODE_ENV === "test";
 };
