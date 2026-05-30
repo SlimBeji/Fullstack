@@ -8,7 +8,6 @@ services:
             - 8000:5173
         volumes:
             - ./frontend-react:/app
-            - /app/node_modules
         env_file:
             - ./frontend-react/react.env
         command: npm run dev

@@ -2,6 +2,10 @@
 
 This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
+```
+bunx create-vite my-app
+```
+
 ## 🔐 Environment Variables
 
 The React client relies on a `react.env` file for configuration.
@@ -35,9 +39,9 @@ This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettie
 The configuration uses the modern `eslint.config.js` format and includes the following plugins:
 
 - **[@typescript-eslint](https://typescript-eslint.io/):** TypeScript-specific linting rules.
-- **[eslint-plugin-unused-imports](https://www.npmjs.com/package/eslint-plugin-unused-imports):**  
+- **[eslint-plugin-unused-imports](https://www.npmjs.com/package/eslint-plugin-unused-imports):**
   Automatically detects and removes unused imports and variables.
-- **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**  
+- **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**
   Enforces consistent ordering of imports and exports.
 
 #### 🔑 Key ESLint Rules

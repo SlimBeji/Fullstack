@@ -16,17 +16,17 @@ run: stop
 
 # React commands
 react-build:
+	rm -rf frontend-react/node_modules
 	podman-compose build react
-	cd frontend-react; npm install
+	cd frontend-react; bun install
 
 react-bash:
 	podman exec -it react bash
 
 react-lint:
-	podman exec -it react npx tsc -b --noEmit
-	podman exec -it react npx eslint "src/**/*.ts" --fix
-	podman exec -it react npx eslint "src/**/*.tsx" --fix
-	podman exec -it react npx prettier --write . | grep -v "(unchanged)"
+	podman exec -it react bunx tsc -b --noEmit
+	podman exec -it react bun run lint
+	podman exec -it react bun run format | grep -v "(unchanged)"
 
 # Vue commands
 vue-build:
