@@ -31,9 +31,10 @@ export const closeAll = async () => {
     await stopBackgroundProcessing();
 };
 
-export const seedTestData = async () => {
+export const setupTestApp = async () => {
     try {
         await connectDbs();
+        await publisher.start();
         await dumpDb();
         await seedDb();
     } catch (err) {

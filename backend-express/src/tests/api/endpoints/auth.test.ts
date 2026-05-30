@@ -2,13 +2,13 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import supertest from "supertest";
 
 import app from "@/api";
-import { closeAll, seedTestData } from "@/services/setup";
+import { closeAll, setupTestApp } from "@/services/setup";
 import { getImagePath } from "@/static";
 
 const request = supertest(app);
 
 beforeAll(async () => {
-    await seedTestData();
+    await setupTestApp();
 });
 
 afterAll(async () => {

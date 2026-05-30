@@ -5,7 +5,7 @@ import app from "@/api";
 import { HttpStatus } from "@/lib/types";
 import { crudsUser } from "@/models/cruds";
 import { createToken, UserRead } from "@/models/schemas";
-import { closeAll, seedTestData } from "@/services/setup";
+import { closeAll, setupTestApp } from "@/services/setup";
 import { readImage } from "@/static";
 
 let adminExample: UserRead;
@@ -15,7 +15,7 @@ let token: string = "";
 const request = supertest(app);
 
 beforeAll(async () => {
-    await seedTestData();
+    await setupTestApp();
     adminExample = (await crudsUser.getByEmail("mslimbeji@gmail.com"))!;
     adminToken = `Bearer ${createToken(adminExample.id, adminExample.email).access_token}`;
     example = (await crudsUser.getByEmail("beji.slim@yahoo.fr"))!;

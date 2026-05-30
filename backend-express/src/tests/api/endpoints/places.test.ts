@@ -5,7 +5,7 @@ import app from "@/api";
 import { HttpStatus } from "@/lib/types";
 import { crudsPlace, crudsUser } from "@/models/cruds";
 import { PlaceRead } from "@/models/schemas";
-import { closeAll, seedTestData } from "@/services/setup";
+import { closeAll, setupTestApp } from "@/services/setup";
 import { getImagePath } from "@/static";
 
 let adminToken: string = "";
@@ -14,7 +14,7 @@ let example: PlaceRead;
 const request = supertest(app);
 
 beforeAll(async () => {
-    await seedTestData();
+    await setupTestApp();
     adminToken = await crudsUser.getBearer("mslimbeji@gmail.com");
     token = await crudsUser.getBearer("beji.slim@yahoo.fr");
     const examples = await crudsPlace.search({

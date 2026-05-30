@@ -3,12 +3,12 @@ import supertest from "supertest";
 
 import app from "@/api";
 import { crudsUser } from "@/models/cruds";
-import { closeAll, seedTestData } from "@/services/setup";
+import { closeAll, setupTestApp } from "@/services/setup";
 
 const request = supertest(app);
 
 beforeAll(async () => {
-    await seedTestData();
+    await setupTestApp();
 });
 
 afterAll(async () => {
