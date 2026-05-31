@@ -51,8 +51,8 @@ export class RedisClient {
         }
     }
 
-    async flushAll(): Promise<void> {
-        await this.client.flushAll();
+    async flushDb(): Promise<void> {
+        await this.client.flushDb();
     }
 
     async close(): Promise<void> {

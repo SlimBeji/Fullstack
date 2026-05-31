@@ -40,8 +40,8 @@ class RedisClient:
             await self._client.aclose()
             self._client = None
 
-    async def flushall(self) -> None:
-        await self.client.flushall()
+    async def flushdb(self) -> None:
+        await self.client.flushdb()
 
     async def get(self, key: str, format_: OutputFormat = "") -> Any:
         raw: bytes = await self.client.get(key)

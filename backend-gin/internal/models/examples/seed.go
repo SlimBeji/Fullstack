@@ -190,7 +190,7 @@ func DumpDb(verbose ...bool) error {
 	}
 
 	rc := instances.GetRedisClient()
-	rc.FlushAll(ctx)
+	rc.FlushDB(ctx)
 
 	if isVerbose {
 		fmt.Println("✅ Cache DB flushed")

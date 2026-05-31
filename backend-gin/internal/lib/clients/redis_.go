@@ -61,8 +61,8 @@ func (r *RedisClient) Delete(ctx context.Context, key string) error {
 	return r.client.Del(ctx, key).Err()
 }
 
-func (r *RedisClient) FlushAll(ctx context.Context) error {
-	return r.client.FlushAll(ctx).Err()
+func (r *RedisClient) FlushDB(ctx context.Context) error {
+	return r.client.FlushDB(ctx).Err()
 }
 
 func (r *RedisClient) Close() error {

@@ -59,7 +59,7 @@ export const dumpDb = async (verbose: boolean = false): Promise<void> => {
         await pgClient.resetTable(tablename);
     }
     if (verbose) console.log("✅ All Tables reset");
-    await redisClient.flushAll();
+    await redisClient.flushDb();
     if (verbose) console.log("✅ Cache DB flushed");
     if (verbose) console.log("✅ Finished. You may exit");
 };

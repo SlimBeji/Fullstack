@@ -176,7 +176,7 @@ pub async fn dumb_db(verbose: bool) {
         if result.is_err() && verbose {}
     }
 
-    let result = app_state.redis.flush_all().await;
+    let result = app_state.redis.flushdb().await;
     match result {
         Ok(_) => {
             if verbose {

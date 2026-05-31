@@ -74,8 +74,8 @@ impl RedisClient {
         self.client.clone().del(key).await
     }
 
-    pub async fn flush_all(&self) -> Result<(), RedisError> {
-        self.client.clone().flushall().await
+    pub async fn flushdb(&self) -> Result<(), RedisError> {
+        self.client.clone().flushdb().await
     }
 
     pub async fn close(self) -> Result<(), RedisError> {
