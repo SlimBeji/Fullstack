@@ -1,7 +1,21 @@
+use std::env;
+
 use time::error::Parse;
 use time::format_description::BorrowedFormatItem;
 use time::format_description::well_known::{Iso8601, Rfc3339};
 use time::{Date, OffsetDateTime, PrimitiveDateTime, Time};
+
+pub fn get_env(key: &str) -> Result<String, String> {
+    env::var(key).map_err(|_| format!("Missing env variable {}", key))
+}
+
+pub fn get_option_env(key: &str) -> Option<String> {
+    env::var(key).ok()
+}
+
+pub fn get_env_or(key: &str, default: &str) -> String {
+    env::var(key).unwrap_or(default.to_string())
+}
 
 pub fn parse_bool(s: &str) -> Result<bool, String> {
     match s {

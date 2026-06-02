@@ -1,7 +1,9 @@
-use std::{env, str::FromStr};
+use std::str::FromStr;
 
 use serde::Deserialize;
 use std::sync::LazyLock;
+
+use crate::lib_::utils::{get_env, get_env_or, get_option_env};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
@@ -111,18 +113,6 @@ impl Settings {
     pub fn is_production(&self) -> bool {
         self.env == "production"
     }
-}
-
-fn get_env(key: &str) -> Result<String, String> {
-    env::var(key).map_err(|_| format!("Missing env variable {}", key))
-}
-
-fn get_option_env(key: &str) -> Option<String> {
-    env::var(key).ok()
-}
-
-fn get_env_or(key: &str, default: &str) -> String {
-    env::var(key).unwrap_or(default.to_string())
 }
 
 fn env_to_num<T: FromStr>(value: &str) -> Result<T, String> {
