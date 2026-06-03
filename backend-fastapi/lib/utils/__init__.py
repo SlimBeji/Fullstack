@@ -1,4 +1,4 @@
-from lib.utils.concurency import *
+from lib.utils.concurrency import *
 from lib.utils.encryption import *
 from lib.utils.enums import *
 from lib.utils.helpers import *
