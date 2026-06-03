@@ -3,7 +3,7 @@ use validator::ValidationError;
 pub fn string_length<const MIN: usize, const MAX: usize>(
     value: &str,
 ) -> Result<(), ValidationError> {
-    let len = value.len();
+    let len = value.chars().count();
 
     // Build appropriate message based on constraints
     let msg = if MAX > 0 && MIN == 0 {
@@ -68,17 +68,11 @@ pub fn array_length<T, const MIN: usize, const MAX: usize>(
 }
 
 pub fn email_strict(email: &str) -> Result<(), ValidationError> {
-    if !email.contains('@') {
+    let Some((_, domain)) = email.split_once('@') else {
         let mut err = ValidationError::new("email_invalid_format");
         err.message = Some("Email must contain '@' symbol".into());
         return Err(err);
-    }
-
-    let (_, domain) = email.split_once('@').ok_or_else(|| {
-        let mut err = ValidationError::new("email_invalid_format");
-        err.message = Some("Email must have a valid format (local@domain)".into());
-        err
-    })?;
+    };
 
     if !domain.contains('.') {
         let mut err = ValidationError::new("email_missing_tld");
