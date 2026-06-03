@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use axum::extract::Request;
 use multer;
 
-use crate::lib_::types_::{ApiError, FileToUpload};
+use crate::lib_::types_::{ApiError, FileToUpload, SimpleError};
 use crate::lib_::utils;
 
 pub enum MultipartField {
@@ -159,7 +159,7 @@ impl MultipartForm {
     pub fn get_file(&self, key: &str) -> Result<FileToUpload, ApiError> {
         match self.inner.get(key) {
             Some(MultipartField::File(f)) => Ok(f.clone()),
-            _ => Err(ApiError::bad_multipart_field(key, "Could not extract file")),
+            _ => Err(ApiError::bad_multipart_field(key, "could not extract file")),
         }
     }
 
@@ -167,7 +167,7 @@ impl MultipartForm {
         match self.inner.get(key) {
             Some(MultipartField::File(f)) => Ok(Some(f.clone())),
             None => Ok(None),
-            _ => Err(ApiError::bad_multipart_field(key, "Could not read file")),
+            _ => Err(ApiError::bad_multipart_field(key, "could not read file")),
         }
     }
 
@@ -186,8 +186,10 @@ impl MultipartForm {
             .and_then(|ct| multer::parse_boundary(ct).ok())
             .ok_or_else(|| {
                 ApiError::multipart_parsing_error(
-                    "Could not process multipart request",
-                    "Missing or invalid Content-Type boundary".into(),
+                    "could not process multipart request",
+                    Box::new(SimpleError::from(
+                        "Missing or invalid Content-Type boundary",
+                    )),
                 )
             })?;
 
@@ -198,7 +200,7 @@ impl MultipartForm {
         // Read the fields
         let mut map = HashMap::new();
         while let Some(field) = multipart.next_field().await.map_err(|e| {
-            ApiError::multipart_parsing_error("Could not process multipart request", Box::new(e))
+            ApiError::multipart_parsing_error("could not process multipart request", Box::new(e))
         })? {
             let Some(name) = field.name().map(|s| s.to_string()) else {
                 continue;

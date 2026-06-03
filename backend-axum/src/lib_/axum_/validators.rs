@@ -44,7 +44,7 @@ where
     }
 }
 
-// ValidatedForm for simple structs that implements only Validated trait
+// ValidatedForm for simple structs that implements only Validate trait
 // Used mainly for application/x-www-form-urlencoded endpoints
 pub struct ValidatedForm<T>(pub T);
 
@@ -65,7 +65,7 @@ where
     }
 }
 
-// ValidatedQuery for simple structs that implements only Validated trait
+// ValidatedQuery for simple structs that implements only Validate trait
 // Used mainly to parse query parameters
 pub struct ValidatedQuery<T>(pub T);
 
