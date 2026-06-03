@@ -105,7 +105,7 @@ Reusable and abstracted modules that serve as the **foundation layer** of the ap
 
 The `/lib` folder acts as the **glue layer** between the application logic and external dependencies — providing consistent interfaces for HTTP frameworks, data validation libraries, PostgreSQL ORMs, and third-party services.
 
-- **/utils** – Generic helper functions independent of any framework (e.g., date/string formatting, file I/O, encryption, hashing, concurency)
+- **/utils** – Generic helper functions independent of any framework (e.g., date/string formatting, file I/O, encryption, hashing, concurrency)
 - **/types** – Reusable type definitions shared across the project (e.g., pagination parameters, file upload schemas, error responses)
 - **/clients** – Wrappers around external services and APIs (e.g., Redis, Google Cloud Storage, task queues, HuggingFace, third-party APIs)
 - **/framework\_** – Abstraction layer over web frameworks to normalize routing, middleware, and request handling (e.g., `fastapi_`, `express_`, `gin_`, `axum_`)
@@ -395,8 +395,8 @@ If no operator is provided, `eq` (equals) is assumed. For nested fields, aliases
 | Operator | Meaning                         | Example                    |
 | -------- | ------------------------------- | -------------------------- |
 | `eq`     | Equals                          | `age=eq:30`                |
-| `ne`     | Not equals                      | `status=null:false`        |
-| `null`   | Wether the field is null or not | `status=ne:inactive`       |
+| `ne`     | Not equals                      | `status=ne:inactive`       |
+| `null`   | Wether the field is null or not | `status=null:false`        |
 | `in`     | In list                         | `status=in:active,pending` |
 | `nin`    | Not in list                     | `role=nin:admin,moderator` |
 | `gt`     | Greater than                    | `age=gt:18`                |
