@@ -62,7 +62,7 @@ async fn main() {
         _ = &mut scheduler_handle => {}
     }
 
-    // Send termination signal to the sibscribers and await future
+    // Send termination signal to the subscribers and await future
     let _ = tx.send(());
     if !axum_handle.is_finished() {
         let _ = axum_handle.await;
@@ -78,5 +78,5 @@ async fn main() {
     if let Ok(state) = Arc::try_unwrap(app_state) {
         state.close().await
     };
-    // If Err, than the state is still being used elsewhere (count > 1)
+    // If Err, then the state is still being used elsewhere (count > 1)
 }
