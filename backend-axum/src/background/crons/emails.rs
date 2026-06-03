@@ -17,7 +17,7 @@ pub async fn send_newsletter_task(_: Tick, data: Data<SharedState>) -> Result<()
         Ok(()) => Ok(()),
         Err(err) => {
             println!(
-                "Following error occured while trigerring {SEND_NEWSLETTER_TASKNAME}: {:?}",
+                "Following error occurred while triggering {SEND_NEWSLETTER_TASKNAME}: {:?}",
                 err
             );
             Err(HandlerError {

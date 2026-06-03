@@ -27,7 +27,7 @@ impl TaskPublisher {
         RedisStorage::<T>::new(self.client.clone()).push(job).await
     }
 
-    pub async fn vaccum<T>(&self) -> Result<(), HandlerError>
+    pub async fn vacuum<T>(&self) -> Result<(), HandlerError>
     where
         T: Serialize + DeserializeOwned + Send + Sync + Unpin + 'static,
     {
