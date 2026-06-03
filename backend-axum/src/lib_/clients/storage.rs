@@ -51,7 +51,7 @@ impl CloudStorage {
         } else if let Some(path) = &config.credentials_file {
             let creds = CredentialsFile::new_from_file(path.clone())
                 .await
-                .expect("could not read gcs credentials file: {}");
+                .expect("could not read gcs credentials file");
             ClientConfig::default()
                 .with_credentials(creds)
                 .await

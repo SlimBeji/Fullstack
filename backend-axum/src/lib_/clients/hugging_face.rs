@@ -1,8 +1,7 @@
-use reqwest::{Client, Error as ReqwestError, Response, StatusCode};
-use serde_json::Value;
+use reqwest::{Client, Error as ReqwestError, Response};
 use std::time::Duration;
 
-use crate::lib_::types_::ApiError;
+use crate::lib_::types_::{ApiError, SimpleError};
 
 #[derive(Debug, Clone)]
 pub struct HuggingFaceClientConfig {
@@ -45,12 +44,10 @@ impl HuggingFaceClient {
 
     pub async fn embed_text(&self, text: &str) -> Result<Vec<f32>, ApiError> {
         if text.is_empty() {
-            return Err(ApiError {
-                code: StatusCode::FAILED_DEPENDENCY,
-                message: "text cannot be empty".into(),
-                details: None,
-                err: None,
-            });
+            return Err(ApiError::internal_error(
+                "text cannot be empty",
+                Box::new(SimpleError::from("text cannot be empty")),
+            ));
         }
 
         let url = self.base_url();
@@ -63,39 +60,29 @@ impl HuggingFaceClient {
             .json(&body)
             .send()
             .await
-            .map_err(|e| ApiError {
-                code: StatusCode::FAILED_DEPENDENCY,
-                message: "embedding server could not be reached".into(),
-                details: Some(Value::String(e.to_string())),
-                err: None,
+            .map_err(|e| {
+                ApiError::failed_dependency("embedding server could not be reached", Box::new(e))
             })?;
 
         if !resp.status().is_success() {
-            return Err(ApiError {
-                code: StatusCode::FAILED_DEPENDENCY,
-                message: "embedding server failed".into(),
-                details: Some(Value::String(format!(
+            return Err(ApiError::failed_dependency(
+                "embedding server failed",
+                Box::new(SimpleError::from(format!(
                     "server returned {} HTTP response",
                     resp.status()
                 ))),
-                err: None,
-            });
+            ));
         }
 
-        let embedding_response: Vec<Vec<f32>> = resp.json().await.map_err(|e| ApiError {
-            code: StatusCode::FAILED_DEPENDENCY,
-            message: "failed to parse embedding server response".into(),
-            details: Some(Value::String(e.to_string())),
-            err: None,
+        let embedding_response: Vec<Vec<f32>> = resp.json().await.map_err(|e| {
+            ApiError::failed_dependency("failed to parse embedding server response", Box::new(e))
         })?;
 
         if embedding_response.is_empty() || embedding_response[0].is_empty() {
-            return Err(ApiError {
-                code: StatusCode::FAILED_DEPENDENCY,
-                message: "server response did not return embedding vector".into(),
-                details: None,
-                err: None,
-            });
+            return Err(ApiError::failed_dependency(
+                "server response did not return embedding vector",
+                Box::new(SimpleError::from("server response empty")),
+            ));
         }
 
         Ok(embedding_response[0].clone())
