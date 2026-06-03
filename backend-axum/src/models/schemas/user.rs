@@ -16,7 +16,7 @@ use crate::lib_::{
 };
 use crate::models::orm::user;
 
-// --- Selectables, Serchables, Sortables ----
+// --- Selectables, Searchables, Sortables ----
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]

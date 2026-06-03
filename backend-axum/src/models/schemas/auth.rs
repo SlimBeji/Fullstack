@@ -42,8 +42,6 @@ impl TokenPayload {
             .get("user_id")
             .and_then(|v| v.as_u64())
             .ok_or(SimpleError::from("Token Not Valid"))? as u32;
-        // .as_u64()
-        // .ok_or(SimpleError::from("Token Not Valid"))? as u32;
         let email = decoded
             .get("email")
             .and_then(|v| v.as_str())
@@ -167,7 +165,7 @@ impl EncodedToken {
             token_type: "bearer".to_string(),
             user_id: id,
             email: email.to_string(),
-            expires_in: 3600,
+            expires_in: config::ENV.jwt_expiration as u16,
         })
     }
 }

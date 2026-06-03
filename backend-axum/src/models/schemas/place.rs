@@ -22,7 +22,7 @@ use crate::models::orm::place;
 pub const LOCATION_LAT: &str = "lat";
 pub const LOCATION_LNG: &str = "lng";
 
-// --- Selectables, Serchables, Sortables ----
+// --- Selectables, Searchables, Sortables ----
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoStaticStr, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
@@ -194,7 +194,7 @@ pub struct PlacePost {
     pub title: String,
     #[validate(custom(function = "string_length::<10, 0>"))]
     pub description: String,
-    #[validate(custom(function = "string_length::<10, 0>"))]
+    #[validate(custom(function = "string_length::<1, 0>"))]
     pub address: String,
     pub lat: f64,
     pub lng: f64,
