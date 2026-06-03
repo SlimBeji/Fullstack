@@ -120,7 +120,7 @@ where
             code: StatusCode::INTERNAL_SERVER_ERROR,
             message: "serialization failure".to_string(),
             details: Some(Value::String(format!(
-                "could not serialie {} record(s)",
+                "could not serialize {} record(s)",
                 Self::get_modelname()
             ))),
             err,
@@ -344,15 +344,15 @@ pub trait Read: CrudsUtils {
     }
 
     fn to_read(data: Self::Reader) -> Result<Self::Read, ApiError> {
-        let users = data.read()?;
-        let user = users.into_iter().next().ok_or(Self::not_found())?;
-        Ok(user)
+        let records = data.read()?;
+        let record = records.into_iter().next().ok_or(Self::not_found())?;
+        Ok(record)
     }
 
     fn to_json(data: Self::Reader) -> Result<Value, ApiError> {
-        let users = data.read_json()?;
-        let user = users.into_iter().next().ok_or(Self::not_found())?;
-        Ok(user)
+        let records = data.read_json()?;
+        let record = records.into_iter().next().ok_or(Self::not_found())?;
+        Ok(record)
     }
 
     async fn get(&self, id: u32, options: Option<Self::Options>) -> Result<Self::Read, ApiError> {
