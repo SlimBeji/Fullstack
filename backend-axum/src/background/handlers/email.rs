@@ -6,7 +6,7 @@ use crate::{
     services::SharedState,
 };
 
-async fn handle_send_newslettter(payload: SendEmailTask) -> Result<(), HandlerError> {
+async fn handle_send_newsletter(payload: SendEmailTask) -> Result<(), HandlerError> {
     println!(
         "Newsletter Email sent to {} as following addres: {}",
         payload.name, payload.email
@@ -16,6 +16,6 @@ async fn handle_send_newslettter(payload: SendEmailTask) -> Result<(), HandlerEr
 
 pub async fn handle_email_tasks(job: EmailJob, _: Data<SharedState>) -> Result<(), HandlerError> {
     match job {
-        EmailJob::Send(payload) => handle_send_newslettter(payload).await,
+        EmailJob::Send(payload) => handle_send_newsletter(payload).await,
     }
 }

@@ -14,7 +14,7 @@ async fn handle_place_embedding(
     let cruds = CrudsPlace::new(state);
     let result = cruds.embed(payload.id).await.map_err(|err| HandlerError {
         taskname: "place_embedding".to_string(),
-        message: "womething went wrong when trying to update place embedding".to_string(),
+        message: "something went wrong when trying to update place embedding".to_string(),
         details: err.into_json(),
     })?;
     println!("{:?}", result);
