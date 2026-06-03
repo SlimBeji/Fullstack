@@ -14,7 +14,7 @@ pub fn get_option_env(key: &str) -> Option<String> {
 }
 
 pub fn get_env_or(key: &str, default: &str) -> String {
-    env::var(key).unwrap_or(default.to_string())
+    env::var(key).unwrap_or_else(|_| default.to_string())
 }
 
 pub fn parse_bool(s: &str) -> Result<bool, String> {

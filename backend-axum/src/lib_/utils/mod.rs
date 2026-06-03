@@ -1,9 +1,9 @@
-pub mod concurency;
+pub mod concurrency;
 pub mod encryption;
 pub mod helpers;
 pub mod json;
 
-pub use concurency::{BatchError, batch_process_in_chunks, batch_process_with_semaphore};
+pub use concurrency::{BatchError, batch_process_in_chunks, batch_process_with_semaphore};
 pub use encryption::{decode_payload, encode_payload, hash_input, is_hashed, verify_hash};
 pub use helpers::{get_env, get_env_or, get_option_env, parse_bool, parse_datetime};
 pub use json::{

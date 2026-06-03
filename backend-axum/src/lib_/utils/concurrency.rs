@@ -50,7 +50,7 @@ where
             let _worker_spot = semaphore
                 .acquire()
                 .await
-                .expect("semaphaore was unexpectedly closed");
+                .expect("semaphore was unexpectedly closed");
             let task_result = transform(item).await;
             (i, task_result)
         });
