@@ -1,6 +1,6 @@
-use backend::models::examples::seed::dumb_db;
+use backend::models::examples::seed::dump_db;
 
 #[tokio::main]
 async fn main() {
-    dumb_db(true).await;
+    dump_db(true).await;
 }

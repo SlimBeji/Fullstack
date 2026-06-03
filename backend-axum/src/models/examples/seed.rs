@@ -154,7 +154,7 @@ pub async fn seed_db(verbose: bool) {
     }
 }
 
-pub async fn dumb_db(verbose: bool) {
+pub async fn dump_db(verbose: bool) {
     let app_state = AppState::new().await;
     for tablename in get_tables() {
         let result = app_state.pg.reset_table(tablename).await;
