@@ -143,7 +143,7 @@ impl CloudStorage {
             .signed_url(&self.config.bucket_name, filename, None, None, options)
             .await
             .map_err(|err| {
-                ApiError::failed_depency("storage server could not sign the url", Box::new(err))
+                ApiError::failed_dependency("storage server could not sign the url", Box::new(err))
             })
     }
 
@@ -175,7 +175,7 @@ impl CloudStorage {
         self.client
             .upload_object(&req, file.data, &UploadType::Simple(media))
             .await
-            .map_err(|err| ApiError::failed_depency("upload failed", Box::new(err)))?;
+            .map_err(|err| ApiError::failed_dependency("upload failed", Box::new(err)))?;
 
         Ok(filename)
     }
@@ -186,7 +186,7 @@ impl CloudStorage {
         destination: Option<String>,
     ) -> Result<String, ApiError> {
         let file = FileToUpload::from_path(path)
-            .map_err(|e| ApiError::failed_depency("could not read file", Box::new(e)))?;
+            .map_err(|e| ApiError::failed_dependency("could not read file", Box::new(e)))?;
         self.upload_file(file, destination).await
     }
 
@@ -200,7 +200,7 @@ impl CloudStorage {
         match self.client.delete_object(&req).await {
             Ok(_) => Ok(true),
             Err(err) if err.to_string().contains("No such object") => Ok(false),
-            Err(err) => Err(ApiError::failed_depency(
+            Err(err) => Err(ApiError::failed_dependency(
                 "failed to delete file",
                 Box::new(err),
             )),

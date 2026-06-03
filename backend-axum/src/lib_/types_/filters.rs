@@ -154,7 +154,7 @@ fn is_usable(key: FilterOp, operators: &mut Vec<FilterOp>) -> Result<(), Validat
     }
 
     // From here on, we may end up with two operators
-    // Need to checl their compatibility
+    // Need to check their compatibility
 
     // Rule 0: No operator used twice
     if operators.contains(&key) {
@@ -674,7 +674,7 @@ impl DateTimeFilters {
     }
 }
 
-// Genral Type
+// General Types
 
 #[derive(Debug)]
 pub enum FieldFilters {

@@ -183,8 +183,7 @@ impl ApiError {
             message: "invalid data".to_string(),
             details: Some(Value::Object(errors_to_serde_map(&e))),
             err: Some(Box::new(e)),
-        })?;
-        Ok(())
+        })
     }
 
     pub fn from_validation_errors(message: impl Into<String>, errors: ValidationErrors) -> Self {
@@ -241,7 +240,10 @@ impl ApiError {
         }
     }
 
-    pub fn failed_depency(message: impl Into<String>, err: Box<dyn Error + Send + Sync>) -> Self {
+    pub fn failed_dependency(
+        message: impl Into<String>,
+        err: Box<dyn Error + Send + Sync>,
+    ) -> Self {
         Self {
             code: StatusCode::FAILED_DEPENDENCY,
             message: message.into(),

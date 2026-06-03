@@ -24,7 +24,7 @@ impl FileToUpload {
         let originalname = path::Path::new(&path)
             .file_name()
             .map(|v| v.to_string_lossy().to_string())
-            .unwrap_or("file".to_string());
+            .unwrap_or_else(|| "file".to_string());
         let mimetype = MimeGuess::from_path(path)
             .first_or_octet_stream()
             .essence_str()
