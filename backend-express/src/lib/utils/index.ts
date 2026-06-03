@@ -1,4 +1,4 @@
-export * from "./concurency";
+export * from "./concurrency";
 export * from "./encryption";
 export * from "./helpers";
 export * from "./tests";
