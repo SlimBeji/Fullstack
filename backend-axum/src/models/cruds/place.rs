@@ -535,7 +535,7 @@ impl CrudsPlace {
             .map_err(Self::read_error)?
             .ok_or(Self::id_not_found(id))?;
 
-        // Run embdding
+        // Run embedding
         let title = Self::get_string_from_json(place::Column::Title.as_str(), &value)?;
         let description = Self::get_string_from_json(place::Column::Description.as_str(), &value)?;
         let text = format!("{} - {}", title, description);

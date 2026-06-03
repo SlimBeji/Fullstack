@@ -309,12 +309,12 @@ impl CrudsUser {
 
         let email_where = where_str_eq(UserSearchable::Email, email);
         if self.exists(&email_where).await? {
-            errors.push(format!("email {} already in user", email));
+            errors.push(format!("email {} already in use", email));
         }
 
         let name_where = where_str_eq(UserSearchable::Name, name);
         if self.exists(&name_where).await? {
-            errors.push(format!("username {} already in user", name));
+            errors.push(format!("username {} already in use", name));
         }
 
         if errors.is_empty() {
@@ -345,12 +345,12 @@ impl CrudsUser {
         Ok(user)
     }
 
-    fn cahce_key(id: u32) -> String {
+    fn cache_key(id: u32) -> String {
         format!("user_read_{}", id)
     }
 
     pub async fn get_cache(&self, id: u32) -> Result<UserRead, ApiError> {
-        let key = Self::cahce_key(id);
+        let key = Self::cache_key(id);
         let result = self
             .app_state
             .redis
@@ -387,7 +387,7 @@ impl Create for CrudsUser {
             return Ok(());
         }
         Err(ApiError::unauthorized(
-            "Only admins can delete users".into(),
+            "Only admins can create users".into(),
         ))
     }
 
@@ -546,7 +546,7 @@ impl Update for CrudsUser {
     ) -> Result<(), ApiError> {
         self.app_state
             .redis
-            .delete(Self::cahce_key(id).as_str())
+            .delete(Self::cache_key(id).as_str())
             .await
             .map_err(|e| {
                 ApiError::internal_error("failed to delete old cache value", Box::new(e))
@@ -602,7 +602,7 @@ impl Delete for CrudsUser {
         // Delete user from redis cache
         self.app_state
             .redis
-            .delete(Self::cahce_key(id).as_str())
+            .delete(Self::cache_key(id).as_str())
             .await
             .map_err(|e| {
                 ApiError::internal_error("failed to delete old cache value", Box::new(e))
