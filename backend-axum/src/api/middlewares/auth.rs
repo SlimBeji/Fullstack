@@ -54,7 +54,7 @@ impl FromRequestParts<SharedState> for Admin {
     ) -> Result<Self, Self::Rejection> {
         let user = user_from_request_parts(parts, state).await?;
         if !user.is_admin {
-            return Err(ApiError::unauthorized("Not and admin".to_string()));
+            return Err(ApiError::unauthorized("Not an admin".to_string()));
         }
         Ok(Self(user))
     }
