@@ -93,11 +93,14 @@ pub struct AppState {
 
 impl AppState {
     pub async fn new() -> Self {
-        let pg = get_pgclient().await;
-        let redis = get_redis_client().await;
-        let storage = get_storage_client().await;
-        let hf = get_hf_client().await;
-        let publisher = get_publisher().await;
+        let (pg, redis, storage, hf, publisher) = join!(
+            get_pgclient(),
+            get_redis_client(),
+            get_storage_client(),
+            get_hf_client(),
+            get_publisher(),
+        );
+
         Self {
             pg,
             redis,
@@ -116,7 +119,7 @@ impl AppState {
         );
 
         if let Err(e) = pg_result {
-            error!("failed to close PstgreSQL: {}", e);
+            error!("failed to close PostgreSQL: {}", e);
         }
         if let Err(e) = redis_result {
             error!("failed to close Redis: {}", e);
