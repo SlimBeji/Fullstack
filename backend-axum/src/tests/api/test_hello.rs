@@ -1,7 +1,4 @@
-use crate::{
-    models::cruds::CrudsUser,
-    tests::api::utils::{get_content_type, parse_json, setup},
-};
+use crate::tests::api::utils::{get_admin_user, get_content_type, parse_json, setup};
 use axum::{
     body::Body,
     http::{Request, StatusCode},
@@ -34,11 +31,7 @@ async fn test_hello_world() {
 #[tokio::test]
 async fn test_hello_user() {
     let (app, state) = setup().await;
-    let cruds = CrudsUser::new(state);
-    let token = cruds
-        .get_bearer("mslimbeji@gmail.com")
-        .await
-        .expect("test error");
+    let (_, token) = get_admin_user(state).await;
 
     let response = app
         .oneshot(
@@ -62,11 +55,7 @@ async fn test_hello_user() {
 #[tokio::test]
 async fn test_hello_admin() {
     let (app, state) = setup().await;
-    let cruds = CrudsUser::new(state);
-    let token = cruds
-        .get_bearer("mslimbeji@gmail.com")
-        .await
-        .expect("test error");
+    let (_, token) = get_admin_user(state).await;
 
     let response = app
         .oneshot(

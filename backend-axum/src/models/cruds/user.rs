@@ -634,11 +634,11 @@ impl CrudsUser {
         }
     }
 
-    pub async fn get_bearer(&self, email: &str) -> Result<String, ApiError> {
+    pub async fn get_user_with_bearer(&self, email: &str) -> Result<(UserRead, String), ApiError> {
         let user = self.get_by_email(email).await?;
         let token = EncodedToken::create(user.id, &user.email)
             .map_err(|err| Self::token_err(email, err))?;
-        Ok(format!("Bearer {}", token.access_token))
+        Ok((user, format!("Bearer {}", token.access_token)))
     }
 
     pub async fn signup(&self, form: SignupSchema) -> Result<EncodedToken, ApiError> {

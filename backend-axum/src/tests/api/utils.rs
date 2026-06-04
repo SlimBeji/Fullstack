@@ -5,7 +5,9 @@ use serde_json::Value;
 
 use crate::api;
 use crate::lib_::types_::FileToUpload;
+use crate::models::cruds::CrudsUser;
 use crate::models::examples::seed::{dump_db, seed_db};
+use crate::models::schemas::UserRead;
 use crate::services::SharedState;
 use crate::services::instances::AppState;
 
@@ -14,6 +16,22 @@ pub async fn setup() -> (Router, SharedState) {
     dump_db(app_state.clone(), false).await;
     seed_db(app_state.clone(), false).await;
     (api::get_app().with_state(app_state.clone()), app_state)
+}
+
+pub async fn get_admin_user(state: SharedState) -> (UserRead, String) {
+    let cruds = CrudsUser::new(state);
+    cruds
+        .get_user_with_bearer("mslimbeji@gmail.com")
+        .await
+        .expect("test error")
+}
+
+pub async fn get_simple_user(state: SharedState) -> (UserRead, String) {
+    let cruds = CrudsUser::new(state);
+    cruds
+        .get_user_with_bearer("beji.slim@yahoo.fr")
+        .await
+        .expect("test error")
 }
 
 pub async fn parse_json(response: Response) -> Value {
