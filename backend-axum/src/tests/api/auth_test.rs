@@ -4,8 +4,8 @@ use axum::{
 };
 use tower::ServiceExt;
 
-use crate::static_;
 use crate::tests::api::utils::{MultipartTestRequest, parse_json, setup};
+use crate::{static_, tests::api::utils::get_content_type};
 
 #[tokio::test]
 async fn test_signup() {
@@ -31,15 +31,7 @@ async fn test_signup() {
         .expect("test error");
 
     assert_eq!(response.status(), StatusCode::OK);
-    assert!(
-        response
-            .headers()
-            .get("Content-Type")
-            .expect("test error")
-            .to_str()
-            .expect("test error")
-            .contains("application/json")
-    );
+    assert!(get_content_type(&response).contains("application/json"));
 
     let json = parse_json(response).await;
     assert_eq!(json["email"], "new_user@gmail.com");
@@ -66,15 +58,7 @@ async fn test_signin() {
         .expect("test error");
 
     assert_eq!(response.status(), StatusCode::OK);
-    assert!(
-        response
-            .headers()
-            .get("Content-Type")
-            .expect("test error")
-            .to_str()
-            .expect("test error")
-            .contains("application/json")
-    );
+    assert!(get_content_type(&response).contains("application/json"));
 
     let json = parse_json(response).await;
     assert_eq!(json["email"], "mslimbeji@gmail.com");

@@ -1,6 +1,6 @@
 use crate::{
     models::cruds::CrudsUser,
-    tests::api::utils::{parse_json, setup},
+    tests::api::utils::{get_content_type, parse_json, setup},
 };
 use axum::{
     body::Body,
@@ -25,15 +25,7 @@ async fn test_hello_world() {
         .expect("test error");
 
     assert_eq!(response.status(), StatusCode::OK);
-    assert!(
-        response
-            .headers()
-            .get("Content-Type")
-            .expect("test error")
-            .to_str()
-            .expect("test error")
-            .contains("application/json")
-    );
+    assert!(get_content_type(&response).contains("application/json"));
 
     let json = parse_json(response).await;
     assert_eq!(json, json!({"message": "Hello World!"}));
@@ -61,15 +53,7 @@ async fn test_hello_user() {
         .expect("test error");
 
     assert_eq!(response.status(), StatusCode::OK);
-    assert!(
-        response
-            .headers()
-            .get("Content-Type")
-            .expect("test error")
-            .to_str()
-            .expect("test error")
-            .contains("application/json")
-    );
+    assert!(get_content_type(&response).contains("application/json"));
 
     let json = parse_json(response).await;
     assert_eq!(json, json!({"message": "Hello Slim Beji!"}));
@@ -97,15 +81,7 @@ async fn test_hello_admin() {
         .expect("test error");
 
     assert_eq!(response.status(), StatusCode::OK);
-    assert!(
-        response
-            .headers()
-            .get("Content-Type")
-            .expect("test error")
-            .to_str()
-            .expect("test error")
-            .contains("application/json")
-    );
+    assert!(get_content_type(&response).contains("application/json"));
 
     let json = parse_json(response).await;
     assert_eq!(json, json!({"message": "Hello Admin Slim Beji!"}));

@@ -23,6 +23,15 @@ pub async fn parse_json(response: Response) -> Value {
     serde_json::from_slice(&bytes).expect("test error")
 }
 
+pub fn get_content_type(response: &Response) -> &str {
+    response
+        .headers()
+        .get("Content-Type")
+        .expect("test error")
+        .to_str()
+        .expect("test error")
+}
+
 pub struct MultipartTestRequest {
     boundary: String,
     body: Vec<u8>,
