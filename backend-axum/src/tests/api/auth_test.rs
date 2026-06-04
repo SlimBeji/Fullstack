@@ -9,7 +9,7 @@ use crate::tests::api::utils::{MultipartTestRequest, parse_json, setup};
 
 #[tokio::test]
 async fn test_signup() {
-    let app = setup().await;
+    let (app, _) = setup().await;
 
     let (content_type, body_bytes) = MultipartTestRequest::new()
         .add_field("name", "Didier Drogba")
@@ -49,7 +49,7 @@ async fn test_signup() {
 
 #[tokio::test]
 async fn test_signin() {
-    let app = setup().await;
+    let (app, _) = setup().await;
 
     let response = app
         .oneshot(

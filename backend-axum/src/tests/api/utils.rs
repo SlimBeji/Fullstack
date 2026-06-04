@@ -6,13 +6,14 @@ use serde_json::Value;
 use crate::api;
 use crate::lib_::types_::FileToUpload;
 use crate::models::examples::seed::{dump_db, seed_db};
+use crate::services::SharedState;
 use crate::services::instances::AppState;
 
-pub async fn setup() -> Router {
+pub async fn setup() -> (Router, SharedState) {
     let app_state = Arc::new(AppState::new().await);
     dump_db(app_state.clone(), false).await;
     seed_db(app_state.clone(), false).await;
-    api::get_app().with_state(app_state)
+    (api::get_app().with_state(app_state.clone()), app_state)
 }
 
 pub async fn parse_json(response: Response) -> Value {
