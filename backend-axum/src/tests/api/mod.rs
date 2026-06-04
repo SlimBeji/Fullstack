@@ -1,3 +1,3 @@
-mod auth_test;
-mod hello_test;
+mod test_auth;
+mod test_hello;
 mod utils;
