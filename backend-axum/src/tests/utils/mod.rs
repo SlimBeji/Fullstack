@@ -1,4 +1,4 @@
-mod dummy_test {
+mod test_utils {
     #[tokio::test]
     async fn trivial_async_test() {
         let x = 5;

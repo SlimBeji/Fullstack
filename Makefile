@@ -214,7 +214,7 @@ axum-revert:
 	podman exec -it -w /app/src/models/migrations axum atlas migrate down --env test
 
 axum-test:
-	podman exec -it axum cargo test -- --test-threads=1
+	podman exec -it axum cargo test --lib tests -- --test-threads=1
 
 axum-lint:
 	podman exec -it axum cargo fmt
