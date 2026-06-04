@@ -1,6 +1,9 @@
-use backend::models::examples::seed::seed_db;
+use std::sync::Arc;
+
+use backend::{models::examples::seed::seed_db, services::instances::AppState};
 
 #[tokio::main]
 async fn main() {
-    seed_db(true).await;
+    let state = Arc::new(AppState::new().await);
+    seed_db(state, true).await;
 }

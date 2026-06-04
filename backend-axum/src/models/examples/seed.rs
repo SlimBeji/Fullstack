@@ -129,12 +129,11 @@ async fn seed_places(state: Arc<AppState>, refs: &mut RecordsMap) -> Result<(), 
     Ok(())
 }
 
-pub async fn seed_db(verbose: bool) {
-    let app_state = Arc::new(AppState::new().await);
+pub async fn seed_db(state: Arc<AppState>, verbose: bool) {
     let mut refs: RecordsMap = HashMap::new();
 
     // Users
-    seed_users(app_state.clone(), &mut refs)
+    seed_users(state.clone(), &mut refs)
         .await
         .expect("failed at seeding user records");
     if verbose {
@@ -142,7 +141,7 @@ pub async fn seed_db(verbose: bool) {
     }
 
     // Places
-    seed_places(app_state.clone(), &mut refs)
+    seed_places(state.clone(), &mut refs)
         .await
         .expect("failed at seeding place records");
     if verbose {
@@ -154,10 +153,9 @@ pub async fn seed_db(verbose: bool) {
     }
 }
 
-pub async fn dump_db(verbose: bool) {
-    let app_state = AppState::new().await;
+pub async fn dump_db(state: Arc<AppState>, verbose: bool) {
     for tablename in get_tables() {
-        let result = app_state.pg.reset_table(tablename).await;
+        let result = state.pg.reset_table(tablename).await;
         match result {
             Ok(_) => {
                 if verbose {
@@ -176,7 +174,7 @@ pub async fn dump_db(verbose: bool) {
         if result.is_err() && verbose {}
     }
 
-    let result = app_state.redis.flushdb().await;
+    let result = state.redis.flushdb().await;
     match result {
         Ok(_) => {
             if verbose {
