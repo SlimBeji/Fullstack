@@ -1,6 +1,6 @@
-# ⚛️ React + Bunn + TypeScript + Vite
+# ⚛️ React + Bun + TypeScript + Vite
 
-This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
+This frontend app was built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
 ```
 bunx create-vite frontend-react
