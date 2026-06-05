@@ -34,7 +34,27 @@ The app uses **Pinia** as the official state management library for Vue 3, conne
 
 ## 🧹 Linting
 
-This project was created with npm create vue@latest, with ESLint (error checking) and Prettier (code formatting) enabled from the start.
+This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
+
+### 🛠 ESLint
+
+The configuration uses the modern `eslint.config.js` flat config format with Vue's `defineConfigWithVueTs()` and includes the following plugins:
+
+- **[eslint-plugin-vue](https://eslint.vuejs.org/):** Vue-specific linting rules for `.vue` files.
+- **[@vue/eslint-config-typescript](https://github.com/vuejs/eslint-config-typescript):** TypeScript support tailored for Vue projects.
+- **[@vue/eslint-config-prettier](https://github.com/vuejs/eslint-config-prettier):** Disables ESLint rules that conflict with Prettier formatting.
+- **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**
+  Enforces consistent ordering of imports and exports.
+- **[eslint-plugin-import](https://www.npmjs.com/package/eslint-plugin-import):**
+  Validates import resolution and prevents unresolved modules.
+
+#### 🔑 Key ESLint Rules
+
+- `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
+- `@typescript-eslint/consistent-type-imports`: **Warn**, enforces the use of `import type` where applicable.
+- `vue/multi-word-component-names`: **Disabled** to allow single-word component names.
+- `simple-import-sort/imports` and `simple-import-sort/exports`: **Warn**, enforces consistent import/export ordering.
+- `import/no-unresolved`: **Error**, ensures all imports can be resolved.
 
 ### 🔑 ESLint Customization
 
@@ -42,6 +62,7 @@ This project was created with npm create vue@latest, with ESLint (error checking
 - Added eslint-plugin-import and eslint-import-resolver-typescript to catch unresolved imports.
 - Disabled vue/multi-word-component-names to allow single-word component names.
 - Enable usage of `any` keyword.
+- Enforcing the use of `import type` where applicable.
 
 ```js
 {
