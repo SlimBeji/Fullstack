@@ -50,6 +50,7 @@ The configuration uses the modern `eslint.config.js` format and includes the fol
 - `unused-imports/no-unused-vars`: **Warn**, ignores variables/args starting with `_`.
 - `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
 - `no-useless-escape`: **Disabled** to avoid messing with regular expressions.
+- `@typescript-eslint/consistent-type-imports`: **Warn**, enforces the use of `import type` where applicable.
 
 ### 🎨 Prettier
 
