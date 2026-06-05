@@ -33,7 +33,29 @@ Stores such as `writable`, `readable`, and `derived` make it easy to centralize 
 
 ## 🧹 Linting
 
-This project was created with npm create vite@latest.
+This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
+
+### 🛠 ESLint
+
+The configuration uses the modern `eslint.config.js` flat config format and includes the following plugins:
+
+- **[eslint-plugin-svelte](https://sveltejs.github.io/eslint-plugin-svelte/):** Svelte-specific linting rules for `.svelte` files.
+- **[@typescript-eslint](https://typescript-eslint.io/):** TypeScript-specific linting rules.
+- **[eslint-plugin-simple-import-sort](https://www.npmjs.com/package/eslint-plugin-simple-import-sort):**
+  Enforces consistent ordering of imports and exports.
+- **[eslint-plugin-import](https://www.npmjs.com/package/eslint-plugin-import):**
+  Validates import resolution and prevents unresolved modules.
+- **[eslint-config-prettier](https://github.com/prettier/eslint-config-prettier):**
+  Disables ESLint rules that conflict with Prettier formatting.
+
+#### 🔑 Key ESLint Rules
+
+- `@typescript-eslint/no-explicit-any`: **Disabled** to allow use of `any` during development.
+- `no-useless-escape`: **Disabled** to avoid messing with regular expressions.
+- `@typescript-eslint/consistent-type-imports`: **Warn**, enforces the use of `import type` where applicable.
+- `simple-import-sort/imports` and `simple-import-sort/exports`: **Warn**, enforces consistent import/export ordering.
+- `import/no-unresolved`: **Error**, ensures all imports can be resolved.
+- Svelte-native component rules are enforced alongside the above.
 
 ### 🔑 ESLint Customization
 
