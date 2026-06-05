@@ -1,4 +1,4 @@
-# ⚛️ React + TypeScript + Vite
+# ⚛️ React + Bunn + TypeScript + Vite
 
 This frontend app is built with **Vite** and uses **TypeScript** for static type checking and safer development.
 
