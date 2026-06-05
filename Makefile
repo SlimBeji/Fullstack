@@ -56,6 +56,20 @@ svelte-lint:
 	podman exec -it svelte bun run lint
 	podman exec -it svelte bun run format | grep -v "(unchanged)"
 
+# Angular commands
+angular-build:
+	rm -rf frontend-angular/node_modules
+	podman-compose build angular
+	cd frontend-angular; bun install
+
+angular-bash:
+	podman exec -it angular bash
+
+angular-lint:
+	podman exec -it angular bunx tsc -b --noEmit
+	podman exec -it angular bun run lint
+	podman exec -it angular bun run format | grep -v "(unchanged)"
+
 # Express commands
 express-build:
 	rm -rf frontend-vue/node_modules

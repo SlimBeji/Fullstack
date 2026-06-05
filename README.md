@@ -71,7 +71,7 @@ Each frontend is a modern **Single Page Application (SPA)** built using popular 
 | React     | http://localhost:8000 | `react.env`      |
 | Vue       | http://localhost:8001 | `vue.env`        |
 | Svelte    | http://localhost:8002 | `svelte.env`     |
-| Angular   | _Not Implemented Yet_ | `angular.env`    |
+| Angular   | http://localhost:8002 | `angular.env`    |
 
 All frontends communicate with any backend through the **same REST API**, enabling a **plug-and-play architecture**.
 

@@ -4,12 +4,14 @@ backend-gin/backend
 backend-axum/target
 **/node_modules
 **/build
+**/out-tsc
 **/dist
 **/dist-ssr
 **/coverage
 **/__pycache__
 *.pyc
 .cache
+**/.angular
 **/.ruff_cache
 **/.mypy_cache
 *.local

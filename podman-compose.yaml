@@ -41,6 +41,20 @@ services:
         command: bun run dev
         restart: on-failure
 
+    angular:
+        build:
+            context: .
+            dockerfile: ./frontend-angular/angular.Dockerfile
+        container_name: angular
+        ports:
+            - 8003:4200
+        volumes:
+            - ./frontend-angular:/app
+        env_file:
+            - ./frontend-angular/angular.env
+        command: bun run start
+        restart: on-failure
+
     express:
         build:
             context: .
