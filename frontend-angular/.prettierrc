@@ -1,0 +1,14 @@
+{
+    "tabWidth": 4,
+    "trailingComma": "es5",
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "parser": "angular"
+            }
+        }
+    ]
+}
