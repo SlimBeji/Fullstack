@@ -1,11 +1,13 @@
-import type { AxiosResponse } from "axios";
-import { AxiosError, HttpStatusCode } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosError, HttpStatusCode } from "axios";
 import { useCallback, useEffect, useReducer, useRef } from "react";
 
-import type { HeaderContent, HttpMethods } from "@/http";
-import { getClient } from "@/http";
+import { getToken } from "@/storage";
+import type { HeaderContent, HttpMethods } from "@/types";
 
 const TOKEN_EXPIRED = "Token expired";
+
+// STATE
 
 interface State {
     loading: boolean;
@@ -17,6 +19,10 @@ interface State {
         response?: AxiosResponse;
     };
 }
+
+const emptyState: State = { loading: false };
+
+// ACTIONS
 
 enum ActionType {
     STORED_TOKEN_EXPIRED,
@@ -55,7 +61,7 @@ type Action =
     | ParseErrorAction
     | ClearErrorAction;
 
-const emptyState: State = { loading: false };
+// REDUCER
 
 const reducer = (state: State, action: Action): State => {
     switch (action.type) {
@@ -94,7 +100,26 @@ const reducer = (state: State, action: Action): State => {
     }
 };
 
-interface useHttpOptions {
+// HELPERS
+
+const getBackend = (
+    contentType: HeaderContent = "application/json",
+    token: string
+): AxiosInstance => {
+    const headers = {
+        "Content-Type": contentType,
+        ...(token && { Authorization: token }),
+    };
+
+    return axios.create({
+        baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
+        headers,
+    });
+};
+
+// HOOK
+
+interface useBackendOptions {
     ignoreNotFound?: boolean;
 }
 
@@ -107,8 +132,8 @@ type SendRequestType = (
 
 type ClearErrorType = () => void;
 
-export const useHttp = (
-    options: useHttpOptions = {}
+export const useBackend = (
+    options: useBackendOptions = {}
 ): [State, SendRequestType, ClearErrorType] => {
     const abortControllerRef = useRef<AbortController>(null);
     const [state, dispatch] = useReducer(reducer, emptyState);
@@ -131,10 +156,9 @@ export const useHttp = (
             } else if (data instanceof URLSearchParams) {
                 contentType = "application/x-www-form-urlencoded";
             }
-            const webClient = getClient(contentType);
 
             // Check the Token
-            const token = webClient.defaults.headers.Authorization;
+            const token = getToken();
             if (!token && tokenRequired) {
                 dispatch({ type: ActionType.STORED_TOKEN_EXPIRED });
                 abortControllerRef.current = null;
@@ -145,6 +169,7 @@ export const useHttp = (
 
             try {
                 // Send Request
+                const webClient = getBackend(contentType, token);
                 dispatch({ type: ActionType.SEND_REQUEST });
                 const resp = await webClient[method](url, data, {
                     signal: abortControllerRef.current.signal,
