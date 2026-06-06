@@ -176,7 +176,7 @@ const onSwitchModeHandler = () => {
 }
 
 .auth-form > hr {
-    @apply border-t-2 border-secondary w-[100%] mb-6;
+    @apply border-t-2 border-secondary w-full mb-6;
 }
 
 .auth-form .buttons {
