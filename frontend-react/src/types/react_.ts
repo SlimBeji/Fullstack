@@ -1,0 +1,5 @@
+import type { SyntheticEvent } from "react";
+
+export type ButtonType = "button" | "submit" | "reset" | undefined;
+
+export type FormSubmitHandler = (e: SyntheticEvent<HTMLFormElement>) => void;
