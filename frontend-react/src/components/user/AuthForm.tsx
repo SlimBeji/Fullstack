@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { FormConfig } from "@/hooks";
-import { useForm, useHttp } from "@/hooks";
+import { useBackend, useForm } from "@/hooks";
 import { authSlice, useAppDispatch } from "@/store";
 import type { SigninResponse } from "@/types";
 import { emailValidator, minLengthValidator } from "@/utils";
@@ -21,7 +21,7 @@ type FieldsType = keyof typeof AuthFormConfig;
 const AuthForm: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const [data, sendRequest, clearError] = useHttp();
+    const [data, sendRequest, clearError] = useBackend();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [state, inputHandlers, , updateFieldConfig] =
         useForm<FieldsType>(AuthFormConfig);

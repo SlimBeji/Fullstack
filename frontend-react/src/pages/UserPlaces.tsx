@@ -4,13 +4,15 @@ import { useParams } from "react-router-dom";
 
 import { PlacesList } from "@/components/places";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import { useHttp } from "@/hooks";
+import { useBackend } from "@/hooks";
 import { useAppSelector } from "@/store";
 import type { Place } from "@/types";
 
 const UserPlaces: React.FC = () => {
     const authData = useAppSelector((state) => state.auth.data);
-    const [data, sendRequest, clearError] = useHttp({ ignoreNotFound: true });
+    const [data, sendRequest, clearError] = useBackend({
+        ignoreNotFound: true,
+    });
     const { userId } = useParams();
 
     const isSameUser = Number(userId) === authData?.user_id ? true : false;

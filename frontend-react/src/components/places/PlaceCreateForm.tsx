@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/hooks";
-import { useForm, useHttp } from "@/hooks";
+import { useBackend, useForm } from "@/hooks";
 import { useAppSelector } from "@/store";
 import { minLengthValidator, numericValidator } from "@/utils";
 
@@ -22,7 +22,7 @@ type FieldsType = keyof typeof CreatePlaceFormConfig;
 const NewPlace: React.FC = () => {
     const navigate = useNavigate();
     const authData = useAppSelector((state) => state.auth.data);
-    const [data, sendRequest, clearError] = useHttp();
+    const [data, sendRequest, clearError] = useBackend();
     const [state, inputHandlers] = useForm<FieldsType>(CreatePlaceFormConfig);
 
     const onSubmit = async (e: React.FormEvent): Promise<void> => {

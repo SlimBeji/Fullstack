@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/hooks";
-import { useForm, useHttp } from "@/hooks";
+import { useBackend, useForm } from "@/hooks";
 import type { Place } from "@/types";
 import { minLengthValidator, numericValidator } from "@/utils";
 
@@ -29,7 +29,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
     const [state, inputHandlers, prefillData] = useForm<FieldsType>(
         UpdatePlaceFormConfig
     );
-    const [data, sendRequest, clearError] = useHttp();
+    const [data, sendRequest, clearError] = useBackend();
 
     useEffect(() => {
         sendRequest(`/places/${placeId}`, "get").then(

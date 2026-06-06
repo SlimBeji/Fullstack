@@ -3,7 +3,7 @@ import { useState } from "react";
 import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
-import { useHttp } from "@/hooks";
+import { useBackend } from "@/hooks";
 import { useAppSelector } from "@/store";
 import type { Place } from "@/types";
 
@@ -14,7 +14,7 @@ interface PlaceItemProps {
 
 const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
     const authData = useAppSelector((state) => state.auth.data);
-    const [data, sendRequest, clearError] = useHttp();
+    const [data, sendRequest, clearError] = useBackend();
     const [showMap, setShowMap] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
