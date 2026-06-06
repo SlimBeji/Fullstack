@@ -2,8 +2,8 @@ import type { AxiosInstance, AxiosResponse } from "axios";
 import axios, { AxiosError, HttpStatusCode } from "axios";
 import { ref } from "vue";
 
+import { getToken } from "@/storage";
 import type { HeaderContent, HttpMethods } from "@/types";
-import { getToken } from "@/utils";
 
 const TOKEN_EXPIRED = "Token expired";
 
