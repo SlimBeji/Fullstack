@@ -20,15 +20,17 @@ The app uses **Pinia** as the official state management library for Vue 3, conne
 
 ## 🗂️ Project Structure (`/src`)
 
-- **`main.ts`** – Application entry point; creates the Vue app, configures plugins, and mounts the root component.
-- **`App.vue`** – Root Vue component defining the global layout and routing.
-- **`/router/`** – Centralized application routing configuration (Vue Router).
-- **`/pages/`** – Top-level route components rendered by `App`.
+- **`main.ts`** – Application entry point; mounts the root `<App />` component and sets up the Pinia store and router.
+- **`App.vue`** – Root component responsible for global layout and route configuration.
+- **`/router/`** – Centralized routing configuration.
+- **`/pages/`** – Top-level route components, each corresponding to a distinct application view.
 - **`/components/`** – Reusable UI components and layout building blocks.
-- **`/store/`** – Pinia stores containing application state and related logic.
-- **`/lib/`** – Contains reusable Vue logic including composables and general-purpose TypeScript utilities.
-- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
-- **`/assets/`** – Static assets such as image placeholders or icons.
+- **`/composables/`** – Custom Vue composables encapsulating reusable logic (analogous to services in **Angular**, hooks in **React**).
+- **`/store/`** – Pinia store setup and related state management logic.
+- **`/storage/`** – Helpers for interacting with the browser's native storage APIs.
+- **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
+- **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
+- **`/assets/`** – Static assets such as images, icons, and fonts.
 
 > The term `/pages` was preferred to the more common `/views` used by Vue community just to keep the analogy between different frameworks
 
