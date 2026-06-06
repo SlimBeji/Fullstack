@@ -35,7 +35,7 @@ const placeNumber = $derived(
 @reference "../../main.css";
 
 .user-item {
-    @apply w-[45%] min-w-[17.5rem] m-4 list-none;
+    @apply w-[45%] min-w-70 m-4 list-none;
 }
 
 .user-item .card {

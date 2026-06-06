@@ -66,7 +66,7 @@ const closeDrawer = () => {
 }
 
 .main-header > div {
-    @apply flex items-center w-full max-w-screen-xl mx-auto;
+    @apply flex items-center w-full max-w-7xl mx-auto;
     @apply bg-transparent;
 }
 
