@@ -18,11 +18,11 @@ interface State {
     };
 }
 
-interface useHttpOptions {
+interface useBackendOptions {
     ignoreNotFound?: boolean;
 }
 
-export const useHttp = (options: useHttpOptions = {}) => {
+export const useBackend = (options: useBackendOptions = {}) => {
     const emptyState: State = { loading: false };
 
     let abortControllerRef: AbortController | null = null;

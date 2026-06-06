@@ -19,14 +19,14 @@ import { useRoute } from "vue-router";
 
 import { PlacesList } from "@/components/places";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import { useHttp } from "@/composables";
+import { useBackend } from "@/composables";
 import { useAuthStore } from "@/store";
 import type { Place } from "@/types";
 
 // Init
 const authStore = useAuthStore();
 const route = useRoute();
-const { httpData, sendRequest, clear } = useHttp({ ignoreNotFound: true });
+const { httpData, sendRequest, clear } = useBackend({ ignoreNotFound: true });
 
 // Computed
 const userId = computed(() => Number(route.params.userId) || undefined);

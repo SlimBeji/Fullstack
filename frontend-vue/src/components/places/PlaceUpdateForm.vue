@@ -69,13 +69,13 @@ import { onMounted } from "vue";
 import { Button, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/composables";
-import { useForm, useHttp } from "@/composables";
+import { useBackend, useForm } from "@/composables";
 import router from "@/router";
 import type { Place } from "@/types";
 import { minLengthValidator, numericValidator } from "@/utils";
 
 // Init
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Props
 const props = defineProps<{ placeId: string }>();

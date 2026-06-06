@@ -72,14 +72,14 @@
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/composables";
-import { useForm, useHttp } from "@/composables";
+import { useBackend, useForm } from "@/composables";
 import router from "@/router";
 import { useAuthStore } from "@/store";
 import { minLengthValidator, numericValidator } from "@/utils";
 
 // Init
 const authStore = useAuthStore();
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Form
 const CreatePlaceFormConfig: FormConfig = {

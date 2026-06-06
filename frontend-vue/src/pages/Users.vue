@@ -14,11 +14,11 @@ import { computed, onMounted } from "vue";
 
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
-import { useHttp } from "@/composables";
+import { useBackend } from "@/composables";
 import type { User } from "@/types";
 
 // Init
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Computed
 const items = computed((): User[] => {
