@@ -1,5 +1,5 @@
 .user-item {
-    @apply w-[45%] min-w-[17.5rem] m-4;
+    @apply w-[45%] min-w-70 m-4;
 }
 
 .user-item .card {
