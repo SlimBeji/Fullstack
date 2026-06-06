@@ -1,8 +1,8 @@
 import type { Reactive } from "vue";
 import { reactive, ref, watch } from "vue";
 
-import type { ValidatorType } from "@/lib";
-import { validate } from "@/lib";
+import type { ValidatorType } from "@/utils";
+import { validate } from "@/utils";
 
 interface FieldConfig {
     active?: boolean;

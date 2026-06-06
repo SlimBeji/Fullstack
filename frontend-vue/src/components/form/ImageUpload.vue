@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
 
-import { fileToUrl } from "@/lib";
+import { fileToUrl } from "@/utils";
 
 import Button from "./Button.vue";
 

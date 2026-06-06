@@ -77,9 +77,9 @@ import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/composables";
 import { useForm, useHttp } from "@/composables";
-import { emailValidator, minLengthValidator } from "@/lib";
 import { useAuthStore } from "@/store";
 import type { SigninResponse } from "@/types";
+import { emailValidator, minLengthValidator } from "@/utils";
 
 // Init
 const authStore = useAuthStore();

@@ -70,9 +70,9 @@ import { Button, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/composables";
 import { useForm, useHttp } from "@/composables";
-import { minLengthValidator, numericValidator } from "@/lib";
 import router from "@/router";
 import type { Place } from "@/types";
+import { minLengthValidator, numericValidator } from "@/utils";
 
 // Init
 const { httpData, sendRequest, clear } = useHttp();

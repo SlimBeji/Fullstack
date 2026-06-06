@@ -14,7 +14,7 @@ import { computed, onMounted } from "vue";
 
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
-import { useHttp } from "@/lib";
+import { useHttp } from "@/composables";
 import type { User } from "@/types";
 
 // Init
