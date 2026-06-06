@@ -20,15 +20,17 @@ The app uses the official **Redux Toolkit** library for state management, connec
 
 ## 🗂️ Project Structure (`/src`)
 
-- **`main.tsx`** – Application entry point; renders the root <App /> component and sets up the Redux store provider.
-- **`App.tsx`** – Root component defining the global layout and routing.
-- **`/router/`** – Centralized application routing configuration.
-- **`/pages/`** – Top-level route components rendered by `App`.
+- **`main.tsx`** – Application entry point; mounts the root `<App />` component and wraps it with the Redux store provider.
+- **`App.tsx`** – Root component responsible for global layout and route configuration.
+- **`/router/`** – Centralized routing configuration.
+- **`/pages/`** – Top-level route components, each corresponding to a distinct application view.
 - **`/components/`** – Reusable UI components and layout building blocks.
-- **`/store/`** – Redux store, slices, and related logic and hooks.
-- **`/lib/`** – Contains reusable React logic including custom hooks and general-purpose TypeScript utilities.
-- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
-- **`/assets/`** – Static assets such as image placeholders or icons.
+- **`/hooks/`** – Custom React hooks encapsulating reusable logic (analogous to services in **Angular**, composables in **Vue** and **Svelte**).
+- **`/store/`** – Redux store setup, slices, selectors, and related hooks.
+- **`/storage/`** – Helpers for interacting with the browser's native storage APIs.
+- **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
+- **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
+- **`/assets/`** – Static assets such as images, icons, and fonts.
 
 ## 🧹 Linting
 
