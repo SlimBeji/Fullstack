@@ -103,7 +103,7 @@ const reducer = (state: State, action: Action): State => {
 // HELPERS
 
 const getBackend = (
-    contentType: HeaderContent = "application/json",
+    contentType: HeaderContent,
     token: string
 ): AxiosInstance => {
     const headers = {
@@ -149,14 +149,6 @@ export const useBackend = (
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
 
-            // Prepare the web client
-            let contentType: HeaderContent = "application/json";
-            if (data instanceof FormData) {
-                contentType = "multipart/form-data";
-            } else if (data instanceof URLSearchParams) {
-                contentType = "application/x-www-form-urlencoded";
-            }
-
             // Check the Token
             const token = getToken();
             if (!token && tokenRequired) {
@@ -167,9 +159,17 @@ export const useBackend = (
                 throw new AxiosError(TOKEN_EXPIRED);
             }
 
+            // Prepare the web client
+            let contentType: HeaderContent = "application/json";
+            if (data instanceof FormData) {
+                contentType = "multipart/form-data";
+            } else if (data instanceof URLSearchParams) {
+                contentType = "application/x-www-form-urlencoded";
+            }
+            const webClient = getBackend(contentType, token);
+
             try {
                 // Send Request
-                const webClient = getBackend(contentType, token);
                 dispatch({ type: ActionType.SEND_REQUEST });
                 const resp = await webClient[method](url, data, {
                     signal: abortControllerRef.current.signal,
