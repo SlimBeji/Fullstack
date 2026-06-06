@@ -1,9 +1,10 @@
 import { useState } from "react";
 
-import type { FormConfig } from "@/lib";
-import { emailValidator, minLengthValidator, useForm, useHttp } from "@/lib";
+import type { FormConfig } from "@/hooks";
+import { useForm, useHttp } from "@/hooks";
 import { authSlice, useAppDispatch } from "@/store";
 import type { SigninResponse } from "@/types";
+import { emailValidator, minLengthValidator } from "@/utils";
 
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";

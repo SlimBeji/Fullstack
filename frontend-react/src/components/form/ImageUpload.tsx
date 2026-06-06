@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useRef, useState } from "react";
 
-import { fileToUrl } from "@/lib";
+import { fileToUrl } from "@/utils";
 
 import Button from "./Button";
 
