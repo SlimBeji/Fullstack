@@ -61,7 +61,7 @@ import { computed, ref } from "vue";
 import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
-import { useHttp } from "@/lib";
+import { useHttp } from "@/composables";
 import { useAuthStore } from "@/store";
 import type { Place } from "@/types";
 

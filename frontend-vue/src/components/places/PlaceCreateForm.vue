@@ -71,8 +71,9 @@
 <script setup lang="ts">
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import type { FormConfig } from "@/lib";
-import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
+import type { FormConfig } from "@/composables";
+import { useForm, useHttp } from "@/composables";
+import { minLengthValidator, numericValidator } from "@/lib";
 import router from "@/router";
 import { useAuthStore } from "@/store";
 
