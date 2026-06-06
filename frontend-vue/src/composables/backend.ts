@@ -1,9 +1,9 @@
-import type { AxiosResponse } from "axios";
-import { AxiosError, HttpStatusCode } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosError, HttpStatusCode } from "axios";
 import { ref } from "vue";
 
 import type { HeaderContent, HttpMethods } from "@/types";
-import { getClient } from "@/utils";
+import { getToken } from "@/utils";
 
 const TOKEN_EXPIRED = "Token expired";
 
@@ -21,6 +21,21 @@ interface State {
 interface useBackendOptions {
     ignoreNotFound?: boolean;
 }
+
+const getClient = (
+    contentType: HeaderContent,
+    token: string
+): AxiosInstance => {
+    const headers = {
+        "Content-Type": contentType,
+        ...(token && { Authorization: token }),
+    };
+
+    return axios.create({
+        baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
+        headers,
+    });
+};
 
 export const useBackend = (options: useBackendOptions = {}) => {
     const emptyState: State = { loading: false };
@@ -63,17 +78,8 @@ export const useBackend = (options: useBackendOptions = {}) => {
         abortControllerRef?.abort();
         abortControllerRef = new AbortController();
 
-        // Prepare the web client
-        let contentType: HeaderContent = "application/json";
-        if (data instanceof FormData) {
-            contentType = "multipart/form-data";
-        } else if (data instanceof URLSearchParams) {
-            contentType = "application/x-www-form-urlencoded";
-        }
-        const webClient = getClient(contentType);
-
         // Check the Token
-        const token = webClient.defaults.headers.Authorization;
+        const token = getToken();
         if (!token && tokenRequired) {
             abortControllerRef = null;
             httpData.value = {
@@ -88,7 +94,17 @@ export const useBackend = (options: useBackendOptions = {}) => {
             throw new AxiosError(TOKEN_EXPIRED);
         }
 
+        // Get the http client
+        let contentType: HeaderContent = "application/json";
+        if (data instanceof FormData) {
+            contentType = "multipart/form-data";
+        } else if (data instanceof URLSearchParams) {
+            contentType = "application/x-www-form-urlencoded";
+        }
+        const webClient = getClient(contentType, token);
+
         try {
+            // Sending the request
             httpData.value = { loading: true };
             const resp = await webClient[method](url, data, {
                 signal: abortControllerRef.signal,
