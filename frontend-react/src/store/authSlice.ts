@@ -1,8 +1,8 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
+import { deleteAuthData, setAuthData } from "@/storage";
 import type { EncodedUserToken, SigninResponse } from "@/types";
-import { LocalStorageKeys } from "@/types";
 
 interface AuthState {
     data?: EncodedUserToken;
@@ -24,14 +24,11 @@ export const authSlice = createSlice({
             const { expires_in, ...rest } = action.payload;
             const expires_at = Math.floor(Date.now() / 1000) + expires_in;
             state.data = { ...rest, expires_at };
-            localStorage.setItem(
-                LocalStorageKeys.userData,
-                JSON.stringify(state.data)
-            );
+            setAuthData(state.data);
         },
         logout: (state: AuthState) => {
             state.data = undefined;
-            localStorage.removeItem(LocalStorageKeys.userData);
+            deleteAuthData();
         },
     },
 });

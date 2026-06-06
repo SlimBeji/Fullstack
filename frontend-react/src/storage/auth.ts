@@ -1,5 +1,16 @@
 import type { EncodedUserToken } from "@/types";
-import { LocalStorageKeys } from "@/types";
+
+enum LocalStorageKeys {
+    userData = "userData",
+}
+
+export const setAuthData = (data: EncodedUserToken) => {
+    localStorage.setItem(LocalStorageKeys.userData, JSON.stringify(data));
+};
+
+export const deleteAuthData = () => {
+    localStorage.removeItem(LocalStorageKeys.userData);
+};
 
 export const getAuthData = (): EncodedUserToken | null => {
     const raw = localStorage.getItem(LocalStorageKeys.userData);
@@ -8,7 +19,7 @@ export const getAuthData = (): EncodedUserToken | null => {
     try {
         data = JSON.parse(raw);
     } catch {
-        localStorage.removeItem(LocalStorageKeys.userData);
+        deleteAuthData();
         return null;
     }
     if (
@@ -18,12 +29,12 @@ export const getAuthData = (): EncodedUserToken | null => {
         !data.email ||
         !data.expires_at
     ) {
-        localStorage.removeItem(LocalStorageKeys.userData);
+        deleteAuthData();
         return null;
     }
 
     if (Date.now() > data.expires_at * 1000) {
-        localStorage.removeItem(LocalStorageKeys.userData);
+        deleteAuthData();
         return null;
     }
     return data;

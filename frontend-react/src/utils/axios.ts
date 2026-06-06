@@ -18,5 +18,3 @@ export const getClient = (
         headers,
     });
 };
-
-export const backendApi = getClient();
