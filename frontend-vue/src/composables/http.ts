@@ -2,9 +2,8 @@ import type { AxiosResponse } from "axios";
 import { AxiosError, HttpStatusCode } from "axios";
 import { ref } from "vue";
 
+import { getClient } from "@/lib";
 import type { HeaderContent, HttpMethods } from "@/types";
-
-import { getClient } from "../utils";
 
 const TOKEN_EXPIRED = "Token expired";
 
