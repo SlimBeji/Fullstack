@@ -1,9 +1,8 @@
 import type { AxiosInstance } from "axios";
 import axios from "axios";
 
+import { getToken } from "@/storage";
 import type { HeaderContent } from "@/types";
-
-import { getToken } from "./storage";
 
 export const getClient = (
     contentType: HeaderContent = "application/json"

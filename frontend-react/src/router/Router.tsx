@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
 import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/pages";
+import { getAuthData } from "@/storage";
 import { authSlice, useAppDispatch, useAppSelector } from "@/store";
-import { getAuthData } from "@/utils";
 
 const route = (
     path: string,
