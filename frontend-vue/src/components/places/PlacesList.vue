@@ -44,7 +44,7 @@ const emit = defineEmits<{
 @reference "@/main.css";
 
 .places-list {
-    @apply w-[90%] max-w-[40rem] my-4 mx-auto p-0 list-none;
+    @apply w-[90%] max-w-160 my-4 mx-auto p-0 list-none;
 }
 
 .no-places {

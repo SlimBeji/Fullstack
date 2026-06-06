@@ -78,6 +78,6 @@ const submitHanlder = (e: Event) => {
 
 .modal-transition-enter-to,
 .modal-transition-leave-from {
-    @apply -translate-y-0 opacity-100;
+    @apply translate-y-0 opacity-100;
 }
 </style>

@@ -40,6 +40,6 @@ aside.sidedrawer {
 
 .sidedrawer-transition-enter-to,
 .sidedrawer-transition-leave-from {
-    @apply -translate-x-0 opacity-100;
+    @apply translate-x-0 opacity-100;
 }
 </style>
