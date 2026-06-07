@@ -1,0 +1,21 @@
+@reference "tailwindcss";
+
+:host {
+    @apply flex flex-col items-center justify-center min-h-screen gap-4;
+}
+
+p {
+    @apply text-sm text-gray-500 m-0;
+}
+
+.buttons {
+    @apply flex justify-center gap-4;
+}
+
+.button-login {
+    @apply px-6 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer border-none;
+}
+
+.button-logout {
+    @apply px-6 py-2 rounded-md bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none;
+}

@@ -1,0 +1,9 @@
+<p>Auth form component</p>
+
+<p>Logged in: {{ store.isLoggedIn() }}</p>
+<p>User ID: {{ store.userId() }}</p>
+
+<div class="buttons">
+    <button class="button-login" (click)="onLogin()">Login</button>
+    <button class="button-logout" (click)="onLogout()">Logout</button>
+</div>

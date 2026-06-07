@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { AuthForm } from '@/components/users';
+import { AuthForm } from '@/components/user';
 
 @Component({
     selector: 'app-auth',
