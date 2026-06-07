@@ -1,10 +1,10 @@
-import type { AxiosResponse } from "axios";
-import { AxiosError, HttpStatusCode } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosError, HttpStatusCode } from "axios";
 import { SvelteURLSearchParams } from "svelte/reactivity";
 import { writable } from "svelte/store";
 
+import { getToken } from "@/storage";
 import type { HeaderContent, HttpMethods } from "@/types";
-import { getClient } from "@/utils";
 
 const TOKEN_EXPIRED = "Token expired";
 
@@ -22,6 +22,21 @@ interface State {
 interface useHttpOptions {
     ignoreNotFound?: boolean;
 }
+
+const getClient = (
+    contentType: HeaderContent,
+    token: string
+): AxiosInstance => {
+    const headers = {
+        "Content-Type": contentType,
+        ...(token && { Authorization: token }),
+    };
+
+    return axios.create({
+        baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
+        headers,
+    });
+};
 
 export function useHttp(options: useHttpOptions = {}) {
     const emptyState: State = { loading: false };
@@ -64,17 +79,8 @@ export function useHttp(options: useHttpOptions = {}) {
         abortController?.abort();
         abortController = new AbortController();
 
-        // Prepare the client
-        let contentType: HeaderContent = "application/json";
-        if (data instanceof FormData) {
-            contentType = "multipart/form-data";
-        } else if (data instanceof SvelteURLSearchParams) {
-            contentType = "application/x-www-form-urlencoded";
-        }
-        const webClient = getClient(contentType);
-
         // Token check
-        const token = webClient.defaults.headers.Authorization;
+        const token = getToken();
         if (!token && tokenRequired) {
             abortController = null;
             httpData.set({
@@ -87,7 +93,17 @@ export function useHttp(options: useHttpOptions = {}) {
             throw new AxiosError(TOKEN_EXPIRED);
         }
 
+        // Prepare the client
+        let contentType: HeaderContent = "application/json";
+        if (data instanceof FormData) {
+            contentType = "multipart/form-data";
+        } else if (data instanceof SvelteURLSearchParams) {
+            contentType = "application/x-www-form-urlencoded";
+        }
+        const webClient = getClient(contentType, token);
+
         try {
+            // Send the request
             httpData.set({ loading: true });
             const resp = await webClient[method](url, data, {
                 signal: abortController.signal,
