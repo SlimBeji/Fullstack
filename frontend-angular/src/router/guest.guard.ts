@@ -2,12 +2,21 @@ import { inject } from '@angular/core';
 import type { CanActivateFn } from '@angular/router';
 import { Router } from '@angular/router';
 
-import { Route } from './paths';
+import { getAuthData } from '@/storage';
+import { AuthStore } from '@/store';
 
-// TODO: replace with actual store/auth service
-const isAuthenticated = (): boolean => false;
+import { Route } from './paths';
 
 export const guestGuard: CanActivateFn = () => {
     const router = inject(Router);
-    return isAuthenticated() ? router.createUrlTree([`/${Route.HOME}`]) : true;
+    const authStore = inject(AuthStore);
+
+    if (!authStore.isLoggedIn()) {
+        const authData = getAuthData();
+        if (authData !== null) {
+            authStore.setAuthData(authData);
+        }
+    }
+
+    return authStore.isLoggedIn() ? router.createUrlTree([`/${Route.HOME}`]) : true;
 };

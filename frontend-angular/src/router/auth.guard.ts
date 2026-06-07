@@ -2,12 +2,21 @@ import { inject } from '@angular/core';
 import type { CanActivateFn } from '@angular/router';
 import { Router } from '@angular/router';
 
-import { Route } from './paths';
+import { getAuthData } from '@/storage';
+import { AuthStore } from '@/store';
 
-// TODO: replace with actual store/auth service
-const isAuthenticated = (): boolean => false;
+import { Route } from './paths';
 
 export const authGuard: CanActivateFn = () => {
     const router = inject(Router);
-    return isAuthenticated() ? true : router.createUrlTree([`/${Route.AUTH}`]);
+    const authStote = inject(AuthStore);
+
+    if (!authStote.isLoggedIn()) {
+        const authData = getAuthData();
+        if (authData != null) {
+            authStote.setAuthData(authData);
+        }
+    }
+
+    return authStote.isLoggedIn() ? true : router.createUrlTree([`/${Route.AUTH}`]);
 };
