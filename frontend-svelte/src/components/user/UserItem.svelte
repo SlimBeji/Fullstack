@@ -1,9 +1,11 @@
 <script lang="ts">
 import { route } from "@mateothegreat/svelte5-router";
 
-import placeholder from "@/assets/avatar_placeholder.jpg";
 import { Avatar } from "@/components/ui";
 import type { User } from "@/types";
+
+// Init
+const placeholder = "/public/avatar_placeholder.jpg";
 
 // Props
 const { user } = $props<{ user: User }>();
