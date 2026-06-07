@@ -31,6 +31,8 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
 - **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
 
+> Unlike **React**, **Vue** and **Svelte**, the `/router/` folder contains only route guards (e.g. `auth.guard.ts`, `guest.guard.ts`). Route definitions live in `app.routes.ts` at the app root.
+
 ## 🧹 Linting
 
 This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
