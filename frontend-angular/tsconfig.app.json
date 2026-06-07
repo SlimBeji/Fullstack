@@ -5,7 +5,10 @@
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./out-tsc/app",
-        "types": []
+        "types": [],
+        "paths": {
+            "@/*": ["./src/*"]
+        },
     },
     "include": [
         "src/**/*.ts"
