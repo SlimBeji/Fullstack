@@ -65,6 +65,9 @@ angular-build:
 angular-bash:
 	podman exec -it angular bash
 
+angular-component/%:
+	podman exec -it --workdir /app/src angular ng g c $*
+
 angular-lint:
 	podman exec -it angular bunx tsc -b --noEmit
 	podman exec -it angular bun run lint

@@ -5,6 +5,9 @@ FROM imbios/bun-node:1.3-22.22.3-debian
 # Create Working directory
 WORKDIR /app
 
+# Install the angular CLI globally
+RUN bun add -g @angular/cli
+
 # Copying requirements
 COPY ./frontend-angular/package.json /app/package.json
 COPY ./frontend-angular/bun.lock /app/bun.lock
