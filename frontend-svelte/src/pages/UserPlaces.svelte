@@ -4,13 +4,13 @@ import { onMount } from "svelte";
 
 import { PlacesList } from "@/components/places";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import { useHttp } from "@/lib";
+import { useBackend } from "@/lib";
 import { authStore } from "@/store";
 import type { Place } from "@/types";
 
 // Init
 const { route } = $props();
-const { httpData, sendRequest, clear } = useHttp({ ignoreNotFound: true });
+const { httpData, sendRequest, clear } = useBackend({ ignoreNotFound: true });
 const loggedUserId = authStore.userId;
 
 // Computed

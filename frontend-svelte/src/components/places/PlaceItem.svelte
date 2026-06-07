@@ -2,13 +2,13 @@
 import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
-import { useHttp } from "@/lib";
+import { useBackend } from "@/lib";
 import { authStore } from "@/store";
 import type { Place } from "@/types";
 
 // Init
 const loggedUserId = authStore.userId;
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Props
 const props = $props<{

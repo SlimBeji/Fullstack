@@ -19,10 +19,6 @@ interface State {
     };
 }
 
-interface useHttpOptions {
-    ignoreNotFound?: boolean;
-}
-
 const getClient = (
     contentType: HeaderContent,
     token: string
@@ -38,7 +34,11 @@ const getClient = (
     });
 };
 
-export function useHttp(options: useHttpOptions = {}) {
+interface useBackendOptions {
+    ignoreNotFound?: boolean;
+}
+
+export function useBackend(options: useBackendOptions = {}) {
     const emptyState: State = { loading: false };
 
     let abortController: AbortController | null = null;

@@ -4,13 +4,13 @@ import { goto } from "@mateothegreat/svelte5-router";
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/lib";
-import { useForm, useHttp } from "@/lib";
+import { useBackend, useForm } from "@/lib";
 import { authStore } from "@/store";
 import { minLengthValidator, numericValidator } from "@/utils";
 
 // Init
 const loggedUserId = authStore.userId;
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Form
 const CreatePlaceFormConfig: FormConfig = {

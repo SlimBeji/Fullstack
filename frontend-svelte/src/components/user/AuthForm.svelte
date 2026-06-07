@@ -4,13 +4,13 @@ import { SvelteURLSearchParams } from "svelte/reactivity";
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/lib";
-import { useForm, useHttp } from "@/lib";
+import { useBackend, useForm } from "@/lib";
 import { authStore } from "@/store";
 import type { SigninResponse } from "@/types";
 import { emailValidator, minLengthValidator } from "@/utils";
 
 // Init
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Form
 const AuthFormConfig: FormConfig = {

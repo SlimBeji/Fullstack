@@ -3,11 +3,11 @@ import { onMount } from "svelte";
 
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
-import { useHttp } from "@/lib";
+import { useBackend } from "@/lib";
 import type { User } from "@/types";
 
 // Init
-const { httpData, sendRequest, clear } = useHttp();
+const { httpData, sendRequest, clear } = useBackend();
 
 // Computed
 let items = $derived<User[]>($httpData.json?.data ?? []);
