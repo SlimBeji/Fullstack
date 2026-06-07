@@ -4,8 +4,7 @@ import { SvelteURLSearchParams } from "svelte/reactivity";
 import { writable } from "svelte/store";
 
 import type { HeaderContent, HttpMethods } from "@/types";
-
-import { getClient } from "../utils";
+import { getClient } from "@/utils";
 
 const TOKEN_EXPIRED = "Token expired";
 

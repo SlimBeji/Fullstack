@@ -1,8 +1,8 @@
 import type { Writable } from "svelte/store";
 import { derived, writable } from "svelte/store";
 
-import type { ValidatorType } from "../utils";
-import { validate } from "../utils";
+import type { ValidatorType } from "@/utils";
+import { validate } from "@/utils";
 
 interface FieldConfig {
     active?: boolean;

@@ -6,8 +6,9 @@ import { onMount } from "svelte";
 import { Button, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/lib";
-import { minLengthValidator, numericValidator, useForm, useHttp } from "@/lib";
+import { useForm, useHttp } from "@/lib";
 import type { Place } from "@/types";
+import { minLengthValidator, numericValidator } from "@/utils";
 
 // Init
 const { httpData, sendRequest, clear } = useHttp();

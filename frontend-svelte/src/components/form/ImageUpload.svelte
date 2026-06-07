@@ -1,7 +1,7 @@
 <script lang="ts">
 import clsx from "clsx";
 
-import { fileToUrl } from "@/lib";
+import { fileToUrl } from "@/utils";
 
 import Button from "./Button.svelte";
 
