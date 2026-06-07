@@ -58,7 +58,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useBackend } from "@/composables";
@@ -66,6 +65,7 @@ import { useAuthStore } from "@/store";
 import type { Place } from "@/types";
 
 // Init
+const placeholder = "/public/place_placeholder.jpg";
 const authStore = useAuthStore();
 const { httpData, sendRequest, clear } = useBackend();
 

@@ -30,7 +30,6 @@ The app uses **Pinia** as the official state management library for Vue 3, conne
 - **`/storage/`** – Helpers for interacting with the browser's native storage APIs.
 - **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
 - **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
-- **`/assets/`** – Static assets such as images, icons, and fonts.
 
 > The term `/pages` was preferred to the more common `/views` used by Vue community just to keep the analogy between different frameworks
 

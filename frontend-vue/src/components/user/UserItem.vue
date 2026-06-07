@@ -18,9 +18,11 @@
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
-import placeholder from "@/assets/avatar_placeholder.jpg";
 import { Avatar } from "@/components/ui";
 import type { User } from "@/types";
+
+// Init
+const placeholder = "/public/avatar_placeholder.jpg";
 
 // Props
 const props = defineProps<{
