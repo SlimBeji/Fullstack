@@ -192,7 +192,7 @@ func (cu *CRUDSUser) PostProcessPartial(
 	ctx context.Context, partial map[string]any,
 ) error {
 	imageURL, exists := partial[string(schemas.UserSelectImageURL)]
-	if !exists {
+	if !exists || imageURL == "" {
 		return nil
 	}
 

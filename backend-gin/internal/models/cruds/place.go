@@ -174,7 +174,7 @@ func (cp *CRUDSPlace) PostProcessPartial(
 	ctx context.Context, partial map[string]any,
 ) error {
 	imageURL, exists := partial[string(schemas.PlaceSelectImageURL)]
-	if !exists {
+	if !exists || imageURL == "" {
 		return nil
 	}
 
