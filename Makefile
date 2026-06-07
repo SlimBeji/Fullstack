@@ -52,7 +52,7 @@ svelte-bash:
 	podman exec -it svelte bash
 
 svelte-lint:
-	podman exec -it svelte bunx tsc -b --noEmit
+	podman exec -it svelte bun run build
 	podman exec -it svelte bun run lint
 	podman exec -it svelte bun run format | grep -v "(unchanged)"
 
