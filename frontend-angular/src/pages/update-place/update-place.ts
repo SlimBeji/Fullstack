@@ -4,6 +4,5 @@ import { Component } from '@angular/core';
     selector: 'app-update-place',
     imports: [],
     templateUrl: './update-place.html',
-    styleUrl: './update-place.css',
 })
 export class UpdatePlace {}
