@@ -5,12 +5,13 @@ import { NewPlace } from '@/pages/new-place/new-place';
 import { UpdatePlace } from '@/pages/update-place/update-place';
 import { UserPlaces } from '@/pages/user-places/user-places';
 import { Users } from '@/pages/users/users';
+import { Route } from '@/router';
 
 export const routes: Routes = [
-    { path: 'auth', component: Auth },
-    { path: '', component: Users },
-    { path: ':userId/places', component: UserPlaces },
-    { path: 'places/new', component: NewPlace },
-    { path: 'places/:placeId', component: UpdatePlace },
-    { path: '**', redirectTo: '', pathMatch: 'full' },
+    { path: Route.AUTH, component: Auth },
+    { path: Route.HOME, component: Users },
+    { path: Route.USER_PLACES, component: UserPlaces },
+    { path: Route.NEW_PLACE, component: NewPlace },
+    { path: Route.UPDATE_PLACE, component: UpdatePlace },
+    { path: Route.ANY, redirectTo: '', pathMatch: 'full' },
 ];
