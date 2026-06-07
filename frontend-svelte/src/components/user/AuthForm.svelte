@@ -3,8 +3,8 @@ import { SvelteURLSearchParams } from "svelte/reactivity";
 
 import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import type { FormConfig } from "@/lib";
-import { useBackend, useForm } from "@/lib";
+import type { FormConfig } from "@/composables";
+import { useBackend, useForm } from "@/composables";
 import { authStore } from "@/store";
 import type { SigninResponse } from "@/types";
 import { emailValidator, minLengthValidator } from "@/utils";

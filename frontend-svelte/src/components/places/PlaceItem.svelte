@@ -2,7 +2,7 @@
 import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
-import { useBackend } from "@/lib";
+import { useBackend } from "@/composables";
 import { authStore } from "@/store";
 import type { Place } from "@/types";
 

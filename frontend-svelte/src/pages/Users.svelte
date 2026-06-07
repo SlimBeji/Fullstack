@@ -3,7 +3,7 @@ import { onMount } from "svelte";
 
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import { UsersList } from "@/components/user";
-import { useBackend } from "@/lib";
+import { useBackend } from "@/composables";
 import type { User } from "@/types";
 
 // Init

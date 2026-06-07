@@ -4,7 +4,7 @@ import { onMount } from "svelte";
 
 import { PlacesList } from "@/components/places";
 import { HttpError, LoadingSpinner } from "@/components/ui";
-import { useBackend } from "@/lib";
+import { useBackend } from "@/composables";
 import { authStore } from "@/store";
 import type { Place } from "@/types";
 
