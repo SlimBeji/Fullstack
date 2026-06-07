@@ -1,8 +1,8 @@
 import { goto } from "@mateothegreat/svelte5-router";
 import { derived, writable } from "svelte/store";
 
+import { deleteAuthData, setAuthData as setAuthSorageData } from "@/storage";
 import type { EncodedUserToken, SigninResponse } from "@/types";
-import { LocalStorageKeys } from "@/types";
 
 const data = writable<EncodedUserToken | undefined>(undefined);
 const isLoggedIn = derived(data, ($data) => !!$data?.user_id);
@@ -17,13 +17,13 @@ function login(payload: SigninResponse) {
     const expires_at = Math.floor(Date.now() / 1000) + expires_in;
     const token: EncodedUserToken = { ...rest, expires_at };
     data.set({ ...rest, expires_at });
-    localStorage.setItem(LocalStorageKeys.userData, JSON.stringify(token));
+    setAuthSorageData(token);
     goto("/");
 }
 
 function logout() {
     data.set(undefined);
-    localStorage.removeItem(LocalStorageKeys.userData);
+    deleteAuthData();
     goto("/auth");
 }
 

@@ -3,8 +3,8 @@ import type { RouteConfig, RouteResult } from "@mateothegreat/svelte5-router";
 import { goto, Router, StatusCode } from "@mateothegreat/svelte5-router";
 
 import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/pages";
+import { getAuthData } from "@/storage";
 import { authStore } from "@/store";
-import { getAuthData } from "@/utils";
 
 const isLoggedIn = authStore.isLoggedIn;
 
