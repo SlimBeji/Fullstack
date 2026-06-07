@@ -25,11 +25,11 @@ The app uses **NgRx** for state management, connecting Angular components to a c
 - **`/router/`** – Centralized application routing configuration (Angular Router).
 - **`/pages/`** – Top-level route components rendered by `App`.
 - **`/components/`** – Reusable UI components and layout building blocks.
+- **`/services/`** – Angular services similat to **React** `/hooks/`, **Vue** and **Svelte** `/composables/`.
 - **`/store/`** – NgRx store, actions, reducers, selectors, and effects.
-- **`/services/`** – Angular services similat to react hooks, vue composables and svelte.
-- **`/lib/`** – Shared utilities, helper functions, and general-purpose TypeScript logic.
-- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
-- **`/assets/`** – Static assets such as images, icons, or fonts.
+- **`/storage/`** – Helpers for interacting with the browser's native storage APIs.
+- **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
+- **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
 
 ## 🧹 Linting
 
