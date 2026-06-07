@@ -31,6 +31,8 @@ The app uses **NgRx** for state management, connecting Angular components to a c
 - **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
 - **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
 
+> Unlike **React**, **Vue** and **Svelte**, the `/router/` folder contains only an enum of paths and route guards (e.g. `auth.guard.ts`, `guest.guard.ts`). Route definitions live in `app.routes.ts` at the app root.
+
 ## 🧹 Linting
 
 This app uses **[ESLint](https://eslint.org/)** and **[Prettier](https://prettier.io/)** to ensure consistent code quality and formatting.
