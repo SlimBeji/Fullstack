@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-import placeholder from "@/assets/place_placeholder.jpg";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useBackend } from "@/hooks";
 import { useAppSelector } from "@/store";
 import type { Place } from "@/types";
+
+const placeholder = "/public/place_placeholder.jpg";
 
 interface PlaceItemProps {
     place: Place;

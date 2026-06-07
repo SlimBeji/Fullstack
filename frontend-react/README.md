@@ -30,7 +30,6 @@ The app uses the official **Redux Toolkit** library for state management, connec
 - **`/storage/`** – Helpers for interacting with the browser's native storage APIs.
 - **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
 - **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
-- **`/assets/`** – Static assets such as images, icons, and fonts.
 
 ## 🧹 Linting
 
