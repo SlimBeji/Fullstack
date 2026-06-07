@@ -21,15 +21,18 @@ Stores such as `writable`, `readable`, and `derived` make it easy to centralize 
 
 ## 🗂️ Project Structure (`/src`)
 
-- **`main.ts`** – Application entry point; initializes the Svelte app and mounts the root component.
-- **`App.svelte`** – Root Svelte component defining the global layout and routing.
-- **`/routes/`** – Application routing configuration using `@mateothegreat/svelte5-router`.
-- **`/views/`** – Top-level route components rendered by `App`.
+- **`main.ts`** – Application entry point; mounts the root `<App />` component and sets up the Pinia store and router.
+- **`App.svelte`** – Root component responsible for global layout and route configuration.
+- **`/router/`** – Application routing configuration using `@mateothegreat/svelte5-router`.
+- **`/pages/`** – Top-level route components, each corresponding to a distinct application view.
 - **`/components/`** – Reusable UI components and layout building blocks.
-- **`/stores/`** – Svelte stores containing application state and related logic.
-- **`/lib/`** – Shared utilities and helper functions for the app (can include custom runes or general-purpose TypeScript logic).
-- **`/types/`** – Shared type definitions including `Enums`, `Interfaces`, and reusable `Types`.
-- **`/assets/`** – Static assets such as images, icons, or fonts.
+- **`/composables/`** – Custom Svelte composables encapsulating reusable logic (analogous to services in **Angular**, hooks in **React**).
+- **`/store/`** – Svelte store containing application state and related logic.
+- **`/storage/`** – Helpers for interacting with the browser's native storage APIs.
+- **`/utils/`** – General-purpose, framework-agnostic TypeScript utilities.
+- **`/types/`** – Shared TypeScript interfaces and type definitions, covering both API response shapes and reusable app-wide types.
+
+> `/pages` was preferred over the more common `/routes` used by the SvelteKit community to maintain naming consistency across different framework projects.
 
 ## 🧹 Linting
 
