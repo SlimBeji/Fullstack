@@ -11,7 +11,7 @@ let map: LeafletMap;
 let marker: Marker;
 
 // Props
-const {position, zoom, markerText} = $props<{
+const { position, zoom, markerText } = $props<{
     position: Location;
     zoom: number;
     markerText: string;
@@ -19,10 +19,7 @@ const {position, zoom, markerText} = $props<{
 
 // Events
 onMount(() => {
-    map = L.map(mapDiv).setView(
-        [position.lat, position.lng],
-        zoom
-    );
+    map = L.map(mapDiv).setView([position.lat, position.lng], zoom);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
