@@ -6,8 +6,7 @@ import { Avatar } from "@/components/ui";
 import type { User } from "@/types";
 
 // Props
-const props = $props<{ user: User }>();
-const user: User = props.user;
+const { user } = $props<{ user: User }>();
 
 // Computed
 const imageUrl = $derived(user.image_url || placeholder);
@@ -19,7 +18,7 @@ const placeNumber = $derived(
 
 <li class="user-item">
     <div class="card">
-        <a use:route href={`/${props.user.id}/places`} class="user-item-link">
+        <a use:route href={`/${user.id}/places`} class="user-item-link">
             <div class="user-avatar">
                 <Avatar {imageUrl} alt={user.name} />
             </div>

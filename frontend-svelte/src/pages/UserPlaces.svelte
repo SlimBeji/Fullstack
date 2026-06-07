@@ -10,9 +10,11 @@ import type { Place } from "@/types";
 
 // Init
 const { route } = $props();
-const userId: number = Number(route.result.path.params.userId);
 const { httpData, sendRequest, clear } = useHttp({ ignoreNotFound: true });
 const loggedUserId = authStore.userId;
+
+// Computed
+const userId: number = $derived(Number(route.result.path.params.userId));
 
 // Events
 onMount(() => {

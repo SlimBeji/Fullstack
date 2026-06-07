@@ -11,28 +11,25 @@ let map: LeafletMap;
 let marker: Marker;
 
 // Props
-const props = $props<{
+const {position, zoom, markerText} = $props<{
     position: Location;
     zoom: number;
     markerText: string;
 }>();
 
-// State
-let mapZoom = $state(props.zoom);
-
 // Events
 onMount(() => {
     map = L.map(mapDiv).setView(
-        [props.position.lat, props.position.lng],
-        mapZoom
+        [position.lat, position.lng],
+        zoom
     );
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
-    marker = L.marker([props.position.lat, props.position.lng])
+    marker = L.marker([position.lat, position.lng])
         .addTo(map)
-        .bindPopup(props.markerText);
+        .bindPopup(markerText);
 
     map.invalidateSize();
     return () => map.remove();
@@ -41,8 +38,8 @@ onMount(() => {
 // Effects
 $effect(() => {
     if (map && marker) {
-        marker.setLatLng([props.position.lat, props.position.lng]);
-        map.setView([props.position.lat, props.position.lng], mapZoom);
+        marker.setLatLng([position.lat, position.lng]);
+        map.setView([position.lat, position.lng], zoom);
     }
 });
 </script>

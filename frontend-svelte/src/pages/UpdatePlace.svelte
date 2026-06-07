@@ -3,7 +3,10 @@ import { PlaceUpdateForm } from "@/components/places";
 
 // Props
 const { route } = $props();
-const placeId: string = route.result.path.params.placeId;
+
+// Computed
+const placeId: string = $derived(route.result.path.params.placeId);
+
 </script>
 
 <PlaceUpdateForm {placeId} />
