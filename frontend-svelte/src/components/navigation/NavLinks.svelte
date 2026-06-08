@@ -17,14 +17,19 @@ const logout = () => {
 
 <ul class="links-container">
     <li>
-        <a href={AppRoute.HOME} use:route use:active={activeAction}>All users</a>
+        <a href={AppRoute.HOME} use:route use:active={activeAction}>All users</a
+        >
     </li>
     <li>
-        <a href={AppRoute.NEW_PLACE} use:active={activeAction} use:route>Add Place</a>
+        <a href={AppRoute.NEW_PLACE} use:active={activeAction} use:route
+            >Add Place</a
+        >
     </li>
     <li>
-        <a href={userPlacesRoute($userId as number)} use:active={activeAction} use:route
-            >My places</a
+        <a
+            href={userPlacesRoute($userId as number)}
+            use:active={activeAction}
+            use:route>My places</a
         >
     </li>
     <li>
