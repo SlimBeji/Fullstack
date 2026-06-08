@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { getAuthData } from '@/storage';
 import { AuthStore } from '@/store';
 
-import { Route } from './paths';
+import { AppRoute } from './routes';
 
 export const guestGuard: CanActivateFn = () => {
     const router = inject(Router);
@@ -18,5 +18,5 @@ export const guestGuard: CanActivateFn = () => {
         }
     }
 
-    return authStore.isLoggedIn() ? router.createUrlTree([`/${Route.HOME}`]) : true;
+    return authStore.isLoggedIn() ? router.createUrlTree([`/${AppRoute.HOME}`]) : true;
 };
