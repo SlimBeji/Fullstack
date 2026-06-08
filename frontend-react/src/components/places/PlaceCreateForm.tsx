@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/hooks";
 import { useBackend, useForm } from "@/hooks";
+import { AppRoute } from "@/router";
 import { useAppSelector } from "@/store";
 import { minLengthValidator, numericValidator } from "@/utils";
 
@@ -39,7 +40,7 @@ const NewPlace: React.FC = () => {
         }
         try {
             await sendRequest("/places/", "post", formData);
-            navigate("/");
+            navigate(AppRoute.HOME);
         } catch (err) {
             console.log(err);
         }

@@ -1,3 +1,4 @@
+import { AppRoute } from "@/router";
 import type { Place } from "@/types";
 
 import { Button } from "../form";
@@ -31,7 +32,7 @@ const PlaceList: React.FC<PlaceListProps> = ({
             <div className="no-places">
                 <div className="card">
                     <h2>No places found. Maybe create one?</h2>
-                    <Button color="secondary" to="/places/new">
+                    <Button color="secondary" to={AppRoute.NEW_PLACE}>
                         Share
                     </Button>
                 </div>

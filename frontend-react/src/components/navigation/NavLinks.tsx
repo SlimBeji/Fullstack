@@ -1,5 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 
+import { AppRoute, userPlacesRoute } from "@/router";
+
 import { authSlice, useAppDispatch, useAppSelector } from "../../store";
 
 interface NavLinkWrapperProps {
@@ -24,21 +26,23 @@ const NavLinks: React.FC = () => {
 
     const onLogout = () => {
         dispatch(authSlice.actions.logout());
-        navigate("/auth");
+        navigate(AppRoute.AUTH);
     };
 
     return (
         <ul className="links-container">
             <li>
-                <NavLinkWrapper to="/">All users</NavLinkWrapper>
+                <NavLinkWrapper to={AppRoute.HOME}>All users</NavLinkWrapper>
             </li>
             <li>
-                <NavLinkWrapper to={`/${userId}/places`}>
+                <NavLinkWrapper to={userPlacesRoute(userId as number)}>
                     My places
                 </NavLinkWrapper>
             </li>
             <li>
-                <NavLinkWrapper to="/places/new">Add place</NavLinkWrapper>
+                <NavLinkWrapper to={AppRoute.NEW_PLACE}>
+                    Add place
+                </NavLinkWrapper>
             </li>
             <li>
                 <button onClick={onLogout}>LOGOUT</button>

@@ -5,11 +5,13 @@ import { Auth, NewPlace, UpdatePlace, UserPlaces, Users } from "@/pages";
 import { getAuthData } from "@/storage";
 import { authSlice, useAppDispatch, useAppSelector } from "@/store";
 
+import { AppRoute } from "./routes";
+
 const route = (
     path: string,
     component: React.ReactNode,
     active: boolean = true,
-    alt: string = "/"
+    alt: string = AppRoute.HOME
 ) => {
     return (
         <Route
@@ -31,7 +33,7 @@ const Router: React.FC = () => {
 
     useEffect(() => {
         if (!authData) {
-            navigate("/auth");
+            navigate(AppRoute.AUTH);
         }
     }, [authData, navigate]);
 
@@ -39,21 +41,31 @@ const Router: React.FC = () => {
         <main>
             <Routes>
                 {/* Unauthenticated Routes */}
-                {route("/auth", <Auth />, !authData, "/")}
+                {route(AppRoute.AUTH, <Auth />, !authData, AppRoute.HOME)}
 
                 {/* Auth required Routes */}
-                {route("/", <Users />)}
-                {route("/:userId/places", <UserPlaces />)}
-                {route("/places/new", <NewPlace />, !!authData, "/auth")}
+                {route(AppRoute.HOME, <Users />, !!authData, AppRoute.AUTH)}
                 {route(
-                    "/places/:placeId",
+                    AppRoute.USER_PLACES,
+                    <UserPlaces />,
+                    !!authData,
+                    AppRoute.AUTH
+                )}
+                {route(
+                    AppRoute.NEW_PLACE,
+                    <NewPlace />,
+                    !!authData,
+                    AppRoute.AUTH
+                )}
+                {route(
+                    AppRoute.UPDATE_PLACE,
                     <UpdatePlace />,
                     !!authData,
-                    "/auth"
+                    AppRoute.AUTH
                 )}
 
                 {/* Default Route */}
-                {route("*", <Navigate to="/" replace />)}
+                {route(AppRoute.ANY, <Navigate to={AppRoute.HOME} replace />)}
             </Routes>
         </main>
     );

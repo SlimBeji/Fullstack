@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useBackend } from "@/hooks";
+import { updatePlaceRoute } from "@/router";
 import { useAppSelector } from "@/store";
 import type { Place } from "@/types";
 
@@ -110,7 +111,9 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                         </Button>
                         {authData?.user_id === place.creator_id && (
                             <>
-                                <Button to={`/places/${place.id}`}>EDIT</Button>
+                                <Button to={updatePlaceRoute(place.id)}>
+                                    EDIT
+                                </Button>
                                 <Button
                                     color="danger"
                                     onClick={openDeleteModal}

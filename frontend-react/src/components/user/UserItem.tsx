@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { Avatar } from "@/components/ui";
+import { userPlacesRoute } from "@/router";
 import type { User } from "@/types";
 
 const placeholder = "/public/avatar_placeholder.jpg";
@@ -19,7 +20,7 @@ const UserItem: React.FC<UserItemProps> = ({ user }) => {
     return (
         <li className="user-item">
             <div className="card">
-                <Link to={`/${user.id}/places`} className="user-item-link">
+                <Link to={userPlacesRoute(user.id)} className="user-item-link">
                     <div className="user-avatar">
                         <Avatar
                             imageUrl={user.image_url || placeholder}

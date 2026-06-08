@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { AppRoute } from "@/router";
+
 import { useAppSelector } from "../../store";
 import Backdrop from "../ui/Backdrop";
 import NavLinks from "./NavLinks";
@@ -38,7 +40,7 @@ const MainNavigation: React.FC = () => {
                         </button>
                     )}
                     <h1 className="app-header">
-                        <Link to="/">Your Places</Link>
+                        <Link to={AppRoute.HOME}>Your Places</Link>
                     </h1>
                     {isLoggedIn && (
                         <nav className="main">

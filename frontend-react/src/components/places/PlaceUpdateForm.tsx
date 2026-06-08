@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/hooks";
 import { useBackend, useForm } from "@/hooks";
+import { AppRoute } from "@/router";
 import type { Place } from "@/types";
 import { minLengthValidator, numericValidator } from "@/utils";
 
@@ -58,7 +59,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                     lng: state.fields.lng.value,
                 },
             });
-            navigate("/");
+            navigate(AppRoute.HOME);
         } catch (err) {
             console.log(err);
         }
