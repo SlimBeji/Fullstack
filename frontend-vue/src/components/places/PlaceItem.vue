@@ -40,7 +40,9 @@
                 <Button @click="openMapHandler" color="secondary" inverse>
                     VIEW ON MAP
                 </Button>
-                <Button v-if="isUserOwned" :to="`/places/${props.place.id}`"
+                <Button
+                    v-if="isUserOwned"
+                    :to="updatePlaceRoute(props.place.id)"
                     >EDIT</Button
                 >
                 <Button
@@ -61,6 +63,7 @@ import { computed, ref } from "vue";
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useBackend } from "@/composables";
+import { updatePlaceRoute } from "@/router";
 import { useAuthStore } from "@/store";
 import type { Place } from "@/types";
 

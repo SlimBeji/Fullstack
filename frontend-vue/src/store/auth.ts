@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
-import router from "@/router";
+import { AppRoute, router } from "@/router";
 import { deleteAuthData, setAuthData as setAuthStorageData } from "@/storage";
 import type { EncodedUserToken, SigninResponse } from "@/types";
 
@@ -20,13 +20,13 @@ export const useAuthStore = defineStore("auth", () => {
         const expires_at = Math.floor(Date.now() / 1000) + expires_in;
         data.value = { ...rest, expires_at };
         setAuthStorageData(data.value);
-        router.push("/");
+        router.push(AppRoute.HOME);
     }
 
     function logout() {
         data.value = undefined;
         deleteAuthData();
-        router.push("/auth");
+        router.push(AppRoute.AUTH);
     }
 
     return {

@@ -1,7 +1,7 @@
 <template>
     <li class="user-item">
         <div class="card">
-            <RouterLink :to="`/${props.user.id}/places`" class="user-item-link">
+            <RouterLink :to="userPlacesRoute(user.id)" class="user-item-link">
                 <div class="user-avatar">
                     <Avatar :imageUrl="imageUrl" :alt="props.user.name" />
                 </div>
@@ -19,6 +19,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
 import { Avatar } from "@/components/ui";
+import { userPlacesRoute } from "@/router";
 import type { User } from "@/types";
 
 // Init

@@ -17,7 +17,7 @@
                 <span />
             </button>
             <h1 class="app-header">
-                <RouterLink to="/">Your Places</RouterLink>
+                <RouterLink :to="AppRoute.HOME">Your Places</RouterLink>
             </h1>
             <nav v-if="authStore.isLoggedIn" class="main">
                 <NavLinks />
@@ -31,6 +31,7 @@ import { ref } from "vue";
 import { RouterLink } from "vue-router";
 
 import { Backdrop } from "@/components/ui";
+import { AppRoute } from "@/router/routes.ts";
 import { useAuthStore } from "@/store";
 
 import NavLinks from "./NavLinks.vue";

@@ -73,7 +73,7 @@ import { Button, ImageUpload, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/composables";
 import { useBackend, useForm } from "@/composables";
-import router from "@/router";
+import { AppRoute, router } from "@/router";
 import { useAuthStore } from "@/store";
 import { minLengthValidator, numericValidator } from "@/utils";
 
@@ -111,7 +111,7 @@ const submitHandler = async (e: Event) => {
 
     try {
         await sendRequest("/places/", "post", formData);
-        router.push("/");
+        router.push(AppRoute.HOME);
     } catch (err) {
         console.log(err);
     }

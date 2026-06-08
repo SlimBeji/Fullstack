@@ -1,17 +1,19 @@
 <template>
     <ul class="links-container">
         <li>
-            <RouterLink exact-active-class="active" to="/"
+            <RouterLink exact-active-class="active" :to="AppRoute.HOME"
                 >All users</RouterLink
             >
         </li>
         <li>
-            <RouterLink exact-active-class="active" to="/places/new"
+            <RouterLink exact-active-class="active" :to="AppRoute.NEW_PLACE"
                 >Add Place</RouterLink
             >
         </li>
         <li>
-            <RouterLink exact-active-class="active" :to="`/${userId}/places`"
+            <RouterLink
+                exact-active-class="active"
+                :to="userPlacesRoute(userId as number)"
                 >My places</RouterLink
             >
         </li>
@@ -24,6 +26,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from "vue-router";
 
+import { AppRoute, userPlacesRoute } from "@/router";
 import { useAuthStore } from "@/store";
 
 // Init
@@ -34,7 +37,7 @@ const userId = authStore.userId;
 // Hanlders
 const logout = () => {
     authStore.logout();
-    router.push("/auth");
+    router.push(AppRoute.AUTH);
 };
 </script>
 

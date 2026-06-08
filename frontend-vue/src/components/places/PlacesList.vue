@@ -11,7 +11,9 @@
         <div v-else-if="props.sameAuthenticatedUser" class="no-places">
             <div class="card">
                 <h2>No places found. Maybe create one?</h2>
-                <Button color="secondary" to="/places/new"> Share </Button>
+                <Button color="secondary" :to="AppRoute.NEW_PLACE">
+                    Share
+                </Button>
             </div>
         </div>
         <div v-else class="no-places">
@@ -24,6 +26,7 @@
 
 <script setup lang="ts">
 import { Button } from "@/components/form";
+import { AppRoute } from "@/router/routes.ts";
 import type { Place } from "@/types";
 
 import PlaceItem from "./PlaceItem.vue";
