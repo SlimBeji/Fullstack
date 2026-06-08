@@ -1,6 +1,7 @@
 import { goto } from "@mateothegreat/svelte5-router";
 import { derived, writable } from "svelte/store";
 
+import { AppRoute } from "@/router";
 import { deleteAuthData, setAuthData as setAuthSorageData } from "@/storage";
 import type { EncodedUserToken, SigninResponse } from "@/types";
 
@@ -18,13 +19,13 @@ function login(payload: SigninResponse) {
     const token: EncodedUserToken = { ...rest, expires_at };
     data.set({ ...rest, expires_at });
     setAuthSorageData(token);
-    goto("/");
+    goto(AppRoute.HOME);
 }
 
 function logout() {
     data.set(undefined);
     deleteAuthData();
-    goto("/auth");
+    goto(AppRoute.AUTH);
 }
 
 export const authStore = {

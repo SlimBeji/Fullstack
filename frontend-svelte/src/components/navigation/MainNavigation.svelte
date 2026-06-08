@@ -2,6 +2,7 @@
 import { route } from "@mateothegreat/svelte5-router";
 
 import { Backdrop } from "@/components/ui";
+import { AppRoute } from "@/router";
 import { authStore } from "@/store";
 
 import NavLinks from "./NavLinks.svelte";
@@ -46,7 +47,7 @@ const closeDrawer = () => {
             </button>
         {/if}
         <h1 class="app-header">
-            <a href="/" use:route>Your Places</a>
+            <a href={AppRoute.HOME} use:route>Your Places</a>
         </h1>
         {#if $isLoggedIn}
             <nav class="main">

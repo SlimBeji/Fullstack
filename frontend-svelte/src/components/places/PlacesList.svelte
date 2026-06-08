@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Button } from "@/components/form";
+import { AppRoute } from "@/router";
 import type { Place } from "@/types";
 
 import PlaceItem from "./PlaceItem.svelte";
@@ -21,7 +22,7 @@ const props = $props<{
         <div class="no-places">
             <div class="card">
                 <h2>No places found. Maybe create one?</h2>
-                <Button color="secondary" to="/places/new">Share</Button>
+                <Button color="secondary" to={AppRoute.NEW_PLACE}>Share</Button>
             </div>
         </div>
     {:else}

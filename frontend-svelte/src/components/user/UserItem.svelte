@@ -2,6 +2,7 @@
 import { route } from "@mateothegreat/svelte5-router";
 
 import { Avatar } from "@/components/ui";
+import { userPlacesRoute } from "@/router";
 import type { User } from "@/types";
 
 // Init
@@ -20,7 +21,7 @@ const placeNumber = $derived(
 
 <li class="user-item">
     <div class="card">
-        <a use:route href={`/${user.id}/places`} class="user-item-link">
+        <a use:route href={userPlacesRoute(user.id)} class="user-item-link">
             <div class="user-avatar">
                 <Avatar {imageUrl} alt={user.name} />
             </div>

@@ -2,6 +2,7 @@
 import { Button } from "@/components/form";
 import { HttpError, LoadingSpinner, Map, Modal } from "@/components/ui";
 import { useBackend } from "@/composables";
+import { updatePlaceRoute } from "@/router";
 import { authStore } from "@/store";
 import type { Place } from "@/types";
 
@@ -93,7 +94,7 @@ const deleteHandler = () => {
                 VIEW ON MAP
             </Button>
             {#if isUserOwned}
-                <Button to={`/places/${props.place.id}`}>EDIT</Button>
+                <Button to={updatePlaceRoute(props.place.id)}>EDIT</Button>
                 <Button color="danger" onClick={openDeleteModalHandler}>
                     DELETE
                 </Button>

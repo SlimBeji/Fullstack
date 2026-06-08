@@ -1,6 +1,7 @@
 <script lang="ts">
 import { active, goto, route } from "@mateothegreat/svelte5-router";
 
+import { AppRoute, userPlacesRoute } from "@/router";
 import { authStore } from "@/store";
 
 // Init
@@ -16,13 +17,13 @@ const logout = () => {
 
 <ul class="links-container">
     <li>
-        <a href="/" use:route use:active={activeAction}>All users</a>
+        <a href={AppRoute.HOME} use:route use:active={activeAction}>All users</a>
     </li>
     <li>
-        <a href="/places/new" use:active={activeAction} use:route>Add Place</a>
+        <a href={AppRoute.NEW_PLACE} use:active={activeAction} use:route>Add Place</a>
     </li>
     <li>
-        <a href={`/${$userId}/places`} use:active={activeAction} use:route
+        <a href={userPlacesRoute($userId as number)} use:active={activeAction} use:route
             >My places</a
         >
     </li>

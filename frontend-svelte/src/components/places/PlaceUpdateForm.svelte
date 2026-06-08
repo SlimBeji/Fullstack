@@ -7,6 +7,7 @@ import { Button, Input } from "@/components/form";
 import { HttpError, LoadingSpinner } from "@/components/ui";
 import type { FormConfig } from "@/composables";
 import { useBackend, useForm } from "@/composables";
+import { AppRoute } from "@/router";
 import type { Place } from "@/types";
 import { minLengthValidator, numericValidator } from "@/utils";
 
@@ -61,7 +62,7 @@ const submitHandler = async (e: Event) => {
                 lng: $lng.value,
             },
         });
-        goto("/");
+        goto(AppRoute.HOME);
     } catch (err) {
         console.log(err);
     }
