@@ -18,5 +18,5 @@ export const guestGuard: CanActivateFn = () => {
         }
     }
 
-    return authStore.isLoggedIn() ? router.createUrlTree([`/${AppRoute.HOME}`]) : true;
+    return authStore.isLoggedIn() ? router.createUrlTree([AppRoute.HOME]) : true;
 };
