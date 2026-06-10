@@ -1,0 +1,14 @@
+@reference "#styles.css";
+
+aside.sidedrawer {
+    @apply fixed z-40 top-0 left-0 h-screen w-[70%];
+    @apply bg-surface shadow-md;
+}
+
+.sidedrawer-enter {
+    @apply animate-in slide-in-from-left duration-200;
+}
+
+.sidedrawer-leave {
+    @apply animate-out slide-out-to-left duration-200;
+}
