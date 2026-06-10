@@ -1,0 +1,29 @@
+@if (drawerIsOpen()) {
+    <app-backdrop (clicked)="drawerIsOpen.set(false)" />
+}
+
+<app-side-drawer [show]="drawerIsOpen()" (clicked)="drawerIsOpen.set(false)">
+    <nav class="sidedrawer">
+        <app-nav-links />
+    </nav>
+</app-side-drawer>
+
+<header class="main-header">
+    <div>
+        @if (store.isLoggedIn()) {
+            <button class="hamburger" (click)="drawerIsOpen.set(true)">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        }
+        <h1 class="app-header">
+            <a [routerLink]="AppRoute.HOME">Your Places</a>
+        </h1>
+        @if (store.isLoggedIn()) {
+            <nav class="main">
+                <app-nav-links />
+            </nav>
+        }
+    </div>
+</header>
