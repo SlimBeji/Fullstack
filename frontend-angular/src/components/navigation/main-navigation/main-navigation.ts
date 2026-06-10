@@ -1,10 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { NavLinks, SideDrawer } from '@/components/navigation';
 import { Backdrop } from '@/components/ui';
 import { AppRoute } from '@/router';
 import { AuthStore } from '@/store';
+
+import { NavLinks } from '../nav-links/nav-links';
+import { SideDrawer } from '../side-drawer/side-drawer';
 
 @Component({
     standalone: true,
