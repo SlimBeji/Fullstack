@@ -1,0 +1,32 @@
+<ul class="links-container">
+    <li>
+        <a
+            [routerLink]="AppRoute.HOME"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+        >
+            All users
+        </a>
+    </li>
+    <li>
+        <a
+            [routerLink]="AppRoute.NEW_PLACE"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+        >
+            Add Place
+        </a>
+    </li>
+    <li>
+        <a
+            [routerLink]="userPlacesRoute(store.userId()!)"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+        >
+            My places
+        </a>
+    </li>
+    <li>
+        <button (click)="store.logout()">LOGOUT</button>
+    </li>
+</ul>
