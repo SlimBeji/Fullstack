@@ -1,0 +1,5 @@
+@reference "#styles.css";
+
+.modal-backdrop {
+    @apply fixed top-0 left-0 w-full h-screen bg-backdrop opacity-70 z-10;
+}
