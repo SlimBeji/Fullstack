@@ -8,9 +8,9 @@
     }
 
     <div class="auth-form">
-        <!-- @if (backend.httpData().loading) {
-            <app-loading-spinner as-overlay/>
-        } -->
+        @if (backend.httpData().loading) {
+            <app-loading-spinner [asOverlay]="true"/>
+        }
 
         <h2>{{ text().requiredText }}</h2>
         <hr />

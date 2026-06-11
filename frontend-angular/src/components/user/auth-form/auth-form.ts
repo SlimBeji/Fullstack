@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormRoot, minLength, pattern, required, validate } from '@angular/forms/signals';
 
 import { Button, ImageUpload, Input } from '@/components/form';
+import { LoadingSpinner } from '@/components/ui';
 import { BackendService } from '@/services';
 import { AuthStore } from '@/store';
 import type { SigninResponse } from '@/types';
@@ -18,7 +19,7 @@ interface AuthFormModel {
     selector: 'app-auth-form',
     templateUrl: './auth-form.html',
     styleUrl: './auth-form.css',
-    imports: [Button, Input, ImageUpload, FormRoot],
+    imports: [Button, Input, ImageUpload, LoadingSpinner, FormRoot],
 })
 export class AuthForm {
     // Init
