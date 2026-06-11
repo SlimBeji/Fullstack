@@ -1,5 +1,6 @@
 import type { ElementRef } from '@angular/core';
-import { Component, computed, input, model, signal, viewChild } from '@angular/core';
+import { Component, computed, input, signal, viewChild } from '@angular/core';
+import type { Field } from '@angular/forms/signals';
 
 import { fileToUrl } from '@/utils';
 
@@ -16,10 +17,7 @@ export class ImageUpload {
     filePicker = viewChild.required<ElementRef<HTMLInputElement>>('filePicker');
 
     // Form
-    value = model<{ file: File | null; url: string }>();
-    invalid = input<boolean>();
-    touched = input<boolean>();
-    disabled = input<boolean>(false);
+    field = input.required<Field<{ file: File | null; url: string }>>();
 
     // Inputs
     id = input.required<string>();
@@ -33,26 +31,32 @@ export class ImageUpload {
     uploadAttempt = signal<boolean>(false);
 
     // Computed
-    inverseClass = computed(() => (this.inverse() && !this.disabled() ? 'inverse' : ''));
+    inverseClass = computed(() => {
+        const field = this.field()();
+        if (this.inverse() && !field.disabled()) return 'inverse';
+        return '';
+    });
 
-    colorClass = computed(() => (this.disabled() ? 'disabled' : this.color()));
+    colorClass = computed(() => (this.field()().disabled() ? 'disabled' : this.color()));
 
-    showError = computed(() => (this.invalid() || !!this.uploadError()) && this.uploadAttempt());
+    showError = computed(
+        () => (this.field()().invalid() || !!this.uploadError()) && this.uploadAttempt()
+    );
 
     // Hanlders
     async changeHandler(event: Event): Promise<void> {
         this.uploadAttempt.set(true);
         const files = (event.target as HTMLInputElement).files;
         if (!files || files.length === 0) {
-            this.value.update((d) => ({ ...d, file: null, url: '' }));
+            this.field()().value.set({ file: null, url: '' });
             this.uploadError.set('Something went wrong! No file found!');
         } else if (files.length > 1) {
-            this.value.update((d) => ({ ...d, file: null, url: '' }));
+            this.field()().value.set({ file: null, url: '' });
             this.uploadError.set('Please upload only one file at a time!');
         } else {
             try {
                 const url = await fileToUrl(files[0]);
-                this.value.update((d) => ({ ...d, file: files[0], url }));
+                this.field()().value.set({ file: files[0], url });
                 this.uploadError.set('');
             } catch {
                 this.uploadError.set('Uploaded file corrupted');

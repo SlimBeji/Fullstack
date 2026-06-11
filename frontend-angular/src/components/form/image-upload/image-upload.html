@@ -9,15 +9,15 @@
     />
     <div>
         <div [class.error]="showError()">
-            @if (value()?.url) {
-                <img [src]="value()?.url" alt="Preview" />
+            @if (field()().value()?.url) {
+                <img [src]="field()().value().url" alt="Preview" />
             } @else {
                 <p class="placeholder">Please pick an image.</p>
             }
         </div>
         <app-button
             type="button"
-            [disabled]="disabled()"
+            [disabled]="field()().disabled()"
             [inverse]="inverse()"
             [color]="color()"
             (clicked)="clickHandler()"
