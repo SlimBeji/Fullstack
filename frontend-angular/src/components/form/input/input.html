@@ -3,29 +3,25 @@
 
     @if (isTextarea()) {
         <textarea
+            [value]="value()"
+            [disabled]="disabled()"
             [id]="id()"
             [class]="inputClass()"
-            [disabled]="disabled()"
             [rows]="rows()"
-            [value]="value()"
-            (input)="onInput($event)"
-            (blur)="onBlur()"
         ></textarea>
     } @else {
         <input
+            [value]="value()"
+            [disabled]="disabled()"
             [id]="id()"
             [class]="inputClass()"
-            [disabled]="disabled()"
             [type]="type()"
             [step]="step()"
             [placeholder]="placeholder()"
-            [value]="value()"
-            (input)="onInput($event)"
-            (blur)="onBlur()"
         />
     }
 
     <p class="error-text" [class.invisible]="!showError()">
-        {{ errorText() }}
+        {{ errorMessage() }}
     </p>
 </div>
