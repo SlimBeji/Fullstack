@@ -14,7 +14,7 @@
 
         <h2>{{ text().requiredText }}</h2>
         <hr />
-        <form [formRoot]="authForm">
+        <form [formRoot]="authForm" (submit)="onSubmit($event)">
             @if (!isLoginMode()) {
                 <app-input
                     [field]="authForm.username"
