@@ -1,0 +1,26 @@
+@if (isAnchor()) {
+    <a
+        [href]="href()"
+        [class]="['btn', colorClass(), inverseClass(), customClass()]"
+        (click)="clickHandler()"
+    >
+        <ng-content />
+    </a>
+} @else if (isRouterLink()) {
+    <a
+        [routerLink]="to()"
+        [class]="['btn', colorClass(), inverseClass(), customClass()]"
+        (click)="clickHandler()"
+    >
+        <ng-content />
+    </a>
+} @else {
+  <button
+    [type]="type()"
+    [disabled]="disabled()"
+    [class]="['btn', colorClass(), inverseClass(), customClass()]"
+    (click)="clickHandler()"
+  >
+    <ng-content />
+  </button>
+}
