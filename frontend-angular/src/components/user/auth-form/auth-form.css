@@ -1,21 +1,22 @@
 @reference "#styles.css";
 
-:host {
-    @apply flex flex-col items-center justify-center min-h-screen gap-4;
+.auth-form {
+    @apply w-[90%] max-w-md mx-auto mt-10 p-6;
+    @apply text-center shadow-lg rounded-xl bg-surface;
 }
 
-p {
-    @apply text-sm text-gray-500 m-0;
+.auth-form > h2 {
+    @apply text-2xl font-bold text-pen mb-2;
 }
 
-.buttons {
-    @apply flex justify-center gap-4;
+.auth-form > hr {
+    @apply border-t-2 border-secondary w-full mb-6;
 }
 
-.button-login {
-    @apply px-6 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer border-none;
+.auth-form .buttons {
+    @apply flex justify-center space-x-4;
 }
 
-.button-logout {
-    @apply px-6 py-2 rounded-md bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none;
+.auth-form .button {
+    @apply min-w-40;
 }
