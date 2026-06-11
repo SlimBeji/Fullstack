@@ -9,8 +9,8 @@
     />
     <div>
         <div [class.error]="showError()">
-            @if (data().url) {
-                <img [src]="data().url" alt="Preview" />
+            @if (value()?.url) {
+                <img [src]="value()?.url" alt="Preview" />
             } @else {
                 <p class="placeholder">Please pick an image.</p>
             }
