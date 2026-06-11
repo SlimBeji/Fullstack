@@ -44,7 +44,9 @@ export class AuthForm {
     authForm = form(this.model, (path) => {
         // Email validation
         required(path.email, { message: 'Please enter a valid email' });
-        email(path.email, { message: 'Please enter a valid email' });
+        pattern(path.email, EMAIL_RE, {
+            message: 'Please enter a valid email',
+        });
 
         // Password validtion
         required(path.password, { message: 'Please enter a password' });
