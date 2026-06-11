@@ -69,12 +69,12 @@ export function useBackend(options: useBackendOptions = {}) {
         });
     }
 
-    async function sendRequest(
+    async function sendRequest<T>(
         url: string,
         method: HttpMethods,
         data?: object,
         tokenRequired: boolean = true
-    ): Promise<AxiosResponse> {
+    ): Promise<AxiosResponse<T>> {
         // Cancel previous request
         abortController?.abort();
         abortController = new AbortController();

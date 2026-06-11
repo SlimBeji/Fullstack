@@ -50,9 +50,8 @@ const onSignin = async (): Promise<void> => {
     const body = new SvelteURLSearchParams();
     body.append("username", $email.value);
     body.append("password", $password.value);
-    const resp = await sendRequest("/auth/signin", "post", body, false);
-    const data = resp.data as SigninResponse;
-    authStore.login(data);
+    const resp = await sendRequest<SigninResponse>("/auth/signin", "post", body, false);
+    authStore.login(resp.data);
 };
 
 const onSignup = async (): Promise<void> => {
@@ -64,9 +63,8 @@ const onSignup = async (): Promise<void> => {
     if ($image.value.file) {
         formData.append("image", $image.value.file);
     }
-    const resp = await sendRequest("/auth/signup", "post", formData, false);
-    const data = resp.data as SigninResponse;
-    authStore.login(data);
+    const resp = await sendRequest<SigninResponse>("/auth/signup", "post", formData, false);
+    authStore.login(resp.data);
 };
 
 const onSubmit = (e: Event): void => {
