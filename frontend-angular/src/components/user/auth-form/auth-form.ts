@@ -1,75 +1,68 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import {
+    email,
+    form,
+    FormField,
+    FormRoot,
+    minLength,
+    required,
+    validate,
+} from '@angular/forms/signals';
 
 import { Button, ImageUpload, Input } from '@/components/form';
-import type { FieldConfig } from '@/services';
-import { type FieldState, validatorPlaceholder } from '@/services';
 import { AuthStore } from '@/store';
 import type { SigninResponse } from '@/types';
 
-// const AuthFormConfig: FormConfig = {
-//     username: { active: false, validators: [validatorPlaceholder] },
-//     image: { active: false, initial: { file: null, url: '' } },
-//     email: { validators: [validatorPlaceholder] },
-//     password: { validators: [validatorPlaceholder] },
-// };
-
-// type FieldsType = keyof typeof AuthFormConfig;
+interface AuthFormModel {
+    username: string;
+    email: string;
+    password: string;
+    image: { file: File | null; url: string };
+}
 
 @Component({
     selector: 'app-auth-form',
     templateUrl: './auth-form.html',
     styleUrl: './auth-form.css',
-    imports: [Button, Input, ImageUpload],
+    imports: [Button, Input, ImageUpload, FormField, FormRoot],
 })
 export class AuthForm {
     // Init
     store = inject(AuthStore);
     // const { httpData, sendRequest, clear } = useBackend();
 
-    // Form
-    fields = signal<Record<string, FieldState>>({
-        username: {
-            value: '',
-            initial: '',
-            active: true,
-            valid: true,
-            validators: [validatorPlaceholder],
-        },
-        image: {
-            value: { file: null, url: '' },
-            initial: { file: null, url: '' },
-            active: true,
-            valid: true,
-            validators: [validatorPlaceholder],
-        },
-        email: {
-            value: '',
-            initial: '',
-            active: true,
-            valid: true,
-            validators: [validatorPlaceholder],
-        },
-        password: {
-            value: '',
-            initial: '',
-            active: true,
-            valid: true,
-            validators: [validatorPlaceholder],
-        },
-    });
-    formValid = signal<boolean>(true);
-    updateFieldConfig(update: Partial<Record<string, FieldConfig>>) {
-        Object.keys(update).forEach((name) => {
-            const field = this.fields()[name];
-            const config = update[name]!;
-            if (config.active !== undefined) field.active = config.active;
-            if (config.validators !== undefined) field.validators = config.validators;
-            if (config.initial !== undefined) field.initial = config.initial;
-        });
-    }
-
     // State
     isLoginMode = signal<boolean>(true);
+    model = signal<AuthFormModel>({
+        username: '',
+        email: '',
+        password: '',
+        image: { file: null, url: '' },
+    });
+
+    // Form
+    authForm = form(this.model, (path) => {
+        // Email validation
+        required(path.email, { message: 'Please enter a valid email' });
+        email(path.email, { message: 'Please enter a valid email' });
+
+        // Password validtion
+        required(path.password, { message: 'Please enter a password' });
+        minLength(path.password, 10, {
+            message: 'Please enter a password with at least 10 characters',
+        });
+
+        // Username only validated in signup mode
+        validate(path.username, (ctx) => {
+            if (!this.isLoginMode() && ctx.value().trim().length < 8) {
+                return {
+                    kind: 'minLength',
+                    message: 'Please enter a valid username of at least 8 characters',
+                };
+            }
+            return null;
+        });
+    });
 
     // Computed
     text = computed(() => {
@@ -92,8 +85,8 @@ export class AuthForm {
     async onSignin() {
         // use URLSearchParams for application/x-www-form-urlencoded
         const body = new URLSearchParams();
-        body.append('username', this.fields()['email'].value);
-        body.append('password', this.fields()['password'].value);
+        body.append('username', this.model().email);
+        body.append('password', this.model().password);
         console.log('request sent to the server');
         //const resp = await sendRequest('/auth/signin', 'post', body, false);
         const data: SigninResponse = {
@@ -109,11 +102,13 @@ export class AuthForm {
     async onSignup() {
         // use FormData for multipart/form-data
         const formData = new FormData();
-        formData.append('name', this.fields()['username'].value);
-        formData.append('email', this.fields()['email'].value);
-        formData.append('password', this.fields()['password'].value);
-        if (this.fields()['image'].value.file) {
-            formData.append('image', this.fields()['image'].value.file);
+        formData.append('name', this.model().username);
+        formData.append('email', this.model().email);
+        formData.append('password', this.model().password);
+
+        const image = this.model().image;
+        if (image.file) {
+            formData.append('image', image.file);
         }
         console.log('request sent to the server');
         //const resp = await sendRequest('/auth/signup', 'post', formData, false);
@@ -137,13 +132,6 @@ export class AuthForm {
     }
 
     onSwitchModeHandler() {
-        // if prev === true ==> We were in Login Mode
-        // username and image were disabled (false)
-        // Switching to Signup Mode, we want to
-        // enable them so we send prev (true)
-        // Same reasoning if we were in Signup Mode
-        const prev = this.isLoginMode();
-        this.updateFieldConfig({ username: { active: prev }, image: { active: prev } });
-        this.isLoginMode.set(!prev);
+        this.isLoginMode.update((prev) => !prev);
     }
 }

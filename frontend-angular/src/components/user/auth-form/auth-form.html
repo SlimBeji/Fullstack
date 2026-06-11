@@ -14,47 +14,40 @@
 
         <h2>{{ text().requiredText }}</h2>
         <hr />
-        <form (submit)="onSubmit($event)">
+        <form [formRoot]="authForm">
             @if (!isLoginMode()) {
                 <app-input
-                    [(value)]="fields()['username'].value"
-                    [isValid]="fields()['username'].valid"
+                    [formField]="authForm.username"
                     element="input"
                     id="username"
                     label="Username"
                     type="test"
-                    errorText="Please enter a valid username of at least 8 characters"
                 />
                 <app-image-upload
-                    [(data)]="fields()['image'].value"
-                    [isValid]="fields()['image'].valid"
-                    id="username"
-                    label="Username"
-                    type="test"
-                    errorText="Please enter a valid username of at least 8 characters"
+                    [formField]="authForm.image"
+                    id="image"
+                    color="secondary"
+                    button-text="Upload your Avatar"
+                    errorText="Please upload a valid image"
                 />
             }
             <app-input
-                [(value)]="fields()['email'].value"
-                [isValid]="fields()['email'].valid"
+                [formField]="authForm.email"
                 element="input"
                 id="email"
                 label="E-mail"
                 type="email"
-                errorText="Please enter a valid email"
             />
             <app-input
-                [(value)]="fields()['password'].value"
-                [isValid]="fields()['password'].valid"
+                [formField]="authForm.password"
                 element="input"
                 id="password"
                 label="Password"
                 type="password"
-                errorText="Please enter a password with at least 10 characters"
             />
             <div class="buttons">
                 <app-button
-                    [disabled]="!formValid()"
+                    [disabled]="authForm().invalid()"
                     color="secondary"
                     type="submit"
                 >
