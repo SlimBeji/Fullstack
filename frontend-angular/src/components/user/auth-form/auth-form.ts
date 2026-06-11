@@ -1,13 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import {
-    form,
-    FormField,
-    FormRoot,
-    minLength,
-    pattern,
-    required,
-    validate,
-} from '@angular/forms/signals';
+import { form, FormRoot, minLength, pattern, required, validate } from '@angular/forms/signals';
 
 import { Button, ImageUpload, Input } from '@/components/form';
 import { AuthStore } from '@/store';
@@ -25,7 +17,7 @@ interface AuthFormModel {
     selector: 'app-auth-form',
     templateUrl: './auth-form.html',
     styleUrl: './auth-form.css',
-    imports: [Button, Input, ImageUpload, FormField, FormRoot],
+    imports: [Button, Input, ImageUpload, FormRoot],
 })
 export class AuthForm {
     // Init
