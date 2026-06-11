@@ -1,10 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-    email,
     form,
     FormField,
     FormRoot,
     minLength,
+    pattern,
     required,
     validate,
 } from '@angular/forms/signals';
@@ -12,6 +12,7 @@ import {
 import { Button, ImageUpload, Input } from '@/components/form';
 import { AuthStore } from '@/store';
 import type { SigninResponse } from '@/types';
+import { EMAIL_RE } from '@/utils';
 
 interface AuthFormModel {
     username: string;
@@ -90,6 +91,7 @@ export class AuthForm {
         body.append('username', this.model().email);
         body.append('password', this.model().password);
         console.log('request sent to the server');
+        console.log(this.model());
         //const resp = await sendRequest('/auth/signin', 'post', body, false);
         const data: SigninResponse = {
             access_token: 'fake-token',
@@ -98,7 +100,7 @@ export class AuthForm {
             email: 'test@test.com',
             expires_in: 3600,
         };
-        this.store.login(data);
+        //this.store.login(data);
     }
 
     async onSignup() {
@@ -113,6 +115,7 @@ export class AuthForm {
             formData.append('image', image.file);
         }
         console.log('request sent to the server');
+        console.log(this.model());
         //const resp = await sendRequest('/auth/signup', 'post', formData, false);
         const data: SigninResponse = {
             access_token: 'fake-token',
@@ -121,7 +124,7 @@ export class AuthForm {
             email: 'test@test.com',
             expires_in: 3600,
         };
-        this.store.login(data);
+        //this.store.login(data);
     }
 
     onSubmit(e: Event) {
