@@ -8,7 +8,7 @@ export interface FieldState extends FieldConfig {
 
 type ValidatorType = (txt: string) => boolean;
 
-interface FieldConfig {
+export interface FieldConfig {
     active?: boolean;
     initial?: any;
     validators?: ValidatorType[];
