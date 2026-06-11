@@ -1,31 +1,31 @@
 <div class="input-container" [class]="containerClass()">
-  <label [for]="id()">{{ label() }}</label>
+    <label [for]="id()">{{ label() }}</label>
 
-  @if (isTextarea()) {
-    <textarea
-      [id]="id()"
-      [class]="inputClass()"
-      [disabled]="disabled()"
-      [rows]="rows()"
-      [value]="value()"
-      (input)="onInput($event)"
-      (blur)="onBlur()"
-    ></textarea>
-  } @else {
-    <input
-      [id]="id()"
-      [class]="inputClass()"
-      [disabled]="disabled()"
-      [type]="type()"
-      [step]="step()"
-      [placeholder]="placeholder()"
-      [value]="value()"
-      (input)="onInput($event)"
-      (blur)="onBlur()"
-    />
-  }
+    @if (isTextarea()) {
+        <textarea
+            [id]="id()"
+            [class]="inputClass()"
+            [disabled]="disabled()"
+            [rows]="rows()"
+            [value]="value()"
+            (input)="onInput($event)"
+            (blur)="onBlur()"
+        ></textarea>
+    } @else {
+        <input
+            [id]="id()"
+            [class]="inputClass()"
+            [disabled]="disabled()"
+            [type]="type()"
+            [step]="step()"
+            [placeholder]="placeholder()"
+            [value]="value()"
+            (input)="onInput($event)"
+            (blur)="onBlur()"
+        />
+    }
 
-  <p class="error-text" [class.invisible]="!showError()">
-    {{ errorText() }}
-  </p>
+    <p class="error-text" [class.invisible]="!showError()">
+        {{ errorText() }}
+    </p>
 </div>
