@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormRoot, minLength, pattern, required, validate } from '@angular/forms/signals';
 
 import { Button, ImageUpload, Input } from '@/components/form';
+import { BackendService } from '@/services';
 import { AuthStore } from '@/store';
 import type { SigninResponse } from '@/types';
 import { EMAIL_RE } from '@/utils';
@@ -22,7 +23,7 @@ interface AuthFormModel {
 export class AuthForm {
     // Init
     store = inject(AuthStore);
-    // const { httpData, sendRequest, clear } = useBackend();
+    backend = inject(BackendService);
 
     // State
     isLoginMode = signal<boolean>(true);
@@ -84,15 +85,10 @@ export class AuthForm {
         body.append('password', this.model().password);
         console.log('request sent to the server');
         console.log(this.model());
-        //const resp = await sendRequest('/auth/signin', 'post', body, false);
-        const data: SigninResponse = {
-            access_token: 'fake-token',
-            token_type: 'bearer',
-            user_id: 1,
-            email: 'test@test.com',
-            expires_in: 3600,
-        };
-        //this.store.login(data);
+        const resp = await this.backend.sendRequest<SigninResponse>('/auth/signin', 'post', body, {
+            tokenRequired: false,
+        });
+        this.store.login(resp.data);
     }
 
     async onSignup() {
@@ -108,15 +104,13 @@ export class AuthForm {
         }
         console.log('request sent to the server');
         console.log(this.model());
-        //const resp = await sendRequest('/auth/signup', 'post', formData, false);
-        const data: SigninResponse = {
-            access_token: 'fake-token',
-            token_type: 'bearer',
-            user_id: 1,
-            email: 'test@test.com',
-            expires_in: 3600,
-        };
-        //this.store.login(data);
+        const resp = await this.backend.sendRequest<SigninResponse>(
+            '/auth/signup',
+            'post',
+            formData,
+            { tokenRequired: false }
+        );
+        this.store.login(resp.data);
     }
 
     onSubmit(e: Event) {
