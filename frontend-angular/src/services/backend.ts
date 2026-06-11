@@ -73,7 +73,12 @@ export class BackendService {
         });
     }
 
-    async sendRequest(url: string, method: HttpMethods, data?: any, options: BackendOptions = {}) {
+    async sendRequest<T>(
+        url: string,
+        method: HttpMethods,
+        data?: any,
+        options: BackendOptions = {}
+    ): Promise<AxiosResponse<T>> {
         // Create abort controller
         this.abortController?.abort();
         this.abortController = new AbortController();
