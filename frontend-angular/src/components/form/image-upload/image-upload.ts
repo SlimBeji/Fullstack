@@ -2,6 +2,7 @@ import type { ElementRef } from '@angular/core';
 import { Component, computed, input, signal, viewChild } from '@angular/core';
 import type { Field } from '@angular/forms/signals';
 
+import type { ColorType } from '@/types';
 import { fileToUrl } from '@/utils';
 
 import { Button } from '../button/button';
@@ -23,7 +24,7 @@ export class ImageUpload {
     id = input.required<string>();
     buttonText = input<string>('Pick an image');
     inverse = input<boolean>(false);
-    color = input<'primary' | 'secondary' | 'success' | 'warning' | 'danger'>('primary');
+    color = input<ColorType>('primary');
     errorText = input<string>();
 
     // Signals

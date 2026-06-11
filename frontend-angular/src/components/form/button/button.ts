@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import type { ButtonType, CssClass } from '@/types';
+import type { ButtonType, ColorType, CssClass } from '@/types';
 
 @Component({
     selector: 'app-button',
@@ -13,7 +13,7 @@ export class Button {
     // Inputs
     disabled = input<boolean>(false);
     inverse = input<boolean>(false);
-    color = input<'primary' | 'secondary' | 'success' | 'warning' | 'danger'>('primary');
+    color = input<ColorType>('primary');
     customClass = input<CssClass>('');
     to = input<string>();
     href = input<string>();
