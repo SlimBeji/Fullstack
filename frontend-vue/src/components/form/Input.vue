@@ -22,9 +22,10 @@ import { computed, ref } from "vue";
 
 import type { CssClass } from "@/types";
 
-// Props
+// Models
 const value = defineModel<string>({ required: true });
 
+// Props
 const props = defineProps<{
     id: string;
     label: string;
