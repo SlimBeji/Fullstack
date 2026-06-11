@@ -124,9 +124,13 @@ const onSignin = async (): Promise<void> => {
     const body = new URLSearchParams();
     body.append("username", fields.email.value);
     body.append("password", fields.password.value);
-    const resp = await sendRequest("/auth/signin", "post", body, false);
-    const data = resp.data as SigninResponse;
-    authStore.login(data);
+    const resp = await sendRequest<SigninResponse>(
+        "/auth/signin",
+        "post",
+        body,
+        false
+    );
+    authStore.login(resp.data);
 };
 
 const onSignup = async (): Promise<void> => {
@@ -138,9 +142,13 @@ const onSignup = async (): Promise<void> => {
     if (fields.image.value.file) {
         formData.append("image", fields.image.value.file);
     }
-    const resp = await sendRequest("/auth/signup", "post", formData, false);
-    const data = resp.data as SigninResponse;
-    authStore.login(data);
+    const resp = await sendRequest<SigninResponse>(
+        "/auth/signup",
+        "post",
+        formData,
+        false
+    );
+    authStore.login(resp.data);
 };
 
 const onSubmit = (e: Event): void => {

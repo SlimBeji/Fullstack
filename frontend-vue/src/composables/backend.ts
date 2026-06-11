@@ -68,12 +68,12 @@ export const useBackend = (options: useBackendOptions = {}) => {
         };
     };
 
-    const sendRequest = async (
+    const sendRequest = async <T>(
         url: string,
         method: HttpMethods,
         data?: object,
         tokenRequired: boolean = true
-    ): Promise<AxiosResponse> => {
+    ): Promise<AxiosResponse<T>> => {
         // Create abort controller
         abortControllerRef?.abort();
         abortControllerRef = new AbortController();
