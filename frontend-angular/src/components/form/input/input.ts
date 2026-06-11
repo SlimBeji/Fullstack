@@ -1,5 +1,6 @@
-import { Component, computed, input, model } from '@angular/core';
-import type { ValidationError, WithOptionalFieldTree } from '@angular/forms/signals';
+import { Component, computed, input } from '@angular/core';
+import type { Field } from '@angular/forms/signals';
+import { FormField } from '@angular/forms/signals';
 
 import type { CssClass } from '@/types';
 
@@ -7,14 +8,11 @@ import type { CssClass } from '@/types';
     selector: 'app-input',
     templateUrl: './input.html',
     styleUrl: './input.css',
+    imports: [FormField],
 })
 export class Input {
     // Form
-    value = model<string>();
-    invalid = input<boolean>();
-    touched = input<boolean>();
-    disabled = input<boolean>();
-    errors = input<readonly WithOptionalFieldTree<ValidationError>[]>();
+    field = input.required<Field<any>>();
 
     // Inputs
     id = input.required<string>();
@@ -28,12 +26,18 @@ export class Input {
     errorText = input<string>();
 
     // Computed
-    showError = computed(() => !!this.invalid() && !!this.touched());
+    showError = computed(() => {
+        const field = this.field()();
+        return !!field.invalid() && !!field.touched();
+    });
 
-    inputClass = computed(() => ({
-        disabled: this.disabled(),
-        active: !this.disabled(),
-    }));
+    inputClass = computed(() => {
+        const field = this.field()();
+        return {
+            disabled: field.disabled(),
+            active: !field.disabled(),
+        };
+    });
 
     containerClass = computed(() => [this.customClass(), { error: this.showError() }]);
 
@@ -43,7 +47,7 @@ export class Input {
         const errorText = this.errorText();
         if (errorText) return errorText;
 
-        const errors = this.errors();
+        const errors = this.field()().errors();
         if (errors && errors.length > 0) return errors[0].message;
 
         return 'The input is not valid';

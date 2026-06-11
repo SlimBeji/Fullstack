@@ -17,7 +17,7 @@
         <form [formRoot]="authForm">
             @if (!isLoginMode()) {
                 <app-input
-                    [formField]="authForm.username"
+                    [field]="authForm.username"
                     element="input"
                     id="username"
                     label="Username"
@@ -32,14 +32,14 @@
                 />
             }
             <app-input
-                [formField]="authForm.email"
+                [field]="authForm.email"
                 element="input"
                 id="email"
                 label="E-mail"
                 type="email"
             />
             <app-input
-                [formField]="authForm.password"
+                [field]="authForm.password"
                 element="input"
                 id="password"
                 label="Password"

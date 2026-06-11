@@ -3,16 +3,14 @@
 
     @if (isTextarea()) {
         <textarea
-            [value]="value()"
-            [disabled]="disabled()"
+            [formField]="field()"
             [id]="id()"
             [class]="inputClass()"
             [rows]="rows()"
         ></textarea>
     } @else {
         <input
-            [value]="value()"
-            [disabled]="disabled()"
+            [formField]="field()"
             [id]="id()"
             [class]="inputClass()"
             [type]="type()"
