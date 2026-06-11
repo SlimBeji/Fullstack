@@ -2,13 +2,13 @@ import clsx from "clsx";
 import type { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import type { ButtonType } from "@/types";
+import type { ButtonType, ColorType } from "@/types";
 
 interface ButtonProps {
     children: ReactNode;
     disabled?: boolean;
     inverse?: boolean;
-    color?: "primary" | "secondary" | "success" | "warning" | "danger";
+    color?: ColorType;
     className?: string;
     to?: string;
     href?: string;

@@ -1,6 +1,7 @@
 <script lang="ts">
 import clsx from "clsx";
 
+import type { ColorType } from "@/types";
 import { fileToUrl } from "@/utils";
 
 import Button from "./Button.svelte";
@@ -20,7 +21,7 @@ let {
     buttonText?: string;
     disabled?: boolean;
     inverse?: boolean;
-    color?: "primary" | "secondary" | "success" | "warning" | "danger";
+    color?: ColorType;
     errorText?: string;
 }>();
 

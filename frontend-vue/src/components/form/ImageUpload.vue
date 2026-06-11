@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
 
+import type { ColorType } from "@/types/html.ts";
 import { fileToUrl } from "@/utils";
 
 import Button from "./Button.vue";
@@ -50,7 +51,7 @@ const props = defineProps<{
     buttonText?: string;
     disabled?: boolean;
     inverse?: boolean;
-    color?: "primary" | "secondary" | "success" | "warning" | "danger";
+    color?: ColorType;
     errorText?: string;
 }>();
 

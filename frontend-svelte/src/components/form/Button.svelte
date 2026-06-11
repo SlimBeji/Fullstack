@@ -2,14 +2,14 @@
 import { route } from "@mateothegreat/svelte5-router";
 import clsx from "clsx";
 
-import type { ButtonType, CssClass } from "@/types";
+import type { ButtonType, ColorType, CssClass } from "@/types";
 
 // Props
 const props = $props<{
     children: () => unknown;
     disabled?: boolean;
     inverse?: boolean;
-    color?: "primary" | "secondary" | "success" | "warning" | "danger";
+    color?: ColorType;
     class?: CssClass;
     to?: string;
     href?: string;
