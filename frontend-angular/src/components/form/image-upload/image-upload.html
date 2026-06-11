@@ -1,0 +1,31 @@
+<div class="image-upload">
+    <input
+        #filePicker
+        [id]="id()"
+        class="hidden"
+        type="file"
+        accept=".jpg,.png,.jpeg"
+        (change)="changeHandler($event)"
+    />
+    <div>
+        <div [class.error]="showError()">
+            @if (data().url) {
+                <img [src]="data().url" alt="Preview" />
+            } @else {
+                <p class="placeholder">Please pick an image.</p>
+            }
+        </div>
+        <app-button
+            type="button"
+            [disabled]="disabled()"
+            [inverse]="inverse()"
+            [color]="color()"
+            (clicked)="clickHandler()"
+        >
+            {{ buttonText() }}
+        </app-button>
+    </div>
+    <p class="error-text" [class.invisible]="!showError()">
+        {{ errorText() || uploadError() }}
+    </p>
+</div>
