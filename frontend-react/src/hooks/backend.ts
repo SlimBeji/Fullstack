@@ -123,12 +123,12 @@ interface useBackendOptions {
     ignoreNotFound?: boolean;
 }
 
-type SendRequestType = (
+type SendRequestType = <T>(
     url: string,
     method: HttpMethods,
     data?: Record<string, any>,
     tokenRequired?: boolean
-) => Promise<AxiosResponse>;
+) => Promise<AxiosResponse<T>>;
 
 type ClearErrorType = () => void;
 
@@ -139,12 +139,12 @@ export const useBackend = (
     const [state, dispatch] = useReducer(reducer, emptyState);
 
     const sendRequest = useCallback(
-        async (
+        async <T>(
             url: string,
             method: HttpMethods,
             data?: object,
             tokenRequired: boolean = true
-        ): Promise<AxiosResponse> => {
+        ): Promise<AxiosResponse<T>> => {
             // Create abort controller
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();

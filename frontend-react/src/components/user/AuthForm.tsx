@@ -45,9 +45,13 @@ const AuthForm: React.FC = () => {
         const body = new URLSearchParams();
         body.append("username", state.fields.email.value);
         body.append("password", state.fields.password.value);
-        const resp = await sendRequest("/auth/signin", "post", body, false);
-        const data = resp.data as SigninResponse;
-        dispatch(authSlice.actions.login(data));
+        const resp = await sendRequest<SigninResponse>(
+            "/auth/signin",
+            "post",
+            body,
+            false
+        );
+        dispatch(authSlice.actions.login(resp.data));
     };
 
     const onSignup = async (): Promise<void> => {
@@ -59,9 +63,13 @@ const AuthForm: React.FC = () => {
         if (state.fields.image.value.file) {
             formData.append("image", state.fields.image.value.file);
         }
-        const resp = await sendRequest("/auth/signup", "post", formData, false);
-        const data = resp.data as SigninResponse;
-        dispatch(authSlice.actions.login(data));
+        const resp = await sendRequest<SigninResponse>(
+            "/auth/signup",
+            "post",
+            formData,
+            false
+        );
+        dispatch(authSlice.actions.login(resp.data));
     };
 
     const onSubmit = (e: React.FormEvent): void => {
