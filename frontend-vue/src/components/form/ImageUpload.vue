@@ -35,13 +35,15 @@ import { fileToUrl } from "@/utils";
 
 import Button from "./Button.vue";
 
+// Template refs
 const filePickerRef = useTemplateRef<HTMLInputElement>("filePicker");
 
-// Props
+// Model
 const data = defineModel<{ file: File | null; url: string }>({
     required: true,
 });
 
+// Props
 const props = defineProps<{
     id: string;
     isValid?: boolean;
