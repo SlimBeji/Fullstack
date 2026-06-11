@@ -87,3 +87,7 @@ The following `make` commands help manage the Angular frontend:
 | `make angular-build` | Build the Docker container and install dependencies in `frontend-angular/`. |
 | `make angular-bash`  | Open an interactive shell inside the running Angular container.             |
 | `make angular-lint`  | Run TypeScript type checks, ESLint fixes, and format files with Prettier.   |
+
+## Notes
+
+> The project uses **Axios** instead of Angular’s native **HttpClient** for a simpler, composable-style API. It provides a more straightforward request/response flow and native AbortController support for request cancellation, avoiding RxJS Observables and subscription handling.
