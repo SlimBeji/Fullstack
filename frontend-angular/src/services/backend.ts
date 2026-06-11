@@ -32,7 +32,7 @@ const getClient = (contentType: HeaderContent, token: string): AxiosInstance => 
     };
 
     return axios.create({
-        baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
+        baseURL: `${import.meta.env['NG_APP_BACKEND_URL']}`,
         headers,
     });
 };
