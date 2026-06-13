@@ -63,7 +63,6 @@
 </template>
 
 <script setup lang="ts">
-import type { AxiosResponse } from "axios";
 import { onMounted } from "vue";
 
 import { Button, Input } from "@/components/form";
@@ -97,18 +96,16 @@ const { fields, formValid, prefillData } = useForm<FieldsType>(
 
 // Events
 onMounted(() => {
-    sendRequest(`/places/${props.placeId}`, "get").then(
-        (resp: AxiosResponse<Place>) => {
-            const { data } = resp;
-            prefillData({
-                title: data.title,
-                address: data.address,
-                description: data.description,
-                lat: String(data.location.lat),
-                lng: String(data.location.lng),
-            });
-        }
-    );
+    sendRequest<Place>(`/places/${props.placeId}`, "get").then((resp) => {
+        const { data } = resp;
+        prefillData({
+            title: data.title,
+            address: data.address,
+            description: data.description,
+            lat: String(data.location.lat),
+            lng: String(data.location.lng),
+        });
+    });
 });
 
 // Handlers

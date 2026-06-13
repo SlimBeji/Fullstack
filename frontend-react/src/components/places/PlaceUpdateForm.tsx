@@ -1,4 +1,3 @@
-import type { AxiosResponse } from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,18 +32,16 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
     const [data, sendRequest, clearError] = useBackend();
 
     useEffect(() => {
-        sendRequest(`/places/${placeId}`, "get").then(
-            (resp: AxiosResponse<Place>) => {
-                const { data } = resp;
-                prefillData({
-                    title: data.title,
-                    address: data.address,
-                    description: data.description,
-                    lat: String(data.location.lat),
-                    lng: String(data.location.lng),
-                });
-            }
-        );
+        sendRequest<Place>(`/places/${placeId}`, "get").then((resp) => {
+            const { data } = resp;
+            prefillData({
+                title: data.title,
+                address: data.address,
+                description: data.description,
+                lat: String(data.location.lat),
+                lng: String(data.location.lng),
+            });
+        });
     }, [sendRequest, prefillData, placeId]);
 
     const submitHandler = async (e: React.FormEvent): Promise<void> => {

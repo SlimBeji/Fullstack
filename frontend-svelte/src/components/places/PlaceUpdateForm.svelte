@@ -1,6 +1,5 @@
 <script lang="ts">
 import { goto } from "@mateothegreat/svelte5-router";
-import type { AxiosResponse } from "axios";
 import { onMount } from "svelte";
 
 import { Button, Input } from "@/components/form";
@@ -35,8 +34,8 @@ const { title, address, description, lat, lng } = fields;
 
 // Events
 onMount(() => {
-    sendRequest(`/places/${props.placeId}`, "get").then(
-        (resp: AxiosResponse<Place>) => {
+    sendRequest<Place>(`/places/${props.placeId}`, "get").then(
+        (resp) => {
             const { data } = resp;
             prefillData({
                 title: data.title,
