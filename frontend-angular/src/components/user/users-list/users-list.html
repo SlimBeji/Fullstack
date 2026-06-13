@@ -1,0 +1,13 @@
+@if (noUsers()) {
+    <div class="no-users">
+        <div class="card">
+            <h2>No Users found!</h2>
+        </div>
+    </div>
+} @else {
+    <ul class="users-list">
+        @for (item of items(); track item.id) {
+            <app-user-item [user]="item" />
+        }
+    </ul>
+}
