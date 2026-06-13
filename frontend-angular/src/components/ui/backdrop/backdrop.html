@@ -1,6 +1,8 @@
-<div
-    class="modal-backdrop"
-    role="button"
-    tabindex="0"
-    (click)="clicked.emit()"
-></div>
+<ng-template cdkPortal appTeleport="backdrop">
+    <div
+        class="modal-backdrop"
+        role="button"
+        tabindex="0"
+        (click)="clicked.emit()"
+    ></div>
+</ng-template>
