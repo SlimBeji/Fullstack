@@ -1,10 +1,10 @@
 <div class="center">
     @if (backend.httpData().error?.message) {
-        <!-- <app-http-error
+        <app-http-error
             header="Credentials not valid!"
             [error]="backend.httpData().error"
             (close)="backend.clear()"
-        /> -->
+        />
     }
 
     <div class="auth-form">
