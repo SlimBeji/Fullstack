@@ -1,1 +1,1 @@
-export * from './backend';
+export { BackendService } from './backend/backend.service';
