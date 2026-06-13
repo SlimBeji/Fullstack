@@ -1,1 +1,11 @@
-<p>users works!</p>
+<app-http-error
+    (closed)="backend.clear()"
+    [error]="backend.httpData().error"
+    header="Could not fetch users!"
+/>
+@if (backend.httpData().loading) {
+    <app-loading-spinner [asOverlay]="true" />
+}
+@if (items().length) {
+    <app-users-list [items]="items()" />
+}
