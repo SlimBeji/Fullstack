@@ -3,7 +3,7 @@
         <app-http-error
             header="Credentials not valid!"
             [error]="backend.httpData().error"
-            (close)="backend.clear()"
+            (closed)="backend.clear()"
         />
     }
 
