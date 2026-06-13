@@ -1,0 +1,5 @@
+@reference "#styles.css";
+
+.map-container {
+    @apply w-full h-50;
+}
