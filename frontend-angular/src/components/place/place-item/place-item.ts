@@ -7,7 +7,7 @@ import { BackendService } from '@/services';
 import { AuthStore } from '@/store';
 import type { Place } from '@/types';
 
-const placeholder = '/public/place_placeholder.jpg';
+const placeholder = '/place_placeholder.jpg';
 
 @Component({
     selector: 'app-place-item',

@@ -5,7 +5,7 @@ import { Avatar } from '@/components/ui';
 import { userPlacesRoute } from '@/router';
 import type { User } from '@/types';
 
-const placeholder = '/public/avatar_placeholder.jpg';
+const placeholder = '/avatar_placeholder.jpg';
 
 @Component({
     selector: 'app-user-item',
