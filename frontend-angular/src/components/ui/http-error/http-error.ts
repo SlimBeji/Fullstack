@@ -25,7 +25,7 @@ export class HttpError {
 
     // Inputs
     error = input<ErrorInput>();
-    header = input.required<string>();
+    header = input<string>('');
 
     // Outputs
     closed = output<void>();
