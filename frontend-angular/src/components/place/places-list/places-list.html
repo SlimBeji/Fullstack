@@ -1,0 +1,20 @@
+<ul class="places-list">
+    @if (items().length > 0) {
+        @for (place of items(); track place.id) {
+            <app-place-item [place]="place" (delete)="delete.emit()" />
+        }
+    } @else if (sameAuthenticatedUser()) {
+        <div class="no-places">
+            <div class="card">
+                <h2>No places found. Maybe create one?</h2>
+                <app-button color="secondary" [to]="AppRoute.NEW_PLACE">Share</app-button>
+            </div>
+        </div>
+    } @else {
+        <div class="no-places">
+            <div class="card">
+                <h2>This user has not created places yet</h2>
+            </div>
+        </div>
+    }
+</ul>
