@@ -1,12 +1,14 @@
-@if (show()) {
-    <aside
-        class="sidedrawer"
-        role="button"
-        tabindex="0"
-        animate.enter="sidedrawer-enter"
-        animate.leave="sidedrawer-leave"
-        (click)="clicked.emit()"
-    >
-        <ng-content />
-    </aside>
-}
+<ng-template cdkPortal appTeleport="drawer">
+    @if (show()) {
+        <aside
+            class="sidedrawer"
+            role="button"
+            tabindex="0"
+            animate.enter="sidedrawer-enter"
+            animate.leave="sidedrawer-leave"
+            (click)="clicked.emit()"
+        >
+            <ng-content />
+        </aside>
+    }
+</ng-template>
