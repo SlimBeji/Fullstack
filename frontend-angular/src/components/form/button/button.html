@@ -1,10 +1,14 @@
+<ng-template #content>
+    <ng-content />
+</ng-template>
+
 @if (isAnchor()) {
     <a
         [href]="href()"
         [class]="['btn', colorClass(), inverseClass(), customClass()]"
         (click)="clickHandler()"
     >
-        <ng-content />
+        <ng-container [ngTemplateOutlet]="content" />
     </a>
 } @else if (isRouterLink()) {
     <a
@@ -12,15 +16,15 @@
         [class]="['btn', colorClass(), inverseClass(), customClass()]"
         (click)="clickHandler()"
     >
-        <ng-content />
+        <ng-container [ngTemplateOutlet]="content" />
     </a>
 } @else {
-  <button
-    [type]="type()"
-    [disabled]="disabled()"
-    [class]="['btn', colorClass(), inverseClass(), customClass()]"
-    (click)="clickHandler()"
-  >
-    <ng-content />
-  </button>
+    <button
+        [type]="type()"
+        [disabled]="disabled()"
+        [class]="['btn', colorClass(), inverseClass(), customClass()]"
+        (click)="clickHandler()"
+    >
+        <ng-container [ngTemplateOutlet]="content" />
+    </button>
 }

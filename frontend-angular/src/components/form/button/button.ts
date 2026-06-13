@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -7,7 +8,7 @@ import type { ButtonType, ColorType, CssClass } from '@/types';
     selector: 'app-button',
     templateUrl: './button.html',
     styleUrl: './button.css',
-    imports: [RouterLink],
+    imports: [RouterLink, NgTemplateOutlet],
 })
 export class Button {
     // Inputs
