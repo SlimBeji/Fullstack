@@ -1,19 +1,36 @@
 import type { ElementRef, OnDestroy } from '@angular/core';
-import { afterNextRender, Component, effect, input, viewChild } from '@angular/core';
+import {
+    afterNextRender,
+    Component,
+    effect,
+    input,
+    viewChild,
+    ViewEncapsulation,
+} from '@angular/core';
 import type { Map as LeafletMap, Marker } from 'leaflet';
 import * as L from 'leaflet';
 
 import type { Location } from '@/types';
 
+L.Icon.Default.imagePath = '';
+
+L.Icon.Default.mergeOptions({
+    iconUrl: '/marker-icon.png',
+    iconRetinaUrl: '/marker-icon-2x.png',
+    shadowUrl: '/marker-shadow.png',
+});
+
 @Component({
     selector: 'app-map',
     templateUrl: './map.html',
     styleUrl: './map.css',
+    encapsulation: ViewEncapsulation.None,
 })
 export class Map implements OnDestroy {
     // Init
     private map: LeafletMap | null = null;
     private marker: Marker | null = null;
+    private resizeObserver: ResizeObserver | null = null;
 
     // ViewChild
     private mapDiv = viewChild.required<ElementRef<HTMLDivElement>>('mapDiv');
@@ -26,7 +43,8 @@ export class Map implements OnDestroy {
     // Handlers
     private readonly _onMount = afterNextRender(() => {
         const pos = this.position();
-        this.map = L.map(this.mapDiv().nativeElement).setView([pos.lat, pos.lng], this.zoom());
+        const element = this.mapDiv().nativeElement;
+        this.map = L.map(element).setView([pos.lat, pos.lng], this.zoom());
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution:
@@ -36,6 +54,14 @@ export class Map implements OnDestroy {
         this.marker = L.marker([pos.lat, pos.lng]).addTo(this.map).bindPopup(this.markerText());
 
         this.map.invalidateSize();
+
+        this.resizeObserver = new ResizeObserver(([entry]) => {
+            const { width, height } = entry.contentRect;
+            if (width > 0 && height > 0) {
+                this.map?.invalidateSize();
+            }
+        });
+        this.resizeObserver.observe(element);
     });
 
     private readonly _onUpdate = effect(() => {
@@ -47,6 +73,7 @@ export class Map implements OnDestroy {
     });
 
     ngOnDestroy() {
+        this.resizeObserver?.disconnect();
         this.map?.remove();
     }
 }
