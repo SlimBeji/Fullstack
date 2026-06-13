@@ -7,10 +7,10 @@ export enum AppRoute {
     ANY = '*',
 }
 
-export const userPlacesRoute = (userId: number): string => {
+export const userPlacesRoute = (userId: number | string): string => {
     return AppRoute.USER_PLACES.replace(':userId', `${userId}`);
 };
 
-export const updatePlaceRoute = (placeId: number): string => {
+export const updatePlaceRoute = (placeId: number | string): string => {
     return AppRoute.UPDATE_PLACE.replace(':placeId', `${placeId}`);
 };
