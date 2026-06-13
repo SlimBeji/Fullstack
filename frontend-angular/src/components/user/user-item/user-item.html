@@ -1,0 +1,13 @@
+<li class="user-item">
+    <div class="card">
+        <a [routerLink]="userPlacesRoute(user().id)" class="user-item-link">
+            <div class="user-avatar">
+                <app-avatar [imageUrl]="imageUrl()" [alt]="user().name" />
+            </div>
+            <div class="user-info">
+                <h2>{{ user().name }}</h2>
+                <h3>{{ placeNumber() }}</h3>
+            </div>
+        </a>
+    </div>
+</li>
