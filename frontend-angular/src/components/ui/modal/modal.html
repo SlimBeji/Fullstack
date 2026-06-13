@@ -1,0 +1,23 @@
+<ng-template cdkPortal appTeleport="modal">
+    @if (show()) {
+        <app-backdrop (clicked)="closed.emit()" />
+        <div
+            class="modal-container"
+            [style]="style()"
+            animate.enter="modal-enter"
+            animate.leave="modal-leave"
+        >
+            <header>
+                <h2>{{ header() }}</h2>
+            </header>
+            <form (submit)="submitedHandler($event)">
+                <div>
+                    <ng-content />
+                </div>
+                <footer>
+                    <ng-content select="[footer]" />
+                </footer>
+            </form>
+        </div>
+    }
+</ng-template>
