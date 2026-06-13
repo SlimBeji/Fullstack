@@ -1,5 +1,7 @@
 <app-main-navigation />
 <main>
+    <ng-template cdkPortalOutlet appTeleportOutlet="backdrop"></ng-template>
+    <ng-template cdkPortalOutlet appTeleportOutlet="drawer"></ng-template>
+    <ng-template cdkPortalOutlet appTeleportOutlet="modal"></ng-template>
     <router-outlet />
 </main>
-
