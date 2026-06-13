@@ -1,5 +1,5 @@
 import { HttpStatusCode } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Service, signal } from '@angular/core';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { AxiosError } from 'axios';
@@ -37,7 +37,7 @@ const getClient = (contentType: HeaderContent, token: string): AxiosInstance => 
     });
 };
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class BackendService {
     private abortController: AbortController | null = null;
 
