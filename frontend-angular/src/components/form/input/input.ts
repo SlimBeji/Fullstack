@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ViewEncapsulation } from '@angular/core';
 import type { Field } from '@angular/forms/signals';
 import { FormField } from '@angular/forms/signals';
 
@@ -9,6 +9,12 @@ import type { CssClass } from '@/types';
     templateUrl: './input.html',
     styleUrl: './input.css',
     imports: [FormField],
+    host: {
+        class: 'input-container',
+        '[class.error]': 'showError()',
+        '[class]': 'customClass()',
+    },
+    encapsulation: ViewEncapsulation.None,
 })
 export class Input {
     // Form
