@@ -1,0 +1,5 @@
+@reference "#styles.css";
+
+.text-error {
+    @apply p-5;
+}

@@ -1,0 +1,18 @@
+@if (isTokenExpired()) {
+    <app-modal
+        (closed)="tokenExpiredCleaner()"
+        header="Session expired"
+        [show]="!!error()"
+    >
+        <p class="text-error">Token expired! Please login again!</p>
+        <div footer>
+            <app-button (click)="tokenExpiredCleaner()">Authenticate</app-button>
+        </div>
+    </app-modal>
+} @else if (error()) {
+    <app-error-modal
+        (closed)="closed.emit()"
+        [error]="error()?.message"
+        [header]="header()"
+    />
+}
