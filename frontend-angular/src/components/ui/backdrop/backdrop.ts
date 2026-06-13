@@ -1,4 +1,3 @@
-import { CdkPortal } from '@angular/cdk/portal';
 import { Component, output } from '@angular/core';
 
 import { Teleport } from '@/services';
@@ -7,7 +6,7 @@ import { Teleport } from '@/services';
     selector: 'app-backdrop',
     templateUrl: './backdrop.html',
     styleUrl: './backdrop.css',
-    imports: [CdkPortal, Teleport],
+    imports: [Teleport],
 })
 export class Backdrop {
     clicked = output<void>();

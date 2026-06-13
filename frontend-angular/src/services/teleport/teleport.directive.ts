@@ -1,6 +1,5 @@
-import { CdkPortal } from '@angular/cdk/portal';
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Directive, inject, input } from '@angular/core';
+import { Directive, inject, input, TemplateRef } from '@angular/core';
 
 import { TeleportService } from './teleport.service';
 
@@ -8,16 +7,16 @@ import { TeleportService } from './teleport.service';
     selector: '[appTeleport]',
 })
 export class Teleport implements OnInit, OnDestroy {
-    private portal = inject(CdkPortal);
+    private template = inject(TemplateRef);
     private teleport = inject(TeleportService);
 
     to = input.required<string>({ alias: 'appTeleport' });
 
     ngOnInit() {
-        this.teleport.attach(this.to(), this.portal);
+        this.teleport.attachRef(this.to(), this.template);
     }
 
     ngOnDestroy() {
-        this.teleport.detach(this.to());
+        this.teleport.detachRef(this.template);
     }
 }

@@ -1,4 +1,3 @@
-import { CdkPortal } from '@angular/cdk/portal';
 import { Component, input, output, ViewEncapsulation } from '@angular/core';
 
 import { Teleport } from '@/services';
@@ -9,7 +8,7 @@ import { Backdrop } from '../backdrop/backdrop';
     selector: 'app-modal',
     templateUrl: './modal.html',
     styleUrl: './modal.css',
-    imports: [Backdrop, CdkPortal, Teleport],
+    imports: [Backdrop, Teleport],
     encapsulation: ViewEncapsulation.None,
 })
 export class Modal {

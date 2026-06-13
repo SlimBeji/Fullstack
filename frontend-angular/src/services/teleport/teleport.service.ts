@@ -1,26 +1,28 @@
-import type { CdkPortal, CdkPortalOutlet } from '@angular/cdk/portal';
+import type { EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Service } from '@angular/core';
 
 @Service()
 export class TeleportService {
-    private outlets = new Map<string, CdkPortalOutlet>();
+    private outlets = new Map<string, ViewContainerRef>();
+    private views = new Map<TemplateRef<unknown>, EmbeddedViewRef<unknown>>();
 
-    register(name: string, outlet: CdkPortalOutlet) {
+    registerOutlet(name: string, outlet: ViewContainerRef) {
         this.outlets.set(name, outlet);
     }
 
-    unregister(name: string) {
+    unregisterOutlet(name: string) {
         this.outlets.delete(name);
     }
 
-    attach(name: string, portal: CdkPortal) {
+    attachRef(name: string, template: TemplateRef<unknown>) {
         const outlet = this.outlets.get(name);
         if (!outlet) return;
-        if (outlet.hasAttached()) outlet.detach();
-        outlet.attach(portal);
+        const viewRef = outlet.createEmbeddedView(template);
+        this.views.set(template, viewRef);
     }
 
-    detach(name: string) {
-        this.outlets.get(name)?.detach();
+    detachRef(template: TemplateRef<unknown>) {
+        this.views.get(template)?.destroy();
+        this.views.delete(template);
     }
 }
