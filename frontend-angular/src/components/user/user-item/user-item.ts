@@ -12,6 +12,7 @@ const placeholder = '/public/avatar_placeholder.jpg';
     templateUrl: './user-item.html',
     styleUrl: './user-item.css',
     imports: [RouterLink, Avatar],
+    host: { class: 'contents' },
 })
 export class UserItem {
     // Init
