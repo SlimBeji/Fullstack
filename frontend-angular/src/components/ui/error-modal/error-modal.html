@@ -1,0 +1,10 @@
+<app-modal
+    (closed)="closed.emit()"
+    [show]="!!error()"
+    [header]="header()"
+>
+    <p class="text-error">{{ error() }}</p>
+    <div footer>
+        <app-button (click)="closed.emit()">Okay</app-button>
+    </div>
+</app-modal>
