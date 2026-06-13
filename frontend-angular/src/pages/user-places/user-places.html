@@ -1,1 +1,14 @@
-<p>user-places works!</p>
+<app-http-error
+    (closed)="backend.clear()"
+    [error]="backend.httpData().error"
+/>
+
+@if (backend.httpData().loading) {
+    <app-loading-spinner [asOverlay]="true" />
+}
+
+<app-places-list
+    (delete)="deleteHandler()"
+    [items]="places()"
+    [sameAuthenticatedUser]="isUserOwned()"
+/>
