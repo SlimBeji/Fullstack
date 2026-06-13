@@ -19,7 +19,7 @@
     @apply p-4 min-h-30;
 }
 
-.modal-container form > footer {
+.modal-container form > footer > div {
     @apply flex justify-end space-x-2 p-4;
 }
 
