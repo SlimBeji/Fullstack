@@ -1,0 +1,51 @@
+<app-http-error
+    (closed)="backend.clear()"
+    [error]="backend.httpData().error"
+/>
+
+@if (backend.httpData().loading) {
+    <div class="center">
+        <app-loading-spinner [asOverlay]="true" />
+    </div>
+}
+
+<app-modal (closed)="closeMapHandler()" [show]="showMap()" [header]="place().address">
+    <app-map [position]="place().location" [zoom]="13" [markerText]="place().title" />
+    <div footer>
+        <app-button [inverse]="true" (click)="closeMapHandler()">
+            CLOSE
+        </app-button>
+    </div>
+</app-modal>
+
+<app-modal (closed)="closeDeleteModalHandler()" [show]="showDeleteModal()" header="Are you sure?">
+    <p class="delete-text-messaage">Do you want to proceed and delete this place?</p>
+    <div footer>
+        <app-button color="danger" (click)="deleteHandler()">DELETE</app-button>
+        <app-button (click)="closeDeleteModalHandler()">CANCEL</app-button>
+    </div>
+</app-modal>
+
+<li class="place-item">
+    <div class="card place-item-card">
+        <div class="image-container">
+            <img [src]="imageUrl()" [alt]="place().title" />
+        </div>
+        <div class="place-info">
+            <h2>{{ place().title }}</h2>
+            <h2>{{ place().address }}</h2>
+            <p>{{ place().description }}</p>
+        </div>
+        <div class="place-actions">
+            <app-button (click)="openMapHandler()" color="secondary" [inverse]="true">
+                VIEW ON MAP
+            </app-button>
+            @if (isUserOwned()) {
+                <app-button [to]="updatePlaceRoute(place().id)">EDIT</app-button>
+            }
+            @if (isUserOwned()) {
+                <app-button color="danger" (click)="openDeleteModalHandler()">DELETE</app-button>
+            }
+        </div>
+    </div>
+</li>
