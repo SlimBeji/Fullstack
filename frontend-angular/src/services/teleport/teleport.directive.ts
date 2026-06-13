@@ -1,22 +1,23 @@
-import { DomPortal } from '@angular/cdk/portal';
-import { DestroyRef, Directive, effect, ElementRef, inject, input } from '@angular/core';
+import { CdkPortal } from '@angular/cdk/portal';
+import type { OnDestroy, OnInit } from '@angular/core';
+import { Directive, inject, input } from '@angular/core';
 
 import { TeleportService } from './teleport.service';
 
 @Directive({
     selector: '[appTeleport]',
 })
-export class Teleport {
+export class Teleport implements OnInit, OnDestroy {
+    private portal = inject(CdkPortal);
+    private teleport = inject(TeleportService);
+
     to = input.required<string>({ alias: 'appTeleport' });
 
-    private el = inject<ElementRef<HTMLElement>>(ElementRef);
-    private service = inject(TeleportService);
+    ngOnInit() {
+        this.teleport.attach(this.to(), this.portal);
+    }
 
-    constructor() {
-        inject(DestroyRef).onDestroy(() => this.service.detach(this.to()));
-
-        effect(() => {
-            this.service.attach(this.to(), new DomPortal(this.el));
-        });
+    ngOnDestroy() {
+        this.teleport.detach(this.to());
     }
 }

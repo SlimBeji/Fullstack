@@ -1,4 +1,4 @@
-import type { CdkPortalOutlet, DomPortal } from '@angular/cdk/portal';
+import type { CdkPortal, CdkPortalOutlet } from '@angular/cdk/portal';
 import { Service } from '@angular/core';
 
 @Service()
@@ -9,7 +9,11 @@ export class TeleportService {
         this.outlets.set(name, outlet);
     }
 
-    attach(name: string, portal: DomPortal<HTMLElement>) {
+    unregister(name: string) {
+        this.outlets.delete(name);
+    }
+
+    attach(name: string, portal: CdkPortal) {
         const outlet = this.outlets.get(name);
         if (!outlet) return;
         if (outlet.hasAttached()) outlet.detach();
