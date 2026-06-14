@@ -1,3 +1,5 @@
+import "./UsersList.css";
+
 import type { User } from "@/types";
 
 import UserItem from "./UserItem";

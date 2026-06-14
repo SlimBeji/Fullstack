@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .auth-form {
     @apply w-[90%] max-w-md mx-auto mt-10 p-6;
     @apply text-center shadow-lg rounded-xl bg-surface;

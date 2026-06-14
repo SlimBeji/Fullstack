@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .users-list {
     @apply flex flex-wrap gap-6;
     @apply w-[90%] max-w-4xl mx-auto;

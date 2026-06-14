@@ -1,3 +1,5 @@
+import "./AuthForm.css";
+
 import { useState } from "react";
 
 import type { FormConfig } from "@/hooks";
