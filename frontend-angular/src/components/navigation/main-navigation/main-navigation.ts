@@ -9,7 +9,6 @@ import { NavLinks } from '../nav-links/nav-links';
 import { SideDrawer } from '../side-drawer/side-drawer';
 
 @Component({
-    standalone: true,
     selector: 'app-main-navigation',
     templateUrl: './main-navigation.html',
     styleUrl: './main-navigation.css',
