@@ -1,6 +1,6 @@
 @reference "#styles.css";
 
-.user-item {
+:host {
     @apply w-[45%] min-w-70 m-4 list-none;
 }
 
