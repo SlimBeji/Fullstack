@@ -1,3 +1,5 @@
+import "./Input.css";
+
 import clsx from "clsx";
 import type { ChangeEvent, ElementType } from "react";
 import { useState } from "react";

@@ -1,3 +1,5 @@
+@reference "@/main.css";
+
 .image-upload {
     @apply w-full mb-4;
 }

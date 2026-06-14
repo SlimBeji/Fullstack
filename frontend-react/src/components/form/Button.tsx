@@ -1,3 +1,5 @@
+import "./Button.css";
+
 import clsx from "clsx";
 import type { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";

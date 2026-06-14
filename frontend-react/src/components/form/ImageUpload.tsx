@@ -1,3 +1,5 @@
+import "./ImageUpload.css";
+
 import clsx from "clsx";
 import React, { useRef, useState } from "react";
 
