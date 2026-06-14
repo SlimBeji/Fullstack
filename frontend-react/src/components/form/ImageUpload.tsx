@@ -1,5 +1,3 @@
-import "./ImageUpload.css";
-
 import clsx from "clsx";
 import React, { useRef, useState } from "react";
 
@@ -7,6 +5,7 @@ import type { ColorType } from "@/types";
 import { fileToUrl } from "@/utils";
 
 import Button from "./Button";
+import styles from "./ImageUpload.module.css";
 
 interface ImageUploadValue {
     file: File | null;
@@ -44,7 +43,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const isDisabled = disabled ?? false;
     const isInverse = inverse && !isDisabled ? "inverse" : "";
     const colorChoice = isDisabled ? "disabled" : color || "primary";
-    const className = `btn ${colorChoice} ${isInverse}`;
+    const className = `${colorChoice} ${isInverse}`;
     const showError = (!isValid || !!uploadError) && uploadAttempt;
 
     const clickHandler = (): void => {
@@ -79,7 +78,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     };
 
     return (
-        <div className="image-upload">
+        <div className={styles["image-upload"]}>
             <input
                 id={id}
                 ref={filePickerRef}
@@ -92,7 +91,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 <div>
                     {value.url && <img src={value.url} alt="Preview" />}
                     {!value.url && (
-                        <p className="placeholder">Please pick an image.</p>
+                        <p className={styles["placeholder"]}>
+                            Please pick an image.
+                        </p>
                     )}
                 </div>
                 <Button
@@ -104,7 +105,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     {buttonText || "Pick an image"}
                 </Button>
             </div>
-            <p className={clsx(["error-text", { invisible: !showError }])}>
+            <p
+                className={clsx([
+                    styles["error-text"],
+                    { invisible: !showError },
+                ])}
+            >
                 {errorText || uploadError}
             </p>
         </div>
