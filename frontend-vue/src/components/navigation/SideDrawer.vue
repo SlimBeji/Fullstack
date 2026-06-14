@@ -20,7 +20,7 @@ const emit = defineEmits<{
 }>();
 </script>
 
-<style lang="css">
+<style scoped lang="css">
 @reference "@/main.css";
 
 aside.sidedrawer {
