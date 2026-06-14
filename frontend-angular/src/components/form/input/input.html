@@ -1,23 +1,25 @@
-<label [for]="id()">{{ label() }}</label>
+<div class="input-container" [class]="containerClass()">
+    <label [for]="id()">{{ label() }}</label>
 
-@if (isTextarea()) {
-    <textarea
-        [formField]="field()"
-        [id]="id()"
-        [class]="inputClass()"
-        [rows]="rows()"
-    ></textarea>
-} @else {
-    <input
-        [formField]="field()"
-        [id]="id()"
-        [class]="inputClass()"
-        [type]="type()"
-        [step]="step()"
-        [placeholder]="placeholder()"
-    />
-}
+    @if (isTextarea()) {
+        <textarea
+            [formField]="field()"
+            [id]="id()"
+            [class]="inputClass()"
+            [rows]="rows()"
+        ></textarea>
+    } @else {
+        <input
+            [formField]="field()"
+            [id]="id()"
+            [class]="inputClass()"
+            [type]="type()"
+            [step]="step()"
+            [placeholder]="placeholder()"
+        />
+    }
 
-<p class="error-text" [class.invisible]="!showError()">
-    {{ errorMessage() }}
-</p>
+    <p class="error-text" [class.invisible]="!showError()">
+        {{ errorMessage() }}
+    </p>
+</div>
