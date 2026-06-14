@@ -1,3 +1,5 @@
+import "./SideDrawer.css";
+
 import { Transition } from "@headlessui/react";
 import type { ReactNode } from "react";
 import { useRef } from "react";

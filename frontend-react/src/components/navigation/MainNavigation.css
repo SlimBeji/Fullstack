@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .main-header {
     @apply flex fixed z-50 top-0 left-0;
     @apply w-full h-16 px-4 shadow-md;

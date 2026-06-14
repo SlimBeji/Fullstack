@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 ul.links-container {
     @apply flex flex-col justify-center items-center md:flex-row;
     @apply w-full h-full m-0 p-0 list-none;

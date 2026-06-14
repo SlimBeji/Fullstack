@@ -1,3 +1,5 @@
+import "./Navlinks.css";
+
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { AppRoute, userPlacesRoute } from "@/router";
