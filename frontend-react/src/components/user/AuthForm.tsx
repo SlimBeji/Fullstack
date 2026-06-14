@@ -1,5 +1,3 @@
-import "./AuthForm.css";
-
 import { useState } from "react";
 
 import type { FormConfig } from "@/hooks";
@@ -10,6 +8,7 @@ import { emailValidator, minLengthValidator } from "@/utils";
 
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
+import styles from "./AuthForm.module.css";
 
 const AuthFormConfig: FormConfig = {
     username: { active: false, validators: [minLengthValidator(8)] },
@@ -107,7 +106,7 @@ const AuthForm: React.FC = () => {
                     onClear={() => clearError()}
                 />
             )}
-            <div className="auth-form">
+            <div className={styles["auth-form"]}>
                 {data.loading && <LoadingSpinner asOverlay />}
                 <h2>{requiredText}</h2>
                 <hr />
@@ -155,7 +154,7 @@ const AuthForm: React.FC = () => {
                         label="Password"
                         errorText="Please enter a password with at least 10 characters"
                     />
-                    <div className="buttons">
+                    <div className={styles["buttons"]}>
                         <Button
                             color="secondary"
                             disabled={!state.valid}
