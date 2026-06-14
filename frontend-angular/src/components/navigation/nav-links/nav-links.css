@@ -15,7 +15,16 @@ ul.links-container li button {
     @apply text-center border rounded-sm text-lg cursor-pointer;
     @apply text-pen-inverse bg-primary border-transparent;
     @apply md:border-transparent;
-    @apply hover:bg-primary-surface hover:text-pen hover:border-transparent;
+}
+
+/*
+ * Define :hover explicitly instead of using hover:* utilities in @apply.
+ * This avoids issues with Tailwind variant generation and Angular's
+ * view encapsulation.
+ */
+ul.links-container li a:hover,
+ul.links-container li button:hover {
+    @apply bg-primary-surface text-pen border-transparent;
 }
 
 ul.links-container li .active {
