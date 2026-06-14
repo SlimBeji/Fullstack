@@ -1,10 +1,9 @@
-import "./Navlinks.css";
-
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { AppRoute, userPlacesRoute } from "@/router";
 
 import { authSlice, useAppDispatch, useAppSelector } from "../../store";
+import styles from "./Navlinks.module.css";
 
 interface NavLinkWrapperProps {
     to: string;
@@ -14,7 +13,7 @@ interface NavLinkWrapperProps {
 const NavLinkWrapper: React.FC<NavLinkWrapperProps> = ({ to, children }) => (
     <NavLink
         to={to}
-        className={({ isActive }) => `${isActive ? "active" : ""}`}
+        className={({ isActive }) => `${isActive ? styles["active"] : ""}`}
     >
         {children}
     </NavLink>
@@ -32,7 +31,7 @@ const NavLinks: React.FC = () => {
     };
 
     return (
-        <ul className="links-container">
+        <ul className={styles["links-container"]}>
             <li>
                 <NavLinkWrapper to={AppRoute.HOME}>All users</NavLinkWrapper>
             </li>
