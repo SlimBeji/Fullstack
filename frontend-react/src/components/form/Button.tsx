@@ -1,10 +1,10 @@
-import "./Button.css";
-
 import clsx from "clsx";
 import type { ElementType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import type { ButtonType, ColorType } from "@/types";
+
+import styles from "./Button.module.css";
 
 interface ButtonProps {
     children: ReactNode;
@@ -40,7 +40,7 @@ const Button: React.FC<ButtonProps> = (props) => {
 
     return (
         <Tag
-            className={clsx(["btn", color, inverse, customClasses])}
+            className={clsx([styles.btn, color, inverse, customClasses])}
             {...tagProps}
         >
             {props.children}
