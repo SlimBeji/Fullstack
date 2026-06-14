@@ -1,12 +1,5 @@
 import type { ElementRef, OnDestroy } from '@angular/core';
-import {
-    afterNextRender,
-    Component,
-    effect,
-    input,
-    viewChild,
-    ViewEncapsulation,
-} from '@angular/core';
+import { afterNextRender, Component, effect, input, viewChild } from '@angular/core';
 import type { Map as LeafletMap, Marker } from 'leaflet';
 import * as L from 'leaflet';
 
@@ -24,7 +17,6 @@ L.Icon.Default.mergeOptions({
     selector: 'app-map',
     templateUrl: './map.html',
     styleUrl: './map.css',
-    encapsulation: ViewEncapsulation.None,
 })
 export class Map implements OnDestroy {
     // Init
