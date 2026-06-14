@@ -118,7 +118,7 @@ const deleteHandler = () => {
 };
 </script>
 
-<style lang="css">
+<style scoped lang="css">
 @reference "@/main.css";
 
 .delete-text-messaage {

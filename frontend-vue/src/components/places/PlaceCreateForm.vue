@@ -118,7 +118,7 @@ const submitHandler = async (e: Event) => {
 };
 </script>
 
-<style lang="css">
+<style scoped lang="css">
 @reference "@/main.css";
 
 .place-create {
