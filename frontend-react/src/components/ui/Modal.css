@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .modal-container {
     @apply fixed z-50 top-[22vh] left-[10%];
     @apply w-[80%] rounded-lg shadow-lg bg-surface;

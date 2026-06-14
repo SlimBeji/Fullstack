@@ -1,4 +1,5 @@
 import "leaflet/dist/leaflet.css";
+import "./Map.css";
 
 import type { Map as MapObject } from "leaflet";
 import { useEffect, useState } from "react";

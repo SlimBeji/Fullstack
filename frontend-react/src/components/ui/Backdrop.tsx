@@ -1,3 +1,5 @@
+import "./Backdrop.css";
+
 import { createPortal } from "react-dom";
 
 interface BackdropProps {

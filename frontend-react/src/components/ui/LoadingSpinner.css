@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .spinner-container.overlay {
     @apply absolute inset-0 bg-surface/90 flex justify-center items-center;
 }
