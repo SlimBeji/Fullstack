@@ -1,8 +1,8 @@
-import "./Input.css";
-
 import clsx from "clsx";
 import type { ChangeEvent, ElementType } from "react";
 import { useState } from "react";
+
+import styles from "./Input.module.css";
 
 interface InputProps {
     onInput: (value: string) => void;
@@ -55,7 +55,7 @@ const Input: React.FC<InputProps> = ({
         id,
         onChange: changeHandler,
         onBlur: touchHandler,
-        className: disabled ? "disabled" : "active",
+        className: disabled ? "disabled" : styles["active"],
         disabled: disabled ?? false,
     };
 
@@ -75,14 +75,19 @@ const Input: React.FC<InputProps> = ({
     return (
         <div
             className={clsx([
-                "input-container",
+                styles["input-container"],
                 className || "basis-full",
                 { error: isError },
             ])}
         >
             <label htmlFor={id}>{label}</label>
             <Tag {...tagProps} />
-            <p className={clsx(["error-text", { invisible: !isError }])}>
+            <p
+                className={clsx([
+                    styles["error-text"],
+                    { invisible: !isError },
+                ])}
+            >
                 {errorText || "The input is not valid"}
             </p>
         </div>
