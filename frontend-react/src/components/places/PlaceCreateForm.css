@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .place-create {
     @apply flex flex-wrap;
     @apply relative w-[90%] max-w-160 my-0 mx-auto p-4;

@@ -1,3 +1,5 @@
+import "./PlacesList.css";
+
 import { AppRoute } from "@/router";
 import type { Place } from "@/types";
 

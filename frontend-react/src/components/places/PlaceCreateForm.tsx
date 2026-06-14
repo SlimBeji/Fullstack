@@ -1,3 +1,5 @@
+import "./PlaceCreateForm.css";
+
 import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/hooks";

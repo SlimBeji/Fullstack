@@ -127,8 +127,3 @@
         @apply bg-disabled-surface text-disabled-pen border-disabled-ruler cursor-not-allowed;
     }
 }
-
-@import "./components/places/PlaceItem.css";
-@import "./components/places/PlacesList.css";
-@import "./components/places/PlaceCreateForm.css";
-@import "./components/places/PlaceUpdateForm.css";
