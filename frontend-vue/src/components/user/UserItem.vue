@@ -49,11 +49,6 @@ const placeNumber = computed(() => {
     @apply w-[45%] min-w-70 m-4 list-none;
 }
 
-.user-item .card {
-    @apply p-0 rounded-xl;
-    @apply hover:shadow-lg transition-shadow duration-300;
-}
-
 .user-item-link {
     @apply flex items-center;
     @apply size-full p-4 rounded-xl bg-surface-alt;
