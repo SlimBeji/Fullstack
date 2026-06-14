@@ -1,5 +1,9 @@
 @reference "#styles.css";
 
+:host {
+    @apply basis-full;
+}
+
 .image-upload {
     @apply w-full mb-4;
 }
