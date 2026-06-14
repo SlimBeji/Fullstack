@@ -19,8 +19,8 @@
     @apply p-4 min-h-30;
 }
 
-.modal-container form > footer > div {
-    @apply flex justify-end space-x-2 p-4;
+.modal-container form > footer > ::ng-deep div[footer] {
+    @apply flex justify-end p-4 gap-2;
 }
 
 .modal-enter {

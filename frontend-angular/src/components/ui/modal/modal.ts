@@ -1,4 +1,4 @@
-import { Component, input, output, ViewEncapsulation } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 import { Teleport } from '@/services';
 
@@ -9,7 +9,6 @@ import { Backdrop } from '../backdrop/backdrop';
     templateUrl: './modal.html',
     styleUrl: './modal.css',
     imports: [Backdrop, Teleport],
-    encapsulation: ViewEncapsulation.None,
 })
 export class Modal {
     // Inputs
