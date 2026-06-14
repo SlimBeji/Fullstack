@@ -6,6 +6,14 @@
     @apply list-none shadow-md rounded-md bg-surface;
 }
 
+.place-update app-input {
+    @apply basis-full;
+}
+
+.place-update app-input.two-per-line {
+    @apply basis-full sm:basis-1/2 sm:pr-2;
+}
+
 .place-update .buttons {
     @apply w-full mt-10 text-right;
 }
