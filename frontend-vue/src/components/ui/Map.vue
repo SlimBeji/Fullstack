@@ -44,7 +44,7 @@ const mapReadyHandler = (mapInstance: LeafletMap) => {
 };
 </script>
 
-<style lang="css">
+<style scoped lang="css">
 @reference "@/main.css";
 
 .map-container {

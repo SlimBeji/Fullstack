@@ -40,7 +40,7 @@ const submitHanlder = (e: Event) => {
 };
 </script>
 
-<style lang="css">
+<style scoped lang="css">
 @reference "@/main.css";
 
 .modal-container {
