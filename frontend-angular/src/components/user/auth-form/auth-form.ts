@@ -84,8 +84,6 @@ export class AuthForm {
         const body = new URLSearchParams();
         body.append('username', this.model().email);
         body.append('password', this.model().password);
-        console.log('request sent to the server');
-        console.log(this.model());
         const resp = await this.backend.sendRequest<SigninResponse>('/auth/signin', 'post', body, {
             tokenRequired: false,
         });
@@ -103,8 +101,6 @@ export class AuthForm {
         if (image.file) {
             formData.append('image', image.file);
         }
-        console.log('request sent to the server');
-        console.log(this.model());
         const resp = await this.backend.sendRequest<SigninResponse>(
             '/auth/signup',
             'post',
