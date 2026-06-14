@@ -1,0 +1,58 @@
+@if (backend.httpData().error?.message) {
+    <app-http-error
+        [error]="backend.httpData().error"
+        (closed)="backend.clear()"
+    />
+} @else if (backend.httpData().loading) {
+    <app-loading-spinner [asOverlay]="true" />
+}
+<form class="place-update" [formRoot]="placeForm" (submit)="onSubmit($event)">
+    <app-input
+        [field]="placeForm.title"
+        id="title"
+        element="input"
+        type="text"
+        label="Title"
+        errorText="Please enter a valid Title"
+    />
+    <app-input
+        [field]="placeForm.address"
+        id="address"
+        element="input"
+        type="text"
+        label="Address"
+        errorText="Please enter a valid address"
+    />
+    <app-input
+        [field]="placeForm.description"
+        id="description"
+        element="textarea"
+        label="Description"
+        errorText="Please enter a valid Description"
+    />
+    <app-input
+        [field]="placeForm.lat"
+        customClass="basis-full sm:basis-1/2 sm:pr-2"
+        id="latitude"
+        element="input"
+        type="number"
+        step="any"
+        label="Latitude"
+        errorText="Please enter a valid Latitude"
+    />
+    <app-input
+        [field]="placeForm.lng"
+        customClass="basis-full sm:basis-1/2 sm:pl-2"
+        id="longitude"
+        element="input"
+        type="number"
+        step="any"
+        label="Longitude"
+        errorText="Please enter a valid Longitude"
+    />
+    <div class="buttons">
+        <app-button [disabled]="placeForm().invalid()" type="submit" color="secondary">
+            Edit Place
+        </app-button>
+    </div>
+</form>
