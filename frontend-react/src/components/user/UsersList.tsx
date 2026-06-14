@@ -1,8 +1,7 @@
-import "./UsersList.css";
-
 import type { User } from "@/types";
 
 import UserItem from "./UserItem";
+import styles from "./UsersList.module.css";
 
 interface UserListProps {
     items: User[];
@@ -11,7 +10,7 @@ interface UserListProps {
 const UsersList: React.FC<UserListProps> = ({ items }) => {
     if (items.length === 0) {
         return (
-            <div className="no-users">
+            <div className={styles["no-users"]}>
                 <div className="card">
                     <h2>No Users found!</h2>
                 </div>
@@ -19,7 +18,7 @@ const UsersList: React.FC<UserListProps> = ({ items }) => {
         );
     }
     return (
-        <ul className="users-list">
+        <ul className={styles["users-list"]}>
             {items.map((item: User) => {
                 return <UserItem key={item.id} user={item} />;
             })}
