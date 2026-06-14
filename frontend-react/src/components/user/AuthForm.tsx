@@ -98,7 +98,7 @@ const AuthForm: React.FC = () => {
     };
 
     return (
-        <div className="center">
+        <div>
             {data.error?.message && (
                 <HttpError
                     header="Credentials not valid!"

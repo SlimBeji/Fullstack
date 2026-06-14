@@ -88,7 +88,7 @@ const onSwitchModeHandler = () => {
 };
 </script>
 
-<div class="center">
+<div>
     {#if $httpData.error?.message}
         <HttpError
             onClose={clear}

@@ -1,5 +1,5 @@
 <template>
-    <div class="center">
+    <div>
         <HttpError
             v-if="httpData.error?.message"
             @close="clear"
