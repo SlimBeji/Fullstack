@@ -23,7 +23,6 @@ interface PlaceUpdateFormModel {
     styleUrl: './place-update-form.css',
     imports: [Button, Input, LoadingSpinner, HttpError, FormRoot],
     providers: [BackendService],
-    host: { class: 'contents' },
 })
 export class PlaceUpdateForm implements OnInit {
     // Init

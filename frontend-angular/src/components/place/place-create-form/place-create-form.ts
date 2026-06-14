@@ -23,7 +23,6 @@ interface PlaceCreateFormModel {
     styleUrl: './place-create-form.css',
     imports: [Button, Input, ImageUpload, LoadingSpinner, HttpError, FormRoot],
     providers: [BackendService],
-    host: { class: 'contents' },
 })
 export class PlaceCreateForm {
     // Init

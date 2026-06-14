@@ -11,7 +11,6 @@ import { PlaceItem } from '../place-item/place-item';
     templateUrl: './places-list.html',
     styleUrl: './places-list.css',
     imports: [Button, PlaceItem],
-    host: { class: 'contents' },
 })
 export class PlacesList {
     protected readonly AppRoute = AppRoute;
