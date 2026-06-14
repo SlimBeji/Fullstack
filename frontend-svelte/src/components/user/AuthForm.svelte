@@ -180,7 +180,7 @@ const onSwitchModeHandler = () => {
 }
 
 .auth-form .buttons {
-    @apply flex justify-center space-x-4;
+    @apply flex justify-center gap-4;
 }
 
 .auth-form .buttons :global(.auth-button) {

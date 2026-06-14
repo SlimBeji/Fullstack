@@ -63,7 +63,7 @@ const submitHanlder = (e: Event) => {
 }
 
 .modal-container form > footer {
-    @apply flex justify-end space-x-2 p-4;
+    @apply flex justify-end p-4 gap-2;
 }
 
 .modal-transition-enter-active,

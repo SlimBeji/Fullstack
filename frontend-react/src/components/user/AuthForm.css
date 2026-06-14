@@ -12,9 +12,9 @@
 }
 
 .auth-form .buttons {
-    @apply flex justify-center space-x-4;
+    @apply flex justify-center gap-4;
 }
 
-.auth-form .button {
+.auth-form button {
     @apply min-w-40;
 }
