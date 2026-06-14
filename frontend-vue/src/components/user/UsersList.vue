@@ -9,7 +9,7 @@
     </ul>
 </template>
 
-<script setup lang="ts">
+<script scoped setup lang="ts">
 import { computed } from "vue";
 
 import type { User } from "@/types";

@@ -42,7 +42,7 @@ const placeNumber = computed(() => {
 });
 </script>
 
-<style lang="css">
+<style scoped lang="css">
 @reference "@/main.css";
 
 .user-item {
