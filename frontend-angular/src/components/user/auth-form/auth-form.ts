@@ -20,6 +20,7 @@ interface AuthFormModel {
     templateUrl: './auth-form.html',
     styleUrl: './auth-form.css',
     imports: [Button, Input, ImageUpload, LoadingSpinner, HttpError, FormRoot],
+    providers: [BackendService],
 })
 export class AuthForm {
     // Init

@@ -37,7 +37,7 @@ const getClient = (contentType: HeaderContent, token: string): AxiosInstance => 
     });
 };
 
-@Service()
+@Service({ autoProvided: false })
 export class BackendService {
     private abortController: AbortController | null = null;
 

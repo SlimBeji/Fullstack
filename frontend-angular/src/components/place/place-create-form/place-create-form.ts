@@ -22,8 +22,8 @@ interface PlaceCreateFormModel {
     templateUrl: './place-create-form.html',
     styleUrl: './place-create-form.css',
     imports: [Button, Input, ImageUpload, LoadingSpinner, HttpError, FormRoot],
+    providers: [BackendService],
     host: { class: 'contents' },
-    //encapsulation: ViewEncapsulation.None,
 })
 export class PlaceCreateForm {
     // Init

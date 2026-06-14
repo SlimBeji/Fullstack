@@ -10,6 +10,7 @@ import type { User } from '@/types';
     selector: 'app-users',
     templateUrl: './users.html',
     imports: [HttpError, LoadingSpinner, UsersList],
+    providers: [BackendService],
 })
 export class Users implements OnInit {
     // Init

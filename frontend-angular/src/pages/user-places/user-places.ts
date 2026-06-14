@@ -13,6 +13,7 @@ import type { Place } from '@/types';
     selector: 'app-user-places',
     templateUrl: './user-places.html',
     imports: [PlacesList, HttpError, LoadingSpinner],
+    providers: [BackendService],
 })
 export class UserPlaces {
     // Init

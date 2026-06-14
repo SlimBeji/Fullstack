@@ -14,6 +14,7 @@ const placeholder = '/place_placeholder.jpg';
     templateUrl: './place-item.html',
     styleUrl: './place-item.css',
     imports: [Button, HttpError, LoadingSpinner, Map, Modal],
+    providers: [BackendService],
 })
 export class PlaceItem {
     // Init
