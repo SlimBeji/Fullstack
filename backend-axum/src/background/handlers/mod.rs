@@ -41,4 +41,8 @@ pub fn create_worker(state: SharedState) -> Monitor {
             3
         ))
         .register(redis_worker!(state, AI_QUEUE, AIJob, handle_ai_tasks, 5))
+        .should_restart(|_, err, attempt| {
+            tracing::warn!(?err, attempt, "worker crashed, restarting");
+            attempt <= 5
+        })
 }
