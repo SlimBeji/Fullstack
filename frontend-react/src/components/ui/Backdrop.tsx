@@ -1,6 +1,6 @@
-import "./Backdrop.css";
-
 import { createPortal } from "react-dom";
+
+import styles from "./Backdrop.module.css";
 
 interface BackdropProps {
     onClick: () => void;
@@ -8,7 +8,7 @@ interface BackdropProps {
 
 const Backdrop: React.FC<BackdropProps> = ({ onClick }) => {
     return createPortal(
-        <div className="modal-backdrop" onClick={onClick}></div>,
+        <div className={styles["modal-backdrop"]} onClick={onClick}></div>,
         document.getElementById("backdrop-hook")!
     );
 };
