@@ -1,5 +1,3 @@
-import "./MainNavigation.css";
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -7,6 +5,7 @@ import { AppRoute } from "@/router";
 
 import { useAppSelector } from "../../store";
 import Backdrop from "../ui/Backdrop";
+import styles from "./MainNavigation.module.css";
 import NavLinks from "./NavLinks";
 import SideDrawer from "./SideDrawer";
 
@@ -28,24 +27,27 @@ const MainNavigation: React.FC = () => {
         <>
             {drawerIsOpen && <Backdrop onClick={closeDrwaer} />}
             <SideDrawer show={drawerIsOpen} onClick={closeDrwaer}>
-                <nav className="sidedrawer">
+                <nav className={styles["sidedrawer"]}>
                     <NavLinks />
                 </nav>
             </SideDrawer>
-            <header className="main-header">
+            <header className={styles["main-header"]}>
                 <div>
                     {isLoggedIn && (
-                        <button className="hamburger" onClick={openDrawer}>
+                        <button
+                            className={styles["hamburger"]}
+                            onClick={openDrawer}
+                        >
                             <span />
                             <span />
                             <span />
                         </button>
                     )}
-                    <h1 className="app-header">
+                    <h1 className={styles["app-header"]}>
                         <Link to={AppRoute.HOME}>Your Places</Link>
                     </h1>
                     {isLoggedIn && (
-                        <nav className="main">
+                        <nav className={styles["main"]}>
                             <NavLinks />
                         </nav>
                     )}
