@@ -1,11 +1,12 @@
 import "leaflet/dist/leaflet.css";
-import "./Map.css";
 
 import type { Map as MapObject } from "leaflet";
 import { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
 import type { Location } from "@/types";
+
+import styles from "./Map.module.css";
 
 interface MapProps {
     position: Location;
@@ -23,7 +24,7 @@ const Map: React.FC<MapProps> = ({ position, zoom, markerText }) => {
     }, [map]);
 
     return (
-        <div className="map-container">
+        <div className={styles["map-container"]}>
             <MapContainer
                 center={position}
                 zoom={zoom}
