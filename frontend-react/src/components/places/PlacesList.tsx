@@ -1,10 +1,9 @@
-import "./PlacesList.css";
-
 import { AppRoute } from "@/router";
 import type { Place } from "@/types";
 
 import { Button } from "../form";
 import PlaceItem from "./PlaceItem";
+import styles from "./PlacesList.module.css";
 
 interface PlaceListProps {
     sameAuthenticatedUser: boolean;
@@ -19,7 +18,7 @@ const PlaceList: React.FC<PlaceListProps> = ({
 }) => {
     if (items.length > 0) {
         return (
-            <ul className="places-list">
+            <ul className={styles["places-list"]}>
                 {items.map((p: Place) => {
                     return (
                         <PlaceItem key={p.id} place={p} onDelete={onDelete} />
@@ -31,7 +30,7 @@ const PlaceList: React.FC<PlaceListProps> = ({
 
     if (sameAuthenticatedUser) {
         return (
-            <div className="no-places">
+            <div className={styles["no-places"]}>
                 <div className="card">
                     <h2>No places found. Maybe create one?</h2>
                     <Button color="secondary" to={AppRoute.NEW_PLACE}>
@@ -43,7 +42,7 @@ const PlaceList: React.FC<PlaceListProps> = ({
     }
 
     return (
-        <div className="no-places">
+        <div className={styles["no-places"]}>
             <div className="card">
                 <h2>This user has not created places yet</h2>
             </div>
