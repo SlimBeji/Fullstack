@@ -1,5 +1,4 @@
-import "./PlaceItem.css";
-
+import clsx from "clsx";
 import { useState } from "react";
 
 import { Button } from "@/components/form";
@@ -8,6 +7,8 @@ import { useBackend } from "@/hooks";
 import { updatePlaceRoute } from "@/router";
 import { useAppSelector } from "@/store";
 import type { Place } from "@/types";
+
+import styles from "./PlaceItem.module.css";
 
 const placeholder = "/public/place_placeholder.jpg";
 
@@ -58,11 +59,7 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
             {data.error?.message && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
-            {data.loading && (
-                <div className="center">
-                    <LoadingSpinner asOverlay />
-                </div>
-            )}
+            {data.loading && <LoadingSpinner asOverlay />}
             <Modal
                 show={showMap}
                 onCancel={closeMapHanlder}
@@ -85,25 +82,25 @@ const PlaceItem: React.FC<PlaceItemProps> = ({ place, onDelete }) => {
                 header="Are you sure?"
                 footer={deleteModalFooter}
             >
-                <p className="delete-text-messaage">
+                <p className={styles["delete-text-messaage"]}>
                     Do you want to proceed and delete this place?
                 </p>
             </Modal>
 
-            <li className="place-item">
-                <div className="card place-item-card">
-                    <div className="image-container">
+            <li className={styles["place-item"]}>
+                <div className={clsx(["card", styles["place-item-card"]])}>
+                    <div className={styles["image-container"]}>
                         <img
                             src={place.image_url || placeholder}
                             alt={place.title}
                         />
                     </div>
-                    <div className="place-info">
+                    <div className={styles["place-info"]}>
                         <h2>{place.title}</h2>
                         <h2>{place.address}</h2>
                         <p>{place.description}</p>
                     </div>
-                    <div className="place-actions">
+                    <div className={styles["place-actions"]}>
                         <Button
                             color="secondary"
                             inverse
