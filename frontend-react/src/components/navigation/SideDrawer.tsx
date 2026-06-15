@@ -1,9 +1,9 @@
-import "./SideDrawer.css";
-
 import { Transition } from "@headlessui/react";
 import type { ReactNode } from "react";
 import { useRef } from "react";
 import { createPortal } from "react-dom";
+
+import styles from "./SideDrawer.module.css";
 
 interface SideDrawerProps {
     show: boolean;
@@ -16,17 +16,17 @@ const SideDrawer: React.FC<SideDrawerProps> = ({ show, children, onClick }) => {
     const content = (
         <Transition
             show={show}
-            enter="sidedrawer effect"
-            enterFrom="sidedrawer a"
-            enterTo="sidedrawer b"
-            leave="sidedrawer effect"
-            leaveFrom="sidedrawer b"
-            leaveTo="sidedrawer a"
+            enter={styles["sidedrawer effect"]}
+            enterFrom={styles["sidedrawer a"]}
+            enterTo={styles["sidedrawer b"]}
+            leave={styles["sidedrawer effect"]}
+            leaveFrom={styles["sidedrawer b"]}
+            leaveTo={styles["sidedrawer a"]}
             as="div"
             ref={nodeRef}
         >
             <div ref={nodeRef}>
-                <aside className="sidedrawer" onClick={onClick}>
+                <aside className={styles["sidedrawer"]} onClick={onClick}>
                     {children}
                 </aside>
             </div>
