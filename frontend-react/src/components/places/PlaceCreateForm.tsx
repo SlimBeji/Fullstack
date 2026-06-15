@@ -1,5 +1,3 @@
-import "./PlaceCreateForm.css";
-
 import { useNavigate } from "react-router-dom";
 
 import type { FormConfig } from "@/hooks";
@@ -10,6 +8,7 @@ import { minLengthValidator, numericValidator } from "@/utils";
 
 import { Button, ImageUpload, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
+import styles from "./PlaceCreateForm.module.css";
 
 const CreatePlaceFormConfig: FormConfig = {
     title: { validators: [minLengthValidator(10)] },
@@ -53,7 +52,7 @@ const NewPlace: React.FC = () => {
             {data.error?.message && (
                 <HttpError error={data.error} onClear={clearError} />
             )}
-            <form className="place-create" onSubmit={onSubmit}>
+            <form className={styles["place-create"]} onSubmit={onSubmit}>
                 {data.loading && <LoadingSpinner asOverlay />}
                 <Input
                     onInput={inputHandlers.title}
@@ -115,7 +114,7 @@ const NewPlace: React.FC = () => {
                     id="image"
                     color="secondary"
                 />
-                <div className="buttons">
+                <div className={styles["buttons"]}>
                     <Button
                         type="submit"
                         color="secondary"
