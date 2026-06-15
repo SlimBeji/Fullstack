@@ -1,4 +1,4 @@
-import "./Avatar.css";
+import styles from "./Avatar.module.css";
 
 interface AvatarProps {
     imageUrl: string;
@@ -7,7 +7,7 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = (props) => {
     return (
-        <div className="avatar-container">
+        <div className={styles["avatar-container"]}>
             <img src={props.imageUrl} alt={props.alt} />
         </div>
     );
