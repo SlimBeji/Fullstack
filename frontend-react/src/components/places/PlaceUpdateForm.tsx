@@ -1,5 +1,3 @@
-import "./PlaceUpdateForm.css";
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +9,7 @@ import { minLengthValidator, numericValidator } from "@/utils";
 
 import { Button, Input } from "../form";
 import { HttpError, LoadingSpinner } from "../ui";
+import styles from "./PlaceUpdateForm.module.css";
 
 const UpdatePlaceFormConfig: FormConfig = {
     title: { validators: [minLengthValidator(10)] },
@@ -73,7 +72,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
     }
 
     return (
-        <form className="place-update" onSubmit={submitHandler}>
+        <form className={styles["place-update"]} onSubmit={submitHandler}>
             <Input
                 onInput={inputHandlers.title}
                 value={state.fields.title.value}
@@ -127,7 +126,7 @@ const PlaceUpdateForm: React.FC<PlaceUpdateFormProps> = ({ placeId }) => {
                 label="Longitude"
                 errorText="Please enter a valid Longitude"
             />
-            <div className="buttons">
+            <div className={styles["buttons"]}>
                 <Button type="submit" color="secondary" disabled={!state.valid}>
                     Edit Place
                 </Button>
