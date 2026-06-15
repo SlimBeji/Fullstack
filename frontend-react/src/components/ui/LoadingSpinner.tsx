@@ -1,7 +1,7 @@
-import "./LoadingSpinner.css";
-
 import clsx from "clsx";
 import React from "react";
+
+import styles from "./LoadingSpinner.module.css";
 
 interface LoadingSpinner {
     asOverlay?: boolean;
@@ -9,7 +9,12 @@ interface LoadingSpinner {
 
 const LoadingSpinner: React.FC<LoadingSpinner> = ({ asOverlay }) => {
     return (
-        <div className={clsx(["spinner-container", { overlay: asOverlay }])}>
+        <div
+            className={clsx([
+                styles["spinner-container"],
+                { [styles["overlay"]]: asOverlay },
+            ])}
+        >
             <div></div>
         </div>
     );
